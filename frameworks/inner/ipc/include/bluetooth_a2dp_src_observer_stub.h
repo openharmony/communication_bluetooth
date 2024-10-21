@@ -42,6 +42,8 @@ private:
         BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply);
     static ErrCode OnVirtualDeviceChangedInner(
         BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply);
+    static int32_t OnCaptureConnectionStateChangedInner(
+        BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply);
     using BluetoothA2dpSrcObserverFunc =
         int32_t (*)(BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothA2dpSrcObserverFunc> memberFuncMap_;

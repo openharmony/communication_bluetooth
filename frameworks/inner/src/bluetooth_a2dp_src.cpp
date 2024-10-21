@@ -70,6 +70,19 @@ public:
         });
     }
 
+    void OnCaptureConnectionStateChanged(const RawAddress &device, int state, const BluetoothA2dpCodecInfo &info) override
+    {
+        HILOGD("hdap conn state, device: %{public}s, state: %{public}s", GET_ENCRYPT_RAW_ADDR(device), state);
+        a2dpSource_.observers_.ForEach([device, state, info](std::shared_ptr<A2dpSourceObserver> observer) {
+            A2dpCodecInfo codecInfo{};
+            codecInfo.bitsPerSample = info.bitsPerSample;
+            codecInfo.channelMode = info.channelMode;
+            codecInfo.codecType = info.codecType;
+            codecInfo.sampleRate = info.sampleRate;
+            observer->OnCaptureConnectionStateChanged(BluetoothRemoteDevice(device.GetAddress(), 0), state, codecInfo);
+        });
+    }
+
     void OnPlayingStatusChanged(const RawAddress &device, int playingState, int error) override
     {
         HILOGI("device: %{public}s, playingState: %{public}d, error: %{public}d",

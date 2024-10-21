@@ -48,6 +48,7 @@ enum BluetoothA2dpSourceObserverInterfaceCode {
     BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED,
     BT_A2DP_SRC_OBSERVER_MEDIASTACK_CHANGED,
     BT_A2DP_SRC_OBSERVER_VIRTUALDEVICE_CHANGED,
+    BT_A2DP_SRC_OBSERVER_CAPTURE_CONNECTION_STATE_CHANGED,
     // The last code, if you want to add a new code, please add it before this
     BT_A2DP_SRC_OBSERVER_BUTT
 };

@@ -34,6 +34,7 @@ public:
         BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED,
         BT_A2DP_SRC_OBSERVER_MEDIASTACK_CHANGED,
         BT_A2DP_SRC_OBSERVER_VIRTUALDEVICE_CHANGED,
+        BT_A2DP_SRC_OBSERVER_CAPTURE_CONNECTION_STATE_CHANGED,
     };
 
     virtual void OnConnectionStateChanged(const RawAddress &device, int state, int cause) = 0;
@@ -41,6 +42,7 @@ public:
     virtual void OnConfigurationChanged(const RawAddress &device, const BluetoothA2dpCodecInfo &info, int error) = 0;
     virtual void OnMediaStackChanged(const RawAddress &device, int action) = 0;
     virtual void OnVirtualDeviceChanged(int32_t action, std::string address) {};
+    virtual void OnCaptureConnectionStateChanged(const RawAddress &device, int state, const BluetoothA2dpCodecInfo &info) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
