@@ -107,7 +107,7 @@ public:
      * @param info the device's codec information.
      * @since 12
      */
-    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, const A2dpCodecInfo &info)
+    virtual void OnCaptureConnectionStateChanged(const BluetoothRemoteDevice &device, int state, const A2dpCodecInfo &info)
     {}
 };
 
