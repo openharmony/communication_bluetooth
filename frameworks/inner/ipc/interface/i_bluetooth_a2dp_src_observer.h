@@ -42,7 +42,8 @@ public:
     virtual void OnConfigurationChanged(const RawAddress &device, const BluetoothA2dpCodecInfo &info, int error) = 0;
     virtual void OnMediaStackChanged(const RawAddress &device, int action) = 0;
     virtual void OnVirtualDeviceChanged(int32_t action, std::string address) {};
-    virtual void OnCaptureConnectionStateChanged(const RawAddress &device, int state, const BluetoothA2dpCodecInfo &info) = 0;
+    virtual void OnCaptureConnectionStateChanged(const RawAddress &device, int state,
+        const BluetoothA2dpCodecInfo &info) {};
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
