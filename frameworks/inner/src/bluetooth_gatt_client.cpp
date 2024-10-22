@@ -16,7 +16,7 @@
 #include <condition_variable>
 #include <memory>
 #include <set>
-
+#include <thread>
 #include "bluetooth_def.h"
 #include "bluetooth_gatt_client.h"
 #include "bluetooth_gatt_client_proxy.h"
@@ -893,7 +893,12 @@ int GattClient::SetNotifyCharacteristicInner(GattCharacteristic &characteristic,
     auto descriptor = characteristic.GetDescriptor(UUID::FromString("00002902-0000-1000-8000-00805F9B34FB"));
     if (descriptor == nullptr) {
         HILOGE("descriptor not exist.");
-        return ret;
+        // some devices don't have this descriptor, call back to application
+        std::thread([this, characteristic]() {
+            std::lock_guard<std::mutex> lock(pimpl->requestInformation_.mutex_);
+            WPTR_GATT_CBACK(pimpl->callback_, OnSetNotifyCharacteristic, characteristic, 0);
+        }).detach();
+        return BT_NO_ERROR;
     }
     BluetoothGattDescriptor desc(bluetooth::Descriptor(
         descriptor->GetHandle(), descriptorValue.data(), descriptorValue.size()));
