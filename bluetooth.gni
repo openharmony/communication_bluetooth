@@ -12,4 +12,10 @@
 # limitations under the License.
 
 declare_args() {
+  bluetooth_service_resourceschedule = true
+
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.resourceschedule_resource_schedule_service)) {
+    bluetooth_service_resourceschedule = false
+  }
 }
