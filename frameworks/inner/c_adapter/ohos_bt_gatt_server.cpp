@@ -279,6 +279,10 @@ public:
         CHECK_AND_RETURN_LOG(
             0 <= serverId_ && serverId_ < MAXIMUM_NUMBER_APPLICATION, "serverId(%{public}d) is invalid", serverId_);
         CHECK_AND_RETURN_LOG(g_GattsCallback && g_GattsCallback->serviceStartCb, "callback is nullptr");
+        if (ret != GattStatus::GATT_SUCCESS) {
+            g_GattsCallback->serviceStartCb(OHOS_BT_STATUS_FAIL, serverId_, MAXIMUM_NUMBER_GATTSERVICE);
+            return;
+        }
 
         {
             std::lock_guard<std::mutex> lock(g_gattServersMutex);
@@ -313,12 +317,10 @@ public:
             vector<GattDescriptor> &descriptors = item->GetDescriptors();
             for (auto des = descriptors.begin(); des != descriptors.end(); des++) {
                 auto descAttribute = GetDescriptorAttribute(serverId_, i, item->GetUuid(), des->GetUuid());
-                if (descAttribute == nullptr) {
-                    HILOGE("not found descriptorAttribute");
-                    continue;
+                if (descAttribute != nullptr) {
+                    descAttribute->actualHandle = des->GetHandle();
+                    HILOGI("descAttribute(%{public}s)", descAttribute->ToLogString().c_str());
                 }
-                descAttribute->actualHandle = des->GetHandle();
-                HILOGI("descAttribute(%{public}s)", descAttribute->ToLogString().c_str());
             }
         }
 
