@@ -52,10 +52,10 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
         HILOGE("socket send time %{public}" PRId64, endTimestamp - beginTimestamp);
     }
 
-    HILOGD("ret: %{public}d", ret);
+    HILOGD("ret: %{public}zd", ret);
 
     if (ret <= 0) {
-        HILOGE("socket write exception! ret:%{public}d errno:%{public}d", ret, errno);
+        HILOGE("socket write exception! ret:%{public}zd errno:%{public}d", ret, errno);
     }
     return ret;
 }
