@@ -38,8 +38,8 @@ ssize_t InputStream::Read(uint8_t *buf, size_t length)
 
     HILOGD("ret:%{public}zd", ret);
 
-    if (ret < 0) {
-        HILOGE("socket exception! errno:%{public}d", errno);
+    if (ret <= 0) {
+        HILOGE("socket read exception! ret:%{public}d errno:%{public}d", ret, errno);
     }
     return ret;
 }
