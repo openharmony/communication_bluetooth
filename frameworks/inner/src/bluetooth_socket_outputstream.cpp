@@ -54,9 +54,8 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
 
     HILOGD("ret: %{public}zu", ret);
 
-    if (ret == -1) {
-        HILOGE("Error.");
-        return -1;
+    if (ret <= 0) {
+        HILOGE("socket write exception! ret:%{public}d errno:%{public}d", ret, errno);
     }
     return ret;
 }
