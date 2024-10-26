@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_ipc_pan_proxy"
+#endif
+
 #include "bluetooth_errorcode.h"
 #include "bluetooth_pan_proxy.h"
 #include "bluetooth_log.h"

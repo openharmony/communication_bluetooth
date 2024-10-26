@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_napi_map_mse"
+#endif
+
 #include "bluetooth_errorcode.h"
 #include "bluetooth_map_mse.h"
 #include "bluetooth_utils.h"

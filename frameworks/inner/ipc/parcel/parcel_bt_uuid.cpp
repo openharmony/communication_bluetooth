@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_ipc_parcel_uuid"
+#endif
 
 #include "parcel_bt_uuid.h"
 #include "bluetooth_log.h"

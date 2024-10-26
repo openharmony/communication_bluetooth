@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_napi_profile"
+#endif
+
 #include "napi_bluetooth_profile.h"
 #include "napi_bluetooth_utils.h"
 #include "hitrace_meter.h"

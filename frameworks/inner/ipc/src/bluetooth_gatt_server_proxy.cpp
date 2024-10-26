@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_ipc_gatt_server_proxy"
+#endif
 
 #include "bluetooth_gatt_server_proxy.h"
 #include "bluetooth_log.h"

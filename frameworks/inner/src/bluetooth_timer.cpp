@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_fwk_timer"
+#endif
+
 #include "bluetooth_timer.h"
 #include "common_timer_errors.h"
 #include "bluetooth_log.h"
