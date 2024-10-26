@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_napi_module_connection"
+#endif
 
 #include "bluetooth_log.h"
 #include "napi_bluetooth_connection.h"

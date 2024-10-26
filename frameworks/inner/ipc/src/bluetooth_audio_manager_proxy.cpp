@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_ipc_audio_manager_proxy"
+#endif
 
 #include "bluetooth_audio_manager_proxy.h"
 #include "bluetooth_errorcode.h"
