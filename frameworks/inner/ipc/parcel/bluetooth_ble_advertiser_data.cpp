@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_ipc_parcel_ble_advertiser"
+#endif
 
 #include "bluetooth_ble_advertiser_data.h"
 #include "bluetooth_log.h"

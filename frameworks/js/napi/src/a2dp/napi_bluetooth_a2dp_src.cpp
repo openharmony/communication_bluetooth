@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_napi_a2dp_src"
+#endif
+
 #include "bluetooth_a2dp_src.h"
 #include "bluetooth_avrcp_tg.h"
 #include "bluetooth_errorcode.h"

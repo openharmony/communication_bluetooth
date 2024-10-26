@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_ipc_a2dp_src_observer_proxy"
+#endif
 
 #include "bluetooth_a2dp_src_proxy.h"
 #include "bluetooth_log.h"

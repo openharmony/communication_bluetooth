@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_fwk_hfp_hf"
+#endif
 
 #include "bluetooth_hfp_hf.h"
 #include "bluetooth_host.h"
@@ -327,7 +330,7 @@ struct HandsFreeUnit::impl {
 
     bool SendKeyPressed(const BluetoothRemoteDevice &device)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE_NAME__, __FUNCTION__);
+        HILOGD("%{public}s(): Enter!", __FUNCTION__);
         sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
         if (proxy != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy->SendKeyPressed(BluetoothRawAddress(device.GetDeviceAddr()));
@@ -377,7 +380,7 @@ struct HandsFreeUnit::impl {
 
     bool SendVoiceTag(const BluetoothRemoteDevice &device, int index)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter! index = %{public}d", __FILE_NAME__, __FUNCTION__, index);
+        HILOGD("%{public}s(): Enter! index = %{public}d", __FUNCTION__, index);
         sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
         if (proxy != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy->SendVoiceTag(BluetoothRawAddress(device.GetDeviceAddr()), index);
