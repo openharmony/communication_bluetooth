@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_napi_gatt_client"
+#endif
+
 #include "napi_bluetooth_gatt_client.h"
 #include <unistd.h>
 #include "bluetooth_errorcode.h"
