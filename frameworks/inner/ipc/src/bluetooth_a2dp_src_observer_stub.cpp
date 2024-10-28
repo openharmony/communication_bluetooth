@@ -39,6 +39,9 @@ BluetoothA2dpSrcObserverStub::BluetoothA2dpSrcObserverStub()
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_VIRTUALDEVICE_CHANGED)] =
         BluetoothA2dpSrcObserverStub::OnVirtualDeviceChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothA2dpSourceObserverInterfaceCode::BT_A2DP_SRC_OBSERVER_CAPTURE_CONNECTION_STATE_CHANGED)] =
+        BluetoothA2dpSrcObserverStub::OnCaptureConnectionStateChangedInner;
 }
 
 BluetoothA2dpSrcObserverStub::~BluetoothA2dpSrcObserverStub()
@@ -122,6 +125,19 @@ ErrCode BluetoothA2dpSrcObserverStub::OnVirtualDeviceChangedInner(
     stub->OnVirtualDeviceChanged(action, addr);
 
     return BT_NO_ERROR;
+}
+
+int32_t BluetoothA2dpSrcObserverStub::OnCaptureConnectionStateChangedInner(
+    BluetoothA2dpSrcObserverStub *stub, MessageParcel &data, MessageParcel &reply)
+{
+    std::string addr = data.ReadString();
+    int state = data.ReadInt32();
+    std::shared_ptr<BluetoothA2dpCodecInfo> info(data.ReadParcelable<BluetoothA2dpCodecInfo>());
+    if (!info) {
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    stub->OnCaptureConnectionStateChanged(RawAddress(addr), state, *info);
+    return NO_ERROR;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
