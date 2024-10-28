@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_c_adapter_gatt_utils"
+#endif
 
 #include "ohos_bt_gatt_utils.h"
 #include "bluetooth_log.h"
