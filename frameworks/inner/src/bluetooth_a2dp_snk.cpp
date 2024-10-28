@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_fwk_a2dp_snk"
+#endif
+
 #include "bluetooth_a2dp_snk.h"
 #include <cstdint>
 #include "bluetooth_a2dp_sink_observer_stub.h"
