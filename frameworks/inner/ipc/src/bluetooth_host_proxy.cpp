@@ -101,26 +101,7 @@ int32_t BluetoothHostProxy::DisableBt()
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::RestrictBluetooth()
-{
-    HILOGI("BluetoothHostProxy::RestrictBluetooth starts");
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::RestrictBluetooth WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-
-    MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::RESTRICT_BLUETOOTH, option, data, reply);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothHostProxy::RestrictBluetooth done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    return reply.ReadInt32();
-}
-
-int32_t BluetoothHostProxy::SatelliteControl(int state)
+int32_t BluetoothHostProxy::SatelliteControl(int type, int state)
 {
     HILOGI("BluetoothHostProxy::SatelliteControl starts");
     MessageParcel data;
@@ -128,6 +109,7 @@ int32_t BluetoothHostProxy::SatelliteControl(int state)
         HILOGI("BluetoothHostProxy::SatelliteControl WriteInterfaceToken error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(type), BT_ERR_IPC_TRANS_FAILED, "Write type error");
     CHECK_AND_RETURN_LOG_RET(data.WriteInt32(state), BT_ERR_IPC_TRANS_FAILED, "Write state error");
 
     MessageParcel reply;
@@ -1607,27 +1589,6 @@ int32_t BluetoothHostProxy::SyncRandomAddress(const std::string &realAddr, const
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::CountEnableTimes(bool isEnable)
-{
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::CountEnableTimes WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    if (!data.WriteBool(isEnable)) {
-        HILOGE("BluetoothHostProxy::CountEnableTimes WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_COUNT_ENABLE_TIMES, option, data, reply);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothHostProxy::CountEnableTimes done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    return reply.ReadInt32();
-}
-
 int32_t BluetoothHostProxy::ConnectAllowedProfiles(const std::string &remoteAddr)
 {
     MessageParcel data;
@@ -1794,6 +1755,19 @@ void BluetoothHostProxy::DeregisterBtResourceManagerObserver(const sptr<IBluetoo
         return;
     }
     return;
+}
+
+int32_t BluetoothHostProxy::EnableBluetoothToRestrictMode(void)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), BT_ERR_IPC_TRANS_FAILED,
+        "WriteInterfaceToken error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::BT_ENABLE_BLUETOOTH_TO_RESTRICT_MODE, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    return reply.ReadInt32();
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
