@@ -355,6 +355,8 @@ public:
      *         BTStateID::STATE_TURNING_OFF;
      *         BTStateID::STATE_TURN_OFF.
      * @since 6
+     * @deprecated since 14
+     * @useinstead BluetoothHost#GetBluetoothState
      */
     int GetBtState() const;
 
@@ -367,8 +369,25 @@ public:
      *         BTStateID::STATE_TURNING_OFF;
      *         BTStateID::STATE_TURN_OFF.
      * @since 6
+     * @deprecated since 14
+     * @useinstead BluetoothHost#GetBluetoothState
      */
     int GetBtState(int &state) const;
+
+    /**
+     * @brief Get the current state of the local Bluetooth adapter.
+     *
+     * @return current state of Bluetooth adapter.
+     *         BluetoothState::STATE_TURN_OFF.
+     *         BluetoothState::STATE_TURNING_ON;
+     *         BluetoothState::STATE_TURN_ON;
+     *         BluetoothState::STATE_TURNING_OFF;
+     *         BluetoothState::STATE_BLE_TURNING_ON;
+     *         BluetoothState::STATE_BLE_ON;
+     *         BluetoothState::STATE_BLE_TURNING_OFF;
+     * @since 14
+     */
+    BluetoothState GetBluetoothState(void) const;
 
     /**
      * @brief Disable ble.
