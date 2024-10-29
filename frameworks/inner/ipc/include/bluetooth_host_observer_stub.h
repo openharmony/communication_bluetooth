@@ -49,6 +49,8 @@ private:
         MessageParcel &data, MessageParcel &reply);
     static int32_t OnDeviceAddrChangedInner(BluetoothHostObserverStub *stub,
         MessageParcel &data, MessageParcel &reply);
+    static int32_t OnBluetoothStateChangedInner(BluetoothHostObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
 
     using BluetoothObserverHostFunc = int32_t (*)(BluetoothHostObserverStub *stub,
         MessageParcel &data, MessageParcel &reply);

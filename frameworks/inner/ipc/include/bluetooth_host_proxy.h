@@ -35,8 +35,7 @@ public:
     void DeregisterObserver(const sptr<IBluetoothHostObserver> &observer) override;
     int32_t EnableBt() override;
     int32_t DisableBt() override;
-    int32_t RestrictBluetooth() override;
-    int32_t SatelliteControl(int state) override;
+    int32_t SatelliteControl(int type, int state) override;
     sptr<IRemoteObject> GetProfile(const std::string &name) override;
     sptr<IRemoteObject> GetBleRemote(const std::string &name) override;
     int32_t BluetoothFactoryReset() override;
@@ -101,7 +100,6 @@ public:
     int32_t SetFastScan(bool isEnable) override;
     int32_t GetRandomAddress(const std::string &realAddr, std::string &randomAddr) override;
     int32_t SyncRandomAddress(const std::string &realAddr, const std::string &randomAddr) override;
-    int32_t CountEnableTimes(bool enable) override;
     int32_t ConnectAllowedProfiles(const std::string &remoteAddr) override;
     int32_t DisconnectAllowedProfiles(const std::string &remoteAddr) override;
     int32_t SetDeviceCustomType(const std::string &address, int32_t deviceType) override;
@@ -113,6 +111,7 @@ public:
     int32_t SetFastScanLevel(int level) override;
     void RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) override;
     void DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) override;
+    int32_t EnableBluetoothToRestrictMode(void) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;

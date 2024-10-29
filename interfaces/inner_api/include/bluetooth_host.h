@@ -389,6 +389,15 @@ public:
     int EnableBle();
 
     /**
+     * @brief Enable bluetooth to restrict mode.
+     *
+     * @return Returns BT_NO_ERROR if the operation is accepted;
+     *         returns others if the operation is rejected.
+     * @since 12
+     */
+    int EnableBluetoothToRestrictMode(void);
+
+    /**
      * @brief Get br/edr enable/disable state.
      *
      * @return Returns <b>true</b> if br is enabled;
@@ -760,12 +769,13 @@ public:
     /**
     * @brief Restrict Bluetooth BR/EDR ability, just BLE ability available.
     *
+    * @param type satellite control type.
     * @param state satellite state.
     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
     *         returns an error code defined in {@link BtErrCode} otherwise.
     * @since 12
     */
-    int SatelliteControl(int state);
+    int SatelliteControl(int type, int state);
 
     /**
      * @brief Set local adapter scan level.
@@ -807,8 +817,6 @@ private:
      * @since 6
      */
     ~BluetoothHost();
-
-    int CountEnableTimes(bool enable);
 
     /**
     * @brief Check whether bluetooth is prohibited by EDM.

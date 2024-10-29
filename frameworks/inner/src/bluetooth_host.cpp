@@ -31,6 +31,8 @@
 #include "iservice_registry.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
+#include "bluetooth_switch_module.h"
+#include "ffrt_inner.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -81,6 +83,10 @@ struct BluetoothHost::impl {
     int32_t profileRegisterId = 0;
     std::atomic_bool isFactoryReseting_ { false };
 
+    class BluetoothSwitchAction;
+    std::mutex switchModuleMutex_ {};  // used for serial execute enableBluetoothToRestrictMode.
+    std::shared_ptr<BluetoothSwitchModule> switchModule_ { nullptr };
+
 private:
     SaManagerStatus saManagerStatus_ = SaManagerStatus::WAIT_NOTIFY;
     std::condition_variable proxyConVar_;
@@ -111,6 +117,21 @@ public:
         host_.observers_.ForEach([transport, status](std::shared_ptr<BluetoothHostObserver> observer) {
             observer->OnStateChanged(transport, status);
         });
+    }
+
+    void OnBluetoothStateChanged(int32_t state) override
+    {
+        std::lock_guard<std::mutex> lock(host_.switchModuleMutex_);
+        CHECK_AND_RETURN_LOG(host_.switchModule_, "switchModule is nullptr");
+        if (state == bluetooth::BluetoothSwitchState::STATE_ON) {
+            host_.switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::BLUETOOTH_ON);
+        }
+        if (state == bluetooth::BluetoothSwitchState::STATE_OFF) {
+            host_.switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::BLUETOOTH_OFF);
+        }
+        if (state == bluetooth::BluetoothSwitchState::STATE_HALF) {
+            host_.switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::BLUETOOTH_HALF);
+        }
     }
 
     void OnDiscoveryStateChanged(int32_t status) override
@@ -393,6 +414,43 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothResourceManagerObserverImp);
 };
 
+class BluetoothHost::impl::BluetoothSwitchAction : public IBluetoothSwitchAction {
+public:
+    BluetoothSwitchAction() = default;
+    ~BluetoothSwitchAction() override = default;
+
+    int EnableBluetooth(void) override
+    {
+        CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
+            BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited !");
+        CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().pimpl->LoadBluetoothHostService(),
+            BT_ERR_INTERNAL_ERROR, "pimpl is null or load bluetooth service failed.");
+
+        sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
+        return proxy->EnableBle();
+    }
+
+    int DisableBluetooth(void) override
+    {
+        sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
+        return proxy->DisableBt();
+    }
+
+    int EnableBluetoothToRestrictMode(void) override
+    {
+        CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
+            BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited !");
+        CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().pimpl->LoadBluetoothHostService(),
+            BT_ERR_INTERNAL_ERROR, "pimpl is null or load bluetooth service failed.");
+
+        sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
+        return proxy->EnableBluetoothToRestrictMode();
+    }
+};
+
 BluetoothHost::impl::impl()
 {
     observerImp_ = new BluetoothHostObserverImp(*this);
@@ -400,6 +458,9 @@ BluetoothHost::impl::impl()
     bleRemoteObserverImp_ = new BluetoothBlePeripheralCallbackImp(*this);
     bleObserverImp_ = new BluetoothHostObserverImp(*this);
     resourceManagerObserverImp_ = new BluetoothResourceManagerObserverImp(*this);
+
+    auto switchActionPtr = std::make_unique<BluetoothSwitchAction>();
+    switchModule_ = std::make_shared<BluetoothSwitchModule>(std::move(switchActionPtr));
 
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(BLUETOOTH_HOST,
         [this](sptr<IRemoteObject> remote) {
@@ -536,15 +597,6 @@ void BluetoothHost::DeregisterObserver(std::shared_ptr<BluetoothHostObserver> ob
     pimpl->observers_.Deregister(observer);
 }
 
-int BluetoothHost::CountEnableTimes(bool enable)
-{
-    HILOGD("enter");
-    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
-
-    return proxy->CountEnableTimes(enable);
-}
-
 int BluetoothHost::EnableBt()
 {
     HILOGD("enter");
@@ -557,23 +609,23 @@ int BluetoothHost::EnableBt()
 
 int BluetoothHost::DisableBt()
 {
-    HILOGD("enter");
-    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
-
-    CountEnableTimes(false);
-    return proxy->DisableBt();
+    HILOGI("enter");
+    std::lock_guard<std::mutex> lock(pimpl->switchModuleMutex_);
+    CHECK_AND_RETURN_LOG_RET(pimpl->switchModule_, BT_ERR_INTERNAL_ERROR, "switchModule is nullptr");
+    return pimpl->switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::DISABLE_BLUETOOTH);
 }
 
 int BluetoothHost::RestrictBluetooth()
 {
-    HILOGD("enter");
-    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
-    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
-
-    return proxy->RestrictBluetooth();
-
+    HILOGI("enter");
+    std::lock_guard<std::mutex> lock(pimpl->switchModuleMutex_);
+    CHECK_AND_RETURN_LOG_RET(pimpl->switchModule_, BT_ERR_INTERNAL_ERROR, "switchModule is nullptr");
+    int ret =  pimpl->switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::DISABLE_BLUETOOTH);
+    if (ret != BT_NO_ERROR) {
+        return ret;
+    }
+    ret = pimpl->switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_RESTRICE_MODE);
+    return ret;
 }
 
 void BluetoothHost::UpdateVirtualDevice(int32_t action, const std::string &address)
@@ -585,14 +637,21 @@ void BluetoothHost::UpdateVirtualDevice(int32_t action, const std::string &addre
     proxy->UpdateVirtualDevice(action, address);
 }
 
-int BluetoothHost::SatelliteControl(int state)
+int BluetoothHost::SatelliteControl(int type, int state)
 {
-    HILOGD("enter");
-    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    HILOGI("type: %{public}d, state: %{public}d", type, state);
+    if (type == static_cast<int>(SATELLITE_CONTROL_MODE::ANTENNA)) {
+        CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    } else if (type == static_cast<int>(SATELLITE_CONTROL_MODE::BLUETOOTH_SWITCH)) {
+        pimpl->LoadBluetoothHostService();
+    } else {
+        HILOGE("Invalid control type: %{public}d", type);
+        return BT_ERR_INVALID_PARAM;
+    }
+
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
-
-    return proxy->SatelliteControl(state);
+    return proxy->SatelliteControl(type, state);
 }
 
 int BluetoothHost::GetBtState() const
@@ -693,16 +752,10 @@ BluetoothRemoteDevice BluetoothHost::GetRemoteDevice(const std::string &addr, in
 
 int BluetoothHost::EnableBle()
 {
-    HILOGD("enter");
-    CHECK_AND_RETURN_LOG_RET(!IsBtProhibitedByEdm(), BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited !");
-    CHECK_AND_RETURN_LOG_RET(pimpl && pimpl->LoadBluetoothHostService(), BT_ERR_INTERNAL_ERROR,
-        "pimpl is null or load bluetooth service failed.");
-
-    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
-
-    CountEnableTimes(true);
-    return proxy->EnableBle();
+    HILOGI("enter");
+    std::lock_guard<std::mutex> lock(pimpl->switchModuleMutex_);
+    CHECK_AND_RETURN_LOG_RET(pimpl->switchModule_, BT_ERR_INTERNAL_ERROR, "switchModule is nullptr");
+    return pimpl->switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::ENABLE_BLUETOOTH);
 }
 
 int BluetoothHost::DisableBle()
@@ -712,6 +765,14 @@ int BluetoothHost::DisableBle()
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
 
     return proxy->DisableBle();
+}
+
+int BluetoothHost::EnableBluetoothToRestrictMode(void)
+{
+    HILOGI("enter");
+    std::lock_guard<std::mutex> lock(pimpl->switchModuleMutex_);
+    CHECK_AND_RETURN_LOG_RET(pimpl->switchModule_, BT_ERR_INTERNAL_ERROR, "switchModule is nullptr");
+    return pimpl->switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_RESTRICE_MODE);
 }
 
 bool BluetoothHost::IsBrEnabled() const
@@ -1142,6 +1203,10 @@ void BluetoothHost::OnRemoveBluetoothSystemAbility()
     }
     if (pimpl->isFactoryReseting_.load()) {
         pimpl->EnableBluetoothAfterFactoryReset();
+    }
+    std::lock_guard<std::mutex> lock(pimpl->switchModuleMutex_);
+    if (pimpl->switchModule_) {
+        pimpl->switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::BLUETOOTH_OFF);
     }
 }
 } // namespace Bluetooth

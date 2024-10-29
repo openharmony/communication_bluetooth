@@ -327,7 +327,7 @@ struct HandsFreeUnit::impl {
 
     bool SendKeyPressed(const BluetoothRemoteDevice &device)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE__, __FUNCTION__);
+        HILOGD("[%{public}s]: %{public}s(): Enter!", __FILE_NAME__, __FUNCTION__);
         sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
         if (proxy != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy->SendKeyPressed(BluetoothRawAddress(device.GetDeviceAddr()));
@@ -377,7 +377,7 @@ struct HandsFreeUnit::impl {
 
     bool SendVoiceTag(const BluetoothRemoteDevice &device, int index)
     {
-        HILOGD("[%{public}s]: %{public}s(): Enter! index = %{public}d", __FILE__, __FUNCTION__, index);
+        HILOGD("[%{public}s]: %{public}s(): Enter! index = %{public}d", __FILE_NAME__, __FUNCTION__, index);
         sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
         if (proxy != nullptr && IS_BT_ENABLED() && device.IsValidBluetoothRemoteDevice()) {
             return proxy->SendVoiceTag(BluetoothRawAddress(device.GetDeviceAddr()), index);
