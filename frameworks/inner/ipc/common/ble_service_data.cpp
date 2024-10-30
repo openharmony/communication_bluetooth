@@ -107,6 +107,26 @@ uint8_t BleScanSettingsImpl::GetMatchMode() const
     return matchMode_;
 }
 
+uint16_t BleScanSettingsImpl::GetScanInterval() const
+{
+    return scanInterval_;
+}
+
+uint16_t BleScanSettingsImpl::GetScanWindow() const
+{
+    return scanWindow_;
+}
+
+void BleScanSettingsImpl::SetScanInterval(uint16_t scanInterval)
+{
+    scanInterval_ = scanInterval;
+}
+
+void BleScanSettingsImpl::SetScanWindow(uint16_t scanWindow)
+{
+    scanWindow_ = scanWindow;
+}
+
 void BleScanFilterImpl::SetDeviceId(const std::string &deviceId)
 {
     deviceId_ = deviceId;
