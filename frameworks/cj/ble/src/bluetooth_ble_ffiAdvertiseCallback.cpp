@@ -20,7 +20,9 @@ namespace CJSystemapi {
 namespace CJBluetoothBle {
 using Bluetooth::AdvertisingState;
 
-FfiBluetoothBleAdvertiseCallback::FfiBluetoothBleAdvertiseCallback() {}
+FfiBluetoothBleAdvertiseCallback::FfiBluetoothBleAdvertiseCallback()
+{
+}
 
 std::shared_ptr<FfiBluetoothBleAdvertiseCallback> FfiBluetoothBleAdvertiseCallback::GetInstance(void)
 {

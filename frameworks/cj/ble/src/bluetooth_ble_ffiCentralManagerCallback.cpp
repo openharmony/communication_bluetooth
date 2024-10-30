@@ -20,7 +20,9 @@ namespace OHOS {
 namespace CJSystemapi {
 namespace CJBluetoothBle {
 
-FfiBluetoothBleCentralManagerCallback::FfiBluetoothBleCentralManagerCallback() {}
+FfiBluetoothBleCentralManagerCallback::FfiBluetoothBleCentralManagerCallback()
+{
+}
 
 FfiBluetoothBleCentralManagerCallback &FfiBluetoothBleCentralManagerCallback::GetInstance(void)
 {
@@ -33,36 +35,41 @@ void FfiBluetoothBleCentralManagerCallback::RegisterBLEDeviceFindFunc(std::funct
     bleDeviceFindFunc = cjCallback;
 }
 
-void FfiBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results)
+void FfiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult &result)
 {
     if (bleDeviceFindFunc == nullptr) {
         return;
     }
     CArrScanResult outResults{};
-    if (results.empty()) {
+    outResults.size = 1;
+    NativeScanResult *resultValue = static_cast<NativeScanResult *>(malloc(sizeof(NativeScanResult) * outResults.size));
+    if (resultValue == nullptr) {
         return;
     }
-    size_t size = results.size();
-    if (size == 0 || size > std::numeric_limits<size_t>::max() / sizeof(NativeScanResult)) {
-        return;
+    for (int i = 0; i < outResults.size; i++) {
+        BleScanResult bleScanResult = result;
+        NativeScanResult nativeResult{};
+        nativeResult.deviceId = MallocCString(bleScanResult.GetPeripheralDevice().GetDeviceAddr());
+        nativeResult.rssi = bleScanResult.GetRssi();
+        nativeResult.data = Convert2CArrUI8(bleScanResult.GetPayload());
+        nativeResult.deviceName = MallocCString(bleScanResult.GetName());
+        nativeResult.connectable = bleScanResult.IsConnectable();
+        resultValue[i] = nativeResult;
     }
-    outResults.head = static_cast<NativeScanResult *>(malloc(sizeof(NativeScanResult) * results.size()));
-    if (outResults.head == nullptr) {
-        return;
-    }
-    size_t i = 0;
-    for (; i < results.size(); i++) {
-        BleScanResult bleScanResult = results[i];
-        NativeScanResult result{};
-        result.deviceId = MallocCString(bleScanResult.GetPeripheralDevice().GetDeviceAddr());
-        result.rssi = bleScanResult.GetRssi();
-        result.data = Convert2CArrUI8(bleScanResult.GetPayload());
-        result.deviceName = MallocCString(bleScanResult.GetName());
-        result.connectable = bleScanResult.IsConnectable();
-        outResults.head[i] = result;
-    }
-    outResults.size = static_cast<int64_t>(i);
+    outResults.head = resultValue;
     bleDeviceFindFunc(outResults);
+
+    for (int i = 0; i < outResults.size; i++) {
+        NativeScanResult nativeResult = outResults.head[i];
+        free(nativeResult.deviceId);
+        free(nativeResult.data.head);
+        free(nativeResult.deviceName);
+        nativeResult.deviceId = nullptr;
+        nativeResult.data.head = nullptr;
+        nativeResult.deviceName = nullptr;
+    }
+    free(resultValue);
+    resultValue = nullptr;
     return;
 }
 
