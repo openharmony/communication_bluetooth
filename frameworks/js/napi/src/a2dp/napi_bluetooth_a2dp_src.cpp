@@ -23,6 +23,7 @@
 #include "napi_bluetooth_host.h"
 #include "napi_bluetooth_utils.h"
 #include "../parser/napi_parser_utils.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -312,6 +313,7 @@ napi_value NapiA2dpSource::A2dpPropertyValueInit(napi_env env, napi_value export
         DECLARE_NAPI_PROPERTY("CodecChannelMode", codecChannelModeObj),
         DECLARE_NAPI_PROPERTY("CodecSampleRate", codecSampleRateObj),
     };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "a2dp_src:napi_define_properties");
     napi_define_properties(env, exports, sizeof(exportProps) / sizeof(*exportProps), exportProps);
     return exports;
 }
@@ -384,6 +386,7 @@ napi_value NapiA2dpSource::DefineCreateProfile(napi_env env, napi_value exports)
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("createA2dpSrcProfile", CreateA2dpSrcProfile),
     };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "a2dp_src:napi_define_properties");
     napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties);
     return exports;
 }

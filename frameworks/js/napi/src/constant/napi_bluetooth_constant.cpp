@@ -17,6 +17,7 @@
 
 #include "bluetooth_log.h"
 #include "napi_bluetooth_utils.h"
+#include "hitrace_meter.h"
 
 namespace {
 const std::string PROFILE_UUID_BASE_UUID = "00000000-0000-1000-8000-00805F9B34FB";
@@ -61,6 +62,7 @@ napi_value NapiConstant::ConstantPropertyValueInit(napi_env env, napi_value expo
         DECLARE_NAPI_PROPERTY("MajorMinorClass", majorMinorClassObj),
         DECLARE_NAPI_PROPERTY("AccessAuthorization", accessAuthorizationObj),
     };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "constant:napi_define_properties");
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
     return exports;
 }
