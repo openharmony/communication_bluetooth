@@ -75,6 +75,30 @@ enum BTStateID {
     STATE_TURNING_OFF,
     STATE_TURN_OFF,
 };
+
+/**
+ * @brief bluetooth state define
+ * use to GetBluetoothState()
+ *
+ * @since 14
+ */
+enum class BluetoothState {
+    /** Indicates the local Bluetooth is off */
+    STATE_OFF = 0,
+    /** Indicates the local Bluetooth is turning on */
+    STATE_TURNING_ON = 1,
+    /** Indicates the local Bluetooth is on, and ready for use */
+    STATE_ON = 2,
+    /** Indicates the local Bluetooth is turning off */
+    STATE_TURNING_OFF = 3,
+    /** Indicates the local Bluetooth is turning LE mode on */
+    STATE_BLE_TURNING_ON = 4,
+    /** Indicates the local Bluetooth is in LE only mode */
+    STATE_BLE_ON = 5,
+    /** Indicates the local Bluetooth is turning off LE only mode */
+    STATE_BLE_TURNING_OFF = 6
+};
+
 /**
  * @brief connect state define
  * use to ConnectionState()...

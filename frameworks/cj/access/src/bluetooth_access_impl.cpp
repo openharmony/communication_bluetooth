@@ -17,8 +17,8 @@
 #endif
 
 #include "bluetooth_access_impl.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
-#include "napi_bluetooth_utils.h"
 
 namespace OHOS {
 namespace CJSystemapi {
@@ -43,40 +43,9 @@ void AccessImpl::DisableBluetooth(int32_t* errCode)
 
 int32_t AccessImpl::GetState(int32_t* errCode)
 {
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-    int32_t state = BTStateID::STATE_TURN_OFF;
-    *errCode = host->GetBtState(state);
-    int32_t status = static_cast<int32_t>(BluetoothState::STATE_OFF);
-    switch (state) {
-        case BTStateID::STATE_TURNING_ON:
-            HILOGD("STATE_TURNING_ON(1)");
-            status = static_cast<int32_t>(BluetoothState::STATE_TURNING_ON);
-            break;
-        case BTStateID::STATE_TURN_ON:
-            HILOGD("STATE_ON(2)");
-            status = static_cast<int32_t>(BluetoothState::STATE_ON);
-            break;
-        case BTStateID::STATE_TURNING_OFF:
-            HILOGD("STATE_TURNING_OFF(3)");
-            status = static_cast<int32_t>(BluetoothState::STATE_TURNING_OFF);
-            break;
-        case BTStateID::STATE_TURN_OFF:
-            HILOGD("STATE_OFF(0)");
-            status = static_cast<int32_t>(BluetoothState::STATE_OFF);
-            break;
-        default:
-            HILOGE("get state failed");
-            break;
-    }
-
-    bool enableBle = host->IsBleEnabled();
-    if (enableBle && (state == BTStateID::STATE_TURN_OFF)) {
-        HILOGD("BR off and BLE on, STATE_BLE_ON(5)");
-        status = static_cast<int32_t>(BluetoothState::STATE_BLE_ON);
-    } else if (!enableBle && (state == BTStateID::STATE_TURN_OFF)) {
-        status = static_cast<int32_t>(BluetoothState::STATE_OFF);
-    }
-    return status;
+    int32_t state = static_cast<int>(BluetoothHost::GetDefaultHost().GetBluetoothState());
+    *errCode = Bluetooth::BT_NO_ERROR;
+    return state;
 }
 } // namespace CJBluetoothAccess
 } // namespace CJSystemapi
