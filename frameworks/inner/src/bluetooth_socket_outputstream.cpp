@@ -35,11 +35,10 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
     }
     auto ret = send(socketFd_, buf, length, MSG_NOSIGNAL);
 
-    HILOGD("ret: %{public}zu", ret);
+    HILOGD("ret: %{public}zd", ret);
 
-    if (ret == -1) {
-        HILOGE("Error.");
-        return -1;
+    if (ret <= 0) {
+        HILOGE("socket write exception! ret:%{public}zd errno:%{public}d", ret, errno);
     }
     return ret;
 }
