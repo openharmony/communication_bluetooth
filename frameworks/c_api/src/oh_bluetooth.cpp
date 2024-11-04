@@ -34,36 +34,7 @@ Bluetooth_ResultCode OH_Bluetooth_GetBluetoothSwitchState(Bluetooth_SwitchState 
         HILOGE("invalid param");
         return Bluetooth_ResultCode::BLUETOOTH_INVALID_PARAM;
     }
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-    int32_t btState = BTStateID::STATE_TURN_OFF;
-    host->GetBtState(btState);
-
-    Bluetooth_SwitchState status = Bluetooth_SwitchState::BLUETOOTH_STATE_OFF;
-    switch (btState) {
-        case BTStateID::STATE_TURNING_ON:
-            status = Bluetooth_SwitchState::BLUETOOTH_STATE_TURNING_ON;
-            break;
-        case BTStateID::STATE_TURN_ON:
-            status = Bluetooth_SwitchState::BLUETOOTH_STATE_ON;
-            break;
-        case BTStateID::STATE_TURNING_OFF:
-            status = Bluetooth_SwitchState::BLUETOOTH_STATE_TURNING_OFF;
-            break;
-        case BTStateID::STATE_TURN_OFF:
-            status = Bluetooth_SwitchState::BLUETOOTH_STATE_OFF;
-            break;
-        default:
-            HILOGE("get state failed");
-            break;
-    }
-
-    bool enableBle = host->IsBleEnabled();
-    if (enableBle && (btState == BTStateID::STATE_TURN_OFF)) {
-        status = Bluetooth_SwitchState::BLUETOOTH_STATE_BLE_ON;
-    } else if (!enableBle && (btState == BTStateID::STATE_TURN_OFF)) {
-        status = Bluetooth_SwitchState::BLUETOOTH_STATE_OFF;
-    }
-    *state = status;
+    *state = static_cast<Bluetooth_SwitchState>(BluetoothHost::GetDefaultHost().GetBluetoothState());
     return Bluetooth_ResultCode::BLUETOOTH_SUCCESS;
 }
 

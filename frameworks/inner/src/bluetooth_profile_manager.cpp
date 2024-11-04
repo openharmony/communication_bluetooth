@@ -158,7 +158,7 @@ void BluetoothProfileManager::RunFuncWhenBluetoothServiceStarted()
 void BluetoothProfileManager::BluetoothSystemAbility::OnAddSystemAbility(int32_t systemAbilityId,
     const std::string &deviceId)
 {
-    HILOGD("systemAbilityId:%{public}d", systemAbilityId);
+    HILOGI("systemAbilityId:%{public}d", systemAbilityId);
     switch (systemAbilityId) {
         case BLUETOOTH_HOST_SYS_ABILITY_ID: {
             BluetoothProfileManager::GetInstance().isBluetoothServiceOn_ = true;
@@ -181,7 +181,7 @@ void BluetoothProfileManager::BluetoothSystemAbility::OnAddSystemAbility(int32_t
 void BluetoothProfileManager::BluetoothSystemAbility::OnRemoveSystemAbility(int32_t systemAbilityId,
     const std::string &deviceId)
 {
-    HILOGD("systemAbilityId:%{public}d", systemAbilityId);
+    HILOGI("systemAbilityId:%{public}d", systemAbilityId);
     switch (systemAbilityId) {
         case BLUETOOTH_HOST_SYS_ABILITY_ID: {
             HILOGD("Clear global variables first");
