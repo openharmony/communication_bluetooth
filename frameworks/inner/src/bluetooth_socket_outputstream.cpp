@@ -21,9 +21,21 @@
 #include "bluetooth_socket_outputstream.h"
 #include "bluetooth_log.h"
 #include "sys/socket.h"
+#include "sys/ioctl.h"
 
 namespace OHOS {
 namespace Bluetooth {
+
+static constexpr int32_t SOCKET_SEND_TIME_THRESHOLD = 1000; // 1000ms
+static constexpr int32_t SOCKET_PACKET_HEAD_LENGTH = 1512;
+static int64_t GetNowTimestamp(void)
+{
+    struct timeval tv;
+    gettimeofday(&tv, nullptr);
+    int64_t timestamp = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+    return timestamp;
+}
+
 OutputStream::OutputStream(int socketFd) : socketFd_(socketFd)
 {}
 
@@ -36,6 +48,22 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
         HILOGE("socket closed.");
         return -1;
     }
+
+    int32_t bufSize;
+    socklen_t optlen = sizeof(bufSize);
+    int sockOptRet = getsockopt(socketFd_, SOL_SOCKET, SO_SNDBUF, &bufSize, &optlen);
+    unsigned long bytesInBuffer;
+    int ioctlRet = ioctl(socketFd_, TIOCOUTQ, &bytesInBuffer);
+    if (sockOptRet != -1 && ioctlRet != -1 && bufSize > bytesInBuffer) { // -1代表无权限获取当前socket发送区大小
+        // 该方法是跟踪send前socket发送通道是否占满导致发包阻塞，目前音频管家上报了此处的freeze，故为其开放查询发送区大小权限
+        unsigned long availableLength = static_cast <unsigned long>(bufSize) - bytesInBuffer;
+        int32_t sendLength = static_cast <int32_t>(length) + SOCKET_PACKET_HEAD_LENGTH;
+        if (availableLength < sendLength) {
+            HILOGW("send queue is full, availableLength is %{public}lu, sendlength is %{public}d",
+                availableLength, sendLength);
+        }
+    }
+    int64_t beginTimestamp = GetNowTimestamp();
     auto ret = send(socketFd_, buf, length, MSG_NOSIGNAL);
 
     HILOGD("ret: %{public}zd", ret);
