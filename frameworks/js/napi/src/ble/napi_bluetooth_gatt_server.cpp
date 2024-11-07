@@ -77,7 +77,7 @@ napi_value NapiGattServer::GattServerConstructor(napi_env env, napi_callback_inf
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     NapiGattServer* gattServer = new NapiGattServer();
 
-    napi_wrap(
+    auto status = napi_wrap(
         env, thisVar, gattServer,
         [](napi_env env, void* data, void* hint) {
             NapiGattServer* server = static_cast<NapiGattServer*>(data);
@@ -88,6 +88,12 @@ napi_value NapiGattServer::GattServerConstructor(napi_env env, napi_callback_inf
         },
         nullptr,
         nullptr);
+
+    if (status != napi_ok) {
+        HILOGE("napi_wrap failed");
+        delete gattServer;
+        gattServer = nullptr;
+    }
 
     return thisVar;
 }
