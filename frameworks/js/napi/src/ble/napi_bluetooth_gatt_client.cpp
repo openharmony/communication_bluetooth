@@ -120,7 +120,7 @@ napi_value NapiGattClient::GattClientConstructor(napi_env env, napi_callback_inf
 
     NapiGattClient *gattClient = new NapiGattClient(deviceId);
 
-    napi_wrap(
+    auto status = napi_wrap(
         env, thisVar, gattClient,
         [](napi_env env, void* data, void* hint) {
             NapiGattClient* client = static_cast<NapiGattClient*>(data);
@@ -131,6 +131,12 @@ napi_value NapiGattClient::GattClientConstructor(napi_env env, napi_callback_inf
         },
         nullptr,
         nullptr);
+
+    if (status != napi_ok) {
+        HILOGE("napi_wrap failed");
+        delete gattClient;
+        gattClient = nullptr;
+    }
 
     return thisVar;
 }
