@@ -47,15 +47,15 @@ void ConvertGattServiceToJS(napi_env env, napi_value result, GattService& servic
     ConvertBLECharacteristicVectorToJS(env, characteristics, service.GetCharacteristics());
     napi_set_named_property(env, result, "characteristics", characteristics);
 
-    napi_value includedServices;
-    napi_create_array(env, &includedServices);
+    napi_value includeServices;
+    napi_create_array(env, &includeServices);
     vector<GattService> services;
     vector<std::reference_wrapper<GattService>> srvs = service.GetIncludedServices();
     for (auto &srv : srvs) {
         services.push_back(srv.get());
     }
-    ConvertGattServiceVectorToJS(env, includedServices, services);
-    napi_set_named_property(env, result, "includedServices", includedServices);
+    ConvertGattServiceVectorToJS(env, includeServices, services);
+    napi_set_named_property(env, result, "includeServices", includeServices);
 }
 
 void ConvertGattServiceVectorToJS(napi_env env, napi_value result, vector<GattService>& services)
