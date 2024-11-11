@@ -76,10 +76,14 @@ napi_value NapiAccess::EnableBluetooth(napi_env env, napi_callback_info info)
 napi_value NapiAccess::RestrictBluetooth(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-    int32_t ret = host->RestrictBluetooth();
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
-    return NapiGetBooleanTrue(env);
+    auto func = []() {
+        int32_t ret = BluetoothHost::GetDefaultHost().RestrictBluetooth();
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 
 napi_value NapiAccess::DisableBluetooth(napi_env env, napi_callback_info info)
