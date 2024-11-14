@@ -95,6 +95,7 @@ struct BleAdvertiser::impl {
             }
         }
 
+        __attribute__((no_sanitize("cfi")))
         void OnStopResultEvent(int32_t result, int32_t advHandle) override
         {
             std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
