@@ -1231,9 +1231,10 @@ void BluetoothHost::OnRemoveBluetoothSystemAbility()
     bool isBluetoothSystemAbilityOn = IsBluetoothSystemAbilityOn();
     if (isBluetoothSystemAbilityOn) {
         HILOGW("Bluetooth SA is started, the hap application may be freezed by rss");
-    }
-    bool isNeedNotifyBluetoothOffState = pimpl->observerImp_ && pimpl->bleObserverImp_ && !isBluetoothSystemAbilityOn;
-    if (isNeedNotifyBluetoothOffState) {
+        // Notify profile manager bluetooth off once.
+        BluetoothProfileManager::GetInstance().NotifyBluetoothStateChange(
+            BTTransport::ADAPTER_BLE, BTStateID::STATE_TURN_OFF);
+    } else if (pimpl->observerImp_ && pimpl->bleObserverImp_) {
         HILOGD("bluetooth_servi died and send state off to app");
         pimpl->observerImp_->OnStateChanged(BTTransport::ADAPTER_BREDR, BTStateID::STATE_TURN_OFF);
         pimpl->bleObserverImp_->OnStateChanged(BTTransport::ADAPTER_BLE, BTStateID::STATE_TURN_OFF);
