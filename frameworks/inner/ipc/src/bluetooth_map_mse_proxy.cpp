@@ -55,11 +55,11 @@ int32_t BluetoothMapMseProxy::GetDevicesByStates(
 
     int32_t ret = reply.ReadInt32();
     CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "reply errCode: %{public}d", ret);
-    int32_t DevNum = reply.ReadInt32();
-    CHECK_AND_RETURN_LOG_RET((DevNum >= 0 && DevNum < MAP_MSE_READ_DEVICE_MAX_SIZE),
-        BT_ERR_INTERNAL_ERROR, "Invalid DevNum: %{public}d", DevNum);
+    int32_t devNum = reply.ReadInt32();
+    CHECK_AND_RETURN_LOG_RET((devNum >= 0 && devNum < MAP_MSE_READ_DEVICE_MAX_SIZE),
+        BT_ERR_INTERNAL_ERROR, "Invalid devNum: %{public}d", devNum);
 
-    for (int32_t i = 0; i < DevNum; i++) {
+    for (int32_t i = 0; i < devNum; i++) {
         std::shared_ptr<BluetoothRawAddress> address(reply.ReadParcelable<BluetoothRawAddress>());
         CHECK_AND_RETURN_LOG_RET((address != nullptr), BT_ERR_INTERNAL_ERROR, "address is nullptr");
         rawDevices.push_back(*address);

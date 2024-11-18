@@ -32,8 +32,12 @@ int32_t BluetoothHfpAgProxy::GetConnectDevices(std::vector<BluetoothRawAddress> 
     SEND_IPC_REQUEST_RETURN_RESULT(BluetoothHfpAgInterfaceCode::BT_HFP_AG_GET_CONNECT_DEVICES,
         data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
-    uint32_t DevNum = reply.ReadUint32();
-    for (uint32_t i = 0; i < DevNum; i++) {
+    uint32_t devNum = reply.ReadUint32();
+    const uint32_t maxSize = 100;
+    if (devNum > maxSize) {
+        return BT_ERR_INVALID_PARAM;
+    }
+    for (uint32_t i = 0; i < devNum; i++) {
         std::shared_ptr<BluetoothRawAddress> dev(reply.ReadParcelable<BluetoothRawAddress>());
         if (!dev) {
             return BT_ERR_IPC_TRANS_FAILED;
@@ -56,8 +60,12 @@ int BluetoothHfpAgProxy::GetDevicesByStates(const std::vector<int> &states, std:
     SEND_IPC_REQUEST_RETURN_RESULT(BluetoothHfpAgInterfaceCode::BT_HFP_AG_GET_DEVICES_BY_STATES,
         data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
-    uint32_t DevNum = reply.ReadUint32();
-    for (uint32_t i = 0; i < DevNum; i++) {
+    uint32_t devNum = reply.ReadUint32();
+    const uint32_t maxSize = 100;
+    if (devNum > maxSize) {
+        return BT_ERR_INVALID_PARAM;
+    }
+    for (uint32_t i = 0; i < devNum; i++) {
         std::shared_ptr<BluetoothRawAddress> dev(reply.ReadParcelable<BluetoothRawAddress>());
         if (!dev) {
             return BT_ERR_IPC_TRANS_FAILED;
