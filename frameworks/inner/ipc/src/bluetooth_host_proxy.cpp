@@ -627,6 +627,10 @@ int32_t BluetoothHostProxy::GetPairedDevices(std::vector<BluetoothRawAddress> &p
         return BT_ERR_IPC_TRANS_FAILED;
     }
     int32_t size = reply.ReadInt32();
+    const int32_t maxSize = 100;
+    if (size > maxSize) {
+        return BT_ERR_INVALID_PARAM;
+    }
     for (int32_t i = 0; i < size; i++) {
         std::shared_ptr<BluetoothRawAddress> rawAddress(reply.ReadParcelable<BluetoothRawAddress>());
         if (!rawAddress) {
@@ -1329,6 +1333,10 @@ void BluetoothHostProxy::GetLocalSupportedUuids(std::vector<std::string> &uuids)
         return;
     }
     int32_t size = reply.ReadInt32();
+    const int32_t maxSize = 100;
+    if (size > maxSize) {
+        return;
+    }
     std::string uuid;
     for (int32_t i = 0; i < size; i++) {
         uuid = reply.ReadString();
@@ -1356,6 +1364,10 @@ int32_t BluetoothHostProxy::GetDeviceUuids(const std::string &address, std::vect
     }
 
     int32_t size = reply.ReadInt32();
+    const int32_t maxSize = 100;
+    if (size > maxSize) {
+        return BT_ERR_INVALID_PARAM;
+    }
     std::string uuid;
     for (int32_t i = 0; i < size; i++) {
         uuid = reply.ReadString();
@@ -1379,6 +1391,10 @@ int32_t BluetoothHostProxy::GetLocalProfileUuids(std::vector<std::string> &uuids
         return BT_ERR_IPC_TRANS_FAILED;
     }
     int32_t size = reply.ReadInt32();
+    const int32_t maxSize = 100;
+    if (size > maxSize) {
+        return BT_ERR_INVALID_PARAM;
+    }
     std::string uuid;
     for (int32_t i = 0; i < size; i++) {
         uuid = reply.ReadString();

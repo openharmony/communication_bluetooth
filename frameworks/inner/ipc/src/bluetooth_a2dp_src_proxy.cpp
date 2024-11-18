@@ -97,6 +97,10 @@ int BluetoothA2dpSrcProxy::GetDevicesByStates(const std::vector<int32_t> &states
     int errorCode = reply.ReadInt32();
     if (errorCode == NO_ERROR) {
         int32_t rawAddsSize = reply.ReadInt32();
+        const int32_t maxSize = 100;
+        if (rawAddsSize > maxSize) {
+            return BT_ERR_INVALID_PARAM;
+        }
         for (int i = 0; i < rawAddsSize; i++) {
             rawAddrs.push_back(RawAddress(reply.ReadString()));
         }
