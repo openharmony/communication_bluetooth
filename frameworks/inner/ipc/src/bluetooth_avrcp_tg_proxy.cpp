@@ -154,6 +154,10 @@ std::vector<BluetoothRawAddress> BluetoothAvrcpTgProxy::GetConnectedDevices()
         return vec;
     }
     int32_t size = reply.ReadInt32();
+    const int32_t maxSize = 100;
+    if (size > maxSize) {
+        return vec;
+    }
     for (int32_t i = 0; i < size; i++) {
         std::shared_ptr<BluetoothRawAddress> rawAddress(reply.ReadParcelable<BluetoothRawAddress>());
         if (!rawAddress) {
@@ -192,6 +196,10 @@ std::vector<BluetoothRawAddress> BluetoothAvrcpTgProxy::GetDevicesByStates(const
         return vec;
     }
     int32_t size = reply.ReadInt32();
+    const int32_t maxSize = 100;
+    if (size > maxSize) {
+        return vec;
+    }
     for (int32_t i = 0; i < size; i++) {
         std::shared_ptr<BluetoothRawAddress> rawAddress(reply.ReadParcelable<BluetoothRawAddress>());
         if (!rawAddress) {

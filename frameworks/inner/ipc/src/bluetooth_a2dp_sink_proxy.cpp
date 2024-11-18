@@ -96,6 +96,10 @@ std::vector<RawAddress> BluetoothA2dpSinkProxy::GetDevicesByStates(const std::ve
         data, reply, option, rawAdds);
 
     int32_t rawAddsSize = reply.ReadInt32();
+    const int32_t maxSize = 100;
+    if (rawAddsSize > maxSize) {
+        return rawAdds;
+    }
     for (int i = 0; i < rawAddsSize; i++) {
         rawAdds.push_back(RawAddress(reply.ReadString()));
     }
