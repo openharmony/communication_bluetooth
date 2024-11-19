@@ -15,7 +15,7 @@
 #ifndef LOG_TAG
 #define LOG_TAG "bt_napi_connection"
 #endif
-
+    
 #include "napi_bluetooth_connection.h"
 
 #include <set>
