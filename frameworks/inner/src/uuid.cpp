@@ -15,6 +15,8 @@
 
 #include "uuid.h"
 
+#include <cerrno>
+
 #define CONSTANT_ZERO 0
 #define CONSTANT_FOUR 4
 #define CONSTANT_EIGHT 8
@@ -53,6 +55,9 @@ UUID::UUID(const long mostSigBits, const long leastSigBits)
 UUID UUID::FromString(const std::string &name)
 {
     UUID ret;
+    if (name.empty()) {
+        return ret;
+    }
     std::string tmp = name;
     std::size_t pos = tmp.find("-");
 
@@ -62,7 +67,13 @@ UUID UUID::FromString(const std::string &name)
     }
 
     for (std::size_t i = 0; (i + 1) < tmp.length();) {
-        ret.uuid_[i / 2] = std::stoi(tmp.substr(i, 2), nullptr, 16); // uuid的长度为16，i / 2作为uuid的数组下标
+        errno = 0;
+        char *endptr = nullptr;
+        long int num = std::strtol(tmp.substr(i, 2).c_str(), endptr, 16); // uuid的长度为16，i / 2作为uuid的数组下标
+        if (errno == ERANGE) {
+            return ret;
+        }
+        ret.uuid_[i / 2] = static_cast<int>(num);
         i += 2; // for 循环中，每轮增加2
     }
 
