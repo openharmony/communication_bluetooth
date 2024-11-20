@@ -38,6 +38,8 @@ public:
 
     NapiAsyncWorkMap asyncWorkMap_ {};
     NapiEventSubscribeModule eventSubscribe_;
+
+    int advHandle_ = -1;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
