@@ -214,16 +214,16 @@ struct HandsFreeAudioGateway::impl {
     {
         HILOGD("enter");
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
-        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, proxy->ConnectSco(), "failed: no proxy");
-        return false;
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
+        return proxy->ConnectSco();
     }
 
     bool DisconnectSco()
     {
         HILOGD("enter");
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
-        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, proxy->DisconnectSco(), "failed: no proxy");
-        return false;
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
+        return proxy->DisconnectSco();
     }
 
     bool IsValidCallType(uint8_t callType)
