@@ -43,9 +43,6 @@ using Bluetooth::BT_ERR_INTERNAL_ERROR;
 using Bluetooth::BT_ERR_INVALID_PARAM;
 using Bluetooth::BT_NO_ERROR;
 
-const int32_t REGISTER_BLE_FIND_DEVICE_TYPE = 0;
-const int32_t REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE = 1;
-
 namespace {
 using Bluetooth::BleCentralManager;
 
@@ -81,7 +78,7 @@ int32_t BleImpl::CreateGattClientDevice(std::string deviceId, FfiClientDevice *&
     return BT_NO_ERROR;
 }
 
-int32_t BleImpl::GetConnectedBleDevices(CArrString res)
+int32_t BleImpl::GetConnectedBleDevices(CArrString &res)
 {
     std::lock_guard<std::mutex> lock(FfiGattServer::deviceListMutex_);
     std::vector<std::string> devicesList = FfiGattServer::deviceList_;
