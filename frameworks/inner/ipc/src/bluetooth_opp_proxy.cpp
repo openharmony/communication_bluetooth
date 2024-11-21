@@ -185,6 +185,10 @@ int32_t BluetoothOppProxy::GetDevicesByStates(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_GET_DEVICES_BY_STATES), data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     int32_t rawAddsSize = reply.ReadInt32();
+    const int32_t maxSize = 100;
+    if (rawAddsSize > maxSize) {
+        return BT_ERR_INVALID_PARAM;
+    }
     for (int i = 0; i < rawAddsSize; i++) {
         std::unique_ptr<BluetoothRawAddress> address(reply.ReadParcelable<BluetoothRawAddress>());
         if (!address) {
