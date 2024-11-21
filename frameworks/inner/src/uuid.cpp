@@ -69,7 +69,7 @@ UUID UUID::FromString(const std::string &name)
     for (std::size_t i = 0; (i + 1) < tmp.length();) {
         errno = 0;
         char *endptr = nullptr;
-        long int num = std::strtol(tmp.substr(i, 2).c_str(), &endptr, 16); // uuid的长度为16
+        long int num = std::strtol(tmp.substr(i, 2).c_str(), &endptr, 16); // 16: hexadecimal
         if (errno == ERANGE) {
             return ret;
         }
