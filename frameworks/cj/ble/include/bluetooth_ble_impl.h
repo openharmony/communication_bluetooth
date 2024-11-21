@@ -44,9 +44,9 @@ public:
 
     static FfiBluetoothBleCentralManagerCallback &GetInstance(void);
 
-    void OnScanCallback(const BleScanResult &result) override{};
+    void OnScanCallback(const BleScanResult &result) override;
     void OnFoundOrLostCallback(const BleScanResult &result, uint8_t callbackType) override{};
-    void OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results) override;
+    void OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results) override{};
     void OnStartOrStopScanEvent(int resultCode, bool isStartScan) override{};
     void OnNotifyMsgReportFromLpDevice(const UUID &uuid, int msgType, const std::vector<uint8_t> &value) override{};
 
@@ -85,7 +85,7 @@ public:
 
     static int32_t CreateGattServer(FfiGattServer *&ffiGattServer);
     static int32_t CreateGattClientDevice(std::string deviceId, FfiClientDevice *&ffiClientDevice);
-    static int32_t GetConnectedBleDevices(CArrString res);
+    static int32_t GetConnectedBleDevices(CArrString &res);
     static int32_t StartBleScan(CArrNativeScanFilter filters, NativeScanOptions *options);
     static int32_t StopBleScan();
     static int32_t StartAdvertising(NativeAdvertiseSetting setting, NativeAdvertiseData advData,
