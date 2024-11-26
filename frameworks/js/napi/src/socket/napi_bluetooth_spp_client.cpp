@@ -316,7 +316,7 @@ napi_status CheckSppClientOn(napi_env env, napi_callback_info info)
     NAPI_BT_RETURN_IF((argc != ARGS_SIZE_THREE), "Requires 3 arguments.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(!ParseString(env, type, argv[PARAM0]),
         "Wrong argument type. String expected.", napi_invalid_arg);
-    NAPI_BT_RETURN_IF(type.c_str() != REGISTER_SPP_READ_TYPE, "Invalid type.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(type != REGISTER_SPP_READ_TYPE, "Invalid type.", napi_invalid_arg);
 
     std::shared_ptr<BluetoothCallbackInfo> callbackInfo = std::make_shared<BufferCallbackInfo>();
     callbackInfo->env_ = env;
