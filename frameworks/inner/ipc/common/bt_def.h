@@ -198,6 +198,9 @@ const uint32_t PROFILE_ID_HOST = 0x00100000;
  */
 constexpr const char *INVALID_MAC_ADDRESS = "00:00:00:00:00:00";
 constexpr const char *INVALID_NAME = "";
+const uint32_t INVALID_CONTROL_TYPE = 0xFFFFFFFF;
+const uint32_t INVALID_CONTROL_TYPE_VAL = 0xFFFFFFFF;
+const uint32_t INVALID_CONTROL_OBJECT = 0xFFFFFFFF;
 const int INVALID_VALUE = 0;
 const int INVALID_TYPE = -1;
 const int ADDRESS_LENGTH = 17;
@@ -1707,6 +1710,26 @@ enum BluetoothSwitchState {
     STATE_ON,
     STATE_OFF,
     STATE_HALF,
+};
+
+enum ControlType {
+    PLAY = 0,
+    VIBRATE = 1,
+    FLASH = 2,
+    LOCK = 3,
+    ERASE = 4,
+};
+
+enum ControlTypeVal {
+    DISABLE = 0,
+    ENABLE = 1,
+    QUERY = 2,
+};
+
+enum ControlObject {
+    LEFT_EAR = 0,
+    RIGHT_EAR = 1,
+    LEFT_RIGHT_EAR = 2,
 };
 
 #ifdef BLUETOOTH_EXPORT

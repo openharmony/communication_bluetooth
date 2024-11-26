@@ -497,6 +497,16 @@ napi_status NapiParseObjectUint32(napi_env env, napi_value object, const char *n
     return napi_ok;
 }
 
+napi_status NapiParseObjectUint32Check(NapiObject napiObject, const char *name, uint32_t &outNum,
+    uint32_t min, uint32_t max)
+{
+    NAPI_BT_CALL_RETURN(NapiParseObjectUint32(napiObject.env, napiObject.object, name, outNum));
+    if (outNum < min || outNum > max) {
+        return napi_invalid_arg;
+    }
+    return napi_ok;
+}
+
 napi_status NapiParseObjectBooleanOptional(napi_env env, napi_value object, const char *name, bool &outBoolean,
     bool &outExist)
 {

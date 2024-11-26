@@ -430,5 +430,17 @@ int32_t BluetoothRemoteDevice::SetVirtualAutoConnectType(int connType, int busin
     int32_t exception = hostProxy->SetVirtualAutoConnectType(address_, connType, businessType);
     return exception;
 }
+
+int32_t BluetoothRemoteDevice::ControlDeviceAction(uint32_t controlType, uint32_t controlTypeVal,
+    uint32_t controlObject) const
+{
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote Device");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
+    int32_t exception = hostProxy->ControlDeviceAction(address_, controlType, controlTypeVal, controlObject);
+    return exception;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
