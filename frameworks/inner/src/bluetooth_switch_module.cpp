@@ -107,6 +107,11 @@ int BluetoothSwitchModule::ProcessBluetoothSwitchAction(
         isBtSwitchProcessing_ = false;
         ffrtQueue_.cancel(taskTimeoutHandle_);
     }
+    // Considering interface compatibility, when a thiry party app invokes the Bluetooth switch interface,
+    // a dialog box is displayed, indicating that the call is success.
+    if (ret == BT_ERR_DIALOG_FOR_USER_CONFIRM) {
+        ret = BT_NO_ERROR;
+    }
     return ret;
 }
 
