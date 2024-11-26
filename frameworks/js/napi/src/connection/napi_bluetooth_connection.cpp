@@ -15,7 +15,7 @@
 #ifndef LOG_TAG
 #define LOG_TAG "bt_napi_connection"
 #endif
-    
+
 #include "napi_bluetooth_connection.h"
 
 #include <set>
@@ -29,6 +29,7 @@
 #include "napi_bluetooth_utils.h"
 #include "parser/napi_parser_utils.h"
 #include "hitrace_meter.h"
+#include "bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -117,6 +118,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setRemoteDeviceType", SetRemoteDeviceType),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceType", GetRemoteDeviceType),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceBatteryInfo", GetRemoteDeviceBatteryInfo),
+        DECLARE_NAPI_FUNCTION("controlDeviceAction", ControlDeviceAction),
     };
 
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
@@ -973,6 +975,75 @@ void DealPairStatus(const int &status, int &bondStatus)
         default:
             break;
     }
+}
+
+struct ControlDeviceActionParams {
+    std::string deviceId;
+    uint32_t controlType;
+    uint32_t controlTypeVal;
+    uint32_t controlObject;
+};
+
+napi_status ParseControlDeviceActionParams(napi_env env, napi_value object, ControlDeviceActionParams &params)
+{
+    HILOGD("ParseControlDeviceActionParams enter");
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object,
+        {"deviceId", "type", "typeValue", "controlObject"}));
+    std::string tmpDeviceId = INVALID_MAC_ADDRESS;
+    NAPI_BT_CALL_RETURN(NapiParseObjectBdAddr(env, object, "deviceId", tmpDeviceId));
+    if (tmpDeviceId.empty() || tmpDeviceId.length() != ADDRESS_LENGTH) {
+        HILOGE("Invalid deviceId");
+        return napi_invalid_arg;
+    }
+    uint32_t tmpControlType = INVALID_CONTROL_TYPE;
+    uint32_t tmpControlTypeVal = INVALID_CONTROL_TYPE_VAL;
+    uint32_t tmpControlObject = INVALID_CONTROL_OBJECT;
+
+    NapiObject napiObject = { env, object };
+    NAPI_BT_CALL_RETURN(NapiParseObjectUint32Check(napiObject, "type", tmpControlType,
+        ControlType::PLAY, ControlType::ERASE));
+    NAPI_BT_CALL_RETURN(NapiParseObjectUint32Check(napiObject, "typeValue", tmpControlTypeVal,
+        ControlTypeVal::DISABLE, ControlTypeVal::QUERY));
+    NAPI_BT_CALL_RETURN(NapiParseObjectUint32Check(napiObject, "controlObject", tmpControlObject,
+        ControlObject::LEFT_EAR, ControlObject::LEFT_RIGHT_EAR));
+    
+    HILOGI("deviceId: %{public}s, controlType: %{public}u, controlTypeVal: %{public}u, controlObject: %{public}u",
+        GetEncryptAddr(tmpDeviceId).c_str(), tmpControlType, tmpControlTypeVal, tmpControlObject);
+
+    params.deviceId = tmpDeviceId;
+    params.controlType = tmpControlType;
+    params.controlTypeVal = tmpControlTypeVal;
+    params.controlObject = tmpControlObject;
+    return napi_ok;
+}
+
+napi_value ControlDeviceAction(napi_env env, napi_callback_info info)
+{
+    HILOGD("ControlDeviceAction enter");
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    auto checkRes = napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRes == napi_ok, BT_ERR_INVALID_PARAM);
+
+    ControlDeviceActionParams params = { INVALID_MAC_ADDRESS, INVALID_CONTROL_TYPE,
+        INVALID_CONTROL_TYPE_VAL, INVALID_CONTROL_OBJECT };
+    auto status = ParseControlDeviceActionParams(env, argv[PARAM0], params);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    std::string deviceId = params.deviceId;
+    uint32_t controlType = params.controlType;
+    uint32_t controlTypeVal = params.controlTypeVal;
+    uint32_t controlObject = params.controlObject;
+    auto func = [deviceId, controlType, controlTypeVal, controlObject]() {
+        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(deviceId);
+        int32_t err = remoteDevice.ControlDeviceAction(controlType, controlTypeVal, controlObject);
+        HILOGI("ControlDeviceAction err: %{public}d", err);
+        return NapiAsyncWorkRet(err);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
