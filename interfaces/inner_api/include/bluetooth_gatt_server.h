@@ -69,7 +69,7 @@ public:
      * @since 6
      *
      */
-    virtual void OnServiceAdded(GattService *Service, int ret)
+    virtual void OnServiceAdded(GattService service, int ret)
     {}
 
     /**
