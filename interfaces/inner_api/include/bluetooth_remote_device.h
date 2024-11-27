@@ -400,6 +400,18 @@ public:
      */
     int32_t SetVirtualAutoConnectType(int connType, int businessType) const;
 
+    /**
+     * @brief Control the actions of Bluetooth peripherals.
+     *
+     * @param controlType The control type.
+     * @param controlTypeVal The value of control type.
+     * @param controlObject The control object.
+     * @return Returns <b>BT_NO_ERROR</b> if the operation is successful;
+     *         returns <b>Other code</b> if the operation fails.
+     * @since 16
+     */
+    int32_t ControlDeviceAction(uint32_t controlType, uint32_t controlTypeVal, uint32_t controlObject) const;
+
 private:
     std::string address_ = "00:00:00:00:00:00";
     int transport_ = BT_TRANSPORT_NONE;

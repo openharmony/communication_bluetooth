@@ -135,6 +135,8 @@ public:
     virtual int32_t SetVirtualAutoConnectType(const std::string &address, int connType, int businessType) = 0;
     virtual int32_t SetFastScanLevel(int level) = 0;
     virtual int32_t EnableBluetoothToRestrictMode(void) = 0;
+    virtual int32_t ControlDeviceAction(const std::string &deviceId, uint32_t controlType,
+        uint32_t controlTypeVal, uint32_t controlObject) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

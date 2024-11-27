@@ -1753,5 +1753,23 @@ int32_t BluetoothHostProxy::EnableBluetoothToRestrictMode(void)
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     return reply.ReadInt32();
 }
+
+int32_t BluetoothHostProxy::ControlDeviceAction(const std::string &deviceId, uint32_t controlType,
+    uint32_t controlTypeVal, uint32_t controlObject)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), BT_ERR_IPC_TRANS_FAILED,
+        "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(deviceId), BT_ERR_IPC_TRANS_FAILED, "Write deviceId error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint32(controlType), BT_ERR_IPC_TRANS_FAILED, "Write controlType error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint32(controlTypeVal), BT_ERR_IPC_TRANS_FAILED, "Write controlTypeVal error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint32(controlObject), BT_ERR_IPC_TRANS_FAILED, "Write controlObject error");
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::CTRL_DEVICE_ACTION, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    return reply.ReadInt32();
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
