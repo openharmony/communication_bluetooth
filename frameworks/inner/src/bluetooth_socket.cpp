@@ -639,9 +639,11 @@ struct ServerSocket::impl {
             HILOGE("socket is not in listen state");
             return nullptr;
         }
-        struct timeval time = {timeout, 0};
-        setsockopt(fd_, SOL_SOCKET, SO_SNDTIMEO, (const char *)&time, sizeof(time));
-        setsockopt(fd_, SOL_SOCKET, SO_RCVTIMEO, (const char *)&time, sizeof(time));
+        if (timeout > 0) {
+            struct timeval time = {timeout, 0};
+            setsockopt(fd_, SOL_SOCKET, SO_SNDTIMEO, (const char *)&time, sizeof(time));
+            setsockopt(fd_, SOL_SOCKET, SO_RCVTIMEO, (const char *)&time, sizeof(time));
+        }
 
         acceptFd_ = RecvSocketFd();
         HILOGI("RecvSocketFd acceptFd: %{public}d", acceptFd_);
@@ -649,7 +651,7 @@ struct ServerSocket::impl {
             return nullptr;
         }
         if (timeout > 0) {
-            time = {0, 0};
+            struct timeval time = {0, 0};
             setsockopt(fd_, SOL_SOCKET, SO_SNDTIMEO, (const char *)&time, sizeof(time));
             setsockopt(fd_, SOL_SOCKET, SO_RCVTIMEO, (const char *)&time, sizeof(time));
         }
