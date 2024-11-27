@@ -93,6 +93,13 @@ napi_status NapiParseObjectGattPermissions(napi_env env, napi_value object, cons
 napi_status NapiParseObjectGattProperties(napi_env env, napi_value object, const char *name,
     NapiGattProperties &outProperties);
 
+struct NapiObject {
+    napi_env env;
+    napi_value object;
+};
+napi_status NapiParseObjectUint32Check(NapiObject napiObject, const char *name, uint32_t &outNum,
+    uint32_t min, uint32_t max);
+
 napi_status NapiGetObjectPropertyOptional(napi_env env, napi_value object, const char *name, napi_value &outProperty,
     bool &outExist);
 napi_status NapiParseObjectBooleanOptional(napi_env env, napi_value object, const char *name, bool &outBoolean,
