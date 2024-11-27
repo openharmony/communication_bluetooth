@@ -34,7 +34,7 @@ using Bluetooth::GattService;
 class FfiGattServerCallback : public GattServerCallback {
 public:
     void OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state) override;
-    void OnServiceAdded(GattService *Service, int ret) override{};
+    void OnServiceAdded(GattService service, int ret) override{};
     void OnCharacteristicReadRequest(const BluetoothRemoteDevice &device, GattCharacteristic &characteristic,
                                      int requestId) override;
     void OnCharacteristicWriteRequest(const BluetoothRemoteDevice &device, GattCharacteristic &characteristic,
