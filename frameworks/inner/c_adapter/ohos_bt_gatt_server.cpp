@@ -276,7 +276,7 @@ public:
         }
     }
 
-    void OnServiceAdded(GattService *Service, int ret) override
+    void OnServiceAdded(GattService service, int ret) override
     {
         int i;
         CHECK_AND_RETURN_LOG(
@@ -294,7 +294,7 @@ public:
                     continue;
                 }
                 auto &gattServiceWrapper = GATTSERVICES(serverId_, i);
-                if (gattServiceWrapper.isAdding && GATTSERVICE(serverId_, i)->GetUuid().Equals(Service->GetUuid())) {
+                if (gattServiceWrapper.isAdding && GATTSERVICE(serverId_, i)->GetUuid().Equals(service.GetUuid())) {
                     gattServiceWrapper.isAdding = false;
                     HILOGI("find service, serverId: %{public}d, serviceIndex: %{public}d", serverId_, i);
                     break;
@@ -302,12 +302,12 @@ public:
             }
         }
         if (i == MAXIMUM_NUMBER_GATTSERVICE) {
-            HILOGE("add service failed, invalid srvcHandle: %{public}u", Service->GetHandle());
+            HILOGE("add service failed, invalid srvcHandle: %{public}u", service.GetHandle());
             g_GattsCallback->serviceStartCb(OHOS_BT_STATUS_FAIL, serverId_, i);
             return;
         }
 
-        vector<GattCharacteristic> &characteristics = Service->GetCharacteristics();
+        vector<GattCharacteristic> &characteristics = service.GetCharacteristics();
         for (auto item = characteristics.begin(); item != characteristics.end(); item++) {
             auto characterAttribute =
                 GetAttributeWithUuid(serverId_, i, GattAttribute::GATT_CHARACTERISTIC, item->GetUuid());
