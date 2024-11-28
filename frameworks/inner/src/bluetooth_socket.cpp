@@ -639,6 +639,7 @@ struct ServerSocket::impl {
             HILOGE("socket is not in listen state");
             return nullptr;
         }
+        // If timeout <= 0, keeps waiting in blocking mode
         if (timeout > 0) {
             struct timeval time = {timeout, 0};
             setsockopt(fd_, SOL_SOCKET, SO_SNDTIMEO, (const char *)&time, sizeof(time));
