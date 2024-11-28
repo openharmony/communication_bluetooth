@@ -1391,7 +1391,7 @@ int32_t BluetoothHostProxy::GetLocalProfileUuids(std::vector<std::string> &uuids
         return BT_ERR_IPC_TRANS_FAILED;
     }
     int32_t size = reply.ReadInt32();
-    const int32_t maxSize = 100;
+    const int32_t maxSize = 1000;
     if (size > maxSize) {
         return BT_ERR_INVALID_PARAM;
     }
