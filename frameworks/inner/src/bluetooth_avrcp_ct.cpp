@@ -918,7 +918,6 @@ AvrcpController *AvrcpController::GetProfile(void)
 void AvrcpController::RegisterObserver(std::shared_ptr<IObserver> observer)
 {
     HILOGD("enter");
-    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
     pimpl->observers_.Register(observer);
 }
@@ -926,7 +925,6 @@ void AvrcpController::RegisterObserver(std::shared_ptr<IObserver> observer)
 void AvrcpController::UnregisterObserver(std::shared_ptr<IObserver> observer)
 {
     HILOGD("enter");
-    CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
     std::lock_guard<std::mutex> lock(pimpl->observerMutex_);
     pimpl->observers_.Deregister(observer);
 }
