@@ -31,7 +31,7 @@ std::shared_ptr<NapiAsyncWork> NapiAsyncWorkFactory::CreateAsyncWork(napi_env en
 {
     auto asyncCallback = NapiParseAsyncCallback(env, info);
     if (!asyncCallback) {
-        HILOGE("asyncCallback is nullptr");
+        HILOGE("asyncCallback is nullptr!");
         return nullptr;
     }
     auto napiAsyncWork = std::make_shared<NapiAsyncWork>(env, asyncWork, asyncCallback, needCallback);
