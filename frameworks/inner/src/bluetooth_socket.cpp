@@ -681,9 +681,9 @@ struct ServerSocket::impl {
         msg.msg_iovlen = 1;
 
 #ifdef DARWIN_PLATFORM
-        int rv = recvmsg(fd_, &msg, 0);
+        int rv = TEMP_FAILURE_RETRY(recvmsg(fd_, &msg, 0));
 #else
-        int rv = recvmsg(fd_, &msg, MSG_NOSIGNAL);
+        int rv = TEMP_FAILURE_RETRY(recvmsg(fd_, &msg, MSG_NOSIGNAL));
 #endif
         if (rv == -1) {
             HILOGE("[sock] recvmsg error  %{public}d, fd: %{public}d", errno, fd_);
