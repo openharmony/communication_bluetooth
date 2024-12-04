@@ -218,6 +218,16 @@ public:
 private:
     DeviceBatteryInfo batteryInfo_;
 };
+
+class NapiNativeInt64 : public NapiNativeObject {
+public:
+    explicit NapiNativeInt64(int64_t value) : value_(value) {}
+    ~NapiNativeInt64() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    int64_t value_;
+};
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_NATIVE_OBJECT_H

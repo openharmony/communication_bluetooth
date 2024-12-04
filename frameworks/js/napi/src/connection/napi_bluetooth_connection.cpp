@@ -117,6 +117,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setRemoteDeviceType", SetRemoteDeviceType),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceType", GetRemoteDeviceType),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceBatteryInfo", GetRemoteDeviceBatteryInfo),
+        DECLARE_NAPI_FUNCTION("getLastConnectionTime", GetRemoteDeviceConnectionTime),
     };
 
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
@@ -973,6 +974,26 @@ void DealPairStatus(const int &status, int &bondStatus)
         default:
             break;
     }
+}
+
+napi_value GetRemoteDeviceConnectionTime(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    std::string remoteAddr = INVALID_MAC_ADDRESS;
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
+    auto func = [remoteAddr]() {
+        int64_t connectionTime = 0;
+        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
+        int32_t err = remoteDevice.GetLastConnectionTime(connectionTime);
+        HILOGI("GetRemoteDeviceConnectionTime GetLastConnectionTime err: %{public}d", err);
+        auto object = std::make_shared<NapiNativeInt64>(connectionTime);
+        return NapiAsyncWorkRet(err, object);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

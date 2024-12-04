@@ -192,6 +192,16 @@ napi_value NapiNativeOppTransferInformation::ToNapiValue(napi_env env) const
     return result;
 }
 
+napi_value NapiNativeInt64::ToNapiValue(napi_env env) const
+{
+    napi_value value = nullptr;
+    napi_status status = napi_create_int64(env, value_, &value);
+    if (status != napi_ok) {
+        HILOGE("napi_create_int64 failed");
+    }
+    return value;
+}
+
 napi_value NapiNativeBatteryInfo::ToNapiValue(napi_env env) const
 {
     napi_value result = nullptr;
