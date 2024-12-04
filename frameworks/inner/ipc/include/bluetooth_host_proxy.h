@@ -110,6 +110,7 @@ public:
     int32_t SetVirtualAutoConnectType(const std::string &address, int connType, int businessType) override;
     int32_t SetFastScanLevel(int level) override;
     int32_t EnableBluetoothToRestrictMode(void) override;
+    int32_t GetLastConnectionTime(const std::string &address, int64_t &connectionTime) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;
