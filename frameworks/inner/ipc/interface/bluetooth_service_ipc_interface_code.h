@@ -451,6 +451,7 @@ enum BluetoothSocketInterfaceCode {
     SOCKET_UPDATE_COC_PARAMS,
     REGISTER_CLIENT_OBSERVER,
     DEREGISTER_CLIENT_OBSERVER,
+    SOCKET_IS_ALLOW_CONNECT,
     // The last code, if you want to add a new code, please add it before this
     SOCKET_BUTT
 };

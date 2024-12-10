@@ -254,6 +254,16 @@ public:
      */
     uint32_t GetMaxReceivePacketSize();
 
+    /**
+     * @brief Check if socket connect is allowed
+     *
+     * @param socketType socketType.
+     * @return Returns <b>true</b> allowed.
+     *         Returns <b>false</b> not allowed.
+     * @since 6
+     */
+    bool IsAllowSocketConnect(int socketType);
+
 private:
     ClientSocket() = delete;
     BLUETOOTH_DECLARE_IMPL();
