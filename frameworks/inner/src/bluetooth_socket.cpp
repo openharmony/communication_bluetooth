@@ -557,6 +557,17 @@ uint32_t ClientSocket::GetMaxReceivePacketSize()
     return pimpl->maxRxPacketSize_;
 }
 
+bool ClientSocket::IsAllowSocketConnect(int socketType)
+{
+    HILOGI("socketType: %{public}d", socketType);
+    sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "proxy is nullptr");
+    bool isAllowed = true;
+    int ret = proxy->IsAllowSocketConnect(socketType, pimpl->remoteDevice_.GetDeviceAddr(), isAllowed);
+    CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, true, "check if socket allowed failed, error: %{public}d", ret);
+    return isAllowed;
+}
+
 struct ServerSocket::impl {
     impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt);
     ~impl()
