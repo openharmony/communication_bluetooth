@@ -31,6 +31,7 @@ extern "C" {
 #define BT_SOCKET_INVALID_PSM (-1)
 #define BT_SOCKET_INVALID_SCN (-1)
 #define BT_SOCKET_INVALID_TYPE (-2)
+#define BT_SOCKET_LIMITED_RESOURCES (-3)
 
 typedef enum {
     OHOS_SOCKET_SPP_RFCOMM = 0x0,
