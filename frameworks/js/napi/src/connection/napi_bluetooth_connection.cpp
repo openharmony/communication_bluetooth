@@ -182,7 +182,7 @@ napi_value GetBtConnectionState(napi_env env, napi_callback_info info)
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int state = static_cast<int>(BTConnectState::DISCONNECTED);
     int32_t err = host->GetBtConnectionState(state);
-    HILOGD("start state %{publDc}d", state);
+    HILOGD("start state %{public}d", state);
     napi_value result = nullptr;
     napi_create_int32(env, GetProfileConnectionState(state), &result);
     NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
