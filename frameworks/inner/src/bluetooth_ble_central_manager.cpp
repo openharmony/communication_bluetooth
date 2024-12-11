@@ -43,7 +43,7 @@ struct BleCentralManager::impl {
     public:
         explicit BluetoothBleCentralManagerCallbackImp() {};
         ~BluetoothBleCentralManagerCallbackImp() override = default;
-        __attribute__((no_sanitize("cfi")))
+__attribute__((no_sanitize("cfi")))
         void OnScanCallback(const BluetoothBleScanResult &result, uint8_t callbackType) override
         {
             callbacks_.ForEach(
@@ -118,7 +118,7 @@ struct BleCentralManager::impl {
             });
         }
         
-        __attribute__((no_sanitize("cfi")))
+__attribute__((no_sanitize("cfi")))
         void OnStartOrStopScanEvent(int resultCode, bool isStartScan) override
         {
             HILOGD("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
