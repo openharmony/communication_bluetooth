@@ -84,6 +84,10 @@ std::vector<RawAddress> BluetoothAvrcpCtProxy::GetConnectedDevices()
         return rawAdds;
     }
     int32_t rawAddsSize = reply.ReadInt32();
+    const int32_t maxSize = 100;
+    if (rawAddsSize > maxSize) {
+        return rawAdds;
+    }
     for (int i = 0; i < rawAddsSize; i++) {
         rawAdds.push_back(RawAddress(reply.ReadString()));
     }
@@ -113,6 +117,10 @@ std::vector<RawAddress> BluetoothAvrcpCtProxy::GetDevicesByStates(const std::vec
         return rawAdds;
     }
     int32_t rawAddsSize = reply.ReadInt32();
+    const int32_t maxSize = 100;
+    if (rawAddsSize > maxSize) {
+        return rawAdds;
+    }
     for (int i = 0; i < rawAddsSize; i++) {
         rawAdds.push_back(RawAddress(reply.ReadString()));
     }
