@@ -166,7 +166,7 @@ int BluetoothSocketProxy::IsAllowSocketConnect(int socketType, const std::string
     MessageOption option(MessageOption::TF_SYNC);
 
     SEND_IPC_REQUEST_RETURN_RESULT(BluetoothSocketInterfaceCode::SOCKET_IS_ALLOW_CONNECT,
-        data, reply, option, false);
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     int32_t exception = reply.ReadInt32();
     if (exception == BT_NO_ERROR) {
