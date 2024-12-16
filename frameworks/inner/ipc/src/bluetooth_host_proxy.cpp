@@ -1771,5 +1771,31 @@ int32_t BluetoothHostProxy::ControlDeviceAction(const std::string &deviceId, uin
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     return reply.ReadInt32();
 }
+
+int32_t BluetoothHostProxy::GetLastConnectionTime(const std::string &address, int64_t &connectionTime)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::GetLastConnectionTime WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteString(address)) {
+        HILOGE("BluetoothHostProxy::GetLastConnectionTime WriteAddress error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::GET_CONNECTION_TIME, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::GetLastConnectionTime done fail error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    BtErrCode exception = static_cast<BtErrCode>(reply.ReadInt32());
+    if (exception == BT_NO_ERROR) {
+        connectionTime = reply.ReadInt64();
+    }
+    return exception;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
