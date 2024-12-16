@@ -279,6 +279,7 @@ enum BluetoothHostInterfaceCode {
     SET_FAST_SCAN_LEVEL,
     BT_ENABLE_BLUETOOTH_TO_RESTRICT_MODE,
     CTRL_DEVICE_ACTION,
+    GET_CONNECTION_TIME,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
