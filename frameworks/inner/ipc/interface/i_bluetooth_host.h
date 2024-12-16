@@ -137,6 +137,7 @@ public:
     virtual int32_t EnableBluetoothToRestrictMode(void) = 0;
     virtual int32_t ControlDeviceAction(const std::string &deviceId, uint32_t controlType,
         uint32_t controlTypeVal, uint32_t controlObject) = 0;
+    virtual int32_t GetLastConnectionTime(const std::string &address, int64_t &connectionTime) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
