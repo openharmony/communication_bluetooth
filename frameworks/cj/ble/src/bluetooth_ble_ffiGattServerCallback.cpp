@@ -75,7 +75,7 @@ void FfiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteDe
 
     CArrUI8 arr{};
     arr.head = valueData;
-    arr.size = valueSize;
+    arr.size = static_cast<int64_t>(valueSize);
     request.value = arr;
 
     request.characteristicUuid = MallocCString(characteristic.GetUuid().ToString().c_str());
@@ -143,7 +143,7 @@ void FfiGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevice
 
     CArrUI8 arr{};
     arr.head = valueData;
-    arr.size = valueSize;
+    arr.size = static_cast<int64_t>(valueSize);
     request.value = arr;
 
     request.descriptorUuid = MallocCString(descriptor.GetUuid().ToString().c_str());

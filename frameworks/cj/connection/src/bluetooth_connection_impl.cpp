@@ -128,7 +128,7 @@ CArrString ConnectionImpl::GetPairedDevices(int32_t* errCode)
     for (; i < size; ++i) {
         ret.head[i] = MallocCString(remoteDeviceLists[i].GetDeviceAddr());
     }
-    ret.size = i;
+    ret.size = static_cast<int64_t>(i);
     return ret;
 }
 
