@@ -88,7 +88,6 @@ napi_value NapiGattServer::GattServerConstructor(napi_env env, napi_callback_inf
         },
         nullptr,
         nullptr);
-
     if (status != napi_ok) {
         HILOGE("napi_wrap failed");
         delete gattServer;
