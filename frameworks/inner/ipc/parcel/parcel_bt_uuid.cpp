@@ -26,14 +26,16 @@ bool ParcelBtUuid::WriteToParcel(MessageParcel &parcel, bluetooth::Uuid &uuid)
     bluetooth::Uuid::UUID128Bit uuid128 = uuid.ConvertTo128Bits();
 
     uint64_t mostSigBits =
-        ((((uint64_t)uuid128[0]) << 56) | (((uint64_t)uuid128[1]) << 48) | (((uint64_t)uuid128[2]) << 40) |
-            (((uint64_t)uuid128[3]) << 32) | (((uint64_t)uuid128[4]) << 24) | (((uint64_t)uuid128[5]) << 16) |
-            (((uint64_t)uuid128[6]) << 8) | uuid128[7]);
+        (static_cast<uint64_t>(uuid128[0]) << 56) | (static_cast<uint64_t>(uuid128[1]) << 48) |
+            (static_cast<uint64_t>(uuid128[2]) << 40) | (static_cast<uint64_t>(uuid128[3]) << 32) |
+            (static_cast<uint64_t>(uuid128[4]) << 24) | (static_cast<uint64_t>(uuid128[5]) << 16) |
+            (static_cast<uint64_t>(uuid128[6]) << 8) | static_cast<uint64_t>(uuid128[7]);
 
     uint64_t leastSigBits =
-        ((((uint64_t)uuid128[8]) << 56) | (((uint64_t)uuid128[9]) << 48) | (((uint64_t)uuid128[10]) << 40) |
-            (((uint64_t)uuid128[11]) << 32) | (((uint64_t)uuid128[12]) << 24) | (((uint64_t)uuid128[13]) << 16) |
-            (((uint64_t)uuid128[14]) << 8) | uuid128[15]);
+        (static_cast<uint64_t>(uuid128[8]) <<56) | (static_cast<uint64_t>(uuid128[9]) << 48) |
+            (static_cast<uint64_t>(uuid128[10]) << 40) | (static_cast<uint64_t>(uuid128[11]) << 32) |
+            (static_cast<uint64_t>(uuid128[12]) << 24) | (static_cast<uint64_t>(uuid128[13]) << 16) |
+            (static_cast<uint64_t>(uuid128[14]) << 8) | static_cast<uint64_t>(uuid128[15]);
 
     bool ret = parcel.WriteUint64(mostSigBits);
     if (!ret) {

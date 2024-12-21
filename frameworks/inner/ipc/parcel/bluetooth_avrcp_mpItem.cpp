@@ -20,30 +20,30 @@ namespace Bluetooth {
 const uint32_t AVRCP_READ_FROM_PARCEL_COUNT_MAX = 0xFFFF;
 bool BluetoothAvrcpMpItem::Marshalling(Parcel &parcel) const
 {
-    if (!parcel.WriteUint8(itemType_)) {
+    if (!parcel.WriteUint8(avrcpMpItem_.itemType_)) {
         return false;
     }
-    if (!parcel.WriteUint16(playerId_)) {
+    if (!parcel.WriteUint16(avrcpMpItem_.playerId_)) {
         return false;
     }
-    if (!parcel.WriteUint8(majorType_)) {
+    if (!parcel.WriteUint8(avrcpMpItem_.majorType_)) {
         return false;
     }
-    if (!parcel.WriteUint32(subType_)) {
+    if (!parcel.WriteUint32(avrcpMpItem_.subType_)) {
         return false;
     }
-    if (!parcel.WriteUint8(playStatus_)) {
+    if (!parcel.WriteUint8(avrcpMpItem_.playStatus_)) {
         return false;
     }
-    if (!parcel.WriteUint32(features_.size())) {
+    if (!parcel.WriteUint32(avrcpMpItem_.features_.size())) {
         return false;
     }
-    for (auto &feature : features_) {
+    for (auto &feature : avrcpMpItem_.features_) {
         if (!parcel.WriteUint8(feature)) {
             return false;
         }
     }
-    if (!parcel.WriteString(name_)) {
+    if (!parcel.WriteString(avrcpMpItem_.name_)) {
         return false;
     }
     return true;
@@ -66,19 +66,19 @@ BluetoothAvrcpMpItem *BluetoothAvrcpMpItem::Unmarshalling(Parcel &parcel)
 
 bool BluetoothAvrcpMpItem::ReadFromParcel(Parcel &parcel)
 {
-    if (!parcel.ReadUint8(itemType_)) {
+    if (!parcel.ReadUint8(avrcpMpItem_.itemType_)) {
         return false;
     }
-    if (!parcel.ReadUint16(playerId_)) {
+    if (!parcel.ReadUint16(avrcpMpItem_.playerId_)) {
         return false;
     }
-    if (!parcel.ReadUint8(majorType_)) {
+    if (!parcel.ReadUint8(avrcpMpItem_.majorType_)) {
         return false;
     }
-    if (!parcel.ReadUint32(subType_)) {
+    if (!parcel.ReadUint32(avrcpMpItem_.subType_)) {
         return false;
     }
-    if (!parcel.ReadUint8(playStatus_)) {
+    if (!parcel.ReadUint8(avrcpMpItem_.playStatus_)) {
         return false;
     }
     uint32_t size = 0;
@@ -90,9 +90,9 @@ bool BluetoothAvrcpMpItem::ReadFromParcel(Parcel &parcel)
         if (!parcel.ReadUint8(feature)) {
             return false;
         }
-        features_.push_back(feature);
+        avrcpMpItem_.features_.push_back(feature);
     }
-    if (!parcel.ReadString(name_)) {
+    if (!parcel.ReadString(avrcpMpItem_.name_)) {
         return false;
     }
     return true;
