@@ -131,7 +131,6 @@ napi_value NapiGattClient::GattClientConstructor(napi_env env, napi_callback_inf
         },
         nullptr,
         nullptr);
-
     if (status != napi_ok) {
         HILOGE("napi_wrap failed");
         delete gattClient;
