@@ -237,13 +237,13 @@ public:
             std::vector<AvrcMpItem> myItems;
             for (size_t i = 0; i < items.size(); i++) {
                 AvrcMpItem myItem;
-                myItem.itemType_ = items.at(i).itemType_;
-                myItem.playerId_ = items.at(i).playerId_;
-                myItem.majorType_ = items.at(i).majorType_;
-                myItem.subType_ = items.at(i).subType_;
-                myItem.playStatus_ = items.at(i).playStatus_;
-                myItem.features_ = items.at(i).features_;
-                myItem.name_ = items.at(i).name_;
+                myItem.itemType_ = items.at(i).avrcpMpItem_.itemType_;
+                myItem.playerId_ = items.at(i).avrcpMpItem_.playerId_;
+                myItem.majorType_ = items.at(i).avrcpMpItem_.majorType_;
+                myItem.subType_ = items.at(i).avrcpMpItem_.subType_;
+                myItem.playStatus_ = items.at(i).avrcpMpItem_.playStatus_;
+                myItem.features_ = items.at(i).avrcpMpItem_.features_;
+                myItem.name_ = items.at(i).avrcpMpItem_.name_;
                 myItems.push_back(myItem);
             }
 
