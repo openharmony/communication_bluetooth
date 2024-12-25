@@ -104,7 +104,10 @@ int32_t BluetoothHidHostProxy::GetDevicesByStates(const std::vector<int32_t> &st
 
     // read size
     int32_t rawAddsSize = reply.ReadInt32();
-
+    const int32_t maxSize = 100;
+    if (rawAddsSize > maxSize) {
+        return BT_ERR_INVALID_PARAM;
+    }
     // read devices
     for (int i = 0; i < rawAddsSize; i++) {
         std::unique_ptr<BluetoothRawAddress> address(reply.ReadParcelable<BluetoothRawAddress>());

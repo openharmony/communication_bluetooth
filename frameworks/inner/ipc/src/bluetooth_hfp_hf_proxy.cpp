@@ -68,6 +68,10 @@ int BluetoothHfpHfProxy::GetDevicesByStates(const std::vector<int> &states, std:
         data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     uint32_t devNum = reply.ReadUint32();
+    const uint32_t maxSize = 100;
+    if (devNum > maxSize) {
+        return BT_ERR_INVALID_PARAM;
+    }
     for (uint32_t i = 0; i < devNum; i++) {
         std::shared_ptr<BluetoothRawAddress> dev(reply.ReadParcelable<BluetoothRawAddress>());
         if (!dev) {
@@ -203,6 +207,10 @@ int BluetoothHfpHfProxy::GetCurrentCallList(const BluetoothRawAddress &device, s
     SEND_IPC_REQUEST_RETURN_RESULT(BluetoothHfpHfInterfaceCode::BT_HFP_HF_GET_CURRENT_CALL_LIST,
         data, reply, option, BT_ERR_IPC_TRANS_FAILED);
     uint32_t callNum = reply.ReadUint32();
+    const uint32_t maxSize = 100;
+    if (callNum > maxSize) {
+        return BT_ERR_INVALID_PARAM;
+    }
     for (uint32_t i = 0; i < callNum; i++) {
         std::shared_ptr<BluetoothHfpHfCall> call(reply.ReadParcelable<BluetoothHfpHfCall>());
         if (!call) {
