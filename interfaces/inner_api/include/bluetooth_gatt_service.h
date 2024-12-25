@@ -110,6 +110,15 @@ public:
      */
     GattCharacteristic *GetCharacteristic(const UUID &uuid);
     /**
+     * @brief The function to get characteristic by characteristic value handle.
+     *
+     * @param handle handle of characteristic value.
+     * @return characteristic.
+     * @since 6
+     *
+     */
+    GattCharacteristic *GetCharacteristic(const uint16_t &handle);
+    /**
      * @brief The function to get all characteristics.
      *
      * @return list of characteristics.

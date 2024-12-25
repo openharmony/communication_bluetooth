@@ -119,12 +119,13 @@ uint16_t ConvertGattProperties(const NapiGattProperties &napiProperties)
 napi_status NapiParseGattCharacteristic(napi_env env, napi_value object, NapiBleCharacteristic &outCharacteristic)
 {
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"serviceUuid", "characteristicUuid",
-        "characteristicValue", "descriptors", "properties", "permissions"}));
+        "characteristicValue", "descriptors", "properties", "characteristicValueHandle", "permissions"}));
 
     std::string serviceUuid {};
     std::string characterUuid {};
     std::vector<uint8_t> characterValue {};
     std::vector<NapiBleDescriptor> descriptors {};
+    uint32_t characteristicValueHandle = 0;
     NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
     NAPI_BT_CALL_RETURN(NapiParseObjectUuid(env, object, "serviceUuid", serviceUuid));
     NAPI_BT_CALL_RETURN(NapiParseObjectUuid(env, object, "characteristicUuid", characterUuid));
@@ -134,6 +135,10 @@ napi_status NapiParseGattCharacteristic(napi_env env, napi_value object, NapiBle
     NapiGattProperties properties = DEFAULT_GATT_PROPERTIES;
     if (NapiIsObjectPropertyExist(env, object, "properties"))  {
         NAPI_BT_CALL_RETURN(NapiParseObjectGattProperties(env, object, "properties", properties));
+    }
+    if (NapiIsObjectPropertyExist(env, object, "characteristicValueHandle")) {
+        NAPI_BT_CALL_RETURN(NapiParseObjectUint32(env, object, "characteristicValueHandle", characteristicValueHandle));
+        NAPI_BT_RETURN_IF(characteristicValueHandle > 0xFFFF, "Invalid characteristicValueHandle", napi_invalid_arg);
     }
     NapiGattPermission permissions = DEFAULT_GATT_PERMISSIONS;
     if (NapiIsObjectPropertyExist(env, object, "permissions")) {
@@ -145,6 +150,7 @@ napi_status NapiParseGattCharacteristic(napi_env env, napi_value object, NapiBle
     outCharacteristic.characteristicValue = std::move(characterValue);
     outCharacteristic.descriptors = std::move(descriptors);
     outCharacteristic.properties = ConvertGattProperties(properties);
+    outCharacteristic.characteristicValueHandle = static_cast<uint16_t>(characteristicValueHandle);
     outCharacteristic.permissions = ConvertGattPermissions(permissions);
     return napi_ok;
 }
@@ -152,18 +158,23 @@ napi_status NapiParseGattCharacteristic(napi_env env, napi_value object, NapiBle
 napi_status NapiParseGattDescriptor(napi_env env, napi_value object, NapiBleDescriptor &outDescriptor)
 {
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"serviceUuid", "characteristicUuid",
-        "descriptorUuid", "descriptorValue", "permissions"}));
+        "descriptorUuid", "descriptorValue", "descriptorHandle", "permissions"}));
 
     std::string serviceUuid {};
     std::string characterUuid {};
     std::string descriptorUuid {};
     std::vector<uint8_t> descriptorValue {};
+    uint32_t descriptorHandle = 0;
     NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
     NAPI_BT_CALL_RETURN(NapiParseObjectUuid(env, object, "serviceUuid", serviceUuid));
     NAPI_BT_CALL_RETURN(NapiParseObjectUuid(env, object, "characteristicUuid", characterUuid));
     NAPI_BT_CALL_RETURN(NapiParseObjectUuid(env, object, "descriptorUuid", descriptorUuid));
     NAPI_BT_CALL_RETURN(NapiParseObjectArrayBuffer(env, object, "descriptorValue", descriptorValue));
 
+    if (NapiIsObjectPropertyExist(env, object, "descriptorHandle")) {
+        NAPI_BT_CALL_RETURN(NapiParseObjectUint32(env, object, "descriptorHandle", descriptorHandle));
+        NAPI_BT_RETURN_IF(descriptorHandle > 0xFFFF, "Invalid descriptorHandle", napi_invalid_arg);
+    }
     NapiGattPermission permissions = DEFAULT_GATT_PERMISSIONS;
     if (NapiIsObjectPropertyExist(env, object, "permissions")) {
         NAPI_BT_CALL_RETURN(NapiParseObjectGattPermissions(env, object, "permissions", permissions));
@@ -173,6 +184,7 @@ napi_status NapiParseGattDescriptor(napi_env env, napi_value object, NapiBleDesc
     outDescriptor.characteristicUuid = UUID::FromString(characterUuid);
     outDescriptor.descriptorUuid = UUID::FromString(descriptorUuid);
     outDescriptor.descriptorValue = std::move(descriptorValue);
+    outDescriptor.descriptorHandle = static_cast<uint16_t>(descriptorHandle);
     outDescriptor.permissions = ConvertGattPermissions(permissions);
     return napi_ok;
 }
