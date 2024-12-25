@@ -86,6 +86,10 @@ int32_t BluetoothPanProxy::GetDevicesByStates(const std::vector<int32_t> &states
 
     // read size
     int32_t rawAddsSize = reply.ReadInt32();
+    const int32_t maxSize = 100;
+    if (rawAddsSize > maxSize) {
+        return BT_ERR_INVALID_PARAM;
+    }
 
     // read devices
     for (int i = 0; i < rawAddsSize; i++) {
