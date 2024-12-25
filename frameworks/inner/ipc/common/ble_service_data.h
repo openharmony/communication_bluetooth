@@ -182,6 +182,38 @@ public:
      */
     uint8_t GetMatchMode() const;
 
+    /**
+     * @brief Get scan interval.
+     *
+     * @return scan interval value.
+     * @since 14
+     */
+    uint16_t GetScanInterval() const;
+
+        /**
+     * @brief Get scan window.
+     *
+     * @return scan window value.
+     * @since 14
+     */
+    uint16_t GetScanWindow() const;
+
+    /**
+     * @brief Set scan interval.
+     *
+     * @param scanInterval scan interval value.
+     * @since 14
+     */
+    void SetScanInterval(uint16_t scanInterval);
+
+    /**
+     * @brief Set scan window.
+     *
+     * @param scanWindow scan window value.
+     * @since 14
+     */
+    void SetScanWindow(uint16_t scanWindow);
+
     bool operator == (const BleScanSettingsImpl &rhs) const
     {
         return (legacy_ == rhs.GetLegacy()) &&
@@ -202,6 +234,8 @@ private:
     uint8_t callbackType_ = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
     uint8_t matchTrackAdvType_ = MAX_MATCH_TRACK_ADV;
     uint8_t matchMode_ = MATCH_MODE_AGGRESSIVE;
+    uint16_t scanInterval_ = 0;
+    uint16_t scanWindow_ = 0;
 };
 
 /**
