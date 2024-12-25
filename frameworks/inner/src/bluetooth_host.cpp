@@ -84,6 +84,7 @@ struct BluetoothHost::impl {
     BluetoothObserverList<BluetoothResourceManagerObserver> resourceManagerObservers_;
 
     void SyncRandomAddrToService(void);
+    int ConvertBluetoothStateToBtStateID(BluetoothState state);
 
     std::mutex proxyMutex_;
     std::string stagingRealAddr_;
@@ -569,6 +570,19 @@ void BluetoothHost::impl::SyncRandomAddrToService(void)
     stagingRandomAddr_ = "";
 }
 
+int BluetoothHost::impl::ConvertBluetoothStateToBtStateID(BluetoothState state)
+{
+    int ret = BTStateID::STATE_TURN_OFF;
+    switch (state) {
+        case BluetoothState::STATE_ON: ret = BTStateID::STATE_TURN_ON; break;
+        case BluetoothState::STATE_TURNING_ON: ret = BTStateID::STATE_TURNING_ON; break;
+        case BluetoothState::STATE_TURNING_OFF: ret = BTStateID::STATE_TURNING_OFF; break;
+        case BluetoothState::STATE_OFF: ret = BTStateID::STATE_TURN_OFF; break;
+        default: break;
+    }
+    return ret;
+}
+
 BluetoothHost::BluetoothHost()
 {
     pimpl = std::make_unique<impl>();
@@ -682,32 +696,23 @@ int BluetoothHost::SatelliteControl(int type, int state)
 
 int BluetoothHost::GetBtState() const
 {
-    HILOGD("enter");
-    if (!IS_BT_ENABLED()) {
-        HILOGD("bluetooth is off.");
-        return BTStateID::STATE_TURN_OFF;
-    }
-    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BTStateID::STATE_TURN_OFF, "proxy is nullptr");
-
-    int state = BTStateID::STATE_TURN_OFF;
-    proxy->GetBtState(state);
-    HILOGD("state: %{public}d", state);
-    return state;
+    BluetoothState state = GetBluetoothState();
+    return pimpl->ConvertBluetoothStateToBtStateID(state);
 }
 
 int BluetoothHost::GetBtState(int &state) const
 {
-    HILOGD("enter");
-    state = BTStateID::STATE_TURN_OFF;
-    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_NO_ERROR, "bluetooth is off.");
+    state = GetBtState();
+    return BT_NO_ERROR;
+}
 
+BluetoothState BluetoothHost::GetBluetoothState(void) const
+{
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "proxy is nullptr");
-
-    int ret = proxy->GetBtState(state);
-    HILOGI("state: %{public}d", state);
-    return ret;
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BluetoothState::STATE_OFF, "proxy is nullptr");
+    int state = static_cast<int>(BluetoothState::STATE_OFF);
+    proxy->GetBtState(state);
+    return static_cast<BluetoothState>(state);
 }
 
 int BluetoothHost::impl::EnableBluetoothAfterFactoryReset(void)
@@ -803,24 +808,17 @@ int BluetoothHost::EnableBluetoothToRestrictMode(void)
 
 bool BluetoothHost::IsBrEnabled() const
 {
-    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    if (proxy == nullptr) {
-        HILOGD("proxy is nullptr");
-        return false;
-    }
-
-    return proxy->IsBrEnabled();
+    BluetoothState state = GetBluetoothState();
+    return state == BluetoothState::STATE_ON;
 }
 
 bool BluetoothHost::IsBleEnabled() const
 {
-    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    if (proxy == nullptr) {
-        HILOGD("proxy is nullptr");
-        return false;
-    }
-
-    return proxy->IsBleEnabled();
+    BluetoothState state = GetBluetoothState();
+    return (state == BluetoothState::STATE_ON ||
+        state == BluetoothState::STATE_BLE_ON ||
+        state == BluetoothState::STATE_TURNING_ON ||
+        state == BluetoothState::STATE_TURNING_OFF);
 }
 
 int BluetoothHost::GetLocalAddress(std::string &addr) const

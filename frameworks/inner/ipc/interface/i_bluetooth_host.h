@@ -68,8 +68,6 @@ public:
     virtual int32_t GetLocalAddress(std::string &addr) = 0;
     virtual int32_t DisableBle() = 0;
     virtual int32_t EnableBle() = 0;
-    virtual bool IsBrEnabled() = 0;
-    virtual bool IsBleEnabled() = 0;
     virtual std::vector<uint32_t> GetProfileList() = 0;
     virtual int32_t GetMaxNumConnectedAudioDevices() = 0;
     virtual int32_t GetBtConnectionState(int &state) = 0;

@@ -257,40 +257,6 @@ int32_t BluetoothHostProxy::EnableBle()
     return reply.ReadInt32();
 }
 
-bool BluetoothHostProxy::IsBrEnabled()
-{
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::IsBrEnabled WriteInterfaceToken error");
-        return false;
-    }
-    MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_IS_BR_ENABLED, option, data, reply);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHostProxy::IsBrEnabled done fail, error: %{public}d", error);
-        return false;
-    }
-    return reply.ReadBool();
-}
-
-bool BluetoothHostProxy::IsBleEnabled()
-{
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::IsBleEnabled WriteInterfaceToken error");
-        return false;
-    }
-    MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_IS_BLE_ENABLED, option, data, reply);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHostProxy::IsBleEnabled done fail, error: %{public}d", error);
-        return false;
-    }
-    return reply.ReadBool();
-}
-
 std::vector<uint32_t> BluetoothHostProxy::GetProfileList()
 {
     std::vector<uint32_t> vec;
