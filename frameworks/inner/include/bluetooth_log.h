@@ -18,9 +18,6 @@
 
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD000101
-#ifndef LOG_TAG
-#define LOG_TAG "Bluetooth"
-#endif
 
 #include "hilog/log.h"
 
@@ -45,20 +42,20 @@
 #endif
 
 #define HILOGD(fmt, ...)                 \
-    HILOG_DEBUG(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        __FILE_NAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+    HILOG_DEBUG(LOG_CORE, "(%{public}s:%{public}d)" fmt,    \
+        __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGI(fmt, ...)                \
-    HILOG_INFO(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        __FILE_NAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+    HILOG_INFO(LOG_CORE, "(%{public}s:%{public}d)" fmt,    \
+        __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGW(fmt, ...)                \
-    HILOG_WARN(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        __FILE_NAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+    HILOG_WARN(LOG_CORE, "(%{public}s:%{public}d)" fmt,    \
+        __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGE(fmt, ...)                 \
-    HILOG_ERROR(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        __FILE_NAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+    HILOG_ERROR(LOG_CORE, "(%{public}s:%{public}d)" fmt,    \
+        __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define HILOGF(fmt, ...)                 \
-    HILOG_FATAL(LOG_CORE, "[%{public}s(%{public}s:%{public}d)]" fmt,    \
-        __FILE_NAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+    HILOG_FATAL(LOG_CORE, "(%{public}s:%{public}d)" fmt,    \
+        __FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 #ifdef CHECK_AND_RETURN_LOG
 #undef CHECK_AND_RETURN_LOG

@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_ipc_remote_device_obser_stub"
+#endif
 
 #include "bluetooth_remote_device_observer_stub.h"
 #include "bluetooth_bt_uuid.h"

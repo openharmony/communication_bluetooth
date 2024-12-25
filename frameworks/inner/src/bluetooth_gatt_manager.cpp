@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_fwk_gatt_manager"
+#endif
+
 #include <set>
 #include <vector>
 
