@@ -27,6 +27,7 @@ struct NapiBleDescriptor {
     UUID characteristicUuid;
     UUID descriptorUuid;
     std::vector<uint8_t> descriptorValue;
+    uint16_t descriptorHandle;
     int permissions;
 };
 
@@ -36,6 +37,7 @@ struct NapiBleCharacteristic {
     std::vector<uint8_t> characteristicValue;
     std::vector<NapiBleDescriptor> descriptors;
     int properties;
+    uint16_t characteristicValueHandle;
     int permissions;
 };
 
