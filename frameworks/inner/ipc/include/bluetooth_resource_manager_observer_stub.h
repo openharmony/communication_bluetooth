@@ -32,10 +32,12 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    ErrCode OnSensingStateChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnBluetoothResourceDecisionInner(MessageParcel &data, MessageParcel &reply);
+    static int32_t OnSensingStateChangedInner(BluetoothResourceManagerObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
+    static int32_t OnBluetoothResourceDecisionInner(BluetoothResourceManagerObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
 
-    using BluetoothResourceManagerObserverFunc = int32_t (BluetoothResourceManagerObserverStub::*)(
+    using BluetoothResourceManagerObserverFunc = int32_t (*)(BluetoothResourceManagerObserverStub *stub,
         MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothResourceManagerObserverFunc> memberFuncMap_;
     DISALLOW_COPY_AND_MOVE(BluetoothResourceManagerObserverStub);

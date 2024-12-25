@@ -177,7 +177,7 @@ int32_t BluetoothHostObserverStub::OnDeviceAddrChangedInner(BluetoothHostObserve
     return NO_ERROR;
 }
 
-ErrCode BluetoothHostObserverStub::OnBluetoothStateChangedInner(BluetoothHostObserverStub *stub,
+int32_t BluetoothHostObserverStub::OnBluetoothStateChangedInner(BluetoothHostObserverStub *stub,
     MessageParcel &data, MessageParcel &reply)
 {
     int32_t state = data.ReadInt32();
