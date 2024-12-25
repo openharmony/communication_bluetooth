@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_fwk_ble_central_manager"
+#endif
+
 #include "bluetooth_ble_central_manager.h"
 #include "bluetooth_ble_central_manager_callback_stub.h"
 #include "bluetooth_def.h"
