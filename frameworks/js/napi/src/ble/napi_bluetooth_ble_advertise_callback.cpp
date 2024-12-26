@@ -40,6 +40,11 @@ std::shared_ptr<NapiBluetoothBleAdvertiseCallback> NapiBluetoothBleAdvertiseCall
 void NapiBluetoothBleAdvertiseCallback::OnStartResultEvent(int result, int advHandle)
 {
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
+    if (advHandle_ == advHandle) {
+        HILOGI("OnStartResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
+        auto napiAdvHandle = std::make_shared<NapiNativeInt>(advHandle);
+        AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GET_ADVERTISING_HANDLE, napiAdvHandle, result);
+    }
     auto nativeObject =
         std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, static_cast<int>(AdvertisingState::STARTED));
     eventSubscribe_.PublishEvent(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, nativeObject);
@@ -64,6 +69,12 @@ void NapiBluetoothBleAdvertiseCallback::OnDisableResultEvent(int result, int adv
 void NapiBluetoothBleAdvertiseCallback::OnStopResultEvent(int result, int advHandle)
 {
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
+    if (advHandle_ == advHandle) {
+        HILOGI("OnStopResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
+        auto napiAdvResult = std::make_shared<NapiNativeInt>(result);
+        AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::BLE_STOP_ADVERTISING, napiAdvResult, result);
+        advHandle_ = -1;
+    }
     auto nativeObject =
         std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, static_cast<int>(AdvertisingState::STOPPED));
     eventSubscribe_.PublishEvent(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, nativeObject);
@@ -74,8 +85,7 @@ void NapiBluetoothBleAdvertiseCallback::OnSetAdvDataEvent(int result)
 
 void NapiBluetoothBleAdvertiseCallback::OnGetAdvHandleEvent(int result, int advHandle)
 {
-    auto napiAdvHandle = std::make_shared<NapiNativeInt>(advHandle);
-    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GET_ADVERTISING_HANDLE, napiAdvHandle, result);
+    advHandle_ = advHandle;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
