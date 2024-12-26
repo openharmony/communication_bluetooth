@@ -331,19 +331,17 @@ public:
             return;
         }
 
-        GattService *ptr = nullptr;
+        GattService gattService(UUID(), GattServiceType::PRIMARY);
         if (ret == GattStatus::GATT_SUCCESS) {
-            GattService gattSvc = serverSptr->pimpl->BuildService(service);
-            serverSptr->pimpl->BuildIncludeService(gattSvc, service.includeServices_);
+            gattService = serverSptr->pimpl->BuildService(service);
+            serverSptr->pimpl->BuildIncludeService(gattService, service.includeServices_);
             {
                 std::lock_guard<std::mutex> lck(serverSptr->pimpl->serviceListMutex_);
-                auto it = serverSptr->pimpl->gattServices_.emplace(
-                    serverSptr->pimpl->gattServices_.end(), std::move(gattSvc));
-                ptr = &(*it);
+                serverSptr->pimpl->gattServices_.emplace(serverSptr->pimpl->gattServices_.end(), gattService);
             }
         }
         if (serverSptr->pimpl && serverSptr->pimpl->callback_) {
-            serverSptr->pimpl->callback_->OnServiceAdded(ptr, ret);
+            serverSptr->pimpl->callback_->OnServiceAdded(gattService, ret);
         }
         return;
     }
