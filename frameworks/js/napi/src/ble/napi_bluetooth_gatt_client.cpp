@@ -188,7 +188,7 @@ static GattCharacteristic *FindCharacteristic(std::vector<GattService> &service,
     return nullptr;
 }
 
-static GattCharacteristic *GetCharacteristic(std::shared_ptr<GattClient> &client,
+static GattCharacteristic *GetCharacteristic(const std::shared_ptr<GattClient> &client,
     const NapiBleCharacteristic &napiCharacter)
 {
     if (client) {
