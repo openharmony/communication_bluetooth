@@ -194,7 +194,7 @@ static GattCharacteristic *GetCharacteristic(std::shared_ptr<GattClient> &client
     if (client) {
         if (napiCharacter.characteristicValueHandle > 0) {
             std::vector<GattService> &services = client->GetService();
-            return FindCharacteristic(service, napiCharacter);
+            return FindCharacteristic(services, napiCharacter);
         } else {
             GattCharacteristic *character = GetCharacteristic(client, napiCharacter.serviceUuid,
                 napiCharacter.characteristicUuid);
