@@ -117,7 +117,7 @@ public:
      * @since 6
      *
      */
-    GattCharacteristic *GetCharacteristic(const uint16_t &handle);
+    GattCharacteristic *GetCharacteristic(const uint16_t handle);
     /**
      * @brief The function to get all characteristics.
      *
