@@ -797,16 +797,6 @@ public:
     int SatelliteControl(int type, int state);
 
     /**
-     * @brief Set local adapter scan level.
-     *
-     * @param level Scan level.
-     * @return Returns <b>true</b> if the operation is successful;
-     *         returns <b>false</b> if the operation fails.
-     * @since 12
-     */
-    int SetFastScanLevel(int level);
-
-    /**
      * @brief Register bluetooth resource manager observer.
      *
      * @param observer Class RegisterBtResourceManagerObserver pointer to register observer.
@@ -822,6 +812,15 @@ public:
      */
     void DeregisterBtResourceManagerObserver(std::shared_ptr<BluetoothResourceManagerObserver> observer);
 
+    /**
+     * @brief Set local adapter scan level.
+     *
+     * @param level Scan level.
+     * @return Returns <b>true</b> if the operation is successful;
+     *         returns <b>false</b> if the operation fails.
+     * @since 12
+     */
+    int SetFastScanLevel(int level);
 
     /**
      * @brief Close the bluetooth host to release resources, only called before the process exits.
