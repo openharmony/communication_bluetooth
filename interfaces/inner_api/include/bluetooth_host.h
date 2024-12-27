@@ -775,6 +775,7 @@ public:
     * @since 12
     */
     int RestrictBluetooth();
+
     /**
     * @brief update virtual device
     *

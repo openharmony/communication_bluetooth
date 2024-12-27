@@ -592,7 +592,7 @@ int A2dpSource::WriteFrame(const uint8_t *data, uint32_t size)
     }
 
     sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
 
     return proxy->WriteFrame(data, size);
 }
@@ -693,7 +693,8 @@ A2dpOffloadCodecStatus A2dpSource::GetOffloadCodecStatus(const BluetoothRemoteDe
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), ret, "bluetooth is off.");
     sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, ret, "a2dpSrc proxy is nullptr");
-    BluetoothA2dpOffloadCodecStatus offloadStatus(proxy->GetOffloadCodecStatus(RawAddress(device.GetDeviceAddr())));
+    BluetoothA2dpOffloadCodecStatus offloadStatus =
+        proxy->GetOffloadCodecStatus(RawAddress(device.GetDeviceAddr()));
     A2dpOffloadCodecStatus status(offloadStatus);
     HILOGI("codecType:%{public}x,mtu:%{public}d", status.offloadInfo.codecType, status.offloadInfo.mtu);
     return status;
