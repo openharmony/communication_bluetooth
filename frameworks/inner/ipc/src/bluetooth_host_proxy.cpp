@@ -1686,19 +1686,6 @@ void BluetoothHostProxy::DeregisterBtResourceManagerObserver(const sptr<IBluetoo
     return;
 }
 
-void BluetoothHostProxy::UpdateVirtualDevice(int32_t action, const std::string &address)
-{
-    MessageParcel data;
-    CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG(data.WriteInt32(action), "Write action error");
-    CHECK_AND_RETURN_LOG(data.WriteString(address), "Write address error");
-    MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::UPDATE_VIRTUAL_DEVICE, option, data, reply);
-    CHECK_AND_RETURN_LOG((error == BT_NO_ERROR), "error: %{public}d", error);
-    return;
-}
-
 int32_t BluetoothHostProxy::IsSupportVirtualAutoConnect(const std::string &address, bool &outSupport)
 {
     MessageParcel data;
@@ -1728,6 +1715,18 @@ int32_t BluetoothHostProxy::SetVirtualAutoConnectType(const std::string &address
     return BT_NO_ERROR;
 }
 
+void BluetoothHostProxy::UpdateVirtualDevice(int32_t action, const std::string &address)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG(data.WriteInt32(action), "Write action error");
+    CHECK_AND_RETURN_LOG(data.WriteString(address), "Write address error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::UPDATE_VIRTUAL_DEVICE, option, data, reply);
+    CHECK_AND_RETURN_LOG((error == BT_NO_ERROR), "error: %{public}d", error);
+    return;
+}
 int32_t BluetoothHostProxy::SetFastScanLevel(int level)
 {
     MessageParcel data;
