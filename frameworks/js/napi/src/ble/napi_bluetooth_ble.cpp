@@ -1096,7 +1096,7 @@ napi_value PropertyInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("MatchMode", matchModeObj),
         DECLARE_NAPI_PROPERTY("ScanDuty", scanDutyObj),
         DECLARE_NAPI_PROPERTY("PhyType", phyTypeObj),
-
+                
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_PROPERTY("GattWriteType", gattWriteTypeObj),
         DECLARE_NAPI_PROPERTY("AdvertisingState", advertisingStateObj),

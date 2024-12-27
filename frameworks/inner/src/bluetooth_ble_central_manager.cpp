@@ -624,7 +624,6 @@ void BleScanResult::SetName(const std::string &name)
 {
     name_ = name;
 }
-
 std::string BleScanResult::GetName(void)
 {
     return name_;
