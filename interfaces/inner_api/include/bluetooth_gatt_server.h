@@ -305,7 +305,7 @@ private:
     explicit GattServer(std::shared_ptr<GattServerCallback> callback);
     BLUETOOTH_DECLARE_IMPL();
 
-    //The passkey pattern of C++
+    // The passkey pattern of C++
     struct PassKey {
         PassKey() {};
     };

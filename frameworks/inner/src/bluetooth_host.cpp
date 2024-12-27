@@ -668,15 +668,6 @@ int BluetoothHost::RestrictBluetooth()
     return ret;
 }
 
-void BluetoothHost::UpdateVirtualDevice(int32_t action, const std::string &address)
-{
-    HILOGD("enter");
-    CHECK_AND_RETURN_LOG(IS_BT_ENABLED(), "bluetooth is off");
-    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
-    proxy->UpdateVirtualDevice(action, address);
-}
-
 int BluetoothHost::SatelliteControl(int type, int state)
 {
     HILOGI("type: %{public}d, state: %{public}d", type, state);
@@ -688,10 +679,17 @@ int BluetoothHost::SatelliteControl(int type, int state)
         HILOGE("Invalid control type: %{public}d", type);
         return BT_ERR_INVALID_PARAM;
     }
-
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     return proxy->SatelliteControl(type, state);
+}
+void BluetoothHost::UpdateVirtualDevice(int32_t action, const std::string &address)
+{
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(IS_BT_ENABLED(), "bluetooth is off");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
+    proxy->UpdateVirtualDevice(action, address);
 }
 
 int BluetoothHost::GetBtState() const
