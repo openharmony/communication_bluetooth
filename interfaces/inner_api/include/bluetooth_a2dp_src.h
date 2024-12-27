@@ -260,13 +260,13 @@ public:
     A2dpCodecStatus GetCodecStatus(const BluetoothRemoteDevice &device) const;
 
     /**
-    * @brief Get the codec encoding preferences of the specified device.
-    *
-    * @param device The address of the bluetooth device.
-    * @param info The codec encoding information.
-    * @return Return the result getted.
-    * @since 6.0
-    */
+     * @brief Get the codec encoding preferences of the specified device.
+     *
+     * @param device The address of the bluetooth device.
+     * @param info The codec encoding information.
+     * @return Return the result getted.
+     * @since 6.0
+     */
     int GetCodecPreference(const BluetoothRemoteDevice &device, A2dpCodecInfo &info);
 
     /**
@@ -364,11 +364,10 @@ public:
 
     /**
      * @brief Get the information of the current rendered position.
-     * @param device The address of the bluetooth device.
+     * @param device The address of the peer bluetooth device.
      * @param[out] dalayValue is the delayed time
      * @param[out] sendDataSize is the data size that has been sent
      * @param[out] timeStamp is the current time stamp
-     * @return Returns general <b>enum BtErrCode</b> for the operation.
      * @since 6.0
      */
     int GetRenderPosition(const BluetoothRemoteDevice &device, uint32_t &delayValue, uint64_t &sendDataSize,

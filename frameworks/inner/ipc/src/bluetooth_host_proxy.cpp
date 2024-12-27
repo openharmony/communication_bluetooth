@@ -1642,17 +1642,47 @@ int32_t BluetoothHostProxy::GetRemoteDeviceInfo(const std::string &address,
     return exception;
 }
 
-
-void BluetoothHostProxy::UpdateVirtualDevice(int32_t action, const std::string &address)
+void BluetoothHostProxy::RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer)
 {
     MessageParcel data;
-    CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG(data.WriteInt32(action), "Write action error");
-    CHECK_AND_RETURN_LOG(data.WriteString(address), "Write address error");
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::RegisterBtResourceManagerObserver WriteInterfaceToken error");
+        return;
+    }
+    if (!data.WriteRemoteObject(observer->AsObject())) {
+        HILOGE("BluetoothHostProxy::RegisterBtResourceManagerObserver WriteInterfaceToken error");
+        return;
+    }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::UPDATE_VIRTUAL_DEVICE, option, data, reply);
-    CHECK_AND_RETURN_LOG((error == BT_NO_ERROR), "error: %{public}d", error);
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::BT_REGISTER_RESOURCE_MANAGER_OBSERVER, option, data, reply);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothHostProxy::RegisterBtResourceManagerObserver done fail, error: %{public}d", error);
+        return;
+    }
+    return;
+}
+
+void BluetoothHostProxy::DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::DeregisterBtResourceManagerObserver WriteInterfaceToken error");
+        return;
+    }
+    if (!data.WriteRemoteObject(observer->AsObject())) {
+        HILOGE("BluetoothHostProxy::DeregisterBtResourceManagerObserver WriteInterfaceToken error");
+        return;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::BT_DEREGISTER_RESOURCE_MANAGER_OBSERVER, option, data, reply);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothHostProxy::DeregisterBtResourceManagerObserver done fail, error: %{public}d", error);
+        return;
+    }
     return;
 }
 
@@ -1698,47 +1728,16 @@ int32_t BluetoothHostProxy::SetFastScanLevel(int level)
     return reply.ReadInt32();
 }
 
-void BluetoothHostProxy::RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer)
+void BluetoothHostProxy::UpdateVirtualDevice(int32_t action, const std::string &address)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::RegisterBtResourceManagerObserver WriteInterfaceToken error");
-        return;
-    }
-    if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("BluetoothHostProxy::RegisterBtResourceManagerObserver WriteInterfaceToken error");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG(data.WriteInt32(action), "Write action error");
+    CHECK_AND_RETURN_LOG(data.WriteString(address), "Write address error");
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(
-        BluetoothHostInterfaceCode::BT_REGISTER_RESOURCE_MANAGER_OBSERVER, option, data, reply);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHostProxy::RegisterBtResourceManagerObserver done fail, error: %{public}d", error);
-        return;
-    }
-    return;
-}
-
-void BluetoothHostProxy::DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer)
-{
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::DeregisterBtResourceManagerObserver WriteInterfaceToken error");
-        return;
-    }
-    if (!data.WriteRemoteObject(observer->AsObject())) {
-        HILOGE("BluetoothHostProxy::DeregisterBtResourceManagerObserver WriteInterfaceToken error");
-        return;
-    }
-    MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(
-        BluetoothHostInterfaceCode::BT_DEREGISTER_RESOURCE_MANAGER_OBSERVER, option, data, reply);
-    if (error != NO_ERROR) {
-        HILOGE("BluetoothHostProxy::DeregisterBtResourceManagerObserver done fail, error: %{public}d", error);
-        return;
-    }
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::UPDATE_VIRTUAL_DEVICE, option, data, reply);
+    CHECK_AND_RETURN_LOG((error == BT_NO_ERROR), "error: %{public}d", error);
     return;
 }
 

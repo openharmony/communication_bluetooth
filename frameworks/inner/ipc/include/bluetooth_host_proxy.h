@@ -103,12 +103,12 @@ public:
     int32_t SetDeviceCustomType(const std::string &address, int32_t deviceType) override;
     int32_t GetRemoteDeviceInfo(const std::string &address,
         std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo, int type) override;
-    void UpdateVirtualDevice(int32_t action, const std::string &address) override;
+    void RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) override;
+    void DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) override;
     int32_t IsSupportVirtualAutoConnect(const std::string &address, bool &outSupport) override;
     int32_t SetVirtualAutoConnectType(const std::string &address, int connType, int businessType) override;
     int32_t SetFastScanLevel(int level) override;
-    void RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) override;
-    void DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) override;
+    void UpdateVirtualDevice(int32_t action, const std::string &address) override;
     int32_t EnableBluetoothToRestrictMode(void) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
