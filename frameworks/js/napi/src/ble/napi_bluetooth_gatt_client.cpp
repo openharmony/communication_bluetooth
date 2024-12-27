@@ -173,11 +173,41 @@ static GattCharacteristic *GetCharacteristic(const std::shared_ptr<GattClient> &
     return character;
 }
 
+static GattCharacteristic *FindCharacteristic(std::vector<GattService> &service,
+    const NapiBleCharacteristic &napiCharacter)
+{
+    GattCharacteristic *character = nullptr;
+    for (auto &svc : service) {
+        if (svc.GetUuid().Equals(napiCharacter.serviceUuid)) {
+            character = svc.GetCharacteristic(napiCharacter.characteristicValueHandle);
+            if (character && character->GetUuid().Equals(napiCharacter.characteristicUuid)) {
+                return character;
+            }
+        }
+    }
+    return nullptr;
+}
+
+static GattCharacteristic *GetCharacteristic(const std::shared_ptr<GattClient> &client,
+    const NapiBleCharacteristic &napiCharacter)
+{
+    if (client) {
+        if (napiCharacter.characteristicValueHandle > 0) {
+            std::vector<GattService> &services = client->GetService();
+            return FindCharacteristic(services, napiCharacter);
+        } else {
+            GattCharacteristic *character = GetCharacteristic(client, napiCharacter.serviceUuid,
+                napiCharacter.characteristicUuid);
+            return character;
+        }
+    }
+    return nullptr;
+}
+
 static GattCharacteristic *GetGattcCharacteristic(const std::shared_ptr<GattClient> &client,
     const NapiBleCharacteristic &napiCharacter)
 {
-    GattCharacteristic *character = GetCharacteristic(client, napiCharacter.serviceUuid,
-        napiCharacter.characteristicUuid);
+    GattCharacteristic *character = GetCharacteristic(client, napiCharacter);
     if (character) {
         character->SetValue(napiCharacter.characteristicValue.data(), napiCharacter.characteristicValue.size());
     }
