@@ -68,7 +68,7 @@ napi_value NapiBleScanner::BleScannerConstructor(napi_env env, napi_callback_inf
     return thisVar;
 }
 
-napi_value NapiBleScanner::CreateBleScanner(napi_env env, napi_cllback_info info)
+napi_value NapiBleScanner::CreateBleScanner(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
     napi_value result;
@@ -145,7 +145,7 @@ napi_value NapiBleScanner::StartScan(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, bleCentralMgr != nullptr, BT_ERR_INVALID_PARAM);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    int ret = bleCentralManager->StartScan(settings, scanFilters);
+    int ret = bleCentralMgr->StartScan(settings, scanFilters);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR || ret == BT_ERR_BLE_SCAN_ALREADY_STARTED, ret);
 
     return NapiGetUndefinedRet(env);
@@ -158,6 +158,8 @@ static napi_status CheckBleScannerNoArgc(napi_env env, napi_callback_info info,
     napi_value thisVar = nullptr;
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
     NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ZERO, "Requires 0 argument.", napi_invalid_arg);
+    NapiBleScanner *napiBleScanner = NapiGetBleScanner(env, thisVar);
+    NAPI_BT_RETURN_IF(napiBleScanner == nullptr, "napiBleScanner is nullptr", napi_invalid_arg);
 
     outBleCentralManager = napiBleScanner->GetBleCentralManager();
     return napi_ok;
@@ -170,7 +172,7 @@ napi_value NapiBleScanner::StopScan(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, bleCentralMgr != nullptr, BT_ERR_INVALID_PARAM);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    int ret = bleCentralManager->StopScan();
+    int ret = bleCentralMgr->StopScan();
     NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
 
     return NapiGetUndefinedRet(env);

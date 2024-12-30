@@ -23,7 +23,7 @@ namespace Bluetooth {
 
 class NapiBleScanner {
 public:
-    static napi_value CreateBleScanner(napi_env env, napi_cllback_info info);
+    static napi_value CreateBleScanner(napi_env env, napi_callback_info info);
     static void DefineBleScannerJSClass(napi_env env);
     static napi_value BleScannerConstructor(napi_env env, napi_callback_info info);
 
