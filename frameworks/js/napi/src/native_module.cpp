@@ -24,6 +24,7 @@
 #include "napi_bluetooth_ble.h"
 #include "napi_bluetooth_gatt_client.h"
 #include "napi_bluetooth_gatt_server.h"
+#include "napi_bluetooth_ble_scanner.h"
 #include "napi_bluetooth_host.h"
 #include "napi_bluetooth_hfp_ag.h"
 #include "napi_bluetooth_hfp_hf.h"

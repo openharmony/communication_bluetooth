@@ -81,7 +81,7 @@ napi_value NapiBleScanner::CreateBleScanner(napi_env env, napi_callback_info inf
 static NapiBleScanner *NapiGetBleScanner(napi_env env, napi_value thisVar)
 {
     NapiBleScanner *bleScanner = nullptr;
-    auto status = napi_unwrap(env, thisVar, (void**)&bleScanner);
+    auto status = napi_unwrap(env, thisVar, (void **)&bleScanner);
     if (status != napi_ok) {
         return nullptr;
     }
@@ -164,6 +164,7 @@ static napi_status CheckBleScannerNoArgc(napi_env env, napi_callback_info info,
     outBleCentralManager = napiBleScanner->GetBleCentralManager();
     return napi_ok;
 }
+
 napi_value NapiBleScanner::StopScan(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
@@ -187,6 +188,7 @@ napi_value NapiBleScanner::On(napi_env env, napi_callback_info info)
     }
     return NapiGetUndefinedRet(env);
 }
+
 napi_value NapiBleScanner::Off(napi_env env, napi_callback_info info)
 {
     NapiBleScanner *napiBleScanner = NapiGetBleScanner(env, info);
