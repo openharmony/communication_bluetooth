@@ -408,6 +408,15 @@ public:
     int EnableBle();
 
     /**
+     * @brief Enable ble without AutoConnect.
+     *
+     * @return Returns <b>true</b> if the operation is accepted;
+     *         returns <b>false</b> if the operation is rejected.
+     * @since 6
+     */
+    int EnableBleNoAutoConnect();
+
+    /**
      * @brief Enable bluetooth to restrict mode.
      *
      * @return Returns BT_NO_ERROR if the operation is accepted;
