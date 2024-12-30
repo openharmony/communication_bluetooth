@@ -43,6 +43,7 @@ public:
     int32_t GetLocalAddress(std::string &addr) override;
     int32_t DisableBle() override;
     int32_t EnableBle() override;
+    int32_t EnableBleNoAutoConnect() override;
     std::vector<uint32_t> GetProfileList() override;
     int32_t GetMaxNumConnectedAudioDevices() override;
     int32_t GetBtConnectionState(int &state) override;
