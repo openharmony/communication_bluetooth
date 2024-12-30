@@ -355,7 +355,7 @@ napi_value NapiNativeBleScanReport::ToNapiValue(napi_env env) const
     std::vector<BleScanResult> results {scanResult_};
     int32_t scanReportType = static_cast<int32_t>(ScanReportType::ON_FOUND);
     ConvertScanReportToJS(env, scanReport, results, scanReportType);
-    return object;
+    return scanReport;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
