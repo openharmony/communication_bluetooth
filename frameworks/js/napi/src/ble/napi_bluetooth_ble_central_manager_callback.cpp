@@ -85,7 +85,7 @@ void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env
 }
 
 void ConvertScanReportToJS(const napi_env &env, napi_value &scanReport, const std::vector<BleScanResult> result,
-    int scanReportType, bool isSysInterface = false)
+    int32_t scanReportType, bool isSysInterface = false)
 {
     napi_value reportType = nullptr;
     napi_create_int32(env, scanReportType, &reportType);
