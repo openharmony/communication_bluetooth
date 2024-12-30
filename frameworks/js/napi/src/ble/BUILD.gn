@@ -43,6 +43,7 @@ ohos_shared_library("ble") {
 
   sources = [
     "napi_bluetooth_ble.cpp",
+    "napi_bluetooth_ble_scanner.cpp",
     "napi_bluetooth_ble_advertise_callback.cpp",
     "napi_bluetooth_ble_central_manager_callback.cpp",
     "napi_bluetooth_ble_utils.cpp",

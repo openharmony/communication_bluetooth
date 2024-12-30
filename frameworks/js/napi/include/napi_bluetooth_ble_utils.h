@@ -70,6 +70,30 @@ void ConvertDescriptorWriteReqToJS(
 void SetGattClientDeviceId(const std::string &deviceId);
 std::string GetGattClientDeviceId();
 
+napi_status ParseScanFilterDeviceIdParameters(
+    const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter);
+napi_status ParseScanFilterLocalNameParameters(
+    const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter);
+napi_status ParseScanFilterServiceUuidParameters(
+    const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter);
+napi_status ParseScanFilterSolicitationUuidParameters(
+    const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter);
+napi_status ParseScanFilterServiceDataParameters(
+    const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter);
+napi_status ParseScanFilterManufactureDataParameters(
+    const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter);
+napi_status ParseScanFilter(const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter);
+napi_status ParseScanFilterParameters(const napi_env &env, napi_value &args, std::vector<BleScanFilter>
+    &params);
+napi_status ParseScanParameters(
+    const napi_env &env, const napi_callback_info &info, const napi_value &scanArg, ScanOptions &params);
+bool ParseScanParameters(napi_env env, napi_value arg, ScanOptions &info);
+napi_value GetPropertyValueByNamed(napi_env env, napi_value object, std::string_view propertyName, napi_valuetype type);
+void RegisterBLEObserver(napi_env env, napi_value val, int32_t callbackIndex, const std::string &type);
+void ConvertMatchMode(ScanOptions &params, int32_t matchMode);
+void ConvertPhyType(ScanOptions &params, int32_t phyType);
+void ConvertDutyMode(ScanOptions &params, int32_t dutyMode);
+
 struct GattCharacteristicCallbackInfo : public BluetoothCallbackInfo {
     GattCharacteristic characteristic_ = {UUID::FromString("0"), 0, 0};
 };
@@ -102,6 +126,16 @@ class NapiNativeBleScanResult : public NapiNativeObject {
 public:
     NapiNativeBleScanResult(const BleScanResult &scanResult) : scanResult_(scanResult) {}
     ~NapiNativeBleScanResult() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    BleScanResult scanResult_;
+};
+
+class NapiNativeBleScanReport : public NapiNativeObject {
+public:
+    NapiNativeBleScanReport(const BleScanResult &scanResult) : scanResult_(scanResult) {}
+    ~NapiNativeBleScanReport() override = default;
 
     napi_value ToNapiValue(napi_env env) const override;
 private:

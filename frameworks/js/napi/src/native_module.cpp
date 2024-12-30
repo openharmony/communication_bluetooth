@@ -24,6 +24,7 @@
 #include "napi_bluetooth_ble.h"
 #include "napi_bluetooth_gatt_client.h"
 #include "napi_bluetooth_gatt_server.h"
+#include "napi_bluetooth_ble_scanner.h"
 #include "napi_bluetooth_host.h"
 #include "napi_bluetooth_hfp_ag.h"
 #include "napi_bluetooth_hfp_hf.h"
@@ -61,6 +62,7 @@ static napi_value Init(napi_env env, napi_value exports)
 
     NapiGattServer::DefineGattServerJSClass(env);
     NapiGattClient::DefineGattClientJSClass(env);
+    NapiBleScanner::DefineBleScannerJSClass(env);
     DefineBLEJSObject(env, exports);
     DefineSppFunctions(env, exports);
     NapiProfile::DefineProfileFunctions(env, exports);
