@@ -207,6 +207,11 @@ enum class AdvertisingState {
     STOPPED = 4  // advertiser stopped
 };
 
+enum class ScanReportType {
+    ON_FOUND = 1, // the found of advertisement packet
+    ON_LOST = 2 // the lost of advertisement packet
+};
+
 struct ScanOptions {
     int32_t interval = 0;                                   // Time of delay for reporting the scan result
     ScanDuty dutyMode = ScanDuty::SCAN_MODE_LOW_POWER;       // Bluetooth LE scan mode
@@ -218,6 +223,11 @@ struct ScanResult {
     std::string deviceId;       // Address of the scanned device
     int32_t rssi;               // RSSI of the remote device
     std::vector<uint8_t> data;  // The raw data of broadcast packet
+};
+
+struct ScanReport {
+    ScanReportType reportType;
+    std::vector<ScanResult> scanResult;
 };
 
 struct NapiAdvManufactureData {
