@@ -61,6 +61,7 @@ static napi_value Init(napi_env env, napi_value exports)
 
     NapiGattServer::DefineGattServerJSClass(env);
     NapiGattClient::DefineGattClientJSClass(env);
+    NapiBleScanner::DefineBleScannerJSClass(env);
     DefineBLEJSObject(env, exports);
     DefineSppFunctions(env, exports);
     NapiProfile::DefineProfileFunctions(env, exports);

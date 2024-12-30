@@ -84,6 +84,18 @@ void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env
     }
 }
 
+void ConvertScanReportToJS(const napi_env &env, napi_value &scanReport, const std::vector<BleScanResult> result,
+    int scanReportType, bool isSysInterface = false)
+{
+    napi_value reportType = nullptr;
+    napi_create_int32(env, scanReportType, &reportType);
+    napi_set_named_property(env, scanReport, "reportType", reportType);
+
+    napi_value scanResult = nullptr;
+    ConvertScanResult(result, env, scanResult);
+    napi_set_named_property(env, scanReport, "scanResult", scanResult);
+}
+
 void AfterWorkCallbackToSysBLEScan(uv_work_t *work, int status)
 {
     if (work == nullptr) {
@@ -201,6 +213,9 @@ void NapiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult 
 
     auto nativeObject = std::make_shared<NapiNativeBleScanResult>(result);
     eventSubscribe_.PublishEvent(REGISTER_BLE_FIND_DEVICE_TYPE, nativeObject);
+
+    auto nativeBleScanReportObj = std::make_shared<NapiNativeBleScanReport>(result);
+    eventSubscribe_.PublishEvent(REGISTER_BLE_FIND_DEVICE_TYPE, nativeBleScanReportObj);
 }
 
 void NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnBleBatchScanResultsEvent(
@@ -329,6 +344,17 @@ napi_value NapiNativeBleScanResult::ToNapiValue(napi_env env) const
     napi_value object = 0;
     std::vector<BleScanResult> results {scanResult_};
     ConvertScanResult(results, env, object);
+    return object;
+}
+
+napi_value NapiNativeBleScanReport::ToNapiValue(napi_env env) const
+{
+    napi_value scanReport = nullptr;
+    napi_create_object(env, &scanReport);
+
+    std::vector<BleScanResult> results {scanResult_};
+    int32_t scanReportType = static_cast<int32_t>(ScanReportType::ON_FOUND);
+    ConvertScanReportToJS(env, scanReport, results, scanReportType);
     return object;
 }
 }  // namespace Bluetooth
