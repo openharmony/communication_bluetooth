@@ -104,25 +104,5 @@ napi_value PropertyValueInit(napi_env env, napi_value exports)
     return exports;
 }
 
-napi_value ScanDutyInit(napi_env env)
-{
-    napi_value scanDuty = nullptr;
-    napi_create_object(env, &scanDuty);
-    SetNamedPropertyByInteger(env, scanDuty, static_cast<int>(ScanDuty::SCAN_MODE_LOW_POWER), "SCAN_MODE_LOW_POWER");
-    SetNamedPropertyByInteger(env, scanDuty, static_cast<int>(ScanDuty::SCAN_MODE_BALANCED), "SCAN_MODE_BALANCED");
-    SetNamedPropertyByInteger(
-        env, scanDuty, static_cast<int>(ScanDuty::SCAN_MODE_LOW_LATENCY), "SCAN_MODE_LOW_LATENCY");
-    return scanDuty;
-}
-
-napi_value MatchModeInit(napi_env env)
-{
-    napi_value matchMode = nullptr;
-    napi_create_object(env, &matchMode);
-    SetNamedPropertyByInteger(
-        env, matchMode, static_cast<int>(MatchMode::MATCH_MODE_AGGRESSIVE), "MATCH_MODE_AGGRESSIVE");
-    SetNamedPropertyByInteger(env, matchMode, static_cast<int>(MatchMode::MATCH_MODE_STICKY), "MATCH_MODE_STICKY");
-    return matchMode;
-}
 }  // namespace Bluetooth
 }  // namespace OHOS
