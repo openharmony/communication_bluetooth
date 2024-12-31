@@ -412,7 +412,7 @@ public:
      *
      * @return Returns <b>true</b> if the operation is accepted;
      *         returns <b>false</b> if the operation is rejected.
-     * @since 6
+     * @since 16
      */
     int EnableBleNoAutoConnect();
 
