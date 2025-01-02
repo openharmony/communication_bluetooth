@@ -307,6 +307,17 @@ public:
     int SetNotifyCharacteristic(GattCharacteristic &characteristic, bool enable);
 
     /**
+     * @brief The function to SetNotifyCharacteristic version 2, this funtion will not trigger onDespritor callback.
+     *
+     * @param characteristic characteristic object.
+     * @param enable enable of GattClient.
+     * @return result of #GATT_STATUS.
+     * @since 13
+     *
+     */
+    int SetNotifyCharacteristicV2(GattCharacteristic &characteristic, bool enable);
+    
+    /**
      * @brief The function to SetIndicateCharacteristic.
      *
      * @param characteristic characteristic object.

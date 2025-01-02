@@ -128,12 +128,12 @@ public:
     virtual int32_t SetDeviceCustomType(const std::string &address, int32_t deviceType) = 0;
     virtual int32_t GetRemoteDeviceInfo(const std::string &address,
         std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo, int type) = 0;
-    virtual void UpdateVirtualDevice(int32_t action, const std::string &address) = 0;
+    virtual void RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) = 0;
+    virtual void DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) = 0;
     virtual int32_t IsSupportVirtualAutoConnect(const std::string &address, bool &outSupport) = 0;
     virtual int32_t SetVirtualAutoConnectType(const std::string &address, int connType, int businessType) = 0;
     virtual int32_t SetFastScanLevel(int level) = 0;
-    virtual void RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) = 0;
-    virtual void DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) = 0;
+    virtual void UpdateVirtualDevice(int32_t action, const std::string &address) = 0;
     virtual int32_t EnableBluetoothToRestrictMode(void) = 0;
 };
 }  // namespace Bluetooth
