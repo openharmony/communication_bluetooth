@@ -33,6 +33,7 @@ public:
     virtual int EnableBluetooth(void) = 0;
     virtual int DisableBluetooth(void) = 0;
     virtual int EnableBluetoothToRestrictMode(void) = 0;
+    virtual void SetNoAutoConnect(bool) = 0;
 };
 
 enum class BluetoothSwitchEvent : int {
@@ -52,6 +53,7 @@ public:
     ~BluetoothSwitchModule() = default;
 
     int ProcessBluetoothSwitchEvent(BluetoothSwitchEvent event);
+    void SetNoAutoConnect(bool) = 0;
 
 private:
     int ProcessEnableBluetoothEvent(void);
