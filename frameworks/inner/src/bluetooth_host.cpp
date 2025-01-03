@@ -95,7 +95,6 @@ struct BluetoothHost::impl {
     class BluetoothSwitchAction;
     std::mutex switchModuleMutex_ {};  // used for serial execute enableBluetoothToRestrictMode.
     std::shared_ptr<BluetoothSwitchModule> switchModule_ { nullptr };
-    std::atomic_bool noAutoConnect_{false};
 
 private:
     SaManagerStatus saManagerStatus_ = SaManagerStatus::WAIT_NOTIFY;
@@ -426,7 +425,7 @@ private:
 
 class BluetoothHost::impl::BluetoothSwitchAction : public IBluetoothSwitchAction {
 public:
-    BluetoothSwitchAction(BluetoothHost::impl &host): host_(host){};
+    BluetoothSwitchAction() = default;
     ~BluetoothSwitchAction() override = default;
 
     int EnableBluetooth(void) override
@@ -438,11 +437,11 @@ public:
 
         sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
-        if (host_.noAutoConnect_) {
-            host_.noAutoConnect_ = false;
-            return proxy->EnableBleNoAutoConnect();
+        bool noAutoConnect = noAutoConnect_.load();
+        if (noAutoConnect) {
+            SetNoAutoConnect(false);
         }
-        return proxy->EnableBle();
+        return proxy->EnableBle(noAutoConnect);
     }
 
     int DisableBluetooth(void) override
@@ -463,8 +462,15 @@ public:
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
         return proxy->EnableBluetoothToRestrictMode();
     }
+
+    void SetNoAutoConnect(bool noAutoConnect) override
+    {
+        noAutoConnect_ = noAutoConnect;
+        return;
+    }
+
 private:
-    BluetoothHost::impl &host_;
+    std::atomic_bool noAutoConnect_ = false;
 };
 
 BluetoothHost::impl::impl()
@@ -475,7 +481,7 @@ BluetoothHost::impl::impl()
     bleObserverImp_ = new BluetoothHostObserverImp(*this);
     resourceManagerObserverImp_ = new BluetoothResourceManagerObserverImp(*this);
 
-    auto switchActionPtr = std::make_unique<BluetoothSwitchAction>(*this);
+    auto switchActionPtr = std::make_unique<BluetoothSwitchAction>();
     switchModule_ = std::make_shared<BluetoothSwitchModule>(std::move(switchActionPtr));
 
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(BLUETOOTH_HOST,
@@ -794,10 +800,10 @@ int BluetoothHost::EnableBle()
     return pimpl->switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::ENABLE_BLUETOOTH);
 }
 
-int BluetoothHost::EnableBleNoAutoConnect()
+int BluetoothHost::EnableBtNoAutoConnect()
 {
     HILOGI("enter");
-    pimpl->noAutoConnect_ = true;
+    pimpl->switchModule_->SetNoAutoConnect(true);
     return EnableBle();
 }
 
