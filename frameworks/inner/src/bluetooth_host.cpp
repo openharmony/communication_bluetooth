@@ -800,7 +800,7 @@ int BluetoothHost::EnableBle()
     return pimpl->switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::ENABLE_BLUETOOTH);
 }
 
-int BluetoothHost::EnableBtNoAutoConnect()
+int BluetoothHost::EnableBluetoothNoAutoConnect()
 {
     HILOGI("enter");
     pimpl->switchModule_->SetNoAutoConnect(true);
