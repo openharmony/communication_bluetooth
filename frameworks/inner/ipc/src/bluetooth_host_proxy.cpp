@@ -261,24 +261,6 @@ int32_t BluetoothHostProxy::EnableBle(bool noAutoConnect)
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::EnableBleNoAutoConnect()
-{
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::EnableBleNoAutoConnect WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_ENABLE_BLE_NOAUTOCONNECT, option, data, reply);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothHostProxy::EnableBleNoAutoConnect done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
-    return reply.ReadInt32();
-}
-
 std::vector<uint32_t> BluetoothHostProxy::GetProfileList()
 {
     std::vector<uint32_t> vec;
