@@ -239,11 +239,15 @@ int32_t BluetoothHostProxy::DisableBle()
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::EnableBle()
+int32_t BluetoothHostProxy::EnableBle(bool noAutoConnect)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
         HILOGE("BluetoothHostProxy::EnableBle WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteBool(noAutoConnect)) {
+        HILOGE("BluetoothHostProxy::EnableBle WriteBool error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
     MessageParcel reply;
