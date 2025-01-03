@@ -414,7 +414,7 @@ public:
      *         returns <b>false</b> if the operation is rejected.
      * @since 16
      */
-    int EnableBtNoAutoConnect();
+    int EnableBluetoothNoAutoConnect();
 
     /**
      * @brief Enable bluetooth to restrict mode.
