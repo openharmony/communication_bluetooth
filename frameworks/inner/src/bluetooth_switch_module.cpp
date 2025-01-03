@@ -222,5 +222,12 @@ void BluetoothSwitchModule::LogCacheEventIgnored(std::vector<BluetoothSwitchEven
         HILOGW("Ignore cache event: %{public}s", log.c_str());
     }
 }
+
+void BluetoothSwitchModule::SetNoAutoConnect(bool noAutoConnect)
+{
+    if (switchAction_ != nullptr) {
+        switchAction_->SetNoAutoConnect(noAutoConnect);
+    }
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
