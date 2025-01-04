@@ -485,6 +485,15 @@ public:
      */
     uint8_t GetAdvHandle(std::shared_ptr<BleAdvertiseCallback> callback);
 
+    /**
+     * @brief Get Advertise Observer.
+     *
+     * @param advHandle Advertise handle.
+     * @return Returns Observer ptr.
+     * @since 6
+     */
+    std::shared_ptr<BleAdvertiseCallback> GetAdvObs(uint32_t advHandle);
+
 private:
     BleAdvertiser();
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleAdvertiser);
