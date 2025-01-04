@@ -555,7 +555,7 @@ napi_value StartAdvertising(napi_env env, napi_callback_info info)
         uint16_t duration = 0;
         auto status = CheckAdvertisingDataWithDuration(env, argv[PARAM0], settings, advData, rspData, duration);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
-        auto callback = std:make_shared<NapiBluetoothBleAdvertiseCallback>();
+        auto callback = std::make_shared<NapiBluetoothBleAdvertiseCallback>();
         auto func = [settings, advData, rspData, duration, bleAdvertiser, callback]() {
             int ret = bleAdvertiser->StartAdvertising(
                 settings, advData, rspData, duration, callback);
