@@ -123,7 +123,7 @@ int BluetoothSwitchModule::ProcessEnableBluetoothEvent(void)
             if (noAutoConnect) {
                 SetNoAutoConnect(false);
             }
-            return switchAction_->EnableBluetooth(noAutoConnect); 
+            return switchAction_->EnableBluetooth(noAutoConnect);
         },
         BluetoothSwitchEvent::ENABLE_BLUETOOTH);
 }
