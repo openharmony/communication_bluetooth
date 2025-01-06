@@ -79,7 +79,7 @@ private:
     std::atomic_bool isBtSwitchProcessing_ { false };
     std::vector<BluetoothSwitchEvent> cachedEventVec_ {};
     std::mutex bluetoothSwitchEventMutex_ {};  // Used for ProcessBluetoothSwitchEvent function
-    std::atomic_bool noAutoConnect_ = false;
+    std::atomic_bool noAutoConnect_ { false };
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
