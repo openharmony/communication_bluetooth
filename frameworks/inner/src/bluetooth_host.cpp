@@ -428,7 +428,7 @@ public:
     BluetoothSwitchAction() = default;
     ~BluetoothSwitchAction() override = default;
 
-    int EnableBluetooth(void) override
+    int EnableBluetooth(bool noAutoConnect) override
     {
         CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
             BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited !");
@@ -437,10 +437,6 @@ public:
 
         sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
-        bool noAutoConnect = noAutoConnect_.load();
-        if (noAutoConnect) {
-            SetNoAutoConnect(false);
-        }
         return proxy->EnableBle(noAutoConnect);
     }
 
@@ -468,9 +464,6 @@ public:
         noAutoConnect_ = noAutoConnect;
         return;
     }
-
-private:
-    std::atomic_bool noAutoConnect_ = false;
 };
 
 BluetoothHost::impl::impl()
