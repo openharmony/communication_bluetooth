@@ -458,12 +458,6 @@ public:
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
         return proxy->EnableBluetoothToRestrictMode();
     }
-
-    void SetNoAutoConnect(bool noAutoConnect) override
-    {
-        noAutoConnect_ = noAutoConnect;
-        return;
-    }
 };
 
 BluetoothHost::impl::impl()
