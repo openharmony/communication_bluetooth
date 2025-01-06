@@ -118,7 +118,13 @@ int BluetoothSwitchModule::ProcessBluetoothSwitchAction(
 int BluetoothSwitchModule::ProcessEnableBluetoothEvent(void)
 {
     return ProcessBluetoothSwitchAction(
-        [this]() { return switchAction_->EnableBluetooth(); },
+        [this]() {
+            bool noAutoConnect = noAutoConnect_.load();
+            if (noAutoConnect) {
+                SetNoAutoConnect(false);
+            }
+            return switchAction_->EnableBluetooth(noAutoConnect); 
+        },
         BluetoothSwitchEvent::ENABLE_BLUETOOTH);
 }
 
@@ -225,9 +231,7 @@ void BluetoothSwitchModule::LogCacheEventIgnored(std::vector<BluetoothSwitchEven
 
 void BluetoothSwitchModule::SetNoAutoConnect(bool noAutoConnect)
 {
-    if (switchAction_ != nullptr) {
-        switchAction_->SetNoAutoConnect(noAutoConnect);
-    }
+    noAutoConnect_ = noAutoConnect;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
