@@ -18,16 +18,6 @@ SUBSYSTEM_DIR = "//foundation/communication"
 ohos_shared_library("bluetooth") {
   branch_protector_ret = "pac_ret"  # Enable PAC CFI
 
-  # sanitize = {
-  #   cfi = true  # Enable/disable control flow integrity detection
-  #   boundary_sanitize = true  # Enable boundary san detection
-  #   cfi_cross_dso = true  # Cross-SO CFI Checks
-  #   integer_overflow = true  # Enable integer overflow detection
-  #   ubsan = true  # Enable some Ubsan options
-  #   debug = false
-  #   blocklist = "./js_napi_blocklist.txt"
-  # }
-
   #install_enable = true
   include_dirs = [
     "include",
@@ -51,6 +41,7 @@ ohos_shared_library("bluetooth") {
     ubsan = true  # Enable some Ubsan options
     debug = false
   }
+
   sources = [
     "src/a2dp/napi_bluetooth_a2dp_src.cpp",
     "src/a2dp/napi_bluetooth_a2dp_src_observer.cpp",
@@ -59,9 +50,9 @@ ohos_shared_library("bluetooth") {
     "src/audio_manager/napi_bluetooth_audio_manager.cpp",
     "src/base_profile/napi_bluetooth_base_profile.cpp",
     "src/ble/napi_bluetooth_ble.cpp",
-    "src/ble/napi_bluetooth_ble_scanner.cpp",
     "src/ble/napi_bluetooth_ble_advertise_callback.cpp",
     "src/ble/napi_bluetooth_ble_central_manager_callback.cpp",
+    "src/ble/napi_bluetooth_ble_scanner.cpp",
     "src/ble/napi_bluetooth_ble_utils.cpp",
     "src/ble/napi_bluetooth_gatt_client.cpp",
     "src/ble/napi_bluetooth_gatt_client_callback.cpp",
@@ -92,7 +83,10 @@ ohos_shared_library("bluetooth") {
     "src/socket/napi_bluetooth_spp_server.cpp",
   ]
 
-  deps = [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework" ]
+  deps = [
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/common:bt_napi_common",
+  ]
 
   external_deps = [
     "ability_base:want",
@@ -149,9 +143,9 @@ ohos_shared_library("bluetoothmanager") {
     "src/audio_manager/napi_bluetooth_audio_manager.cpp",
     "src/base_profile/napi_bluetooth_base_profile.cpp",
     "src/ble/napi_bluetooth_ble.cpp",
-    "src/ble/napi_bluetooth_ble_scanner.cpp",
     "src/ble/napi_bluetooth_ble_advertise_callback.cpp",
     "src/ble/napi_bluetooth_ble_central_manager_callback.cpp",
+    "src/ble/napi_bluetooth_ble_scanner.cpp",
     "src/ble/napi_bluetooth_ble_utils.cpp",
     "src/ble/napi_bluetooth_gatt_client.cpp",
     "src/ble/napi_bluetooth_gatt_client_callback.cpp",
@@ -182,7 +176,10 @@ ohos_shared_library("bluetoothmanager") {
     "src/socket/napi_bluetooth_spp_server.cpp",
   ]
 
-  deps = [ "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework" ]
+  deps = [
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/common:bt_napi_common",
+  ]
 
   external_deps = [
     "ability_base:want",

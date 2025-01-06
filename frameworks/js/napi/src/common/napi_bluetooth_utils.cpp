@@ -22,8 +22,6 @@
 #include <optional>
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
-#include "event_handler.h"  // libeventhandler
-#include "event_runner.h"  // libeventhandler
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "napi_bluetooth_error.h"
