@@ -46,7 +46,10 @@ ohos_shared_library("cj_bluetooth_ble_ffi") {
     "src/bluetooth_ble_impl.cpp",
   ]
 
-  deps = [ "$BT_PART_DIR/frameworks/inner:btframework" ]
+  deps = [
+    "$BT_PART_DIR/frameworks/inner:btframework",
+    "$BT_PART_DIR/frameworks/js/napi/src/common:bt_napi_common",
+  ]
 
   external_deps = [
     "c_utils:utils",

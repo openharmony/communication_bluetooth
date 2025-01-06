@@ -49,7 +49,10 @@ ohos_shared_library("a2dp") {
     "$BT_NAPI_DIR/src/a2dp/native_module_a2dp.cpp",
   ]
 
-  deps = [ "$BT_PART_DIR/frameworks/inner:btframework" ]
+  deps = [
+    "$BT_PART_DIR/frameworks/inner:btframework",
+    "$BT_PART_DIR/frameworks/js/napi/src/common:bt_napi_common",
+  ]
 
   external_deps = [
     "ability_base:want",
