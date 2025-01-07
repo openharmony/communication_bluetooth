@@ -490,9 +490,9 @@ public:
      *
      * @param advHandle Advertise handle.
      * @return Returns Observer ptr.
-     * @since 6
+     * @since 16
      */
-    std::shared_ptr<BleAdvertiseCallback> GetAdvObs(uint32_t advHandle);
+    std::shared_ptr<BleAdvertiseCallback> GetAdvObserver(uint32_t advHandle);
 
 private:
     BleAdvertiser();
