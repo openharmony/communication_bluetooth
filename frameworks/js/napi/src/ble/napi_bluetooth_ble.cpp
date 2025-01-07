@@ -601,7 +601,7 @@ napi_status CheckAdvertisingEnableParams(napi_env env, napi_callback_info info,
 
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
     NAPI_BT_RETURN_IF(bleAdvertiser == nullptr, "bleAdvertiser is nullptr", napi_invalid_arg);
-    callback = bleAdvertiser->GetAdvObs(outAdvHandle);
+    callback = bleAdvertiser->GetAdvObserver(outAdvHandle);
     NAPI_BT_RETURN_IF(callback == nullptr, "callback is nullptr", napi_invalid_arg);
 
     bool exist = false;
@@ -664,7 +664,7 @@ napi_status CheckAdvertisingDisableParams(napi_env env, napi_callback_info info,
 
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
     NAPI_BT_RETURN_IF(bleAdvertiser == nullptr, "bleAdvertiser is nullptr", napi_invalid_arg);
-    callback = bleAdvertiser->GetAdvObs(outAdvHandle);
+    callback = bleAdvertiser->GetAdvObserver(outAdvHandle);
     NAPI_BT_RETURN_IF(callback == nullptr, "callback is nullptr", napi_invalid_arg);
 
     return napi_ok;
@@ -708,7 +708,7 @@ napi_status CheckStopAdvWithAdvId(napi_env env, napi_value object, uint32_t &out
 
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
     NAPI_BT_RETURN_IF(bleAdvertiser == nullptr, "bleAdvertiser is nullptr", napi_invalid_arg);
-    callback = bleAdvertiser->GetAdvObs(outAdvHandle);
+    callback = bleAdvertiser->GetAdvObserver(outAdvHandle);
     NAPI_BT_RETURN_IF(callback == nullptr, "callback is nullptr", napi_invalid_arg);
     return napi_ok;
 }
