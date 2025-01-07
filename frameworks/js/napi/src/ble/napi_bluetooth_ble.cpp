@@ -38,7 +38,8 @@
 namespace OHOS {
 namespace Bluetooth {
 
-auto g_eventSubscribe = std::make_shared<NapiEventSubscribeModule>(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, BT_MODULE_NAME);
+auto g_eventSubscribe =
+    std::make_shared<NapiEventSubscribeModule>(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, BT_MODULE_NAME);
 
 namespace {
 struct SysStopBLEContext {
