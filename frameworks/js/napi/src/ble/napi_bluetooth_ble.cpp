@@ -38,7 +38,7 @@
 namespace OHOS {
 namespace Bluetooth {
 
-NapiEventSubscribeModule g_eventSubscribe(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, BT_MODULE_NAME);
+auto g_eventSubscribe = std::make_shared<NapiEventSubscribeModule>(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, BT_MODULE_NAME);
 
 namespace {
 struct SysStopBLEContext {
@@ -211,6 +211,11 @@ napi_value SysUnsubscribeBLEFound(napi_env env, napi_callback_info info)
 }
 } // namespace
 
+const std::shared_ptr<NapiEventSubscribeModule> &GetEventSubscribe()
+{
+    return g_eventSubscribe;
+}
+
 void DefineSystemBLEInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
@@ -249,7 +254,7 @@ static napi_value On(napi_env env, napi_callback_info info)
         return NapiBluetoothBleCentralManagerCallback::GetInstance().eventSubscribe_.Register(env, info);
     };
     auto bleAdvertiserFunc =  [](napi_env env, napi_callback_info info) {
-        return g_eventSubscribe.Register(env, info);
+        return g_eventSubscribe->Register(env, info);
     };
 
     auto status = NapiBluetoothBleOnOffExecute(env, info, bleCentralManagerFunc, bleAdvertiserFunc);
@@ -263,7 +268,7 @@ static napi_value Off(napi_env env, napi_callback_info info)
         return NapiBluetoothBleCentralManagerCallback::GetInstance().eventSubscribe_.Deregister(env, info);
     };
     auto bleAdvertiserFunc =  [](napi_env env, napi_callback_info info) {
-        return g_eventSubscribe.Deregister(env, info);
+        return g_eventSubscribe->Deregister(env, info);
     };
 
     auto status = NapiBluetoothBleOnOffExecute(env, info, bleCentralManagerFunc, bleAdvertiserFunc);
@@ -618,9 +623,11 @@ napi_value EnableAdvertising(napi_env env, napi_callback_info info)
     HILOGI("enter");
     uint32_t advHandle = 0xFF;
     uint16_t duration = 0;
-    std::shared_ptr<BleAdvertiseCallback> callback;
-    auto status = CheckAdvertisingEnableParams(env, info, advHandle, duration, callback);
+    std::shared_ptr<BleAdvertiseCallback> baseCallback;
+    auto status = CheckAdvertisingEnableParams(env, info, advHandle, duration, baseCallback);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    std::shared_ptr<NapiBluetoothBleAdvertiseCallback> callback =
+        std::static_pointer_cast<NapiBluetoothBleAdvertiseCallback>(baseCallback);
     auto func = [advHandle, duration, callback]() {
         std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
         if (bleAdvertiser == nullptr) {
@@ -632,8 +639,11 @@ napi_value EnableAdvertising(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(ret);
     };
 
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    bool success = callback->asyncWorkMap_.TryPush(
+        NapiAsyncType::BLE_ENABLE_ADVERTISING, asyncWork);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
     asyncWork->Run();
     return asyncWork->GetRet();
@@ -663,9 +673,11 @@ napi_value DisableAdvertising(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
     uint32_t advHandle = 0xFF;
-    std::shared_ptr<BleAdvertiseCallback> callback;
-    auto status = CheckAdvertisingDisableParams(env, info, advHandle, callback);
+    std::shared_ptr<BleAdvertiseCallback> baseCallback;
+    auto status = CheckAdvertisingDisableParams(env, info, advHandle, baseCallback);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    std::shared_ptr<NapiBluetoothBleAdvertiseCallback> callback =
+        std::static_pointer_cast<NapiBluetoothBleAdvertiseCallback>(baseCallback);
     auto func = [advHandle, callback]() {
         std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
         if (bleAdvertiser == nullptr) {
@@ -677,8 +689,11 @@ napi_value DisableAdvertising(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(ret);
     };
 
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    bool success = callback->asyncWorkMap_.TryPush(
+        NapiAsyncType::BLE_DISABLE_ADVERTISING, asyncWork);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
     asyncWork->Run();
     return asyncWork->GetRet();
