@@ -31,7 +31,7 @@ napi_value DisableAdvertising(napi_env env, napi_callback_info info);
 napi_value StopAdvertising(napi_env env, napi_callback_info info);
 napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info);
 napi_value PropertyInit(napi_env env, napi_value exports);
-extern NapiEventSubscribeModule g_eventSubscribe;
+const std::shared_ptr<NapiEventSubscribeModule> &GetEventSubscribe();
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif /* NAPI_BLUETOOTH_BLE_H_ */
