@@ -594,7 +594,7 @@ static napi_status ParseScanFilterParameters(const napi_env &env, napi_value &ar
     return napi_ok;
 }
 
-static napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vector<BleScanFilter> &outScanfilters,
+napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vector<BleScanFilter> &outScanfilters,
     BleScanSettings &outSettinngs)
 {
     size_t argc = ARGS_SIZE_TWO;
