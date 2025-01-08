@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -78,8 +78,14 @@ napi_value NapiBleScanner::CreateBleScanner(napi_env env, napi_callback_info inf
     return result;
 }
 
-static NapiBleScanner *NapiGetBleScanner(napi_env env, napi_value thisVar)
+static NapiBleScanner *NapiGetBleScanner(napi_env env, napi_callback_info info)
 {
+    size_t argc = 0;
+    napi_value thisVar = nullptr;
+    if (napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr) != napi_ok) {
+        return nullptr;
+    }
+
     NapiBleScanner *bleScanner = nullptr;
     auto status = napi_unwrap(env, thisVar, (void **)&bleScanner);
     if (status != napi_ok) {
@@ -88,95 +94,58 @@ static NapiBleScanner *NapiGetBleScanner(napi_env env, napi_value thisVar)
     return bleScanner;
 }
 
-static NapiBleScanner *NapiGetBleScanner(napi_env env, napi_callback_info info)
-{
-    size_t argc = 0;
-    napi_value thisVar = nullptr;
-    if (napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr) != napi_ok) {
-        return nullptr;
-    }
-    return NapiGetBleScanner(env, thisVar);
-}
-
-static napi_status CheckBleScannerParams(napi_env env, napi_callback_info info,
-    std::vector<BleScanFilter> &outScanFilters, BleScanSettings &outSettings,
-    std::shared_ptr<BleCentralManager> &outBleCentralManager)
-{
-    size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
-    napi_value thisVar = nullptr;
-    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    NAPI_BT_RETURN_IF((argc == 0 || argc > ARGS_SIZE_TWO), "Requires 1 or 2 arguments.", napi_invalid_arg);
-    NapiBleScanner *napiBleScanner = NapiGetBleScanner(env, thisVar);
-    NAPI_BT_RETURN_IF(napiBleScanner == nullptr, "napiBleScanner is nullptr", napi_invalid_arg);
-
-    outBleCentralManager = napiBleScanner->GetBleCentralManager();
-
-    std::vector<BleScanFilter> scanFilters;
-    // Support null param
-    napi_valuetype type = napi_undefined;
-    NAPI_BT_CALL_RETURN(napi_typeof(env, argv[PARAM0], &type));
-    if (type == napi_null) {
-        BleScanFilter emptyFilter;
-        scanFilters.push_back(emptyFilter);
-    } else {
-        NAPI_BT_CALL_RETURN(ParseScanFilterParameters(env, argv[PARAM0], scanFilters));
-    }
-
-    if (argc == ARGS_SIZE_TWO) {
-        ScanOptions scanOptions;
-        NAPI_BT_CALL_RETURN(ParseScanParameters(env, info, argv[PARAM1], scanOptions));
-        outSettings.SetReportDelay(scanOptions.interval);
-        outSettings.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
-        outSettings.SetPhy(static_cast<int32_t>(scanOptions.phyType));
-    }
-
-    outScanFilters = std::move(scanFilters);
-    return napi_ok;
-}
-
 napi_value NapiBleScanner::StartScan(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<BleCentralManager> bleCentralMgr = nullptr;
     std::vector<BleScanFilter> scanFilters;
     BleScanSettings settings;
-    auto status = CheckBleScannerParams(env, info, scanFilters, settings, bleCentralMgr);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, bleCentralMgr != nullptr, BT_ERR_INVALID_PARAM);
+    auto status = CheckBleScanParams(env, info, scanFilters, settings);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    int ret = bleCentralMgr->StartScan(settings, scanFilters);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR || ret == BT_ERR_BLE_SCAN_ALREADY_STARTED, ret);
+    NapiBleScanner *napiBleScanner = NapiGetBleScanner(env, info);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, napiBleScanner != nullptr, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, napiBleScanner->GetBleCentralManager() != nullptr, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, napiBleScanner->GetCallback() != nullptr, BT_ERR_INVALID_PARAM);
 
-    return NapiGetUndefinedRet(env);
-}
+    auto func = [napiBleScanner, settings, scanFilters]() {
+        int ret = napiBleScanner->GetBleCentralManager()->StartScan(settings, scanFilters);
+        return NapiAsyncWorkRet(ret);
+    };
+    
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    bool success =
+        napiBleScanner->GetCallback()->asyncWorkMap_.TryPush(NapiAsyncType::BLE_START_SCAN, asyncWork);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
-static napi_status CheckBleScannerNoArgc(napi_env env, napi_callback_info info,
-    std::shared_ptr<BleCentralManager> &outBleCentralManager)
-{
-    size_t argc = ARGS_SIZE_ZERO;
-    napi_value thisVar = nullptr;
-    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
-    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ZERO, "Requires 0 argument.", napi_invalid_arg);
-    NapiBleScanner *napiBleScanner = NapiGetBleScanner(env, thisVar);
-    NAPI_BT_RETURN_IF(napiBleScanner == nullptr, "napiBleScanner is nullptr", napi_invalid_arg);
-
-    outBleCentralManager = napiBleScanner->GetBleCentralManager();
-    return napi_ok;
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 
 napi_value NapiBleScanner::StopScan(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<BleCentralManager> bleCentralMgr = nullptr;
-    auto status = CheckBleScannerNoArgc(env, info, bleCentralMgr);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, bleCentralMgr != nullptr, BT_ERR_INVALID_PARAM);
+    auto status = CheckEmptyParam(env, type_info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    int ret = bleCentralMgr->StopScan();
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
+    NapiBleScanner *napiBleScanner = NapiGetBleScanner(env, info);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, napiBleScanner != nullptr, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, napiBleScanner->GetBleCentralManager() != nullptr, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, napiBleScanner->GetCallback() != nullptr, BT_ERR_INVALID_PARAM);
 
-    return NapiGetUndefinedRet(env);
+    auto func = [napiBleScanner]() {
+        int ret = napiBleScanner->GetBleCentralManager()->StopScan();
+        return NapiAsyncWorkRet(ret);
+    };
+
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    bool success =
+        napiBleScanner->GetCallback()->asyncWorkMap_.TryPush(NapiAsyncType::BLE_STOP_SCAN, asyncWork);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
+
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 
 napi_value NapiBleScanner::On(napi_env env, napi_callback_info info)
