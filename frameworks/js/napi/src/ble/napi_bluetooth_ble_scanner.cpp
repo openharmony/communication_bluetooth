@@ -125,7 +125,7 @@ napi_value NapiBleScanner::StartScan(napi_env env, napi_callback_info info)
 napi_value NapiBleScanner::StopScan(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    auto status = CheckEmptyParam(env, type_info);
+    auto status = CheckEmptyParam(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     NapiBleScanner *napiBleScanner = NapiGetBleScanner(env, info);
