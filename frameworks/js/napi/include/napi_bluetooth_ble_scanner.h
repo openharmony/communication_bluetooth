@@ -44,7 +44,7 @@ public:
 
     NapiBleScanner()
     {
-        callback_ = std::make_shared<NapiBluetoothBleCentralManagerCallback>();
+        callback_ = std::make_shared<NapiBluetoothBleCentralManagerCallback>(true);
         bleCentralManager_ = std::make_shared<BleCentralManager>(callback_);
     }
     ~NapiBleScanner() = default;
