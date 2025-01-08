@@ -209,7 +209,7 @@ enum class AdvertisingState {
 
 enum class ScanReportType {
     ON_FOUND = 1, // the found of advertisement packet
-    ON_LOST = 2 // the lost of advertisement packet
+    ON_LOST = 2  // the lost of advertisement packet
 };
 
 struct ScanOptions {

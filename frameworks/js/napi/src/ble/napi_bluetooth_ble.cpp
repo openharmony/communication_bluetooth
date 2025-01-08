@@ -895,8 +895,10 @@ napi_status CheckAdvertisingEnableParams(napi_env env, napi_callback_info info,
 
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
     NAPI_BT_RETURN_IF(bleAdvertiser == nullptr, "bleAdvertiser is nullptr", napi_invalid_arg);
-    callback = bleAdvertiser->GetAdvObserver(outAdvHandle);
-    NAPI_BT_RETURN_IF(callback == nullptr, "callback is nullptr", napi_invalid_arg);
+    if (outAdvHandle != BLE_INVALID_ADVERTISING_HANDLE) {
+        callback = bleAdvertiser->GetAdvObserver(outAdvHandle);
+        NAPI_BT_RETURN_IF(callback == nullptr, "callback is nullptr", napi_invalid_arg);
+    }
 
     bool exist = false;
     uint32_t duration = 0;
@@ -921,6 +923,7 @@ napi_value EnableAdvertising(napi_env env, napi_callback_info info)
     std::shared_ptr<BleAdvertiseCallback> baseCallback;
     auto status = CheckAdvertisingEnableParams(env, info, advHandle, duration, baseCallback);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE, BT_ERR_INTERNAL_ERROR);
     std::shared_ptr<NapiBluetoothBleAdvertiseCallback> callback =
         std::static_pointer_cast<NapiBluetoothBleAdvertiseCallback>(baseCallback);
     auto func = [advHandle, duration, callback]() {
@@ -958,8 +961,10 @@ napi_status CheckAdvertisingDisableParams(napi_env env, napi_callback_info info,
 
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
     NAPI_BT_RETURN_IF(bleAdvertiser == nullptr, "bleAdvertiser is nullptr", napi_invalid_arg);
-    callback = bleAdvertiser->GetAdvObserver(outAdvHandle);
-    NAPI_BT_RETURN_IF(callback == nullptr, "callback is nullptr", napi_invalid_arg);
+    if (outAdvHandle != BLE_INVALID_ADVERTISING_HANDLE) {
+        callback = bleAdvertiser->GetAdvObserver(outAdvHandle);
+        NAPI_BT_RETURN_IF(callback == nullptr, "callback is nullptr", napi_invalid_arg);
+    }
 
     return napi_ok;
 }
@@ -971,6 +976,7 @@ napi_value DisableAdvertising(napi_env env, napi_callback_info info)
     std::shared_ptr<BleAdvertiseCallback> baseCallback;
     auto status = CheckAdvertisingDisableParams(env, info, advHandle, baseCallback);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE, BT_ERR_INTERNAL_ERROR);
     std::shared_ptr<NapiBluetoothBleAdvertiseCallback> callback =
         std::static_pointer_cast<NapiBluetoothBleAdvertiseCallback>(baseCallback);
     auto func = [advHandle, callback]() {
@@ -1002,8 +1008,10 @@ napi_status CheckStopAdvWithAdvId(napi_env env, napi_value object, uint32_t &out
 
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
     NAPI_BT_RETURN_IF(bleAdvertiser == nullptr, "bleAdvertiser is nullptr", napi_invalid_arg);
-    callback = bleAdvertiser->GetAdvObserver(outAdvHandle);
-    NAPI_BT_RETURN_IF(callback == nullptr, "callback is nullptr", napi_invalid_arg);
+    if (outAdvHandle != BLE_INVALID_ADVERTISING_HANDLE) {
+        callback = bleAdvertiser->GetAdvObserver(outAdvHandle);
+        NAPI_BT_RETURN_IF(callback == nullptr, "callback is nullptr", napi_invalid_arg);
+    }
     return napi_ok;
 }
 
@@ -1038,6 +1046,7 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
         std::shared_ptr<BleAdvertiseCallback> baseCallback;
         status = CheckStopAdvWithAdvId(env, argv[PARAM0], advHandle, baseCallback);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE, BT_ERR_INTERNAL_ERROR);
         std::shared_ptr<NapiBluetoothBleAdvertiseCallback> callback =
             std::static_pointer_cast<NapiBluetoothBleAdvertiseCallback>(baseCallback);
         auto func = [bleAdvertiser, callback]() {
@@ -1075,7 +1084,7 @@ napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value  ScanReportTypeInit(napi_env env)
+napi_value ScanReportTypeInit(napi_env env)
 {
     HILOGD("enter");
     napi_value scanReportTypeObj = nullptr;
@@ -1131,7 +1140,6 @@ napi_value PropertyInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("MatchMode", matchModeObj),
         DECLARE_NAPI_PROPERTY("ScanDuty", scanDutyObj),
         DECLARE_NAPI_PROPERTY("PhyType", phyTypeObj),
-                
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_PROPERTY("GattWriteType", gattWriteTypeObj),
         DECLARE_NAPI_PROPERTY("AdvertisingState", advertisingStateObj),
