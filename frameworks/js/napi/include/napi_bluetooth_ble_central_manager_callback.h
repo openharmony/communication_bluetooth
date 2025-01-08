@@ -25,7 +25,7 @@ namespace OHOS {
 namespace Bluetooth {
 class NapiBluetoothBleCentralManagerCallback : public BleCentralManagerCallback {
 public:
-    NapiBluetoothBleCentralManagerCallback();
+    NapiBluetoothBleCentralManagerCallback(bool isLatestNapiBleScannerObj);
     ~NapiBluetoothBleCentralManagerCallback() override = default;
 
     static NapiBluetoothBleCentralManagerCallback &GetInstance(void);
@@ -37,6 +37,8 @@ public:
     void OnNotifyMsgReportFromLpDevice(const UUID &uuid, int msgType, const std::vector<uint8_t> &value) override {};
 
     NapiEventSubscribeModule eventSubscribe_;
+    NapiAsyncWorkMap asyncWorkMap_ {};
+    bool isLatestNapiBleScannerObj_ = false;
 
 private:
     void UvQueueWorkOnScanCallback(uv_work_t *work, std::shared_ptr<BleScanResult> &result);
