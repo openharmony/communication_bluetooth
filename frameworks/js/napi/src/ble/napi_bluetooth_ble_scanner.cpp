@@ -87,7 +87,7 @@ static NapiBleScanner *NapiGetBleScanner(napi_env env, napi_callback_info info)
     }
 
     NapiBleScanner *bleScanner = nullptr;
-    auto status = napi_unwrap(env, thisVar, (void **)&bleScanner);
+    auto status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&bleScanner));
     if (status != napi_ok) {
         return nullptr;
     }
@@ -111,7 +111,7 @@ napi_value NapiBleScanner::StartScan(napi_env env, napi_callback_info info)
         int ret = napiBleScanner->GetBleCentralManager()->StartScan(settings, scanFilters);
         return NapiAsyncWorkRet(ret);
     };
-    
+
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     bool success =
