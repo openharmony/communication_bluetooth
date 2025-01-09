@@ -222,9 +222,9 @@ public:
                 HILOGD("TimerId no registered, is 0.");
             }
         }
+        lock_guard<mutex> lock(g_advMutex);
         g_bleAdvCallbacks[advId_] = nullptr;
         int i = 0;
-        lock_guard<mutex> lock(g_advMutex);
         for (; i < MAX_BLE_ADV_NUM; i++) {
             if (g_bleAdvCallbacks[i] != nullptr) {
                 break;
