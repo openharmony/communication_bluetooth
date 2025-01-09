@@ -47,7 +47,10 @@ ohos_shared_library("pbap") {
     "native_module_pbap.cpp",
   ]
 
-  deps = [ "$BT_PART_DIR/frameworks/inner:btframework" ]
+  deps = [
+    "$BT_PART_DIR/frameworks/inner:btframework",
+    "$BT_PART_DIR/frameworks/js/napi/src/common:bt_napi_common",
+  ]
 
   external_deps = [
     "ability_base:want",
