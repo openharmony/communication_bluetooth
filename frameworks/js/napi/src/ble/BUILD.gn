@@ -43,9 +43,9 @@ ohos_shared_library("ble") {
 
   sources = [
     "napi_bluetooth_ble.cpp",
-    "napi_bluetooth_ble_scanner.cpp",
     "napi_bluetooth_ble_advertise_callback.cpp",
     "napi_bluetooth_ble_central_manager_callback.cpp",
+    "napi_bluetooth_ble_scanner.cpp",
     "napi_bluetooth_ble_utils.cpp",
     "napi_bluetooth_gatt_client.cpp",
     "napi_bluetooth_gatt_client_callback.cpp",
@@ -54,7 +54,10 @@ ohos_shared_library("ble") {
     "native_module_ble.cpp",
   ]
 
-  deps = [ "$BT_PART_DIR/frameworks/inner:btframework" ]
+  deps = [
+    "$BT_PART_DIR/frameworks/inner:btframework",
+    "$BT_PART_DIR/frameworks/js/napi/src/common:bt_napi_common",
+  ]
 
   external_deps = [
     "c_utils:utils",
