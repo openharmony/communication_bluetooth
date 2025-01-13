@@ -280,6 +280,8 @@ enum BluetoothHostInterfaceCode {
     BT_ENABLE_BLUETOOTH_TO_RESTRICT_MODE,
     CTRL_DEVICE_ACTION,
     GET_CONNECTION_TIME,
+    BT_UPDATE_CLOUD_DEVICE,
+    GET_CLOUD_BOND_STATE,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
