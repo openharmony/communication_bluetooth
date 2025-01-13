@@ -923,6 +923,7 @@ napi_value EnableAdvertising(napi_env env, napi_callback_info info)
     std::shared_ptr<BleAdvertiseCallback> baseCallback;
     auto status = CheckAdvertisingEnableParams(env, info, advHandle, duration, baseCallback);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    // compatible with XTS
     NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE, BT_ERR_INTERNAL_ERROR);
     std::shared_ptr<NapiBluetoothBleAdvertiseCallback> callback =
         std::static_pointer_cast<NapiBluetoothBleAdvertiseCallback>(baseCallback);
@@ -976,6 +977,7 @@ napi_value DisableAdvertising(napi_env env, napi_callback_info info)
     std::shared_ptr<BleAdvertiseCallback> baseCallback;
     auto status = CheckAdvertisingDisableParams(env, info, advHandle, baseCallback);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    // compatible with XTS
     NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE, BT_ERR_INTERNAL_ERROR);
     std::shared_ptr<NapiBluetoothBleAdvertiseCallback> callback =
         std::static_pointer_cast<NapiBluetoothBleAdvertiseCallback>(baseCallback);
@@ -1046,6 +1048,7 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
         std::shared_ptr<BleAdvertiseCallback> baseCallback;
         status = CheckStopAdvWithAdvId(env, argv[PARAM0], advHandle, baseCallback);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+        // compatible with XTS
         NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE, BT_ERR_INTERNAL_ERROR);
         std::shared_ptr<NapiBluetoothBleAdvertiseCallback> callback =
             std::static_pointer_cast<NapiBluetoothBleAdvertiseCallback>(baseCallback);
