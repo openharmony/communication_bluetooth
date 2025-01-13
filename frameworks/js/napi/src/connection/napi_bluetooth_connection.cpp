@@ -72,22 +72,16 @@ std::map<std::string, std::function<napi_value(napi_env env)>> g_callbackDefault
          napi_set_named_property(env, result, "state", state);
          return result;
      }}};
-
+#ifdef BLUETOOTH_API_SINCE_10
 napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
 {
     RegisterObserverToHost();
     ConnectionPropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getBtConnectionState", GetBtConnectionState),
-#ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("pairDevice", PairDeviceAsync),
         DECLARE_NAPI_FUNCTION("cancelPairedDevice", CancelPairedDeviceAsync),
         DECLARE_NAPI_FUNCTION("getProfileConnectionState", GetProfileConnectionStateEx),
-#else
-        DECLARE_NAPI_FUNCTION("pairDevice", PairDevice),
-        DECLARE_NAPI_FUNCTION("cancelPairedDevice", CancelPairedDevice),
-        DECLARE_NAPI_FUNCTION("getProfileConnectionState", GetProfileConnectionState),
-#endif
         DECLARE_NAPI_FUNCTION("getRemoteDeviceName", GetRemoteDeviceName),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceClass", GetRemoteDeviceClass),
         DECLARE_NAPI_FUNCTION("getLocalName", GetLocalName),
@@ -99,7 +93,6 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getBluetoothScanMode", GetBluetoothScanMode),
         DECLARE_NAPI_FUNCTION("startBluetoothDiscovery", StartBluetoothDiscovery),
         DECLARE_NAPI_FUNCTION("stopBluetoothDiscovery", StopBluetoothDiscovery),
-#ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("setDevicePinCode", SetDevicePinCode),
         DECLARE_NAPI_FUNCTION("cancelPairingDevice", CancelPairingDevice),
         DECLARE_NAPI_FUNCTION("pairCredibleDevice", PairCredibleDevice),
@@ -112,19 +105,54 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("connectAllowedProfiles", ConnectAllowedProfiles),
         DECLARE_NAPI_FUNCTION("disconnectAllowedProfiles", DisconnectAllowedProfiles),
         DECLARE_NAPI_FUNCTION("getRemoteProductId", GetRemoteProductId),
-#endif
         DECLARE_NAPI_FUNCTION("setRemoteDeviceName", SetRemoteDeviceName),
         DECLARE_NAPI_FUNCTION("setRemoteDeviceType", SetRemoteDeviceType),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceType", GetRemoteDeviceType),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceBatteryInfo", GetRemoteDeviceBatteryInfo),
         DECLARE_NAPI_FUNCTION("controlDeviceAction", ControlDeviceAction),
         DECLARE_NAPI_FUNCTION("getLastConnectionTime", GetRemoteDeviceConnectionTime),
+        DECLARE_NAPI_FUNCTION("updateCloudBluetoothDevice", UpdateCloudBluetoothDevice),
     };
 
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     return exports;
 }
+#else
+napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
+{
+    RegisterObserverToHost();
+    ConnectionPropertyValueInit(env, exports);
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_FUNCTION("getBtConnectionState", GetBtConnectionState),
+        DECLARE_NAPI_FUNCTION("pairDevice", PairDevice),
+        DECLARE_NAPI_FUNCTION("cancelPairedDevice", CancelPairedDevice),
+        DECLARE_NAPI_FUNCTION("getProfileConnectionState", GetProfileConnectionState),
+        DECLARE_NAPI_FUNCTION("getRemoteDeviceName", GetRemoteDeviceName),
+        DECLARE_NAPI_FUNCTION("getRemoteDeviceClass", GetRemoteDeviceClass),
+        DECLARE_NAPI_FUNCTION("getLocalName", GetLocalName),
+        DECLARE_NAPI_FUNCTION("getPairedDevices", GetPairedDevices),
+        DECLARE_NAPI_FUNCTION("getProfileConnState", GetProfileConnectionState),
+        DECLARE_NAPI_FUNCTION("setDevicePairingConfirmation", SetDevicePairingConfirmation),
+        DECLARE_NAPI_FUNCTION("setLocalName", SetLocalName),
+        DECLARE_NAPI_FUNCTION("setBluetoothScanMode", SetBluetoothScanMode),
+        DECLARE_NAPI_FUNCTION("getBluetoothScanMode", GetBluetoothScanMode),
+        DECLARE_NAPI_FUNCTION("startBluetoothDiscovery", StartBluetoothDiscovery),
+        DECLARE_NAPI_FUNCTION("stopBluetoothDiscovery", StopBluetoothDiscovery),
+        DECLARE_NAPI_FUNCTION("setRemoteDeviceName", SetRemoteDeviceName),
+        DECLARE_NAPI_FUNCTION("setRemoteDeviceType", SetRemoteDeviceType),
+        DECLARE_NAPI_FUNCTION("getRemoteDeviceType", GetRemoteDeviceType),
+        DECLARE_NAPI_FUNCTION("getRemoteDeviceBatteryInfo", GetRemoteDeviceBatteryInfo),
+        DECLARE_NAPI_FUNCTION("controlDeviceAction", ControlDeviceAction),
+        DECLARE_NAPI_FUNCTION("getLastConnectionTime", GetRemoteDeviceConnectionTime),
+        DECLARE_NAPI_FUNCTION("updateCloudBluetoothDevice", UpdateCloudBluetoothDevice),
+    };
+
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
+    napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+    return exports;
+}
+#endif
 
 using NapiBluetoothOnOffFunc = std::function<napi_status(napi_env env, napi_callback_info info)>;
 
@@ -1059,6 +1087,28 @@ napi_value GetRemoteDeviceConnectionTime(napi_env env, napi_callback_info info)
         HILOGI("GetRemoteDeviceConnectionTime GetLastConnectionTime err: %{public}d", err);
         auto object = std::make_shared<NapiNativeInt64>(connectionTime);
         return NapiAsyncWorkRet(err, object);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value UpdateCloudBluetoothDevice(napi_env env, napi_callback_info info)
+{
+    HILOGI("[CLOUD_DEV] UpdateCloudBluetoothDevice enter");
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    auto checkRes = napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRes == napi_ok, BT_ERR_INVALID_PARAM);
+    std::vector<TrustPairDeviceParam> trustPairs {};
+    auto status = NapiParseTrustPairDevice(env, argv[PARAM0], trustPairs);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    auto func = [trustPairs]() {
+        int32_t err = BluetoothHost::GetDefaultHost().UpdateCloudBluetoothDevice(trustPairs);
+        HILOGI("[CLOUD_DEV] UpdateCloudBluetoothDevice err: %{public}d", err);
+        return NapiAsyncWorkRet(err);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
