@@ -550,6 +550,15 @@ uint8_t BleAdvertiser::GetAdvHandle(std::shared_ptr<BleAdvertiseCallback> callba
     return pimpl->callbacks_.GetAdvertiserHandle(callback);
 }
 
+std::shared_ptr<BleAdvertiseCallback> BleAdvertiser::GetAdvObserver(uint32_t advHandle)
+{
+    if (!BluetoothHost::GetDefaultHost().IsBleEnabled()) {
+        HILOGE("BLE is not enabled");
+        return nullptr;
+    }
+    return pimpl->callbacks_.GetAdvertiserObserver(advHandle);
+}
+
 BleAdvertiserData::BleAdvertiserData()
 {}
 
