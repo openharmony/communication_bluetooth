@@ -558,7 +558,7 @@ napi_value NapiGattClient::GetDeviceName(napi_env env, napi_callback_info info)
         int32_t err = BluetoothHost::GetDefaultHost().GetRemoteDevice(
             deviceAddr, BT_TRANSPORT_BLE).GetDeviceName(deviceName);
 
-        HILOGI("err: %{public}d, deviceName: %{public}s", err, deviceName.c_str());
+        HILOGI("err: %{public}d", err);
         auto object = std::make_shared<NapiNativeString>(deviceName);
         return NapiAsyncWorkRet(err, object);
     };
