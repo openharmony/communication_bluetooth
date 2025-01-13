@@ -114,7 +114,7 @@ public:
      *
      * @param handle handle of characteristic value.
      * @return characteristic.
-     * @since 6
+     * @since 16
      *
      */
     GattCharacteristic *GetCharacteristic(const uint16_t handle);

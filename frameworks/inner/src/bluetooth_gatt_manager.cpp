@@ -64,6 +64,7 @@ GattManager::GattManager() : pimpl(new GattManager::impl())
     sptr<BluetoothGattClientProxy> proxy =
         GetRemoteProxy<BluetoothGattClientProxy>(PROFILE_GATT_CLIENT);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+    pimpl->clientProxy_ = proxy;
 }
 
 GattManager::~GattManager()
