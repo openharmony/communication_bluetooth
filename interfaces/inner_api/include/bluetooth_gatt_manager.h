@@ -62,7 +62,7 @@ public:
     std::vector<BluetoothRemoteDevice> GetDevicesByStates(const std::array<int, GATT_CONNECTION_STATE_NUM> &states);
 
     /**
-     * @brief The function to get devices by state.
+     * @brief The function to get connected devices.
      *
      * @return list of devices.
      * @since 6
