@@ -1023,7 +1023,7 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vec
     } else {
         withoutRespond = ((characteristic.GetWriteType() ==
             static_cast<int>(GattCharacteristic::WriteType::DEFAULT)) ? false : true);
-        HILOGD("Write without response：%{public}d", withoutRespond);
+        HILOGD("Write without response: %{public}d", withoutRespond);
         pimpl->requestInformation_.type_ = REQUEST_TYPE_CHARACTERISTICS_WRITE;
         // if withoutRespond is true, no need wait for callback
         pimpl->requestInformation_.doing_ = (!withoutRespond);
