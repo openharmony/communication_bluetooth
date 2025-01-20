@@ -198,7 +198,7 @@ public:
         bool isExist = clientSptr->pimpl->GetCharacteristicByHandle(characteristic.handle_, charac);
         if (!isExist) {
             HILOGE("no expected characteristic handle:%{public}d type:%{public}d",
-                characteristic.handle_, requestType;
+                characteristic.handle_, requestType);
             ret = BT_ERR_INTERNAL_ERROR;
         }
         if (requestType != REQUEST_TYPE_CHARACTERISTICS_READ) {
