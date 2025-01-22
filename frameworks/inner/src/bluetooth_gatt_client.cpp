@@ -188,16 +188,20 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
-        std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
-        clientSptr->pimpl->requestInformation_.doing_ = false;
+        uint8_t requestType;
+        {
+            std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
+            clientSptr->pimpl->requestInformation_.doing_ = false;
+            requestType = clientSptr->pimpl->requestInformation_.type_;
+        }
         GattCharacteristic charac(UUID(), 0, 0);
         bool isExist = clientSptr->pimpl->GetCharacteristicByHandle(characteristic.handle_, charac);
         if (!isExist) {
             HILOGE("no expected characteristic handle:%{public}d type:%{public}d",
-                characteristic.handle_, clientSptr->pimpl->requestInformation_.type_);
+                characteristic.handle_, requestType);
             ret = BT_ERR_INTERNAL_ERROR;
         }
-        if (clientSptr->pimpl->requestInformation_.type_ != REQUEST_TYPE_CHARACTERISTICS_READ) {
+        if (requestType != REQUEST_TYPE_CHARACTERISTICS_READ) {
             HILOGE("Unexpected call!");
             return;
         }
@@ -215,16 +219,20 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
-        std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
-        clientSptr->pimpl->requestInformation_.doing_ = false;
+        uint8_t requestType;
+        {
+            std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
+            clientSptr->pimpl->requestInformation_.doing_ = false;
+            requestType = clientSptr->pimpl->requestInformation_.type_;
+        }
         GattCharacteristic charac(UUID(), 0, 0);
         bool isExist = clientSptr->pimpl->GetCharacteristicByHandle(characteristic.handle_, charac);
         if (!isExist) {
             HILOGE("no expected characteristic handle:%{public}d type:%{public}d",
-                characteristic.handle_, clientSptr->pimpl->requestInformation_.type_);
+                characteristic.handle_, requestType);
             ret = BT_ERR_INTERNAL_ERROR;
         }
-        if (clientSptr->pimpl->requestInformation_.type_ != REQUEST_TYPE_CHARACTERISTICS_WRITE) {
+        if (requestType != REQUEST_TYPE_CHARACTERISTICS_WRITE) {
             HILOGE("Unexpected call!");
             return;
         }
@@ -239,16 +247,20 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
-        std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
-        clientSptr->pimpl->requestInformation_.doing_ = false;
+        uint8_t requestType;
+        {
+            std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
+            clientSptr->pimpl->requestInformation_.doing_ = false;
+            requestType = clientSptr->pimpl->requestInformation_.type_;
+        }
         GattDescriptor desc(UUID(), 0);
         bool isExist = clientSptr->pimpl->GetDescriptorByHandle(descriptor.handle_, desc);
         if (!isExist) {
             HILOGE("no expected descriptor handle:%{public}d type:%{public}d",
-                descriptor.handle_, clientSptr->pimpl->requestInformation_.type_);
+                descriptor.handle_, requestType);
             ret = BT_ERR_INTERNAL_ERROR;
         }
-        if (clientSptr->pimpl->requestInformation_.type_ != REQUEST_TYPE_DESCRIPTOR_READ) {
+        if (requestType != REQUEST_TYPE_DESCRIPTOR_READ) {
             HILOGE("Unexpected call!");
             return;
         }
@@ -266,18 +278,22 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
-        std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
-        clientSptr->pimpl->requestInformation_.doing_ = false;
+        uint8_t requestType;
+        {
+            std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
+            clientSptr->pimpl->requestInformation_.doing_ = false;
+            requestType = clientSptr->pimpl->requestInformation_.type_;
+        }
         GattDescriptor desc(UUID(), 0);
         bool isExist = clientSptr->pimpl->GetDescriptorByHandle(descriptor.handle_, desc);
         if (!isExist) {
             HILOGE("no expected descriptor handle:%{public}d type:%{public}d",
-                descriptor.handle_, clientSptr->pimpl->requestInformation_.type_);
+                descriptor.handle_, requestType);
             ret = BT_ERR_INTERNAL_ERROR;
         }
-        if (clientSptr->pimpl->requestInformation_.type_ == REQUEST_TYPE_DESCRIPTOR_WRITE) {
+        if (requestType == REQUEST_TYPE_DESCRIPTOR_WRITE) {
             WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnDescriptorWriteResult, desc, ret);
-        } else if (clientSptr->pimpl->requestInformation_.type_ == REQUEST_TYPE_SET_NOTIFY_CHARACTERISTICS) {
+        } else if (requestType == REQUEST_TYPE_SET_NOTIFY_CHARACTERISTICS) {
             GattCharacteristic charac(UUID(), 0, 0);
             if (isExist && desc.GetCharacteristic() != nullptr) {
                 charac = *desc.GetCharacteristic();
@@ -332,9 +348,13 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
-        std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
-        clientSptr->pimpl->requestInformation_.doing_ = false;
-        if (clientSptr->pimpl->requestInformation_.type_ != REQUEST_TYPE_READ_REMOTE_RSSI_VALUE) {
+        uint8_t requestType;
+        {
+            std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
+            clientSptr->pimpl->requestInformation_.doing_ = false;
+            requestType = clientSptr->pimpl->requestInformation_.type_;
+        }
+        if (requestType != REQUEST_TYPE_READ_REMOTE_RSSI_VALUE) {
             HILOGE("Unexpected call!");
         }
         WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnReadRemoteRssiValueResult, rssi, status);
@@ -1003,7 +1023,7 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vec
     } else {
         withoutRespond = ((characteristic.GetWriteType() ==
             static_cast<int>(GattCharacteristic::WriteType::DEFAULT)) ? false : true);
-        HILOGD("Write without response：%{public}d", withoutRespond);
+        HILOGD("Write without response: %{public}d", withoutRespond);
         pimpl->requestInformation_.type_ = REQUEST_TYPE_CHARACTERISTICS_WRITE;
         // if withoutRespond is true, no need wait for callback
         pimpl->requestInformation_.doing_ = (!withoutRespond);
