@@ -72,6 +72,9 @@ bool BluetoothBleScanFilter::Marshalling(Parcel &parcel) const
     if (!parcel.WriteBool(advIndReport_)) {
         return false;
     }
+    if (!parcel.WriteUint8(filterIndex_)) {
+        return false;
+    }
     return true;
 }
 
@@ -126,6 +129,9 @@ bool BluetoothBleScanFilter::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!parcel.ReadBool(advIndReport_)) {
+        return false;
+    }
+    if (!parcel.ReadUint8(filterIndex_)) {
         return false;
     }
     return true;

@@ -132,6 +132,18 @@ struct BleAdvertiser::impl {
             }
         }
 
+        void OnChangeAdvResultEvent(int32_t result, int32_t advHandle) override
+        {
+            std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
+            CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
+
+            HILOGD("result: %{public}d, advHandle: %{public}d", result, advHandle);
+            auto observer = advertiserSptr->pimpl->callbacks_.GetAdvertiserObserver(advHandle);
+            if (observer != nullptr) {
+                observer->OnChangeAdvResultEvent(result);
+            }
+        }
+
     private:
         std::weak_ptr<BleAdvertiser> advertiser_;
         BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBleAdvertiserCallbackImp);

@@ -981,6 +981,16 @@ public:
         return advIndReport_;
     }
 
+    void SetFilterIndex(uint8_t index)
+    {
+        filterIndex_ = index;
+    }
+
+    uint8_t GetFilterIndex() const
+    {
+        return filterIndex_;
+    }
+
 public:
     std::string deviceId_;
     std::string name_;
@@ -1001,6 +1011,7 @@ public:
     std::vector<uint8_t> manufactureData_;
     std::vector<uint8_t> manufactureDataMask_;
     bool advIndReport_ = false;
+    uint8_t filterIndex_ = 0;
 };
 }  // namespace bluetooth
 }  // namespace OHOS
