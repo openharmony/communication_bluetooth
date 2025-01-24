@@ -452,5 +452,15 @@ int32_t BluetoothRemoteDevice::GetLastConnectionTime(int64_t &connectionTime) co
     CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     return hostProxy->GetLastConnectionTime(address_, connectionTime);
 }
+
+int32_t BluetoothRemoteDevice::GetCloudBondState(int32_t &cloudBondState) const
+{
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote Device");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
+    return hostProxy->GetCloudBondState(address_, cloudBondState);
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

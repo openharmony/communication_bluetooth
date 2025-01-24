@@ -837,6 +837,8 @@ public:
      * @since 13
      */
     void Close(void);
+
+    int32_t UpdateCloudBluetoothDevice(const std::vector<TrustPairDeviceParam> &cloudDevices);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
