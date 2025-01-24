@@ -450,6 +450,27 @@ void BleAdvertiser::SetAdvertisingData(const std::vector<uint8_t> &advData, cons
     proxy->SetAdvertisingData(bleAdvertiserData, bleScanResponse, advHandle);
 }
 
+int BleAdvertiser::ChangeAdvertisingParams(uint8_t advHandle, const BleAdvertiserSettings &settings)
+{
+    CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVAILD_STATE, "bluetooth is off.");
+    sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+
+    int ret = pimpl->CheckAdvertiserSettings(settings);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("check settings err:%{public}d", ret);
+        return ret;
+    }
+    BluetoothBleAdvertiserSettings setting;
+    setting.SetConnectable(settings.IsConnectable());
+    setting.SetInterval(settings.GetInterval());
+    setting.SetLegacyMode(settings.IsLegacyMode());
+    setting.SetTxPower(settings.GetTxPower());
+    setting.SetOwnAddr(settings.GetOwnAddr());
+    setting.SetOwnAddrType(settings.GetOwnAddrType());
+    return proxy->ChangeAdvertisingParams(advHandle, setting);
+}
+
 int BleAdvertiser::EnableAdvertising(uint8_t advHandle, uint16_t duration,
     std::shared_ptr<BleAdvertiseCallback> callback)
 {
