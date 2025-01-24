@@ -396,6 +396,16 @@ public:
      * @since 11
      */
     virtual void OnGetAdvHandleEvent(int result, int advHandle) = 0;
+
+    /**
+     * @brief Change advertising setting result event callback.
+     *
+     * @param result Change advertising setting parameters result.
+     * @param advHandle advertising handle.
+     * @since 16
+     */
+    virtual void OnChangeAdvResultEvent(int result, int advHandle)
+    {}
 };
 
 /**
@@ -493,6 +503,15 @@ public:
      * @since 16
      */
     std::shared_ptr<BleAdvertiseCallback> GetAdvObserver(uint32_t advHandle);
+
+    /**
+     * @brief Change advertising parameters when advertising is disabled.
+     *
+     * @param advHandle Advertising handle.
+     * @param settings Advertising settings.
+     * @since 16
+     */
+    int ChangeAdvertisingParam(uint8_t advHandle, const BleAdvertiserSettings &settings);
 
 private:
     BleAdvertiser();

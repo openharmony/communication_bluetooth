@@ -97,5 +97,8 @@ void NapiBluetoothBleAdvertiseCallback::OnGetAdvHandleEvent(int result, int advH
 {
     advHandle_ = advHandle;
 }
+
+void NapiBluetoothBleAdvertiseCallback::OnChangeAdvResultEvent(int result, int advHandle)
+{}
 }  // namespace Bluetooth
 }  // namespace OHOS

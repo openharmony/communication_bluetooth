@@ -47,6 +47,9 @@ const std::map<uint32_t, std::function<ErrCode(
         {static_cast<uint32_t>(
             BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_SET_ADV_DATA),
             BluetoothBleAdvertiseCallbackStub::OnSetAdvDataEventInner},
+        {static_cast<uint32_t>(
+            BluetoothBleAdvertiseCallbackInterfaceCode::BT_BLE_ADVERTISE_CALLBACK_CHANGE_ADV_RESULT),
+            BluetoothBleAdvertiseCallbackStub::OnChangeAdvResultEventInner},
 };
 
 BluetoothBleAdvertiseCallbackStub::BluetoothBleAdvertiseCallbackStub()
@@ -139,6 +142,16 @@ ErrCode BluetoothBleAdvertiseCallbackStub::OnSetAdvDataEventInner(
     const int32_t result = static_cast<int32_t>(data.ReadInt32());
     const int32_t advHandle = static_cast<int32_t>(data.ReadInt32());
     stub->OnSetAdvDataEvent(result, advHandle);
+    return NO_ERROR;
+}
+
+__attribute__((no_sanitize("cfi")))
+ErrCode BluetoothBleAdvertiseCallbackStub::OnChangeAdvResultEventInner(
+    BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
+{
+    const int32_t result = static_cast<int32_t>(data.ReadInt32());
+    const int32_t advHandle = static_cast<int32_t>(data.ReadInt32());
+    stub->OnChangeAdvResultEvent(result, advHandle);
     return NO_ERROR;
 }
 }  // namespace Bluetooth

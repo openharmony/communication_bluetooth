@@ -470,6 +470,9 @@ public:
 
     bool GetAdvIndReportFlag() const;
 
+    void SetFilterIndex(uint8_t index);
+
+    uint8_t GetFilterIndex() const;
     /**
      * @brief Compare two BleScanFilter whether are same or not.
      *
@@ -494,7 +497,8 @@ public:
             (manufacturerId_ == rhs.manufacturerId_) &&
             (manufactureData_ == rhs.manufactureData_) &&
             (manufactureDataMask_ == rhs.manufactureDataMask_) &&
-            (advIndReprot_ == rhs.advIndReprot_);
+            (advIndReprot_ == rhs.advIndReprot_) &&
+            (filterIndex_ == rhs.filterIndex_);
     }
 
     private:
@@ -517,6 +521,7 @@ public:
         std::vector<uint8_t> manufactureData_;
         std::vector<uint8_t> manufactureDataMask_;
         bool advIndReprot_ = false;
+        uint8_t filterIndex_ = 0;
 };
 
 struct BleActiveDeviceInfo {
@@ -655,6 +660,19 @@ public:
     * @since 6
     */
     int RemoveLpDeviceParam(const UUID &uuid);
+
+    /**
+     * @brief Change a scan with BleScanConfigs and filter.
+     * If don't change ble scan filter, set std::vector<BleScanFilter> empty or set filterAction none.
+     *
+     * @param settings Scan settings.
+     * @param filters Scan filters.
+     * @param filterAction Indicates change filter behavior. see {@link BleScanUpdateFilterAction}.
+     * @return Returns {@link BT_NO_ERROR} if the scan is started.
+     * returns an error code defined in {@link BtStatus} otherwise.
+     */
+    int ChangeScanParams(const BleScanConfigs &settings, const std::vector<BleScanFilter> &filter,
+        uint32_t filterAction);
 
 private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleCentralManager);
