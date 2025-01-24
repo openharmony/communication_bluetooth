@@ -357,6 +357,66 @@ napi_status NapiParseUuid(napi_env env, napi_value value, std::string &outUuid)
     return napi_ok;
 }
 
+napi_status NapiParseInt64(napi_env env, napi_value value, int64_t &outNum)
+{
+    int64_t num = 0;
+    NAPI_BT_CALL_RETURN(NapiIsNumber(env, value));
+    NAPI_BT_CALL_RETURN(napi_get_value_int64(env, value, &num));
+    outNum = num;
+    return napi_ok;
+}
+
+napi_status NapiParseObjectInt64(napi_env env, napi_value object, const char *name, int64_t &outNum)
+{
+    napi_value property;
+    int64_t num = 0;
+    NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
+    NAPI_BT_CALL_RETURN(NapiGetObjectProperty(env, object, name, property));
+    NAPI_BT_CALL_RETURN(NapiParseInt64(env, property, num));
+    outNum = num;
+    return napi_ok;
+}
+
+napi_status NapiParseObjectStr(napi_env env, napi_value object, const char *name, std::string &outStr)
+{
+    napi_value property;
+    std::string str;
+    NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
+    NAPI_BT_CALL_RETURN(NapiGetObjectProperty(env, object, name, property));
+    NAPI_BT_CALL_RETURN(NapiParseString(env, property, str));
+    outStr = std::move(str);
+    return napi_ok;
+}
+
+napi_status NapiParseObjectUuids(napi_env env, napi_value object, const char *name, std::vector<std::string> &outUuid)
+{
+    std::string uuids;
+    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, name, uuids));
+    NAPI_BT_CALL_RETURN(ParseAndCheckUuids(uuids, outUuid));
+    return napi_ok;
+}
+
+napi_status ParseAndCheckUuids(const std::string &uuids, std::vector<std::string> &res)
+{
+    const std::regex pattern("[,]");
+    std::vector<std::string> result(
+        std::sregex_token_iterator(uuids.begin(), uuids.end(), pattern, -1),
+        std::sregex_token_iterator()
+    );
+    for (const auto &str : result) {
+        NAPI_BT_RETURN_IF(!IsValidUuid(str), "Invalid uuid", napi_invalid_arg);
+    }
+    res = std::move(result);
+    return napi_ok;
+}
+
+napi_status NapiParseTrustPairDevice(napi_env env, napi_value object, std::vector<TrustPairDeviceParam> &outService)
+{
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"trustedPairedDevices"}));
+    NAPI_BT_CALL_RETURN(NapiParseObjectArray(env, object, "trustedPairedDevices", outService));
+    return napi_ok;
+}
+
 napi_status NapiParseArrayBuffer(napi_env env, napi_value value, std::vector<uint8_t> &outVec)
 {
     uint8_t *data = nullptr;
@@ -637,6 +697,36 @@ napi_status NapiParseObject<NapiBleDescriptor>(napi_env env, napi_value object, 
     return NapiParseGattDescriptor(env, object, outObj);
 }
 
+template <>
+napi_status NapiParseObject<TrustPairDeviceParam>(napi_env env, napi_value object, TrustPairDeviceParam &outObj)
+{
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"sn", "deviceType",
+        "modelId", "manufactory", "productId", "hiLinkVersion", "macAddress", "serviceType",
+        "serviceId", "deviceName", "uuids", "bluetoothClass", "token", "deviceNameTime",
+        "secureAdvertisingInfo", "pairState"}));
+    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "sn", outObj.sn_));
+    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "deviceType", outObj.deviceType_));
+    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "modelId", outObj.modelId_));
+    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "manufactory", outObj.manufactory_));
+    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "productId", outObj.productId_));
+    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "hiLinkVersion", outObj.hiLinkVersion_));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBdAddr(env, object, "macAddress", outObj.macAddress_));
+    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "serviceType", outObj.serviceType_));
+    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "serviceId", outObj.serviceId_));
+    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "deviceName", outObj.deviceName_));
+    NAPI_BT_CALL_RETURN(NapiParseObjectUuids(env, object, "uuids", outObj.uuids_));
+    NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, object, "bluetoothClass", outObj.bluetoothClass_));
+    NAPI_BT_CALL_RETURN(NapiParseObjectInt64(env, object, "deviceNameTime", outObj.deviceNameTime_));
+    NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, object, "pairState", outObj.pairState_));
+    std::vector<uint8_t> tokenValue;
+    std::vector<uint8_t> secureAdvertisingInfoValue;
+    NAPI_BT_CALL_RETURN(NapiParseObjectArrayBuffer(env, object, "token", tokenValue));
+    NAPI_BT_CALL_RETURN(NapiParseObjectArrayBuffer(env, object, "secureAdvertisingInfo", secureAdvertisingInfoValue));
+    outObj.token_ = std::move(tokenValue);
+    outObj.secureAdvertisingInfo_ = std::move(secureAdvertisingInfoValue);
+    return napi_ok;
+}
+
 template <typename T>
 napi_status NapiParseArray(napi_env env, napi_value array, std::vector<T> &outVec)
 {
@@ -670,7 +760,8 @@ template napi_status NapiParseArray<UUID>(napi_env env, napi_value array,
     std::vector<UUID> &outVec);
 template napi_status NapiParseArray<std::string>(napi_env env, napi_value array,
     std::vector<std::string> &outVec);
-
+template napi_status NapiParseArray<TrustPairDeviceParam>(napi_env env, napi_value array,
+    std::vector<TrustPairDeviceParam> &outVec);
 
 template <typename T>
 napi_status NapiParseObjectArray(napi_env env, napi_value object, const char *name, std::vector<T> &outVec)
@@ -697,5 +788,7 @@ template napi_status NapiParseObjectArray<UUID>(napi_env env, napi_value object,
     std::vector<UUID> &outVec);
 template napi_status NapiParseObjectArray<std::string>(napi_env env, napi_value object, const char *name,
     std::vector<std::string> &outVec);
+template napi_status NapiParseObjectArray<TrustPairDeviceParam>(napi_env env, napi_value object, const char *name,
+    std::vector<TrustPairDeviceParam> &outVec);
 }  // namespace Bluetooth
 }  // namespace OHOS

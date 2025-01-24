@@ -204,6 +204,7 @@ ohos_shared_library("btcommon") {
     "ipc/common/avrcp_media.cpp",
     "ipc/common/ble_parcel_data.cpp",
     "ipc/common/ble_service_data.cpp",
+    "ipc/common/bt_trust_pair_device.cpp",
     "ipc/common/bt_uuid.cpp",
     "ipc/common/gatt_data.cpp",
     "ipc/common/hands_free_unit_calls.cpp",
@@ -231,6 +232,7 @@ ohos_shared_library("btcommon") {
     "ipc/parcel/bluetooth_remote_device_info.cpp",
     "ipc/parcel/bluetooth_sensing_info.cpp",
     "ipc/parcel/bluetooth_socket_coc.cpp",
+    "ipc/parcel/bluetooth_trust_pair_device.cpp",
     "ipc/parcel/parcel_bt_uuid.cpp",
   ]
 

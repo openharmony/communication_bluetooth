@@ -94,6 +94,12 @@ napi_status NapiParseObjectGattPermissions(napi_env env, napi_value object, cons
     NapiGattPermission &outPermissions);
 napi_status NapiParseObjectGattProperties(napi_env env, napi_value object, const char *name,
     NapiGattProperties &outProperties);
+napi_status NapiParseObjectStr(napi_env env, napi_value object, const char *name, std::string &outStr);
+napi_status NapiParseInt64(napi_env env, napi_value object, const char *name, int64_t &outNum);
+napi_status NapiParseObjectInt64(napi_env env, napi_value object, const char *name, int64_t &outNum);
+napi_status NapiParseTrustPairDevice(napi_env env, napi_value object, std::vector<TrustPairDeviceParam> &outService);
+napi_status ParseAndCheckUuids(const std::string &uuids, std::vector<std::string> &res);
+napi_status NapiParseObjectUuids(napi_env env, napi_value object, std::vector<std::string> &outUuid);
 
 struct NapiObject {
     napi_env env;
