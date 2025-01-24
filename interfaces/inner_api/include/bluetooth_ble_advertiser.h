@@ -511,7 +511,7 @@ public:
      * @param settings Advertising settings.
      * @since 16
      */
-    int ChangeAdvertisingParam(uint8_t advHandle, const BleAdvertiserSettings &settings);
+    int ChangeAdvertisingParams(uint8_t advHandle, const BleAdvertiserSettings &settings);
 
 private:
     BleAdvertiser();
