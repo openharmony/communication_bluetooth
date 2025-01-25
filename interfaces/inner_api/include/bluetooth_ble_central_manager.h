@@ -671,7 +671,7 @@ public:
      * @return Returns {@link BT_NO_ERROR} if the scan is started.
      * returns an error code defined in {@link BtStatus} otherwise.
      */
-    int ChangeScanParams(const BleScanConfigs &settings, const std::vector<BleScanFilter> &filter,
+    int ChangeScanParams(const BleScanSettings &settings, const std::vector<BleScanFilter> &filter,
         uint32_t filterAction);
 
 private:
