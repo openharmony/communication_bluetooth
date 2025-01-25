@@ -278,7 +278,7 @@ int BluetoothBleAdvertiserProxy::ChangeAdvertisingParams(uint8_t advHandle,
     }
 
     if (!data.WriteUint8(advHandle)) {
-        HILOGW("[ChangeAdvertisingParams] fail: transact advHandle:%{public}d", advHandle);
+        HILOGW("[ChangeAdvertisingParams] fail: transact advHandle:%{public}u", advHandle);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteParcelable(&settings)) {
@@ -287,9 +287,9 @@ int BluetoothBleAdvertiserProxy::ChangeAdvertisingParams(uint8_t advHandle,
     }
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_SYNC };
-    ErrCode result = InnerTransact(BLE_CHANGE_ADVERTISING_PARAMS, option, data, reply);
-    if (result != NO_ERROR) {
-        HILOGW("[SetAdvertisingData] fail: transact ErrCode=%{public}d", result);
+    int result = InnerTransact(BLE_CHANGE_ADVERTISING_PARAMS, option, data, reply);
+    if (result != BT_NO_ERROR) {
+        HILOGW("[ChangeAdvertisingParams] fail: transact ErrCode=%{public}d", result);
     }
     return result;
 }

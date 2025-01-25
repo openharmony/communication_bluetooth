@@ -1476,7 +1476,8 @@ bool StartAdvAddrTimer(int advHandle, const AdvOwnAddrParams *ownAddrParams)
  * @brief Change Advertising parameters when adv is disabled. If advertising started, an error will be returned.
  *
  * @param advId Indicates the advertisement ID.
- * @param advParam Indicates the advertising parameters. For details, see {@link BleAdvParams}.
+ * @param advParam Indicates the advertising parameters. For details, see {@link BleAdvParams}. If you don't want
+ * to cahnge current advertising address, please set ownAddr to 0xFF.
  * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the advertising is started.
  * returns an error code defined in {@link BtStatus} otherwise.
  * @since 16

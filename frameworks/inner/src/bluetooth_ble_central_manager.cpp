@@ -536,15 +536,15 @@ int BleCentralManager::RemoveLpDeviceParam(const UUID &uuid)
     return proxy->RemoveLpDeviceParam(btUuid);
 }
 
-int BleCentralManager::ChangeScanParams(const BleScanSettings &settings, const std::vector<BleScanFIlter> &filter,
+int BleCentralManager::ChangeScanParams(const BleScanSettings &settings, const std::vector<BleScanFilter> &filters,
     uint32_t filterAction)
 {
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_INVALID_STATE;
     }
     CHECK_AND_RETURN_LOG_RET((pimpl->scannerId_ != BLE_SCAN_INVALID_ID), BT_ERR_INVALID_PARAM, "scannerId invalid");
-    int ret = pimpl->CheckScanParams(settings, filters, filter.size() != 0);
+    int ret = pimpl->CheckScanParams(settings, filters, filters.size() != 0);
     CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "param invalid");
 
     HILOGI("scannerId:%{public}d, callbackType:%{public}d", pimpl->scannerId_, settings.GetCallbackType());

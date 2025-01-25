@@ -137,10 +137,10 @@ struct BleAdvertiser::impl {
             std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
             CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
 
-            HILOGD("result: %{public}d, advHandle: %{public}d", result, advHandle);
+            HILOGI("result: %{public}d, advHandle: %{public}d", result, advHandle);
             auto observer = advertiserSptr->pimpl->callbacks_.GetAdvertiserObserver(advHandle);
             if (observer != nullptr) {
-                observer->OnChangeAdvResultEvent(result);
+                observer->OnChangeAdvResultEvent(result, advHandle);
             }
         }
 
@@ -452,7 +452,7 @@ void BleAdvertiser::SetAdvertisingData(const std::vector<uint8_t> &advData, cons
 
 int BleAdvertiser::ChangeAdvertisingParams(uint8_t advHandle, const BleAdvertiserSettings &settings)
 {
-    CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVAILD_STATE, "bluetooth is off.");
+    CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
 

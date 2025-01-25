@@ -670,6 +670,7 @@ public:
      * @param filterAction Indicates change filter behavior. see {@link BleScanUpdateFilterAction}.
      * @return Returns {@link BT_NO_ERROR} if the scan is started.
      * returns an error code defined in {@link BtStatus} otherwise.
+     * @since 16
      */
     int ChangeScanParams(const BleScanSettings &settings, const std::vector<BleScanFilter> &filter,
         uint32_t filterAction);
