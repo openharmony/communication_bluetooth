@@ -404,8 +404,7 @@ public:
      * @param advHandle advertising handle.
      * @since 16
      */
-    virtual void OnChangeAdvResultEvent(int result, int advHandle)
-    {}
+    virtual void OnChangeAdvResultEvent(int result, int advHandle) = 0;
 };
 
 /**
