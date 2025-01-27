@@ -1503,7 +1503,7 @@ int BleChangeAdvParams(int advId, const BleAdvParams advParam)
 }
 
 /**
- * @brief Change a scan with BleScanConfigs and filter.
+ * @brief Change a scan with BleScanConfigs and filter. Please make sure scan is started.
  * If don't change ble scan filter, set BleScanNativeFilter to nullptr or filterSzie to zero.
  * Don't support only using manufactureId as filter conditions, need to use it with manufactureData.
  * The manufactureId need to be set a related number when you need a filtering confition of manufactureData.
