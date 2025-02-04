@@ -35,6 +35,7 @@ public:
     void OnStopResultEvent(int result, int advHandle) override;
     void OnSetAdvDataEvent(int result) override;
     void OnGetAdvHandleEvent(int result, int advHandle) override;
+    void OnChangeAdvResultEvent(int result, int advHandle) override;
 
     NapiAsyncWorkMap asyncWorkMap_ {};
 
