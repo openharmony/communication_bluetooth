@@ -198,10 +198,22 @@ public:
     }
 
     void OnEnableResultEvent(int result, int advHandle) override
-    {}
+    {
+        HILOGI("advId:%{public}d, advHandle:%{public}d, ret:%{public}d", advId_, advHandle, result);
+        int ret = (result == 0) ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
+        if (g_AppCallback != nullptr && g_AppCallback->onEnableExCb != nullptr) {
+            g_AppCallback->onEnableExCb(advId_, ret);
+        }
+    }
 
     void OnDisableResultEvent(int result, int advHandle) override
-    {}
+    {
+        HILOGI("advId:%{public}d, advHandle:%{public}d, ret:%{public}d", advId_, advHandle, result);
+        int ret = (result == 0) ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
+        if (g_AppCallback != nullptr && g_AppCallback->onDisableExCb != nullptr) {
+            g_AppCallback->onDisableExCb(advId_, ret);
+        }
+    }
 
     void OnStopResultEvent(int result, int advHandle) override
     {
@@ -246,6 +258,15 @@ public:
 
     void OnGetAdvHandleEvent(int result, int advHandle) override
     {}
+
+    void OnChangeAdvResultEvent(int result, int advHandle) override
+    {
+        HILOGI("advId:%{public}d, advHandle:%{public}d, ret:%{public}d", advId_, advHandle, result);
+        int ret = (result == 0) ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
+        if (g_AppCallback != nullptr && g_AppCallback->advChangeCb != nullptr) {
+            g_AppCallback->advChangeCb(advId_, ret);
+        }
+    }
 
     int GetAdvHandle()
     {
@@ -883,6 +904,7 @@ static int SetOneScanFilter(BleScanFilter &scanFilter, BleScanNativeFilter *nati
         }
     }
     scanFilter.SetAdvIndReportFlag(nativeScanFilter->advIndReport);
+    scanFilter.SetFilterIndex(nativeScanFilter->filterIndex);
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -1448,6 +1470,76 @@ bool StartAdvAddrTimer(int advHandle, const AdvOwnAddrParams *ownAddrParams)
         g_advAddrTimerIds[advHandle] = timerId;
     }
     return true;
+}
+
+/**
+ * @brief Change Advertising parameters when adv is disabled. If advertising started, an error will be returned.
+ *
+ * @param advId Indicates the advertisement ID.
+ * @param advParam Indicates the advertising parameters. For details, see {@link BleAdvParams}. If you don't want
+ * to cahnge current advertising address, please set ownAddr to 0xFF.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the advertising is started.
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 16
+ */
+int BleChangeAdvParams(int advId, const BleAdvParams advParam)
+{
+    HILOGI("advId:%{public}d", advId);
+    if (advId < 0 || advId >= MAX_BLE_ADV_NUM) {
+        HILOGW("Invaild advId:%{public}d", advId);
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    lock_guard<mutex> lock(g_advMutex);
+    if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
+        HILOGE("Adv is not started, need call BleStartAdvEx first.");
+        return OHOS_BT_STATUS_FAIL;
+    }
+    BleAdvertiserSettings settings;
+    settings.SetInterval(advParam.minInterval);
+    if ((advParam.advType == OHOS_BLE_ADV_SCAN_IND) || (advParam.advType == OHOS_BLE_ADV_NONCONN_IND)) {
+        settings.SetConnectable(false);
+    }
+    return g_BleAdvertiser->ChangeAdvertisingParams(g_bleAdvCallbacks[advId]->GetAdvHandle(), settings);
+}
+
+/**
+ * @brief Change a scan with BleScanConfigs and filter. Please make sure scan is started.
+ * If don't change ble scan filter, set BleScanNativeFilter to nullptr or filterSzie to zero.
+ * Don't support only using manufactureId as filter conditions, need to use it with manufactureData.
+ * The manufactureId need to be set a related number when you need a filtering confition of manufactureData.
+ *
+ * @param scannerId Indicates the scanner id.
+ * @param configs Indicates the pointer to the scan filter. For details, see {@link BleScanConfigs}.
+ * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
+ * @param filterSize Indicates the number of the scan filter.
+ * @param filterAction Indicates change filter behavior. See {@link BleScanUpdateFilterAction}.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the scan is started;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 16
+ */
+int BleChangeScanParams(int32_t scannerId, const BleScanConfigs *config, const BleScanNativeFilter *filter,
+    uint32_t filterSize, uint32_t filterAction)
+{
+    if (config == nullptr) {
+        HILOGE("config invaild action:%{public}d", filterAction);
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    std::shared_ptr<BleCentralManager> bleCentralManager = g_bleCentralManagerMap.GetObject(scannerId);
+    if (bleCentralManager == nullptr) {
+        HILOGE("invaild scannerId:%{public}d", scannerId);
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+    std::vector<BleScanFilter> scanFilters;
+    if (filter != nullptr && filterSize != 0) {
+        int result = SetConfigScanFilter(scannerId, filter, filterSize, scanFilters);
+        if (result != OHOS_BT_STATUS_SUCCESS) {
+            HILOGE("SetConfigScanFilter failed result:%{public}d", result);
+            return OHOS_BT_STATUS_FAIL;
+        }
+    }
+    BleScanSettings settings;
+    settings.SetScanMode(config->scanMode);
+    return bleCentralManager->ChangeScanParams(settings, scanFilters, filterAction);
 }
 
 int AllocateAdvHandle(void)

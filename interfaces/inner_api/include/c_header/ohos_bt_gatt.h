@@ -291,6 +291,18 @@ typedef enum {
 } BleScanResultPhyType;
 
 /**
+ * @brief Update scan filter parameters action.
+ *
+ * @since 16
+ */
+typedef enum {
+    BLE_SCAN_UPDATE_FILTER_NONE,
+    BLE_SCAN_UPDATE_FILTER_ADD,
+    BLE_SCAN_UPDATE_FILTER_DELETE,
+    BLE_SCAN_UPDATE_FILTER_MODIFY,
+} BleScanUpdateFilterAction;
+
+/**
  * @brief Defines BLE advertising own address parameters.
  *
  * @since 6
@@ -391,6 +403,8 @@ typedef struct {
     unsigned short manufactureId;
     /** Adv_Ind Report */
     bool advIndReport;
+    /** Scan filter identifier index */
+    uint8_t filterIndex;
 } BleScanNativeFilter;
 
 /**
@@ -558,6 +572,27 @@ typedef void (*LpDeviceInfoCallback)(BtUuid *uuid, int32_t type, uint8_t *data, 
 typedef void (*ScanStateChangeCallback)(int32_t resultCode, bool isStartScan);
 
 /**
+ * @brief Called when advertising is enabled. For details, see {@link BleEnableAdvEx}.
+ *
+ * @since 16
+ */
+typedef void (*AdvEnableExCallback)(int advId, int status);
+
+/**
+ * @brief Called when advertising is disabled. For details, see {@link BleDisableAdvEx}.
+ *
+ * @since 16
+ */
+typedef void (*AdvDisableExCallback)(int advId, int status);
+
+/**
+ * @brief Called when advertising setting is changed. For details, see {@link BleChangeAdvParams}.
+ *
+ * @since 16
+ */
+typedef void (*AdvChangedCallback)(int advId, int status);
+
+/**
  * @brief Defines GATT callbacks.
  *
  * @since 6
@@ -573,6 +608,12 @@ typedef struct {
     AdvUpdateCallback advUpdateCb;
     /** Called when a secure access request is received. */
     SecurityRespondCallback securityRespondCb;
+    /** Called when advertising is changed from disabled to enabled */
+    AdvEnableExCallback onEnableExCb;
+    /** Called when advertising is changed form enabled to disabled */
+    AdvDisableExCallback onDisableExCb;
+    /** Called when advertising setting is changed */
+    AdvChangedCallback advChangeCb;
 } BtGattCallbacks;
 
 /**
@@ -955,6 +996,36 @@ void ClearGlobalResource(void);
  * @since 12
  */
 bool StartAdvAddrTimer(int advHandle, const AdvOwnAddrParams *ownAddrParams);
+
+/**
+ * @brief Change Advertising parameters when adv is disabled. If advertising started, an error will be returned.
+ *
+ * @param advId Indicates the advertisement ID.
+ * @param advParam Indicates the advertising parameters. For details, see {@link BleAdvParams}. If you don't want
+ * to cahnge current advertising address, please set ownAddr to 0xFF.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the advertising is started.
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 16
+ */
+int BleChangeAdvParams(int advId, const BleAdvParams advParam);
+
+/**
+ * @brief Change a scan with BleScanConfigs and filter. Please make sure scan is started.
+ * If don't change ble scan filter, set BleScanNativeFilter to nullptr or filterSzie to zero.
+ * Don't support only using manufactureId as filter conditions, need to use it with manufactureData.
+ * The manufactureId need to be set a related number when you need a filtering confition of manufactureData.
+ *
+ * @param scannerId Indicates the scanner id.
+ * @param configs Indicates the pointer to the scan filter. For details, see {@link BleScanConfigs}.
+ * @param filter Indicates the pointer to the scan filter. For details, see {@link BleScanNativeFilter}.
+ * @param filterSize Indicates the number of the scan filter.
+ * @param filterAction Indicates change filter behavior. See {@link BleScanUpdateFilterAction}.
+ * @return Returns {@link OHOS_BT_STATUS_SUCCESS} if the scan is started;
+ * returns an error code defined in {@link BtStatus} otherwise.
+ * @since 16
+ */
+int BleChangeScanParams(int32_t scannerId, const BleScanConfigs *config, const BleScanNativeFilter *filter,
+    uint32_t filterSize, uint32_t filterAction);
 
 /**
  * @brief Allocate adv handle

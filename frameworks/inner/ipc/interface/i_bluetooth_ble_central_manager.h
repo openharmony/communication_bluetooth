@@ -67,6 +67,8 @@ public:
     virtual bool IsLpDeviceAvailable() = 0;
     virtual int SetLpDeviceParam(const BluetoothLpDeviceParamSet &paramSet) = 0;
     virtual int RemoveLpDeviceParam(const bluetooth::Uuid &uuid) = 0;
+    virtual int ChangeScanParams(int32_t scannerId, const BluetoothBleScanSettings &settings,
+        const std::vector<BluetoothBleScanFilter> &filters, uint32_t filterAction) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
