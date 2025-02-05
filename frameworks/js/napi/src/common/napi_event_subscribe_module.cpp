@@ -70,8 +70,8 @@ napi_status NapiEventSubscribeModule::Register(napi_env env, napi_callback_info 
         if (napiCallback) {
             callbackVec.push_back(napiCallback);
         }
-        HILOGI("Register one %{public}s callback in %{public}s module, %{public}zu callback left",
-            name.c_str(), moduleName_.c_str(), callbackVec.size());
+        HILOGI("Register one %{public}s callback in %{public}s module, %{public}s, %{public}zu callback left",
+            name.c_str(), moduleName_.c_str(), napiCallback->ToLogString().c_str(), callbackVec.size());
     });
     return napi_ok;
 }
@@ -104,11 +104,15 @@ napi_status NapiEventSubscribeModule::Deregister(napi_env env, napi_callback_inf
     eventSubscribeMap_.ChangeValueByLambda(name, [this, &name, &callback](auto &callbackVec) {
         auto it = std::find_if(callbackVec.begin(), callbackVec.end(),
             [&callback](auto &napiCallback) { return napiCallback->Equal(callback); });
-        if (it != callbackVec.end()) {
-            callbackVec.erase(it);
+        if (it == callbackVec.end()) {
+            HILOGW("Deregister unknown %{public}s callback in %{public}s module", name.c_str(), moduleName_.c_str());
+            return;
         }
-        HILOGI("Deregister one %{public}s callback in %{public}s module, %{public}zu callback left",
-            name.c_str(), moduleName_.c_str(), callbackVec.size());
+
+        std::string callbackIdLog = (*it)->ToLogString();
+        callbackVec.erase(it);
+        HILOGI("Deregister one %{public}s callback in %{public}s module, %{public}s, %{public}zu callback left",
+            name.c_str(), moduleName_.c_str(), callbackIdLog.c_str(), callbackVec.size());
     });
     return napi_ok;
 }
