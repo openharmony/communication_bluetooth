@@ -52,6 +52,10 @@ napi_value NapiAsyncCallback::GetRet(void)
 
 NapiCallback::NapiCallback(napi_env env, napi_value callback) : env_(env)
 {
+    // Use ID to identify NAPI callback.
+    static int idCount = 0;
+    id_ = idCount++;
+
     auto status = napi_create_reference(env, callback, 1, &callbackRef_);
     if (status != napi_ok) {
         HILOGE("napi_create_reference failed, status: %{public}d", status);
@@ -135,6 +139,11 @@ bool NapiCallback::Equal(napi_value &callback) const
     bool isEqual = false;
     napi_strict_equals(env_, storedCallback, callback, &isEqual);
     return isEqual;
+}
+
+std::string NapiCallback::ToLogString(void) const
+{
+    return "callbackId: " + std::to_string(id_);
 }
 
 NapiPromise::NapiPromise(napi_env env) : env_(env)
