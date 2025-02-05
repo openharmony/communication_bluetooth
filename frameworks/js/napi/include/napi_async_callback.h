@@ -19,6 +19,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <string>
 #include "napi/native_api.h"
 #include "napi_async_work.h"
 
@@ -53,6 +54,7 @@ public:
     void CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object);
     napi_env GetNapiEnv(void);
     bool Equal(napi_value &callback) const;
+    std::string ToLogString(void) const;
 private:
     NapiCallback(const NapiCallback &) = delete;
     NapiCallback &operator=(const NapiCallback &) = delete;
@@ -61,6 +63,7 @@ private:
 
     napi_env env_;
     napi_ref callbackRef_;
+    int id_;
 };
 
 class NapiPromise {
