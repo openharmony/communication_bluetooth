@@ -27,6 +27,8 @@ namespace OHOS {
 namespace Bluetooth {
 
 static constexpr int32_t SOCKET_PACKET_HEAD_LENGTH = 1512;
+static constexpr int32_t AAM_UID = 7878;
+static constexpr int32_t AAM_BAD_RET = -978974;
 
 OutputStream::OutputStream(int socketFd) : socketFd_(socketFd)
 {}
@@ -53,6 +55,10 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
         if (availableLength < static_cast<unsigned long>(sendLength)) {
             HILOGW("send queue is full, availableLength is %{public}lu, sendlength is %{public}d",
                 availableLength, sendLength);
+            if (getuid() == AAM_UID) {
+                HILOGE("AAM close socket");
+                return AAM_BAD_RET;
+            }
         }
     }
     auto ret = send(socketFd_, buf, length, MSG_NOSIGNAL);
