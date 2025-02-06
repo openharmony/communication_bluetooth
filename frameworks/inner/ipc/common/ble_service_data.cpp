@@ -97,6 +97,16 @@ uint8_t BleScanSettingsImpl::GetMatchTrackAdvType() const
     return matchTrackAdvType_;
 }
 
+void BleScanSettingsImpl::SetSensitivityMode(uint8_t sensitivityMode)
+{
+    sensitivityMode_ = sensitivityMode;
+}
+
+uint8_t BleScanSettingsImpl::GetSensitivityMode() const
+{
+    return sensitivityMode_;
+}
+
 void BleScanSettingsImpl::SetMatchMode(uint8_t matchMode)
 {
     matchMode_ = matchMode;

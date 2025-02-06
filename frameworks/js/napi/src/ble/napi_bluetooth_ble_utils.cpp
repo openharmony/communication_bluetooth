@@ -386,6 +386,70 @@ void ConvertDescriptorWriteReqToJS(napi_env env, napi_value result, const std::s
     }
 }
 
+napi_value ScanReportTypeInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value scanReportTypeObj = nullptr;
+    napi_create_object(env, &scanReportTypeObj);
+    SetNamedPropertyByInteger(
+        env, scanReportTypeObj, static_cast<int32_t>(ScanReportType::ON_FOUND), "ON_FOUND");
+    SetNamedPropertyByInteger(
+        env, scanReportTypeObj, static_cast<int32_t>(ScanReportType::ON_LOST), "ON_LOST");
+    return scanReportTypeObj;
+}
+
+napi_value ScanDutyInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value scanDutyObj = nullptr;
+    napi_create_object(env, &scanDutyObj);
+    SetNamedPropertyByInteger(
+        env, scanDutyObj, static_cast<int>(ScanDuty::SCAN_MODE_LOW_POWER), "SCAN_MODE_LOW_POWER");
+    SetNamedPropertyByInteger(
+        env, scanDutyObj, static_cast<int>(ScanDuty::SCAN_MODE_BALANCED), "SCAN_MODE_BALANCED");
+    SetNamedPropertyByInteger(
+        env, scanDutyObj, static_cast<int>(ScanDuty::SCAN_MODE_LOW_LATENCY), "SCAN_MODE_LOW_LATENCY");
+    return scanDutyObj;
+}
+
+napi_value MatchModeInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value matchModeObj = nullptr;
+    napi_create_object(env, &matchModeObj);
+    SetNamedPropertyByInteger(
+        env, matchModeObj, static_cast<int>(MatchMode::MATCH_MODE_AGGRESSIVE), "MATCH_MODE_AGGRESSIVE");
+    SetNamedPropertyByInteger(
+        env, matchModeObj, static_cast<int>(MatchMode::MATCH_MODE_STICKY), "MATCH_MODE_STICKY");
+    return matchModeObj;
+}
+
+napi_value PhyTypeInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value phyTypeObj = nullptr;
+    napi_create_object(env, &phyTypeObj);
+    SetNamedPropertyByInteger(
+        env, phyTypeObj, static_cast<int32_t>(PhyType::PHY_LE_1M), "PHY_LE_1M");
+    SetNamedPropertyByInteger(
+        env, phyTypeObj, static_cast<int32_t>(PhyType::PHY_LE_ALL_SUPPORTED), "PHY_LE_ALL_SUPPORTED");
+    return phyTypeObj;
+}
+
+napi_value ScanReportModeInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value reportModeObj = nullptr;
+    napi_create_object(env, &reportModeObj);
+    SetNamedPropertyByInteger(
+        env, reportModeObj, static_cast<int32_t>(ScanReportMode::NORMAL), "NORMAL");
+    SetNamedPropertyByInteger(
+        env, reportModeObj, static_cast<int32_t>(ScanReportMode::FENCE_SENSITIVITY_LOW), "FENCE_SENSITIVITY_LOW");
+    SetNamedPropertyByInteger(
+        env, reportModeObj, static_cast<int32_t>(ScanReportMode::FENCE_SENSITIVITY_HIGH), "FENCE_SENSITIVITY_HIGH");
+    return reportModeObj;
+}
+
 void SetGattClientDeviceId(const std::string &deviceId)
 {
     deviceAddr = deviceId;
