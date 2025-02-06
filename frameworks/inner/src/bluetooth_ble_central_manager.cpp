@@ -202,6 +202,7 @@ void BleCentralManager::impl::ConvertBleScanSetting(const BleScanSettings &inSet
     outSetting.SetLegacy(inSettings.GetLegacy());
     outSetting.SetPhy(inSettings.GetPhy());
     outSetting.SetCallbackType(inSettings.GetCallbackType());
+    outSetting.SetSensitivityMode(inSettings.GetSensitivityMode());
     outSetting.SetMatchTrackAdvType(inSettings.GetMatchTrackAdvType());
 }
 
@@ -359,8 +360,8 @@ int BleCentralManager::StartScan(const BleScanSettings &settings, const std::vec
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    HILOGD("StartScan with params, scannerId: %{public}d, callbackType: %{public}d",
-        pimpl->scannerId_, settings.GetCallbackType());
+    HILOGD("StartScan with params, scannerId: %{public}d, callbackType: %{public}d, sensitivityMode: %{public}d",
+        pimpl->scannerId_, settings.GetCallbackType(), settings.GetSensitivityMode());
     BluetoothBleScanSettings parcelSettings;
     pimpl->ConvertBleScanSetting(settings, parcelSettings);
 
@@ -725,6 +726,16 @@ void BleScanSettings::SetCallbackType(uint8_t callbackType)
 uint8_t BleScanSettings::GetCallbackType() const
 {
     return callbackType_;
+}
+
+void BleScanSettings::SetSensitivityMode(uint8_t sensitivityMode)
+{
+    sensitivityMode_ = sensitivityMode;
+}
+
+uint8_t BleScanSettings::GetSensitivityMode() const
+{
+    return sensitivityMode_;
 }
 
 void BleScanSettings::SetMatchTrackAdvType(uint8_t matchTrackAdvType)

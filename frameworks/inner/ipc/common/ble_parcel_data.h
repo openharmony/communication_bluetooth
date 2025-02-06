@@ -779,6 +779,28 @@ public:
     }
 
     /**
+     * @brief Set sensitivity mode.
+     *
+     * @param sensitivityMode sensitivity mode.
+     * @since 15
+     */
+    void SetSensitivityMode(uint8_t sensitivityMode)
+    {
+        sensitivityMode_ = sensitivityMode;
+    }
+
+    /**
+     * @brief Get sensitivity mode.
+     *
+     * @return sensitivity mode value.
+     * @since 15
+     */
+    uint8_t GetSensitivityMode() const
+    {
+        return sensitivityMode_;
+    }
+
+    /**
      * @brief Set match track adv type for total number of advertisers to track per filter.
      *
      * @param matchTrackAdvType match track adv type value.
@@ -806,6 +828,7 @@ public:
     bool legacy_ = true;
     int phy_ = 255;
     uint8_t callbackType_ = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
+    uint8_t sensitivityMode_ = SENSITIVITY_MODE_HIGH;
     uint8_t matchTrackAdvType_ = MAX_MATCH_TRACK_ADV;
 };
 

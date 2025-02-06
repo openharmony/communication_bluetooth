@@ -182,9 +182,14 @@ struct ScanFilter {
     std::vector<uint8_t> manufactureDataMask;
 };
 
-enum MatchMode {
+enum class MatchMode {
     MATCH_MODE_AGGRESSIVE = 1,  //  aggressive mode
     MATCH_MODE_STICKY = 2       // sticky mode
+};
+
+enum class SensitivityMode {
+    SENSITIVITY_MODE_HIGH = 1,  //  high sensitivity mode
+    SENSITIVITY_MODE_LOW = 2    //  low sensitivity mode
 };
 
 enum class ScanDuty {
@@ -212,11 +217,20 @@ enum class ScanReportType {
     ON_LOST = 2 // the lost of advertisement packet
 };
 
+// Report mode used during scan.
+enum class ScanReportMode {
+    NORMAL = 1,
+    FENCE_SENSITIVITY_LOW = 10,
+    FENCE_SENSITIVITY_HIGH = 11,
+};
+
 struct ScanOptions {
     int32_t interval = 0;                                   // Time of delay for reporting the scan result
     ScanDuty dutyMode = ScanDuty::SCAN_MODE_LOW_POWER;       // Bluetooth LE scan mode
     MatchMode matchMode = MatchMode::MATCH_MODE_AGGRESSIVE;  // Match mode for Bluetooth LE scan filters hardware match
+    SensitivityMode sensitivityMode = SensitivityMode::SENSITIVITY_MODE_HIGH; // Sensitivity Mode for scan
     PhyType phyType = PhyType::PHY_LE_1M;                    // Phy for Bluetooth LE scan
+    ScanReportMode reportMode = ScanReportMode::NORMAL;      // Scan report mode
 };
 
 struct ScanResult {

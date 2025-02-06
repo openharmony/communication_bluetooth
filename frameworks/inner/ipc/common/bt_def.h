@@ -464,6 +464,9 @@ constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_FIRST_MATCH = 2;
 constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_LOST_MATCH = 4;
 constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_FIRST_AND_LOST_MATCH = 6;
 
+// Sensitivity mode for Bluetooth LE scan
+typedef enum { SENSITIVITY_MODE_HIGH = 1, SENSITIVITY_MODE_LOW = 2 } SENSITIVITY_MODE;
+
 // Match mode for Bluetooth LE scan filters hardware match
 typedef enum { MATCH_MODE_AGGRESSIVE = 1, MATCH_MODE_STICKY = 2 } MATCH_MODE;
 
