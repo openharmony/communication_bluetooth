@@ -15,6 +15,7 @@ SUBSYSTEM_DIR = "//foundation/communication"
 
 group("bluetooth_ffi") {
   deps = [
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/cj/a2dp:cj_bluetooth_a2dp_ffi",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/cj/access:cj_bluetooth_access_ffi",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/cj/ble:cj_bluetooth_ble_ffi",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/cj/connection:cj_bluetooth_connection_ffi",
