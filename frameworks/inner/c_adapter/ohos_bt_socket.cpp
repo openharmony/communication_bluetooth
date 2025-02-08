@@ -250,6 +250,10 @@ int SocketConnect(const BluetoothCreateSocketPara *socketPara, const BdAddr *bdA
     std::shared_ptr<ClientSocket> client = std::make_shared<ClientSocket>(*device, serverUuid,
         BtSocketType(socketPara->socketType), socketPara->isEncrypt);
     HILOGI("socketType: %{public}d, isEncrypt: %{public}d", socketPara->socketType, socketPara->isEncrypt);
+    if (socketPara->socketType != OHOS_SOCKET_L2CAP_LE && !client->IsAllowSocketConnect(socketPara->socketType)) {
+        HILOGE("SocketConnect fail due to limited resources, addr: %{public}s", GetEncryptAddr(strAddress).c_str());
+        return BT_SOCKET_LIMITED_RESOURCES;
+    }
     client->Init();
     int result = client->Connect(psm);
     if (result != OHOS_BT_STATUS_SUCCESS) {
@@ -301,6 +305,10 @@ int SocketConnectEx(const BluetoothCreateSocketPara *socketPara, const BdAddr *b
     std::shared_ptr<ClientSocket> client = std::make_shared<ClientSocket>(*device, serverUuid,
         BtSocketType(socketPara->socketType), socketPara->isEncrypt, connWrapper);
     HILOGI("socketType: %{public}d, isEncrypt: %{public}d", socketPara->socketType, socketPara->isEncrypt);
+    if (socketPara->socketType != OHOS_SOCKET_L2CAP_LE && !client->IsAllowSocketConnect(socketPara->socketType)) {
+        HILOGE("SocketConnect fail due to limited resources, addr: %{public}s", GetEncryptAddr(strAddress).c_str());
+        return BT_SOCKET_LIMITED_RESOURCES;
+    }
     client->Init();
     int result = client->Connect(psm);
     if (result != OHOS_BT_STATUS_SUCCESS) {

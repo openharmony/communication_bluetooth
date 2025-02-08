@@ -153,5 +153,26 @@ int BluetoothSocketProxy::UpdateCocConnectionParams(const BluetoothSocketCocInfo
 
     return reply.ReadInt32();
 }
+
+int BluetoothSocketProxy::IsAllowSocketConnect(int socketType, const std::string &addr, bool &isAllowed)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothSocketProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(socketType), BT_ERR_IPC_TRANS_FAILED, "write socketType error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(addr), BT_ERR_IPC_TRANS_FAILED, "write addr error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothSocketInterfaceCode::SOCKET_IS_ALLOW_CONNECT,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
+    int32_t exception = reply.ReadInt32();
+    if (exception == BT_NO_ERROR) {
+        isAllowed = reply.ReadBool();
+    }
+    return exception;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

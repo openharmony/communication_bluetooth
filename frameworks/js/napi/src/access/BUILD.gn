@@ -48,7 +48,10 @@ ohos_shared_library("access") {
     "native_module_access.cpp",
   ]
 
-  deps = [ "$BT_PART_DIR/frameworks/inner:btframework" ]
+  deps = [
+    "$BT_PART_DIR/frameworks/inner:btframework",
+    "$BT_PART_DIR/frameworks/js/napi/src/common:bt_napi_common",
+  ]
 
   external_deps = [
     "ability_base:want",

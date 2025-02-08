@@ -37,6 +37,7 @@ public:
     int DeregisterClientObserver(const BluetoothRawAddress &dev, const bluetooth::Uuid uuid,
         const sptr<IBluetoothClientSocketObserver> &observer) override;
     int UpdateCocConnectionParams(const BluetoothSocketCocInfo &info) override;
+    int IsAllowSocketConnect(int socketType, const std::string &addr, bool &isAllowed) override;
 private:
     static inline BrokerDelegator<BluetoothSocketProxy> delegator_;
 };

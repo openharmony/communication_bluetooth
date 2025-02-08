@@ -1,0 +1,73 @@
+# Copyright (C) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+BT_PART_DIR = "../../../../.."
+BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
+
+ohos_shared_library("bt_napi_common") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  innerapi_tags = [ "platformsdk" ]
+
+  include_dirs = [
+    "$BT_NAPI_DIR/include",
+    "$BT_PART_DIR/frameworks/inner/include",
+    "$BT_PART_DIR/interfaces/inner_api/include",
+    "$BT_PART_DIR/interfaces/inner_api/include/c_header",
+  ]
+
+  defines = [
+    "BT_LOG_TAG = \"bluetooth_napi\"",
+    "BT_LOG_DOMAIN = 0xD000100",
+    "ENABLE_NAPI_BLUETOOTH_MANAGER",
+    "BLUETOOTH_API_SINCE_10",
+  ]
+
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
+    debug = false
+  }
+
+  sources = [
+    "$BT_NAPI_DIR/src/common/napi_async_callback.cpp",
+    "$BT_NAPI_DIR/src/common/napi_async_work.cpp",
+    "$BT_NAPI_DIR/src/common/napi_bluetooth_error.cpp",
+    "$BT_NAPI_DIR/src/common/napi_bluetooth_event.cpp",
+    "$BT_NAPI_DIR/src/common/napi_bluetooth_utils.cpp",
+    "$BT_NAPI_DIR/src/common/napi_event_subscribe_module.cpp",
+    "$BT_NAPI_DIR/src/common/napi_native_object.cpp",
+    "$BT_NAPI_DIR/src/common/napi_timer.cpp",
+    "$BT_NAPI_DIR/src/parser/napi_parser_utils.cpp",
+  ]
+
+  deps = [ "$BT_PART_DIR/frameworks/inner:btframework" ]
+
+  external_deps = [
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_single",
+    "libuv:uv",
+    "napi:ace_napi",
+  ]
+
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}

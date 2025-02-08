@@ -412,6 +412,15 @@ public:
      */
     int32_t ControlDeviceAction(uint32_t controlType, uint32_t controlTypeVal, uint32_t controlObject) const;
 
+    /**
+     * @brief Get latest connection time of device.
+     *
+     * @return latest connection time, or 0 if there was a problem.
+     * @since 16
+     */
+    int32_t GetLastConnectionTime(int64_t &connectionTime) const;
+
+    int32_t GetCloudBondState(int32_t &cloudBondState) const;
 private:
     std::string address_ = "00:00:00:00:00:00";
     int transport_ = BT_TRANSPORT_NONE;

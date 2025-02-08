@@ -82,6 +82,16 @@ GattCharacteristic *GattService::GetCharacteristic(const UUID &uuid)
     return nullptr;
 }
 
+GattCharacteristic *GattService::GetCharacteristic(const uint16_t handle)
+{
+    for (auto &characteristic : characteristics_) {
+        if (characteristic.GetHandle() == handle) {
+            return &characteristic;
+        }
+    }
+    return nullptr;
+}
+
 std::vector<GattCharacteristic> &GattService::GetCharacteristics()
 {
     return characteristics_;

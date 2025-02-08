@@ -44,6 +44,8 @@ private:
         BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
     static ErrCode OnSetAdvDataEventInner(
         BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnChangeAdvResultEventInner(
+        BluetoothBleAdvertiseCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
     static const std::map<uint32_t,
         std::function<ErrCode(BluetoothBleAdvertiseCallbackStub *, MessageParcel &, MessageParcel &)>>
         memberFuncMap_;

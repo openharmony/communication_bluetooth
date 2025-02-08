@@ -132,6 +132,18 @@ struct BleAdvertiser::impl {
             }
         }
 
+        void OnChangeAdvResultEvent(int32_t result, int32_t advHandle) override
+        {
+            std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
+            CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
+
+            HILOGI("result: %{public}d, advHandle: %{public}d", result, advHandle);
+            auto observer = advertiserSptr->pimpl->callbacks_.GetAdvertiserObserver(advHandle);
+            if (observer != nullptr) {
+                observer->OnChangeAdvResultEvent(result, advHandle);
+            }
+        }
+
     private:
         std::weak_ptr<BleAdvertiser> advertiser_;
         BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothBleAdvertiserCallbackImp);
@@ -438,6 +450,27 @@ void BleAdvertiser::SetAdvertisingData(const std::vector<uint8_t> &advData, cons
     proxy->SetAdvertisingData(bleAdvertiserData, bleScanResponse, advHandle);
 }
 
+int BleAdvertiser::ChangeAdvertisingParams(uint8_t advHandle, const BleAdvertiserSettings &settings)
+{
+    CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+
+    int ret = pimpl->CheckAdvertiserSettings(settings);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("check settings err:%{public}d", ret);
+        return ret;
+    }
+    BluetoothBleAdvertiserSettings setting;
+    setting.SetConnectable(settings.IsConnectable());
+    setting.SetInterval(settings.GetInterval());
+    setting.SetLegacyMode(settings.IsLegacyMode());
+    setting.SetTxPower(settings.GetTxPower());
+    setting.SetOwnAddr(settings.GetOwnAddr());
+    setting.SetOwnAddrType(settings.GetOwnAddrType());
+    return proxy->ChangeAdvertisingParams(advHandle, setting);
+}
+
 int BleAdvertiser::EnableAdvertising(uint8_t advHandle, uint16_t duration,
     std::shared_ptr<BleAdvertiseCallback> callback)
 {
@@ -548,6 +581,15 @@ uint8_t BleAdvertiser::GetAdvHandle(std::shared_ptr<BleAdvertiseCallback> callba
     }
     CHECK_AND_RETURN_LOG_RET(callback != nullptr, BLE_INVALID_ADVERTISING_HANDLE, "callback is nullptr");
     return pimpl->callbacks_.GetAdvertiserHandle(callback);
+}
+
+std::shared_ptr<BleAdvertiseCallback> BleAdvertiser::GetAdvObserver(uint32_t advHandle)
+{
+    if (!BluetoothHost::GetDefaultHost().IsBleEnabled()) {
+        HILOGE("BLE is not enabled");
+        return nullptr;
+    }
+    return pimpl->callbacks_.GetAdvertiserObserver(advHandle);
 }
 
 BleAdvertiserData::BleAdvertiserData()

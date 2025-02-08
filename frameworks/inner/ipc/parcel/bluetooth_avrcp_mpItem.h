@@ -25,9 +25,9 @@ class BluetoothAvrcpMpItem : public Parcelable,
                              public bluetooth::AvrcMpItem {
 public:
     BluetoothAvrcpMpItem() = default;
-    explicit BluetoothAvrcpMpItem(const bluetooth::AvrcMpItem &other) : bluetooth::AvrcMpItem(other)
+    explicit BluetoothAvrcpMpItem(const bluetooth::AvrcMpItem &other) : avrcpMpItem_(other)
     {}  // NOLINT(implicit)
-    BluetoothAvrcpMpItem(const BluetoothAvrcpMpItem &other) : bluetooth::AvrcMpItem(other)
+    BluetoothAvrcpMpItem(const BluetoothAvrcpMpItem &other) : avrcpMpItem_(other.avrcpMpItem_)
     {}  // NOLINT(implicit)
     ~BluetoothAvrcpMpItem() override = default;
 
@@ -37,6 +37,8 @@ public:
 
     bool WriteToParcel(Parcel &parcel);
     bool ReadFromParcel(Parcel &parcel);
+
+    bluetooth::AvrcMpItem avrcpMpItem_;
 };
 } // namespace Bluetooth
 } // namespace OHOS

@@ -41,12 +41,14 @@ struct BleCentralManager::impl {
     void ConvertActiveDeviceInfo(const std::vector<BleActiveDeviceInfo> &inDeviceInfos,
         std::vector<BluetoothActiveDeviceInfo> &outDeviceInfos);
     bool InitScannerId(void);
-    int32_t CheckScanParams(const BleScanSettings &settings, const std::vector<BleScanFilter> &filters);
+    int32_t CheckScanParams(const BleScanSettings &settings, const std::vector<BleScanFilter> &filters,
+        bool checkFilter);
 
     class BluetoothBleCentralManagerCallbackImp : public BluetoothBleCentralManagerCallBackStub {
     public:
         explicit BluetoothBleCentralManagerCallbackImp() {};
         ~BluetoothBleCentralManagerCallbackImp() override = default;
+        __attribute__((no_sanitize("cfi")))
         void OnScanCallback(const BluetoothBleScanResult &result, uint8_t callbackType) override
         {
             callbacks_.ForEach(
@@ -121,6 +123,7 @@ struct BleCentralManager::impl {
             });
         }
 
+        __attribute__((no_sanitize("cfi")))
         void OnStartOrStopScanEvent(int resultCode, bool isStartScan) override
         {
             HILOGD("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
@@ -231,6 +234,7 @@ void BleCentralManager::impl::ConvertBleScanFilter(const std::vector<BleScanFilt
         scanFilter.SetManufactureData(filter.GetManufactureData());
         scanFilter.SetManufactureDataMask(filter.GetManufactureDataMask());
         scanFilter.SetAdvIndReportFlag(filter.GetAdvIndReportFlag());
+        scanFilter.SetFilterIndex(filter.GetFilterIndex());
         bluetoothBleScanFilters.push_back(scanFilter);
     }
 }
@@ -257,7 +261,7 @@ void BleCentralManager::impl::ConvertActiveDeviceInfo(const std::vector<BleActiv
 }
 
 int32_t BleCentralManager::impl::CheckScanParams(const BleScanSettings &settings,
-    const std::vector<BleScanFilter> &filters)
+    const std::vector<BleScanFilter> &filters, bool checkFilter)
 {
     uint8_t callbackType = settings.GetCallbackType();
     if (callbackType != BLE_SCAN_CALLBACK_TYPE_ALL_MATCH &&
@@ -268,7 +272,7 @@ int32_t BleCentralManager::impl::CheckScanParams(const BleScanSettings &settings
         return BT_ERR_INVALID_PARAM;
     }
 
-    if ((callbackType & BLE_SCAN_CALLBACK_TYPE_FIRST_AND_LOST_MATCH) != 0) {
+    if ((callbackType & BLE_SCAN_CALLBACK_TYPE_FIRST_AND_LOST_MATCH) != 0 && checkFilter) {
         if (filters.size() == 0) {
             HILOGE("onFound/onLost need non-empty filters callbackType: %{public}d", callbackType);
             return BT_ERR_INVALID_PARAM;
@@ -345,7 +349,7 @@ int BleCentralManager::StartScan(const BleScanSettings &settings, const std::vec
         return BT_ERR_INVALID_STATE;
     }
 
-    int ret = pimpl->CheckScanParams(settings, filters);
+    int ret = pimpl->CheckScanParams(settings, filters, true);
     if (ret != BT_NO_ERROR) {
         return ret;
     }
@@ -532,6 +536,31 @@ int BleCentralManager::RemoveLpDeviceParam(const UUID &uuid)
     return proxy->RemoveLpDeviceParam(btUuid);
 }
 
+int BleCentralManager::ChangeScanParams(const BleScanSettings &settings, const std::vector<BleScanFilter> &filters,
+    uint32_t filterAction)
+{
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+    CHECK_AND_RETURN_LOG_RET((pimpl->scannerId_ != BLE_SCAN_INVALID_ID), BT_ERR_INVALID_PARAM, "scannerId invalid");
+    int ret = pimpl->CheckScanParams(settings, filters, filters.size() != 0);
+    CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "param invalid");
+
+    HILOGI("scannerId:%{public}d, callbackType:%{public}d", pimpl->scannerId_, settings.GetCallbackType());
+    BluetoothBleScanSettings parcelSetting;
+    pimpl->ConvertBleScanSetting(settings, parcelSetting);
+
+    std::vector<BluetoothBleScanFilter> parcelFilters;
+    if (filters.size() != 0) {
+        pimpl->ConvertBleScanFilter(filters, parcelFilters);
+    }
+    sptr<IBluetoothBleCentralManager> proxy =
+        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    return proxy->ChangeScanParams(pimpl->scannerId_, parcelSetting, parcelFilters, filterAction);
+}
+
 BleScanResult::BleScanResult()
 {}
 
@@ -622,7 +651,6 @@ void BleScanResult::SetName(const std::string &name)
 {
     name_ = name;
 }
-
 std::string BleScanResult::GetName(void)
 {
     return name_;
@@ -860,5 +888,14 @@ bool BleScanFilter::GetAdvIndReportFlag() const
     return advIndReprot_;
 }
 
+void BleScanFilter::SetFilterIndex(uint8_t index)
+{
+    filterIndex_ = index;
+}
+
+uint8_t BleScanFilter::GetFilterIndex() const
+{
+    return filterIndex_;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

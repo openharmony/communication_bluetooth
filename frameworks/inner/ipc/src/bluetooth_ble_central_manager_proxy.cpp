@@ -503,6 +503,50 @@ int BluetoothBleCentralManagerProxy::RemoveLpDeviceParam(const bluetooth::Uuid &
     return reply.ReadInt32();
 }
 
+int BluetoothBleCentralManagerProxy::ChangeScanParams(int32_t scannerId, const BluetoothBleScanSettings &settings,
+    const std::vector<BluetoothBleScanFilter> &filters, uint32_t filterAction)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
+        HILOGW("[ChangeScanParams] fail: write interface token failed.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
+    if (!data.WriteInt32(scannerId)) {
+        HILOGW("[ChangeScanParams] fail: write scannerId failed.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
+    if (!data.WriteParcelable(&settings)) {
+        HILOGW("[ChangeScanParams] fail: write settings failed.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    if (!data.WriteInt32(filters.size())) {
+        HILOGW("[ChangeScanParams] fail: write filters size failed.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
+    for (size_t i = 0; i < filters.size(); i++) {
+        if (!data.WriteParcelable(&filters[i])) {
+            HILOGW("[ChangeScanParams] fail: write filters failed.");
+            return BT_ERR_INTERNAL_ERROR;
+        }
+    }
+    if (!data.WriteUint32(filterAction)) {
+        HILOGW("[ChangeScanParams] fail: write filterAction failed.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(BLE_CHANGE_SCAN_PARAM, option, data, reply);
+    if (result != NO_ERROR) {
+        HILOGE("[ChangeScanParams] fail: transact ErrCode=%{public}d", result);
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    return reply.ReadInt32();
+}
+
 int32_t BluetoothBleCentralManagerProxy::InnerTransact(
     uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply)
 {

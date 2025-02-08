@@ -29,6 +29,7 @@ enum BluetoothBleAdvertiseCallbackInterfaceCode {
     BT_BLE_ADVERTISE_CALLBACK_DISABLE_RESULT_EVENT,
     BT_BLE_ADVERTISE_CALLBACK_STOP_RESULT_EVENT,
     BT_BLE_ADVERTISE_CALLBACK_SET_ADV_DATA,
+    BT_BLE_ADVERTISE_CALLBACK_CHANGE_ADV_RESULT,
     // The last code, if you want to add a new code, please add it before this
     BT_BLE_ADVERTISE_CALLBACK_BUTT
 };
@@ -44,6 +45,7 @@ enum BluetoothBleAdvertiserInterfaceCode {
     BLE_SET_ADVERTISING_DATA,
     BLE_ENABLE_ADVERTISING,
     BLE_DISABLE_ADVERTISING,
+    BLE_CHANGE_ADVERTISING_PARAMS,
     // The last code, if you want to add a new code, please add it before this
     BLE_ADVERTISER_BUTT
 };
@@ -75,6 +77,7 @@ enum BluetoothBleCentralManagerInterfaceCode {
     BLE_IS_LPDEVICE_AVAILABLE,
     BLE_SET_LPDEVICE_PARAM,
     BLE_REMOVE_LPDEVICE_PARAM,
+    BLE_CHANGE_SCAN_PARAM,
     // The last code, if you want to add a new code, please add it before this
     BLE_CENTRAL_MANAGER_BUTT
 };
@@ -273,12 +276,15 @@ enum BluetoothHostInterfaceCode {
     SATELLITE_CONTROL,
     BT_REGISTER_RESOURCE_MANAGER_OBSERVER,
     BT_DEREGISTER_RESOURCE_MANAGER_OBSERVER,
-    UPDATE_VIRTUAL_DEVICE,
     GET_VIRTUAL_AUTO_CONN_SWITCH,
     SET_VIRTUAL_AUTO_CONN_TYPE,
     SET_FAST_SCAN_LEVEL,
+    UPDATE_VIRTUAL_DEVICE,
     BT_ENABLE_BLUETOOTH_TO_RESTRICT_MODE,
     CTRL_DEVICE_ACTION,
+    GET_CONNECTION_TIME,
+    BT_UPDATE_CLOUD_DEVICE,
+    GET_CLOUD_BOND_STATE,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
@@ -451,6 +457,7 @@ enum BluetoothSocketInterfaceCode {
     SOCKET_UPDATE_COC_PARAMS,
     REGISTER_CLIENT_OBSERVER,
     DEREGISTER_CLIENT_OBSERVER,
+    SOCKET_IS_ALLOW_CONNECT,
     // The last code, if you want to add a new code, please add it before this
     SOCKET_BUTT
 };

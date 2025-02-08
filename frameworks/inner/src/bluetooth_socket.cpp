@@ -557,6 +557,17 @@ uint32_t ClientSocket::GetMaxReceivePacketSize()
     return pimpl->maxRxPacketSize_;
 }
 
+bool ClientSocket::IsAllowSocketConnect(int socketType)
+{
+    HILOGI("socketType: %{public}d", socketType);
+    sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, true, "proxy is nullptr");
+    bool isAllowed = true;
+    int ret = proxy->IsAllowSocketConnect(socketType, pimpl->remoteDevice_.GetDeviceAddr(), isAllowed);
+    CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, true, "check if socket allowed failed, error: %{public}d", ret);
+    return isAllowed;
+}
+
 struct ServerSocket::impl {
     impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt);
     ~impl()
@@ -681,9 +692,9 @@ struct ServerSocket::impl {
         msg.msg_iovlen = 1;
 
 #ifdef DARWIN_PLATFORM
-        int rv = recvmsg(fd_, &msg, 0);
+        int rv = TEMP_FAILURE_RETRY(recvmsg(fd_, &msg, 0));
 #else
-        int rv = recvmsg(fd_, &msg, MSG_NOSIGNAL);
+        int rv = TEMP_FAILURE_RETRY(recvmsg(fd_, &msg, MSG_NOSIGNAL));
 #endif
         if (rv == -1) {
             HILOGE("[sock] recvmsg error  %{public}d, fd: %{public}d", errno, fd_);

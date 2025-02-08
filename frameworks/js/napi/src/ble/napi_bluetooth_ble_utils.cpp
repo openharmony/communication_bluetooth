@@ -159,6 +159,10 @@ void ConvertBLECharacteristicToJS(napi_env env, napi_value result, GattCharacter
     napi_create_array(env, &descriptors);
     ConvertBLEDescriptorVectorToJS(env, descriptors, characteristic.GetDescriptors());
     napi_set_named_property(env, result, "descriptors", descriptors);
+
+    napi_value characteristicValueHandle;
+    napi_create_uint32(env, static_cast<uint32_t>(characteristic.GetHandle()), &characteristicValueHandle);
+    napi_set_named_property(env, result, "characteristicValueHandle", characteristicValueHandle);
 }
 
 void ConvertBLEDescriptorVectorToJS(napi_env env, napi_value result, vector<GattDescriptor>& descriptors)
@@ -210,6 +214,10 @@ void ConvertBLEDescriptorToJS(napi_env env, napi_value result, GattDescriptor& d
         HILOGE("memcpy_s error");
     }
     napi_set_named_property(env, result, "descriptorValue", value);
+
+    napi_value descriptorHandle;
+    napi_create_uint32(env, static_cast<uint32_t>(descriptor.GetHandle()), &descriptorHandle);
+    napi_set_named_property(env, result, "descriptorHandle", descriptorHandle);
 }
 
 void ConvertCharacteristicReadReqToJS(napi_env env, napi_value result, const std::string &device,

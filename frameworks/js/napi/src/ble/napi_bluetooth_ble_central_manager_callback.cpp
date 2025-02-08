@@ -173,13 +173,15 @@ void SysOnScanCallBack(sysBLEMap &observers, const BleScanResult &result)
 }
 } // namespace
 
-NapiBluetoothBleCentralManagerCallback::NapiBluetoothBleCentralManagerCallback()
+NapiBluetoothBleCentralManagerCallback::NapiBluetoothBleCentralManagerCallback(bool isLatestNapiBleScannerObj)
     : eventSubscribe_(REGISTER_BLE_FIND_DEVICE_TYPE, BT_MODULE_NAME)
-{}
+{
+    isLatestNapiBleScannerObj_ = isLatestNapiBleScannerObj;
+}
 
 NapiBluetoothBleCentralManagerCallback &NapiBluetoothBleCentralManagerCallback::GetInstance(void)
 {
-    static NapiBluetoothBleCentralManagerCallback instance;
+    static NapiBluetoothBleCentralManagerCallback instance(false);
     return instance;
 }
 
@@ -199,8 +201,13 @@ void NapiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult 
     // system scan
     OnSysScanCallback(result, REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
 
-    auto nativeObject = std::make_shared<NapiNativeBleScanResult>(result);
-    eventSubscribe_.PublishEvent(REGISTER_BLE_FIND_DEVICE_TYPE, nativeObject);
+    if (isLatestNapiBleScannerObj_) {
+        auto nativeBleScanReportObj = std::make_shared<NapiNativeBleScanReport>(result);
+        eventSubscribe_.PublishEvent(REGISTER_BLE_FIND_DEVICE_TYPE, nativeBleScanReportObj);
+    } else {
+        auto nativeObject = std::make_shared<NapiNativeBleScanResult>(result);
+        eventSubscribe_.PublishEvent(REGISTER_BLE_FIND_DEVICE_TYPE, nativeObject);
+    }
 }
 
 void NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnBleBatchScanResultsEvent(
@@ -281,7 +288,14 @@ void NapiBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const st
 
 void NapiBluetoothBleCentralManagerCallback::OnStartOrStopScanEvent(int resultCode, bool isStartScan)
 {
-    HILOGD("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
+    HILOGI("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
+    auto napiIsStartScan = std::make_shared<NapiNativeBool>(isStartScan);
+    if (isStartScan) {
+        AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::BLE_START_SCAN, napiIsStartScan, resultCode);
+    } else {
+        AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::BLE_STOP_SCAN, napiIsStartScan, resultCode);
+    }
+
     std::array<std::shared_ptr<BluetoothCallbackInfo>, ARGS_SIZE_THREE> callbackInfos;
     {
         std::lock_guard<std::mutex> lock(g_sysBLEObserverMutex);
@@ -330,6 +344,25 @@ napi_value NapiNativeBleScanResult::ToNapiValue(napi_env env) const
     std::vector<BleScanResult> results {scanResult_};
     ConvertScanResult(results, env, object);
     return object;
+}
+
+napi_value NapiNativeBleScanReport::ToNapiValue(napi_env env) const
+{
+    napi_value scanReport = nullptr;
+    napi_create_object(env, &scanReport);
+
+    std::vector<BleScanResult> results {scanResult_};
+    int32_t scanReportType = static_cast<int32_t>(ScanReportType::ON_FOUND);
+
+    napi_value reportType = nullptr;
+    napi_create_int32(env, scanReportType, &reportType);
+    napi_set_named_property(env, scanReport, "reportType", reportType);
+
+    napi_value scanResult = nullptr;
+    ConvertScanResult(results, env, scanResult);
+    napi_set_named_property(env, scanReport, "scanResult", scanResult);
+
+    return scanReport;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
