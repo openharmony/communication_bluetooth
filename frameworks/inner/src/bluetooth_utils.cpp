@@ -142,6 +142,8 @@ std::string GetUpdateOutputStackActionName(int action)
             return "USER_OPERATION(6)";
         case static_cast<int>(UpdateOutputStackAction::ACTION_STOP_VIRTUAL_CALL):
             return "STOP_VIRTUAL_CALL(7)";
+        case static_cast<int>(UpdateOutputStackAction::ACTION_UPDATE_DEVICE_TYPE):
+            return "UPDATE_DEVICE_TYPE(8)";
         default:
             return "Unknown";
     }

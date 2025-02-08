@@ -1546,6 +1546,7 @@ enum UpdateOutputStackAction {
     ACTION_DISABLE_WEAR_DETECTION = 5,
     ACTION_USER_OPERATION = 6,
     ACTION_STOP_VIRTUAL_CALL = 7,
+    ACTION_UPDATE_DEVICE_TYPE = 8,
 };
 
 enum HfpAgScoStateChangeReason {
