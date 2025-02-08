@@ -451,6 +451,9 @@ constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_FIRST_MATCH = 2;
 constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_LOST_MATCH = 4;
 constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_FIRST_AND_LOST_MATCH = 6;
 
+// Sensitivity mode for Bluetooth LE scan
+typedef enum { SENSITIVITY_MODE_HIGH = 1, SENSITIVITY_MODE_LOW = 2 } SENSITIVITY_MODE;
+
 // Determines total number of advertisers to track per filter
 typedef enum { ONE_MATCH_TRACK_ADV = 1, FEW_MATCH_TRACK_ADV = 2, MAX_MATCH_TRACK_ADV = 3 } MATCH_TRACK_ADV_TYPE;
 

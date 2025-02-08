@@ -67,6 +67,12 @@ void ConvertDescriptorReadReqToJS(
 void ConvertDescriptorWriteReqToJS(
     napi_env env, napi_value result, const std::string &device, GattDescriptor &descriptor, int requestId);
 
+napi_value ScanReportTypeInit(napi_env env);
+napi_value ScanDutyInit(napi_env env);
+napi_value MatchModeInit(napi_env env);
+napi_value PhyTypeInit(napi_env env);
+napi_value ScanReportModeInit(napi_env env);
+
 void SetGattClientDeviceId(const std::string &deviceId);
 std::string GetGattClientDeviceId();
 napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vector<BleScanFilter> &outScanfilters,
@@ -112,12 +118,14 @@ private:
 
 class NapiNativeBleScanReport : public NapiNativeObject {
 public:
-    NapiNativeBleScanReport(const BleScanResult &scanResult) : scanResult_(scanResult) {}
+    NapiNativeBleScanReport(const BleScanResult &scanResult, ScanReportType scanReportType)
+        : scanResult_(scanResult), scanReportType_(scanReportType) {}
     ~NapiNativeBleScanReport() override = default;
 
     napi_value ToNapiValue(napi_env env) const override;
 private:
     BleScanResult scanResult_;
+    ScanReportType scanReportType_;
 };
 
 class NapiNativeGattServiceArray : public NapiNativeObject {
