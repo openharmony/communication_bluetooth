@@ -42,7 +42,7 @@ public:
     int32_t GetBtState(int &state) override;
     int32_t GetLocalAddress(std::string &addr) override;
     int32_t DisableBle() override;
-    int32_t EnableBle() override;
+    int32_t EnableBle(bool noAutoConnect) override;
     std::vector<uint32_t> GetProfileList() override;
     int32_t GetMaxNumConnectedAudioDevices() override;
     int32_t GetBtConnectionState(int &state) override;
@@ -105,13 +105,16 @@ public:
         std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo, int type) override;
     void RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) override;
     void DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) override;
-    void UpdateVirtualDevice(int32_t action, const std::string &address) override;
     int32_t IsSupportVirtualAutoConnect(const std::string &address, bool &outSupport) override;
     int32_t SetVirtualAutoConnectType(const std::string &address, int connType, int businessType) override;
     int32_t SetFastScanLevel(int level) override;
+    void UpdateVirtualDevice(int32_t action, const std::string &address) override;
     int32_t EnableBluetoothToRestrictMode(void) override;
     int32_t ControlDeviceAction(const std::string &deviceId, uint32_t controlType,
         uint32_t controlTypeVal, uint32_t controlObject) override;
+    int32_t GetLastConnectionTime(const std::string &address, int64_t &connectionTime) override;
+    int32_t UpdateCloudBluetoothDevice(std::vector<BluetoothTrustPairDevice> &cloudDevices) override;
+    int32_t GetCloudBondState(const std::string &address, int32_t &cloudBondState) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;

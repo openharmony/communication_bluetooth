@@ -268,6 +268,32 @@ void BluetoothBleAdvertiserProxy::SetAdvertisingData(const BluetoothBleAdvertise
     }
 }
 
+int BluetoothBleAdvertiserProxy::ChangeAdvertisingParams(uint8_t advHandle,
+    const BluetoothBleAdvertiserSettings &settings)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothBleAdvertiserProxy::GetDescriptor())) {
+        HILOGW("[ChangeAdvertisingParams] fail: transact desCriptor");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    if (!data.WriteUint8(advHandle)) {
+        HILOGW("[ChangeAdvertisingParams] fail: transact advHandle:%{public}u", advHandle);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteParcelable(&settings)) {
+        HILOGW("[ChangeAdvertisingParams] fail: transact settings");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = { MessageOption::TF_SYNC };
+    int result = InnerTransact(BLE_CHANGE_ADVERTISING_PARAMS, option, data, reply);
+    if (result != BT_NO_ERROR) {
+        HILOGW("[ChangeAdvertisingParams] fail: transact ErrCode=%{public}d", result);
+    }
+    return result;
+}
+
 ErrCode BluetoothBleAdvertiserProxy::InnerTransact(
     uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply)
 {

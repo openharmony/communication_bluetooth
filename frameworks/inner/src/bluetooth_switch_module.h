@@ -30,7 +30,7 @@ public:
     IBluetoothSwitchAction() = default;
     virtual ~IBluetoothSwitchAction() = default;
 
-    virtual int EnableBluetooth(void) = 0;
+    virtual int EnableBluetooth(bool) = 0;
     virtual int DisableBluetooth(void) = 0;
     virtual int EnableBluetoothToRestrictMode(void) = 0;
 };
@@ -52,6 +52,7 @@ public:
     ~BluetoothSwitchModule() = default;
 
     int ProcessBluetoothSwitchEvent(BluetoothSwitchEvent event);
+    void SetNoAutoConnect(bool);
 
 private:
     int ProcessEnableBluetoothEvent(void);
@@ -78,6 +79,7 @@ private:
     std::atomic_bool isBtSwitchProcessing_ { false };
     std::vector<BluetoothSwitchEvent> cachedEventVec_ {};
     std::mutex bluetoothSwitchEventMutex_ {};  // Used for ProcessBluetoothSwitchEvent function
+    std::atomic_bool noAutoConnect_ { false };
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

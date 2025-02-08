@@ -69,6 +69,8 @@ void ConvertDescriptorWriteReqToJS(
 
 void SetGattClientDeviceId(const std::string &deviceId);
 std::string GetGattClientDeviceId();
+napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vector<BleScanFilter> &outScanfilters,
+    BleScanSettings &outSettinngs);
 
 struct GattCharacteristicCallbackInfo : public BluetoothCallbackInfo {
     GattCharacteristic characteristic_ = {UUID::FromString("0"), 0, 0};
@@ -102,6 +104,16 @@ class NapiNativeBleScanResult : public NapiNativeObject {
 public:
     NapiNativeBleScanResult(const BleScanResult &scanResult) : scanResult_(scanResult) {}
     ~NapiNativeBleScanResult() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    BleScanResult scanResult_;
+};
+
+class NapiNativeBleScanReport : public NapiNativeObject {
+public:
+    NapiNativeBleScanReport(const BleScanResult &scanResult) : scanResult_(scanResult) {}
+    ~NapiNativeBleScanReport() override = default;
 
     napi_value ToNapiValue(napi_env env) const override;
 private:

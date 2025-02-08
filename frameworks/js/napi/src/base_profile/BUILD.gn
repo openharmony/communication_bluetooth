@@ -48,7 +48,10 @@ ohos_shared_library("baseprofile") {
     "native_module_base_profile.cpp",
   ]
 
-  deps = [ "$BT_PART_DIR/frameworks/inner:btframework" ]
+  deps = [
+    "$BT_PART_DIR/frameworks/inner:btframework",
+    "$BT_PART_DIR/frameworks/js/napi/src/common:bt_napi_common",
+  ]
 
   external_deps = [
     "ability_base:want",

@@ -42,6 +42,7 @@ public:
     virtual int32_t GetAdvertiserHandle(int32_t &advHandle) = 0;
     virtual void SetAdvertisingData(const BluetoothBleAdvertiserData &advData,
         const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle) = 0;
+    virtual int ChangeAdvertisingParams(uint8_t advHandle, const BluetoothBleAdvertiserSettings &settings) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -54,6 +54,7 @@ public:
     virtual int DeregisterClientObserver(const BluetoothRawAddress &dev, const bluetooth::Uuid uuid,
         const sptr<IBluetoothClientSocketObserver> &observer) = 0;
     virtual int UpdateCocConnectionParams(const BluetoothSocketCocInfo &info) = 0;
+    virtual int IsAllowSocketConnect(int socketType, const std::string &addr, bool &isAllowed) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

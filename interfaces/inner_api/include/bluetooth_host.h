@@ -408,6 +408,15 @@ public:
     int EnableBle();
 
     /**
+     * @brief Enable bluetooth without AutoConnect.
+     *
+     * @return Returns <b>true</b> if the operation is accepted;
+     *         returns <b>false</b> if the operation is rejected.
+     * @since 16
+     */
+    int EnableBluetoothNoAutoConnect();
+
+    /**
      * @brief Enable bluetooth to restrict mode.
      *
      * @return Returns BT_NO_ERROR if the operation is accepted;
@@ -775,6 +784,7 @@ public:
     * @since 12
     */
     int RestrictBluetooth();
+
     /**
     * @brief update virtual device
     *
@@ -827,6 +837,8 @@ public:
      * @since 13
      */
     void Close(void);
+
+    int32_t UpdateCloudBluetoothDevice(const std::vector<TrustPairDeviceParam> &cloudDevices);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.

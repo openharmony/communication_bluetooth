@@ -26,6 +26,7 @@
 #include "iremote_broker.h"
 #include "../parcel/bluetooth_device_battery_info.h"
 #include "../parcel/bluetooth_remote_device_info.h"
+#include "bluetooth_trust_pair_device.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -67,7 +68,7 @@ public:
     virtual int32_t GetBtState(int &state) = 0;
     virtual int32_t GetLocalAddress(std::string &addr) = 0;
     virtual int32_t DisableBle() = 0;
-    virtual int32_t EnableBle() = 0;
+    virtual int32_t EnableBle(bool noAutoConnect = false) = 0;
     virtual std::vector<uint32_t> GetProfileList() = 0;
     virtual int32_t GetMaxNumConnectedAudioDevices() = 0;
     virtual int32_t GetBtConnectionState(int &state) = 0;
@@ -130,13 +131,16 @@ public:
         std::shared_ptr<BluetoothRemoteDeviceInfo> &deviceInfo, int type) = 0;
     virtual void RegisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) = 0;
     virtual void DeregisterBtResourceManagerObserver(const sptr<IBluetoothResourceManagerObserver> &observer) = 0;
-    virtual void UpdateVirtualDevice(int32_t action, const std::string &address) = 0;
     virtual int32_t IsSupportVirtualAutoConnect(const std::string &address, bool &outSupport) = 0;
     virtual int32_t SetVirtualAutoConnectType(const std::string &address, int connType, int businessType) = 0;
     virtual int32_t SetFastScanLevel(int level) = 0;
+    virtual void UpdateVirtualDevice(int32_t action, const std::string &address) = 0;
     virtual int32_t EnableBluetoothToRestrictMode(void) = 0;
     virtual int32_t ControlDeviceAction(const std::string &deviceId, uint32_t controlType,
         uint32_t controlTypeVal, uint32_t controlObject) = 0;
+    virtual int32_t GetLastConnectionTime(const std::string &address, int64_t &connectionTime) = 0;
+    virtual int32_t UpdateCloudBluetoothDevice(std::vector<BluetoothTrustPairDevice> &cloudDevices) = 0;
+    virtual int32_t GetCloudBondState(const std::string &address, int32_t &cloudBondState) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

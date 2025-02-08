@@ -87,6 +87,9 @@ void FfiBluetoothBleAdvertiseCallback::OnGetAdvHandleEvent(int result, int advHa
     return;
 }
 
+void FfiBluetoothBleAdvertiseCallback::OnChangeAdvResultEvent(int result, int advHandle)
+{}
+
 int32_t FfiBluetoothBleAdvertiseCallback::GetAdvHandleEvent()
 {
     return handleEvent;

@@ -169,12 +169,12 @@ int32_t FfiClientDevice::WriteCharacteristicValue(NativeBLECharacteristic charac
     GattCharacteristic *character = GetGattcCharacteristic(client_, characteristic);
     std::vector<uint8_t> value{};
 
-    character->SetWriteType(writeType);
-
     if (character == nullptr) {
         HILOGE("character is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
+    character->SetWriteType(writeType);
+
     int ret = BT_ERR_INTERNAL_ERROR;
     if (client_) {
         ret = client_->WriteCharacteristic(*character);

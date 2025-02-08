@@ -51,7 +51,7 @@ void FfiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &ch
 
     CArrUI8 arr{};
     arr.head = valueData;
-    arr.size = valueSize;
+    arr.size = static_cast<int64_t>(valueSize);
     outCharacteristic.characteristicValue = arr;
 
     outCharacteristic.properties = ConvertGattPropertiesToCJ(character_.GetProperties());

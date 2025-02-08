@@ -309,7 +309,7 @@ void FreeNativeBLECharacteristic(NativeBLECharacteristic characteristic)
 {
     free(characteristic.characteristicUuid);
     free(characteristic.serviceUuid);
-    for (size_t i = 0; i < characteristic.descriptors.size; i++) {
+    for (int64_t i = 0; i < characteristic.descriptors.size; i++) {
         NativeBLEDescriptor descriptor = characteristic.descriptors.head[i];
         FreeNativeBLEDescriptor(descriptor);
     }

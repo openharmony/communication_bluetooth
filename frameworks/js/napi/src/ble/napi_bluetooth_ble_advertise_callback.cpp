@@ -23,11 +23,11 @@
 #include "napi_native_object.h"
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_ble_utils.h"
+#include "napi_bluetooth_ble.h"
 
 namespace OHOS {
 namespace Bluetooth {
 NapiBluetoothBleAdvertiseCallback::NapiBluetoothBleAdvertiseCallback()
-    : eventSubscribe_(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, BT_MODULE_NAME)
 {}
     
 std::shared_ptr<NapiBluetoothBleAdvertiseCallback> NapiBluetoothBleAdvertiseCallback::GetInstance(void)
@@ -47,23 +47,33 @@ void NapiBluetoothBleAdvertiseCallback::OnStartResultEvent(int result, int advHa
     }
     auto nativeObject =
         std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, static_cast<int>(AdvertisingState::STARTED));
-    eventSubscribe_.PublishEvent(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, nativeObject);
+    GetEventSubscribe()->PublishEvent(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, nativeObject);
 }
 
 void NapiBluetoothBleAdvertiseCallback::OnEnableResultEvent(int result, int advHandle)
 {
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
+    if (advHandle_ == advHandle) {
+        HILOGI("OnEnableResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
+        auto napiAdvResult = std::make_shared<NapiNativeInt>(result);
+        AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::BLE_ENABLE_ADVERTISING, napiAdvResult, result);
+    }
     auto nativeObject =
         std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, static_cast<int>(AdvertisingState::ENABLED));
-    eventSubscribe_.PublishEvent(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, nativeObject);
+    GetEventSubscribe()->PublishEvent(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, nativeObject);
 }
 
 void NapiBluetoothBleAdvertiseCallback::OnDisableResultEvent(int result, int advHandle)
 {
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
+    if (advHandle_ == advHandle) {
+        HILOGI("OnDisableResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
+        auto napiAdvResult = std::make_shared<NapiNativeInt>(result);
+        AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::BLE_DISABLE_ADVERTISING, napiAdvResult, result);
+    }
     auto nativeObject =
         std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, static_cast<int>(AdvertisingState::DISABLED));
-    eventSubscribe_.PublishEvent(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, nativeObject);
+    GetEventSubscribe()->PublishEvent(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, nativeObject);
 }
 
 void NapiBluetoothBleAdvertiseCallback::OnStopResultEvent(int result, int advHandle)
@@ -77,7 +87,7 @@ void NapiBluetoothBleAdvertiseCallback::OnStopResultEvent(int result, int advHan
     }
     auto nativeObject =
         std::make_shared<NapiNativeAdvertisingStateInfo>(advHandle, static_cast<int>(AdvertisingState::STOPPED));
-    eventSubscribe_.PublishEvent(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, nativeObject);
+    GetEventSubscribe()->PublishEvent(REGISTER_BLE_ADVERTISING_STATE_INFO_TYPE, nativeObject);
 }
 
 void NapiBluetoothBleAdvertiseCallback::OnSetAdvDataEvent(int result)
@@ -87,5 +97,8 @@ void NapiBluetoothBleAdvertiseCallback::OnGetAdvHandleEvent(int result, int advH
 {
     advHandle_ = advHandle;
 }
+
+void NapiBluetoothBleAdvertiseCallback::OnChangeAdvResultEvent(int result, int advHandle)
+{}
 }  // namespace Bluetooth
 }  // namespace OHOS

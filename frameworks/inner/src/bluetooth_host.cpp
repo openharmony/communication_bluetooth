@@ -428,7 +428,7 @@ public:
     BluetoothSwitchAction() = default;
     ~BluetoothSwitchAction() override = default;
 
-    int EnableBluetooth(void) override
+    int EnableBluetooth(bool noAutoConnect) override
     {
         CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
             BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited !");
@@ -437,7 +437,7 @@ public:
 
         sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
-        return proxy->EnableBle();
+        return proxy->EnableBle(noAutoConnect);
     }
 
     int DisableBluetooth(void) override
@@ -668,15 +668,6 @@ int BluetoothHost::RestrictBluetooth()
     return ret;
 }
 
-void BluetoothHost::UpdateVirtualDevice(int32_t action, const std::string &address)
-{
-    HILOGD("enter");
-    CHECK_AND_RETURN_LOG(IS_BT_ENABLED(), "bluetooth is off");
-    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
-    proxy->UpdateVirtualDevice(action, address);
-}
-
 int BluetoothHost::SatelliteControl(int type, int state)
 {
     HILOGI("type: %{public}d, state: %{public}d", type, state);
@@ -688,10 +679,17 @@ int BluetoothHost::SatelliteControl(int type, int state)
         HILOGE("Invalid control type: %{public}d", type);
         return BT_ERR_INVALID_PARAM;
     }
-
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     return proxy->SatelliteControl(type, state);
+}
+void BluetoothHost::UpdateVirtualDevice(int32_t action, const std::string &address)
+{
+    HILOGD("enter");
+    CHECK_AND_RETURN_LOG(IS_BT_ENABLED(), "bluetooth is off");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
+    proxy->UpdateVirtualDevice(action, address);
 }
 
 int BluetoothHost::GetBtState() const
@@ -787,6 +785,13 @@ int BluetoothHost::EnableBle()
     std::lock_guard<std::mutex> lock(pimpl->switchModuleMutex_);
     CHECK_AND_RETURN_LOG_RET(pimpl->switchModule_, BT_ERR_INTERNAL_ERROR, "switchModule is nullptr");
     return pimpl->switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::ENABLE_BLUETOOTH);
+}
+
+int BluetoothHost::EnableBluetoothNoAutoConnect()
+{
+    HILOGI("enter");
+    pimpl->switchModule_->SetNoAutoConnect(true);
+    return EnableBle();
 }
 
 int BluetoothHost::DisableBle()
@@ -1252,6 +1257,27 @@ void BluetoothHost::Close(void)
 {
     std::lock_guard<std::mutex> lock(pimpl->switchModuleMutex_);
     pimpl->switchModule_ = nullptr;
+}
+
+int32_t BluetoothHost::UpdateCloudBluetoothDevice(const std::vector<TrustPairDeviceParam> &cloudDevices)
+{
+    HILOGI("[CLOUD_DEV] UpdateCloudBluetoothDevice enter");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "pimpl or bluetooth host is nullptr");
+    std::vector<BluetoothTrustPairDevice> cloudDevicesVec {};
+    for (auto &devParam : cloudDevices) {
+        BluetoothTrustPairDevice trustPairDevice;
+        trustPairDevice.SetMacAddress(devParam.macAddress_);
+        trustPairDevice.SetDeviceName(devParam.deviceName_);
+        trustPairDevice.SetUuid(devParam.uuids_);
+        trustPairDevice.SetBluetoothClass(devParam.bluetoothClass_);
+        trustPairDevice.SetToken(devParam.token_);
+        trustPairDevice.SetSecureAdvertisingInfo(devParam.secureAdvertisingInfo_);
+        HILOGI("[CLOUD_DEV] UpdateCloudBluetoothDevice add device: %{public}s",
+            GetEncryptAddr(trustPairDevice.GetMacAddress()).c_str());
+        cloudDevicesVec.emplace_back(trustPairDevice);
+    }
+    return proxy->UpdateCloudBluetoothDevice(cloudDevicesVec);
 }
 } // namespace Bluetooth
 } // namespace OHOS
