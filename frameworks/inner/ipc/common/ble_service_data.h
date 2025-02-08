@@ -167,6 +167,22 @@ public:
     uint8_t GetMatchTrackAdvType() const;
 
     /**
+     * @brief Set sensitivity mode for Bluetooth LE scan.
+     *
+     * @param sensitivityMode sensitivity mode value.
+     * @since 15
+     */
+    void SetSensitivityMode(uint8_t sensitivityMode);
+
+    /**
+     * @brief Get sensitivity mode.
+     *
+     * @return sensitivity mode value.
+     * @since 15
+     */
+    uint8_t GetSensitivityMode() const;
+
+    /**
      * @brief Set match mode for Bluetooth LE scan filters hardware match.
      *
      * @param matchMode match mode value.
@@ -233,6 +249,7 @@ private:
     int phy_ = PHY_LE_1M;
     uint8_t callbackType_ = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
     uint8_t matchTrackAdvType_ = MAX_MATCH_TRACK_ADV;
+    uint8_t sensitivityMode_ = SENSITIVITY_MODE_HIGH;
     uint8_t matchMode_ = MATCH_MODE_AGGRESSIVE;
     uint16_t scanInterval_ = 0;
     uint16_t scanWindow_ = 0;

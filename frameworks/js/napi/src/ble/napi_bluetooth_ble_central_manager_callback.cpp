@@ -202,11 +202,36 @@ void NapiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult 
     OnSysScanCallback(result, REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
 
     if (isLatestNapiBleScannerObj_) {
-        auto nativeBleScanReportObj = std::make_shared<NapiNativeBleScanReport>(result);
+        auto nativeBleScanReportObj = std::make_shared<NapiNativeBleScanReport>(result, ScanReportType::ON_FOUND);
         eventSubscribe_.PublishEvent(REGISTER_BLE_FIND_DEVICE_TYPE, nativeBleScanReportObj);
     } else {
         auto nativeObject = std::make_shared<NapiNativeBleScanResult>(result);
         eventSubscribe_.PublishEvent(REGISTER_BLE_FIND_DEVICE_TYPE, nativeObject);
+    }
+}
+
+void NapiBluetoothBleCentralManagerCallback::OnFoundOrLostCallback(const BleScanResult &result, uint8_t callbackType)
+{
+    HILOGD("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(result.GetPeripheralDevice()));
+
+    ScanReportType scanReportType = ScanReportType::ON_FOUND;
+    ConvertScanReportType(scanReportType, callbackType);
+
+    if (isLatestNapiBleScannerObj_) {
+        auto nativeBleScanReportObj = std::make_shared<NapiNativeBleScanReport>(result, scanReportType);
+        eventSubscribe_.PublishEvent(REGISTER_BLE_FIND_DEVICE_TYPE, nativeBleScanReportObj);
+    } else {
+        HILOGE("error callback.");
+    }
+}
+
+void NapiBluetoothBleCentralManagerCallback::ConvertScanReportType(
+    ScanReportType &scanReportType, uint8_t callbackType)
+{
+    if (callbackType == BLE_SCAN_CALLBACK_TYPE_FIRST_MATCH) {
+        scanReportType = ScanReportType::ON_FOUND;
+    } else if (callbackType == BLE_SCAN_CALLBACK_TYPE_LOST_MATCH) {
+        scanReportType = ScanReportType::ON_LOST;
     }
 }
 
@@ -352,7 +377,7 @@ napi_value NapiNativeBleScanReport::ToNapiValue(napi_env env) const
     napi_create_object(env, &scanReport);
 
     std::vector<BleScanResult> results {scanResult_};
-    int32_t scanReportType = static_cast<int32_t>(ScanReportType::ON_FOUND);
+    int32_t scanReportType = static_cast<int32_t>(scanReportType_);
 
     napi_value reportType = nullptr;
     napi_create_int32(env, scanReportType, &reportType);
