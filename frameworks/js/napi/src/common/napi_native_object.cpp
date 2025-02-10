@@ -227,5 +227,9 @@ napi_value NapiNativeBatteryInfo::ToNapiValue(napi_env env) const
     return result;
 }
 
+napi_value NapiNativeArrayBuffer::ToNapiValue(napi_env env) const
+{
+    
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

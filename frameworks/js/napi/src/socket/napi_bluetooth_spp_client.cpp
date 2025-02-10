@@ -20,6 +20,8 @@
 #include "napi_bluetooth_spp_client.h"
 #include "napi_bluetooth_error.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_async_work.h"
+#include "napi_native_object.h"
 #include "securec.h"
 #include <limits>
 #include <unistd.h>
@@ -366,7 +368,7 @@ napi_status CheckSppClientOff(napi_env env, napi_callback_info info)
         (argc != ARGS_SIZE_TWO && argc != ARGS_SIZE_THREE), "Requires 2 or 3 arguments.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(!ParseString(env, type, argv[PARAM0]),
                       "Wrong argument type. String expected.", napi_invalid_arg);
-    NAPI_BT_RETURN_IF(type.c_str() != REGISTER_SPP_READ_TYPE, "Invalid type.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(type != REGISTER_SPP_READ_TYPE, "Invalid type.", napi_invalid_arg);
 
     NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM1]), "Wrong argument type. Int expected.", napi_invalid_arg);
 
@@ -450,6 +452,62 @@ void NapiSppClient::SppRead(int id)
         }
     }
     return;
+}
+
+static int WriteDataLoop(std::shared_ptr<OutputStream> outputStream, uint8_t* totalBuf, size_t totalSize)
+{
+    while (totalSize) {
+        int resault = outputStream->Write(totalBuf, totalSize);
+        if (result <= 0) {
+            HILOGE("Write faild");
+            return BT_ERR_SPP_IO;
+        }
+        totalSize = totalSize - static_cast<size_t>(result);
+        totalBuf += static<size_t>(result);
+    }
+    return BT_NO_ERROR;
+}
+
+napi_value NapiSppClient::SppWriteAsync(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    uint8_t* totalBuf = nullptr;
+    size_t totalSize = 0;
+    int err = 0;
+    int id = -1;
+
+    auto status = CheckSppWriteParams(env, info, id, &totalBuf, totalSize);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, clientMap[id] > 0, BT_ERR_INTERNAL_ERROR);
+    auto client = clientMap[id];
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client != nullptr, BT_ERR_INVALID_PARAM);
+    std::shared_ptr<OutputStream> outputStream = client->client_->GetOutputStream();
+
+    auto func = [outputStream, totalBuf, totalSize, &err]() {
+        err = WriteDataLoop(outputStream, totalBuf, totalSize);
+        return NapiAsyncWorkRet(err);
+    }
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+static napi_status CheckSppReadParams(napi_env env, napi_callback_info info, int &id)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {0};
+    napi_value thisVar = nullptr;
+
+    NAPI_BT_CALL_RETURN(napi_get_ca_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF((argc != ARGS_SIZE_ONE), "Requires 1 arguments.", napi_invalid_arg);
+    napi_valuetype valueType = napi_undefined;
+    NAPI_BT_CALL_RETURN(napi_typeof(env, argv[PARAM0], &valueType));
+    NAPI_BT_RETURN_IF(valueType != napi_number, "Wrong argument type. Function expected", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM0]), "Wrong argument type. int expected", napi_invalid_arg);
+
+    return napi_ok;
 }
 } // namespace Bluetooth
 } // namespace OHOS

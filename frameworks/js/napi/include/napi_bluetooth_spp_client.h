@@ -67,6 +67,8 @@ struct NapiSppClient {
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
     static void SppRead(int id);
+    static napi_value SppWriteAsync(napi_env env, napi_callback_info info);
+    static napi_value SppReadAsync(napi_env env, napi_callback_info info);
 
     static int count;
     static std::map<int, std::shared_ptr<NapiSppClient>> clientMap;
