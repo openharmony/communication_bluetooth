@@ -228,6 +228,11 @@ public:
 private:
     int64_t value_;
 };
+
+clase NapiNativeArrayBuffer : public NapiNativeObject {
+public:
+private:
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_NATIVE_OBJECT_H
