@@ -457,13 +457,13 @@ void NapiSppClient::SppRead(int id)
 static int WriteDataLoop(std::shared_ptr<OutputStream> outputStream, uint8_t* totalBuf, size_t totalSize)
 {
     while (totalSize) {
-        int resault = outputStream->Write(totalBuf, totalSize);
+        int result = outputStream->Write(totalBuf, totalSize);
         if (result <= 0) {
             HILOGE("Write faild");
             return BT_ERR_SPP_IO;
         }
         totalSize = totalSize - static_cast<size_t>(result);
-        totalBuf += static<size_t>(result);
+        totalBuf += static_cast<size_t>(result);
     }
     return BT_NO_ERROR;
 }
@@ -486,7 +486,8 @@ napi_value NapiSppClient::SppWriteAsync(napi_env env, napi_callback_info info)
     auto func = [outputStream, totalBuf, totalSize, &err]() {
         err = WriteDataLoop(outputStream, totalBuf, totalSize);
         return NapiAsyncWorkRet(err);
-    }
+    };
+
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
 
@@ -500,14 +501,63 @@ static napi_status CheckSppReadParams(napi_env env, napi_callback_info info, int
     napi_value argv[ARGS_SIZE_ONE] = {0};
     napi_value thisVar = nullptr;
 
-    NAPI_BT_CALL_RETURN(napi_get_ca_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
     NAPI_BT_RETURN_IF((argc != ARGS_SIZE_ONE), "Requires 1 arguments.", napi_invalid_arg);
     napi_valuetype valueType = napi_undefined;
     NAPI_BT_CALL_RETURN(napi_typeof(env, argv[PARAM0], &valueType));
-    NAPI_BT_RETURN_IF(valueType != napi_number, "Wrong argument type. Function expected", napi_invalid_arg);
-    NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM0]), "Wrong argument type. int expected", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(valueType != napi_number, "Wrong argument type. Function expected.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM0]), "Wrong argument type. int expected.", napi_invalid_arg);
 
     return napi_ok;
+}
+
+static int ReadData(std::shared_ptr<InputStream> inputStream, uint8_t* buf, SppCallbackBuffer &sppBuffer)
+{
+    (void)memset_s(buf, sizeof(buf), 0, sizeof(buf));
+    int result = inputStream->Read(buf, sizeof(buf));
+    if (result <= 0) {
+        HILOGE("Read faild");
+        return BT_ERR_SPP_IO;
+    } else {
+        sppBuffer.len_ = result;
+        if (memcpy_s(sppBuffer.data_, sppBuffer.len_, buf, sppBuffer.len_) != EOK) {
+            HILOGE("memcpy_s failed!");
+            return BT_ERR_INVALID_PARAM;
+        }
+    }
+    return BT_NO_ERROR;
+}
+
+napi_value NapiSppClient::SppReadAsync(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    int id = -1;
+    int err = 0;
+    auto status = CheckSppReadParams(env, info, id);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    auto client = clientMap[id];
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client != nullptr, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, !client->sppReadFlag, BT_ERR_INVALID_PARAM);
+    client->sppReadFlag = true;
+    std::shared_ptr<InputStream> inputStream = client->client_->GetInputStream();
+    uint8_t buf[SOCKET_BUFFER_SIZE];
+    auto func = [inputStream, &buf, &err, id] {
+        SppCallbackBuffer buffer;
+        err = ReadData(inputStream, buf, buffer);
+        HILOGI("err: %{public}d, size=%{public}ld", err, buffer.len_);
+        auto object = std::make_shared<NapiNativeArrayBuffer>(buffer);
+        auto client = clientMap[id];
+        if (client == nullptr) {
+            HILOGI("client is nullptr");
+            return NapiAsyncWorkRet(BT_ERR_SPP_IO, object);
+        }
+        client->sppReadFlag = false;
+        return NapiAsyncWorkRet(err, object);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 } // namespace Bluetooth
 } // namespace OHOS
