@@ -398,6 +398,10 @@ napi_status NapiParseObjectUuids(napi_env env, napi_value object, const char *na
 
 napi_status ParseAndCheckUuids(const std::string &uuids, std::vector<std::string> &res)
 {
+    HILOGI("[CLOUD_PAIR] ParseAndCheckUuids %{public}s", uuids.c_str());
+    if (uuids.empty()) {
+        return napi_ok;
+    }
     const std::regex pattern("[,]");
     std::vector<std::string> result(
         std::sregex_token_iterator(uuids.begin(), uuids.end(), pattern, -1),
