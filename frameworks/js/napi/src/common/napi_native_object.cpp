@@ -17,6 +17,7 @@
 #endif
 
 #include "napi_native_object.h"
+#include <string.h>
 
 namespace OHOS {
 namespace Bluetooth {
