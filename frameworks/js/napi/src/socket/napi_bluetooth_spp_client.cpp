@@ -459,7 +459,7 @@ static int WriteDataLoop(std::shared_ptr<OutputStream> outputStream, uint8_t* to
     while (totalSize) {
         int result = outputStream->Write(totalBuf, totalSize);
         if (result <= 0) {
-            HILOGE("Write faild");
+            HILOGE("Write failed");
             return BT_ERR_SPP_IO;
         }
         totalSize = totalSize - static_cast<size_t>(result);
@@ -513,8 +513,9 @@ static napi_status CheckSppReadParams(napi_env env, napi_callback_info info, int
 
 static int ReadData(std::shared_ptr<InputStream> inputStream, uint8_t* buf, SppCallbackBuffer &sppBuffer)
 {
-    (void)memset_s(buf, sizeof(buf), 0, sizeof(buf));
-    int result = inputStream->Read(buf, sizeof(buf));
+    size_t bufferSize = sizeof(buf);
+    (void)memset_s(buf, bufferSize, 0, bufferSize);
+    int result = inputStream->Read(buf, bufferSize);
     if (result <= 0) {
         HILOGE("Read faild");
         return BT_ERR_SPP_IO;
