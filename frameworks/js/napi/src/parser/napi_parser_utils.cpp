@@ -708,24 +708,24 @@ napi_status NapiParseObject<TrustPairDeviceParam>(napi_env env, napi_value objec
         "modelId", "manufactory", "productId", "hiLinkVersion", "macAddress", "serviceType",
         "serviceId", "deviceName", "uuids", "bluetoothClass", "token", "deviceNameTime",
         "secureAdvertisingInfo", "pairState"}));
-    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "sn", outObj.sn_));
-    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "deviceType", outObj.deviceType_));
-    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "modelId", outObj.modelId_));
-    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "manufactory", outObj.manufactory_));
-    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "productId", outObj.productId_));
-    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "hiLinkVersion", outObj.hiLinkVersion_));
+    NapiParseObjectStr(env, object, "sn", outObj.sn_);
+    NapiParseObjectStr(env, object, "deviceType", outObj.deviceType_);
+    NapiParseObjectStr(env, object, "modelId", outObj.modelId_);
+    NapiParseObjectStr(env, object, "manufactory", outObj.manufactory_);
+    NapiParseObjectStr(env, object, "productId", outObj.productId_);
+    NapiParseObjectStr(env, object, "hiLinkVersion", outObj.hiLinkVersion_);
     NAPI_BT_CALL_RETURN(NapiParseObjectBdAddr(env, object, "macAddress", outObj.macAddress_));
-    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "serviceType", outObj.serviceType_));
-    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "serviceId", outObj.serviceId_));
-    NAPI_BT_CALL_RETURN(NapiParseObjectStr(env, object, "deviceName", outObj.deviceName_));
+    NapiParseObjectStr(env, object, "serviceType", outObj.serviceType_);
+    NapiParseObjectStr(env, object, "serviceId", outObj.serviceId_);
+    NapiParseObjectStr(env, object, "deviceName", outObj.deviceName_);
     NAPI_BT_CALL_RETURN(NapiParseObjectUuids(env, object, "uuids", outObj.uuids_));
-    NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, object, "bluetoothClass", outObj.bluetoothClass_));
-    NAPI_BT_CALL_RETURN(NapiParseObjectInt64(env, object, "deviceNameTime", outObj.deviceNameTime_));
-    NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, object, "pairState", outObj.pairState_));
+    NapiParseObjectInt32(env, object, "bluetoothClass", outObj.bluetoothClass_);
+    NapiParseObjectInt64(env, object, "deviceNameTime", outObj.deviceNameTime_);
+    NapiParseObjectInt32(env, object, "pairState", outObj.pairState_);
     std::vector<uint8_t> tokenValue;
     std::vector<uint8_t> secureAdvertisingInfoValue;
-    NAPI_BT_CALL_RETURN(NapiParseObjectArrayBuffer(env, object, "token", tokenValue));
-    NAPI_BT_CALL_RETURN(NapiParseObjectArrayBuffer(env, object, "secureAdvertisingInfo", secureAdvertisingInfoValue));
+    NapiParseObjectArrayBuffer(env, object, "token", tokenValue);
+    NapiParseObjectArrayBuffer(env, object, "secureAdvertisingInfo", secureAdvertisingInfoValue);
     outObj.token_ = std::move(tokenValue);
     outObj.secureAdvertisingInfo_ = std::move(secureAdvertisingInfoValue);
     return napi_ok;
