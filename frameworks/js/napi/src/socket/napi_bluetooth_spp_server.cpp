@@ -42,6 +42,8 @@ void DefineSppFunctions(napi_env env, napi_value exports)
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("on", NapiSppServer::RegisterSocketObserver),
         DECLARE_NAPI_FUNCTION("off", NapiSppServer::DeRegisterSocketObserver),
+        DECLARE_NAPI_FUNCTION("sppWriteAsync", NapiSppClient::SppWriteAsync),
+        DECLARE_NAPI_FUNCTION("sppReadAsync", NapiSppClient::SppReadAsync),
 #endif
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "spp:napi_define_properties");

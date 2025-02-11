@@ -17,6 +17,7 @@
 #define NAPI_NATIVE_OBJECT_H
 
 #include "napi_bluetooth_utils.h"
+#include "napi_bluetooth_spp_client.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -227,6 +228,17 @@ public:
     napi_value ToNapiValue(napi_env env) const override;
 private:
     int64_t value_;
+};
+
+class NapiNativeArrayBuffer : public NapiNativeObject {
+public:
+    explicit NapiNativeArrayBuffer(SppCallbackBuffer sppBuffer)
+        : sppBuffer_(sppBuffer) {}
+    ~NapiNativeArrayBuffer() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    SppCallbackBuffer sppBuffer_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

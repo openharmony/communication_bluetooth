@@ -17,6 +17,7 @@
 #endif
 
 #include "napi_native_object.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -227,5 +228,22 @@ napi_value NapiNativeBatteryInfo::ToNapiValue(napi_env env) const
     return result;
 }
 
+napi_value NapiNativeArrayBuffer::ToNapiValue(napi_env env) const
+{
+    napi_value object = nullptr;
+    uint8_t* bufferData = nullptr;
+    napi_create_arraybuffer(env, sppBuffer_.len_, (void**)&bufferData, &object);
+    if (sppBuffer_.len_ <= 0) {
+        HILOGE("bufferSize_ < 0, bufferSize_: %{public}zu", sppBuffer_.len_);
+        return object;
+    }
+    if (memset_s(bufferData, sppBuffer_.len_, 0, sppBuffer_.len_) != EOK) {
+        HILOGE("memset_s error");
+    }
+    if (memcpy_s(bufferData, sppBuffer_.len_, sppBuffer_.data_, sppBuffer_.len_) != EOK) {
+        HILOGE("memcpy_s error");
+    }
+    return object;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
