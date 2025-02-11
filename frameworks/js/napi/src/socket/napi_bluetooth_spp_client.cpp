@@ -473,7 +473,6 @@ napi_value NapiSppClient::SppWriteAsync(napi_env env, napi_callback_info info)
     HILOGD("enter");
     uint8_t* totalBuf = nullptr;
     size_t totalSize = 0;
-    int err = 0;
     int id = -1;
 
     auto status = CheckSppWriteParams(env, info, id, &totalBuf, totalSize);
@@ -483,7 +482,8 @@ napi_value NapiSppClient::SppWriteAsync(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, client != nullptr, BT_ERR_INVALID_PARAM);
     std::shared_ptr<OutputStream> outputStream = client->client_->GetOutputStream();
 
-    auto func = [outputStream, totalBuf, totalSize, &err]() {
+    auto func = [outputStream, totalBuf, totalSize]() {
+        int err = 0;
         err = WriteDataLoop(outputStream, totalBuf, totalSize);
         return NapiAsyncWorkRet(err);
     };
@@ -533,7 +533,6 @@ napi_value NapiSppClient::SppReadAsync(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
     int id = -1;
-    int err = 0;
     auto status = CheckSppReadParams(env, info, id);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     auto client = clientMap[id];
@@ -542,7 +541,8 @@ napi_value NapiSppClient::SppReadAsync(napi_env env, napi_callback_info info)
     client->sppReadFlag = true;
     std::shared_ptr<InputStream> inputStream = client->client_->GetInputStream();
     uint8_t buf[SOCKET_BUFFER_SIZE];
-    auto func = [inputStream, &buf, &err, id] {
+    auto func = [inputStream, &buf, id] {
+        int err = 0;
         SppCallbackBuffer buffer;
         err = ReadData(inputStream, buf, buffer);
         HILOGI("err: %{public}d, size=%{public}ld", err, buffer.len_);
