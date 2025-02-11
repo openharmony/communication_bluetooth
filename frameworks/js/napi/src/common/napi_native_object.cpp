@@ -230,12 +230,12 @@ napi_value NapiNativeBatteryInfo::ToNapiValue(napi_env env) const
 napi_value NapiNativeArrayBuffer::ToNapiValue(napi_env env) const
 {
     napi_value object = nullptr;
+    uint8_t* bufferData = nullptr;
+    napi_create_arraybuffer(env, sppBuffer_.len_, (void**)&bufferData, &object);
     if (sppBuffer_.len_ <= 0) {
         HILOGE("bufferSize_ < 0, bufferSize_: %{public}zu", sppBuffer_.len_);
         return object;
     }
-    uint8_t* bufferData = nullptr;
-    napi_create_arraybuffer(env, sppBuffer_.len_, (void**)&bufferData, &object);
     if (memset_s(bufferData, sppBuffer_.len_, 0, sppBuffer_.len_) != EOK) {
         HILOGE("memset_s error");
     }
