@@ -21,6 +21,9 @@
 
 namespace OHOS {
 namespace Bluetooth {
+#ifndef EOK
+#define EOK 0
+#endif
 class NapiNativeObject {
 public:
     virtual ~NapiNativeObject() = default;
