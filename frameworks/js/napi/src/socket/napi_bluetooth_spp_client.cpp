@@ -511,27 +511,21 @@ static napi_status CheckSppReadParams(napi_env env, napi_callback_info info, int
     return napi_ok;
 }
 
-static int ReadData(std::shared_ptr<InputStream> inputStream, uint8_t* buf, SppCallbackBuffer &sppBuffer)
+static int ReadData(std::shared_ptr<InputStream> inputStream, int bufSize, SppCallbackBuffer &sppBuffer)
 {
-    size_t bufferSize = sizeof(buf);
-    (void)memset_s(buf, bufferSize, 0, bufferSize);
-    int result = inputStream->Read(buf, bufferSize);
+    (void)memset_s(sppBuffer.data_, bufSize, 0, bufSize);
+    int result = inputStream->Read(reinterpret_cast<uint8_t*>(sppBuffer.data_), bufSize);
     if (result <= 0) {
         HILOGE("Read faild");
         return BT_ERR_SPP_IO;
-    } else {
-        sppBuffer.len_ = result;
-        if (memcpy_s(sppBuffer.data_, sppBuffer.len_, buf, sppBuffer.len_) != EOK) {
-            HILOGE("memcpy_s failed!");
-            return BT_ERR_INVALID_PARAM;
-        }
     }
+    sppBuffer.len_ = result;
     return BT_NO_ERROR;
 }
 
 napi_value NapiSppClient::SppReadAsync(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    HILOGD("enter");
     int id = -1;
     auto status = CheckSppReadParams(env, info, id);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
@@ -540,12 +534,10 @@ napi_value NapiSppClient::SppReadAsync(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, !client->sppReadFlag, BT_ERR_INVALID_PARAM);
     client->sppReadFlag = true;
     std::shared_ptr<InputStream> inputStream = client->client_->GetInputStream();
-    uint8_t buf[SOCKET_BUFFER_SIZE];
-    auto func = [inputStream, &buf, id] {
+    auto func = [inputStream, id] {
         int err = 0;
         SppCallbackBuffer buffer;
-        err = ReadData(inputStream, buf, buffer);
-        HILOGI("err: %{public}d, size=%{public}ld", err, buffer.len_);
+        err = ReadData(inputStream, SOCKET_BUFFER_SIZE, buffer);
         auto object = std::make_shared<NapiNativeArrayBuffer>(buffer);
         auto client = clientMap[id];
         if (client == nullptr) {
