@@ -17,6 +17,7 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "napi_event_subscribe_module.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -30,6 +31,7 @@ napi_value DisableAdvertising(napi_env env, napi_callback_info info);
 napi_value StopAdvertising(napi_env env, napi_callback_info info);
 napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info);
 napi_value PropertyInit(napi_env env, napi_value exports);
+const std::shared_ptr<NapiEventSubscribeModule> &GetEventSubscribe();
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif /* NAPI_BLUETOOTH_BLE_H_ */
