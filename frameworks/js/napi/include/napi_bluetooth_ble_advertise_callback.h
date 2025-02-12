@@ -37,7 +37,6 @@ public:
     void OnGetAdvHandleEvent(int result, int advHandle) override;
 
     NapiAsyncWorkMap asyncWorkMap_ {};
-    NapiEventSubscribeModule eventSubscribe_;
 
     int advHandle_ = -1;
 };
