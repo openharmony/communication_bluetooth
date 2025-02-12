@@ -767,7 +767,6 @@ std::optional<std::reference_wrapper<GattService>> GattClient::GetService(const 
 std::vector<GattService> &GattClient::GetService()
 {
     HILOGI("enter");
-    std::vector<GattService> gattServices;
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
         return pimpl->gattServices_;
