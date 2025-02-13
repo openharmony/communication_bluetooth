@@ -767,19 +767,17 @@ std::optional<std::reference_wrapper<GattService>> GattClient::GetService(const 
 std::vector<GattService> &GattClient::GetService()
 {
     HILOGI("enter");
-    std::vector<GattService> gattServices;
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return gattServices;
+        return pimpl->gattServices_;
     }
 
     if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
         HILOGE("pimpl or gatt client proxy is nullptr");
-        return gattServices;
+        return pimpl->gattServices_;
     }
 
     pimpl->GetServices();
-    std::lock_guard<std::mutex> lock(pimpl->gattServicesMutex_);
     return pimpl->gattServices_;
 }
 
