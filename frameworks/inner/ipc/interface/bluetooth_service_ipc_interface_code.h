@@ -364,6 +364,7 @@ enum BluetoothOppInterfaceCode {
     COMMAND_DEREGISTER_OBSERVER,
     COMMAND_GET_DEVICE_STATE,
     COMMAND_GET_DEVICES_BY_STATES,
+    COMMAND_SET_LAST_RECEIVED_URI,
     // The last code, if you want to add a new code, please add it before this
     COMMAND_OPP_BUTT
 };

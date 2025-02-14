@@ -245,6 +245,50 @@ void BluetoothOppTransferInformation::SetTotalBytes(uint64_t totalBytes)
     totalBytes_ = totalBytes;
 }
 
+BluetoothOppFileHolder::BluetoothOppFileHolder()
+{}
+
+BluetoothOppFileHolder::BluetoothOppFileHolder(const std::string &filePath,
+    const int64_t &fileSize, const int32_t &fileFd)
+{
+    filePath_ = filePath;
+    fileSize_ = fileSize;
+    fileFd_ = fileFd;
+}
+
+BluetoothOppFileHolder::~BluetoothOppFileHolder()
+{}
+
+std::string BluetoothOppFileHolder::GetFilePath() const
+{
+    return filePath_;
+}
+
+int64_t BluetoothOppFileHolder::GetFileSize() const
+{
+    return fileSize_;
+}
+
+int32_t BluetoothOppFileHolder::GetFileFd() const
+{
+    return fileFd_;
+}
+
+void BluetoothOppFileHolder::SetFilePath(const std::string &filePath)
+{
+    filePath_ = filePath;
+}
+
+void BluetoothOppFileHolder::SetFileFd(const int32_t &fileFd)
+{
+    fileFd_ = fileFd;
+}
+
+void BluetoothOppFileHolder::SetFileSize(const int64_t &fileSize)
+{
+    fileSize_ = fileSize;
+}
+
 Opp::Opp()
 {
     pimpl = std::make_unique<impl>();
@@ -293,24 +337,38 @@ int32_t Opp::GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state)
     return proxy->GetDeviceState(BluetoothRawAddress(device.GetDeviceAddr()), state);
 }
 
-int32_t Opp::SendFile(std::string device, std::vector<std::string> filePaths,
-    std::vector<std::string> mimeTypes, bool& result)
+int32_t Opp::SendFile(std::string device, std::vector<BluetoothOppFileHolder> fileHolders, bool& result)
 {
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
     sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
-    int ret = proxy->SendFile(device, filePaths, mimeTypes, result);
+    std::vector<BluetoothIOppTransferFileHolder> fileHoldersInterface;
+    for (BluetoothOppFileHolder fileHolder : fileHolders) {
+        fileHoldersInterface.push_back(BluetoothIOppTransferFileHolder(fileHolder.GetFilePath(),
+            fileHolder.GetFileSize(), fileHolder.GetFileFd()));
+    }
+    int ret = proxy->SendFile(device, fileHoldersInterface, result);
     HILOGI("send file result is : %{public}d", result);
     return ret;
 }
 
-int32_t Opp::SetIncomingFileConfirmation(bool accept)
+int32_t Opp::SetLastReceivedFileUri(const std::string &uri)
+{
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
+    sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
+    int ret = proxy->SetLastReceivedFileUri(uri);
+    HILOGI("setLastReceivedFileUri is : %{public}d", ret);
+    return ret;
+}
+
+int32_t Opp::SetIncomingFileConfirmation(bool accept, int32_t fileFd)
 {
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off");
 
     sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
-    int ret = proxy->SetIncomingFileConfirmation(accept);
+    int ret = proxy->SetIncomingFileConfirmation(accept, fileFd);
     HILOGI("setIncomingFileConfirmation result is : %{public}d", ret);
     return ret;
 }

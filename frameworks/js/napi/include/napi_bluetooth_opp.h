@@ -34,6 +34,7 @@ public:
     static napi_value SetIncomingFileConfirmation(napi_env env, napi_callback_info info);
     static napi_value GetCurrentTransferInformation(napi_env env, napi_callback_info info);
     static napi_value CancelTransfer(napi_env env, napi_callback_info info);
+    static napi_value SetLastReceivedFileUri(napi_env env, napi_callback_info info);
     static napi_value GetConnectionDevices(napi_env env, napi_callback_info info);
     static napi_value GetDeviceState(napi_env env, napi_callback_info info);
 
