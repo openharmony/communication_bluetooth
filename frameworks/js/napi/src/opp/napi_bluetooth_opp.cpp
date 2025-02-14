@@ -41,14 +41,13 @@ void NapiBluetoothOpp::DefineOppJSClass(napi_env env, napi_value exports)
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
-        DECLARE_NAPI_FUNCTION("onEvent", On),
-        DECLARE_NAPI_FUNCTION("offEvent", Off),
         DECLARE_NAPI_FUNCTION("sendFile", SendFile),
         DECLARE_NAPI_FUNCTION("setIncomingFileConfirmation", SetIncomingFileConfirmation),
         DECLARE_NAPI_FUNCTION("getCurrentTransferInformation", GetCurrentTransferInformation),
         DECLARE_NAPI_FUNCTION("cancelTransfer", CancelTransfer),
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
+        DECLARE_NAPI_FUNCTION("setLastReceivedFileUri", SetLastReceivedFileUri),
     };
 
     napi_define_class(env, "NapiBluetoothOpp", NAPI_AUTO_LENGTH, OppConstructor, nullptr,
@@ -105,26 +104,26 @@ napi_value NapiBluetoothOpp::Off(napi_env env, napi_callback_info info)
     return NapiGetUndefinedRet(env);
 }
 
-napi_status CheckSetIncomingFileConfirmation(napi_env env, napi_callback_info info, bool &accept)
+napi_status CheckSetIncomingFileConfirmation(napi_env env, napi_callback_info info, bool &accept, int &fileFd)
 {
-    size_t argc = ARGS_SIZE_ONE;
-    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
-    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Require 1 arguments.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Require 2 arguments.", napi_invalid_arg);
     NAPI_BT_CALL_RETURN(NapiParseBoolean(env, argv[PARAM0], accept));
+    NAPI_BT_CALL_RETURN(NapiParseInt32(env, argv[PARAM1], fileFd));
     return napi_ok;
 }
 
 napi_status CheckSendFileParam(napi_env env, napi_callback_info info, std::string &addr,
-    std::vector<std::string> &filePaths, std::vector<std::string> &mimeTypes)
+    std::vector<FileHolder> &fileHolders)
 {
-    size_t argc = ARGS_SIZE_THREE;
-    napi_value argv[ARGS_SIZE_THREE] = {nullptr};
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
-    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_THREE, "Require 3 arguments.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Require 2 arguments.", napi_invalid_arg);
     NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr));
-    NAPI_BT_CALL_RETURN(NapiParseStringArray(env, argv[PARAM1], filePaths));
-    NAPI_BT_CALL_RETURN(NapiParseStringArray(env, argv[PARAM2], mimeTypes));
+    NAPI_BT_CALL_RETURN(NapiParseFileHolderArray(env, argv[PARAM1], fileHolders));
     return napi_ok;
 }
 
@@ -133,16 +132,22 @@ napi_value NapiBluetoothOpp::SendFile(napi_env env, napi_callback_info info)
     HILOGI("enter");
 
     std::string device {};
-    std::vector<std::string> filePaths;
-    std::vector<std::string> mimeTypes;
+    std::vector<FileHolder> fileHolders;
 
-    auto status = CheckSendFileParam(env, info, device, filePaths, mimeTypes);
+    auto status = CheckSendFileParam(env, info, device, fileHolders);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    HILOGI("fileHolders size is %{public}u", fileHolders.size());
 
-    auto func = [device, filePaths, mimeTypes]() {
+    auto func = [device, fileHolders]() {
         Opp *profile = Opp::GetProfile();
         bool result = false;
-        int32_t errorCode = profile->SendFile(device, filePaths, mimeTypes, result);
+        std::vector<BluetoothOppFileHolder> oppFileHolders;
+        for (FileHolder fileHolder : fileHolders) {
+            oppFileHolders.push_back(BluetoothOppFileHolder(fileHolder.filePath,
+                fileHolder.fileSize, fileHolder.fileFd));
+        }
+        HILOGI("oppFileHolders size is %{public}u", oppFileHolders.size());
+        int32_t errorCode = profile->SendFile(device, oppFileHolders, result);
         HILOGI("err: %{public}d result: %{public}d", errorCode, result);
         return NapiAsyncWorkRet(errorCode);
     };
@@ -157,12 +162,14 @@ napi_value NapiBluetoothOpp::SetIncomingFileConfirmation(napi_env env, napi_call
     HILOGI("enter");
 
     bool accept = false;
-    auto status = CheckSetIncomingFileConfirmation(env, info, accept);
+    int32_t fileFd = -1;
+    auto status = CheckSetIncomingFileConfirmation(env, info, accept, fileFd);
+    HILOGI("fileFd is %{public}d", fileFd);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    auto func = [accept]() {
+    auto func = [accept, fileFd]() {
         Opp *profile = Opp::GetProfile();
-        int32_t errorCode = profile->SetIncomingFileConfirmation(accept);
+        int32_t errorCode = profile->SetIncomingFileConfirmation(accept, fileFd);
         HILOGI("err: %{public}d", errorCode);
         return NapiAsyncWorkRet(errorCode);
     };
@@ -190,6 +197,38 @@ napi_value NapiBluetoothOpp::GetCurrentTransferInformation(napi_env env, napi_ca
     auto status = ConvertOppTransferInformationToJS(env, ret, information);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
     return ret;
+}
+
+napi_status CheckLastReceivedFileUri(napi_env env, napi_callback_info info, std::string &uri)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Require 1 arguments.", napi_invalid_arg);
+    NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], uri));
+    return napi_ok;
+}
+
+napi_value NapiBluetoothOpp::SetLastReceivedFileUri(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+
+    std::string uri {};
+
+    auto status = CheckLastReceivedFileUri(env, info, uri);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [uri]() {
+        Opp *profile = Opp::GetProfile();
+        bool result = false;
+        int32_t errorCode = profile->SetLastReceivedFileUri(uri);
+        HILOGI("err: %{public}d result: %{public}d", errorCode, result);
+        return NapiAsyncWorkRet(errorCode);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 
 napi_value NapiBluetoothOpp::CancelTransfer(napi_env env, napi_callback_info info)

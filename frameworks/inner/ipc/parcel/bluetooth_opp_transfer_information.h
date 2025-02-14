@@ -35,6 +35,24 @@ public:
 
     bool ReadFromParcel(Parcel &parcel);
 };
+
+class BluetoothIOppTransferFileHolder : public Parcelable, public bluetooth::IOppTransferFileHolder {
+public:
+    BluetoothIOppTransferFileHolder() = default;
+    ~BluetoothIOppTransferFileHolder() override = default;
+
+    explicit BluetoothIOppTransferFileHolder(const bluetooth::IOppTransferFileHolder& other);
+    explicit BluetoothIOppTransferFileHolder(const std::string &filePath,
+        const int64_t &fileSize, const int32_t &fileFd);
+    
+    bool Marshalling(Parcel &parcel) const override;
+
+    static BluetoothIOppTransferFileHolder *Unmarshalling(Parcel &parcel);
+
+    bool WriteToParcel(Parcel &parcel) const;
+
+    bool ReadFromParcel(Parcel &parcel);
+};
 }  // namespace Bluetooth
 }  // namespace OHOS
 

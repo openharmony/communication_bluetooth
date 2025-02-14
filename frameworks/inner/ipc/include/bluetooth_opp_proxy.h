@@ -28,10 +28,11 @@ public:
     {}
 
     int32_t SendFile(std::string &device,
-        std::vector<std::string> &filePaths, std::vector<std::string> &mimeTypes, bool& result) override;
-    int32_t SetIncomingFileConfirmation(bool accept) override;
+        std::vector<BluetoothIOppTransferFileHolder> fileHolders, bool& result) override;
+    int32_t SetIncomingFileConfirmation(bool accept, int fd) override;
     int32_t GetCurrentTransferInformation(BluetoothIOppTransferInformation &transferInformation) override;
     int32_t CancelTransfer(bool &result) override;
+    int32_t SetLastReceivedFileUri(const std::string &uri) override;
     void RegisterObserver(const sptr<IBluetoothOppObserver> &observer) override;
     void DeregisterObserver(const sptr<IBluetoothOppObserver> &observer) override;
     int32_t GetDeviceState(const BluetoothRawAddress &device, int& result) override;
@@ -41,6 +42,8 @@ private:
     static inline BrokerDelegator<BluetoothOppProxy> delegator_;
     bool WriteParcelableStringVector(const std::vector<std::string> &parcelableVector, Parcel &reply);
     bool WriteParcelableInt32Vector(const std::vector<int32_t> &parcelableVector, Parcel &reply);
+    bool WriteParcelableFileHolderVector(const std::vector<BluetoothIOppTransferFileHolder> &fileHolders,
+        MessageParcel &reply);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

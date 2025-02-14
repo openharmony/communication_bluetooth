@@ -91,7 +91,7 @@ napi_value NapiConstant::ProfileIdInit(napi_env env)
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PAN_NETWORK, "PROFILE_PAN_NETWORK");
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PBAP_CLIENT, "PROFILE_PBAP_PCE");
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PBAP_SERVER, "PROFILE_PBAP_PSE");
-    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_OPP, "PROFILE_OPP");
+    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_OPP, "PROFILE_OPP_SERVER");
     return profileId;
 }
 

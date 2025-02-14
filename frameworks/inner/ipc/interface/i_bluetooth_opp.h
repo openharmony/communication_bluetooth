@@ -31,11 +31,12 @@ class IBluetoothOpp : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Bluetooth.IBluetoothOpp");
 
-    virtual int32_t SendFile(std::string &device, std::vector<std::string> &filePaths,
-        std::vector<std::string> &mimeTypes, bool& result) = 0;
-    virtual int32_t SetIncomingFileConfirmation(bool accept) = 0;
+    virtual int32_t SendFile(std::string &device,
+        std::vector<BluetoothIOppTransferFileHolder> fileHolders, bool& result) = 0;
+    virtual int32_t SetIncomingFileConfirmation(bool accept, int fd) = 0;
     virtual int32_t GetCurrentTransferInformation(BluetoothIOppTransferInformation &transferInformation) = 0;
     virtual int32_t CancelTransfer(bool &result) = 0;
+    virtual int32_t SetLastReceivedFileUri(const std::string &uri) = 0;
     virtual void RegisterObserver(const sptr<IBluetoothOppObserver> &observer) = 0;
     virtual void DeregisterObserver(const sptr<IBluetoothOppObserver> &observer) = 0;
     virtual int32_t GetDeviceState(const BluetoothRawAddress &device, int& result) = 0;
