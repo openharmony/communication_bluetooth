@@ -41,6 +41,12 @@ struct NapiBleCharacteristic {
     int permissions;
 };
 
+struct FileHolder {
+    std::string filePath = "";
+    int64_t fileSize = 0;
+    int32_t fileFd = -1;
+};
+
 struct NapiGattService {
     UUID serviceUuid;
     bool isPrimary;
@@ -88,7 +94,10 @@ napi_status NapiParseObjectUuid(napi_env env, napi_value object, const char *nam
 napi_status NapiParseObjectArrayBuffer(napi_env env, napi_value object, const char *name, std::vector<uint8_t> &outVec);
 napi_status NapiParseObjectBdAddr(napi_env env, napi_value object, const char *name, std::string &outAddr);
 napi_status NapiParseStringArray(napi_env env, napi_value value, std::vector<std::string> &outStrVec);
+napi_status NapiParseFileHolder(napi_env env, napi_value object, FileHolder &outFileHolder);
+napi_status NapiParseFileHolderArray(napi_env env, napi_value value, std::vector<FileHolder> &outFileHolderVec);
 napi_status NapiParseObjectInt32(napi_env env, napi_value object, const char *name, int32_t &outNum);
+napi_status NapiParseObjectString(napi_env env, napi_value object, const char *name, std::string &outString);
 napi_status NapiParseObjectUint32(napi_env env, napi_value object, const char *name, uint32_t &outNum);
 napi_status NapiParseObjectGattPermissions(napi_env env, napi_value object, const char *name,
     NapiGattPermission &outPermissions);

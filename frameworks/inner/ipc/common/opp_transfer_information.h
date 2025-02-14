@@ -45,12 +45,22 @@ public:
     void SetStatus(int status);
     int GetFailedReason() const;
     void SetFailedReason(int failedReason);
+    int GetFileFd() const;
+    void SetFileFd(int fileFd);
     uint64_t GetTimeStamp() const;
     void SetTimeStamp(uint64_t timeStamp);
     uint64_t GetCurrentBytes() const;
     void SetCurrentBytes(uint64_t currentBytes);
     uint64_t GetTotalBytes() const;
     void SetTotalBytes(uint64_t totalBytes);
+    int GetIsAccepct() const;
+    void SetIsAccepct(int isAccept);
+    int GetOperationNum() const;
+    void SetOperationNum(int operationNum);
+    int GetCurrentCount() const;
+    void SetCurrentCount(int currentCount);
+    int GetTotalCount() const;
+    void SetTotalCount(int totalCount);
 
 private:
     int id_ = -1;
@@ -62,10 +72,33 @@ private:
     int direction_ = 0;
     int status_ = 0;
     int failedReason_ = 0;
+    int fileFd_ = -1;
+    int operationNum_ = 0;
+    int isAccepct_ = false;
     uint64_t timeStamp_ = 0;
     uint64_t currentBytes_ = 0;
     uint64_t totalBytes_ = 0;
+    int currentCount_ = 0;
+    int totalCount_ = 0;
 };
+
+class IOppTransferFileHolder {
+public:
+    IOppTransferFileHolder() = default;
+    virtual ~IOppTransferFileHolder() = default;
+    IOppTransferFileHolder(const std::string &filePath, const int64_t &fileSize, const int32_t &fileFd);
+    std::string GetFilePath() const;
+    void SetFilePath(const std::string &filePath);
+    int64_t GetFileSize() const;
+    void SetFileSize(const int64_t &fileSize);
+    int32_t GetFileFd() const;
+    void SetFileFd(const int32_t &fileFd);
+private:
+    std::string filePath_ = "";
+    int64_t fileSize_ = 0;
+    int32_t fileFd_ = 0;
+};
+
 }  // namespace bluetooth
 }  // namespace OHOS
 

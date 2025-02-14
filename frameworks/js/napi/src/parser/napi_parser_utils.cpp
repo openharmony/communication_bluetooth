@@ -339,6 +339,47 @@ napi_status NapiParseStringArray(napi_env env, napi_value value, std::vector<std
     return napi_ok;
 }
 
+napi_status NapiParseFileHolderArray(napi_env env, napi_value value, std::vector<FileHolder> &outFileHolderVec)
+{
+    NAPI_BT_CALL_RETURN(NapiIsArray(env, value));
+    uint32_t length = 0;
+    std::vector<FileHolder> fileHolderVec {};
+    napi_get_array_length(env, value, &length);
+    for (size_t i = 0; i < length; i++) {
+        FileHolder fileHolder;
+        napi_value result;
+        napi_get_element(env, value, i, &result);
+        NAPI_BT_CALL_RETURN(NapiParseFileHolder(env, result, fileHolder));
+        fileHolderVec.push_back(fileHolder);
+    }
+    outFileHolderVec = std::move(fileHolderVec);
+    return napi_ok;
+}
+
+napi_status NapiParseFileHolder(napi_env env, napi_value object, FileHolder &outFileHolder)
+{
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"filePath", "fileSize", "fileFd"}));
+    NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
+    std::string filePath {};
+    int64_t fileSize = 0;
+    int32_t fileFd = 0;
+    std::string fileType {};
+
+    NAPI_BT_CALL_RETURN(NapiParseObjectString(env, object, "filePath", filePath));
+    NAPI_BT_CALL_RETURN(NapiParseObjectInt64(env, object, "fileSize", fileSize));
+    NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, object, "fileFd", fileFd));
+    HILOGI("filePath: %{public}s fileSize: %{public}Ld fileFd: %{public}d",
+        filePath.c_str(), fileSize, fileFd);
+
+    FileHolder fileHolder;
+    fileHolder.filePath = filePath;
+    fileHolder.fileSize = fileSize;
+    fileHolder.fileFd = fileFd;
+    outFileHolder = std::move(fileHolder);
+    return napi_ok;
+}
+
+
 napi_status NapiParseBdAddr(napi_env env, napi_value value, std::string &outAddr)
 {
     std::string bdaddr {};
@@ -559,6 +600,17 @@ napi_status NapiParseObjectInt32(napi_env env, napi_value object, const char *na
     NAPI_BT_CALL_RETURN(NapiGetObjectProperty(env, object, name, property));
     NAPI_BT_CALL_RETURN(NapiParseInt32(env, property, num));
     outNum = num;
+    return napi_ok;
+}
+
+napi_status NapiParseObjectString(napi_env env, napi_value object, const char *name, std::string &outString)
+{
+    napi_value property;
+    std::string str = "";
+    NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
+    NAPI_BT_CALL_RETURN(NapiGetObjectProperty(env, object, name, property));
+    NAPI_BT_CALL_RETURN(NapiParseString(env, property, str));
+    outString = str;
     return napi_ok;
 }
 
