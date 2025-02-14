@@ -88,6 +88,16 @@ void IOppTransferInformation::SetDirection(int direction)
     direction_ = direction;
 }
 
+int IOppTransferInformation::GetFileFd() const
+{
+    return fileFd_;
+}
+
+void IOppTransferInformation::SetFileFd(int fileFd)
+{
+    fileFd_ = fileFd;
+}
+
 int IOppTransferInformation::GetStatus() const
 {
     return status_;
@@ -136,6 +146,84 @@ uint64_t IOppTransferInformation::GetTotalBytes() const
 void IOppTransferInformation::SetTotalBytes(uint64_t totalBytes)
 {
     totalBytes_ = totalBytes;
+}
+
+int IOppTransferInformation::GetOperationNum() const
+{
+    return operationNum_;
+}
+
+void IOppTransferInformation::SetOperationNum(int operationNum)
+{
+    operationNum_ = operationNum;
+}
+
+int IOppTransferInformation::GetIsAccepct() const
+{
+    return isAccepct_;
+}
+
+void IOppTransferInformation::SetIsAccepct(int isAccepct)
+{
+    isAccepct_ = isAccepct;
+}
+
+int IOppTransferInformation::GetCurrentCount() const
+{
+    return currentCount_;
+}
+
+void IOppTransferInformation::SetCurrentCount(int currentCount)
+{
+    currentCount_ = currentCount;
+}
+
+int IOppTransferInformation::GetTotalCount() const
+{
+    return totalCount_;
+}
+
+void IOppTransferInformation::SetTotalCount(int totalCount)
+{
+    totalCount_ = totalCount;
+}
+
+IOppTransferFileHolder::IOppTransferFileHolder(const std::string &filePath,
+    const int64_t &fileSize, const int32_t &fileFd)
+{
+    filePath_ = filePath;
+    fileSize_ = fileSize;
+    fileFd_ = fileFd;
+}
+
+std::string IOppTransferFileHolder::GetFilePath() const
+{
+    return filePath_;
+}
+
+void IOppTransferFileHolder::SetFilePath(const std::string &filePath)
+{
+    filePath_ = filePath;
+}
+
+int64_t IOppTransferFileHolder::GetFileSize() const
+{
+    return fileSize_;
+}
+
+void IOppTransferFileHolder::SetFileSize(const int64_t &fileSize)
+{
+    fileSize_ = fileSize;
+}
+
+int32_t IOppTransferFileHolder::GetFileFd() const
+{
+    return fileFd_;
+}
+
+void IOppTransferFileHolder::SetFileFd(const int32_t &fileFd)
+{
+    fileFd_ = fileFd;
 }
 }  // namespace bluetooth
 }  // namespace OHOS

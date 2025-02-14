@@ -122,6 +122,7 @@ bool BluetoothIOppTransferInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     SetCurrentBytes(val64);
+
     if (!parcel.ReadInt64(val64)) {
         return false;
     }
@@ -144,5 +145,70 @@ BluetoothIOppTransferInformation *BluetoothIOppTransferInformation::Unmarshallin
     }
     return oppTransferInformation;
 }
+
+BluetoothIOppTransferFileHolder::BluetoothIOppTransferFileHolder(const std::string &filePath,
+    const int64_t &fileSize, const int32_t &fileFd)
+{
+    SetFilePath(filePath);
+    SetFileSize(fileSize);
+    SetFileFd(fileFd);
+}
+
+BluetoothIOppTransferFileHolder::BluetoothIOppTransferFileHolder(const bluetooth::IOppTransferFileHolder &other)
+{
+    SetFilePath(other.GetFilePath());
+    SetFileSize(other.GetFileSize());
+    SetFileFd(other.GetFileFd());
+}
+
+bool BluetoothIOppTransferFileHolder::WriteToParcel(Parcel &parcel) const
+{
+    if (!parcel.WriteString(GetFilePath())) {
+        return false;
+    }
+    if (!parcel.WriteInt64(GetFileSize())) {
+        return false;
+    }
+    if (!parcel.WriteInt32(GetFileFd())) {
+        return false;
+    }
+    return true;
+}
+
+bool BluetoothIOppTransferFileHolder::ReadFromParcel(Parcel &parcel)
+{
+    std::string str;
+    int64_t val64 = 0;
+    int32_t val32 = 0;
+    if (!parcel.ReadString(str)) {
+        return false;
+    }
+    SetFilePath(str);
+    if (!parcel.ReadInt64(val64)) {
+        return false;
+    }
+    SetFileSize(val64);
+    if (!parcel.ReadInt32(val32)) {
+        return false;
+    }
+    SetFileFd(val32);
+    return true;
+}
+
+bool BluetoothIOppTransferFileHolder::Marshalling(Parcel &parcel) const
+{
+    return WriteToParcel(parcel);
+}
+
+BluetoothIOppTransferFileHolder *BluetoothIOppTransferFileHolder::Unmarshalling(Parcel &parcel)
+{
+    BluetoothIOppTransferFileHolder *oppTransferFileHolder = new BluetoothIOppTransferFileHolder();
+    if (oppTransferFileHolder != nullptr && !oppTransferFileHolder->ReadFromParcel(parcel)) {
+        delete oppTransferFileHolder;
+        oppTransferFileHolder = nullptr;
+    }
+    return oppTransferFileHolder;
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS

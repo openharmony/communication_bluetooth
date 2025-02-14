@@ -269,6 +269,88 @@ private:
 };
 
 /**
+ * @brief Bluetooth Opp FileHolder.
+ *
+ * @since 15
+ */
+class BLUETOOTH_API BluetoothOppFileHolder {
+public:
+    /**
+     * @brief A destructor used to create the <b>BluetoothOppFileHolder</b> instance.
+     *
+     * @since 15
+     */
+    BluetoothOppFileHolder(const std::string &filePath, const int64_t &fileSize, const int32_t &fileFd);
+
+    /**
+     * @brief A destructor used to create the <b>BluetoothOppFileHolder</b> instance.
+     *
+     * @since 15
+     */
+    BluetoothOppFileHolder();
+
+    /**
+     * @brief A destructor used to delete the <b>BluetoothOppFileHolder</b> instance.
+     *
+     * @since 15
+     */
+    ~BluetoothOppFileHolder();
+
+    /**
+     * @brief Get File Path.
+     *
+     * @return filePath.
+     * @since 15
+     */
+    std::string GetFilePath() const;
+
+    /**
+     * @brief Get File Size.
+     *
+     * @return fileSize.
+     * @since 15
+     */
+    int64_t GetFileSize() const;
+
+    /**
+     * @brief Get File Fd.
+     *
+     * @return fileFd.
+     * @since 15
+     */
+    int32_t GetFileFd() const;
+
+    /**
+     * @brief Set File Path.
+     *
+     * @return filePath.
+     * @since 15
+     */
+    void SetFilePath(const std::string &filePath);
+
+    /**
+     * @brief Set File Fd.
+     *
+     * @return fileFd.
+     * @since 15
+     */
+    void SetFileFd(const int32_t &fileFd);
+
+    /**
+     * @brief Set File Size.
+     *
+     * @return fileSize.
+     * @since 15
+     */
+    void SetFileSize(const int64_t &fileSize);
+
+private:
+    std::string filePath_;
+    int64_t fileSize_;
+    int32_t fileFd_;
+};
+
+/**
  * @brief Class for Opp Host observer functions.
  *
  */
@@ -316,15 +398,14 @@ public:
      *
      * @return Return operate result to confirm whether the file is successfully sent.
      */
-    int32_t SendFile(std::string device, std::vector<std::string> filePaths,
-        std::vector<std::string> mimeTypes, bool& result);
+    int32_t SendFile(std::string device, std::vector<BluetoothOppFileHolder> fileHolders, bool& result);
 
     /**
      * @brief Set Incoming File Confirmation.
      *
      * @return Return operate result to confirm whether the setting is successful.
      */
-    int32_t SetIncomingFileConfirmation(bool accept);
+    int32_t SetIncomingFileConfirmation(bool accept, int32_t fileFd);
 
     /**
      * @brief Get Current Transfer Information.
@@ -339,6 +420,14 @@ public:
      * @return Return operate result to confirm whether the cancellation is set successfully.
      */
     int32_t CancelTransfer(bool& result);
+
+    /**
+     * @brief Set LastReceived FileUri.
+     * @param Set LastReceived FileUri.
+     *
+     * @return Return operate result to SetLastReceivedFileUri.
+     */
+    int32_t SetLastReceivedFileUri(const std::string &uri);
 
     /**
      * @brief Get remote opp device list which are in the specified states.
