@@ -193,6 +193,13 @@
             ]
           },
           "name": "//foundation/communication/bluetooth/frameworks/inner:btcommon"
+        },
+        {
+          "header": {
+            "header_base": "//foundation/communication/bluetooth/frameworks/cj/a2dp/include",
+            "header_files": []
+          },
+          "name": "//foundation/communication/bluetooth/frameworks/cj/a2dp:cj_bluetooth_a2dp_ffi"
         }
       ]
     }
