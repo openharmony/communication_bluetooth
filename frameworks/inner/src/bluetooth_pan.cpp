@@ -62,7 +62,7 @@ struct Pan::impl {
     int32_t GetDevicesByStates(std::vector<int> states, std::vector<BluetoothRemoteDevice>& result)
     {
         HILOGI("enter");
-        sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_OPP_SERVER);
+        sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_PAN_SERVER);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_SERVICE_DISCONNECTED, "failed: no proxy");
 
         std::vector<BluetoothRawAddress> rawDevices;
@@ -88,7 +88,7 @@ struct Pan::impl {
     int32_t GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
-        sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_OPP_SERVER);
+        sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_PAN_SERVER);
         if (proxy == nullptr || !device.IsValidBluetoothRemoteDevice()) {
             HILOGE("invalid param.");
             return BT_ERR_INVALID_PARAM;
@@ -100,7 +100,7 @@ struct Pan::impl {
     int32_t Disconnect(const BluetoothRemoteDevice &device)
     {
         HILOGI("device: %{public}s", GET_ENCRYPT_ADDR(device));
-        sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_OPP_SERVER);
+        sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_PAN_SERVER);
         if (proxy == nullptr || !device.IsValidBluetoothRemoteDevice()) {
             HILOGE("invalid param.");
             return BT_ERR_INVALID_PARAM;
@@ -124,7 +124,7 @@ struct Pan::impl {
     int32_t SetTethering(bool value)
     {
         HILOGI("enter");
-        sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_OPP_SERVER);
+        sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_PAN_SERVER);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_SERVICE_DISCONNECTED, "failed: no proxy");
 
         int32_t ret = proxy->SetTethering(value);
@@ -135,7 +135,7 @@ struct Pan::impl {
     int32_t IsTetheringOn(bool &value)
     {
         HILOGI("enter");
-        sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_OPP_SERVER);
+        sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_PAN_SERVER);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_SERVICE_DISCONNECTED, "failed: no proxy");
 
         return proxy->IsTetheringOn(value);
@@ -195,7 +195,7 @@ int32_t Pan::GetDevicesByStates(std::vector<int> states, std::vector<BluetoothRe
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
-    sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_OPP_SERVER);
+    sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_PAN_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
 
     return pimpl->GetDevicesByStates(states, result);
@@ -207,7 +207,7 @@ int32_t Pan::GetDeviceState(const BluetoothRemoteDevice &device, int32_t &state)
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
-    sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_OPP_SERVER);
+    sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_PAN_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
 
     return pimpl->GetDeviceState(device, state);
@@ -220,7 +220,7 @@ int32_t Pan::Disconnect(const BluetoothRemoteDevice &device)
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_OPP_SERVER);
+    sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_PAN_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
 
     return pimpl->Disconnect(device);
@@ -247,7 +247,7 @@ int32_t Pan::SetTethering(bool value)
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_OPP_SERVER);
+    sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_PAN_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
 
     return pimpl->SetTethering(value);
@@ -260,7 +260,7 @@ int32_t Pan::IsTetheringOn(bool &value)
         return BT_ERR_INVALID_STATE;
     }
 
-    sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_OPP_SERVER);
+    sptr<IBluetoothPan> proxy = GetRemoteProxy<IBluetoothPan>(PROFILE_PAN_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
 
     return pimpl->IsTetheringOn(value);
