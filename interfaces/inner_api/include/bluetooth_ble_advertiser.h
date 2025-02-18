@@ -512,6 +512,14 @@ public:
      */
     int ChangeAdvertisingParams(uint8_t advHandle, const BleAdvertiserSettings &settings);
 
+    /**
+     * @brief Get all Advertise Observer.
+     *
+     * @return Returns Observer ptr list.
+     * @since 16
+     */
+    std::vector<std::shared_ptr<BleAdvertiseCallback>> GetAdvObservers();
+
 private:
     BleAdvertiser();
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleAdvertiser);
