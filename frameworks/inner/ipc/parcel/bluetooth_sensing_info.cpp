@@ -38,6 +38,18 @@ bool BluetoothSensingInfo::Marshalling(Parcel &parcel) const
     if (!parcel.WriteUint16(interval_)) {
         return false;
     }
+    if (!parcel.WriteBool(connectable_)) {
+        return false;
+    }
+    if (!parcel.WriteInt32(payloadLen_)) {
+        return false;
+    }
+    if (!parcel.WriteString(bussinessType_)) {
+        return false;
+    }
+    if (!parcel.WriteInt32(scanMode_)) {
+        return false;
+    }
     return true;
 }
 
@@ -74,6 +86,18 @@ bool BluetoothSensingInfo::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!parcel.ReadUint16(interval_)) {
+        return false;
+    }
+    if (!parcel.ReadBool(connectable_)) {
+        return false;
+    }
+    if (!parcel.ReadInt32(payloadLen_)) {
+        return false;
+    }
+    if (!parcel.ReadString(bussinessType_)) {
+        return false;
+    }
+    if (!parcel.ReadInt32(scanMode_)) {
         return false;
     }
     return true;
