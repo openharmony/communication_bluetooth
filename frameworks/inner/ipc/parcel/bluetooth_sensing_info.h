@@ -27,7 +27,8 @@ public:
     ~BluetoothSensingInfo() = default;
     explicit BluetoothSensingInfo(const bluetooth::SensingInfo &info)
         : addr_(info.addr_), uuid_(info.uuid_), resourceId_(info.resourceId_), pkgName_(info.pkgName_),
-        isServer_(info.isServer_), interval_(info.interval_)
+        isServer_(info.isServer_), interval_(info.interval_), connectable_(info.connectable_),
+        payloadLen_(info.payloadLen_), bussinessType_(info.bussinessType_), scanMode_(info.scanMode_)
     {}
     bool Marshalling(Parcel &parcel) const override;
     static BluetoothSensingInfo *Unmarshalling(Parcel &parcel);
@@ -40,6 +41,10 @@ public:
     std::string pkgName_;
     bool isServer_;
     uint16_t interval_;
+    bool connectable_;
+    int payloadLen_;
+    std::string bussinessType_;
+    int scanMode_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
