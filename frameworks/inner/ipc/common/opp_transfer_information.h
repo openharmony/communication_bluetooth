@@ -43,8 +43,8 @@ public:
     void SetDirection(int direction);
     int GetStatus() const;
     void SetStatus(int status);
-    int GetFailedReason() const;
-    void SetFailedReason(int failedReason);
+    int GetResult() const;
+    void SetResult(int result);
     int GetFileFd() const;
     void SetFileFd(int fileFd);
     uint64_t GetTimeStamp() const;
@@ -71,7 +71,7 @@ private:
     std::string deviceAddress_;
     int direction_ = 0;
     int status_ = 0;
-    int failedReason_ = 0;
+    int result_ = 0;
     int fileFd_ = -1;
     int operationNum_ = 0;
     int isAccepct_ = false;
