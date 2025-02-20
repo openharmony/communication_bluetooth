@@ -108,14 +108,14 @@ void IOppTransferInformation::SetStatus(int status)
     status_ = status;
 }
 
-int IOppTransferInformation::GetFailedReason() const
+int IOppTransferInformation::GetResult() const
 {
-    return failedReason_;
+    return result_;
 }
 
-void IOppTransferInformation::SetFailedReason(int failedReason)
+void IOppTransferInformation::SetResult(int result)
 {
-    failedReason_ = failedReason;
+    result_ = result;
 }
 
 uint64_t IOppTransferInformation::GetTimeStamp() const

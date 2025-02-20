@@ -27,10 +27,12 @@ BluetoothIOppTransferInformation::BluetoothIOppTransferInformation(const bluetoo
     SetDeviceAddress(other.GetDeviceAddress());
     SetDirection(other.GetDirection());
     SetStatus(other.GetStatus());
-    SetFailedReason(other.GetFailedReason());
+    SetResult(other.GetResult());
     SetTimeStamp(other.GetTimeStamp());
     SetCurrentBytes(other.GetCurrentBytes());
     SetTotalBytes(other.GetTotalBytes());
+    SetCurrentCount(other.GetCurrentCount());
+    SetTotalCount(other.GetTotalCount());
 }
 bool BluetoothIOppTransferInformation::WriteToParcel(Parcel &parcel) const
 {
@@ -58,7 +60,7 @@ bool BluetoothIOppTransferInformation::WriteToParcel(Parcel &parcel) const
     if (!parcel.WriteInt32(GetStatus())) {
         return false;
     }
-    if (!parcel.WriteInt32(GetFailedReason())) {
+    if (!parcel.WriteInt32(GetResult())) {
         return false;
     }
     if (!parcel.WriteInt64(GetTimeStamp())) {
@@ -68,6 +70,12 @@ bool BluetoothIOppTransferInformation::WriteToParcel(Parcel &parcel) const
         return false;
     }
     if (!parcel.WriteInt64(GetTotalBytes())) {
+        return false;
+    }
+    if (!parcel.WriteInt32(GetCurrentCount())) {
+        return false;
+    }
+    if (!parcel.WriteInt32(GetTotalCount())) {
         return false;
     }
     return true;
@@ -113,7 +121,7 @@ bool BluetoothIOppTransferInformation::ReadFromParcel(Parcel &parcel)
     if (!parcel.ReadInt32(val)) {
         return false;
     }
-    SetFailedReason(val);
+    SetResult(val);
     if (!parcel.ReadInt64(val64)) {
         return false;
     }
@@ -127,6 +135,14 @@ bool BluetoothIOppTransferInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     SetTotalBytes(val64);
+    if (!parcel.ReadInt32(val)) {
+        return false;
+    }
+    SetCurrentCount(val);
+    if (!parcel.ReadInt32(val)) {
+        return false;
+    }
+    SetTotalCount(val);
 
     return true;
 }
