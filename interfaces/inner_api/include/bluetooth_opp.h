@@ -51,14 +51,14 @@ public:
     /**
      * @brief A constructor used to create a <b>BluetoothOppTransferInformation</b> instance.
      *
-     * @since 6
+     * @since 15
      */
     BluetoothOppTransferInformation();
 
     /**
      * @brief A destructor used to delete the <b>BluetoothOppTransferInformation</b> instance.
      *
-     * @since 6
+     * @since 15
      */
     ~BluetoothOppTransferInformation();
 
@@ -66,7 +66,7 @@ public:
      * @brief Get Id.
      *
      * @return Returns Id.
-     * @since 6
+     * @since 15
      */
     int GetId() const;
 
@@ -74,7 +74,7 @@ public:
      * @brief Get File Name.
      *
      * @return File Name.
-     * @since 6
+     * @since 15
      */
     std::string GetFileName() const;
 
@@ -82,14 +82,14 @@ public:
      * @brief Get File Path.
      *
      * @return Returns File Path.
-     * @since 6
+     * @since 15
      */
     std::string GetFilePath() const;
 
     /**
      * @brief Get Mime Type.
      *
-     * @since 6
+     * @since 15
      */
     std::string GetMimeType() const;
 
@@ -97,7 +97,7 @@ public:
      * @brief Get Device Name.
      *
      * @return Returns Device Name.
-     * @since 6
+     * @since 15
      */
     std::string GetDeviceName() const;
 
@@ -105,7 +105,7 @@ public:
      * @brief Get Device Address.
      *
      * @return Returns Device Address.
-     * @since 6
+     * @since 15
      */
     std::string GetDeviceAddress() const;
 
@@ -113,7 +113,7 @@ public:
      * @brief Get Direction.
      *
      * @return Returns Direction.
-     * @since 6
+     * @since 15
      */
     int GetDirection() const;
 
@@ -121,23 +121,23 @@ public:
      * @brief Get Status.
      *
      * @return Returns Status.
-     * @since 6
+     * @since 15
      */
     int GetStatus() const;
 
     /**
-     * @brief Get Failed Reason.
+     * @brief Get Result.
      *
-     * @return Returns Failed Reason.
-     * @since 6
+     * @return Returns Result.
+     * @since 15
      */
-    int GetFailedReason() const;
+    int GetResult() const;
 
     /**
      * @brief Get Time Stamp.
      *
      * @return TimeStamp.
-     * @since 6
+     * @since 15
      */
     uint64_t GetTimeStamp() const;
 
@@ -145,7 +145,7 @@ public:
      * @brief Get Current Bytes.
      *
      * @return Returns Current Bytes.
-     * @since 6
+     * @since 15
      */
     uint64_t GetCurrentBytes() const;
 
@@ -153,15 +153,31 @@ public:
      * @brief Get Total Bytes.
      *
      * @return Returns TotalBytes.
-     * @since 6
+     * @since 15
      */
     uint64_t GetTotalBytes() const;
+
+    /**
+     * @brief Get CurrentCount.
+     *
+     * @return Returns CurrentCount.
+     * @since 15
+     */
+    int GetCurrentCount() const;
+
+    /**
+     * @brief Get TotalCount.
+     *
+     * @return Returns TotalCount.
+     * @since 15
+     */
+    int GetTotalCount() const;
 
     /**
      * @brief Set Id.
      *
      * @param interval Id.
-     * @since 6
+     * @since 15
      */
     void SetId(int id);
 
@@ -169,7 +185,7 @@ public:
      * @brief Set File Name.
      *
      * @param interval File Name.
-     * @since 6
+     * @since 15
      */
     void SetFileName(std::string fileName);
 
@@ -177,7 +193,7 @@ public:
      * @brief Set File Path.
      *
      * @param interval File Path.
-     * @since 6
+     * @since 15
      */
     void SetFilePath(std::string filePath);
 
@@ -185,7 +201,7 @@ public:
      * @brief Set Mime Type.
      *
      * @param interval Mime Type.
-     * @since 6
+     * @since 15
      */
     void SetMimeType(std::string mimeType);
 
@@ -193,7 +209,7 @@ public:
      * @brief Set Device Name.
      *
      * @param interval Device Name.
-     * @since 6
+     * @since 15
      */
     void SetDeviceName(std::string deviceName);
 
@@ -201,7 +217,7 @@ public:
      * @brief Set Device Address.
      *
      * @param interval Device Address.
-     * @since 6
+     * @since 15
      */
     void SetDeviceAddress(std::string deviceAddress);
 
@@ -209,7 +225,7 @@ public:
      * @brief Set Direction.
      *
      * @param interval Direction.
-     * @since 6
+     * @since 15
      */
     void SetDirection(int direction);
 
@@ -217,23 +233,23 @@ public:
      * @brief Set Status.
      *
      * @param interval Status.
-     * @since 6
+     * @since 15
      */
     void SetStatus(int status);
 
     /**
-     * @brief Set Failed Reason.
+     * @brief Set Result.
      *
-     * @param interval Failed Reason.
-     * @since 6
+     * @param interval Result.
+     * @since 15
      */
-    void SetFailedReason(int failedReason);
+    void SetResult(int result);
 
     /**
      * @brief Set Time Stamp.
      *
      * @param interval Time Stamp.
-     * @since 6
+     * @since 15
      */
     void SetTimeStamp(uint64_t timeStamp);
 
@@ -241,7 +257,7 @@ public:
      * @brief Set Current Bytes.
      *
      * @param interval Current Bytes.
-     * @since 6
+     * @since 15
      */
     void SetCurrentBytes(uint64_t currentBytes);
 
@@ -249,9 +265,25 @@ public:
      * @brief Set Total Bytes.
      *
      * @param interval Total Bytes.
-     * @since 6
+     * @since 15
      */
     void SetTotalBytes(uint64_t totalBytes);
+
+    /**
+     * @brief Set CurrentCount.
+     *
+     * @param interval CurrentCount.
+     * @since 15
+     */
+    void SetCurrentCount(int currentCount);
+
+    /**
+     * @brief Set TotalCount.
+     *
+     * @param interval TotalCount.
+     * @since 15
+     */
+    void SetTotalCount(int totalCount);
 
 private:
     int id_ = -1;
@@ -262,10 +294,12 @@ private:
     std::string deviceAddress_;
     int direction_ = 0;
     int status_ = 0;
-    int failedReason_ = 0;
+    int result_ = 0;
     uint64_t timeStamp_ = 0;
     uint64_t currentBytes_ = 0;
     uint64_t totalBytes_ = 0;
+    int currentCount_ = 0;
+    int totalCount_ = 0;
 };
 
 /**

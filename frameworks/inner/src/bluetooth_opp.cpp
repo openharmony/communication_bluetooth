@@ -40,12 +40,14 @@ BluetoothOppTransferInformation TransferInformation(const BluetoothIOppTransferI
     oppTransferinformation.SetMimeType(other.GetFileType());
     oppTransferinformation.SetDeviceName(other.GetDeviceName());
     oppTransferinformation.SetDeviceAddress(other.GetDeviceAddress());
-    oppTransferinformation.SetFailedReason(other.GetFailedReason());
+    oppTransferinformation.SetResult(other.GetResult());
     oppTransferinformation.SetStatus(other.GetStatus());
     oppTransferinformation.SetDirection(other.GetDirection());
     oppTransferinformation.SetTimeStamp(other.GetTimeStamp());
     oppTransferinformation.SetCurrentBytes(other.GetCurrentBytes());
     oppTransferinformation.SetTotalBytes(other.GetTotalBytes());
+    oppTransferinformation.SetCurrentCount(other.GetCurrentCount());
+    oppTransferinformation.SetTotalCount(other.GetTotalCount());
     return oppTransferinformation;
 }
 
@@ -165,9 +167,9 @@ int BluetoothOppTransferInformation::GetStatus() const
     return status_;
 }
 
-int BluetoothOppTransferInformation::GetFailedReason() const
+int BluetoothOppTransferInformation::GetResult() const
 {
-    return failedReason_;
+    return result_;
 }
 
 uint64_t BluetoothOppTransferInformation::GetTimeStamp() const
@@ -183,6 +185,16 @@ uint64_t BluetoothOppTransferInformation::GetCurrentBytes() const
 uint64_t BluetoothOppTransferInformation::GetTotalBytes() const
 {
     return totalBytes_;
+}
+
+int BluetoothOppTransferInformation::GetCurrentCount() const
+{
+    return currentCount_;
+}
+
+int BluetoothOppTransferInformation::GetTotalCount() const
+{
+    return totalCount_;
 }
 
 void BluetoothOppTransferInformation::SetId(int id)
@@ -225,9 +237,9 @@ void BluetoothOppTransferInformation::SetStatus(int status)
     status_ = status;
 }
 
-void BluetoothOppTransferInformation::SetFailedReason(int failedReason)
+void BluetoothOppTransferInformation::SetResult(int result)
 {
-    failedReason_ = failedReason;
+    result_ = result;
 }
 
 void BluetoothOppTransferInformation::SetTimeStamp(uint64_t timeStamp)
@@ -243,6 +255,16 @@ void BluetoothOppTransferInformation::SetCurrentBytes(uint64_t currentBytes)
 void BluetoothOppTransferInformation::SetTotalBytes(uint64_t totalBytes)
 {
     totalBytes_ = totalBytes;
+}
+
+void BluetoothOppTransferInformation::SetCurrentCount(int currentCount)
+{
+    currentCount_ = currentCount;
+}
+
+void BluetoothOppTransferInformation::SetTotalCount(int totalCount)
+{
+    totalCount_ = totalCount;
 }
 
 BluetoothOppFileHolder::BluetoothOppFileHolder()
