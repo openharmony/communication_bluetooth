@@ -156,11 +156,11 @@ napi_status ConvertOppTransferInformationToJS(napi_env env, napi_value result,
 
     napi_value deviceName;
     napi_create_string_utf8(env, transferInformation.GetDeviceName().c_str(), NAPI_AUTO_LENGTH, &deviceName);
-    napi_set_named_property(env, result, "deviceName", deviceName);
+    napi_set_named_property(env, result, "remoteDeviceName", deviceName);
 
     napi_value deviceAddress;
     napi_create_string_utf8(env, transferInformation.GetDeviceAddress().c_str(), NAPI_AUTO_LENGTH, &deviceAddress);
-    napi_set_named_property(env, result, "deviceAddress", deviceAddress);
+    napi_set_named_property(env, result, "remoteDeviceId", deviceAddress);
 
     napi_value direction;
     napi_create_int32(env, transferInformation.GetDirection(), &direction);
@@ -170,9 +170,9 @@ napi_status ConvertOppTransferInformationToJS(napi_env env, napi_value result,
     napi_create_int32(env, transferInformation.GetStatus(), &status);
     napi_set_named_property(env, result, "status", status);
 
-    napi_value failedReason;
-    napi_create_int32(env, transferInformation.GetFailedReason(), &failedReason);
-    napi_set_named_property(env, result, "failedReason", failedReason);
+    napi_value results;
+    napi_create_int32(env, transferInformation.GetResult(), &results);
+    napi_set_named_property(env, result, "result", results);
 
     napi_value timeStamp;
     napi_create_int64(env, transferInformation.GetTimeStamp(), &timeStamp);
@@ -185,6 +185,14 @@ napi_status ConvertOppTransferInformationToJS(napi_env env, napi_value result,
     napi_value totalBytes;
     napi_create_int64(env, transferInformation.GetTotalBytes(), &totalBytes);
     napi_set_named_property(env, result, "totalBytes", totalBytes);
+
+    napi_value currentCount;
+    napi_create_int32(env, transferInformation.GetCurrentCount(), &currentCount);
+    napi_set_named_property(env, result, "currentCount", currentCount);
+
+    napi_value totalCount;
+    napi_create_int32(env, transferInformation.GetTotalCount(), &totalCount);
+    napi_set_named_property(env, result, "totalCount", totalCount);
 
     return napi_ok;
 }
