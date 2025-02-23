@@ -43,7 +43,7 @@ public:
 private:
     bool IsValidEventName(const std::string &eventName) const;
     bool IsNapiCallbackExist(
-        const std::vector<std::shared_ptr<NapiCallback>> &napiCallbackVec, napi_value &callback) const;
+        const std::vector<std::shared_ptr<NapiCallback>> &napiCallbackVec, napi_env env, napi_value &callback) const;
     void CallFunction(
         std::shared_ptr<NapiNativeObject> nativeObject, std::vector<std::shared_ptr<NapiCallback>> napiCallbackVec);
 
