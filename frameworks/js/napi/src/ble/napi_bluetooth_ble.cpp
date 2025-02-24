@@ -1120,7 +1120,7 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
             int ret = bleAdvertiser->StopAdvertising(NapiBluetoothBleAdvertiseCallback::GetInstance());
             NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
         } else {
-            for (auto &callback : bleAdvertiser->GetAdvObservers()) {
+            for (auto &callback : callbacks) {
                 int ret = bleAdvertiser->StopAdvertising(callback);
                 NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
             }
