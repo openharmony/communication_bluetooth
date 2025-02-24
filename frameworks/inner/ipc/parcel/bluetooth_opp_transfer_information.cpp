@@ -222,6 +222,7 @@ BluetoothIOppTransferFileHolder *BluetoothIOppTransferFileHolder::Unmarshalling(
     if (oppTransferFileHolder != nullptr && !oppTransferFileHolder->ReadFromParcel(parcel)) {
         delete oppTransferFileHolder;
         oppTransferFileHolder = nullptr;
+        return nullptr;
     }
     return oppTransferFileHolder;
 }
