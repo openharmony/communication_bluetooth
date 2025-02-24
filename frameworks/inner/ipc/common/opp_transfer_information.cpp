@@ -158,14 +158,14 @@ void IOppTransferInformation::SetOperationNum(int operationNum)
     operationNum_ = operationNum;
 }
 
-int IOppTransferInformation::GetIsAccepct() const
+int IOppTransferInformation::GetIsAccept() const
 {
-    return isAccepct_;
+    return isAccept_;
 }
 
-void IOppTransferInformation::SetIsAccepct(int isAccepct)
+void IOppTransferInformation::SetIsAccept(int isAccept)
 {
-    isAccepct_ = isAccepct;
+    isAccept_ = isAccept;
 }
 
 int IOppTransferInformation::GetCurrentCount() const

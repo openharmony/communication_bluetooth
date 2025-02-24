@@ -345,7 +345,7 @@ napi_status NapiParseFileHolderArray(napi_env env, napi_value value, std::vector
     uint32_t length = 0;
     std::vector<FileHolder> fileHolderVec {};
     napi_get_array_length(env, value, &length);
-    for (size_t i = 0; i < length; i++) {
+    for (uint32_t i = 0; i < length; i++) {
         FileHolder fileHolder;
         napi_value result;
         napi_get_element(env, value, i, &result);
@@ -368,8 +368,7 @@ napi_status NapiParseFileHolder(napi_env env, napi_value object, FileHolder &out
     NAPI_BT_CALL_RETURN(NapiParseObjectString(env, object, "filePath", filePath));
     NAPI_BT_CALL_RETURN(NapiParseObjectInt64(env, object, "fileSize", fileSize));
     NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, object, "fileFd", fileFd));
-    HILOGI("filePath: %{public}s fileSize: %{public}Ld fileFd: %{public}d",
-        filePath.c_str(), fileSize, fileFd);
+    HILOGI("fileSize: %{public}Ld fileFd: %{public}d", fileSize, fileFd);
 
     FileHolder fileHolder;
     fileHolder.filePath = filePath;
