@@ -379,9 +379,9 @@ public:
     void SetFileSize(const int64_t &fileSize);
 
 private:
-    std::string filePath_;
-    int64_t fileSize_;
-    int32_t fileFd_;
+    std::string filePath_ = "";
+    int64_t fileSize_ = 0;
+    int32_t fileFd_ = -1;
 };
 
 /**

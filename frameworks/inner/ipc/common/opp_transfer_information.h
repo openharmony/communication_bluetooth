@@ -53,8 +53,8 @@ public:
     void SetCurrentBytes(uint64_t currentBytes);
     uint64_t GetTotalBytes() const;
     void SetTotalBytes(uint64_t totalBytes);
-    int GetIsAccepct() const;
-    void SetIsAccepct(int isAccept);
+    int GetIsAccept() const;
+    void SetIsAccept(int isAccept);
     int GetOperationNum() const;
     void SetOperationNum(int operationNum);
     int GetCurrentCount() const;
@@ -74,7 +74,7 @@ private:
     int result_ = 0;
     int fileFd_ = -1;
     int operationNum_ = 0;
-    int isAccepct_ = false;
+    int isAccept_ = false;
     uint64_t timeStamp_ = 0;
     uint64_t currentBytes_ = 0;
     uint64_t totalBytes_ = 0;

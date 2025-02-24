@@ -22,8 +22,8 @@
 
 namespace OHOS {
 namespace Bluetooth {
-int32_t BluetoothOppProxy::SendFile(std::string &device,
-    std::vector<BluetoothIOppTransferFileHolder> fileHolders, bool& result)
+int32_t BluetoothOppProxy::SendFile(const std::string &device,
+    const std::vector<BluetoothIOppTransferFileHolder> &fileHolders, bool& result)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor()),
@@ -240,7 +240,7 @@ bool BluetoothOppProxy::WriteParcelableFileHolderVector(const std::vector<Blueto
         return false;
     }
 
-    for (auto fileHolder : fileHolders) {
+    for (auto &fileHolder : fileHolders) {
         if (!reply.WriteString(fileHolder.GetFilePath())) {
             HILOGE("write file path failed");
             return false;
