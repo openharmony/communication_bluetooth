@@ -27,8 +27,8 @@ public:
     virtual ~BluetoothOppProxy()
     {}
 
-    int32_t SendFile(std::string &device,
-        std::vector<BluetoothIOppTransferFileHolder> fileHolders, bool& result) override;
+    int32_t SendFile(const std::string &device,
+        const std::vector<BluetoothIOppTransferFileHolder> &fileHolders, bool& result) override;
     int32_t SetIncomingFileConfirmation(bool accept, int fd) override;
     int32_t GetCurrentTransferInformation(BluetoothIOppTransferInformation &transferInformation) override;
     int32_t CancelTransfer(bool &result) override;
