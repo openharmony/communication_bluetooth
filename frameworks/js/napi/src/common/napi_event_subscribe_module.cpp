@@ -62,7 +62,7 @@ napi_status NapiEventSubscribeModule::Register(napi_env env, napi_callback_info 
     NAPI_BT_CALL_RETURN(NapiIsFunction(env, callback));
 
     eventSubscribeMap_.ChangeValueByLambda(name, [this, &env, &name, &callback](auto &callbackVec) {
-        if (IsNapiCallbackExist(callbackVec, callback)) {
+        if (IsNapiCallbackExist(callbackVec, env, callback)) {
             HILOGW("The %{public}s callback is registered, no need to re-registered", name.c_str());
             return;
         }
@@ -101,9 +101,9 @@ napi_status NapiEventSubscribeModule::Deregister(napi_env env, napi_callback_inf
     // The argc is ARGS_SIZE_TWO
     napi_value callback = argv[PARAM1];
     NAPI_BT_CALL_RETURN(NapiIsFunction(env, callback));
-    eventSubscribeMap_.ChangeValueByLambda(name, [this, &name, &callback](auto &callbackVec) {
+    eventSubscribeMap_.ChangeValueByLambda(name, [this, &name, &env, &callback](auto &callbackVec) {
         auto it = std::find_if(callbackVec.begin(), callbackVec.end(),
-            [&callback](auto &napiCallback) { return napiCallback->Equal(callback); });
+            [&env, &callback](auto &napiCallback) { return napiCallback->Equal(env, callback); });
         if (it == callbackVec.end()) {
             HILOGW("Deregister unknown %{public}s callback in %{public}s module", name.c_str(), moduleName_.c_str());
             return;
@@ -124,10 +124,10 @@ bool NapiEventSubscribeModule::IsValidEventName(const std::string &eventName) co
 }
 
 bool NapiEventSubscribeModule::IsNapiCallbackExist(
-    const std::vector<std::shared_ptr<NapiCallback>> &napiCallbackVec, napi_value &callback) const
+    const std::vector<std::shared_ptr<NapiCallback>> &napiCallbackVec, napi_env env, napi_value &callback) const
 {
-    auto it = std::find_if(napiCallbackVec.begin(), napiCallbackVec.end(),
-        [&callback](const std::shared_ptr<NapiCallback> &napiCallback) { return napiCallback->Equal(callback); });
+    auto it = std::find_if(napiCallbackVec.begin(), napiCallbackVec.end(), [&env, &callback]
+        (const std::shared_ptr<NapiCallback> &napiCallback) { return napiCallback->Equal(env, callback); });
     return it != napiCallbackVec.end();
 }
 

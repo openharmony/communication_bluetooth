@@ -130,8 +130,12 @@ napi_env NapiCallback::GetNapiEnv(void)
     return env_;
 }
 
-bool NapiCallback::Equal(napi_value &callback) const
+bool NapiCallback::Equal(napi_env env, napi_value &callback) const
 {
+    if (env != env_) {
+        HILOGD("Callback is not in the same thread, not uqual");
+        return false;
+    }
     NapiHandleScope scope(env_);
     napi_value storedCallback = nullptr;
     napi_get_reference_value(env_, callbackRef_, &storedCallback);
