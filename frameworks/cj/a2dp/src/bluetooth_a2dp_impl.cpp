@@ -30,7 +30,7 @@ int32_t A2dpSourceProfileImpl::GetPlayingState(char* deviceId, int32_t* errCode)
 {
     int32_t state = PlayingState::STATE_NOT_PLAYING;
     std::string remoteAddr = deviceId;
-    if (IsValidAddress(remoteAddr)) {
+    if (!IsValidAddress(remoteAddr)) {
         *errCode = BT_ERR_INVALID_PARAM;
         return state;
     }
