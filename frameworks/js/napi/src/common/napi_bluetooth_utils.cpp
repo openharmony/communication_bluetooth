@@ -197,7 +197,7 @@ napi_status ConvertOppTransferInformationToJS(napi_env env, napi_value result,
     return napi_ok;
 }
 
-napi_status ConvertStringVectorToJS(napi_env env, napi_value result, std::vector<std::string>& stringVector)
+napi_status ConvertStringVectorToJS(napi_env env, napi_value result, const std::vector<std::string>& stringVector)
 {
     HILOGI("vector size: %{public}zu", stringVector.size());
     size_t idx = 0;
@@ -206,7 +206,7 @@ napi_status ConvertStringVectorToJS(napi_env env, napi_value result, std::vector
         return napi_ok;
     }
 
-    for (auto& str : stringVector) {
+    for (const auto& str : stringVector) {
         napi_value obj = nullptr;
         NAPI_BT_CALL_RETURN(napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &obj));
         NAPI_BT_CALL_RETURN(napi_set_element(env, result, idx, obj));

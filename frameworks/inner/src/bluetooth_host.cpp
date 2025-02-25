@@ -1298,5 +1298,13 @@ int64_t BluetoothHost::GetRefusePolicyProhibitedTime()
 {
     return pimpl->refusePolicyProhibitedTime_;
 }
+
+int32_t BluetoothHost::ProcessRandomDeviceIdCommand(
+    int32_t command, std::vector<std::string> &deviceIdVec, bool &isValid)
+{
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
+    return proxy->ProcessRandomDeviceIdCommand(command, deviceIdVec, isValid);
+}
 } // namespace Bluetooth
 } // namespace OHOS

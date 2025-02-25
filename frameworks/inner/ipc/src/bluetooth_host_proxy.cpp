@@ -1872,5 +1872,52 @@ int32_t BluetoothHostProxy::UpdateRefusePolicy(const int32_t pid, const int64_t 
     }
     return reply.ReadInt32();
 }
+
+int32_t BluetoothHostProxy::ProcessRandomDeviceIdCommand(
+    int32_t command, std::vector<std::string> &deviceIdVec, bool &isValid)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteInt32(command)) {
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    uint32_t size = static_cast<uint32_t>(deviceIdVec.size());
+    if (!data.WriteUint32(size)) {
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    for (uint32_t i = 0; i < size; i++) {
+        if (!data.WriteString(deviceIdVec[i])) {
+            return BT_ERR_IPC_TRANS_FAILED;
+        }
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::PROCESS_RANDOM_DEVICE_ID_COMMAND, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("ipc failed, code: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    BtErrCode exception = static_cast<BtErrCode>(reply.ReadInt32());
+    if (exception != BT_NO_ERROR) {
+        return exception;
+    }
+
+    size = reply.ReadUint32();
+    const uint32_t maxSize = 10000;
+    if (size > maxSize) {
+        HILOGE("ipc transfer size reach upper limit");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    deviceIdVec.clear();
+    for (uint32_t i = 0; i < size; i++) {
+        deviceIdVec.push_back(reply.ReadString());
+    }
+    isValid = reply.ReadBool();
+    return BT_NO_ERROR;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

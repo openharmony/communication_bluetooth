@@ -67,6 +67,16 @@ private:
     std::string value_;
 };
 
+class NapiNativeStringArray : public NapiNativeObject {
+public:
+    explicit NapiNativeStringArray(std::vector<std::string> value) : value_(std::move(value)) {}
+    ~NapiNativeStringArray() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    std::vector<std::string> value_;
+};
+
 class NapiNativeUuidsArray : public NapiNativeObject {
 public:
     explicit NapiNativeUuidsArray(const std::vector<std::string> uuids) : uuids_(uuids) {}
