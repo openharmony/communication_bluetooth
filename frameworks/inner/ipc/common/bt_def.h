@@ -1736,6 +1736,13 @@ enum ControlObject {
     LEFT_RIGHT_EAR = 2,
 };
 
+enum class RandomDeviceIdCommand {
+    ADD = 1,
+    DELETE,
+    GET,
+    IS_VALID
+};
+
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else

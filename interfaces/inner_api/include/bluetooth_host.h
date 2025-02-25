@@ -853,6 +853,8 @@ public:
      * @since 16
      */
     int64_t GetRefusePolicyProhibitedTime();
+
+    int32_t ProcessRandomDeviceIdCommand(int32_t command, std::vector<std::string> &deviceIdVec, bool &isValid);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
