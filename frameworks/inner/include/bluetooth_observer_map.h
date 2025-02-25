@@ -35,6 +35,7 @@ public:
     uint8_t GetAdvertiserHandle(T observer);
     T PopAdvertiserObserver(uint8_t advHandle);
     T GetAdvertiserObserver(uint8_t advHandle);
+    std::vector<T> GetAdvertiserObservers();
     bool IsExistAdvertiserCallback(T observer, int &handle);
     void Clear(void);
 
@@ -156,6 +157,18 @@ T BluetoothObserverMap<T>::GetAdvertiserObserver(uint8_t advHandle)
     }
 
     return nullptr;
+}
+
+template<typename T>
+std::vector<T> BluetoothObserverMap<T>::GetAdvertiserObservers()
+{
+    std::lock_guard<std::mutex> lock(lock_);
+    std::vector<T> values;
+    auto it = observers_.begin();
+    for (; it != observers_.end(); it++) {
+        values.push_back(it->second);
+    }
+    return values;
 }
 
 template<typename T>
