@@ -1114,9 +1114,16 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
     } else {
         auto status = CheckEmptyArgs(env, info);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
-        for (auto &callback : bleAdvertiser->GetAdvObservers()) {
-            int ret = bleAdvertiser->StopAdvertising(callback);
+        std::vector<std::shared_ptr<BleAdvertiseCallback>> callbacks = bleAdvertiser->GetAdvObservers();
+        if (callbacks.empty()) {
+            // compatible with XTS
+            int ret = bleAdvertiser->StopAdvertising(NapiBluetoothBleAdvertiseCallback::GetInstance());
             NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+        } else {
+            for (auto &callback : callbacks) {
+                int ret = bleAdvertiser->StopAdvertising(callback);
+                NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+            }
         }
         return NapiGetUndefinedRet(env);
     }
