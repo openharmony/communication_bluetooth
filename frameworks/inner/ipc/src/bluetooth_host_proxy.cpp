@@ -1849,5 +1849,28 @@ int32_t BluetoothHostProxy::GetCloudBondState(const std::string &address, int32_
     }
     return exception;
 }
+
+int32_t BluetoothHostProxy::UpdateRefusePolicy(const int32_t pid, const int64_t prohibitedSecondsTime)
+{
+    HILOGI("BluetoothHostProxy::UpdateRefusePolicy starts");
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::UpdateRefusePolicy WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(pid), BT_ERR_IPC_TRANS_FAILED,
+                             "write pid error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt64(prohibitedSecondsTime), BT_ERR_IPC_TRANS_FAILED,
+                             "write time error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::BT_UPDATE_REFUSE_POLICY, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::UpdateRefusePolicy done fail error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadInt32();
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
