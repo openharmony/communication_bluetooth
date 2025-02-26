@@ -17,6 +17,8 @@
 #endif
 
 #include "bluetooth_errorcode.h"
+#include "bluetooth_host.h"
+#include "datetime_ex.h"
 #include "napi_bluetooth_spp_client.h"
 #include "napi_bluetooth_error.h"
 #include "napi_bluetooth_utils.h"
@@ -247,6 +249,13 @@ napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
     bool isOK = false;
     int id = -1;
 
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    auto prohibitedTime = host->GetRefusePolicyProhibitedTime();
+    if (prohibitedTime < 0 || prohibitedTime > GetSecondsSince1970ToNow()) {
+        HILOGE("socket refuse because of Refuse Policy");
+        NAPI_BT_ASSERT_RETURN_FALSE(env, false, BT_ERR_INVALID_PARAM);
+    }
+
     auto status = CheckSppWriteParams(env, info, id, &totalBuf, totalSize);
     NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     NAPI_BT_ASSERT_RETURN_FALSE(env, clientMap[id] > 0, BT_ERR_INTERNAL_ERROR);
@@ -474,6 +483,13 @@ napi_value NapiSppClient::SppWriteAsync(napi_env env, napi_callback_info info)
     uint8_t* totalBuf = nullptr;
     size_t totalSize = 0;
     int id = -1;
+
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    auto prohibitedTime = host->GetRefusePolicyProhibitedTime();
+    if (prohibitedTime < 0 || prohibitedTime > GetSecondsSince1970ToNow()) {
+        HILOGE("socket refuse because of Refuse Policy");
+        NAPI_BT_ASSERT_RETURN_FALSE(env, false, BT_ERR_INVALID_PARAM);
+    }
 
     auto status = CheckSppWriteParams(env, info, id, &totalBuf, totalSize);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
