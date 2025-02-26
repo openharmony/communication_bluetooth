@@ -26,10 +26,10 @@ enum class BondState { BOND_STATE_INVALID = 0, BOND_STATE_BONDING = 1, BOND_STAT
 bool IsValidAddress(std::string bdaddr);
 std::string GetFormatPinCode(uint32_t pinType, uint32_t pinCode);
 char* MallocCString(const std::string& origin);
-CArrString Convert2CArrString(std::vector<std::string> &tids);
-void DealPairStatus(const int &status, int &bondStatus);
+CArrString Convert2CArrString(std::vector<std::string>& tids);
+void DealPairStatus(const int& status, int& bondStatus);
 
-} // namespace BluetoothConnection
+} // namespace CJBluetoothConnection
 } // namespace CJSystemapi
 } // namespace OHOS
 

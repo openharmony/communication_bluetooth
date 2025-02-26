@@ -18,18 +18,18 @@
 
 #include "bluetooth_connection_common.h"
 
+#include <regex>
+
 #include "bluetooth_def.h"
 #include "bluetooth_log.h"
-
-#include <regex>
 
 namespace OHOS {
 namespace CJSystemapi {
 namespace CJBluetoothConnection {
 
 using Bluetooth::PAIR_NONE;
-using Bluetooth::PAIR_PAIRING;
 using Bluetooth::PAIR_PAIRED;
+using Bluetooth::PAIR_PAIRING;
 using Bluetooth::PIN_TYPE_CONFIRM_PASSKEY;
 using Bluetooth::PIN_TYPE_NOTIFY_PASSKEY;
 
@@ -71,19 +71,18 @@ char* MallocCString(const std::string& origin)
     return std::char_traits<char>::copy(res, origin.c_str(), length);
 }
 
-CArrString Convert2CArrString(std::vector<std::string> &tids)
+CArrString Convert2CArrString(std::vector<std::string>& tids)
 {
-    CArrString res{0};
+    CArrString res { 0 };
     if (tids.empty()) {
         return res;
     }
 
     size_t size = tids.size();
-    if (size == 0 ||
-        size > std::numeric_limits<size_t>::max() / sizeof(char *)) {
+    if (size == 0 || size > std::numeric_limits<size_t>::max() / sizeof(char*)) {
         return res;
     }
-    res.head = static_cast<char **>(malloc(sizeof(char *) * size));
+    res.head = static_cast<char**>(malloc(sizeof(char*) * size));
     if (!res.head) {
         return res;
     }
@@ -97,7 +96,7 @@ CArrString Convert2CArrString(std::vector<std::string> &tids)
     return res;
 }
 
-void DealPairStatus(const int &status, int &bondStatus)
+void DealPairStatus(const int& status, int& bondStatus)
 {
     HILOGD("status is %{public}d", status);
     switch (status) {
@@ -115,6 +114,6 @@ void DealPairStatus(const int &status, int &bondStatus)
     }
 }
 
-} // namespace BluetoothConnection
+} // namespace CJBluetoothConnection
 } // namespace CJSystemapi
 } // namespace OHOS

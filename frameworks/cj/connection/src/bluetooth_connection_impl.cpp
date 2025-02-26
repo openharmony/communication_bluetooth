@@ -29,17 +29,17 @@
 namespace OHOS {
 namespace CJSystemapi {
 namespace CJBluetoothConnection {
-using OHOS::Bluetooth::BluetoothRemoteDevice;
+using Bluetooth::BluetoothHost;
 using Bluetooth::BT_ERR_INVALID_PARAM;
 using Bluetooth::BT_NO_ERROR;
-using Bluetooth::INVALID_NAME;
-using Bluetooth::MajorClass;
-using Bluetooth::BluetoothHost;
 using Bluetooth::BT_TRANSPORT_BREDR;
-using Bluetooth::PAIR_NONE;
-using Bluetooth::GetProfileConnectionState;
 using Bluetooth::BTConnectState;
 using Bluetooth::DeviceBatteryInfo;
+using Bluetooth::GetProfileConnectionState;
+using Bluetooth::INVALID_NAME;
+using Bluetooth::MajorClass;
+using Bluetooth::PAIR_NONE;
+using OHOS::Bluetooth::BluetoothRemoteDevice;
 
 void ConnectionImpl::PairDevice(std::string deviceId, int32_t* errCode)
 {
@@ -66,7 +66,7 @@ char* ConnectionImpl::GetRemoteDeviceName(std::string deviceId, int32_t* errCode
 
 DeviceClass ConnectionImpl::GetRemoteDeviceClass(std::string deviceId, int32_t* errCode)
 {
-    DeviceClass ret{0};
+    DeviceClass ret { 0 };
     if (!IsValidAddress(deviceId)) {
         *errCode = BT_ERR_INVALID_PARAM;
         return ret;
@@ -87,12 +87,12 @@ DeviceClass ConnectionImpl::GetRemoteDeviceClass(std::string deviceId, int32_t* 
 
 CArrString ConnectionImpl::GetRemoteProfileUuids(std::string deviceId, int32_t* errCode)
 {
-    CArrString ret{0};
+    CArrString ret { 0 };
     if (!IsValidAddress(deviceId)) {
         *errCode = BT_ERR_INVALID_PARAM;
         return ret;
     }
-    std::vector<std::string> uuids{};
+    std::vector<std::string> uuids {};
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(deviceId);
     *errCode = remoteDevice.GetDeviceUuids(uuids);
     ret = Convert2CArrString(uuids);
@@ -101,7 +101,7 @@ CArrString ConnectionImpl::GetRemoteProfileUuids(std::string deviceId, int32_t* 
 
 char* ConnectionImpl::GetLocalName(int32_t* errCode)
 {
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    BluetoothHost* host = &BluetoothHost::GetDefaultHost();
     std::string localName = INVALID_NAME;
     *errCode = host->GetLocalName(localName);
     return MallocCString(localName);
@@ -109,17 +109,16 @@ char* ConnectionImpl::GetLocalName(int32_t* errCode)
 
 CArrString ConnectionImpl::GetPairedDevices(int32_t* errCode)
 {
-    CArrString ret{0};
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    CArrString ret { 0 };
+    BluetoothHost* host = &BluetoothHost::GetDefaultHost();
     std::vector<BluetoothRemoteDevice> remoteDeviceLists;
     *errCode = host->GetPairedDevices(BT_TRANSPORT_BREDR, remoteDeviceLists);
-    std::vector<std::string> deviceAddr{};
+    std::vector<std::string> deviceAddr {};
     size_t size = remoteDeviceLists.size();
-    if (size == 0 ||
-        size > std::numeric_limits<size_t>::max() / sizeof(char *)) {
+    if (size == 0 || size > std::numeric_limits<size_t>::max() / sizeof(char*)) {
         return ret;
     }
-    ret.head = static_cast<char **>(malloc(sizeof(char *) * size));
+    ret.head = static_cast<char**>(malloc(sizeof(char*) * size));
     if (!ret.head) {
         return ret;
     }
@@ -148,7 +147,7 @@ int32_t ConnectionImpl::GetPairState(std::string deviceId, int32_t* errCode)
 
 int32_t ConnectionImpl::GetProfileConnectionState(int32_t profileId, int32_t* errCode)
 {
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    BluetoothHost* host = &BluetoothHost::GetDefaultHost();
     int state = static_cast<int>(BTConnectState::DISCONNECTED);
     *errCode = host->GetBtProfileConnState(Bluetooth::GetProfileId(profileId), state);
     int status = Bluetooth::GetProfileConnectionState(state);
@@ -179,14 +178,14 @@ void ConnectionImpl::SetDevicePinCode(std::string deviceId, std::string code, in
 
 void ConnectionImpl::SetLocalName(std::string localName, int32_t* errCode)
 {
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    BluetoothHost* host = &BluetoothHost::GetDefaultHost();
     *errCode = host->SetLocalName(localName);
     return;
 }
 
 void ConnectionImpl::SetBluetoothScanMode(int32_t mode, int32_t duration, int32_t* errCode)
 {
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    BluetoothHost* host = &BluetoothHost::GetDefaultHost();
     *errCode = host->SetBtScanMode(mode, duration);
     if (*errCode == BT_NO_ERROR) {
         return;
@@ -197,7 +196,7 @@ void ConnectionImpl::SetBluetoothScanMode(int32_t mode, int32_t duration, int32_
 
 int32_t ConnectionImpl::GetBluetoothScanMode(int32_t* errCode)
 {
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    BluetoothHost* host = &BluetoothHost::GetDefaultHost();
     int32_t scanMode = 0;
     *errCode = host->GetBtScanMode(scanMode);
     return scanMode;
@@ -205,21 +204,21 @@ int32_t ConnectionImpl::GetBluetoothScanMode(int32_t* errCode)
 
 void ConnectionImpl::StartBluetoothDiscovery(int32_t* errCode)
 {
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    BluetoothHost* host = &BluetoothHost::GetDefaultHost();
     *errCode = host->StartBtDiscovery();
     return;
 }
 
-void ConnectionImpl::StoptBluetoothDiscovery(int32_t* errCode)
+void ConnectionImpl::StopBluetoothDiscovery(int32_t* errCode)
 {
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    BluetoothHost* host = &BluetoothHost::GetDefaultHost();
     *errCode = host->CancelBtDiscovery();
     return;
 }
 
 bool ConnectionImpl::IsBluetoothDiscovering(int32_t* errCode)
 {
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    BluetoothHost* host = &BluetoothHost::GetDefaultHost();
     bool isDiscovering = false;
     *errCode = host->IsBtDiscovering(isDiscovering);
     return isDiscovering;
@@ -238,7 +237,7 @@ void ConnectionImpl::SetRemoteDeviceName(std::string deviceId, std::string name,
 
 CBatteryInfo ConnectionImpl::GetRemoteDeviceBatteryInfo(std::string deviceId, int32_t* errCode)
 {
-    CBatteryInfo info{0};
+    CBatteryInfo info { 0 };
     if (!IsValidAddress(deviceId)) {
         *errCode = BT_ERR_INVALID_PARAM;
         return info;
@@ -257,6 +256,6 @@ CBatteryInfo ConnectionImpl::GetRemoteDeviceBatteryInfo(std::string deviceId, in
     return info;
 }
 
-} // namespace BluetoothConnection
+} // namespace CJBluetoothConnection
 } // namespace CJSystemapi
 } // namespace OHOS
