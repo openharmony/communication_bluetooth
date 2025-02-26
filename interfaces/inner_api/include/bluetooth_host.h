@@ -839,6 +839,20 @@ public:
     void Close(void);
 
     int32_t UpdateCloudBluetoothDevice(const std::vector<TrustPairDeviceParam> &cloudDevices);
+
+    /**
+     * @brief refuse policy
+     *
+     * @since 16
+     */
+    int UpdateRefusePolicy(const int32_t pid, const int64_t prohibitedSecondsTime);
+
+    /**
+     * @brief get refuse policy prohibitedTime.
+     *
+     * @since 16
+     */
+    int64_t GetRefusePolicyProhibitedTime();
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
