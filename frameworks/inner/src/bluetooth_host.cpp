@@ -21,6 +21,7 @@
 #include <mutex>
 #include <unistd.h>
 #include <thread>
+#include <cinttypes>
 #include "bluetooth_ble_peripheral_observer_stub.h"
 #include "bluetooth_host_load_callback.h"
 #include "bluetooth_host_observer_stub.h"
@@ -205,7 +206,7 @@ public:
 
     void OnRefusePolicyChanged(const int32_t pid, const int64_t prohibitedSecondsTime) override
     {
-        HILOGI("OnRefusePolicyChanged, pid: %{public}d time %{public}lld ", pid, prohibitedSecondsTime);
+        HILOGI("OnRefusePolicyChanged, pid: %{public}d time %{public}" PRId64"", pid, prohibitedSecondsTime);
         host_.refusePolicyProhibitedTime_ = prohibitedSecondsTime;
     }
 private:
