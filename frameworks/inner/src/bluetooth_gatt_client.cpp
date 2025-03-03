@@ -681,7 +681,7 @@ int GattClient::Disconnect()
     }
 
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
-    if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
+    if (!pimpl->isRegisterSucceeded_) {
         HILOGE("Request not supported");
         return BT_ERR_INTERNAL_ERROR;
     }
