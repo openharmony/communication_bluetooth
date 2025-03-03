@@ -26,6 +26,7 @@
 #include "iremote_broker.h"
 #include "../parcel/bluetooth_device_battery_info.h"
 #include "../parcel/bluetooth_remote_device_info.h"
+#include "bluetooth_trust_pair_device.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -135,6 +136,9 @@ public:
     virtual int32_t SetFastScanLevel(int level) = 0;
     virtual void UpdateVirtualDevice(int32_t action, const std::string &address) = 0;
     virtual int32_t EnableBluetoothToRestrictMode(void) = 0;
+    virtual int32_t GetLastConnectionTime(const std::string &address, int64_t &connectionTime) = 0;
+    virtual int32_t UpdateCloudBluetoothDevice(std::vector<BluetoothTrustPairDevice> &cloudDevices) = 0;
+    virtual int32_t GetCloudBondState(const std::string &address, int32_t &cloudBondState) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
