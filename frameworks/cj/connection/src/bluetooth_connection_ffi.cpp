@@ -100,7 +100,7 @@ void FfiBluetoothConStartBluetoothDiscovery(int32_t* errCode)
 
 void FfiBluetoothConStopBluetoothDiscovery(int32_t* errCode)
 {
-    return ConnectionImpl::StoptBluetoothDiscovery(errCode);
+    return ConnectionImpl::StopBluetoothDiscovery(errCode);
 }
 
 bool FfiBluetoothConIsBluetoothDiscovering(int32_t* errCode)
@@ -123,6 +123,6 @@ void FfiBluetoothConOn(int32_t callbackType, void (*callback)(), int32_t* errCod
     return ConnectionImpl::RegisterConnectionObserver(callbackType, callback, errCode);
 }
 }
-} // namespace BluetoothConnection
+} // namespace CJBluetoothConnection
 } // namespace CJSystemapi
 } // namespace OHOS

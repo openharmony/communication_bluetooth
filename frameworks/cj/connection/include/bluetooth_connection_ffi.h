@@ -16,10 +16,10 @@
 #ifndef BLUETOOTH_CONNECTION_FFI_H
 #define BLUETOOTH_CONNECTION_FFI_H
 
+#include <cstdint>
+
 #include "cj_common_ffi.h"
 #include "native/ffi_remote_data.h"
-
-#include <cstdint>
 
 extern "C" {
 typedef struct {
@@ -29,12 +29,12 @@ typedef struct {
 } DeviceClass;
 
 typedef struct {
-    char *deviceId;
-    char *pinCode;
+    char* deviceId;
+    char* pinCode;
 } CPinRequiredParam;
 
 typedef struct {
-    char *deviceId;
+    char* deviceId;
     int32_t state;
     int32_t cause;
 } CBondStateParam;
