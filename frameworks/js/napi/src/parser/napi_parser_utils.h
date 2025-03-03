@@ -87,11 +87,18 @@ napi_status NapiParseObjectArrayBuffer(napi_env env, napi_value object, const ch
 napi_status NapiParseObjectBdAddr(napi_env env, napi_value object, const char *name, std::string &outAddr);
 napi_status NapiParseStringArray(napi_env env, napi_value value, std::vector<std::string> &outStrVec);
 napi_status NapiParseObjectInt32(napi_env env, napi_value object, const char *name, int32_t &outNum);
+napi_status NapiParseObjectString(napi_env env, napi_value object, const char *name, std::string &outString);
 napi_status NapiParseObjectUint32(napi_env env, napi_value object, const char *name, uint32_t &outNum);
 napi_status NapiParseObjectGattPermissions(napi_env env, napi_value object, const char *name,
     NapiGattPermission &outPermissions);
 napi_status NapiParseObjectGattProperties(napi_env env, napi_value object, const char *name,
     NapiGattProperties &outProperties);
+napi_status NapiParseObjectStr(napi_env env, napi_value object, const char *name, std::string &outStr);
+napi_status NapiParseInt64(napi_env env, napi_value object, const char *name, int64_t &outNum);
+napi_status NapiParseObjectInt64(napi_env env, napi_value object, const char *name, int64_t &outNum);
+napi_status NapiParseTrustPairDevice(napi_env env, napi_value object, std::vector<TrustPairDeviceParam> &outService);
+napi_status ParseAndCheckUuids(const std::string &uuids, std::vector<std::string> &res);
+napi_status NapiParseObjectUuids(napi_env env, napi_value object, std::vector<std::string> &outUuid);
 
 napi_status NapiGetObjectPropertyOptional(napi_env env, napi_value object, const char *name, napi_value &outProperty,
     bool &outExist);
