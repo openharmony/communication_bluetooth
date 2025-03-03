@@ -664,6 +664,7 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
 
     BleAdvertiserSettings settings;
     settings.SetInterval(advParam->minInterval);
+    settings.SetTxPower(advParam->txPower);
     if (advParam->advType == OHOS_BLE_ADV_SCAN_IND || advParam->advType == OHOS_BLE_ADV_NONCONN_IND) {
         settings.SetConnectable(false);
     }
