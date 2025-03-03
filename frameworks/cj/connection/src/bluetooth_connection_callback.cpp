@@ -16,10 +16,10 @@
 #define LOG_TAG "bt_cj_connection_callback"
 #endif
 
-#include "bluetooth_connection_impl.h"
-#include "bluetooth_connection_ffi.h"
-#include "bluetooth_errorcode.h"
 #include "bluetooth_connection_common.h"
+#include "bluetooth_connection_ffi.h"
+#include "bluetooth_connection_impl.h"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "cj_lambda.h"
 
@@ -29,27 +29,24 @@ namespace CJBluetoothConnection {
 using Bluetooth::BluetoothHost;
 using Bluetooth::BT_ERR_INTERNAL_ERROR;
 
-std::shared_ptr<CjBluetoothConnectionObserver> g_connectionObserver =
-    std::make_shared<CjBluetoothConnectionObserver>();
+std::shared_ptr<CjBluetoothConnectionObserver> g_connectionObserver = std::make_shared<CjBluetoothConnectionObserver>();
 std::shared_ptr<CjBluetoothRemoteDeviceObserver> g_remoteDeviceObserver =
     std::make_shared<CjBluetoothRemoteDeviceObserver>();
-std::mutex deviceMutex;
 bool g_flag = false;
 
-CjBluetoothConnectionObserver::CjBluetoothConnectionObserver()
-{}
+CjBluetoothConnectionObserver::CjBluetoothConnectionObserver() {}
 
-void CjBluetoothConnectionObserver::OnDiscoveryResult(const BluetoothRemoteDevice &device,
-    int rssi, const std::string deviceName, int deviceClass)
+void CjBluetoothConnectionObserver::OnDiscoveryResult(
+    const BluetoothRemoteDevice& device, int rssi, const std::string deviceName, int deviceClass)
 {
     if (deviceFindFunc == nullptr) {
         HILOGD("not register bluetoothDeviceFind event failed");
         return;
     }
-    CArrString array{0};
+    CArrString array { 0 };
     std::shared_ptr<BluetoothRemoteDevice> remoteDevice = std::make_shared<BluetoothRemoteDevice>(device);
     array.size = 1;
-    char **retValue = static_cast<char**>(malloc(sizeof(char*) * array.size));
+    char** retValue = static_cast<char**>(malloc(sizeof(char*) * array.size));
     if (retValue == nullptr) {
         return;
     }
@@ -69,13 +66,13 @@ void CjBluetoothConnectionObserver::OnDiscoveryResult(const BluetoothRemoteDevic
     retValue = nullptr;
 }
 
-void CjBluetoothConnectionObserver::OnPairConfirmed(const BluetoothRemoteDevice &device, int reqType, int number)
+void CjBluetoothConnectionObserver::OnPairConfirmed(const BluetoothRemoteDevice& device, int reqType, int number)
 {
     if (pinRequestFunc == nullptr) {
         HILOGD("not register pinRequired event failed");
         return;
     }
-    CPinRequiredParam cPinRequiredParam{0};
+    CPinRequiredParam cPinRequiredParam { 0 };
     char* deviceAddr = MallocCString(device.GetDeviceAddr());
     cPinRequiredParam.deviceId = deviceAddr;
 
@@ -100,17 +97,15 @@ void CjBluetoothConnectionObserver::RegisterPinRequestFunc(std::function<void(CP
     pinRequestFunc = cjCallback;
 }
 
-CjBluetoothRemoteDeviceObserver::CjBluetoothRemoteDeviceObserver()
-{}
+CjBluetoothRemoteDeviceObserver::CjBluetoothRemoteDeviceObserver() {}
 
-void CjBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device,
-    int status, int cause)
+void CjBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice& device, int status, int cause)
 {
     if (bondStateFunc == nullptr) {
         HILOGD("not register bondStateChange event failed");
         return;
     }
-    CBondStateParam cBondStateParam{0};
+    CBondStateParam cBondStateParam { 0 };
     int bondStatus = 0;
     DealPairStatus(status, bondStatus);
 
@@ -126,14 +121,14 @@ void CjBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteD
     deviceAddr = nullptr;
 }
 
-void CjBluetoothRemoteDeviceObserver::OnRemoteBatteryChanged(const BluetoothRemoteDevice &device,
-    const DeviceBatteryInfo &batteryInfo)
+void CjBluetoothRemoteDeviceObserver::OnRemoteBatteryChanged(
+    const BluetoothRemoteDevice& device, const DeviceBatteryInfo& batteryInfo)
 {
     if (batteryChangeFunc == nullptr) {
         HILOGD("not register batteryChange event failed");
         return;
     }
-    CBatteryInfo cBatteryInfo{0};
+    CBatteryInfo cBatteryInfo { 0 };
     cBatteryInfo.batteryLevel = batteryInfo.batteryLevel_;
     cBatteryInfo.leftEarBatteryLevel = batteryInfo.leftEarBatteryLevel_;
     cBatteryInfo.leftEarChargeState = static_cast<int32_t>(batteryInfo.leftEarChargeState_);
@@ -157,7 +152,7 @@ void CjBluetoothRemoteDeviceObserver::RegisterBatteryChangeFunc(std::function<vo
 
 static void RegisterObserverToHost()
 {
-    BluetoothHost &host = BluetoothHost::GetDefaultHost();
+    BluetoothHost& host = BluetoothHost::GetDefaultHost();
     host.RegisterObserver(g_connectionObserver);
     host.RegisterRemoteDeviceObserver(g_remoteDeviceObserver);
 }
@@ -209,6 +204,6 @@ void ConnectionImpl::RegisterConnectionObserver(int32_t callbackType, void (*cal
         g_remoteDeviceObserver->RegisterBatteryChangeFunc(remoteDeviceObserverFunc);
     }
 }
-} // namespace BluetoothConnection
+} // namespace CJBluetoothConnection
 } // namespace CJSystemapi
 } // namespace OHOS

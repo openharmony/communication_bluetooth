@@ -200,6 +200,27 @@
             "header_files": []
           },
           "name": "//foundation/communication/bluetooth/frameworks/cj/a2dp:cj_bluetooth_a2dp_ffi"
+        },
+        {
+          "header": {
+            "header_base": "//foundation/communication/bluetooth/frameworks/cj/access/include",
+            "header_files": []
+          },
+          "name": "//foundation/communication/bluetooth/frameworks/cj/access:cj_bluetooth_access_ffi"
+        },
+        {
+          "header": {
+            "header_base": "//foundation/communication/bluetooth/frameworks/cj/ble/include",
+            "header_files": []
+          },
+          "name": "//foundation/communication/bluetooth/frameworks/cj/ble:cj_bluetooth_ble_ffi"
+        },
+        {
+          "header": {
+            "header_base": "//foundation/communication/bluetooth/frameworks/cj/connection/include",
+            "header_files": []
+          },
+          "name": "//foundation/communication/bluetooth/frameworks/cj/connection:cj_bluetooth_connection_ffi"
         }
       ]
     }
