@@ -1252,5 +1252,26 @@ void BluetoothHost::Close(void)
     std::lock_guard<std::mutex> lock(pimpl->switchModuleMutex_);
     pimpl->switchModule_ = nullptr;
 }
+
+int32_t BluetoothHost::UpdateCloudBluetoothDevice(const std::vector<TrustPairDeviceParam> &cloudDevices)
+{
+    HILOGI("[CLOUD_DEV] UpdateCloudBluetoothDevice enter");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "pimpl or bluetooth host is nullptr");
+    std::vector<BluetoothTrustPairDevice> cloudDevicesVec {};
+    for (auto &devParam : cloudDevices) {
+        BluetoothTrustPairDevice trustPairDevice;
+        trustPairDevice.SetMacAddress(devParam.macAddress_);
+        trustPairDevice.SetDeviceName(devParam.deviceName_);
+        trustPairDevice.SetUuid(devParam.uuids_);
+        trustPairDevice.SetBluetoothClass(devParam.bluetoothClass_);
+        trustPairDevice.SetToken(devParam.token_);
+        trustPairDevice.SetSecureAdvertisingInfo(devParam.secureAdvertisingInfo_);
+        HILOGI("[CLOUD_DEV] UpdateCloudBluetoothDevice add device: %{public}s",
+            GetEncryptAddr(trustPairDevice.GetMacAddress()).c_str());
+        cloudDevicesVec.emplace_back(trustPairDevice);
+    }
+    return proxy->UpdateCloudBluetoothDevice(cloudDevicesVec);
+}
 } // namespace Bluetooth
 } // namespace OHOS

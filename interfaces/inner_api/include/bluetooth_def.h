@@ -1579,6 +1579,25 @@ enum class SATELLITE_CONTROL_MODE {
     BLUETOOTH_SWITCH = 1,
 };
 
+struct TrustPairDeviceParam {
+    std::string sn_;
+    std::string deviceType_;
+    std::string modelId_;
+    std::string manufactory_;
+    std::string productId_;
+    std::string hiLinkVersion_;
+    std::string macAddress_;
+    std::string serviceType_;
+    std::string serviceId_;
+    std::string deviceName_;
+    std::vector<std::string> uuids_;
+    int32_t bluetoothClass_;
+    std::vector<uint8_t> token_;
+    int64_t deviceNameTime_;
+    std::vector<uint8_t> secureAdvertisingInfo_;
+    int32_t pairState_;
+};
+
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else
