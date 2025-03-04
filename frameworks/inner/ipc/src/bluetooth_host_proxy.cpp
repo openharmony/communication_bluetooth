@@ -1753,5 +1753,80 @@ int32_t BluetoothHostProxy::EnableBluetoothToRestrictMode(void)
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     return reply.ReadInt32();
 }
+
+int32_t BluetoothHostProxy::GetLastConnectionTime(const std::string &address, int64_t &connectionTime)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::GetLastConnectionTime WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteString(address)) {
+        HILOGE("BluetoothHostProxy::GetLastConnectionTime WriteAddress error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::GET_CONNECTION_TIME, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::GetLastConnectionTime done fail error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    BtErrCode exception = static_cast<BtErrCode>(reply.ReadInt32());
+    if (exception == BT_NO_ERROR) {
+        connectionTime = reply.ReadInt64();
+    }
+    return exception;
+}
+
+int32_t BluetoothHostProxy::UpdateCloudBluetoothDevice(std::vector<BluetoothTrustPairDevice> &cloudDevices)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    int32_t cloudDevSize = static_cast<int32_t>(cloudDevices.size());
+    CHECK_AND_RETURN_LOG_RET(cloudDevSize < TRUST_PAIR_DEVICE_SIZE_MAX,
+        BT_ERR_IPC_TRANS_FAILED, "error size:%{public}d", cloudDevSize);
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(cloudDevSize),
+        BT_ERR_IPC_TRANS_FAILED, "Write cloudDevices size error");
+    for (auto &dev : cloudDevices) {
+        CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&dev),
+            BT_ERR_IPC_TRANS_FAILED, "Write cloudDevices error");
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::BT_UPDATE_CLOUD_DEVICE, option, data, reply);
+    HILOGI("[CLOUD_DEV] UpdateCloudBluetoothDev %{public}d.", cloudDevSize);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    return reply.ReadInt32();
+}
+
+int32_t BluetoothHostProxy::GetCloudBondState(const std::string &address, int32_t &cloudBondState)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::GetCloudBondState WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteString(address)) {
+        HILOGE("BluetoothHostProxy::GetCloudBondState WriteAddress error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::GET_CLOUD_BOND_STATE, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::GetCloudBondState done fail error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    BtErrCode exception = static_cast<BtErrCode>(reply.ReadInt32());
+    if (exception == BT_NO_ERROR) {
+        cloudBondState = reply.ReadInt32();
+    }
+    return exception;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
