@@ -403,6 +403,10 @@ public:
         sensingInfo.pkgName_ = info.pkgName_;
         sensingInfo.isServer_ = info.isServer_;
         sensingInfo.interval_ = info.interval_;
+        sensingInfo.connectable_ = info.connectable_;
+        sensingInfo.payloadLen_ = info.payloadLen_;
+        sensingInfo.bussinessType_ = info.bussinessType_;
+        sensingInfo.scanMode_ = info.scanMode_;
         host_.resourceManagerObservers_.ForEach(
             [eventId, sensingInfo](std::shared_ptr<BluetoothResourceManagerObserver> observer) {
                 observer->OnSensingStateChanged(eventId, sensingInfo);
