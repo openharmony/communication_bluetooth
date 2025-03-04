@@ -109,6 +109,13 @@ std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object)
 napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    auto prohibitedTime = host->GetRefusePolicyProhibitedTime();
+    if (prohibitedTime < 0 || prohibitedTime > GetSecondsSince1970ToNow()) {
+        HILOGE("socket refuse because of Refuse Policy");
+        NAPI_BT_ASSERT_RETURN_FALSE(env, false, BT_ERR_PROHIBITED_BY_EDM);
+    }
+
     std::string deviceId;
     SppConnectCallbackInfo *callbackInfo = new SppConnectCallbackInfo();
     auto status = CheckSppConnectParams(env, info, deviceId, callbackInfo);
@@ -253,7 +260,7 @@ napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
     auto prohibitedTime = host->GetRefusePolicyProhibitedTime();
     if (prohibitedTime < 0 || prohibitedTime > GetSecondsSince1970ToNow()) {
         HILOGE("socket refuse because of Refuse Policy");
-        NAPI_BT_ASSERT_RETURN_FALSE(env, false, BT_ERR_INVALID_PARAM);
+        NAPI_BT_ASSERT_RETURN_FALSE(env, false, BT_ERR_PROHIBITED_BY_EDM);
     }
 
     auto status = CheckSppWriteParams(env, info, id, &totalBuf, totalSize);
@@ -488,7 +495,7 @@ napi_value NapiSppClient::SppWriteAsync(napi_env env, napi_callback_info info)
     auto prohibitedTime = host->GetRefusePolicyProhibitedTime();
     if (prohibitedTime < 0 || prohibitedTime > GetSecondsSince1970ToNow()) {
         HILOGE("socket refuse because of Refuse Policy");
-        NAPI_BT_ASSERT_RETURN_FALSE(env, false, BT_ERR_INVALID_PARAM);
+        NAPI_BT_ASSERT_RETURN_FALSE(env, false, BT_ERR_PROHIBITED_BY_EDM);
     }
 
     auto status = CheckSppWriteParams(env, info, id, &totalBuf, totalSize);
