@@ -19,6 +19,8 @@
 #include "napi_bluetooth_error.h"
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_spp_server.h"
+#include "bluetooth_host.h"
+#include "datetime_ex.h"
 #include "bluetooth_errorcode.h"
 #include "hitrace_meter.h"
 
@@ -116,6 +118,12 @@ static napi_status CheckSppListenParams(
 napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    auto prohibitedTime = host->GetRefusePolicyProhibitedTime();
+    if (prohibitedTime < 0 || prohibitedTime > GetSecondsSince1970ToNow()) {
+        HILOGE("socket refuse because of Refuse Policy");
+        NAPI_BT_ASSERT_RETURN_FALSE(env, false, BT_ERR_PROHIBITED_BY_EDM);
+    }
     string name;
     SppListenCallbackInfo *callbackInfo = new (std::nothrow) SppListenCallbackInfo();
     NAPI_BT_ASSERT_RETURN_UNDEF(env, callbackInfo != nullptr, BT_ERR_INVALID_PARAM);
