@@ -1610,6 +1610,10 @@ struct SensingInfo {
     std::string pkgName_;
     bool isServer_;
     uint16_t interval_;
+    bool connectable_;
+    int payloadLen_;
+    std::string bussinessType_;
+    int scanMode_;
 };
 
 enum class SATELLITE_CONTROL_MODE {
