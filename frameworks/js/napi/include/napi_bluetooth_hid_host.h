@@ -43,6 +43,7 @@ public:
 
     static std::shared_ptr<NapiBluetoothHidHostObserver> observer_;
     static thread_local napi_ref consRef_;
+    static bool isRegistered_;
 };
 } // namespace Bluetooth
 } // namespace OHOS
