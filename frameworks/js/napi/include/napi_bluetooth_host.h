@@ -25,8 +25,6 @@ napi_value BluetoothHostInit(napi_env env, napi_value exports);
 napi_value RegisterHostObserver(napi_env env, napi_callback_info info);
 napi_value DeregisterHostObserver(napi_env env, napi_callback_info info);
 napi_value PropertyValueInit(napi_env env, napi_value exports);
-napi_value ScanDutyInit(napi_env env);
-napi_value MatchModeInit(napi_env env);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif /* NAPI_BLUETOOTH_H_ */

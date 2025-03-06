@@ -24,6 +24,7 @@
 #include "napi_bluetooth_ble.h"
 #include "napi_bluetooth_gatt_client.h"
 #include "napi_bluetooth_gatt_server.h"
+#include "napi_bluetooth_ble_scanner.h"
 #include "hitrace_meter.h"
 
 namespace OHOS {
@@ -42,6 +43,7 @@ static napi_value Init(napi_env env, napi_value exports)
 
     NapiGattServer::DefineGattServerJSClass(env);
     NapiGattClient::DefineGattClientJSClass(env);
+    NapiBleScanner::DefineBleScannerJSClass(env);
     DefineBLEJSObject(env, exports);
 
     HILOGI("-----Ble Init end------");

@@ -23,6 +23,7 @@
 #include "napi_bluetooth_error.h"
 #include "napi_bluetooth_gatt_client.h"
 #include "napi_bluetooth_gatt_server.h"
+#include "napi_bluetooth_ble_scanner.h"
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_ble_utils.h"
 
@@ -342,6 +343,7 @@ void DefineBLEJSObject(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("stopAdvertising", StopAdvertising),
         DECLARE_NAPI_FUNCTION("enableAdvertising", EnableAdvertising),
         DECLARE_NAPI_FUNCTION("disableAdvertising", DisableAdvertising),
+        DECLARE_NAPI_FUNCTION("createBleScanner", NapiBleScanner::CreateBleScanner),
 #endif
     };
 
@@ -359,10 +361,10 @@ void DefineBLEJSObject(napi_env env, napi_value exports)
 static void ConvertMatchMode(ScanOptions &params, int32_t matchMode)
 {
     switch (matchMode) {
-        case MatchMode::MATCH_MODE_AGGRESSIVE:
+        case static_cast<uint8_t>(MatchMode::MATCH_MODE_AGGRESSIVE):
             params.matchMode = MatchMode::MATCH_MODE_AGGRESSIVE;
             break;
-        case MatchMode::MATCH_MODE_STICKY:
+        case static_cast<uint8_t>(MatchMode::MATCH_MODE_STICKY):
             params.matchMode = MatchMode::MATCH_MODE_STICKY;
             break;
         default:
@@ -411,7 +413,8 @@ static napi_status ParseScanParameters(
     const napi_env &env, const napi_callback_info &info, const napi_value &scanArg, ScanOptions &params)
 {
     (void)info;
-    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, scanArg, {"interval", "dutyMode", "matchMode", "phyType"}));
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(
+        env, scanArg, {"interval", "dutyMode", "matchMode", "phyType", "reportMode"}));
 
     bool exist = false;
     int32_t interval = 0;
@@ -440,6 +443,14 @@ static napi_status ParseScanParameters(
     if (exist) {
         HILOGI("Scan phyType is %{public}d", phyType);
         ConvertPhyType(params, phyType);
+    }
+    // This parameter is overwritten by the value entered by the user.
+    int32_t scanReportMode = 0;
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, scanArg, "reportMode", exist, scanReportMode));
+    if (exist) {
+        HILOGI("Scan reportMode is %{public}d", scanReportMode);
+        // Default value of params is ScanReportMode::NORMAL.
+        params.reportMode = ScanReportMode::NORMAL;
     }
     return napi_ok;
 }
@@ -601,7 +612,7 @@ static napi_status ParseScanFilterParameters(const napi_env &env, napi_value &ar
     return napi_ok;
 }
 
-static napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vector<BleScanFilter> &outScanfilters,
+napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vector<BleScanFilter> &outScanfilters,
     BleScanSettings &outSettinngs)
 {
     size_t argc = ARGS_SIZE_TWO;
@@ -1096,26 +1107,10 @@ napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info)
 napi_value PropertyInit(napi_env env, napi_value exports)
 {
     HILOGD("enter");
-
-    napi_value matchModeObj = nullptr;
-    napi_value scanDutyObj = nullptr;
-    napi_value phyTypeObj = nullptr;
-    napi_create_object(env, &matchModeObj);
-    napi_create_object(env, &scanDutyObj);
-    napi_create_object(env, &phyTypeObj);
-
-    SetNamedPropertyByInteger(env, matchModeObj, MatchMode::MATCH_MODE_STICKY, "MATCH_MODE_STICKY");
-    SetNamedPropertyByInteger(env, matchModeObj, MatchMode::MATCH_MODE_AGGRESSIVE, "MATCH_MODE_AGGRESSIVE");
-    SetNamedPropertyByInteger(
-        env, scanDutyObj, static_cast<int32_t>(ScanDuty::SCAN_MODE_BALANCED), "SCAN_MODE_BALANCED");
-    SetNamedPropertyByInteger(
-        env, scanDutyObj, static_cast<int32_t>(ScanDuty::SCAN_MODE_LOW_LATENCY), "SCAN_MODE_LOW_LATENCY");
-    SetNamedPropertyByInteger(
-        env, scanDutyObj, static_cast<int32_t>(ScanDuty::SCAN_MODE_LOW_POWER), "SCAN_MODE_LOW_POWER");
-    SetNamedPropertyByInteger(
-        env, phyTypeObj, static_cast<int32_t>(PhyType::PHY_LE_1M), "PHY_LE_1M");
-    SetNamedPropertyByInteger(
-        env, phyTypeObj, static_cast<int32_t>(PhyType::PHY_LE_ALL_SUPPORTED), "PHY_LE_ALL_SUPPORTED");
+    napi_value matchModeObj = MatchModeInit(env);
+    napi_value scanDutyObj = ScanDutyInit(env);
+    napi_value phyTypeObj = PhyTypeInit(env);
+    napi_value reportModeObj = ScanReportModeInit(env);
 
 #ifdef BLUETOOTH_API_SINCE_10
     napi_value gattWriteTypeObj = nullptr;
@@ -1130,16 +1125,19 @@ napi_value PropertyInit(napi_env env, napi_value exports)
     SetNamedPropertyByInteger(env, advertisingStateObj, static_cast<int32_t>(AdvertisingState::ENABLED), "ENABLED");
     SetNamedPropertyByInteger(env, advertisingStateObj, static_cast<int32_t>(AdvertisingState::DISABLED), "DISABLED");
     SetNamedPropertyByInteger(env, advertisingStateObj, static_cast<int32_t>(AdvertisingState::STOPPED), "STOPPED");
+
+    napi_value scanReportTypeObj = ScanReportTypeInit(env);
 #endif
 
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("MatchMode", matchModeObj),
         DECLARE_NAPI_PROPERTY("ScanDuty", scanDutyObj),
         DECLARE_NAPI_PROPERTY("PhyType", phyTypeObj),
-
+        DECLARE_NAPI_PROPERTY("ScanReportMode", reportModeObj),
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_PROPERTY("GattWriteType", gattWriteTypeObj),
         DECLARE_NAPI_PROPERTY("AdvertisingState", advertisingStateObj),
+        DECLARE_NAPI_PROPERTY("ScanReportType", scanReportTypeObj),
 #endif
     };
 
