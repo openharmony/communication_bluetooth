@@ -182,7 +182,7 @@ struct ScanFilter {
     std::vector<uint8_t> manufactureDataMask;
 };
 
-enum MatchMode {
+enum class MatchMode {
     MATCH_MODE_AGGRESSIVE = 1,  //  aggressive mode
     MATCH_MODE_STICKY = 2       // sticky mode
 };
@@ -207,17 +207,33 @@ enum class AdvertisingState {
     STOPPED = 4  // advertiser stopped
 };
 
+// Report mode used during scan.
+enum class ScanReportMode {
+    NORMAL = 1
+};
+
+enum class ScanReportType {
+    ON_FOUND = 1, // the found of advertisement packet
+    ON_LOST = 2 // the lost of advertisement packet
+};
+
 struct ScanOptions {
     int32_t interval = 0;                                   // Time of delay for reporting the scan result
     ScanDuty dutyMode = ScanDuty::SCAN_MODE_LOW_POWER;       // Bluetooth LE scan mode
     MatchMode matchMode = MatchMode::MATCH_MODE_AGGRESSIVE;  // Match mode for Bluetooth LE scan filters hardware match
     PhyType phyType = PhyType::PHY_LE_1M;                    // Phy for Bluetooth LE scan
+    ScanReportMode reportMode = ScanReportMode::NORMAL;      // Scan report mode
 };
 
 struct ScanResult {
     std::string deviceId;       // Address of the scanned device
     int32_t rssi;               // RSSI of the remote device
     std::vector<uint8_t> data;  // The raw data of broadcast packet
+};
+
+struct ScanReport {
+    ScanReportType reportType;
+    std::vector<ScanResult> scanResult;
 };
 
 struct NapiAdvManufactureData {
