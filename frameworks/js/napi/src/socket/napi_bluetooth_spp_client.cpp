@@ -228,6 +228,8 @@ napi_value NapiSppClient::SppCloseClientSocket(napi_env env, napi_callback_info 
         client->client_->Close();
         isOK = true;
     }
+    NAPI_BT_RETURN_IF(napi_release_threadsafe_function(client->sppReadThreadSafeFunc_, napi_tsfn_abort),
+        "inner error", nullptr);
     clientMap.erase(id);
     return NapiGetBooleanRet(env, isOK);
 }
@@ -279,6 +281,10 @@ napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
 
 static void NapiThreadSafeFuncCallJs(napi_env, napi_value jsCallback, void *context, void *data)
 {
+    if (jsCallback == nullptr) {
+        HILOGE("delete safeFunc, jsCallback is nullptr");
+        return;
+    }
     BufferCallbackInfo *callbackInfo = static_cast<BufferCallbackInfo *>(data);
     std::shared_ptr<SppCallbackBuffer> buffer = callbackInfo->PopData();
     if (buffer == nullptr) {
@@ -316,7 +322,10 @@ static napi_status NapiSppCreateThreadSafeFunc(const std::shared_ptr<NapiSppClie
     NAPI_BT_CALL_RETURN(napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback));
     NAPI_BT_CALL_RETURN(napi_create_threadsafe_function(callbackInfo->env_, callback, nullptr,
         name, maxQueueSize, initialThreadCount, nullptr, nullptr, nullptr, NapiThreadSafeFuncCallJs, &tsfn));
-
+    if (client->sppReadThreadSafeFunc_ != nullptr) {
+        NAPI_BT_RETURN_IF(napi_release_threadsafe_function(client->sppReadThreadSafeFunc_, napi_tsfn_abort),
+            "inner error", napi_invalid_arg);
+    }
     client->sppReadThreadSafeFunc_ = tsfn;
     return napi_ok;
 }
