@@ -97,7 +97,8 @@ public:
     virtual int32_t GetMessagePermission(const std::string &address) = 0;
     virtual bool SetMessagePermission(const std::string &address, int32_t permission) = 0;
     virtual int32_t GetPowerMode(const std::string &address) = 0;
-    virtual int32_t GetDeviceName(int32_t transport, const std::string &address, std::string &name) = 0;
+    virtual int32_t GetDeviceName(int32_t transport, const std::string &address,
+        std::string &name, bool alias = true) = 0;
     virtual std::string GetDeviceAlias(const std::string &address) = 0;
     virtual int32_t SetDeviceAlias(const std::string &address, const std::string &aliasName) = 0;
     virtual int32_t GetRemoteDeviceBatteryInfo(const std::string &address, BluetoothBatteryInfo &batteryInfo) = 0;
