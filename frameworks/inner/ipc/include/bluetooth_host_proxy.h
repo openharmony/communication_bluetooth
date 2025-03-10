@@ -71,7 +71,7 @@ public:
     int32_t GetMessagePermission(const std::string &address) override;
     bool SetMessagePermission(const std::string &address, int32_t permission) override;
     int32_t GetPowerMode(const std::string &address) override;
-    int32_t GetDeviceName(int32_t transport, const std::string &address, std::string &name) override;
+    int32_t GetDeviceName(int32_t transport, const std::string &address, std::string &name, bool alias = true) override;
     std::string GetDeviceAlias(const std::string &address) override;
     int32_t SetDeviceAlias(const std::string &address, const std::string &aliasName) override;
     int32_t GetRemoteDeviceBatteryInfo(const std::string &address, BluetoothBatteryInfo &info) override;

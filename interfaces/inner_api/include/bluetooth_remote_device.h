@@ -133,10 +133,11 @@ public:
     /**
      * @brief Get device name.
      *
+     * @param Indicates whether to obtain the device alias.
      * @return Returns device name.
      * @since 6
      */
-    int GetDeviceName(std::string &name) const;
+    int GetDeviceName(std::string &name, bool alias = true) const;
 
     /**
      * @brief Get device alias.

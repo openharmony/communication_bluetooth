@@ -883,7 +883,7 @@ int32_t BluetoothHostProxy::GetPowerMode(const std::string &address)
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::GetDeviceName(int32_t transport, const std::string &address, std::string &name)
+int32_t BluetoothHostProxy::GetDeviceName(int32_t transport, const std::string &address, std::string &name, bool alias)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
@@ -896,6 +896,10 @@ int32_t BluetoothHostProxy::GetDeviceName(int32_t transport, const std::string &
     }
     if (!data.WriteString(address)) {
         HILOGE("BluetoothHostProxy::GetDeviceName address error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteBool(alias)) {
+        HILOGE("BluetoothHostProxy::GetDeviceName alias error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
     MessageParcel reply;
