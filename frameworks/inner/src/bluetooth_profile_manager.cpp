@@ -133,8 +133,6 @@ void BluetoothProfileManager::NotifyBluetoothStateChange(int32_t transport, int3
         });
     }
     if (transport == ADAPTER_BLE && status == STATE_TURN_ON) {
-        HILOGD("Clear global variables, return to initial state");
-        ClearGlobalResource();
         profileIdFuncMap_.Iterate([this](const int32_t id, ProfileIdProperty &property) {
             if (property.functions.bleTurnOnFunc) {
                 auto remote = GetProfileRemote(property.objectName);
