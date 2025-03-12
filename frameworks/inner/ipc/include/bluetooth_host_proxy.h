@@ -116,6 +116,8 @@ public:
     int32_t UpdateCloudBluetoothDevice(std::vector<BluetoothTrustPairDevice> &cloudDevices) override;
     int32_t GetCloudBondState(const std::string &address, int32_t &cloudBondState) override;
     int32_t UpdateRefusePolicy(const int32_t pid, const int64_t prohibitedSecondsTime) override;
+    int32_t ProcessRandomDeviceIdCommand(
+        int32_t command, std::vector<std::string> &deviceIdVec, bool &isValid) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;

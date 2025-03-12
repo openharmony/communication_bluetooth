@@ -287,6 +287,7 @@ enum BluetoothHostInterfaceCode {
     BT_UPDATE_CLOUD_DEVICE,
     GET_CLOUD_BOND_STATE,
     BT_UPDATE_REFUSE_POLICY,
+    PROCESS_RANDOM_DEVICE_ID_COMMAND,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
