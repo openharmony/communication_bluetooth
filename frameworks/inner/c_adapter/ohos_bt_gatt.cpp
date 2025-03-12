@@ -1447,7 +1447,7 @@ void ClearGlobalResource(void)
             g_bleAdvCallbacks[i] = nullptr;
         }
     }
-    HILOGD("clear all g_bleAdvCallbacks when ble turn on or bluetooth_serivce unload");
+    HILOGI("clear all g_bleAdvCallbacks");
 }
 
 bool StartAdvAddrTimer(int advHandle, const AdvOwnAddrParams *ownAddrParams)
