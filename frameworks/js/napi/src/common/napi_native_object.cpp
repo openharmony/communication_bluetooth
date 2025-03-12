@@ -245,5 +245,13 @@ napi_value NapiNativeArrayBuffer::ToNapiValue(napi_env env) const
     }
     return object;
 }
+
+napi_value NapiNativeStringArray::ToNapiValue(napi_env env) const
+{
+    napi_value object = nullptr;
+    napi_create_array(env, &object);
+    ConvertStringVectorToJS(env, object, value_);
+    return object;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -51,6 +51,10 @@ napi_value NapiAccess::DefineAccessJSFunction(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getLocalAddress", GetLocalAddress),
         DECLARE_NAPI_FUNCTION("on", RegisterAccessObserver),
         DECLARE_NAPI_FUNCTION("off", DeregisterAccessObserver),
+        DECLARE_NAPI_FUNCTION("addPersistentDeviceId", AddPersistentDeviceId),
+        DECLARE_NAPI_FUNCTION("deletePersistentDeviceId", DeletePersistentDeviceId),
+        DECLARE_NAPI_FUNCTION("getPersistentDeviceIds", GetPersistentDeviceIds),
+        DECLARE_NAPI_FUNCTION("isValidRandomDeviceId", isValidRandomDeviceId),
 #endif
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "access:napi_define_properties");
@@ -178,5 +182,77 @@ napi_value NapiAccess::GetLocalAddress(napi_env env, napi_callback_info info)
     return result;
 }
 #endif
+
+napi_value NapiAccess::AddPersistentDeviceId(napi_env env, napi_callback_info info)
+{
+    std::string deviceId = "";
+    auto status = CheckDeviceAddressParam(env, info, deviceId);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [deviceId]() {
+        bool isValid = false;
+        std::vector<std::string> deviceIdVec = { deviceId };
+        int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
+            static_cast<int32_t>(RandomDeviceIdCommand::ADD), deviceIdVec, isValid);
+        HILOGI("AddPersistentDeviceId ret: %{public}d", ret);
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value NapiAccess::DeletePersistentDeviceId(napi_env env, napi_callback_info info)
+{
+    std::string deviceId = "";
+    auto status = CheckDeviceAddressParam(env, info, deviceId);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [deviceId]() mutable {
+        bool isValid = false;
+        std::vector<std::string> deviceIdVec = { deviceId };
+        int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
+            static_cast<int32_t>(RandomDeviceIdCommand::DELETE), deviceIdVec, isValid);
+        HILOGI("DeletePersistentDeviceId ret: %{public}d", ret);
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value NapiAccess::GetPersistentDeviceIds(napi_env env, napi_callback_info info)
+{
+    bool isValid = false;
+    std::vector<std::string> deviceIdVec;
+    int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
+        static_cast<int32_t>(RandomDeviceIdCommand::GET), deviceIdVec, isValid);
+    HILOGI("GetPersistentDeviceIds ret: %{public}d", ret);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, BT_ERR_INTERNAL_ERROR);
+
+    NapiNativeStringArray object(deviceIdVec);
+    return object.ToNapiValue(env);
+}
+
+napi_value NapiAccess::isValidRandomDeviceId(napi_env env, napi_callback_info info)
+{
+    std::string deviceId = "";
+    auto status = CheckDeviceAddressParam(env, info, deviceId);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    bool isValid = false;
+    std::vector<std::string> deviceIdVec = { deviceId };
+    int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
+        static_cast<int32_t>(RandomDeviceIdCommand::IS_VALID), deviceIdVec, isValid);
+    HILOGI("isValidRandomDeviceId ret: %{public}d", ret);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, BT_ERR_INTERNAL_ERROR);
+
+    NapiNativeBool object(isValid);
+    return object.ToNapiValue(env);
+}
+
+
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -143,6 +143,8 @@ public:
     virtual int32_t UpdateCloudBluetoothDevice(std::vector<BluetoothTrustPairDevice> &cloudDevices) = 0;
     virtual int32_t GetCloudBondState(const std::string &address, int32_t &cloudBondState) = 0;
     virtual int32_t UpdateRefusePolicy(const int32_t pid, const int64_t prohibitedSecondsTime) = 0;
+    virtual int32_t ProcessRandomDeviceIdCommand(
+        int32_t command, std::vector<std::string> &deviceIdVec, bool &isValid) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
