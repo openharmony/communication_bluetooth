@@ -34,6 +34,7 @@ using namespace std;
 std::shared_ptr<NapiBluetoothHidHostObserver> NapiBluetoothHidHost::observer_ =
     std::make_shared<NapiBluetoothHidHostObserver>();
 thread_local napi_ref NapiBluetoothHidHost::consRef_ = nullptr;
+bool NapiBluetoothHidHost::isRegistered_ = false;
 
 void NapiBluetoothHidHost::DefineHidHostJSClass(napi_env env, napi_value exports)
 {
@@ -63,8 +64,6 @@ void NapiBluetoothHidHost::DefineHidHostJSClass(napi_env env, napi_value exports
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_HID_HOST, napiProfile);
-    HidHost *profile = HidHost::GetProfile();
-    profile->RegisterObserver(observer_);
 #endif
 }
 
@@ -106,6 +105,12 @@ napi_value NapiBluetoothHidHost::On(napi_env env, napi_callback_info info)
     if (observer_) {
         auto status = observer_->eventSubscribe_.Register(env, info);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
+
+    if (!isRegistered_) {
+        HidHost *profile = HidHost::GetProfile();
+        profile->RegisterObserver(observer_);
+        isRegistered_ = true;
     }
     return NapiGetUndefinedRet(env);
 }
