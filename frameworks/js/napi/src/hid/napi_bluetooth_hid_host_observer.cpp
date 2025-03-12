@@ -34,6 +34,8 @@ NapiBluetoothHidHostObserver::NapiBluetoothHidHostObserver()
     
 void NapiBluetoothHidHostObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause)
 {
+    HILOGD("enter, remote device address: %{public}s, state: %{public}d, cause: %{public}d",
+        GET_ENCRYPT_ADDR(device), state, cause);
     auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state, cause);
     eventSubscribe_.PublishEvent(STR_BT_HID_HOST_OBSERVER_CONNECTION_STATE_CHANGE, nativeObject);
 }
