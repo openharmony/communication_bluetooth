@@ -113,6 +113,8 @@ void AfterWorkCallbackToSysBLEScan(uv_work_t *work, int status)
         napi_call_function(env, undefine, funcFail, ARGS_SIZE_TWO, callbackValue, &callbackResult);
     }
     napi_call_function(env, undefine, funcComplete, 0, nullptr, &callbackResult);
+    delete work;
+    work = nullptr;
 }
 
 void AfterWorkCallbackToSysBLEDeviceFound(uv_work_t *work, int status)
@@ -139,6 +141,8 @@ void AfterWorkCallbackToSysBLEDeviceFound(uv_work_t *work, int status)
     napi_value funcSuccess = nullptr;
     napi_get_reference_value(env, data->callbackSuccess, &funcSuccess);
     napi_call_function(env, undefine, funcSuccess, ARGS_SIZE_ONE, &object, &callbackResult);
+    delete work;
+    work = nullptr;
 }
 
 void SysOnScanCallBack(sysBLEMap &observers, const BleScanResult &result)
@@ -168,8 +172,14 @@ void SysOnScanCallBack(sysBLEMap &observers, const BleScanResult &result)
     data->callbackFail = callbackInfos[PARAM1]->callback_;
     data->result = std::make_shared<BleScanResult>(result);
     work->data = static_cast<void *>(data);
-    uv_queue_work(
+    int ret = uv_queue_work(
         loop, work, [](uv_work_t *work) {}, AfterWorkCallbackToSysBLEDeviceFound);
+    if (ret != 0) {
+        delete data;
+        data = nullptr;
+        delete work;
+        work = nullptr;
+    }
 }
 } // namespace
 
@@ -311,16 +321,8 @@ void NapiBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const st
     }
 }
 
-void NapiBluetoothBleCentralManagerCallback::OnStartOrStopScanEvent(int resultCode, bool isStartScan)
+static void StartBLESysScanTask(int resultCode)
 {
-    HILOGI("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
-    auto napiIsStartScan = std::make_shared<NapiNativeBool>(isStartScan);
-    if (isStartScan) {
-        AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::BLE_START_SCAN, napiIsStartScan, resultCode);
-    } else {
-        AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::BLE_STOP_SCAN, napiIsStartScan, resultCode);
-    }
-
     std::array<std::shared_ptr<BluetoothCallbackInfo>, ARGS_SIZE_THREE> callbackInfos;
     {
         std::lock_guard<std::mutex> lock(g_sysBLEObserverMutex);
@@ -359,8 +361,27 @@ void NapiBluetoothBleCentralManagerCallback::OnStartOrStopScanEvent(int resultCo
     data->callbackFail = callbackInfos[PARAM1]->callback_;
     data->callbackComplete = callbackInfos[PARAM2]->callback_;
     work->data = static_cast<void *>(data);
-    uv_queue_work(
+    int ret = uv_queue_work(
         loop, work, [](uv_work_t *work) {}, AfterWorkCallbackToSysBLEScan);
+    if (ret != 0) {
+        delete data;
+        data = nullptr;
+        delete work;
+        work = nullptr;
+    }
+}
+
+void NapiBluetoothBleCentralManagerCallback::OnStartOrStopScanEvent(int resultCode, bool isStartScan)
+{
+    HILOGI("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
+    auto napiIsStartScan = std::make_shared<NapiNativeBool>(isStartScan);
+    if (isStartScan) {
+        AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::BLE_START_SCAN, napiIsStartScan, resultCode);
+    } else {
+        AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::BLE_STOP_SCAN, napiIsStartScan, resultCode);
+    }
+
+    StartBLESysScanTask(resultCode);
 }
 
 napi_value NapiNativeBleScanResult::ToNapiValue(napi_env env) const
