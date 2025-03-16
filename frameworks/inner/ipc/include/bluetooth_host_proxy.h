@@ -110,6 +110,7 @@ public:
     int32_t SetFastScanLevel(int level) override;
     void UpdateVirtualDevice(int32_t action, const std::string &address) override;
     int32_t EnableBluetoothToRestrictMode(void) override;
+    int32_t UpdateRefusePolicy(const int32_t pid, const int64_t prohibitedSecondsTime) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;

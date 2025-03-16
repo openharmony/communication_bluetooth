@@ -135,6 +135,7 @@ public:
     virtual int32_t SetFastScanLevel(int level) = 0;
     virtual void UpdateVirtualDevice(int32_t action, const std::string &address) = 0;
     virtual int32_t EnableBluetoothToRestrictMode(void) = 0;
+    virtual int32_t UpdateRefusePolicy(const int32_t pid, const int64_t prohibitedSecondsTime) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
