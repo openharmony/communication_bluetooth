@@ -191,6 +191,7 @@ enum BluetoothHostObserverInterfaceCode {
     BT_HOST_OBSERVER_DEVICE_NAME_CHANGED,
     BT_HOST_OBSERVER_DEVICE_ADDR_CHANGED,
     BT_HOST_OBSERVER_STATE_CHANGE_V2,
+    BT_HOST_OBSERVER_REFUSE_POLICY_CHANGE,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_OBSERVER_BUTT
 };
@@ -278,6 +279,7 @@ enum BluetoothHostInterfaceCode {
     SET_FAST_SCAN_LEVEL,
     UPDATE_VIRTUAL_DEVICE,
     BT_ENABLE_BLUETOOTH_TO_RESTRICT_MODE,
+    BT_UPDATE_REFUSE_POLICY,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
