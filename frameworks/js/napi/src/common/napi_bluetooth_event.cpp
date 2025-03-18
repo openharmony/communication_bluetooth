@@ -37,7 +37,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
     }
     work->data = asyncEvent;
 
-    uv_queue_work(
+    int ret = uv_queue_work(
         loop,
         work,
         [](uv_work_t *work) {},
@@ -62,6 +62,12 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
             work = nullptr;
         }
     );
+    if (ret != 0) {
+        delete asyncEvent;
+        asyncEvent = nullptr;
+        delete work;
+        work = nullptr;
+    }
 }
 
 napi_value NapiEvent::CreateResult(const std::shared_ptr<BluetoothCallbackInfo> &cb, int value)
