@@ -230,7 +230,7 @@ napi_value NapiAccess::GetPersistentDeviceIds(napi_env env, napi_callback_info i
     int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
         static_cast<int32_t>(RandomDeviceIdCommand::GET), deviceIdVec, isValid);
     HILOGI("GetPersistentDeviceIds ret: %{public}d", ret);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
 
     NapiNativeStringArray object(deviceIdVec);
     return object.ToNapiValue(env);
@@ -247,7 +247,7 @@ napi_value NapiAccess::isValidRandomDeviceId(napi_env env, napi_callback_info in
     int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
         static_cast<int32_t>(RandomDeviceIdCommand::IS_VALID), deviceIdVec, isValid);
     HILOGI("isValidRandomDeviceId ret: %{public}d", ret);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
 
     NapiNativeBool object(isValid);
     return object.ToNapiValue(env);
