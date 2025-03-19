@@ -21,6 +21,7 @@
 #include <mutex>
 #include <unistd.h>
 #include <thread>
+#include <cinttypes>
 #include "bluetooth_ble_peripheral_observer_stub.h"
 #include "bluetooth_host_load_callback.h"
 #include "bluetooth_host_observer_stub.h"
@@ -95,6 +96,7 @@ struct BluetoothHost::impl {
     class BluetoothSwitchAction;
     std::mutex switchModuleMutex_ {};  // used for serial execute enableBluetoothToRestrictMode.
     std::shared_ptr<BluetoothSwitchModule> switchModule_ { nullptr };
+    int64_t refusePolicyProhibitedTime_ = 0;
 
 private:
     SaManagerStatus saManagerStatus_ = SaManagerStatus::WAIT_NOTIFY;
@@ -202,6 +204,11 @@ public:
             [address](std::shared_ptr<BluetoothHostObserver> observer) { observer->OnDeviceAddrChanged(address); });
     }
 
+    void OnRefusePolicyChanged(const int32_t pid, const int64_t prohibitedSecondsTime) override
+    {
+        HILOGI("OnRefusePolicyChanged, pid: %{public}d time %{public}" PRId64"", pid, prohibitedSecondsTime);
+        host_.refusePolicyProhibitedTime_ = prohibitedSecondsTime;
+    }
 private:
     bool isNeedInterceptSwitchStatus(int32_t transport, int32_t status)
     {
@@ -1251,6 +1258,18 @@ void BluetoothHost::Close(void)
 {
     std::lock_guard<std::mutex> lock(pimpl->switchModuleMutex_);
     pimpl->switchModule_ = nullptr;
+}
+
+int BluetoothHost::UpdateRefusePolicy(const int32_t pid, const int64_t prohibitedSecondsTime)
+{
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
+    return proxy->UpdateRefusePolicy(pid, prohibitedSecondsTime);
+}
+
+int64_t BluetoothHost::GetRefusePolicyProhibitedTime()
+{
+    return pimpl->refusePolicyProhibitedTime_;
 }
 } // namespace Bluetooth
 } // namespace OHOS
