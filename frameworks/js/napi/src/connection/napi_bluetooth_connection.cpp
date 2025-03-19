@@ -209,18 +209,31 @@ napi_value CancelPairedDevice(napi_env env, napi_callback_info info)
     return NapiGetBooleanTrue(env);
 }
 
+bool CheckGetRemoteDeviceNameParam(napi_env env, napi_callback_info info, std::string &addr, bool &alias)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    NAPI_BT_RETURN_IF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok, "call failed.", false);
+    NAPI_BT_RETURN_IF(NapiParseBdAddr(env, argv[PARAM0], addr) != napi_ok, "NapiParseBdAddr failed", false);
+    if (argc > ARGS_SIZE_ONE) {
+        NAPI_BT_RETURN_IF(!ParseBool(env, alias, argv[PARAM1]), "ParseBool failed", false);
+    }
+    return true;
+}
+
 napi_value GetRemoteDeviceName(napi_env env, napi_callback_info info)
 {
     HILOGD("start");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     std::string name = INVALID_NAME;
     napi_value result = nullptr;
-    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    bool alias = true;
+    bool checkRet = CheckGetRemoteDeviceNameParam(env, info, remoteAddr, alias);
     napi_create_string_utf8(env, name.c_str(), name.size(), &result);
     NAPI_BT_ASSERT_RETURN(env, checkRet == true, BT_ERR_INVALID_PARAM, result);
 
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
-    int32_t err = remoteDevice.GetDeviceName(name);
+    int32_t err = remoteDevice.GetDeviceName(name, alias);
     napi_create_string_utf8(env, name.c_str(), name.size(), &result);
     NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
     return result;
