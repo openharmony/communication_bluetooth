@@ -126,13 +126,13 @@ std::string BluetoothRemoteDevice::GetDeviceName() const
     return name;
 }
 
-int BluetoothRemoteDevice::GetDeviceName(std::string &name) const
+int BluetoothRemoteDevice::GetDeviceName(std::string &name, bool alias) const
 {
     CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
-    return hostProxy->GetDeviceName(transport_, address_, name);
+    return hostProxy->GetDeviceName(transport_, address_, name, alias);
 }
 
 std::string BluetoothRemoteDevice::GetDeviceAlias() const
