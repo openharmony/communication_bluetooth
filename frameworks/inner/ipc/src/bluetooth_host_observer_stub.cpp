@@ -42,6 +42,8 @@ BluetoothHostObserverStub::BluetoothHostObserverStub()
         BluetoothHostObserverStub::OnDeviceAddrChangedInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_STATE_CHANGE_V2)] =
         BluetoothHostObserverStub::OnBluetoothStateChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_REFUSE_POLICY_CHANGE)] =
+        BluetoothHostObserverStub::OnBluetoothRefusePolicyChangedInner;
 }
 
 BluetoothHostObserverStub::~BluetoothHostObserverStub()
@@ -182,6 +184,15 @@ int32_t BluetoothHostObserverStub::OnBluetoothStateChangedInner(BluetoothHostObs
 {
     int32_t state = data.ReadInt32();
     stub->OnBluetoothStateChanged(state);
+    return NO_ERROR;
+}
+
+int32_t BluetoothHostObserverStub::OnBluetoothRefusePolicyChangedInner(
+    BluetoothHostObserverStub *stub, MessageParcel &data, MessageParcel &reply)
+{
+    int32_t pid = data.ReadInt32();
+    int64_t time = data.ReadInt64();
+    stub->OnRefusePolicyChanged(pid, time);
     return NO_ERROR;
 }
 }  // namespace Bluetooth
