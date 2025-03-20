@@ -979,8 +979,7 @@ int BleStartScanEx(int32_t scannerId, const BleScanConfigs *configs, const BleSc
 
     BleScanSettings settings;
     settings.SetScanMode(configs->scanMode);
-    bleCentralManager->StartScan(settings, scanFilters);
-    return OHOS_BT_STATUS_SUCCESS;
+    return bleCentralManager->StartScan(settings, scanFilters);
 }
 
 /**
