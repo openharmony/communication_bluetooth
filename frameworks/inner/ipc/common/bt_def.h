@@ -342,6 +342,8 @@ enum class GattPermission : uint16_t {
 enum class GattConnectionPriority : int { BALANCED, HIGH, LOW_POWER };
 
 enum GattStatus {
+    EMPTY_FILTER = -31,
+    MAX_FILTERS = -30,
     INVALID_REMOTE_DEVICE = -29,
     INCLUDE_SERVICE_NOT_FOUND,
     REFERENCED_BY_OTHER_SERVICE,
