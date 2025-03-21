@@ -416,7 +416,8 @@ int32_t Opp::CancelTransfer(bool &result)
     sptr<IBluetoothOpp> proxy = GetRemoteProxy<IBluetoothOpp>(PROFILE_OPP_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
 
-    int ret = proxy->CancelTransfer(result);
+    int ret = proxy->CancelTransfer();
+    result = (ret == BT_NO_ERROR) ? true : false;
     HILOGI("cancelTransfer result is : %{public}d", ret);
     return ret;
 }
