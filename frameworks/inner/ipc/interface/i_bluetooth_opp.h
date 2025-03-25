@@ -35,7 +35,7 @@ public:
         const std::vector<BluetoothIOppTransferFileHolder> &fileHolders, bool& result) = 0;
     virtual int32_t SetIncomingFileConfirmation(bool accept, int fd) = 0;
     virtual int32_t GetCurrentTransferInformation(BluetoothIOppTransferInformation &transferInformation) = 0;
-    virtual int32_t CancelTransfer(bool &result) = 0;
+    virtual int32_t CancelTransfer() = 0;
     virtual int32_t SetLastReceivedFileUri(const std::string &uri) = 0;
     virtual void RegisterObserver(const sptr<IBluetoothOppObserver> &observer) = 0;
     virtual void DeregisterObserver(const sptr<IBluetoothOppObserver> &observer) = 0;
