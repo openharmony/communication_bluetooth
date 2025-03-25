@@ -80,6 +80,8 @@ int32_t BluetoothOppProxy::GetCurrentTransferInformation(BluetoothIOppTransferIn
     int error = Remote()->SendRequest(static_cast<uint32_t>(
         BluetoothOppInterfaceCode::COMMAND_GET_CURRENT_TRANSFER_INFORMATION), data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    int32_t ret = reply.ReadInt32();
+    CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "reply errCode: %{public}d", ret);
     std::unique_ptr<BluetoothIOppTransferInformation>
         oppInformation_(reply.ReadParcelable<BluetoothIOppTransferInformation>());
     CHECK_AND_RETURN_LOG_RET((oppInformation_ != nullptr), BT_ERR_DEVICE_DISCONNECTED, "oppInformation is nullptr");
@@ -87,7 +89,7 @@ int32_t BluetoothOppProxy::GetCurrentTransferInformation(BluetoothIOppTransferIn
     return BT_NO_ERROR;
 }
 
-int32_t BluetoothOppProxy::CancelTransfer(bool &result)
+int32_t BluetoothOppProxy::CancelTransfer()
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothOppProxy::GetDescriptor()),
@@ -101,8 +103,7 @@ int32_t BluetoothOppProxy::CancelTransfer(bool &result)
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_CANCEL_TRANSFER), data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
 
-    result = reply.ReadInt32() == BT_NO_ERROR ? true : false;
-    return BT_NO_ERROR;
+    return reply.ReadInt32();
 }
 
 int32_t BluetoothOppProxy::SetLastReceivedFileUri(const std::string &uri)
@@ -176,10 +177,8 @@ int32_t BluetoothOppProxy::GetDeviceState(const BluetoothRawAddress &device, int
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_GET_DEVICE_STATE), data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
 
-    int32_t ec = reply.ReadInt32();
-    if (FAILED(ec)) {
-        return ec;
-    }
+    int32_t ret = reply.ReadInt32();
+    CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "reply errCode: %{public}d", ret);
 
     result = reply.ReadInt32();
     return BT_NO_ERROR;
@@ -201,6 +200,8 @@ int32_t BluetoothOppProxy::GetDevicesByStates(
     int error = Remote()->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_GET_DEVICES_BY_STATES), data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    int32_t ret = reply.ReadInt32();
+    CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "reply errCode: %{public}d", ret);
     int32_t rawAddsSize = reply.ReadInt32();
     const int32_t maxSize = 100;
     if (rawAddsSize > maxSize) {

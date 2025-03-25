@@ -31,7 +31,7 @@ public:
         const std::vector<BluetoothIOppTransferFileHolder> &fileHolders, bool& result) override;
     int32_t SetIncomingFileConfirmation(bool accept, int fd) override;
     int32_t GetCurrentTransferInformation(BluetoothIOppTransferInformation &transferInformation) override;
-    int32_t CancelTransfer(bool &result) override;
+    int32_t CancelTransfer() override;
     int32_t SetLastReceivedFileUri(const std::string &uri) override;
     void RegisterObserver(const sptr<IBluetoothOppObserver> &observer) override;
     void DeregisterObserver(const sptr<IBluetoothOppObserver> &observer) override;
