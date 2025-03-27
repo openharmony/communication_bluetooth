@@ -855,6 +855,8 @@ public:
     int64_t GetRefusePolicyProhibitedTime();
 
     int32_t ProcessRandomDeviceIdCommand(int32_t command, std::vector<std::string> &deviceIdVec, bool &isValid);
+
+    void CleanResourceWhenDlclose();
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.

@@ -87,6 +87,15 @@ public:
      * @brief check bluetooth service is on or not
      */
     bool IsBluetoothServiceOn();
+    /**
+     * @brief clear resource when dlclose
+     */
+    static void ClearSystemAbility();
+
+    /**
+     * @brief clear resource when dlclose
+     */
+    void Close();
 
     static BluetoothProfileManager &GetInstance();
 
