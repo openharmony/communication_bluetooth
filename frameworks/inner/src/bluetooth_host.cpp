@@ -1311,5 +1311,10 @@ int32_t BluetoothHost::ProcessRandomDeviceIdCommand(
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     return proxy->ProcessRandomDeviceIdCommand(command, deviceIdVec, isValid);
 }
+
+void BluetoothHost::CleanResourceWhenDlclose()
+{
+    BluetoothProfileManager::GetInstance().Close();
+}
 } // namespace Bluetooth
 } // namespace OHOS
