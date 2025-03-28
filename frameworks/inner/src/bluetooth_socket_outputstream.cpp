@@ -29,6 +29,7 @@ namespace Bluetooth {
 static constexpr int32_t SOCKET_PACKET_HEAD_LENGTH = 1512;
 static constexpr int32_t AAM_UID = 7878;
 static constexpr int32_t AAM_BAD_RET = -978974;
+static constexpr int32_t SOFTBUS_UID = 1024;
 
 OutputStream::OutputStream(int socketFd) : socketFd_(socketFd)
 {}
@@ -61,11 +62,23 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
             }
         }
     }
+
+    if (getuid() == SOFTBUS_UID && setTimeoutFlag_ == false) {
+        HILOGD("Softbus write set timeout.");
+        timeval timeVals;
+        if (setsockopt(socketFd_, SOL_SOCKET, SO_SNDTIMEO, &) == -1) {
+            HILOGE("setsockopt failed");
+            return -1;
+        }
+        setTimeoutFlag_ == true;
+    }
+
     auto ret = send(socketFd_, buf, length, MSG_NOSIGNAL);
 
     HILOGD("ret: %{public}zd", ret);
 
     if (ret <= 0) {
+        setTimeoutFlag_ == false;
         HILOGE("socket write exception! ret:%{public}zd errno:%{public}d", ret, errno);
     }
     return ret;
