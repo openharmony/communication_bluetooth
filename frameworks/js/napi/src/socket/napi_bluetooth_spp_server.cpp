@@ -39,6 +39,7 @@ void DefineSppFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("sppCloseServerSocket", NapiSppServer::SppCloseServerSocket),
         DECLARE_NAPI_FUNCTION("sppCloseClientSocket", NapiSppClient::SppCloseClientSocket),
         DECLARE_NAPI_FUNCTION("sppWrite", NapiSppClient::SppWrite),
+        DECLARE_NAPI_FUNCTION("getDeviceId", NapiSppClient::GetDeviceId),
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("on", NapiSppServer::RegisterSocketObserver),
         DECLARE_NAPI_FUNCTION("off", NapiSppServer::DeRegisterSocketObserver),
