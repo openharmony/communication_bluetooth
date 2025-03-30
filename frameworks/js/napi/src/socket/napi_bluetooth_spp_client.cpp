@@ -28,6 +28,7 @@
 #include <limits>
 #include <unistd.h>
 #include <uv.h>
+#include "../parser/napi_parser_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -576,6 +577,33 @@ napi_value NapiSppClient::SppReadAsync(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
+}
+
+static napi_status CheckSppFdParams(napi_env env, napi_callback_info info, int &id)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {0};
+
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 arguments.", napi_invalid_arg);
+    NAPI_BT_CALL_RETURN(NapiParseInt32(env, argv[PARAM0], id));
+    return napi_ok;
+}
+
+napi_value NapiSppClient::GetDeviceId(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    int id = -1;
+    auto status = CheckSppFdParams(env, info, id);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    auto client = clientMap[id];
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client != nullptr, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client->client_ != nullptr, BT_ERR_INVALID_PARAM);
+    BluetoothRemoteDevice remoteDevice = client->client_->GetRemoteDevice();
+    std::string addr = remoteDevice.GetDeviceAddr();
+    napi_value result = nullptr;
+    napi_create_string_utf8(env, addr.c_str(), addr.size(), &result);
+    return result;
 }
 } // namespace Bluetooth
 } // namespace OHOS
