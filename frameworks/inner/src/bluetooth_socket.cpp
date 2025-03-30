@@ -721,7 +721,11 @@ struct ServerSocket::impl {
         (void)sprintf_s(token, sizeof(token), "%02X:%02X:%02X:%02X:%02X:%02X",
             buf[0x05], buf[0x04], buf[0x03], buf[0x02], buf[0x01], buf[0x00]);
         BluetoothRawAddress rawAddr {token};
-        acceptAddress_ = rawAddr.GetAddress().c_str();
+        // If the random address fails to be obtained, the actual address is returned by default.
+        std::string randomAddr = rawAddr.GetAddress();
+        BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+        host->GetRandomAddress(rawAddr.GetAddress(), randomAddr);
+        acceptAddress_ = randomAddr;
 
         maxTxPacketSize_ = GetPacketSizeFromBuf(recvBuf + TX_OFFSET, rv - TX_OFFSET);
         maxRxPacketSize_ = GetPacketSizeFromBuf(recvBuf + RX_OFFSET, rv - RX_OFFSET);
