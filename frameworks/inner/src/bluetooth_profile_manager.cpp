@@ -33,6 +33,8 @@
 namespace OHOS {
 namespace Bluetooth {
 
+sptr<BluetoothProfileManager::BluetoothSystemAbility> BluetoothProfileManager::bluetoothSystemAbility_ = nullptr;
+
 BluetoothProfileManager::BluetoothProfileManager()
 {
     bluetoothSystemAbility_ = new BluetoothSystemAbility();
@@ -51,11 +53,6 @@ BluetoothProfileManager &BluetoothProfileManager::GetInstance()
 }
 
 extern "C" __attribute__((destructor)) void BluetoothProfileManager::ClearSystemAbility()
-{
-    BluetoothHost::GetDefaultHost().CleanResourceWhenDlclose();
-}
-
-void BluetoothProfileManager::Close()
 {
     sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHECK_AND_RETURN_LOG(samgrProxy != nullptr, "[BLUETOOTH_PROFILE_MANAGER] failed to get samgrProxy");
