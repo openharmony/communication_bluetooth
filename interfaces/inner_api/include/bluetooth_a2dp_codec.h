@@ -82,7 +82,7 @@ struct A2dpCodecStatus {
 };
 
 /**
- * @brief A2dp offload Codec configuration information of a2dp source
+ * @brief A2dp offload codec configuration information of a2dp source
  *
  * @since 6.0
  */

@@ -18,6 +18,7 @@
 
 #include <unistd.h>
 #include <cerrno>
+#include <cinttypes>
 #include "bluetooth_socket_outputstream.h"
 #include "bluetooth_log.h"
 #include "sys/socket.h"
@@ -26,7 +27,15 @@
 namespace OHOS {
 namespace Bluetooth {
 
+static constexpr int32_t SOCKET_SEND_TIME_THRESHOLD = 1000; // 1000ms
 static constexpr int32_t SOCKET_PACKET_HEAD_LENGTH = 1512;
+static int64_t GetNowTimestamp(void)
+{
+    struct timeval tv;
+    gettimeofday(&tv, nullptr);
+    int64_t timestamp = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+    return timestamp;
+}
 static constexpr int32_t AAM_UID = 7878;
 static constexpr int32_t AAM_BAD_RET = -978974;
 
@@ -51,7 +60,7 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
     if (sockOptRet != -1 && ioctlRet != -1 && static_cast<unsigned long>(bufSize) > bytesInBuffer) { // -1代表无权限获取发送队列大小
         // 该方法是跟踪send前socket发送通道是否占满导致发包阻塞
         unsigned long availableLength = static_cast<unsigned long>(bufSize) - bytesInBuffer;
-        int32_t sendLength = static_cast <int32_t>(length) + SOCKET_PACKET_HEAD_LENGTH;
+        int32_t sendLength = static_cast<int32_t>(length) + SOCKET_PACKET_HEAD_LENGTH;
         if (availableLength < static_cast<unsigned long>(sendLength)) {
             HILOGW("send queue is full, availableLength is %{public}lu, sendlength is %{public}d",
                 availableLength, sendLength);
@@ -61,7 +70,12 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
             }
         }
     }
+    int64_t beginTimestamp = GetNowTimestamp();
     auto ret = send(socketFd_, buf, length, MSG_NOSIGNAL);
+    int64_t endTimestamp = GetNowTimestamp();
+    if (endTimestamp - beginTimestamp > SOCKET_SEND_TIME_THRESHOLD) {
+        HILOGE("socket send time %{public}" PRId64, endTimestamp - beginTimestamp);
+    }
 
     HILOGD("ret: %{public}zd", ret);
 

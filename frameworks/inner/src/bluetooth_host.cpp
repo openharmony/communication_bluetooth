@@ -694,6 +694,7 @@ int BluetoothHost::SatelliteControl(int type, int state)
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     return proxy->SatelliteControl(type, state);
 }
+
 void BluetoothHost::UpdateVirtualDevice(int32_t action, const std::string &address)
 {
     HILOGD("enter");
@@ -1306,6 +1307,7 @@ int64_t BluetoothHost::GetRefusePolicyProhibitedTime()
 int32_t BluetoothHost::ProcessRandomDeviceIdCommand(
     int32_t command, std::vector<std::string> &deviceIdVec, bool &isValid)
 {
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     return proxy->ProcessRandomDeviceIdCommand(command, deviceIdVec, isValid);
