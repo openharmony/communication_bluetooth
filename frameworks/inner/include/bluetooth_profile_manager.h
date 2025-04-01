@@ -92,11 +92,6 @@ public:
      */
     static void ClearSystemAbility();
 
-    /**
-     * @brief clear resource when dlclose
-     */
-    void Close();
-
     static BluetoothProfileManager &GetInstance();
 
 private:
@@ -116,7 +111,7 @@ private:
     SafeMap<int32_t, ProfileIdProperty> profileIdFuncMap_;
     std::atomic_bool isBluetoothServiceOn_ = false;
     std::atomic_bool isNeedCheckBluetoothServiceOn_ = true;
-    sptr<BluetoothSystemAbility> bluetoothSystemAbility_ = nullptr;
+    static sptr<BluetoothSystemAbility> bluetoothSystemAbility_;
     int32_t registerValidId_ = BEGIN_ID;
     std::mutex idMutex_;
     std::mutex getProfileRemoteMutex_;
