@@ -74,8 +74,8 @@ public:
     int Write(const uint8_t *buf, size_t length);
 
 private:
-    
     int socketFd_;
+    bool setTimeoutFlag_ = false;
     OutputStream() = delete;
 };
 } // namespace Bluetooth
