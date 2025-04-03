@@ -63,6 +63,7 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
     }
     auto ret = send(socketFd_, buf, length, MSG_NOSIGNAL);
 
+    
     HILOGD("ret: %{public}zd", ret);
 
     if (ret <= 0) {

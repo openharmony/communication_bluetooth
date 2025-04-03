@@ -74,6 +74,7 @@ public:
     int Write(const uint8_t *buf, size_t length);
 
 private:
+    
     int socketFd_;
     OutputStream() = delete;
 };
