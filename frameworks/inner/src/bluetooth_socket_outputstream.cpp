@@ -80,7 +80,7 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
     HILOGD("ret: %{public}zd", ret);
 
     if (ret <= 0) {
-        setTimeoutFlag_ == false;
+        setTimeoutFlag_ = false;
         HILOGE("socket write exception! ret:%{public}zd errno:%{public}d", ret, errno);
     }
     return ret;
