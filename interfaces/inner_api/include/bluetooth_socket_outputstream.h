@@ -75,6 +75,7 @@ public:
 
 private:
     int socketFd_;
+    bool setTimeoutFlag_ = false;
     OutputStream() = delete;
 };
 } // namespace Bluetooth
