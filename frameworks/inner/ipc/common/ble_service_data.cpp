@@ -550,7 +550,7 @@ void BleAdvertiserDataImpl::AddServiceData(const Uuid &uuid, const std::string &
             cdata[0] = data.length() + BLE_UUID_LEN_128 + 1;
             cdata[1] = BLE_AD_TYPE_128SERVICE_DATA;  /// 0x21
             uint8_t uuidData[BLE_UUID_LEN_128];
-            uuid.ConvertToBytesLE(uuidData);
+            uuid.ConvertToBytesLE(uuidData, BLE_UUID_LEN_128);
             AddData(std::string(cdata, BLE_ADV_DATA_FIELD_TYPE_AND_LEN) +
                     std::string(reinterpret_cast<char *>(uuidData), BLE_UUID_LEN_128) + data);
             break;
@@ -612,7 +612,7 @@ void BleAdvertiserDataImpl::AddServiceUuids(const std::vector<Uuid> &uuidVec)
             serviceUuid32.append(std::string(reinterpret_cast<char *>(&uuid32), BLE_UUID_LEN_32));
         } else {
             uint8_t uuidData[BLE_UUID_LEN_128];
-            uuid.ConvertToBytesLE(uuidData);
+            uuid.ConvertToBytesLE(uuidData, BLE_UUID_LEN_128);
             serviceUuid128.append(std::string(reinterpret_cast<char *>(uuidData), BLE_UUID_LEN_128));
         }
     }
@@ -684,7 +684,7 @@ void BleAdvertiserDataImpl::SetCompleteServices(const Uuid &uuid)
             cdata[0] = BLE_UUID_LEN_128 + 1;
             cdata[1] = BLE_AD_TYPE_128SRV_CMPL;  /// 0x07
             uint8_t uuidData[BLE_UUID_LEN_128];
-            uuid.ConvertToBytesLE(uuidData);
+            uuid.ConvertToBytesLE(uuidData, BLE_UUID_LEN_128);
             AddData(std::string(cdata, BLE_ADV_DATA_FIELD_TYPE_AND_LEN) +
                     std::string(reinterpret_cast<char *>(uuidData), BLE_UUID_LEN_128));
             break;
