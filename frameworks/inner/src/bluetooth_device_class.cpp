@@ -60,15 +60,15 @@ bool BluetoothDeviceClass::IsProfileSupported(int profileId) const
     } else if (profileId == BluetoothDevice::PROFILE_OPP) {
         return IsOppSupported();
     } else if (profileId == BluetoothDevice::PROFILE_HID) {
-        return (GetMajorMinorClass() & BluetoothDevice::MAJOR_PERIPHERAL) ==
-               BluetoothDevice::MAJOR_PERIPHERAL;
+        return (static_cast<unsigned int>(GetMajorMinorClass()) &
+            BluetoothDevice::MAJOR_PERIPHERAL) == BluetoothDevice::MAJOR_PERIPHERAL;
     } else if (profileId == BluetoothDevice::PROFILE_PANU ||
                profileId == BluetoothDevice::PROFILE_NAP) {
         if (IsServiceSupported(BluetoothDevice::SERVICE_NETWORKING)) {
             return true;
         }
-        return (GetMajorMinorClass() & BluetoothDevice::MAJOR_NETWORKING) ==
-               BluetoothDevice::MAJOR_NETWORKING;
+        return (static_cast<unsigned int>(GetMajorMinorClass()) &
+            BluetoothDevice::MAJOR_NETWORKING) == BluetoothDevice::MAJOR_NETWORKING;
     } else {
         return false;
     }
