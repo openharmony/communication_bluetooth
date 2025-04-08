@@ -106,7 +106,7 @@ GattCharacteristic::GattCharacteristic(GattCharacteristic &&src)
       handle_(src.handle_),
       permissions_(src.permissions_),
       properties_(src.properties_),
-      service_(src.service_),
+      service_(nullptr),
       value_(std::move(src.value_)),
       length_(src.length_),
       descriptors_(),
@@ -115,6 +115,8 @@ GattCharacteristic::GattCharacteristic(GattCharacteristic &&src)
     for (auto &desc : src.descriptors_) {
         descriptors_.insert(descriptors_.end(), std::move(desc))->characteristic_ = this;
     }
+    service_ = src.service_;
+    src.service_ = nullptr;
 }
 
 void GattCharacteristic::AddDescriptor(const GattDescriptor &descriptor)
