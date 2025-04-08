@@ -823,8 +823,8 @@ int GattServer::SendResponse(
     }
 
     int result = BT_ERR_INTERNAL_ERROR;
-    uint8_t requestType = requestId >> EIGHT_BITS;
-    uint8_t transport = requestId & 0xFF;
+    uint8_t requestType = static_cast<uint32_t>(requestId) >> EIGHT_BITS;
+    uint8_t transport = static_cast<uint32_t>(requestId) & 0xFF;
     if (transport != GATT_TRANSPORT_TYPE_CLASSIC && transport != GATT_TRANSPORT_TYPE_LE) {
         return result;
     }
