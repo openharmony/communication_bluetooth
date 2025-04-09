@@ -894,16 +894,17 @@ int GattClient::SetNotifyCharacteristicInner(GattCharacteristic &characteristic,
         HILOGE("pimpl or gatt client proxy is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
+    
+    std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
+    if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
+        HILOGE("Request not supported");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     int ret = proxy->RequestNotification(pimpl->applicationId_, characteristic.GetHandle(), enable);
     if (ret != BT_NO_ERROR) {
         return ret;
-    }
-    std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
-    if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
-        HILOGE("Request not supported");
-        return BT_ERR_INTERNAL_ERROR;
     }
     std::lock_guard<std::mutex> lock(pimpl->requestInformation_.mutex_);
     if (pimpl->requestInformation_.doing_) {
