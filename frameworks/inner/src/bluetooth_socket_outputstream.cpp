@@ -38,7 +38,8 @@ static int64_t GetNowTimestamp(void)
 }
 static constexpr int32_t AAM_UID = 7878;
 static constexpr int32_t AAM_BAD_RET = -978974;
-
+static constexpr int32_t SOFTBUS_UID = 1024;
+static constexpr int32_t SOCKET_WRITE_TIMEOUT_50_SEC = 50;
 OutputStream::OutputStream(int socketFd) : socketFd_(socketFd)
 {}
 
@@ -77,9 +78,11 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
         HILOGE("socket send time %{public}" PRId64, endTimestamp - beginTimestamp);
     }
 
+    
     HILOGD("ret: %{public}zd", ret);
 
     if (ret <= 0) {
+        setTimeoutFlag_ = false;
         HILOGE("socket write exception! ret:%{public}zd errno:%{public}d", ret, errno);
     }
     return ret;
