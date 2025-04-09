@@ -52,7 +52,7 @@ public:
     ~BluetoothSwitchModule() = default;
 
     int ProcessBluetoothSwitchEvent(BluetoothSwitchEvent event);
-    void SetNoAutoConnect(bool);
+    void SetNoAutoConnect(bool noAutoConnect);
 
 private:
     int ProcessEnableBluetoothEvent(void);

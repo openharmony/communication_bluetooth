@@ -592,7 +592,7 @@ int A2dpSource::WriteFrame(const uint8_t *data, uint32_t size)
     }
 
     sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, RET_BAD_STATUS, "failed: no proxy");
 
     return proxy->WriteFrame(data, size);
 }
@@ -607,7 +607,7 @@ int A2dpSource::GetRenderPosition(const BluetoothRemoteDevice &device, uint32_t 
     }
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "device err");
     sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "a2dpSrc proxy is nullptr");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     return proxy->GetRenderPosition(RawAddress(device.GetDeviceAddr()), delayValue, sendDataSize, timeStamp);
 }
 

@@ -18,7 +18,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
-#include <vector>
 #include "iosfwd"
 #include "bt_uuid.h"
 
