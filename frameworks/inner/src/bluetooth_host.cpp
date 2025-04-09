@@ -1166,8 +1166,10 @@ int BluetoothHost::SetFastScan(bool isEnable)
 
 int BluetoothHost::GetRandomAddress(const std::string &realAddr, std::string &randomAddr) const
 {
-    randomAddr = realAddr;
-    return BT_NO_ERROR;
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "pimpl or bluetooth host is nullptr");
+    return proxy->GetRandomAddress(realAddr, randomAddr);
 }
 
 int BluetoothHost::ConnectAllowedProfiles(const std::string &remoteAddr) const
