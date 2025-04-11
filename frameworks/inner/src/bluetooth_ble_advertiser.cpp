@@ -365,7 +365,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     if (pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
         ret = proxy->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, false);
     } else {
-        ret = proxy->GetAdvertiserHandle(advHandle);
+        ret = proxy->GetAdvertiserHandle(advHandle, pimpl->callbackImp_);
         if (ret != BT_NO_ERROR || advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
             HILOGE("Invalid advertising handle");
             callback->OnStartResultEvent(BT_ERR_INTERNAL_ERROR, static_cast<int>(BLE_INVALID_ADVERTISING_HANDLE));
@@ -413,7 +413,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     if (pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
         ret = proxy->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, true);
     } else {
-        ret = proxy->GetAdvertiserHandle(advHandle);
+        ret = proxy->GetAdvertiserHandle(advHandle, pimpl->callbackImp_);
         if (ret != BT_NO_ERROR || advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
             HILOGE("Invalid advertising handle");
             callback->OnStartResultEvent(BT_ERR_INTERNAL_ERROR, BLE_INVALID_ADVERTISING_HANDLE);
