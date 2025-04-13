@@ -56,11 +56,30 @@ enum CodecSampleRate {
     CODEC_SAMPLE_RATE_192000 = 6,
 };
 
+enum CodecBitRate {
+    CODEC_BIT_RATE_96000 = 0,
+    CODEC_BIT_RATE_128000 = 1,
+    CODEC_BIT_RATE_192000 = 2,
+    CODEC_BIT_RATE_256000 = 3,
+    CODEC_BIT_RATE_320000 = 4,
+    CODEC_BIT_RATE_480000 = 5,
+    CODEC_BIT_RATE_640000 = 6,
+    CODEC_BIT_RATE_960000 = 7,
+    CODEC_BIT_RATE_ABR = 8,
+};
+
+enum CodecFrameLength {
+    CODEC_FRAME_LENGTH_5MS = 0,
+    CODEC_FRAME_LENGTH_10MS = 1,
+};
+
 struct CodecInfo {
     CodecType codecType;
     CodecBitsPerSample codecBitsPerSample;
     CodecChannelMode codecChannelMode;
     CodecSampleRate codecSampleRate;
+    CodecBitRate codecBitRate;
+    CodecFrameLength codecFrameLength;
 };
 
 class NapiA2dpSource {
@@ -89,6 +108,7 @@ public:
     static napi_value DisableAbsoluteVolume(napi_env env, napi_callback_info info);
     static napi_value SetCurrentCodecInfo(napi_env env, napi_callback_info info);
     static napi_value GetCurrentCodecInfo(napi_env env, napi_callback_info info);
+    static napi_value GetCurrentFullCodecInfo(napi_env env, napi_callback_info info);
     static napi_value EnableAutoPlay(napi_env env, napi_callback_info info);
     static napi_value DisableAutoPlay(napi_env env, napi_callback_info info);
     static napi_value GetAutoPlayDisabledDuration(napi_env env, napi_callback_info info);
