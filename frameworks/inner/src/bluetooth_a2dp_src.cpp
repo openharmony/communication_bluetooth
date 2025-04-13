@@ -411,6 +411,8 @@ A2dpCodecStatus A2dpSource::GetCodecStatus(const BluetoothRemoteDevice &device) 
     ret.codecInfo.channelMode = codecStatus.codecInfo.channelMode;
     ret.codecInfo.codecPriority = codecStatus.codecInfo.codecPriority;
     ret.codecInfo.bitsPerSample = codecStatus.codecInfo.bitsPerSample;
+    ret.codecInfo.codecSpecific3 = codecStatus.codecInfo.codecSpecific3;
+    ret.codecInfo.codecSpecific4 = codecStatus.codecInfo.codecSpecific4;
 
     A2dpCodecInfo serviceInfo;
     for (auto it = codecStatus.codecInfoConfirmCap.begin(); it != codecStatus.codecInfoConfirmCap.end(); it++) {
@@ -419,6 +421,8 @@ A2dpCodecStatus A2dpSource::GetCodecStatus(const BluetoothRemoteDevice &device) 
         serviceInfo.channelMode = it->channelMode;
         serviceInfo.codecPriority = it->codecPriority;
         serviceInfo.bitsPerSample = it->bitsPerSample;
+        serviceInfo.codecSpecific3 = it->codecSpecific3;
+        serviceInfo.codecSpecific4 = it->codecSpecific4;
         ret.codecInfoConfirmedCap.push_back(serviceInfo);
     }
 
@@ -428,6 +432,8 @@ A2dpCodecStatus A2dpSource::GetCodecStatus(const BluetoothRemoteDevice &device) 
         serviceInfo.channelMode = it->channelMode;
         serviceInfo.codecPriority = it->codecPriority;
         serviceInfo.bitsPerSample = it->bitsPerSample;
+        serviceInfo.codecSpecific3 = it->codecSpecific3;
+        serviceInfo.codecSpecific4 = it->codecSpecific4;
         ret.codecInfoLocalCap.push_back(serviceInfo);
     }
     return ret;
@@ -458,6 +464,8 @@ int A2dpSource::GetCodecPreference(const BluetoothRemoteDevice &device, A2dpCode
     info.sampleRate = serviceInfo.sampleRate;
     info.channelMode = serviceInfo.channelMode;
     info.bitsPerSample = serviceInfo.bitsPerSample;
+    info.codecSpecific3 = serviceInfo.codecSpecific3;
+    info.codecSpecific4 = serviceInfo.codecSpecific4;
     return ret;
 }
 
