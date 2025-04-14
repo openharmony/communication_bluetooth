@@ -1400,6 +1400,35 @@ enum A2dpUserCodecBitsPerSample : uint8_t {
 };
 
 /**
+ * @brief A2dp codec bit rate enum.
+ *
+ * @since 19
+ */
+enum A2dpUserCodecBitRate : uint8_t {
+    A2DP_L2HCST_BIT_RATE_DEFAULT = 0x0,
+    A2DP_L2HCST_BIT_RATE_320K = 0x01,
+    A2DP_L2HCST_BIT_RATE_640K = 0x01 << 1,
+    A2DP_L2HCST_BIT_RATE_960K = 0x01 << 2,
+    A2DP_L2HCST_BIT_RATE_AUTO_RATE = 0x01 << 3,
+    A2DP_L2HCST_BIT_RATE_96K = 0x01 << 4,
+    A2DP_L2HCST_BIT_RATE_LOSSLESS = 0x01 << 5,
+    A2DP_L2HCST_BIT_RATE_128K = 0x01 << 6,
+    A2DP_L2HCST_BIT_RATE_192K = 0x01 << 7,
+    A2DP_L2HCST_BIT_RATE_256K = 0x01 << 8,
+    A2DP_L2HCST_BIT_RATE_480K = 0x01 << 9,
+};
+
+/**
+ * @brief A2dp codec frame length enum.
+ *
+ * @since 19
+ */
+enum A2dpUserCodecFrameLength : uint8_t {
+    A2DP_L2HCST_FRAME_LENGTH_5MS = 0x01,
+    A2DP_L2HCST_FRAME_LENGTH_10MS = 0x01 << 1,
+};
+
+/**
  * @brief Pbap action Type.
  *
  * @since 6
