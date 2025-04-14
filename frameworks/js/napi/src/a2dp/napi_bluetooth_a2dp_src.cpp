@@ -872,7 +872,6 @@ static void ConvertCodecBitRateVector(napi_env env, napi_value &object, int32_t 
 
 static void ConvertCodecFrameLengthVector(napi_env env, napi_value &object, int32_t codecSampleRate)
 {
-
     napi_value codecFrameLengthArray = nullptr;
     napi_create_array(env, &codecFrameLengthArray);
     int count = 0;
