@@ -213,11 +213,16 @@ void BluetoothBleAdvertiserProxy::Close(int32_t advHandle)
     }
 }
 
-int32_t BluetoothBleAdvertiserProxy::GetAdvertiserHandle(int32_t &advHandle)
+int32_t BluetoothBleAdvertiserProxy::GetAdvertiserHandle(int32_t &advHandle,
+    const sptr<IBluetoothBleAdvertiseCallback> &callback)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleAdvertiserProxy::GetDescriptor())) {
         HILOGW("[GetAdvertiserHandle] fail: write interface token failed.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    if (!data.WriteRemoteObject(callback->AsObject())) {
+        HILOGW("[GetAdvertiserHandle] fail: write callback failed.");
         return BT_ERR_INTERNAL_ERROR;
     }
 
