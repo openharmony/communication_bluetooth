@@ -39,7 +39,7 @@ public:
     virtual int DisableAdvertising(uint8_t advHandle) = 0;
     virtual int StopAdvertising(int32_t advHandle) = 0;
     virtual void Close(int32_t advHandle) = 0;
-    virtual int32_t GetAdvertiserHandle(int32_t &advHandle) = 0;
+    virtual int32_t GetAdvertiserHandle(int32_t &advHandle, const sptr<IBluetoothBleAdvertiseCallback> &callback) = 0;
     virtual void SetAdvertisingData(const BluetoothBleAdvertiserData &advData,
         const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle) = 0;
 };
