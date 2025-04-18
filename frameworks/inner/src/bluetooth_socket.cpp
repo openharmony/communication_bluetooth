@@ -710,9 +710,12 @@ struct ServerSocket::impl {
         BluetoothRawAddress rawAddr {token};
         // If the random address fails to be obtained, the actual address is returned by default.
         std::string randomAddr = rawAddr.GetAddress();
+        std::string testAddr = rawAddr.GetAddress();
+        HILOGE("[sock] addr0 %{public}s", randomAddr);
         BluetoothHost *host = &BluetoothHost::GetDefaultHost();
         host->GetRandomAddress(rawAddr.GetAddress(), randomAddr);
-        acceptAddress_ = randomAddr;
+        HILOGE("[sock] addr1 %{public}s", randomAddr);
+        acceptAddress_ = testAddr;
 
         maxTxPacketSize_ = GetPacketSizeFromBuf(recvBuf + TX_OFFSET, rv - TX_OFFSET);
         maxRxPacketSize_ = GetPacketSizeFromBuf(recvBuf + RX_OFFSET, rv - RX_OFFSET);
