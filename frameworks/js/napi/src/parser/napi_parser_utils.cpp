@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "napi_async_callback.h"
-
+#include <cinttypes>
 namespace OHOS {
 namespace Bluetooth {
 
