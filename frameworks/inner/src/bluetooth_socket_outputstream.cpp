@@ -71,6 +71,17 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
             }
         }
     }
+    if (getuid() == SOFTBUS_UID && setTimeoutFlag_ == false) {
+        HILOGD("SOFTBUS write data set 50s tiemout.");
+        timeval timeout;
+        timeout.tv_sec = SOCKET_WRITE_TIMEOUT_50_SEC;
+        timeout.tv_usec = 0;
+        if (setsockopt(socketFd_, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout)) < 0) {
+            HILOGW("Failed to set send timeout");
+            return -1;
+        }
+        setTimeoutFlag_ = true;
+    }
     int64_t beginTimestamp = GetNowTimestamp();
     auto ret = send(socketFd_, buf, length, MSG_NOSIGNAL);
     int64_t endTimestamp = GetNowTimestamp();
@@ -78,7 +89,6 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
         HILOGE("socket send time %{public}" PRId64, endTimestamp - beginTimestamp);
     }
 
-    
     HILOGD("ret: %{public}zd", ret);
 
     if (ret <= 0) {
