@@ -56,9 +56,9 @@ extern "C" __attribute__((destructor)) void BluetoothProfileManager::ClearSystem
 {
     sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHECK_AND_RETURN_LOG(samgrProxy != nullptr, "[BLUETOOTH_PROFILE_MANAGER] failed to get samgrProxy");
-    int32_t ret = samgrProxy->SubscribeSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID, bluetoothSystemAbility_);
+    int32_t ret = samgrProxy->UnSubscribeSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID, bluetoothSystemAbility_);
     CHECK_AND_RETURN_LOG(ret == ERR_OK,
-        "[BLUETOOTH_PROFILE_MANAGER] subscribe systemAbilityId: bluetooth service failed!");
+        "[BLUETOOTH_PROFILE_MANAGER] Unsubscribe systemAbilityId: bluetooth service failed!");
     bluetoothSystemAbility_ = nullptr;
 }
 
