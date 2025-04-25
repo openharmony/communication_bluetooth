@@ -1553,8 +1553,11 @@ int32_t BluetoothHostProxy::GetRandomAddress(const std::string &realAddr, std::s
         HILOGE("BluetoothHostProxy::GetRandomAddress fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
-    randomAddr = reply.ReadString();
-    return reply.ReadInt32();
+    int32_t exception = reply.ReadInt32();
+    if (exception == BT_NO_ERROR) {
+        randomAddr = reply.ReadString();
+    }
+    return exception;
 }
 
 int32_t BluetoothHostProxy::SyncRandomAddress(const std::string &realAddr, const std::string &randomAddr)
