@@ -54,7 +54,7 @@ public:
     virtual void DeregisterBleCentralManagerCallback(int32_t scannerId,
         const sptr<IBluetoothBleCentralManagerCallback> &callback) = 0;
     virtual int StartScan(int32_t scannerId, const BluetoothBleScanSettings &settings,
-        const std::vector<BluetoothBleScanFilter> &filters) = 0;
+        const std::vector<BluetoothBleScanFilter> &filters, bool isNewApi) = 0;
     virtual int StopScan(int32_t scannerId) = 0;
     virtual void RemoveScanFilter(int32_t scannerId) = 0;
     virtual bool FreezeByRss(std::set<int> pidSet, bool isProxy) = 0;
