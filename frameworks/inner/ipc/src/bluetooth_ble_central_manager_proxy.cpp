@@ -85,7 +85,7 @@ void BluetoothBleCentralManagerProxy::DeregisterBleCentralManagerCallback(int32_
 }
 
 int BluetoothBleCentralManagerProxy::StartScan(int32_t scannerId, const BluetoothBleScanSettings &settings,
-    const std::vector<BluetoothBleScanFilter> &filters)
+    const std::vector<BluetoothBleScanFilter> &filters, bool isNewApi)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
@@ -112,6 +112,11 @@ int BluetoothBleCentralManagerProxy::StartScan(int32_t scannerId, const Bluetoot
             HILOGE("[StartScan] fail: write filter failed");
             return BT_ERR_INTERNAL_ERROR;
         }
+    }
+
+    if (!data.WriteBool(isNewApi)) {
+        HILOGE("[StartScan] fail: write isNewApi failed");
+        return BT_ERR_INTERNAL_ERROR;
     }
 
     MessageParcel reply;
