@@ -692,9 +692,11 @@ public:
     int ChangeScanParams(const BleScanSettings &settings, const std::vector<BleScanFilter> &filter,
         uint32_t filterAction);
 
+    void SetNewApiFlag();
 private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleCentralManager);
     BLUETOOTH_DECLARE_IMPL();
+    bool isNewApi_ = false;
 };
 } // namespace Bluetooth
 } // namespace OHOS

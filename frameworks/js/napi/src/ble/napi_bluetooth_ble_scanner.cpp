@@ -108,6 +108,7 @@ napi_value NapiBleScanner::StartScan(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, napiBleScanner->GetCallback() != nullptr, BT_ERR_INVALID_PARAM);
 
     auto func = [napiBleScanner, settings, scanFilters]() {
+        napiBleScanner->GetBleCentralManager()->SetNewApiFlag();
         int ret = napiBleScanner->GetBleCentralManager()->StartScan(settings, scanFilters);
         return NapiAsyncWorkRet(ret);
     };
