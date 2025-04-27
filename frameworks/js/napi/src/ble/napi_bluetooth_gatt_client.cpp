@@ -551,10 +551,13 @@ napi_value NapiGattClient::GetDeviceName(napi_env env, napi_callback_info info)
 
     auto status = CheckGattClientGetDeviceName(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
-
-    auto func = []() {
+    NapiGattClient *napiGattClient = NapiGetGattClient(env, info);
+    std::string deviceAddr = "";
+    if (napiGattClient && napiGattClient->GetDevice()) {
+        deviceAddr = napiGattClient->GetDevice()->GetDeviceAddr();
+    }
+    auto func = [deviceAddr]() {
         std::string deviceName = "";
-        std::string deviceAddr = GetGattClientDeviceId();
         int32_t err = BluetoothHost::GetDefaultHost().GetRemoteDevice(
             deviceAddr, BT_TRANSPORT_BLE).GetDeviceName(deviceName);
 
