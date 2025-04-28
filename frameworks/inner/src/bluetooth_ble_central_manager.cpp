@@ -371,7 +371,7 @@ int BleCentralManager::StartScan(const BleScanSettings &settings, const std::vec
     sptr<IBluetoothBleCentralManager> proxy =
         GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
-    return proxy->StartScan(pimpl->scannerId_, parcelSettings, parcelFilters);
+    return proxy->StartScan(pimpl->scannerId_, parcelSettings, parcelFilters, isNewApi_);
 }
 
 int BleCentralManager::StopScan()
@@ -560,6 +560,11 @@ int BleCentralManager::ChangeScanParams(const BleScanSettings &settings, const s
         GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     return proxy->ChangeScanParams(pimpl->scannerId_, parcelSetting, parcelFilters, filterAction);
+}
+
+void BleCentralManager::SetNewApiFlag()
+{
+    isNewApi_ = true;
 }
 
 BleScanResult::BleScanResult()
