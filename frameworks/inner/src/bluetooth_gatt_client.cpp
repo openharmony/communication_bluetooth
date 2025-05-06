@@ -797,12 +797,12 @@ int GattClient::ReadCharacteristic(GattCharacteristic &characteristic)
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
         HILOGE("Request not supported");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED;
     }
     std::lock_guard<std::mutex> lck(pimpl->requestInformation_.mutex_);
     if (pimpl->requestInformation_.doing_) {
         HILOGE("Remote device busy");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_OPERATION_BUSY;
     }
     int result = GattStatus::GATT_FAILURE;
     HILOGI("applicationId: %{public}d, handle: 0x%{public}04X", pimpl->applicationId_, characteristic.GetHandle());
@@ -834,12 +834,12 @@ int GattClient::ReadDescriptor(GattDescriptor &descriptor)
     std::lock_guard<std::mutex> lck(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
         HILOGE("Request not supported");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED;
     }
     std::lock_guard<std::mutex> lock(pimpl->requestInformation_.mutex_);
     if (pimpl->requestInformation_.doing_) {
         HILOGE("Remote device busy");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_OPERATION_BUSY;
     }
     int result = BT_ERR_INTERNAL_ERROR;
     HILOGI("applicationId: %{public}d, handle: 0x%{public}04X", pimpl->applicationId_, descriptor.GetHandle());
@@ -903,12 +903,12 @@ int GattClient::SetNotifyCharacteristicInner(GattCharacteristic &characteristic,
     std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
         HILOGE("Request not supported");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED;
     }
     std::lock_guard<std::mutex> lock(pimpl->requestInformation_.mutex_);
     if (pimpl->requestInformation_.doing_) {
         HILOGI("Remote device busy");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_OPERATION_BUSY;
     }
     auto descriptor = characteristic.GetDescriptor(UUID::FromString("00002902-0000-1000-8000-00805F9B34FB"));
     if (descriptor == nullptr) {
@@ -996,7 +996,7 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vec
     std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
         HILOGE("Request not supported");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED;
     }
     size_t length = value.size();
     HILOGD("length:%{public}zu", length);
@@ -1007,7 +1007,7 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vec
     std::lock_guard<std::mutex> lock(pimpl->requestInformation_.mutex_);
     if (pimpl->requestInformation_.doing_) {
         HILOGE("Remote device busy");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_OPERATION_BUSY;
     }
     BluetoothGattCharacteristic character(
         bluetooth::Characteristic(characteristic.GetHandle(), value.data(), length));
@@ -1050,7 +1050,7 @@ int GattClient::WriteDescriptor(GattDescriptor &descriptor)
     std::lock_guard<std::mutex> lck(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
         HILOGE("Request not supported");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED;
     }
     size_t length = 0;
     auto &characterValue = descriptor.GetValue(&length);
@@ -1061,7 +1061,7 @@ int GattClient::WriteDescriptor(GattDescriptor &descriptor)
     std::lock_guard<std::mutex> lock(pimpl->requestInformation_.mutex_);
     if (pimpl->requestInformation_.doing_) {
         HILOGE("Remote device busy");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_OPERATION_BUSY;
     }
     int result = BT_ERR_INTERNAL_ERROR;
     sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
@@ -1141,12 +1141,12 @@ int GattClient::ReadRemoteRssiValue()
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
         HILOGE("Request not supported");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED;
     }
     std::lock_guard<std::mutex> lck(pimpl->requestInformation_.mutex_);
     if (pimpl->requestInformation_.doing_) {
         HILOGE("Remote device busy");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_OPERATION_BUSY;
     }
     int result = GattStatus::GATT_FAILURE;
     HILOGI("applicationId: %{public}d", pimpl->applicationId_);

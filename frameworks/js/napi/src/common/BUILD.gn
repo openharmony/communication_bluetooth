@@ -66,6 +66,7 @@ ohos_shared_library("bt_napi_common") {
     "ipc:ipc_single",
     "libuv:uv",
     "napi:ace_napi",
+    "samgr:samgr_proxy",
   ]
 
   part_name = "bluetooth"

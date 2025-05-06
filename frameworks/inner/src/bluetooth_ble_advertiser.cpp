@@ -316,12 +316,12 @@ int32_t BleAdvertiser::impl::CheckAdvertiserData(const BluetoothBleAdvertiserSet
     uint32_t size = GetAdvertiserTotalBytes(advData, setting.IsConnectable());
     if (size > maxSize) {
         HILOGE("bleAdvertiserData size = %{public}d, maxSize = %{public}d", size, maxSize);
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_BLE_ADV_DATA_EXCEED_LIMIT;
     }
     size = GetAdvertiserTotalBytes(scanResponse, false);
     if (size > maxSize) {
         HILOGE("bleScanResponse size = %{public}d, maxSize = %{public}d,", size, maxSize);
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_BLE_ADV_DATA_EXCEED_LIMIT;
     }
     return BT_NO_ERROR;
 }
@@ -366,7 +366,13 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
         ret = proxy->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, false);
     } else {
         ret = proxy->GetAdvertiserHandle(advHandle, pimpl->callbackImp_);
+        // ret will be BT_ERR_MAX_RESOURCES or BT_ERR_INTERNAL_ERROR.
         if (ret != BT_NO_ERROR || advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
+            if (ret == BT_ERR_MAX_RESOURCES) {
+                HILOGE("The number of adv handle reaches the maximum.");
+                callback->OnStartResultEvent(BT_ERR_MAX_RESOURCES, static_cast<int>(BLE_INVALID_ADVERTISING_HANDLE));
+                return ret;
+            }
             HILOGE("Invalid advertising handle");
             callback->OnStartResultEvent(BT_ERR_INTERNAL_ERROR, static_cast<int>(BLE_INVALID_ADVERTISING_HANDLE));
             return ret;
@@ -486,7 +492,7 @@ int BleAdvertiser::EnableAdvertising(uint8_t advHandle, uint16_t duration,
     uint8_t tmpAdvHandle = pimpl->callbacks_.GetAdvertiserHandle(callback);
     if (tmpAdvHandle == BLE_INVALID_ADVERTISING_HANDLE) {
         HILOGE("Invalid advertising callback");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_BLE_INVALID_ADV_ID;
     }
 
     std::shared_ptr<BleAdvertiseCallback> observer = pimpl->callbacks_.GetAdvertiserObserver(advHandle);
@@ -513,7 +519,7 @@ int BleAdvertiser::DisableAdvertising(uint8_t advHandle, std::shared_ptr<BleAdve
     uint8_t tmpAdvHandle = pimpl->callbacks_.GetAdvertiserHandle(callback);
     if (tmpAdvHandle == BLE_INVALID_ADVERTISING_HANDLE) {
         HILOGE("Invalid advertising callback");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_BLE_INVALID_ADV_ID;
     }
 
     std::shared_ptr<BleAdvertiseCallback> observer = pimpl->callbacks_.GetAdvertiserObserver(advHandle);
@@ -541,7 +547,7 @@ int BleAdvertiser::StopAdvertising(std::shared_ptr<BleAdvertiseCallback> callbac
     uint8_t advHandle = pimpl->callbacks_.GetAdvertiserHandle(callback);
     if (advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
         HILOGE("Invalid advertising handle");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_BLE_INVALID_ADV_ID;
     }
 
     int ret = proxy->StopAdvertising(advHandle);
