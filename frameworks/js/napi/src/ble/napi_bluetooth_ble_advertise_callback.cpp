@@ -42,6 +42,7 @@ void NapiBluetoothBleAdvertiseCallback::OnStartResultEvent(int result, int advHa
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
     if (advHandle_ == advHandle) {
         HILOGI("OnStartResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
+        result = GetSDKAdaptedStatusCode(result); // Adaptation for old sdk
         auto napiAdvHandle = std::make_shared<NapiNativeInt>(advHandle);
         AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GET_ADVERTISING_HANDLE, napiAdvHandle, result);
     }
@@ -55,6 +56,7 @@ void NapiBluetoothBleAdvertiseCallback::OnEnableResultEvent(int result, int advH
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
     if (advHandle_ == advHandle) {
         HILOGI("OnEnableResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
+        result = GetSDKAdaptedStatusCode(result); // Adaptation for old sdk
         auto napiAdvResult = std::make_shared<NapiNativeInt>(result);
         AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::BLE_ENABLE_ADVERTISING, napiAdvResult, result);
     }
@@ -68,6 +70,7 @@ void NapiBluetoothBleAdvertiseCallback::OnDisableResultEvent(int result, int adv
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
     if (advHandle_ == advHandle) {
         HILOGI("OnDisableResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
+        result = GetSDKAdaptedStatusCode(result); // Adaptation for old sdk
         auto napiAdvResult = std::make_shared<NapiNativeInt>(result);
         AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::BLE_DISABLE_ADVERTISING, napiAdvResult, result);
     }
@@ -81,6 +84,7 @@ void NapiBluetoothBleAdvertiseCallback::OnStopResultEvent(int result, int advHan
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
     if (advHandle_ == advHandle) {
         HILOGI("OnStopResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
+        result = GetSDKAdaptedStatusCode(result); // Adaptation for old sdk
         auto napiAdvResult = std::make_shared<NapiNativeInt>(result);
         AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::BLE_STOP_ADVERTISING, napiAdvResult, result);
         advHandle_ = -1;

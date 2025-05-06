@@ -37,6 +37,15 @@ using namespace std;
 
 thread_local napi_ref NapiGattClient::consRef_ = nullptr;
 
+const std::vector<std::pair<int, int>> NapiGattClient::g_gattStatusSrvToNapi = {
+    { Bluetooth::BT_NO_ERROR,                                 GATT_SUCCESS },
+    { Bluetooth::BT_ERR_GATT_WRITE_NOT_PERMITTED,             WRITE_NOT_PERMITTED },
+    { Bluetooth::BT_ERR_GATT_READ_NOT_PERMITTED,              READ_NOT_PERMITTED },
+    { Bluetooth::BT_ERR_GATT_CONNECTION_CONGESTED,            GATT_CONGESTION },
+    { Bluetooth::BT_ERR_GATT_CONNECTION_NOT_ENCRYPTED,        INSUFFICIENT_ENCRYPTION },
+    { Bluetooth::BT_ERR_GATT_CONNECTION_NOT_AUTHENTICATED,    AUTHENTICATION_FAILED },
+    { Bluetooth::BT_ERR_GATT_CONNECTION_NOT_AUTHORIZED,       INSUFFICIENT_AUTHORIZATION },
+};
 static napi_status CheckCreateGattClientDeviceParams(napi_env env, napi_callback_info info, napi_value &outResult)
 {
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -338,6 +347,7 @@ napi_value NapiGattClient::ReadCharacteristicValue(napi_env env, napi_callback_i
         int ret = BT_ERR_INTERNAL_ERROR;
         if (gattClient) {
             ret = gattClient->ReadCharacteristic(*character);
+            ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret)); // Adaptation for old sdk
         }
         return NapiAsyncWorkRet(ret);
     };
@@ -391,6 +401,7 @@ napi_value NapiGattClient::ReadDescriptorValue(napi_env env, napi_callback_info 
         int ret = BT_ERR_INTERNAL_ERROR;
         if (gattClient) {
             ret = gattClient->ReadDescriptor(*descriptor);
+            ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret)); // Adaptation for old sdk
         }
         return NapiAsyncWorkRet(ret);
     };
@@ -524,6 +535,7 @@ napi_value NapiGattClient::GetRssiValue(napi_env env, napi_callback_info info)
         int ret = BT_ERR_INTERNAL_ERROR;
         if (gattClient) {
             ret = gattClient->ReadRemoteRssiValue();
+            ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret)); // Adaptation for old sdk
         }
         return NapiAsyncWorkRet(ret);
     };
@@ -566,6 +578,27 @@ napi_value NapiGattClient::GetDeviceName(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
+}
+
+int NapiGattClient::GattStatusFromService(int status)
+{
+    // if status is from napi, do not deal with.
+    if (status > 0) {
+        return status;
+    }
+    int ret = BT_ERR_INTERNAL_ERROR;
+    // statusCode srv -> napi
+    auto iter = g_gattStatusSrvToNapi.begin();
+    for (; iter != g_gattStatusSrvToNapi.end(); iter++) {
+        if (iter->second == status) {
+            ret = iter->first; // transfer to napi errorCode.
+            break;
+        }
+    }
+    if (iter == g_gattStatusSrvToNapi.end()) {
+        HILOGW("Unsupported error code conversion, status: %{public}d", status);
+    }
+    return ret;
 }
 
 #ifdef BLUETOOTH_API_SINCE_10
@@ -616,6 +649,7 @@ napi_value NapiGattClient::WriteCharacteristicValueEx(napi_env env, napi_callbac
         int ret = BT_ERR_INTERNAL_ERROR;
         if (gattClient) {
             ret = gattClient->WriteCharacteristic(*character);
+            ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret)); // Adaptation for old sdk
         }
         return NapiAsyncWorkRet(ret);
     };
@@ -672,6 +706,7 @@ napi_value NapiGattClient::WriteDescriptorValueEx(napi_env env, napi_callback_in
         int ret = BT_ERR_INTERNAL_ERROR;
         if (gattClient) {
             ret = gattClient->WriteDescriptor(*descriptor);
+            ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret)); // Adaptation for old sdk
         }
         return NapiAsyncWorkRet(ret);
     };
@@ -728,6 +763,7 @@ static napi_value setCharacteristicChangeInner(napi_env env, napi_callback_info 
             } else {
                 ret = gattClient->SetIndicateCharacteristic(*character, enable);
             }
+            ret = GetSDKAdaptedStatusCode(NapiGattClient::GattStatusFromService(ret)); // Adaptation for old sdk
         }
         return NapiAsyncWorkRet(ret);
     };
@@ -790,6 +826,7 @@ napi_value NapiGattClient::WriteCharacteristicValue(napi_env env, napi_callback_
     std::shared_ptr<GattClient> client = gattClient->GetClient();
     NAPI_BT_ASSERT_RETURN_FALSE(env, client != nullptr, BT_ERR_INTERNAL_ERROR);
     int ret = client->WriteCharacteristic(*characteristic, std::move(value));
+    ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret)); // Adaptation for old sdk
     HILOGI("ret: %{public}d", ret);
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
@@ -830,6 +867,7 @@ napi_value NapiGattClient::WriteDescriptorValue(napi_env env, napi_callback_info
     NAPI_BT_ASSERT_RETURN_FALSE(env, client != nullptr, BT_ERR_INTERNAL_ERROR);
 
     int ret = client->WriteDescriptor(*descriptor);
+    ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret)); // Adaptation for old sdk
     HILOGI("ret: %{public}d", ret);
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
@@ -872,6 +910,7 @@ napi_value NapiGattClient::SetNotifyCharacteristicChanged(napi_env env, napi_cal
     NAPI_BT_ASSERT_RETURN_FALSE(env, client != nullptr, BT_ERR_INTERNAL_ERROR);
 
     int ret = client->SetNotifyCharacteristic(*characteristic, enableNotify);
+    ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret)); // Adaptation for old sdk
     HILOGI("ret: %{public}d", ret);
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
