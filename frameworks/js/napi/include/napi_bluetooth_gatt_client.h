@@ -58,6 +58,7 @@ public:
     static napi_value SetBLEMtuSize(napi_env env, napi_callback_info info);
     static napi_value GetRssiValue(napi_env env, napi_callback_info info);
     static napi_value GetDeviceName(napi_env env, napi_callback_info info);
+    static int GattStatusFromService(int status);
 
     std::shared_ptr<GattClient> &GetClient()
     {
@@ -87,6 +88,8 @@ public:
 
     static thread_local napi_ref consRef_;
 
+    // napi (first) <-> service (second)
+    static const std::vector<std::pair<int, int>> g_gattStatusSrvToNapi;
 private:
     std::shared_ptr<GattClient> client_ = nullptr;
     std::shared_ptr<NapiGattClientCallback> callback_;
