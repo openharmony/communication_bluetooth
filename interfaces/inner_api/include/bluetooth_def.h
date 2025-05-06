@@ -320,6 +320,10 @@ enum class GattConnectionPriority : int {
 };
 
 enum GattStatus {
+    AUTHENTICATION_FAILED = -33,
+    GATT_CONGESTION = -32,
+    EMPTY_FILTER = -31,
+    MAX_FILTERS = -30,
     INVALID_REMOTE_DEVICE = -29,
     INCLUDE_SERVICE_NOT_FOUND,
     REFERENCED_BY_OTHER_SERVICE,
