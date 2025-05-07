@@ -462,7 +462,7 @@ void GattClient::impl::BuildServiceList(const std::vector<BluetoothGattService> 
     HILOGI("enter");
     for (auto &svc : src) {
         GattService svcTmp(UUID::ConvertFrom128Bits(svc.uuid_.ConvertTo128Bits()),
-            svc.handle_,
+            svc.startHandle_,
             svc.endHandle_,
             svc.isPrimary_ ? GattServiceType::PRIMARY : GattServiceType::SECONDARY);
         for (auto &character : svc.characteristics_) {
