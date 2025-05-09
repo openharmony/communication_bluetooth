@@ -652,7 +652,7 @@ static void ConvertCodecBitRate(A2dpCodecInfo &a2dpCodecInfo, int32_t codecBitRa
 {
     auto iter = g_codecBitRateMap.find(codecBitRate);
     if (iter != g_codecBitRateMap.end()) {
-        a2dpCodecInfo.codecSpecific3 = iter->second;
+        a2dpCodecInfo.codecSpecific4 = iter->second;
     }
 }
 
@@ -704,7 +704,7 @@ static void ConvertCodecInfoToJs(napi_env env, napi_value &object, const A2dpCod
     ConvertCodecChannelModeToCodecInfo(codecInfo, a2dpCodecInfo.channelMode);
     ConvertCodecBitsPerSampleToCodecInfo(codecInfo, a2dpCodecInfo.bitsPerSample);
     ConvertCodecTypeToCodecInfo(codecInfo, a2dpCodecInfo.codecType);
-    ConvertCodecBitRateToCodecInfo(codecInfo, a2dpCodecInfo.codecSpecific3);
+    ConvertCodecBitRateToCodecInfo(codecInfo, a2dpCodecInfo.codecSpecific4);
     // convert CodecInfo to JS
     napi_value value = nullptr;
     napi_create_int32(env, codecInfo.codecType, &value);
@@ -747,17 +747,17 @@ static void ConvertCodecBitsPerSampleVector(napi_env env, napi_value &object, in
         napi_set_element(env, codecBitsPerSampleArray, count, value);
         count++;
     }
-    if (codecSampleRate & A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_16_USER) {
+    if (static_cast<uint8_t>(codecSampleRate) & A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_16_USER) {
         napi_create_int32(env, CODEC_BITS_PER_SAMPLE_16, &value);
         napi_set_element(env, codecBitsPerSampleArray, count, value);
         count++;
     }
-    if (codecSampleRate & A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_24_USER) {
+    if (static_cast<uint8_t>(codecSampleRate) & A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_24_USER) {
         napi_create_int32(env, CODEC_BITS_PER_SAMPLE_24, &value);
         napi_set_element(env, codecBitsPerSampleArray, count, value);
         count++;
     }
-    if (codecSampleRate & A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_32_USER) {
+    if (static_cast<uint8_t>(codecSampleRate) & A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_32_USER) {
         napi_create_int32(env, CODEC_BITS_PER_SAMPLE_32, &value);
         napi_set_element(env, codecBitsPerSampleArray, count, value);
         count++;
@@ -777,12 +777,12 @@ static void ConvertCodecChannelModeVector(napi_env env, napi_value &object, int3
         napi_set_element(env, codecChannelModeArray, count, value);
         count++;
     }
-    if (channelMode & A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_MONO_USER) {
+    if (static_cast<uint8_t>(channelMode) & A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_MONO_USER) {
         napi_create_int32(env, CODEC_CHANNEL_MODE_MONO, &value);
         napi_set_element(env, codecChannelModeArray, count, value);
         count++;
     }
-    if (channelMode & A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_MONO_STEREO_USER) {
+    if (static_cast<uint8_t>(channelMode) & A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_MONO_STEREO_USER) {
         napi_create_int32(env, CODEC_CHANNEL_MODE_STEREO, &value);
         napi_set_element(env, codecChannelModeArray, count, value);
         count++;
@@ -802,17 +802,17 @@ static void ConvertCodecSampleRateVector(napi_env env, napi_value &object, int32
         napi_set_element(env, codecSampleRateArray, count, value);
         count++;
     }
-    if (codecSampleRate & A2dpUserCodecSampleRate::A2DP_SBC_SAMPLE_RATE_44100_USER) {
+    if (static_cast<uint32_t>(codecSampleRate) & A2dpUserCodecSampleRate::A2DP_SBC_SAMPLE_RATE_44100_USER) {
         napi_create_int32(env, CODEC_SAMPLE_RATE_44100, &value);
         napi_set_element(env, codecSampleRateArray, count, value);
         count++;
     }
-    if (codecSampleRate & A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_48000_USER) {
+    if (static_cast<uint32_t>(codecSampleRate) & A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_48000_USER) {
         napi_create_int32(env, CODEC_SAMPLE_RATE_48000, &value);
         napi_set_element(env, codecSampleRateArray, count, value);
         count++;
     }
-    if (codecSampleRate & A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_96000_USER) {
+    if (static_cast<uint32_t>(codecSampleRate) & A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_96000_USER) {
         napi_create_int32(env, CODEC_SAMPLE_RATE_96000, &value);
         napi_set_element(env, codecSampleRateArray, count, value);
         count++;
@@ -827,42 +827,42 @@ static void ConvertCodecBitRateVector(napi_env env, napi_value &object, int32_t 
     napi_value value = nullptr;
     napi_value codecBitRateArray = nullptr;
     napi_create_array(env, &codecBitRateArray);
-    if (codecBitRate & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_96K) {
+    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_96K) {
         napi_create_int32(env, CODEC_BIT_RATE_96000, &value);
         napi_set_element(env, codecBitRateArray, count, value);
         count++;
     }
-    if (codecBitRate & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_192K) {
+    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_192K) {
         napi_create_int32(env, CODEC_BIT_RATE_192000, &value);
         napi_set_element(env, codecBitRateArray, count, value);
         count++;
     }
-    if (codecBitRate & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_256K) {
+    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_256K) {
         napi_create_int32(env, CODEC_BIT_RATE_256000, &value);
         napi_set_element(env, codecBitRateArray, count, value);
         count++;
     }
-    if (codecBitRate & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_320K) {
+    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_320K) {
         napi_create_int32(env, CODEC_BIT_RATE_320000, &value);
         napi_set_element(env, codecBitRateArray, count, value);
         count++;
     }
-    if (codecBitRate & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_480K) {
+    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_480K) {
         napi_create_int32(env, CODEC_BIT_RATE_480000, &value);
         napi_set_element(env, codecBitRateArray, count, value);
         count++;
     }
-    if (codecBitRate & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_640K) {
+    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_640K) {
         napi_create_int32(env, CODEC_BIT_RATE_640000, &value);
         napi_set_element(env, codecBitRateArray, count, value);
         count++;
     }
-    if (codecBitRate & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_960K) {
+    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_960K) {
         napi_create_int32(env, CODEC_BIT_RATE_960000, &value);
         napi_set_element(env, codecBitRateArray, count, value);
         count++;
     }
-    if (codecBitRate & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_AUTO_RATE) {
+    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_AUTO_RATE) {
         napi_create_int32(env, CODEC_BIT_RATE_ABR, &value);
         napi_set_element(env, codecBitRateArray, count, value);
         count++;
