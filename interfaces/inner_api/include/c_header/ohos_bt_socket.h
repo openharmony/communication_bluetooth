@@ -32,6 +32,7 @@ extern "C" {
 #define BT_SOCKET_INVALID_SCN (-1)
 #define BT_SOCKET_INVALID_TYPE (-2)
 #define BT_SOCKET_LIMITED_RESOURCES (-3)
+#define BT_SOCEKET_CONNECT_FAILED (-4)
 
 typedef enum {
     OHOS_SOCKET_SPP_RFCOMM = 0x0,
@@ -220,6 +221,16 @@ int SetSocketBufferSize(int clientId, uint32_t bufferSize);
  * @return Returns the operation result status {@link BtStatus}.
  */
 int SocketUpdateCocConnectionParams(BluetoothCocUpdateSocketParam* param, const BdAddr *bdAddr);
+
+/**
+ * @brief Obtain the device random address based on the device real address and tokenId.
+ *
+ * @param realAddr The remote device real address.
+ * @param randomAddr The remote device random address.
+ * @param tokenId The relative ID used to identify the current client socket.
+ * @return Returns the operation result status {@link BtStatus}.
+ */
+int GetRamdomAddress(const BdAddr *realAddr, BdAddr *randomAddr, uint64_t tokenId);
 
 #ifdef __cplusplus
 }
