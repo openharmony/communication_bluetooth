@@ -62,6 +62,8 @@ constexpr int32_t BLE_DEVICE_FIND_TYPE = 5;
 
 constexpr uint32_t INVALID_REF_COUNT = 0xFF;
 
+constexpr int SDK_VERSION_20 = 20;
+
 struct ServerResponse {
     std::string deviceId = "";
     int transId = 0;
@@ -521,6 +523,9 @@ napi_status CheckDeviceAddressParam(napi_env env, napi_callback_info info, std::
 napi_status CheckAccessAuthorizationParam(napi_env env, napi_callback_info info, std::string &addr,
     int32_t &accessAuthorization);
 napi_status NapiGetOnOffCallbackName(napi_env env, napi_callback_info info, std::string &name);
+
+int GetCurrentSdkVersion(void);
+int GetSDKAdaptedStatusCode(int status);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_BLUETOOTH_UTILS_H
