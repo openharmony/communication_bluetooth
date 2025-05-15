@@ -1946,7 +1946,7 @@ int32_t BluetoothHostProxy::GetCarKeyDfxData(std::string &dfxData)
     if (exception == BT_NO_ERROR) {
         dfxData = reply.ReadString();
     }
-    return dfxData;
+    return exception;
 }
 
 int32_t BluetoothHostProxy::SetCarKeyCardData(const std::string &address, int32_t action)
