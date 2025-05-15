@@ -32,6 +32,7 @@ private:
     NapiHaEventUtils() = delete;
     static void GenerateProcessorId();
     static int64_t AddProcessor();
+    std::string RandomTransId() const;
     int64_t GetNowTimeMs() const;
     void WriteEndEvent() const;
 
