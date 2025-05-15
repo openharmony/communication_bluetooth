@@ -100,6 +100,8 @@ napi_value UpdateCloudBluetoothDevice(napi_env env, napi_callback_info info);
 
 void RegisterObserverToHost();
 void DealPairStatus(const int &status, int &bondStatus);
+napi_value GetCarKeyDfxData(napi_env env, napi_callback_info info);
+napi_value SetCarKeyCardData(napi_env env, napi_callback_info info);
 }  // namespace Bluetooth
 }  // namespace OHOS
 

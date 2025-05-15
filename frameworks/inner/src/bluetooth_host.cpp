@@ -1314,5 +1314,21 @@ int32_t BluetoothHost::ProcessRandomDeviceIdCommand(
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     return proxy->ProcessRandomDeviceIdCommand(command, deviceIdVec, isValid);
 }
+
+int BluetoothHost::GetCarKeyDfxData(std::string &dfxData) const
+{
+    HILOGI("enter");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
+    return proxy->GetCarKeyDfxData(dfxData);
+}
+
+int BluetoothHost::SetCarKeyCardData(const std::string &address, int32_t action)
+{
+    HILOGI("enter");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
+    return proxy->SetCarKeyCardData(address, action);
+}
 } // namespace Bluetooth
 } // namespace OHOS

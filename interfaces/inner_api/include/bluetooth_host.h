@@ -855,6 +855,10 @@ public:
     int64_t GetRefusePolicyProhibitedTime();
 
     int32_t ProcessRandomDeviceIdCommand(int32_t command, std::vector<std::string> &deviceIdVec, bool &isValid);
+
+    int GetCarKeyDfxData(std::string &dfxData) const;
+
+    int SetCarKeyCardData(const std::string &address, int32_t action);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
