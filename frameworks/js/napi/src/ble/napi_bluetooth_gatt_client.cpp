@@ -281,7 +281,7 @@ napi_value NapiGattClient::Connect(napi_env env, napi_callback_info info)
 
     int ret = client->Connect(gattClient->GetCallback(), false, GATT_TRANSPORT_TYPE_LE);
     HILOGI("ret: %{public}d", ret);
-    haUtils->WriteParam(ret);
+    haUtils.WriteParam(ret);
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
@@ -300,7 +300,7 @@ napi_value NapiGattClient::Disconnect(napi_env env, napi_callback_info info)
 
     int ret = client->Disconnect();
     HILOGI("ret: %{public}d", ret);
-    haUtils->WriteParam(ret);
+    haUtils.WriteParam(ret);
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }

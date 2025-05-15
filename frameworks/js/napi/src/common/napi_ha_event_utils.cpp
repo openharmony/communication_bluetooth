@@ -33,28 +33,28 @@ constexpr int32_t ROW = 30; // 或30条数据触发一次上报
 constexpr int32_t TIME_MS_PER_SECOND = 1000;
 constexpr int32_t TIME_NS_PER_MS = 1000000;
 
-int64_t ApiEventUtil::processorId_ = -1;
-std::mutex ApiEventUtil::processorLock_;
+int64_t NapiHaEventUtils::processorId_ = -1;
+std::mutex NapiHaEventUtils::processorLock_;
 
-ApiEventUtil::ApiEventUtil(const std::string &apiName): apiName_(apiName)
+NapiHaEventUtils::NapiHaEventUtils(const std::string &apiName): apiName_(apiName)
 {
     beginTime_ = GetNowTimeMs();
     errCode_ = BT_ERR_INVALID_PARAM;
     GenerateProcessorId();
 }
 
-ApiEventUtil::~ApiEventUtil()
+NapiHaEventUtils::~NapiHaEventUtils()
 {
     WriteEndEvent();
 }
 
-void ApiEventUtil::WriteEndEvent(const int32_t result, const int32_t errCode)
+void NapiHaEventUtils::WriteParam(const int32_t errCode)
 {
     std::lock_guard<std::mutex> lock(errCodeLock_);
     errCode_ = errCode;
 }
 
-void ApiEventUtil::GenerateProcessorId()
+void NapiHaEventUtils::GenerateProcessorId()
 {
     std::lock_guard<std::mutex> lock(processorLock_);
     if (processorId_ == -1) {
@@ -68,14 +68,14 @@ void ApiEventUtil::GenerateProcessorId()
     }
 }
 
-int64_t ApiEventUtil::GetNowTimeMs() const
+int64_t NapiHaEventUtils::GetNowTimeMs() const
 {
     struct timespec ts = {};
     clock_gettime(CLOCK_BOOTTIME, &ts);
     return (int64_t)ts.tv_sec * TIME_MS_PER_SECOND + (int64_t)ts.tv_nsec / TIME_NS_PER_MS;
 }
 
-int64_t ApiEventUtil::AddProcessor()
+int64_t NapiHaEventUtils::AddProcessor()
 {
     HiviewDFX::HiAppEvent::ReportConfig config;
     config.name = "ha_app_event"; // 系统预制so，实现上报功能，由HA提供
@@ -108,12 +108,12 @@ int64_t ApiEventUtil::AddProcessor()
     return HiviewDFX::HiAppEvent::AppEventProcessorMgr::AddProcessor(config);
 }
 
-std::string ApiEventUtil::RandomTransId() const
+std::string NapiHaEventUtils::RandomTransId() const
 {
     return std::string("transId_") + std::to_string(std::rand());
 }
 
-void ApiEventUtil::WriteEndEvent() const
+void NapiHaEventUtils::WriteEndEvent() const
 {
     HiviewDFX::HiAppEvent::Event event("api_diagnostic", "api_exec_end", HiviewDFX::HiAppEvent::BEHAVIOR);
     std::string transId = RandomTransId();

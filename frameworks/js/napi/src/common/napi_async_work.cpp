@@ -144,7 +144,7 @@ void NapiAsyncWork::Run(void)
 
 std::shared_ptr<NapiHaEventUtils> NapiAsyncWork::GetHaUtilsPtr(void) const
 {
-    return haUtils;
+    return haUtils_;
 }
 
 void NapiAsyncWork::TimeoutCallback(void)
