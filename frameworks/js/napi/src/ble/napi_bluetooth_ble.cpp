@@ -1087,6 +1087,26 @@ static napi_status CheckEmptyArgs(napi_env env, napi_callback_info info)
     return napi_ok;
 }
 
+napi_value ProcessStopAdvertisingAsyncWork(napi_env env, napi_callback_info info,
+    std::shared_ptr<BleAdvertiser> bleAdvertiser, std::shared_ptr<BleAdvertiseCallback> baseCallback,
+    std::shared_ptr<NapiHaEventUtils> haUtils)
+{
+    std::shared_ptr<NapiBluetoothBleAdvertiseCallback> callback =
+        std::static_pointer_cast<NapiBluetoothBleAdvertiseCallback>(baseCallback);
+    auto func = [bleAdvertiser, callback]() {
+        int ret = bleAdvertiser->StopAdvertising(callback);
+        return NapiAsyncWorkRet(ret);
+    };
+
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    bool success = callback->asyncWorkMap_.TryPush(NapiAsyncType::BLE_STOP_ADVERTISING, asyncWork);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
+
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
 napi_value StopAdvertising(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
@@ -1115,21 +1135,7 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
         // compatible with XTS
         haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE, BT_ERR_INTERNAL_ERROR);
-        std::shared_ptr<NapiBluetoothBleAdvertiseCallback> callback =
-            std::static_pointer_cast<NapiBluetoothBleAdvertiseCallback>(baseCallback);
-        auto func = [bleAdvertiser, callback]() {
-            int ret = bleAdvertiser->StopAdvertising(callback);
-            return NapiAsyncWorkRet(ret);
-        };
-
-        auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
-        NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
-        bool success = callback->asyncWorkMap_.TryPush(
-            NapiAsyncType::BLE_STOP_ADVERTISING, asyncWork);
-        NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
-
-        asyncWork->Run();
-        return asyncWork->GetRet();
+        return ProcessStopAdvertisingAsyncWork(env, info, bleAdvertiser, baseCallback, haUtils);
     } else {
         auto status = CheckEmptyArgs(env, info);
         haUtils->WriteErrCode(BT_ERR_INVALID_PARAM);
