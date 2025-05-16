@@ -83,14 +83,26 @@ uint16_t ConvertGattPermissions(const NapiGattPermission &napiPermissions)
     if (napiPermissions.readable) {
         permissions |= static_cast<uint16_t>(GattPermission::READABLE);
     }
+    if (napiPermissions.readEncrypted) {
+        permissions |= static_cast<uint16_t>(GattPermission::READ_ENCRYPTED);
+    }
+    if (napiPermissions.readEncryptedMitm) {
+        permissions |= static_cast<uint16_t>(GattPermission::READ_ENCRYPTED_MITM);
+    }
     if (napiPermissions.writeable) {
         permissions |= static_cast<uint16_t>(GattPermission::WRITEABLE);
     }
-    if (napiPermissions.readEncrypted) {
-        permissions |= static_cast<uint16_t>(GattPermission::READ_ENCRYPTED_MITM);
-    }
     if (napiPermissions.writeEncrypted) {
+        permissions |= static_cast<uint16_t>(GattPermission::WRITE_ENCRYPTED);
+    }
+    if (napiPermissions.writeEncryptedMitm) {
         permissions |= static_cast<uint16_t>(GattPermission::WRITE_ENCRYPTED_MITM);
+    }
+    if (napiPermissions.writeSigned) {
+        permissions |= static_cast<uint16_t>(GattPermission::WRITE_SIGNED);
+    }
+    if (napiPermissions.writeSignedMitm) {
+        permissions |= static_cast<uint16_t>(GattPermission::WRITE_SIGNED_MITM);
     }
     return permissions;
 }
@@ -111,6 +123,15 @@ uint16_t ConvertGattProperties(const NapiGattProperties &napiProperties)
     }
     if (napiProperties.indicate) {
         properties |= static_cast<uint16_t>(GattCharacteristic::INDICATE);
+    }
+    if (napiProperties.broadcast) {
+        properties |= static_cast<uint16_t>(GattCharacteristic::BROADCAST);
+    }
+    if (napiProperties.authenticatedSignedWrite) {
+        properties |= static_cast<uint16_t>(GattCharacteristic::AUTHENTICATED_SIGNED_WRITES);
+    }
+    if (napiProperties.extendedProperties) {
+        properties |= static_cast<uint16_t>(GattCharacteristic::EXTENDED_PROPERTIES);
     }
     return properties;
 }
@@ -243,19 +264,27 @@ napi_status NapiParseObjectGattPermissions(napi_env env, napi_value object, cons
     NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
     NAPI_BT_CALL_RETURN(NapiGetObjectProperty(env, object, name, permissionObject));
     // Parse permission object
-    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, permissionObject, {"readable", "writeable",
-        "readEncrypted", "writeEncrypted"}));
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, permissionObject, {"read", "readEncrypted",
+        "readEncryptedMitm", "write", "writeEncrypted", "writeEncryptedMitm", "writeSigned", "writeSignedMitm"}));
 
     bool isExist;
     NapiGattPermission permissions {};
     NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, permissionObject, "readable", permissions.readable, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, permissionObject, "writeable", permissions.writeable, isExist));
+        NapiParseObjectBooleanOptional(env, permissionObject, "read", permissions.readable, isExist));
     NAPI_BT_CALL_RETURN(
         NapiParseObjectBooleanOptional(env, permissionObject, "readEncrypted", permissions.readEncrypted, isExist));
     NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, permissionObject, "readEncryptedMitm", permissions.readEncryptedMitm, isExist));
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, permissionObject, "write", permissions.writeable, isExist));
+    NAPI_BT_CALL_RETURN(
         NapiParseObjectBooleanOptional(env, permissionObject, "writeEncrypted", permissions.writeEncrypted, isExist));
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, permissionObject, "writeEncryptedMitm", permissions.writeEncryptedMitm, isExist));
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, permissionObject, "writeSigned", permissions.writeSigned, isExist));
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, permissionObject, "writeSignedMitm", permissions.writeSignedMitm, isExist));
     outPermissions = permissions;
     return napi_ok;
 }
@@ -268,7 +297,7 @@ napi_status NapiParseObjectGattProperties(napi_env env, napi_value object, const
     NAPI_BT_CALL_RETURN(NapiGetObjectProperty(env, object, name, propertiesObject));
     // Parse properties object
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, propertiesObject, {"write", "writeNoResponse",
-        "read", "notify", "indicate"}));
+        "read", "notify", "indicate", "broadcast", "authenticatedSignedWrite", "extendedProperties"}));
 
     bool isExist;
     NapiGattProperties properties {};
@@ -282,6 +311,12 @@ napi_status NapiParseObjectGattProperties(napi_env env, napi_value object, const
         NapiParseObjectBooleanOptional(env, propertiesObject, "notify", properties.notify, isExist));
     NAPI_BT_CALL_RETURN(
         NapiParseObjectBooleanOptional(env, propertiesObject, "indicate", properties.indicate, isExist));
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, propertiesObject, "broadcast", properties.broadcast, isExist));
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, propertiesObject, "authenticatedSignedWrite", properties.authenticatedSignedWrite, isExist));
+    NAPI_BT_CALL_RETURN(
+        NapiParseObjectBooleanOptional(env, propertiesObject, "extendedProperties", properties.extendedProperties, isExist));
     outProperties = properties;
     return napi_ok;
 }
