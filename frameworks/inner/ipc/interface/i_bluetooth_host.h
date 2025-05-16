@@ -123,7 +123,7 @@ public:
     virtual void RegisterBlePeripheralCallback(const sptr<IBluetoothBlePeripheralObserver> &observer) = 0;
     virtual void DeregisterBlePeripheralCallback(const sptr<IBluetoothBlePeripheralObserver> &observer) = 0;
     virtual int32_t SetFastScan(bool isEnable) = 0;
-    virtual int32_t GetRandomAddress(const std::string &realAddr, std::string &randomAddr) = 0;
+    virtual int32_t GetRandomAddress(const std::string &realAddr, std::string &randomAddr, uint64_t tokenId = 0) = 0;
     virtual int32_t SyncRandomAddress(const std::string &realAddr, const std::string &randomAddr) = 0;
     virtual int32_t ConnectAllowedProfiles(const std::string &remoteAddr) = 0;
     virtual int32_t DisconnectAllowedProfiles(const std::string &remoteAddr) = 0;

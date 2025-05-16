@@ -92,7 +92,16 @@ static bool GetSocketUuidPara(const BluetoothCreateSocketPara *socketPara, UUID 
         }
         serverUuid = UUID::FromString(tmpUuid);
     } else if (socketPara->socketType == OHOS_SOCKET_L2CAP_LE) {
-        serverUuid = UUID::RandomUUID();
+        if (socketPara->uuid.uuid == nullptr || strlen(socketPara->uuid.uuid) != socketPara->uuid.uuidLen) {
+            serverUuid = UUID::RandomUUID();
+        } else {
+            string tmpUuid(socketPara->uuid.uuid);
+            if (!IsValidUuid(tmpUuid)) {
+                HILOGE("match the UUID faild.");
+                return false;
+            }
+            serverUuid = UUID::FromString(tmpUuid);
+        }
     } else {
         HILOGE("param socketType invalid. socketType: %{public}d", socketPara->socketType);
         return false;
@@ -260,11 +269,40 @@ int SocketConnect(const BluetoothCreateSocketPara *socketPara, const BdAddr *bdA
         HILOGE("SocketConnect fail, result: %{public}d", result);
         client->Close();
         HILOGE("SocketConnect closed.");
+        if (result == BT_ERR_SPP_CONNECT_FAILED) {
+            return BT_SOCEKET_CONNECT_FAILED;
+        }
         return BT_SOCKET_INVALID_ID;
     }
     int clientId = g_clientMap.AddObject(client);
     HILOGI("SocketConnect success, clientId: %{public}d", clientId);
     return clientId;
+}
+
+/**
+ * @brief Obtain the device random address based on the device real address and tokenId.
+ *
+ * @param realAddr The remote device real address.
+ * @param randomAddr The remote device random address.
+ * @param tokenId The relative ID used to identify the current client socket.
+ * @return Returns the operation result status {@link BtStatus}.
+ */
+int GetRandomAddress(const BdAddr *realAddr, BdAddr *randomAddr, uint64_t tokenId)
+{
+    if (realAddr == nullptr || randomAddr == nullptr) {
+        HILOGE("realAddr is nullptr, or randomAddr is nullptr");
+        return OHOS_BT_STATUS_FAIL;
+    }
+
+    string strRealAddr;
+    ConvertAddr(realAddr->addr, strRealAddr);
+    string strRandomAddr;
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    int result = host->GetRandomAddress(strRealAddr, strRandomAddr, tokenId);
+    if (result == OHOS_BT_STATUS_SUCCESS) {
+        GetAddrFromString(strRandomAddr, randomAddr->addr);
+    }
+    return result;
 }
 
 /**
