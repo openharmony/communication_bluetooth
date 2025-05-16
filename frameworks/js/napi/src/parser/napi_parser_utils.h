@@ -56,9 +56,13 @@ struct NapiGattService {
 
 struct NapiGattPermission {
     bool readable = false;
-    bool writeable = false;
     bool readEncrypted = false;
+    bool readEncryptedMitm = false;
+    bool writeable = false;
     bool writeEncrypted = false;
+    bool writeEncryptedMitm = false;
+    bool writeSigned = false;
+    bool writeSignedMitm = false;
 };
 
 struct NapiGattProperties {
@@ -67,6 +71,9 @@ struct NapiGattProperties {
     bool read = false;
     bool notify = false;
     bool indicate = false;
+    bool broadcast = false;
+    bool authenticatedSignedWrite = false;
+    bool extendedProperties = false;
 };
 
 bool NapiIsObjectPropertyExist(napi_env env, napi_value object, const char *name);

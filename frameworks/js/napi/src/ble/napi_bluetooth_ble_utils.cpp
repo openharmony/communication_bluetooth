@@ -122,6 +122,57 @@ napi_value ConvertGattPropertiesToJs(napi_env env, int properties)
 
     napi_get_boolean(env, HasProperty(properties, GattCharacteristic::INDICATE), &value);
     napi_set_named_property(env, object, "indicate", value);
+
+    napi_get_boolean(env, HasProperty(properties, GattCharacteristic::BROADCAST), &value);
+    napi_set_named_property(env, object, "broadcast", value);
+
+    napi_get_boolean(env, HasProperty(properties, GattCharacteristic::AUTHENTICATED_SIGNED_WRITES), &value);
+    napi_set_named_property(env, object, "authenticatedSignedWrite", value);
+
+    napi_get_boolean(env, HasProperty(properties, GattCharacteristic::EXTENDED_PROPERTIES), &value);
+    napi_set_named_property(env, object, "extendedProperties", value);
+    return object;
+}
+
+bool HasPermission(int permissions, int permissionMask)
+{
+    if (permissions < 0 || permissionMask < 0) {
+        HILOGE("permissions or permissionMask is less than 0");
+        return false;
+    }
+    return (static_cast<unsigned int>(permissions) & static_cast<unsigned int>(permissionMask)) != 0;
+}
+
+napi_value ConvertGattPermissionsToJs(napi_env env, int permissions)
+{
+    napi_value object;
+    napi_create_object(env, &object);
+
+    napi_value value;
+    napi_get_boolean(env, HasPermission(permissions, GattCharacteristic::READABLE), &value);
+    napi_set_named_property(env, object, "read", value);
+
+    napi_get_boolean(env, HasPermission(permissions, GattCharacteristic::READ_ENCRYPTED), &value);
+    napi_set_named_property(env, object, "readEncrypted", value);
+
+    napi_get_boolean(env, HasPermission(permissions, GattCharacteristic::READ_ENCRYPTED_MITM), &value);
+    napi_set_named_property(env, object, "readEncryptedMitm", value);
+
+    napi_get_boolean(env, HasPermission(permissions, GattCharacteristic::WRITEABLE), &value);
+    napi_set_named_property(env, object, "write", value);
+
+    napi_get_boolean(env, HasPermission(permissions, GattCharacteristic::WRITE_ENCRYPTED), &value);
+    napi_set_named_property(env, object, "writeEncrypted", value);
+
+    napi_get_boolean(env, HasPermission(permissions, GattCharacteristic::WRITE_ENCRYPTED_MITM), &value);
+    napi_set_named_property(env, object, "writeEncryptedMitm", value);
+
+    napi_get_boolean(env, HasPermission(permissions, GattCharacteristic::WRITE_SIGNED), &value);
+    napi_set_named_property(env, object, "writeSigned", value);
+
+    napi_get_boolean(env, HasPermission(permissions, GattCharacteristic::WRITE_SIGNED_MITM), &value);
+    napi_set_named_property(env, object, "writeSignedMitm", value);
+
     return object;
 }
 
@@ -154,6 +205,9 @@ void ConvertBLECharacteristicToJS(napi_env env, napi_value result, GattCharacter
 
     napi_value propertiesValue = ConvertGattPropertiesToJs(env, characteristic.GetProperties());
     napi_set_named_property(env, result, "properties", propertiesValue);
+
+    napi_value permissionsValue = ConvertGattPermissionsToJs(env, characteristic.GetPermissions());
+    napi_set_named_property(env, result, "permissions", permissionsValue);
 
     napi_value descriptors;
     napi_create_array(env, &descriptors);
@@ -218,6 +272,9 @@ void ConvertBLEDescriptorToJS(napi_env env, napi_value result, GattDescriptor& d
     napi_value descriptorHandle;
     napi_create_uint32(env, static_cast<uint32_t>(descriptor.GetHandle()), &descriptorHandle);
     napi_set_named_property(env, result, "descriptorHandle", descriptorHandle);
+
+    napi_value permissionsValue = ConvertGattPermissionsToJs(env, descriptor.GetPermissions());
+    napi_set_named_property(env, result, "permissions", permissionsValue);
 }
 
 void ConvertCharacteristicReadReqToJS(napi_env env, napi_value result, const std::string &device,

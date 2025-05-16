@@ -85,6 +85,20 @@ public:
         EXTENDED_PROPERTIES = 0x80
     };
 
+    /** A GATT characteristic permission.
+     *  Define GATT characteristic permission.
+     */
+    enum Permission {
+        READABLE = 0x01,
+        READ_ENCRYPTED = 0x02,
+        READ_ENCRYPTED_MITM = 0x04,
+        WRITEABLE = 0x08,
+        WRITE_ENCRYPTED = 0x10,
+        WRITE_ENCRYPTED_MITM = 0x20,
+        WRITE_SIGNED = 0x40,
+        WRITE_SIGNED_MITM = 0x80
+    };
+
     /**
      * @brief The function to delete constructor of GattCharacteristic.
      *
