@@ -136,7 +136,7 @@ napi_value NapiBluetoothOpp::SendFile(napi_env env, napi_callback_info info)
 
     auto status = CheckSendFileParam(env, info, device, fileHolders);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
-    HILOGI("fileHolders size is %{public}u", fileHolders.size());
+    HILOGI("fileHolders size is %{public}zu", fileHolders.size());
 
     auto func = [device, fileHolders]() {
         Opp *profile = Opp::GetProfile();
@@ -146,7 +146,7 @@ napi_value NapiBluetoothOpp::SendFile(napi_env env, napi_callback_info info)
             oppFileHolders.push_back(BluetoothOppFileHolder(fileHolder.filePath,
                 fileHolder.fileSize, fileHolder.fileFd));
         }
-        HILOGI("oppFileHolders size is %{public}u", oppFileHolders.size());
+        HILOGI("oppFileHolders size is %{public}zu", oppFileHolders.size());
         int32_t errorCode = profile->SendFile(device, oppFileHolders, result);
         HILOGI("err: %{public}d result: %{public}d", errorCode, result);
         return NapiAsyncWorkRet(errorCode);
