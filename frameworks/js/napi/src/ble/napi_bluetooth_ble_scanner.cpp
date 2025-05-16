@@ -116,7 +116,7 @@ napi_value NapiBleScanner::StartScan(napi_env env, napi_callback_info info)
     };
 
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
-    haUtils->WriteParam(BT_ERR_INTERNAL_ERROR);
+    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     bool success =
         napiBleScanner->GetCallback()->asyncWorkMap_.TryPush(NapiAsyncType::BLE_START_SCAN, asyncWork);
@@ -144,7 +144,7 @@ napi_value NapiBleScanner::StopScan(napi_env env, napi_callback_info info)
     };
 
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
-    haUtils->WriteParam(BT_ERR_INTERNAL_ERROR);
+    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     bool success =
         napiBleScanner->GetCallback()->asyncWorkMap_.TryPush(NapiAsyncType::BLE_STOP_SCAN, asyncWork);

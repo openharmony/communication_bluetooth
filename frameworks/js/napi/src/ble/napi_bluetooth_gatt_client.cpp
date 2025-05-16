@@ -273,7 +273,7 @@ napi_value NapiGattClient::Connect(napi_env env, napi_callback_info info)
     NapiGattClient *gattClient = nullptr;
     auto status = CheckGattClientNoArgc(env, info, &gattClient);
     NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok, BT_ERR_INVALID_PARAM);
-    haUtils.WriteParam(BT_ERR_INTERNAL_ERROR);
+    haUtils.WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, gattClient->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR);
 
     std::shared_ptr<GattClient> client = gattClient->GetClient();
@@ -281,7 +281,7 @@ napi_value NapiGattClient::Connect(napi_env env, napi_callback_info info)
 
     int ret = client->Connect(gattClient->GetCallback(), false, GATT_TRANSPORT_TYPE_LE);
     HILOGI("ret: %{public}d", ret);
-    haUtils.WriteParam(ret);
+    haUtils.WriteErrCode(ret);
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
@@ -295,12 +295,12 @@ napi_value NapiGattClient::Disconnect(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     std::shared_ptr<GattClient> client = gattClient->GetClient();
-    haUtils.WriteParam(BT_ERR_INTERNAL_ERROR);
+    haUtils.WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_FALSE(env, client != nullptr, BT_ERR_INTERNAL_ERROR);
 
     int ret = client->Disconnect();
     HILOGI("ret: %{public}d", ret);
-    haUtils.WriteParam(ret);
+    haUtils.WriteErrCode(ret);
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }

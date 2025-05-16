@@ -89,7 +89,7 @@ private:
     std::shared_ptr<NapiAsyncCallback> napiAsyncCallback_ = nullptr;
     std::atomic_bool needCallback_ = false; // Indicates whether an asynchronous work needs to wait for callback.
     std::atomic_bool triggered_ = false; // Indicates whether the asynchronous callback is called.
-    std::shared_ptr<NapiHaEventUtils> haUtils_;
+    std::shared_ptr<NapiHaEventUtils> haUtils_; // HA report tool, which is transferred fron the original API interface
 };
 
 class NapiAsyncWorkFactory {
