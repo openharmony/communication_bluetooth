@@ -21,6 +21,7 @@
 #include "bluetooth_errorcode.h"
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_error.h"
+#include "napi_ha_event_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -97,6 +98,7 @@ static NapiBleScanner *NapiGetBleScanner(napi_env env, napi_callback_info info)
 napi_value NapiBleScanner::StartScan(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>("StartScan");
     std::vector<BleScanFilter> scanFilters;
     BleScanSettings settings;
     auto status = CheckBleScanParams(env, info, scanFilters, settings);
@@ -113,7 +115,8 @@ napi_value NapiBleScanner::StartScan(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(ret);
     };
 
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
+    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     bool success =
         napiBleScanner->GetCallback()->asyncWorkMap_.TryPush(NapiAsyncType::BLE_START_SCAN, asyncWork);
@@ -126,6 +129,7 @@ napi_value NapiBleScanner::StartScan(napi_env env, napi_callback_info info)
 napi_value NapiBleScanner::StopScan(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>("StopScan");
     auto status = CheckEmptyParam(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
@@ -139,7 +143,8 @@ napi_value NapiBleScanner::StopScan(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(ret);
     };
 
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
+    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     bool success =
         napiBleScanner->GetCallback()->asyncWorkMap_.TryPush(NapiAsyncType::BLE_STOP_SCAN, asyncWork);
