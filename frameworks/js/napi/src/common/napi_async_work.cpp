@@ -73,10 +73,6 @@ void NapiAsyncWork::Info::Complete(void)
                 HILOGE("asyncWorkSptr is nullptr");
                 return;
             }
-            auto haUtils = asyncWorkSptr->GetHaUtilsPtr();
-            if (haUtils) {
-                haUtils->WriteParam(BT_ERR_TIMEOUT);
-            }
             asyncWorkSptr->TimeoutCallback();
         };
         NapiTimer::GetInstance()->Register(func, napiAsyncWork->timerId_);
@@ -92,7 +88,7 @@ void NapiAsyncWork::Info::Complete(void)
         napiAsyncWork->triggered_ = true;
         auto haUtils = napiAsyncWork->GetHaUtilsPtr();
         if (haUtils) {
-            haUtils->WriteParam(errCode);
+            haUtils->WriteErrCode(errCode);
         }
         napiAsyncWork->napiAsyncCallback_->CallFunction(errCode, object);
     }
@@ -158,7 +154,7 @@ void NapiAsyncWork::CallFunction(int errCode, std::shared_ptr<NapiNativeObject> 
     if (!needCallback_.load()) {
         HILOGE("Unsupported in no needCallback mode");
         if (haUtils_) {
-            haUtils_->WriteParam(BT_ERR_INTERNAL_ERROR);
+            haUtils_->WriteErrCode(BT_ERR_INTERNAL_ERROR);
         }
         return;
     }
@@ -177,7 +173,7 @@ void NapiAsyncWork::CallFunction(int errCode, std::shared_ptr<NapiNativeObject> 
         if (asyncWorkPtr && asyncWorkPtr->napiAsyncCallback_) {
             auto haUtils = asyncWorkPtr->GetHaUtilsPtr();
             if (haUtils) {
-                haUtils->WriteParam(errCode);
+                haUtils->WriteErrCode(errCode);
             }
             asyncWorkPtr->napiAsyncCallback_->CallFunction(errCode, nativeObj);
         }

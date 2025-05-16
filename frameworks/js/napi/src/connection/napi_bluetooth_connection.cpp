@@ -515,7 +515,7 @@ napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(err);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
-    haUtils->WriteParam(BT_ERR_INTERNAL_ERROR);
+    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
@@ -588,7 +588,7 @@ napi_value PairCredibleDevice(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(err);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
-    haUtils->WriteParam(BT_ERR_INTERNAL_ERROR);
+    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
@@ -684,7 +684,7 @@ napi_value ConnectAllowedProfiles(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(ret);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
-    haUtils->WriteParam(BT_ERR_INTERNAL_ERROR);
+    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
@@ -705,7 +705,7 @@ napi_value DisconnectAllowedProfiles(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(ret);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
-    haUtils->WriteParam(BT_ERR_INTERNAL_ERROR);
+    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();

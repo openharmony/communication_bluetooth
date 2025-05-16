@@ -39,7 +39,7 @@ std::mutex NapiHaEventUtils::processorLock_;
 NapiHaEventUtils::NapiHaEventUtils(const std::string &apiName): apiName_(apiName)
 {
     beginTime_ = GetNowTimeMs();
-    errCode_ = BT_ERR_INVALID_PARAM;
+    errCode_ = BT_ERR_INVALID_PARAM; // 考虑到NAPI接口会优先校验入参，这里直接默认初始化为401错误码
     GenerateProcessorId();
 }
 
@@ -48,7 +48,7 @@ NapiHaEventUtils::~NapiHaEventUtils()
     WriteEndEvent();
 }
 
-void NapiHaEventUtils::WriteParam(const int32_t errCode)
+void NapiHaEventUtils::WriteErrCode(const int32_t errCode)
 {
     std::lock_guard<std::mutex> lock(errCodeLock_);
     errCode_ = errCode;

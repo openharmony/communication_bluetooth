@@ -26,7 +26,7 @@ class NapiHaEventUtils {
 public:
     explicit NapiHaEventUtils(const std::string &apiName);
     ~NapiHaEventUtils();
-    void WriteParam(const int32_t errCode);
+    void WriteErrCode(const int32_t errCode);
 
 private:
     NapiHaEventUtils() = delete;
