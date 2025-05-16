@@ -27,14 +27,14 @@
 namespace OHOS {
 namespace Bluetooth {
 std::shared_ptr<NapiAsyncWork> NapiAsyncWorkFactory::CreateAsyncWork(napi_env env, napi_callback_info info,
-    std::function<NapiAsyncWorkRet(void)> asyncWork, bool needCallback)
+    std::function<NapiAsyncWorkRet(void)> asyncWork, bool needCallback, std::shared_ptr<NapiHaEventUtils> haUtils)
 {
     auto asyncCallback = NapiParseAsyncCallback(env, info);
     if (!asyncCallback) {
         HILOGE("asyncCallback is nullptr!");
         return nullptr;
     }
-    auto napiAsyncWork = std::make_shared<NapiAsyncWork>(env, asyncWork, asyncCallback, needCallback);
+    auto napiAsyncWork = std::make_shared<NapiAsyncWork>(env, asyncWork, asyncCallback, needCallback, haUtils);
     return napiAsyncWork;
 }
 
@@ -86,6 +86,10 @@ void NapiAsyncWork::Info::Complete(void)
 
     if (napiAsyncWork->napiAsyncCallback_) {
         napiAsyncWork->triggered_ = true;
+        auto haUtils = napiAsyncWork->GetHaUtilsPtr();
+        if (haUtils) {
+            haUtils->WriteErrCode(errCode);
+        }
         napiAsyncWork->napiAsyncCallback_->CallFunction(errCode, object);
     }
 }
@@ -134,6 +138,11 @@ void NapiAsyncWork::Run(void)
     }
 }
 
+std::shared_ptr<NapiHaEventUtils> NapiAsyncWork::GetHaUtilsPtr(void) const
+{
+    return haUtils_;
+}
+
 void NapiAsyncWork::TimeoutCallback(void)
 {
     HILOGI("enter");
@@ -144,6 +153,9 @@ void NapiAsyncWork::CallFunction(int errCode, std::shared_ptr<NapiNativeObject> 
 {
     if (!needCallback_.load()) {
         HILOGE("Unsupported in no needCallback mode");
+        if (haUtils_) {
+            haUtils_->WriteErrCode(BT_ERR_INTERNAL_ERROR);
+        }
         return;
     }
 
@@ -159,6 +171,10 @@ void NapiAsyncWork::CallFunction(int errCode, std::shared_ptr<NapiNativeObject> 
     triggered_ = true;
     auto func = [errCode, nativeObj, asyncWorkPtr = shared_from_this()]() {
         if (asyncWorkPtr && asyncWorkPtr->napiAsyncCallback_) {
+            auto haUtils = asyncWorkPtr->GetHaUtilsPtr();
+            if (haUtils) {
+                haUtils->WriteErrCode(errCode);
+            }
             asyncWorkPtr->napiAsyncCallback_->CallFunction(errCode, nativeObj);
         }
     };
