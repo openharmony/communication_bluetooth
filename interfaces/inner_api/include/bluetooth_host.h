@@ -751,10 +751,11 @@ public:
     * the interface needs to be used for address translation.
     * @param realAddr real address.
     * @param[out] randomAddr random address.
+    * @param tokenId tokenId.
     * @return Returns {@link BT_NO_ERROR} if get random address success;
     * returns an error code defined in {@link BtErrCode} otherwise.
     */
-    int GetRandomAddress(const std::string &realAddr, std::string &randomAddr) const;
+    int GetRandomAddress(const std::string &realAddr, std::string &randomAddr, uint64_t tokenId = 0) const;
 
     /**
     * @brief Connects all allowed bluetooth profiles between the local and remote device.
