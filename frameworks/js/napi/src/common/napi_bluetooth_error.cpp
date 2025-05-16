@@ -54,6 +54,15 @@ static std::map<int32_t, std::string> napiErrMsgMap {
     { BtErrCode::BT_ERR_AUDIO_NOT_IDLE, "Audio is not idle." },
     { BtErrCode::BT_ERR_VIRTUAL_CALL_NOT_STARTED, "Virtual call is not started." },
     { BtErrCode::BT_ERR_DISCONNECT_SCO_FAILED, "Disconnect sco failed." },
+    { BtErrCode::BT_ERR_MAX_RESOURCES, "The number of resources reaches the upper limit." },
+    { BtErrCode::BT_ERR_BLE_ADV_DATA_EXCEED_LIMIT, "The length of the advertising data exceeds the upper limit." },
+    { BtErrCode::BT_ERR_BLE_INVALID_ADV_ID, "Invalid advertising id." },
+    { BtErrCode::BT_ERR_OPERATION_BUSY, "The operation is busy. The last operation is not complete." },
+    { BtErrCode::BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED, "The connection is not established." },
+    { BtErrCode::BT_ERR_GATT_CONNECTION_CONGESTED, "The connection is congested." },
+    { BtErrCode::BT_ERR_GATT_CONNECTION_NOT_ENCRYPTED, "The connection is not encrypted." },
+    { BtErrCode::BT_ERR_GATT_CONNECTION_NOT_AUTHENTICATED, "The connection is not authenticated." },
+    { BtErrCode::BT_ERR_GATT_CONNECTION_NOT_AUTHORIZED, "The connection is not authorized." },
 };
 
 std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode)
