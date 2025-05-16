@@ -19,6 +19,7 @@
 #include <memory>
 #include <mutex>
 #include "napi_bluetooth_utils.h"
+#include "napi_ha_event_utils.h"
 #include "napi_native_object.h"
 
 namespace OHOS {
@@ -56,13 +57,15 @@ struct NapiAsyncWorkRet {
 class NapiAsyncWork : public std::enable_shared_from_this<NapiAsyncWork> {
 public:
     NapiAsyncWork(napi_env env, std::function<NapiAsyncWorkRet(void)> func,
-        std::shared_ptr<NapiAsyncCallback> asyncCallback, bool needCallback = false)
-        : env_(env), func_(func), napiAsyncCallback_(asyncCallback), needCallback_(needCallback) {}
+        std::shared_ptr<NapiAsyncCallback> asyncCallback, bool needCallback = false,
+        std::shared_ptr<NapiHaEventUtils> haUtils = nullptr)
+        : env_(env), func_(func), napiAsyncCallback_(asyncCallback), needCallback_(needCallback), haUtils_(haUtils) {}
     ~NapiAsyncWork() = default;
 
     void Run(void);
     void CallFunction(int errorCode, std::shared_ptr<NapiNativeObject> object);
     napi_value GetRet(void);
+    std::shared_ptr<NapiHaEventUtils> GetHaUtilsPtr(void) const;
 
     struct Info {
         void Execute(void);
@@ -86,12 +89,14 @@ private:
     std::shared_ptr<NapiAsyncCallback> napiAsyncCallback_ = nullptr;
     std::atomic_bool needCallback_ = false; // Indicates whether an asynchronous work needs to wait for callback.
     std::atomic_bool triggered_ = false; // Indicates whether the asynchronous callback is called.
+    std::shared_ptr<NapiHaEventUtils> haUtils_; // HA report tool, which is transferred fron the original API interface
 };
 
 class NapiAsyncWorkFactory {
 public:
     static std::shared_ptr<NapiAsyncWork> CreateAsyncWork(napi_env env, napi_callback_info info,
-        std::function<NapiAsyncWorkRet(void)> asyncWork, bool needCallback = ASYNC_WORK_NO_NEED_CALLBACK);
+        std::function<NapiAsyncWorkRet(void)> asyncWork, bool needCallback = ASYNC_WORK_NO_NEED_CALLBACK,
+        std::shared_ptr<NapiHaEventUtils> haUtils = nullptr);
 };
 
 class NapiAsyncWorkMap {
