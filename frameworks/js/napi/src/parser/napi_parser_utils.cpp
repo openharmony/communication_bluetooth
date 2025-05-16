@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "napi_async_callback.h"
-
+#include <cinttypes>
 namespace OHOS {
 namespace Bluetooth {
 
@@ -368,7 +368,7 @@ napi_status NapiParseFileHolder(napi_env env, napi_value object, FileHolder &out
     NAPI_BT_CALL_RETURN(NapiParseObjectString(env, object, "filePath", filePath));
     NAPI_BT_CALL_RETURN(NapiParseObjectInt64(env, object, "fileSize", fileSize));
     NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, object, "fileFd", fileFd));
-    HILOGI("fileSize: %{public}lld fileFd: %{public}d", fileSize, fileFd);
+    HILOGI("fileSize: %{public}" PRId64 "fileFd: %{public}d", fileSize, fileFd);
 
     FileHolder fileHolder;
     fileHolder.filePath = filePath;
