@@ -43,6 +43,7 @@ void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &c
 void NapiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
 {
     HILOGI("UUID: %{public}s, ret: %{public}d", characteristic.GetUuid().ToString().c_str(), ret);
+    ret = GetSDKAdaptedStatusCode(NapiGattClient::GattStatusFromService(ret)); // Adaptation for old sdk
     auto napiCharacter = std::make_shared<NapiNativeBleCharacteristic>(characteristic);
     AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_READ_CHARACTER, napiCharacter, ret);
 }
@@ -50,6 +51,7 @@ void NapiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic
 void NapiGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descriptor, int ret)
 {
     HILOGI("UUID: %{public}s, ret: %{public}d", descriptor.GetUuid().ToString().c_str(), ret);
+    ret = GetSDKAdaptedStatusCode(NapiGattClient::GattStatusFromService(ret)); // Adaptation for old sdk
     auto napiDescriptor = std::make_shared<NapiNativeBleDescriptor>(descriptor);
     AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_READ_DESCRIPTOR, napiDescriptor, ret);
 }
@@ -69,6 +71,7 @@ void NapiGattClientCallback::OnServicesDiscovered(int status)
 void NapiGattClientCallback::OnReadRemoteRssiValueResult(int rssi, int ret)
 {
     HILOGI("rssi: %{public}d, ret: %{public}d", rssi, ret);
+    ret = GetSDKAdaptedStatusCode(NapiGattClient::GattStatusFromService(ret)); // Adaptation for old sdk
     auto napiRssi = std::make_shared<NapiNativeInt>(rssi);
     AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_READ_REMOTE_RSSI_VALUE, napiRssi, ret);
 }
@@ -77,6 +80,7 @@ void NapiGattClientCallback::OnCharacteristicWriteResult(const GattCharacteristi
 {
 #ifdef BLUETOOTH_API_SINCE_10
     HILOGI("UUID: %{public}s, ret: %{public}d", characteristic.GetUuid().ToString().c_str(), ret);
+    ret = GetSDKAdaptedStatusCode(NapiGattClient::GattStatusFromService(ret)); // Adaptation for old sdk
     auto napiCharacter = std::make_shared<NapiNativeBleCharacteristic>(characteristic);
     AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_WRITE_CHARACTER, napiCharacter, ret);
 #endif
@@ -86,6 +90,7 @@ void NapiGattClientCallback::OnDescriptorWriteResult(const GattDescriptor &descr
 {
 #ifdef BLUETOOTH_API_SINCE_10
     HILOGI("UUID: %{public}s, ret: %{public}d", descriptor.GetUuid().ToString().c_str(), ret);
+    ret = GetSDKAdaptedStatusCode(NapiGattClient::GattStatusFromService(ret)); // Adaptation for old sdk
     auto napiDescriptor = std::make_shared<NapiNativeBleDescriptor>(descriptor);
     AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_WRITE_DESCRIPTOR, napiDescriptor, ret);
 #endif
@@ -95,6 +100,7 @@ void NapiGattClientCallback::OnSetNotifyCharacteristic(const GattCharacteristic 
 {
 #ifdef BLUETOOTH_API_SINCE_10
     HILOGI("UUID: %{public}s, status: %{public}d", characteristic.GetUuid().ToString().c_str(), status);
+    status = GetSDKAdaptedStatusCode(NapiGattClient::GattStatusFromService(status)); // Adaptation for old sdk
     AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_ENABLE_CHARACTER_CHANGED, nullptr, status);
 #endif
 }
