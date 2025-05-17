@@ -913,6 +913,7 @@ napi_value StartAdvertising(napi_env env, napi_callback_info info)
         auto func = [settings, advData, rspData, duration, bleAdvertiser, callback]() {
             int ret = bleAdvertiser->StartAdvertising(
                 settings, advData, rspData, duration, callback);
+            ret = GetSDKAdaptedStatusCode(ret); // Adaptation for old sdk
             return NapiAsyncWorkRet(ret);
         };
 
@@ -983,7 +984,8 @@ napi_value EnableAdvertising(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     // compatible with XTS
     haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE,
+        GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID)); // Adaptation for old sdk
     std::shared_ptr<NapiBluetoothBleAdvertiseCallback> callback =
         std::static_pointer_cast<NapiBluetoothBleAdvertiseCallback>(baseCallback);
     auto func = [advHandle, duration, callback]() {
@@ -994,6 +996,7 @@ napi_value EnableAdvertising(napi_env env, napi_callback_info info)
         }
         int ret = bleAdvertiser->EnableAdvertising(
             advHandle, duration, callback);
+        ret = GetSDKAdaptedStatusCode(ret); // Adaptation for old sdk
         return NapiAsyncWorkRet(ret);
     };
 
@@ -1039,7 +1042,8 @@ napi_value DisableAdvertising(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     // compatible with XTS
     haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE,
+        GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID)); // Adaptation for old sdk
     std::shared_ptr<NapiBluetoothBleAdvertiseCallback> callback =
         std::static_pointer_cast<NapiBluetoothBleAdvertiseCallback>(baseCallback);
     auto func = [advHandle, callback]() {
@@ -1050,6 +1054,7 @@ napi_value DisableAdvertising(napi_env env, napi_callback_info info)
         }
         int ret = bleAdvertiser->DisableAdvertising(
             advHandle, callback);
+        ret = GetSDKAdaptedStatusCode(ret); // Adaptation for old sdk
         return NapiAsyncWorkRet(ret);
     };
 
@@ -1095,6 +1100,7 @@ napi_value ProcessStopAdvertisingAsyncWork(napi_env env, napi_callback_info info
         std::static_pointer_cast<NapiBluetoothBleAdvertiseCallback>(baseCallback);
     auto func = [bleAdvertiser, callback]() {
         int ret = bleAdvertiser->StopAdvertising(callback);
+        ret = GetSDKAdaptedStatusCode(ret); // Adaptation for old sdk
         return NapiAsyncWorkRet(ret);
     };
 
@@ -1134,7 +1140,8 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
         // compatible with XTS
         haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
-        NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE, BT_ERR_INTERNAL_ERROR);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE,
+            GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID)); // Adaptation for old sdk
         return ProcessStopAdvertisingAsyncWork(env, info, bleAdvertiser, baseCallback, haUtils);
     } else {
         auto status = CheckEmptyArgs(env, info);
@@ -1145,11 +1152,13 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
             // compatible with XTS
             int ret = bleAdvertiser->StopAdvertising(NapiBluetoothBleAdvertiseCallback::GetInstance());
             haUtils->WriteErrCode(ret);
+            ret = GetSDKAdaptedStatusCode(ret); // Adaptation for old sdk
             NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
         } else {
             for (auto &callback : callbacks) {
                 int ret = bleAdvertiser->StopAdvertising(callback);
                 haUtils->WriteErrCode(ret);
+                ret = GetSDKAdaptedStatusCode(ret); // Adaptation for old sdk
                 NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
             }
         }

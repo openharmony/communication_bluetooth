@@ -68,6 +68,7 @@ ohos_shared_library("bt_napi_common") {
     "libuv:uv",
     "hiappevent:hiappevent_innerapi",
     "napi:ace_napi",
+    "samgr:samgr_proxy",
   ]
 
   part_name = "bluetooth"

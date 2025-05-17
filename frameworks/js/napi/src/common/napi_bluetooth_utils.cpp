@@ -28,6 +28,9 @@
 #include "napi_bluetooth_spp_client.h"
 #include "../parser/napi_parser_utils.h"
 #include "securec.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
+#include "bundle_mgr_proxy.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -820,6 +823,61 @@ napi_status NapiGetOnOffCallbackName(napi_env env, napi_callback_info info, std:
 
     name = type;
     return napi_ok;
+}
+
+int GetCurrentSdkVersion(void)
+{
+    int version = SDK_VERSION_20;  // default sdk version is api 20
+
+    auto systemAbilityManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (!systemAbilityManager) {
+        HILOGE("fail to get system ability mgr.");
+        return version;
+    }
+    auto remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (!remoteObject) {
+        HILOGE("fail to get bundle manager proxy.");
+        return version;
+    }
+    sptr<AppExecFwk::BundleMgrProxy> bundleMgrProxy = iface_cast<AppExecFwk::BundleMgrProxy>(remoteObject);
+    if (bundleMgrProxy == nullptr) {
+        HILOGE("Failed to get bundle manager proxy.");
+        return version;
+    }
+    AppExecFwk::BundleInfo bundleInfo;
+    auto flags = AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION;
+    auto ret = bundleMgrProxy->GetBundleInfoForSelf(static_cast<int32_t>(flags), bundleInfo);
+    if (ret != ERR_OK) {
+        HILOGE("GetBundleInfoForSelf: get fail.");
+        return version;
+    }
+
+    version = bundleInfo.targetVersion % 100; // %100 to get the real version
+    return version;
+}
+
+int GetSDKAdaptedStatusCode(int status)
+{
+    std::set<int> statusCodeForNewSdk = {
+        BT_ERR_MAX_RESOURCES,
+        BT_ERR_OPERATION_BUSY,
+        BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED,
+        BT_ERR_GATT_CONNECTION_CONGESTED,
+        BT_ERR_GATT_CONNECTION_NOT_ENCRYPTED,
+        BT_ERR_GATT_CONNECTION_NOT_AUTHENTICATED,
+        BT_ERR_GATT_CONNECTION_NOT_AUTHORIZED,
+        BT_ERR_BLE_ADV_DATA_EXCEED_LIMIT,
+        BT_ERR_BLE_INVALID_ADV_ID,
+    };
+    bool isNewStatusCode = false;
+    if (statusCodeForNewSdk.find(status) != statusCodeForNewSdk.end()) {
+        isNewStatusCode = true;
+    }
+    // If sdk version is lower than SDK_VERSION_20, the status code is changed to old version.
+    if (GetCurrentSdkVersion() < SDK_VERSION_20 && isNewStatusCode) {
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    return status;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
