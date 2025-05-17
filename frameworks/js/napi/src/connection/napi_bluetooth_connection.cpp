@@ -313,7 +313,7 @@ napi_value SetCarKeyCardData(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int ret = host->SetCarKeyCardData(remoteAddr, action);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
 
