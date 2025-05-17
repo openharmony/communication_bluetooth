@@ -885,15 +885,9 @@ int GattClient::RequestBleMtuSize(int mtu)
 int GattClient::SetNotifyCharacteristicInner(GattCharacteristic &characteristic, bool enable,
     const std::vector<uint8_t> &descriptorValue)
 {
-    if (!IS_BLE_ENABLED()) {
-        HILOGE("bluetooth is off.");
-        return BT_ERR_INVALID_STATE;
-    }
-
-    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
-        HILOGE("pimpl or gatt client proxy is nullptr");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    bool isValid = (pimpl != nullptr && pimpl->Init(weak_from_this()));
+    CHECK_AND_RETURN_LOG_RET(isValid, BT_ERR_INTERNAL_ERROR, "pimpl or gatt client proxy is nullptr");
     sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     int ret = proxy->RequestNotification(pimpl->applicationId_, characteristic.GetHandle(), enable);
