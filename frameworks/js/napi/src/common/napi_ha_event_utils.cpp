@@ -20,8 +20,10 @@
 #include "napi_ha_event_utils.h"
 #include "bluetooth_log.h"
 #include "bluetooth_errorcode.h"
+#ifndef CROSS_PLATFORM
 #include "app_event.h"
 #include "app_event_processor_mgr.h"
+#endif
 
 namespace OHOS {
 namespace Bluetooth {
@@ -77,6 +79,7 @@ int64_t NapiHaEventUtils::GetNowTimeMs() const
 
 int64_t NapiHaEventUtils::AddProcessor()
 {
+#ifndef CROSS_PLATFORM
     HiviewDFX::HiAppEvent::ReportConfig config;
     config.name = "ha_app_event"; // 系统预制so，实现上报功能，由HA提供
     config.appId = "com_huawei_hmos_sdk_ocg";
@@ -106,6 +109,9 @@ int64_t NapiHaEventUtils::AddProcessor()
         config.eventConfigs.push_back(event3);
     }
     return HiviewDFX::HiAppEvent::AppEventProcessorMgr::AddProcessor(config);
+#else
+    return -1;
+#endif
 }
 
 std::string NapiHaEventUtils::RandomTransId() const
@@ -115,6 +121,7 @@ std::string NapiHaEventUtils::RandomTransId() const
 
 void NapiHaEventUtils::WriteEndEvent() const
 {
+#ifndef CROSS_PLATFORM
     HiviewDFX::HiAppEvent::Event event("api_diagnostic", "api_exec_end", HiviewDFX::HiAppEvent::BEHAVIOR);
     std::string transId = RandomTransId();
     event.AddParam("trans_id", transId);
@@ -127,6 +134,7 @@ void NapiHaEventUtils::WriteEndEvent() const
     int ret = Write(event);
     HILOGD("WriteEndEvent transId:%{public}s, apiName:%{public}s, sdkName:%{public}s, errCode:%{public}d,"
         "ret:%{public}d", transId.c_str(), apiName_.c_str(), SDK_NAME.c_str(), errCode_, ret);
+#endif
 }
 
 } // namespace Bluetooth
