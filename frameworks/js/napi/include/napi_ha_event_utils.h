@@ -18,15 +18,18 @@
 
 #include <iostream>
 #include <string>
+#include "safe_map.h"
+#include "napi/native_api.h"
 
 namespace OHOS {
 namespace Bluetooth {
 
 class NapiHaEventUtils {
 public:
-    explicit NapiHaEventUtils(const std::string &apiName);
+    NapiHaEventUtils(napi_env env, const std::string &apiName);
     ~NapiHaEventUtils();
     void WriteErrCode(const int32_t errCode);
+    static void WriteErrCode(napi_env env, const int32_t errCode);
 
 private:
     NapiHaEventUtils() = delete;
@@ -39,10 +42,10 @@ private:
 private:
     static int64_t processorId_;
     static std::mutex processorLock_;
-    std::mutex errCodeLock_;
+    static SafeMap<napi_env, int32_t> envErrCodeMap_; // mapping between napi_env and errCode
+    napi_env env_;
     std::string apiName_;
     int64_t beginTime_;
-    int32_t errCode_;
 };
 
 } // namespace Bluetooth
