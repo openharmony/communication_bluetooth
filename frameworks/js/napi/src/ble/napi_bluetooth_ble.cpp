@@ -685,14 +685,13 @@ napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vecto
 napi_value StartBLEScan(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    NapiHaEventUtils haUtils("StartBLEScan");
+    NapiHaEventUtils haUtils(env, "StartBLEScan");
     std::vector<BleScanFilter> scanfilters;
     BleScanSettings settings;
     auto status = CheckBleScanParams(env, info, scanfilters, settings);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     int ret = BleCentralManagerGetInstance()->StartScan(settings, scanfilters);
-    haUtils.WriteErrCode(ret);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR || ret == BT_ERR_BLE_SCAN_ALREADY_STARTED, ret);
 
     return NapiGetUndefinedRet(env);
@@ -701,12 +700,11 @@ napi_value StartBLEScan(napi_env env, napi_callback_info info)
 napi_value StopBLEScan(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    NapiHaEventUtils haUtils("StopBLEScan");
+    NapiHaEventUtils haUtils(env, "StopBLEScan");
     auto status = CheckEmptyParam(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     int ret = BleCentralManagerGetInstance()->StopScan();
-    haUtils.WriteErrCode(ret);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
     return NapiGetUndefinedRet(env);
 }
@@ -890,7 +888,7 @@ napi_status CheckAdvertisingData(napi_env env, napi_callback_info info, BleAdver
 napi_value StartAdvertising(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>("StartAdvertising");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "StartAdvertising");
     size_t argc = ARGS_SIZE_THREE;
     napi_value argv[ARGS_SIZE_THREE] = {nullptr};
     napi_value thisVar = nullptr;
@@ -898,7 +896,6 @@ napi_value StartAdvertising(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRes == napi_ok, BT_ERR_INVALID_PARAM);
 
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
-    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, bleAdvertiser, BT_ERR_INTERNAL_ERROR);
 
     BleAdvertiserSettings settings;
@@ -907,7 +904,6 @@ napi_value StartAdvertising(napi_env env, napi_callback_info info)
     if (argc != 0 && NapiIsObjectPropertyExist(env, argv[PARAM0], "advertisingSettings")) {
         uint16_t duration = 0;
         auto status = CheckAdvertisingDataWithDuration(env, argv[PARAM0], settings, advData, rspData, duration);
-        haUtils->WriteErrCode(BT_ERR_INVALID_PARAM);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
         auto callback = std::make_shared<NapiBluetoothBleAdvertiseCallback>();
         auto func = [settings, advData, rspData, duration, bleAdvertiser, callback]() {
@@ -918,7 +914,6 @@ napi_value StartAdvertising(napi_env env, napi_callback_info info)
         };
 
         auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
-        haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
         bool success = callback->asyncWorkMap_.TryPush(
             NapiAsyncType::GET_ADVERTISING_HANDLE, asyncWork);
@@ -928,11 +923,9 @@ napi_value StartAdvertising(napi_env env, napi_callback_info info)
         return asyncWork->GetRet();
     } else {
         auto status = CheckAdvertisingData(env, info, settings, advData, rspData);
-        haUtils->WriteErrCode(BT_ERR_INVALID_PARAM);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
         int ret = bleAdvertiser->StartAdvertising(
             settings, advData, rspData, 0, NapiBluetoothBleAdvertiseCallback::GetInstance());
-        haUtils->WriteErrCode(ret);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
         return NapiGetUndefinedRet(env);
     }
@@ -976,14 +969,13 @@ napi_status CheckAdvertisingEnableParams(napi_env env, napi_callback_info info,
 napi_value EnableAdvertising(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>("EnableAdvertising");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "EnableAdvertising");
     uint32_t advHandle = 0xFF;
     uint16_t duration = 0;
     std::shared_ptr<BleAdvertiseCallback> baseCallback;
     auto status = CheckAdvertisingEnableParams(env, info, advHandle, duration, baseCallback);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     // compatible with XTS
-    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE,
         GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID)); // Adaptation for old sdk
     std::shared_ptr<NapiBluetoothBleAdvertiseCallback> callback =
@@ -1035,13 +1027,12 @@ napi_status CheckAdvertisingDisableParams(napi_env env, napi_callback_info info,
 napi_value DisableAdvertising(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>("DisableAdvertising");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "DisableAdvertising");
     uint32_t advHandle = 0xFF;
     std::shared_ptr<BleAdvertiseCallback> baseCallback;
     auto status = CheckAdvertisingDisableParams(env, info, advHandle, baseCallback);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     // compatible with XTS
-    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE,
         GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID)); // Adaptation for old sdk
     std::shared_ptr<NapiBluetoothBleAdvertiseCallback> callback =
@@ -1116,7 +1107,7 @@ napi_value ProcessStopAdvertisingAsyncWork(napi_env env, napi_callback_info info
 napi_value StopAdvertising(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>("StopAdvertising");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "StopAdvertising");
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = {nullptr};
     napi_value thisVar = nullptr;
@@ -1124,7 +1115,6 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRes == napi_ok, BT_ERR_INVALID_PARAM);
 
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
-    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, bleAdvertiser, BT_ERR_INTERNAL_ERROR);
 
     if (argc != ARGS_SIZE_ZERO) {
@@ -1132,32 +1122,27 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
         if (argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO) {
             status = napi_invalid_arg;
         }
-        haUtils->WriteErrCode(BT_ERR_INVALID_PARAM);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
         uint32_t advHandle = 0xFF;
         std::shared_ptr<BleAdvertiseCallback> baseCallback;
         status = CheckStopAdvWithAdvId(env, argv[PARAM0], advHandle, baseCallback);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
         // compatible with XTS
-        haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, advHandle != BLE_INVALID_ADVERTISING_HANDLE,
             GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID)); // Adaptation for old sdk
         return ProcessStopAdvertisingAsyncWork(env, info, bleAdvertiser, baseCallback, haUtils);
     } else {
         auto status = CheckEmptyArgs(env, info);
-        haUtils->WriteErrCode(BT_ERR_INVALID_PARAM);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
         std::vector<std::shared_ptr<BleAdvertiseCallback>> callbacks = bleAdvertiser->GetAdvObservers();
         if (callbacks.empty()) {
             // compatible with XTS
             int ret = bleAdvertiser->StopAdvertising(NapiBluetoothBleAdvertiseCallback::GetInstance());
-            haUtils->WriteErrCode(ret);
             ret = GetSDKAdaptedStatusCode(ret); // Adaptation for old sdk
             NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
         } else {
             for (auto &callback : callbacks) {
                 int ret = bleAdvertiser->StopAdvertising(callback);
-                haUtils->WriteErrCode(ret);
                 ret = GetSDKAdaptedStatusCode(ret); // Adaptation for old sdk
                 NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
             }
