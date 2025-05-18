@@ -113,6 +113,8 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("controlDeviceAction", ControlDeviceAction),
         DECLARE_NAPI_FUNCTION("getLastConnectionTime", GetRemoteDeviceConnectionTime),
         DECLARE_NAPI_FUNCTION("updateCloudBluetoothDevice", UpdateCloudBluetoothDevice),
+        DECLARE_NAPI_FUNCTION("getCarKeyDfxData", GetCarKeyDfxData),
+        DECLARE_NAPI_FUNCTION("setCarKeyDfxData", SetCarKeyCardData),
     };
 
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
@@ -274,6 +276,46 @@ napi_value GetRemoteDeviceName(napi_env env, napi_callback_info info)
     napi_create_string_utf8(env, name.c_str(), name.size(), &result);
     NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
     return result;
+}
+
+napi_value GetCarKeyDfxData(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    napi_value result = nullptr;
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    std::string dfxData;
+    int32_t err = host->GetCarKeyDfxData(dfxData);
+    napi_create_string_utf8(env, dfxData.c_str(), dfxData.size(), &result);
+    NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
+    return result;
+}
+
+napi_status ParseSetCarKeyCardDataParameters(napi_env env, napi_callback_info info,
+    std::string &outRemoteAddr, int32_t &outAction)
+{
+    HILOGD("enter");
+    std::string remoteAddr{};
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
+    NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], remoteAddr));
+    outRemoteAddr = remoteAddr;
+    NAPI_BT_RETURN_IF(!ParseInt32(env, outAction, argv[PARAM1]), "action ParseInt32 failed", napi_invalid_arg);
+    return napi_ok;
+}
+
+napi_value SetCarKeyCardData(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    std::string remoteAddr;
+    int32_t action = 0;
+    auto status = ParseSetCarKeyCardDataParameters(env, info, remoteAddr, action);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    int ret = host->SetCarKeyCardData(remoteAddr, action);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+    return NapiGetBooleanTrue(env);
 }
 
 napi_value GetRemoteDeviceClass(napi_env env, napi_callback_info info)

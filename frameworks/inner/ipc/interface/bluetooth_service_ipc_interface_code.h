@@ -288,6 +288,8 @@ enum BluetoothHostInterfaceCode {
     GET_CLOUD_BOND_STATE,
     BT_UPDATE_REFUSE_POLICY,
     PROCESS_RANDOM_DEVICE_ID_COMMAND,
+    BT_GET_CAR_KEY_DFX_DATA,
+    BT_SET_CAR_KEY_CARD_DATA,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
