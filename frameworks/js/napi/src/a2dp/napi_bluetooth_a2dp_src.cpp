@@ -929,6 +929,7 @@ static napi_status CheckSetCodecPreferenceParam(napi_env env, napi_callback_info
     ConvertCodecSampleRate(a2dpCodecInfo, codecSampleRate);
     if (NapiIsObjectPropertyExist(env, argv[PARAM1], "codecBitRate")) {
         int32_t codecBitRate = 0;
+        NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, argv[PARAM1], "codecBitRate", codecBitRate));
         ConvertCodecBitRate(a2dpCodecInfo, codecBitRate);
     }
     return napi_ok;
