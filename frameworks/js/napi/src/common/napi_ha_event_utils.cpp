@@ -52,7 +52,7 @@ NapiHaEventUtils::~NapiHaEventUtils()
 
 void NapiHaEventUtils::WriteErrCode(napi_env env, const int32_t errCode)
 {
-    envErrCodeMap_.EnsureInsert(env_, errCode);
+    envErrCodeMap_.EnsureInsert(env, errCode);
 }
 
 void NapiHaEventUtils::WriteErrCode(const int32_t errCode)
