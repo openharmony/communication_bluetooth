@@ -65,7 +65,7 @@ void NapiHaEventUtils::GenerateProcessorId()
     std::lock_guard<std::mutex> lock(processorLock_);
     if (processorId_ == -1) {
         processorId_ = AddProcessor();
-        HILOGW("add processorId:%{public}lld", processorId_);
+        HILOGW("add processorId:%{public}" PRId64, processorId_);
     }
 
     if (processorId_ == INVALID_PROCESSOR_ID) {
