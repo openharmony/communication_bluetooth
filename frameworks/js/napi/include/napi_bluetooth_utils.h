@@ -271,13 +271,6 @@ struct NapiGattsServerResponse {
     std::vector<uint8_t> value;
 };
 
-enum ProfileConnectionState {
-    STATE_DISCONNECTED = 0,  // the current profile is disconnected
-    STATE_CONNECTING = 1,    // the current profile is being connected
-    STATE_CONNECTED = 2,     // the current profile is connected
-    STATE_DISCONNECTING = 3  // the current profile is being disconnected
-};
-
 enum ScoState {
     SCO_DISCONNECTED,
     SCO_CONNECTING,
