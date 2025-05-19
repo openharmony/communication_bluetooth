@@ -37,11 +37,11 @@ constexpr int32_t TIME_NS_PER_MS = 1000000;
 
 int64_t NapiHaEventUtils::processorId_ = -1;
 std::mutex NapiHaEventUtils::processorLock_;
+SafeMap<napi_env, int32_t> NapiHaEventUtils::envErrCodeMap_ = {};
 
-NapiHaEventUtils::NapiHaEventUtils(const std::string &apiName): apiName_(apiName)
+NapiHaEventUtils::NapiHaEventUtils(napi_env env, const std::string &apiName): env_(env), apiName_(apiName)
 {
     beginTime_ = GetNowTimeMs();
-    errCode_ = BT_ERR_INVALID_PARAM; // 考虑到NAPI接口会优先校验入参，这里直接默认初始化为401错误码
     GenerateProcessorId();
 }
 
@@ -50,10 +50,14 @@ NapiHaEventUtils::~NapiHaEventUtils()
     WriteEndEvent();
 }
 
+void NapiHaEventUtils::WriteErrCode(napi_env env, const int32_t errCode)
+{
+    envErrCodeMap_.EnsureInsert(env, errCode);
+}
+
 void NapiHaEventUtils::WriteErrCode(const int32_t errCode)
 {
-    std::lock_guard<std::mutex> lock(errCodeLock_);
-    errCode_ = errCode;
+    NapiHaEventUtils::WriteErrCode(env_, errCode);
 }
 
 void NapiHaEventUtils::GenerateProcessorId()
@@ -61,10 +65,9 @@ void NapiHaEventUtils::GenerateProcessorId()
     std::lock_guard<std::mutex> lock(processorLock_);
     if (processorId_ == -1) {
         processorId_ = AddProcessor();
-        HILOGW("add processorId:%{public}lld", processorId_);
     }
 
-    if (processorId_ == INVALID_PROCESSOR_ID) {
+    if (processorId_ == INVALID_PROCESSOR_ID) { // 非应用不支持打点
         HILOGE("invaild processorId !!!");
         return;
     }
@@ -124,16 +127,19 @@ void NapiHaEventUtils::WriteEndEvent() const
 #ifndef CROSS_PLATFORM
     HiviewDFX::HiAppEvent::Event event("api_diagnostic", "api_exec_end", HiviewDFX::HiAppEvent::BEHAVIOR);
     std::string transId = RandomTransId();
+    int32_t errCode = BT_NO_ERROR; // 默认API调用成功
+    errCode = envErrCodeMap_.ReadVal(env_);
+    envErrCodeMap_.Erase(env_);
     event.AddParam("trans_id", transId);
     event.AddParam("api_name", apiName_);
     event.AddParam("sdk_name", SDK_NAME);
     event.AddParam("begin_time", beginTime_);
     event.AddParam("end_time", GetNowTimeMs());
-    event.AddParam("result", (errCode_ == BT_NO_ERROR ? 0 : 1));
-    event.AddParam("error_code", errCode_);
+    event.AddParam("result", (errCode == BT_NO_ERROR ? 0 : 1));
+    event.AddParam("error_code", errCode);
     int ret = Write(event);
     HILOGD("WriteEndEvent transId:%{public}s, apiName:%{public}s, sdkName:%{public}s, errCode:%{public}d,"
-        "ret:%{public}d", transId.c_str(), apiName_.c_str(), SDK_NAME.c_str(), errCode_, ret);
+        "ret:%{public}d", transId.c_str(), apiName_.c_str(), SDK_NAME.c_str(), errCode, ret);
 #endif
 }
 

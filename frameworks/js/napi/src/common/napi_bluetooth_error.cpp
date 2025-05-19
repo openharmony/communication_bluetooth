@@ -20,6 +20,7 @@
 
 #include "bluetooth_errorcode.h"
 #include "napi_bluetooth_utils.h"
+#include "napi_ha_event_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -81,6 +82,7 @@ void HandleSyncErr(const napi_env &env, int32_t errCode)
     if (errCode == BtErrCode::BT_NO_ERROR) {
         return;
     }
+    NapiHaEventUtils::WriteErrCode(env, errCode);
     std::string errMsg = GetNapiErrMsg(env, errCode);
     if (errMsg != "") {
         napi_throw_error(env, std::to_string(errCode).c_str(), errMsg.c_str());
