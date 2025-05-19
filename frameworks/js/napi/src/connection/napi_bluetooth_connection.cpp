@@ -545,7 +545,7 @@ napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::st
 napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>("PairDeviceAsync");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "connection.PairDeviceAsync");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
@@ -557,7 +557,6 @@ napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(err);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
-    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
@@ -617,7 +616,8 @@ napi_status CheckPairCredibleDeviceParam(napi_env env, napi_callback_info info, 
 napi_value PairCredibleDevice(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>("PairCredibleDevice");
+    std::shared_ptr<NapiHaEventUtils> haUtils =
+        std::make_shared<NapiHaEventUtils>(env, "connection.PairCredibleDevice");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     int transport = BT_TRANSPORT_NONE;
     auto status = CheckPairCredibleDeviceParam(env, info, remoteAddr, transport);
@@ -630,7 +630,6 @@ napi_value PairCredibleDevice(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(err);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
-    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
@@ -714,7 +713,8 @@ napi_value GetPairState(napi_env env, napi_callback_info info)
 napi_value ConnectAllowedProfiles(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>("ConnectAllowedProfiles");
+    std::shared_ptr<NapiHaEventUtils> haUtils =
+        std::make_shared<NapiHaEventUtils>(env, "connection.ConnectAllowedProfiles");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
@@ -726,7 +726,6 @@ napi_value ConnectAllowedProfiles(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(ret);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
-    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
@@ -735,7 +734,8 @@ napi_value ConnectAllowedProfiles(napi_env env, napi_callback_info info)
 napi_value DisconnectAllowedProfiles(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>("DisconnectAllowedProfiles");
+    std::shared_ptr<NapiHaEventUtils> haUtils =
+        std::make_shared<NapiHaEventUtils>(env, "connection.DisconnectAllowedProfiles");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
@@ -747,7 +747,6 @@ napi_value DisconnectAllowedProfiles(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(ret);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
-    haUtils->WriteErrCode(BT_ERR_INTERNAL_ERROR);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
