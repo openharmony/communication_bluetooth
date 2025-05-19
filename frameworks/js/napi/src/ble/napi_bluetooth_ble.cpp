@@ -685,7 +685,7 @@ napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vecto
 napi_value StartBLEScan(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    NapiHaEventUtils haUtils(env, "StartBLEScan");
+    NapiHaEventUtils haUtils(env, "ble.StartBLEScan");
     std::vector<BleScanFilter> scanfilters;
     BleScanSettings settings;
     auto status = CheckBleScanParams(env, info, scanfilters, settings);
@@ -700,7 +700,7 @@ napi_value StartBLEScan(napi_env env, napi_callback_info info)
 napi_value StopBLEScan(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    NapiHaEventUtils haUtils(env, "StopBLEScan");
+    NapiHaEventUtils haUtils(env, "ble.StopBLEScan");
     auto status = CheckEmptyParam(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
@@ -888,7 +888,7 @@ napi_status CheckAdvertisingData(napi_env env, napi_callback_info info, BleAdver
 napi_value StartAdvertising(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "StartAdvertising");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "ble.StartAdvertising");
     size_t argc = ARGS_SIZE_THREE;
     napi_value argv[ARGS_SIZE_THREE] = {nullptr};
     napi_value thisVar = nullptr;
@@ -969,7 +969,7 @@ napi_status CheckAdvertisingEnableParams(napi_env env, napi_callback_info info,
 napi_value EnableAdvertising(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "EnableAdvertising");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "ble.EnableAdvertising");
     uint32_t advHandle = 0xFF;
     uint16_t duration = 0;
     std::shared_ptr<BleAdvertiseCallback> baseCallback;
@@ -1027,7 +1027,7 @@ napi_status CheckAdvertisingDisableParams(napi_env env, napi_callback_info info,
 napi_value DisableAdvertising(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "DisableAdvertising");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "ble.DisableAdvertising");
     uint32_t advHandle = 0xFF;
     std::shared_ptr<BleAdvertiseCallback> baseCallback;
     auto status = CheckAdvertisingDisableParams(env, info, advHandle, baseCallback);
@@ -1107,7 +1107,7 @@ napi_value ProcessStopAdvertisingAsyncWork(napi_env env, napi_callback_info info
 napi_value StopAdvertising(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "StopAdvertising");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "ble.StopAdvertising");
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = {nullptr};
     napi_value thisVar = nullptr;

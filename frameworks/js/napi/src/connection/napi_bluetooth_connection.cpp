@@ -503,7 +503,7 @@ napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::st
 napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "PairDeviceAsync");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "connection.PairDeviceAsync");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
@@ -574,7 +574,8 @@ napi_status CheckPairCredibleDeviceParam(napi_env env, napi_callback_info info, 
 napi_value PairCredibleDevice(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "PairCredibleDevice");
+    std::shared_ptr<NapiHaEventUtils> haUtils =
+        std::make_shared<NapiHaEventUtils>(env, "connection.PairCredibleDevice");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     int transport = BT_TRANSPORT_NONE;
     auto status = CheckPairCredibleDeviceParam(env, info, remoteAddr, transport);
@@ -670,7 +671,8 @@ napi_value GetPairState(napi_env env, napi_callback_info info)
 napi_value ConnectAllowedProfiles(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "ConnectAllowedProfiles");
+    std::shared_ptr<NapiHaEventUtils> haUtils =
+        std::make_shared<NapiHaEventUtils>(env, "connection.ConnectAllowedProfiles");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
@@ -690,7 +692,8 @@ napi_value ConnectAllowedProfiles(napi_env env, napi_callback_info info)
 napi_value DisconnectAllowedProfiles(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "DisconnectAllowedProfiles");
+    std::shared_ptr<NapiHaEventUtils> haUtils =
+        std::make_shared<NapiHaEventUtils>(env, "connection.DisconnectAllowedProfiles");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);

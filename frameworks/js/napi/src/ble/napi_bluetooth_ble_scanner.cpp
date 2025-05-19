@@ -98,7 +98,7 @@ static NapiBleScanner *NapiGetBleScanner(napi_env env, napi_callback_info info)
 napi_value NapiBleScanner::StartScan(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "StartScan");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "ble.BleScanner.StartScan");
     std::vector<BleScanFilter> scanFilters;
     BleScanSettings settings;
     auto status = CheckBleScanParams(env, info, scanFilters, settings);
@@ -128,7 +128,7 @@ napi_value NapiBleScanner::StartScan(napi_env env, napi_callback_info info)
 napi_value NapiBleScanner::StopScan(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "StopScan");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "ble.BleScanner.StopScan");
     auto status = CheckEmptyParam(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
