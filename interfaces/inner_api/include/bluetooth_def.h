@@ -1680,6 +1680,13 @@ enum class RandomDeviceIdCommand {
     IS_VALID
 };
 
+enum ProfileConnectionState {
+    STATE_DISCONNECTED = 0, // the current profile is disconnected
+    STATE_CONNECTING = 1,   // the current profile is being connected
+    STATE_CONNECTED = 2,    // the current profile is connected
+    STATE_DISCONNECTING = 3 // the current profile is being disconnected
+};
+
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else
