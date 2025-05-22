@@ -72,9 +72,13 @@ void NapiHaEventUtils::GenerateProcessorId()
 
 int64_t NapiHaEventUtils::GetNowTimeMs() const
 {
+#ifndef CROSS_PLATFORM
     struct timespec ts = {};
     clock_gettime(CLOCK_BOOTTIME, &ts);
     return (int64_t)ts.tv_sec * TIME_MS_PER_SECOND + (int64_t)ts.tv_nsec / TIME_NS_PER_MS;
+#else
+    return -1;
+#endif
 }
 
 int64_t NapiHaEventUtils::AddProcessor()
