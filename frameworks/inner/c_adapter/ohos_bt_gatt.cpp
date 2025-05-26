@@ -1584,6 +1584,7 @@ int CheckAndAllocateAdvHandle(void)
         CheckAdvIdInUse();
         i = AllocateAdvHandle();
     }
+    return i;
 }
 
 }  // namespace Bluetooth
