@@ -593,6 +593,13 @@ typedef void (*AdvDisableExCallback)(int advId, int status);
 typedef void (*AdvChangedCallback)(int advId, int status);
 
 /**
+ * @brief Called when advertising number reaching max
+ *
+ * @since 16
+ */
+typedef void (*AdvIdReachMaxCallback)(int *advIds, int *advNum);
+
+/**
  * @brief Defines GATT callbacks.
  *
  * @since 6
@@ -614,6 +621,8 @@ typedef struct {
     AdvDisableExCallback onDisableExCb;
     /** Called when advertising setting is changed */
     AdvChangedCallback advChangeCb;
+    /** Called when advertising number reaching max */
+    AdvIdReachMaxCallback advIdReachMaxCb;
 } BtGattCallbacks;
 
 /**
@@ -1033,6 +1042,18 @@ int BleChangeScanParams(int32_t scannerId, const BleScanConfigs *config, const B
  * @since 12
  */
 int AllocateAdvHandle(void);
+
+/**
+ * @brief Check advId in use, and release advIds not in use
+ * @since 16
+ */
+void CheckAdvIdInUse(void);
+
+/**
+ * @brief Check if all advIds are in use. If not all in use, return advId available
+ * @since 16
+ */
+int CheckAndAllocateAdvHandle(void);
 #ifdef __cplusplus
 }
 #endif

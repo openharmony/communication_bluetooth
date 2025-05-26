@@ -638,21 +638,16 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
     const AdvOwnAddrParams *ownAddrParams)
 {
     HILOGD("BleStartAdvWithAddr enter");
-    if (advId == nullptr || rawData == nullptr || advParam == nullptr || !IsRpa(ownAddrParams)) {
-        HILOGW("params are invalid");
-        return OHOS_BT_STATUS_PARM_INVALID;
-    }
+    CHECK_AND_RETURN_LOG_RET((advId != nullptr && rawData != nullptr && advParam != nullptr && IsRpa(ownAddrParams)),
+        OHOS_BT_STATUS_PARM_INVALID, "params are invalid");
     if (!IsBleEnabled()) {
         HILOGE("bluetooth is off.");
         *advId = -1;
         return OHOS_BT_STATUS_NOT_READY;
     }
     lock_guard<mutex> lock(g_advMutex);
-    int i = AllocateAdvHandle();
-    if (i == MAX_BLE_ADV_NUM) {
-        HILOGW("reach the max num of adv");
-        return OHOS_BT_STATUS_UNHANDLED;
-    }
+    int i = CheckAndAllocateAdvHandle();
+    CHECK_AND_RETURN_LOG_RET(i != MAX_BLE_ADV_NUM, OHOS_BT_STATUS_UNHANDLED, "reach the max num of adv");
     *advId = i;
 
     if (!StartAdvAddrTimer(i, ownAddrParams)) {
@@ -724,18 +719,8 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
     if (g_BleAdvertiser == nullptr) {
         g_BleAdvertiser = BleAdvertiser::CreateInstance();
     }
-    int i = 0;
-    for (i = 0; i < MAX_BLE_ADV_NUM; i++) {
-        if (g_bleAdvCallbacks[i] == nullptr) {
-            g_bleAdvCallbacks[i] = std::make_shared<BleAdvCallback>(i);
-            break;
-        }
-    }
-
-    if (i == MAX_BLE_ADV_NUM) {
-        HILOGW("reach the max num of adv");
-        return OHOS_BT_STATUS_UNHANDLED;
-    }
+    int i = CheckAndAllocateAdvHandle();
+    CHECK_AND_RETURN_LOG_RET(i != MAX_BLE_ADV_NUM, OHOS_BT_STATUS_UNHANDLED, "reach the max num of adv");
     *advId = i;
     BleAdvertiserSettings settings;
     settings.SetInterval(advParam.minInterval);
@@ -1552,6 +1537,53 @@ int AllocateAdvHandle(void)
         }
     }
     return i;
+}
+
+void CheckAdvIdInUse(void)
+{
+    if (g_AppCallback == nullptr || g_AppCallback->advIdReachMaxCb == nullptr) {
+        HILOGE("call back is null");
+        return;
+    }
+    int advIds[MAX_BLE_ADV_NUM];
+    std::shared_ptr<int> advNum = std::make_shared<int>(-1);
+    g_AppCallback->advIdReachMaxCb(advIds, advNum.get());
+    if (advNum == nullptr || *advNum < 0 || *advNum > MAX_BLE_ADV_NUM) {
+        HILOGW("Do not check advertising num, invalid advNum");
+        return;
+    }
+    if (*advNum == MAX_BLE_ADV_NUM) {
+        HILOGW("Check advertising num reach max");
+        return;
+    }
+    for (int i = 0; i < MAX_BLE_ADV_NUM; i++) {
+        if (g_bleAdvCallbacks[i] == nullptr) {
+            HILOGW("Advertising num no reaching max, advId: %{public}d", i);
+            return;
+        }
+        bool advIdInUse = false;
+        for (int j = 0; j < *advNum; j++) {
+            if (i == advIds[j]) {
+                advIdInUse = true;
+                break;
+            }
+        }
+        if (!advIdInUse) {
+            HILOGW("AdvId: %{public}d not in use", i);
+            g_bleAdvCallbacks[i] = nullptr;
+        }
+    }
+    return;
+}
+
+int CheckAndAllocateAdvHandle(void)
+{
+    int i = AllocateAdvHandle();
+    if (i == MAX_BLE_ADV_NUM) {
+        HILOGW("check and re-allocate advId");
+        CheckAdvIdInUse();
+        i = AllocateAdvHandle();
+    }
 }
 
 }  // namespace Bluetooth
