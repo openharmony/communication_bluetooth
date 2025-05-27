@@ -595,9 +595,13 @@ typedef void (*AdvChangedCallback)(int advId, int status);
 /**
  * @brief Called when advertising number reaching max
  *
+ * @param buffer Int array cantains all advIds bluetooth currently in use. Caller can write buffer with caller advIds.
+ * @param maxBufferSize Max advIds buffer size, which equals to MAX_BLE_ADV_NUM.
+ * @param bufferSize Caller advIds buffer size. Bluetooth will read buffer according to bufferSize.
+ *
  * @since 16
  */
-typedef void (*AdvIdReachMaxCallback)(int *advIds, int *advNum);
+typedef void (*AdvIdReachMaxCallback)(int *buffer, int maxBufferSize, int *bufferSize);
 
 /**
  * @brief Defines GATT callbacks.
