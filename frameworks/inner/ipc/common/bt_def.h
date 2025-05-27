@@ -1456,7 +1456,7 @@ enum A2dpUserCodecChannelMode : uint8_t {
  *
  * @since 19
  */
-enum A2dpUserCodecBitRate : uint8_t {
+enum A2dpUserCodecBitRate : uint32_t {
     A2DP_L2HCST_BIT_RATE_DEFAULT = 0x0,
     A2DP_L2HCST_BIT_RATE_320K = 0x01,
     A2DP_L2HCST_BIT_RATE_640K = 0x01 << 1,
