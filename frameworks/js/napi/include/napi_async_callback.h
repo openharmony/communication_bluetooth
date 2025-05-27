@@ -55,6 +55,15 @@ public:
     napi_env GetNapiEnv(void);
     bool Equal(napi_env env, napi_value &callback) const;
     std::string ToLogString(void) const;
+    void SetNapiEnvValidity(bool isValid)
+    {
+        isValid_ = isValid;
+    }
+    bool IsValidNapiEnv(void) const
+    {
+        return isValid_;
+    }
+
 private:
     NapiCallback(const NapiCallback &) = delete;
     NapiCallback &operator=(const NapiCallback &) = delete;
@@ -64,22 +73,35 @@ private:
     napi_env env_;
     napi_ref callbackRef_;
     int id_;
+    /*************************** env_cleanup_hook ********************************/
+    bool isValid_ = true;
+    /*************************** env_cleanup_hook ********************************/
 };
 
 class NapiPromise {
 public:
     explicit NapiPromise(napi_env env);
-    ~NapiPromise() = default;
+    ~NapiPromise();
 
     void ResolveOrReject(int errCode, const std::shared_ptr<NapiNativeObject> &object);
     void Resolve(napi_value resolution);
     void Reject(napi_value rejection);
     napi_value GetPromise(void) const;
+    void SetNapiEnvValidity(bool isValid)
+    {
+        isValid_ = isValid;
+    }
+    bool IsValidNapiEnv(void) const
+    {
+        return isValid_;
+    }
+
 private:
     napi_env env_;
     napi_value promise_;
     napi_deferred deferred_;
     bool isResolvedOrRejected_ = false;
+    bool isValid_ = true;
 };
 
 class NapiHandleScope {
