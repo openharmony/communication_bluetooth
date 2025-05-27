@@ -1,0 +1,330 @@
+/*
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@!namespace("@ohos.bluetooth.ble", "ble")
+@!sts_inject("""
+static { loadLibrary("bluetoothBle_taihe_native.z") }
+""")
+from ohos.bluetooth.constant use ProfileConnectionState;
+
+struct ScanReport {
+    reportType: ScanReportType;
+    scanResult: Array<ScanResult>;
+}
+enum ScanReportType: i32 {
+    ON_FOUND = 1,
+    ON_LOST = 2
+}
+struct ScanResult {
+    deviceId: String;
+    rssi: i32;
+    data: @arraybuffer Array<u8>;
+    deviceName: String;
+    connectable: bool;
+}
+
+@on_off("BLEDeviceFind")
+function OnBLEDeviceFind(callback: (a: ScanReport) => void): void;
+@on_off("BLEDeviceFind")
+function OffBLEDeviceFind(callback:Optional<(a: ScanReport)=> void>): void;
+
+@on_off("advertisingStateChange")
+function OnAdvertisingStateChange(callback: (a: AdvertisingStateChangeInfo) => void): void;
+@on_off("advertisingStateChange")
+function OffAdvertisingStateChange(callback:Optional<(a: AdvertisingStateChangeInfo)=> void>): void;
+
+
+enum MatchMode: i32 {
+    MATCH_MODE_AGGRESSIVE = 1,
+    MATCH_MODE_STICKY = 2
+}
+
+struct AdvertisingEnableParams {
+    advertisingId: i32;
+    duration: Optional<i16>;
+}
+
+
+struct DescriptorWriteRequest {
+    deviceId: String;
+    transId: i32;
+    offset: i32;
+    isPrepared: bool;
+    needRsp: bool;
+    value: @arraybuffer Array<u8>;
+    descriptorUuid: String;
+    characteristicUuid: String;
+    serviceUuid: String;
+}
+
+struct DescriptorReadRequest {
+    deviceId: String;
+    transId: i32;
+    offset: i32;
+    descriptorUuid: String;
+    characteristicUuid: String;
+    serviceUuid: String;
+}
+
+struct AdvertiseSetting {
+    interval: Optional<i16>;
+    txPower: Optional<i8>;
+    connectable: Optional<bool>;
+}
+
+struct NotifyCharacteristic {
+    serviceUuid: String;
+    characteristicUuid: String;
+    characteristicValue: @arraybuffer Array<u8>;
+    confirm: bool;
+}
+
+struct ScanFilter {
+    deviceId: Optional<String>;
+    name: Optional<String>;
+    serviceUuid: Optional<String>;
+    serviceUuidMask: Optional<String>;
+    serviceSolicitationUuid: Optional<String>;
+    serviceSolicitationUuidMask: Optional<String>;
+    serviceData: Optional<@arraybuffer Array<u8>>;
+    serviceDataMask: Optional<@arraybuffer Array<u8>>;
+    manufactureId: Optional<i16>;
+    manufactureData: Optional<@arraybuffer Array<u8>>;
+    manufactureDataMask: Optional<@arraybuffer Array<u8>>;
+}
+
+struct CharacteristicReadRequest {
+    deviceId: String;
+    transId: i32;
+    offset: i32;
+    characteristicUuid: String;
+    serviceUuid: String;
+}
+
+struct CharacteristicWriteRequest {
+    deviceId: String;
+    transId: i32;
+    offset: i32;
+    isPrepared: bool;
+    needRsp: bool;
+    value: @arraybuffer Array<u8>;
+    characteristicUuid: String;
+    serviceUuid: String;
+}
+
+function CreateGattClientDevice(deviceId: String): GattClientDevice;
+
+function StopBLEScan(): void;
+
+struct ServerResponse {
+    deviceId: String;
+    transId: i32;
+    status: i32;
+    offset: i32;
+    value: @arraybuffer Array<u8>;
+}
+
+struct ScanOptions {
+    interval: Optional<i32>;
+    dutyMode: Optional<ScanDuty>;
+    matchMode: Optional<MatchMode>;
+    phyType: Optional<PhyType>;
+    reportMode: Optional<ScanReportMode>;
+}
+
+enum ScanDuty: i32 {
+    SCAN_MODE_LOW_POWER = 0,
+    SCAN_MODE_BALANCED = 1,
+    SCAN_MODE_LOW_LATENCY = 2
+}
+
+enum PhyType: i32 {
+    PHY_LE_1M = 1,
+    PHY_LE_ALL_SUPPORTED = 255
+}
+
+enum ScanReportMode: i32 {
+    NORMAL = 1,
+    FENCE_SENSITIVITY_LOW = 10,
+    FENCE_SENSITIVITY_HIGH = 11
+}
+
+struct BLECharacteristic {
+    serviceUuid: String;
+    characteristicUuid: String;
+    characteristicValue: @arraybuffer Array<u8>;
+    descriptors: Array<BLEDescriptor>;
+    properties: Optional<GattProperties>;
+    characteristicValueHandle: Optional<i16>;
+}
+
+struct AdvertisingStateChangeInfo {
+    advertisingId: i32;
+    state: AdvertisingState;
+}
+
+enum AdvertisingState: i32 {
+    STARTED = 1,
+    ENABLED = 2,
+    DISABLED = 3,
+    STOPPED = 4
+}
+
+struct BLEDescriptor {
+    serviceUuid: String;
+    characteristicUuid: String;
+    descriptorUuid: String;
+    descriptorValue: @arraybuffer Array<u8>;
+    descriptorHandle: Optional<i16>;
+}
+
+struct GattProperties {
+    write: Optional<bool>;
+    writeNoResponse: Optional<bool>;
+    read: Optional<bool>;
+    notify: Optional<bool>;
+    indicate: Optional<bool>;
+}
+
+enum GattWriteType: i32 {
+    WRITE = 1,
+    WRITE_NO_RESPONSE = 2
+}
+
+function StopAdvertising(): void;
+
+@gen_async("stopAdvertising")
+@gen_promise("stopAdvertising")
+function StopAdvertisingSync(advertisingId: f64): void;
+
+interface GattClientDevice {
+    @on_off("BLECharacteristicChange")
+    OnBLECharacteristicChange(callback: (a: BLECharacteristic) => void): void;
+    @on_off("BLECharacteristicChange")
+    OffBLECharacteristicChange(callback:Optional<(a: BLECharacteristic)=> void>): void;
+
+    @gen_async("setCharacteristicChangeNotification")
+    @gen_promise("setCharacteristicChangeNotification")
+    SetCharacteristicChangeNotificationSync(characteristic: BLECharacteristic, enable: bool): void;
+
+    @gen_async("getRssiValue")
+    @gen_promise("getRssiValue")
+    GetRssiValueSync(): f64;
+
+    @gen_async("writeCharacteristicValue")
+    @gen_promise("writeCharacteristicValue")
+    WriteCharacteristicValueSync(characteristic: BLECharacteristic, writeType: GattWriteType): void;
+
+    @gen_async("getServices")
+    @gen_promise("getServices")
+    GetServicesSync(): void;
+
+    @gen_async("writeDescriptorValue")
+    @gen_promise("writeDescriptorValue")
+    WriteDescriptorValueSync(descriptor: BLEDescriptor): void;
+
+    @on_off("BLEMtuChange")
+    OnBLEMtuChange(callback: (a: f64) => void): void;
+    @on_off("BLEMtuChange")
+    OffBLEMtuChange(callback:Optional<(a: f64)=> void>): void;
+
+    @on_off("BLEConnectionStateChange")
+    OnBLEConnectionStateChange(callback: (a: BLEConnectionChangeState) => void): void;
+    @on_off("BLEConnectionStateChange")
+    OffBLEConnectionStateChange(callback:Optional<(a: BLEConnectionChangeState)=> void>): void;
+
+    SetBLEMtuSize(mtu: f64): void;
+    Connect(): void;
+    Disconnect(): void;
+
+    Close(): void;
+}
+
+function CreateGattServer(): GattServer;
+
+interface GattServer {
+    @on_off("characteristicRead")
+    OnCharacteristicRead(callback: (a: CharacteristicReadRequest) => void): void;
+    @on_off("characteristicRead")
+    OffCharacteristicRead(callback:Optional<(a: CharacteristicReadRequest)=> void>): void;
+
+    @on_off("BLEMtuChange")
+    OnBLEMtuChange(callback: (a: f64) => void): void;
+    @on_off("BLEMtuChange")
+    OffBLEMtuChange(callback:Optional<(a: f64)=> void>): void;
+
+    @on_off("descriptorRead")
+    OnDescriptorRead(callback: (a: DescriptorReadRequest) => void): void;
+    @on_off("descriptorRead")
+    OffDescriptorRead(callback:Optional<(a: DescriptorReadRequest)=> void>): void;
+
+    @on_off("descriptorWrite")
+    OnDescriptorWrite(callback: (a: DescriptorWriteRequest) => void): void;
+    @on_off("descriptorWrite")
+    OffDescriptorWrite(callback:Optional<(a: DescriptorWriteRequest)=> void>): void;
+
+    @on_off("connectionStateChange")
+    OnConnectionStateChange(callback: (a: BLEConnectionChangeState) => void): void;
+    @on_off("connectionStateChange")
+    OffConnectionStateChange(callback:Optional<(a: BLEConnectionChangeState)=> void>): void;
+
+    Close(): void;
+}
+
+struct AdvertiseData {
+    serviceUuids: Array<String>;
+    manufactureData: Array<ManufactureData>;
+    serviceData: Array<ServiceData>;
+    includeDeviceName: Optional<bool>;
+    includeTxPower: Optional<bool>;
+}
+
+struct AdvertisingParams {
+    advertisingSettings: AdvertiseSetting;
+    advertisingData: AdvertiseData;
+    advertisingResponse: Optional<AdvertiseData>;
+    duration: Optional<i16>;
+}
+struct ManufactureData {
+    manufactureId: i16;
+    manufactureValue: @arraybuffer Array<u8>;
+}
+
+struct ServiceData {
+    serviceUuid: String;
+    serviceValue: @arraybuffer Array<u8>;
+}
+
+struct GattService {
+    serviceUuid: String;
+    isPrimary: bool;
+    characteristics: Array<BLECharacteristic>;
+    includeServices: Optional<Array<GattService>>;
+}
+
+struct BLEConnectionChangeState {
+    deviceId: String;
+    state: ProfileConnectionState;
+}
+
+function CreateBleScanner(): BleScanner;
+
+interface BleScanner {
+    @on_off("BLEDeviceFind")
+    OnBLEDeviceFind(callback: (a: ScanReport) => void): void;
+    @on_off("BLEDeviceFind")
+    OffBLEDeviceFind(callback:Optional<(a: ScanReport)=> void>): void;
+}
+
