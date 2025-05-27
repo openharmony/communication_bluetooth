@@ -1547,7 +1547,7 @@ void CheckAdvIdInUse(void)
     }
     int advIds[MAX_BLE_ADV_NUM];
     std::shared_ptr<int> advNum = std::make_shared<int>(-1);
-    g_AppCallback->advIdReachMaxCb(advIds, advNum.get());
+    g_AppCallback->advIdReachMaxCb(advIds, MAX_BLE_ADV_NUM, advNum.get());
     if (advNum == nullptr || *advNum < 0 || *advNum > MAX_BLE_ADV_NUM) {
         HILOGW("Do not check advertising num, invalid advNum");
         return;
