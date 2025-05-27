@@ -693,6 +693,8 @@ static void ConvertCodecBitRateToCodecInfo(CodecInfo &codecInfo, int32_t codecBi
     auto iter = g_a2dpCodecBitRateMap.find(codecBitRate);
     if (iter != g_a2dpCodecBitRateMap.end()) {
         codecInfo.codecBitRate = iter->second;
+    } else {
+        codecInfo.codecBitRate = CODEC_BIT_RATE_ABR; // default value is ABR
     }
 }
 
@@ -717,8 +719,11 @@ static void ConvertCodecInfoToJs(napi_env env, napi_value &object, const A2dpCod
     napi_set_named_property(env, object, "codecSampleRate", value);
     napi_create_int32(env, codecInfo.codecBitRate, &value);
     napi_set_named_property(env, object, "codecBitRate", value);
-    napi_create_int32(env, CODEC_FRAME_LENGTH_10MS, &value); // only 10ms frame length is supported
-    napi_set_named_property(env, object, "codecFrameLength", value);
+    if (a2dpCodecInfo.codecType == A2DP_CODEC_TYPE_L2HCST_USER ||
+        a2dpCodecInfo.codecType == A2DP_CODEC_TYPE_L2HCV2_USER) {
+        napi_create_int32(env, CODEC_FRAME_LENGTH_10MS, &value); // only 10ms frame length is supported
+        napi_set_named_property(env, object, "codecFrameLength", value);
+    }
 }
 
 static void ConvertCodecType(napi_env env, napi_value &object, int32_t codecType)
@@ -888,7 +893,10 @@ static void ConvertCodecInfoListToJS(napi_env env, napi_value &object, const A2d
     ConvertCodecChannelModeVector(env, object, a2dpCodecInfo.channelMode);
     ConvertCodecSampleRateVector(env, object, a2dpCodecInfo.sampleRate);
     ConvertCodecBitRateVector(env, object, a2dpCodecInfo.codecSpecific3);
-    ConvertCodecFrameLengthVector(env, object, a2dpCodecInfo.codecSpecific2);
+    if (a2dpCodecInfo.codecType == A2DP_CODEC_TYPE_L2HCST_USER ||
+        a2dpCodecInfo.codecType == A2DP_CODEC_TYPE_L2HCV2_USER) {
+        ConvertCodecFrameLengthVector(env, object, a2dpCodecInfo.codecSpecific2);
+    }
 }
 
 static void ConvertCodecInfoConfirmedCapToJs(napi_env env, napi_value &object,
