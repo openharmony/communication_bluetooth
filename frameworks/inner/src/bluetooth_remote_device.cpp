@@ -342,7 +342,7 @@ int BluetoothRemoteDevice::GetDeviceProductType(int &cod, int &majorClass, int &
         HILOGW("cod = %{public}d", cod);
         cod = BluetoothDevice::MAJOR_UNCATEGORIZED;
         majorClass = BluetoothDevice::MAJOR_UNCATEGORIZED;
-        majorMinorClass = BluetoothDevice::MAJOR_UNCATEGORIZED;
+        majorMinorClass = BluetoothDevice::COMPUTER_UNCATEGORIZED;
     }
     HILOGD("device %{public}s cod = %{public}#X, majorClass = %{public}#X, majorMinorClass = %{public}#X",
         GetEncryptAddr(address_).c_str(), cod, majorClass, majorMinorClass);
