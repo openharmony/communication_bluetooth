@@ -1,0 +1,94 @@
+# Copyright (C) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+ 
+import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("//build/ohos.gni")
+import("//build/ohos/taihe_idl/taihe.gni")
+
+SUBSYSTEM_DIR = "//foundation/communication"
+
+copy_taihe_idl("bluetooth_hid_taihe") {
+  sources = [ 
+    "idl/ohos.bluetooth.hid.taihe" 
+  ]
+  deps = [
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/bluetooth_baseProfile:bluetooth_baseProfile_taihe"
+  ]
+}
+ 
+subsystem_name = "communication"
+part_name = "bluetooth"
+taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
+ 
+ohos_taihe("run_taihe") {
+  taihe_generated_file_path = "$taihe_generated_file_path"
+  deps = [ ":bluetooth_hid_taihe" ]
+  outputs = [
+    "$taihe_generated_file_path/src/ohos.bluetooth.hid.ani.cpp",
+    "$taihe_generated_file_path/src/ohos.bluetooth.hid.abi.c",
+  ]
+}
+ 
+taihe_shared_library("bluetoothHid_taihe_native") {
+  taihe_generated_file_path = "$taihe_generated_file_path"
+  part_name = "$part_name"
+  subsystem_name = "$subsystem_name"
+  sources = get_target_outputs(":run_taihe")
+  include_dirs = [
+    "include",
+    "src",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include"
+  ]
+  sources += [
+    "src/ani_constructor.cpp",
+    "src/ohos.bluetooth.hid.impl.cpp",
+  ]
+  deps = [
+    ":run_taihe",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
+    "../bluetooth_baseProfile:bluetoothBaseProfile_taihe_native"
+  ]
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
+    debug = false
+  }
+}
+ 
+generate_static_abc("bluetoothHid_abc") {
+  base_url = "$taihe_generated_file_path"
+  files = [ "$taihe_generated_file_path/@ohos.bluetooth.hid.ets" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/bluetoothHid_abc.abc"
+  dependencies = [ ":run_taihe" ]
+}
+
+ohos_prebuilt_etc("bluetoothHid_etc") {
+  source = "$target_out_dir/bluetoothHid_abc.abc"           
+  module_install_dir = "framework"
+  part_name = "$part_name"
+  subsystem_name = "$subsystem_name"
+  deps = [ ":bluetoothHid_abc" ]
+}
+
+group("bluetoothHid_taihe") {
+  deps = [
+    ":bluetoothHid_etc",
+    ":bluetoothHid_taihe_native"
+  ]
+  # deps = [":run_taihe"]
+}
