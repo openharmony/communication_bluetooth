@@ -60,7 +60,7 @@ void BluetoothTimer::Register(const TimerCallback &callback, uint32_t &outTimerI
 void BluetoothTimer::UnRegister(uint32_t timerId)
 {
     if (timerId == 0) {
-        HILOGE("timerId is 0, no register timer");
+        HILOGD("timerId is 0, no register timer");
         return;
     }
 
