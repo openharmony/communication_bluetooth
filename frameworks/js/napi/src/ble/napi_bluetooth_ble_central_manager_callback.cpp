@@ -373,7 +373,7 @@ static void StartBLESysScanTask(int resultCode)
 
 void NapiBluetoothBleCentralManagerCallback::OnStartOrStopScanEvent(int resultCode, bool isStartScan)
 {
-    HILOGI("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
+    HILOGD("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
     auto napiIsStartScan = std::make_shared<NapiNativeBool>(isStartScan);
     if (isStartScan) {
         AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::BLE_START_SCAN, napiIsStartScan, resultCode);

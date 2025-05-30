@@ -128,7 +128,7 @@ __attribute__((no_sanitize("cfi")))
 ErrCode BluetoothGattClientCallbackStub::OnCharacteristicWriteInner(
     BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
-    HILOGI("BluetoothGattClientCallbackStub::OnCharacteristicWriteInner Triggered!");
+    HILOGD("BluetoothGattClientCallbackStub::OnCharacteristicWriteInner Triggered!");
     int32_t ret = data.ReadInt32();
     std::shared_ptr<BluetoothGattCharacteristic> characteristic(data.ReadParcelable<BluetoothGattCharacteristic>());
     if (!characteristic) {

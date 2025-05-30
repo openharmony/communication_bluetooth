@@ -362,14 +362,14 @@ bool DisableBt(void)
 
 int GetBtState()
 {
-    HILOGI("enter");
+    HILOGD("enter");
     if (g_BluetoothHost == nullptr) {
         g_BluetoothHost = &BluetoothHost::GetDefaultHost();
     }
 
     int state;
     g_BluetoothHost->GetBtState(state);
-    HILOGI("br state: %{public}d", state);
+    HILOGD("br state: %{public}d", state);
     return state;
 }
 
