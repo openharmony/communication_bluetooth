@@ -196,7 +196,7 @@ void AsyncWorkCallFunction(NapiAsyncWorkMap &map, NapiAsyncType type, std::share
     HILOGD("type: %{public}d", type);
     auto asyncWork = map.Get(type);
     if (!asyncWork) {
-        HILOGE("async work(%{public}d) is nullptr", type);
+        HILOGD("async work(%{public}d) is nullptr", type);
         return;
     }
     map.Erase(type);
