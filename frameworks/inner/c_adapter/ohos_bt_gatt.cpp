@@ -411,7 +411,7 @@ int BleStopAdv(int advId)
     }
 
     std::function stopAdvFunc = [advId]() {
-        HILOGI("stop adv in adv_Queue thread, advId = %{public}d", advId);
+        HILOGD("stop adv in adv_Queue thread, advId = %{public}d", advId);
         lock_guard<mutex> lock(g_advMutex);
         int ret = g_BleAdvertiser->StopAdvertising(g_bleAdvCallbacks[advId]);
         if (ret != BT_NO_ERROR) {
