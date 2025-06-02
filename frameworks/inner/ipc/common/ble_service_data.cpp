@@ -57,6 +57,16 @@ int BleScanSettingsImpl::GetScanMode() const
     return scanMode_;
 }
 
+void BleScanSettingsImpl::SetReportMode(int reportMode)
+{
+    reportMode_ = reportMode;
+}
+
+int BleScanSettingsImpl::GetReportMode() const
+{
+    return reportMode_;
+}
+
 void BleScanSettingsImpl::SetLegacy(bool legacy)
 {
     legacy_ = legacy;
