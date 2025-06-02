@@ -96,7 +96,7 @@ struct BleCentralManager::impl {
         void OnBleBatchScanResultsEvent(std::vector<BluetoothBleScanResult> &results) override
         {
             HILOGI("enter");
-            callbacks_.ForEach([&results](std::shared_ptr<BleCentralManagerCallback> observer) {
+            callbacks_.ForEach([&results, this](std::shared_ptr<BleCentralManagerCallback> observer) {
                 std::vector<BleScanResult> scanResults;
                 for (auto &result : results) {
                     BleScanResult scanResult;
