@@ -121,7 +121,7 @@ public:
     NapiNativeBleScanReport(const BleScanResult &scanResult, ScanReportType scanReportType)
         : scanResults_(std::vector<BleScanResult>{scanResult}), scanReportType_(scanReportType) {}
     NapiNativeBleScanReport(const std::vector<BleScanResult> &scanResults, ScanReportType scanReportType)
-        : scanResult_(scanResult), scanReportType_(scanReportType) {}
+        : scanResults_(scanResults), scanReportType_(scanReportType) {}
     ~NapiNativeBleScanReport() override = default;
 
     napi_value ToNapiValue(napi_env env) const override;
