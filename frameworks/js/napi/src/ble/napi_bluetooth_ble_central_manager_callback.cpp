@@ -356,7 +356,6 @@ napi_value NapiNativeBleScanReport::ToNapiValue(napi_env env) const
     napi_value scanReport = nullptr;
     napi_create_object(env, &scanReport);
 
-    std::vector<BleScanResult> results {scanResult_};
     int32_t scanReportType = static_cast<int32_t>(scanReportType_);
 
     napi_value reportType = nullptr;
@@ -364,7 +363,7 @@ napi_value NapiNativeBleScanReport::ToNapiValue(napi_env env) const
     napi_set_named_property(env, scanReport, "reportType", reportType);
 
     napi_value scanResult = nullptr;
-    ConvertScanResult(ScanResults_, env, scanResult);
+    ConvertScanResult(scanResults_, env, scanResult);
     napi_set_named_property(env, scanReport, "scanResult", scanResult);
 
     return scanReport;
