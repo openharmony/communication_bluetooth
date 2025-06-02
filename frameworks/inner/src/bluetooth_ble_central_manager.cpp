@@ -52,12 +52,12 @@ struct BleCentralManager::impl {
         void ConvertScanResult(BluetoothBleScanResult &tempResult, BleScanResult &scanResult)
         {
             for (auto &manufacturerData : tempResult.GetManufacturerData()) {
-                scanResult.AddManufacturerData(manufacturerData.first, manufactureData.second);
+                scanResult.AddManufacturerData(manufacturerData.first, manufacturerData.second);
             }
 
             for (auto &serviceUuidData : tempResult.GetServiceUuids()) {
                 UUID uuid = UUID::ConvertFrom128Bits(serviceUuidData.first.ConvertTo128Bits);
-                scanResult.AddServiceData(uuid, serviceData.second);
+                scanResult.AddServiceUuid(uuid);
             }
 
             for (auto &serviceData : tempResult.GetServiceData()) {
@@ -78,7 +78,7 @@ struct BleCentralManager::impl {
         void OnScanCallback(const BluetoothBleScanResult &result, uint8_t callbackType) override
         {
             callbacks_.ForEach(
-                [callbackType, &result](std::shared_ptr<BleCentralManagerCallback> observer) {
+                [callbackType, &result, this](std::shared_ptr<BleCentralManagerCallback> observer) {
                 BluetoothBleScanResult tempResult(result);
                 BleScanResult scanResult;
                 ConvertScanResult(tempResult, scanResult);
