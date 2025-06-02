@@ -422,7 +422,7 @@ public:
 private:
     long reportDelayMillis_ = 0;
     int scanMode_ = SCAN_MODE_LOW_POWER;
-    int report_Mode_ = REPORT_MODE_NORMAL;
+    int reportMode_ = REPORT_MODE_NORMAL;
     bool legacy_ = true;
     int phy_ = PHY_LE_1M;
     uint8_t callbackType_ = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
