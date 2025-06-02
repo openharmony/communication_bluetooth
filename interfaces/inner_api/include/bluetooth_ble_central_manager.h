@@ -324,7 +324,7 @@ public:
      */
     int GetScanMode() const;
 
-        /**
+    /**
      * @brief Set report mode.
      *
      * @param reportMode Report mode.

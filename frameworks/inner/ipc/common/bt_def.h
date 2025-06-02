@@ -480,7 +480,7 @@ typedef enum {
 // Discard rule
 typedef enum {
     DISCARD_OLDEST = 0x00,
-    DISCARD_WEAKEST_RSSI = 0x01
+    DISCARD_WEAKEST_RSSI = 0x01,
 } DISCARD_RULE;
 
 // Scan callback type
