@@ -220,6 +220,14 @@ void NapiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult 
     }
 }
 
+void NapiBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results)
+{
+    if (isLatestNapiBleScannerObj_) {
+        auto nativeBleScanReportObj = std::make_shared<NapiNativeBleScanReport>(results, ScanReportType::ON_BATCH);
+        eventSubscribe_.PublishEvent(REGISTER_BLE_FIND_DEVICE_TYPE, nativeBleScanReportObj);
+    }
+}
+
 void NapiBluetoothBleCentralManagerCallback::OnFoundOrLostCallback(const BleScanResult &result, uint8_t callbackType)
 {
     HILOGD("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(result.GetPeripheralDevice()));
@@ -270,55 +278,6 @@ void NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnBleBatchScanResultsEve
     ConvertScanResult(results, callbackData->env, result);
     napi_get_reference_value(callbackData->env, callbackData->callback, &callback);
     napi_call_function(callbackData->env, undefined, callback, ARGS_SIZE_ONE, &result, &callResult);
-}
-
-void NapiBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results)
-{
-    HILOGI("enter, scan result size: %{public}zu", results.size());
-    std::shared_ptr<BluetoothCallbackInfo> callbackInfo = GetCallbackInfoByType(REGISTER_BLE_FIND_DEVICE_TYPE);
-    if (callbackInfo == nullptr) {
-        HILOGI("This callback is not registered by ability.");
-        return;
-    }
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(callbackInfo->env_, &loop);
-    if (loop == nullptr) {
-        HILOGE("loop instance is nullptr");
-        return;
-    }
-
-    auto callbackData = new (std::nothrow) AfterWorkCallbackData<NapiBluetoothBleCentralManagerCallback,
-        decltype(&NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnBleBatchScanResultsEvent),
-        std::vector<BleScanResult>>();
-    if (callbackData == nullptr) {
-        HILOGE("new callbackData failed");
-        return;
-    }
-
-    callbackData->object = this;
-    callbackData->function = &NapiBluetoothBleCentralManagerCallback::UvQueueWorkOnBleBatchScanResultsEvent;
-    callbackData->env = callbackInfo->env_;
-    callbackData->callback = callbackInfo->callback_;
-    callbackData->data = results;
-
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        HILOGE("new work failed");
-        delete callbackData;
-        callbackData = nullptr;
-        return;
-    }
-
-    work->data = static_cast<void *>(callbackData);
-
-    int ret = uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, AfterWorkCallback<decltype(callbackData)>);
-    if (ret != 0) {
-        delete callbackData;
-        callbackData = nullptr;
-        delete work;
-        work = nullptr;
-    }
 }
 
 static void StartBLESysScanTask(int resultCode)
@@ -405,7 +364,7 @@ napi_value NapiNativeBleScanReport::ToNapiValue(napi_env env) const
     napi_set_named_property(env, scanReport, "reportType", reportType);
 
     napi_value scanResult = nullptr;
-    ConvertScanResult(results, env, scanResult);
+    ConvertScanResult(ScanResults_, env, scanResult);
     napi_set_named_property(env, scanReport, "scanResult", scanResult);
 
     return scanReport;

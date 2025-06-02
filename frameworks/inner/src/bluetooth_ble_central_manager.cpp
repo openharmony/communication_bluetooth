@@ -49,34 +49,39 @@ struct BleCentralManager::impl {
         explicit BluetoothBleCentralManagerCallbackImp() {};
         ~BluetoothBleCentralManagerCallbackImp() override = default;
         __attribute__((no_sanitize("cfi")))
+        void ConvertScanResult(BluetoothBleScanResult &tempResult, BleScanResult &scanResult)
+        {
+            for (auto &manufacturerData : tempResult.GetManufacturerData()) {
+                scanResult.AddManufacturerData(manufacturerData.first, manufactureData.second);
+            }
+
+            for (auto &serviceUuidData : tempResult.GetServiceUuids()) {
+                UUID uuid = UUID::ConvertFrom128Bits(serviceUuidData.first.ConvertTo128Bits);
+                scanResult.AddServiceData(uuid, serviceData.second);
+            }
+
+            for (auto &serviceData : tempResult.GetServiceData()) {
+                    UUID uuid = UUID::ConvertFrom128Bits(serviceData.first.ConvertTo128Bits());
+                    scanResult.AddServiceData(uuid, serviceData.second);
+            }
+
+            scanResult.SetAdvertiseFlag(tempResult.GetAdvertiseFlag());
+            scanResult.SetRssi(tempResult.GetRssi());
+            scanResult.SetConnectable(tempResult.IsConnectable());
+            BluetoothRemoteDevice device(tempResult.GetPeripheralDevice().GetAddress(), BT_TRANSPORT_BLE);
+            scanResult.SetPeripheralDevice(device);
+            scanResult.SetPayload(tempResult.GetPayload());
+            scanResult.SetName(tempResult.GetName());
+            scanResult.SetEventType(tempResult.GetEventType());
+        }
+
         void OnScanCallback(const BluetoothBleScanResult &result, uint8_t callbackType) override
         {
             callbacks_.ForEach(
                 [callbackType, &result](std::shared_ptr<BleCentralManagerCallback> observer) {
                 BluetoothBleScanResult tempResult(result);
                 BleScanResult scanResult;
-                for (auto &manufacturerData : tempResult.GetManufacturerData()) {
-                    scanResult.AddManufacturerData(manufacturerData.first, manufacturerData.second);
-                }
-
-                for (auto &serviceUuidData : tempResult.GetServiceUuids()) {
-                    UUID uuid = UUID::ConvertFrom128Bits(serviceUuidData.ConvertTo128Bits());
-                    scanResult.AddServiceUuid(uuid);
-                }
-
-                for (auto &serviceData : tempResult.GetServiceData()) {
-                    UUID uuid = UUID::ConvertFrom128Bits(serviceData.first.ConvertTo128Bits());
-                    scanResult.AddServiceData(uuid, serviceData.second);
-                }
-
-                scanResult.SetAdvertiseFlag(tempResult.GetAdvertiseFlag());
-                scanResult.SetRssi(tempResult.GetRssi());
-                scanResult.SetConnectable(tempResult.IsConnectable());
-                BluetoothRemoteDevice device(tempResult.GetPeripheralDevice().GetAddress(), BT_TRANSPORT_BLE);
-                scanResult.SetPeripheralDevice(device);
-                scanResult.SetPayload(tempResult.GetPayload());
-                scanResult.SetName(tempResult.GetName());
-                scanResult.SetEventType(tempResult.GetEventType());
+                ConvertScanResult(tempResult, scanResult);
                 std::string address = result.GetPeripheralDevice().GetAddress();
                 HILOGD("device: %{public}s, len: %{public}d",
                     GetEncryptAddr(address).c_str(), static_cast<int>(scanResult.GetPayload().size()));
@@ -95,27 +100,7 @@ struct BleCentralManager::impl {
                 std::vector<BleScanResult> scanResults;
                 for (auto &result : results) {
                     BleScanResult scanResult;
-                    for (auto &manufacturerData : result.GetManufacturerData()) {
-                        scanResult.AddManufacturerData(manufacturerData.first, manufacturerData.second);
-                    }
-
-                    for (auto &serviceData : result.GetServiceData()) {
-                        UUID uuid = UUID::ConvertFrom128Bits(serviceData.first.ConvertTo128Bits());
-                        scanResult.AddServiceData(uuid, serviceData.second);
-                    }
-
-                    for (auto &serviceUuidData : result.GetServiceUuids()) {
-                        UUID uuid = UUID::ConvertFrom128Bits(serviceUuidData.ConvertTo128Bits());
-                        scanResult.AddServiceUuid(uuid);
-                    }
-
-                    scanResult.SetAdvertiseFlag(result.GetAdvertiseFlag());
-                    scanResult.SetConnectable(result.IsConnectable());
-                    scanResult.SetRssi(result.GetRssi());
-                    BluetoothRemoteDevice device(result.GetPeripheralDevice().GetAddress(), BT_TRANSPORT_BLE);
-                    scanResult.SetPeripheralDevice(device);
-                    scanResult.SetPayload(result.GetPayload());
-
+                    ConvertScanResult(result, scanResult);
                     scanResults.push_back(scanResult);
                 }
 
@@ -197,8 +182,9 @@ bool BleCentralManager::impl::InitScannerId(void)
 void BleCentralManager::impl::ConvertBleScanSetting(const BleScanSettings &inSettings,
     BluetoothBleScanSettings &outSetting)
 {
-    outSetting.SetReportDelay(0);
+    outSetting.SetReportDelay(inSettings.GetReportDelayMillisValue);
     outSetting.SetScanMode(inSettings.GetScanMode());
+    outSetting.SetReportMode(inSettings.GetReportMode());
     outSetting.SetLegacy(inSettings.GetLegacy());
     outSetting.SetPhy(inSettings.GetPhy());
     outSetting.SetCallbackType(inSettings.GetCallbackType());
@@ -701,6 +687,16 @@ int BleScanSettings::SetScanMode(int scanMode)
 int BleScanSettings::GetScanMode() const
 {
     return scanMode_;
+}
+
+void BleScanSettings::SetReportMode(int reportMode)
+{
+    reportMode_ = reportMode;
+}
+
+int BleScanSettings::GetReportMode() const
+{
+    return reportMode_;
 }
 
 void BleScanSettings::SetLegacy(bool legacy)

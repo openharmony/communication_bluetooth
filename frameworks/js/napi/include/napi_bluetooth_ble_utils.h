@@ -119,12 +119,14 @@ private:
 class NapiNativeBleScanReport : public NapiNativeObject {
 public:
     NapiNativeBleScanReport(const BleScanResult &scanResult, ScanReportType scanReportType)
+        : scanResults_(std::vector<BleScanResult>{scanResult}), scanReportType_(scanReportType) {}
+    NapiNativeBleScanReport(const std::vector<BleScanResult> &scanResults, ScanReportType scanReportType)
         : scanResult_(scanResult), scanReportType_(scanReportType) {}
     ~NapiNativeBleScanReport() override = default;
 
     napi_value ToNapiValue(napi_env env) const override;
 private:
-    BleScanResult scanResult_;
+    std::vector<BleScanResult> scanResults_;
     ScanReportType scanReportType_;
 };
 

@@ -27,12 +27,14 @@
 #include "napi_bluetooth_utils.h"
 #include "napi_bluetooth_ble_utils.h"
 #include "napi_ha_event_utils.h"
+
 #include "bluetooth_ble_advertiser.h"
 #include "bluetooth_ble_central_manager.h"
 #include "bluetooth_errorcode.h"
 #include "bluetooth_utils.h"
 #include "../parser/napi_parser_utils.h"
 #include "hitrace_meter.h"
+
 #include <memory>
 namespace OHOS {
 namespace Bluetooth {
@@ -414,6 +416,9 @@ static void ConvertScanReportMode(ScanOptions &params, int32_t scanReportMode)
         case static_cast<int32_t>(ScanReportMode::NORMAL):
             params.reportMode = ScanReportMode::NORMAL;
             break;
+        case static_cast<int32_t>(ScanReportMode::BATCH):
+            params.reportMode = ScanReportMode::BATCH;
+            break;
         case static_cast<int32_t>(ScanReportMode::FENCE_SENSITIVITY_LOW):
             params.reportMode = ScanReportMode::FENCE_SENSITIVITY_LOW;
             break;
@@ -651,12 +656,21 @@ napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vecto
     if (argc == ARGS_SIZE_TWO) {
         ScanOptions scanOptions;
         NAPI_BT_CALL_RETURN(ParseScanParameters(env, info, argv[PARAM1], scanOptions));
-        outSettinngs.SetReportDelay(scanOptions.interval);
+
+        // enforce ReportDelay to be either 0 or at least the floor value(5000ms)
+        long currentReportDelay = ScanOptions.interval;
+        long reportDelayFloorValue = 5000;
+        if (currentReportDelay == 0 || currentReportDelay >= reportDelayFloorValue) {
+            outsettings.SetReportDelay(currentReportDelay);
+        } else {
+            outsettings.SetReportDelay(reportDelayFloorValue);
+        }
         outSettinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
         outSettinngs.SetPhy(static_cast<int32_t>(scanOptions.phyType));
         // reportMode -> callbackType + sensitivityMode
         uint8_t callbackType = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
         uint8_t sensitivityMode = static_cast<uint8_t>(SensitivityMode::SENSITIVITY_MODE_HIGH);
+
         switch (scanOptions.reportMode) {
             case ScanReportMode::NORMAL:
                 callbackType = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
@@ -674,6 +688,7 @@ napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vecto
         }
         outSettinngs.SetCallbackType(callbackType);
         outSettinngs.SetSensitivityMode(sensitivityMode);
+        outSettinngs.SetReportMode(static_cast<int32_t>(scanOptions.reportMode));
     }
 
     outScanfilters = std::move(scanfilters);

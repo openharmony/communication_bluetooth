@@ -462,6 +462,27 @@ typedef enum {
     SCAN_MODE_OP_MAX,
 } SCAN_MODE;
 
+// Report mode
+typedef enum {
+    REPORT_MODE_NORMAL = 0x01,
+    REPORT_MODE_BATCH = 0x02,
+    REPORT_MODE_FENCE_SENSITIVITY_LOW = 0x0A,
+    REPORT_MODE_FENCE_SENSITIVITY_HIGH = 0x0B,
+    REPORT_MODE_INVALID
+} REPORT_MODE;
+
+// Format of data
+typedef enum {
+    BATCH_SCAN_FORMAT_TRUNCATED = 0x01,
+    BATCH_SCAN_FORMAT_FULL = 0x02,
+} BATCH_SCAN_FORMAT;
+
+// Discard rule
+typedef enum {
+    DISCARD_OLDEST = 0x00,
+    DISCARD_WEAKEST_RSSI = 0x01
+} DISCARD_RULE;
+
 // Scan callback type
 constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_ALL_MATCH = 1;
 constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_FIRST_MATCH = 2;
