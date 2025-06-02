@@ -182,7 +182,7 @@ bool BleCentralManager::impl::InitScannerId(void)
 void BleCentralManager::impl::ConvertBleScanSetting(const BleScanSettings &inSettings,
     BluetoothBleScanSettings &outSetting)
 {
-    outSetting.SetReportDelay(inSettings.GetReportDelayMillisValue);
+    outSetting.SetReportDelay(inSettings.GetReportDelayMillisValue());
     outSetting.SetScanMode(inSettings.GetScanMode());
     outSetting.SetReportMode(inSettings.GetReportMode());
     outSetting.SetLegacy(inSettings.GetLegacy());
