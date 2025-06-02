@@ -56,7 +56,7 @@ struct BleCentralManager::impl {
             }
 
             for (auto &serviceUuidData : tempResult.GetServiceUuids()) {
-                UUID uuid = UUID::ConvertFrom128Bits(serviceUuidData.first.ConvertTo128Bits);
+                UUID uuid = UUID::ConvertFrom128Bits(serviceUuidData.ConvertTo128Bits());
                 scanResult.AddServiceUuid(uuid);
             }
 
