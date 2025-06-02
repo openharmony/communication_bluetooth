@@ -661,9 +661,9 @@ napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vecto
         long currentReportDelay = scanOptions.interval;
         long reportDelayFloorValue = 5000;
         if (currentReportDelay == 0 || currentReportDelay >= reportDelayFloorValue) {
-            outSettings.SetReportDelay(currentReportDelay);
+            outSettinngs.SetReportDelay(currentReportDelay);
         } else {
-            outSettings.SetReportDelay(reportDelayFloorValue);
+            outSettinngs.SetReportDelay(reportDelayFloorValue);
         }
         outSettinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
         outSettinngs.SetPhy(static_cast<int32_t>(scanOptions.phyType));
