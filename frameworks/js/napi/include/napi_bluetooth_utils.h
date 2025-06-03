@@ -216,12 +216,14 @@ enum class AdvertisingState {
 
 enum class ScanReportType {
     ON_FOUND = 1, // the found of advertisement packet
-    ON_LOST = 2 // the lost of advertisement packet
+    ON_LOST = 2, // the lost of advertisement packet
+    ON_BATCH = 3 // Batchscan reports
 };
 
 // Report mode used during scan.
 enum class ScanReportMode {
     NORMAL = 1,
+    BATCH = 2,
     FENCE_SENSITIVITY_LOW = 10,
     FENCE_SENSITIVITY_HIGH = 11,
 };

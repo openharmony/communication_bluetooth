@@ -449,6 +449,15 @@ typedef enum {
     SCAN_MODE_INVALID
 } SCAN_MODE;
 
+// Report mode
+typedef enum {
+    REPORT_MODE_NORMAL = 0x01,
+    REPORT_MODE_BATCH = 0x02,
+    REPORT_MODE_FENCE_SENSITIVITY_LOW = 0x0A,
+    REPORT_MODE_FENCE_SENSITIVITY_HIGH = 0x0B,
+    REPORT_MODE_INVALID
+} REPORT_MODE;
+
 // Scan callback type
 constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_ALL_MATCH = 1;
 constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_FIRST_MATCH = 2;

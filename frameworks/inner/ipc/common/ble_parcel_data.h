@@ -713,6 +713,29 @@ public:
     }
 
     /**
+     * @brief Set report mode.
+     *
+     * @param reportMode Report mode.
+     * @return If the reportMode is invalid.
+     * @since 6
+     */
+    void SetReportMode(int reportMode)
+    {
+        reportMode_ = reportMode;
+    }
+
+    /**
+     * @brief Get report mode.
+     *
+     * @return Report mode.
+     * @since 6
+     */
+    int GetReportMode() const
+    {
+        return reportMode_;
+    }
+
+    /**
      * @brief Set legacy flag.
      *
      * @param legacy Legacy value.
@@ -825,6 +848,7 @@ public:
 public:
     long reportDelayMillis_ = 0;
     int scanMode_ = 0;
+    int reportMode_ = 1;
     bool legacy_ = true;
     int phy_ = 255;
     uint8_t callbackType_ = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
