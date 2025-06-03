@@ -106,7 +106,7 @@ public:
      * @brief Set report mode.
      *
      * @param reportMode Report mode.
-     * @since 6
+     * @since 20
      */
     void SetReportMode(int reportMode);
 
@@ -114,7 +114,7 @@ public:
      * @brief Get report mode.
      *
      * @return Report mode.
-     * @since 6
+     * @since 20
      */
     int GetReportMode() const;
 
