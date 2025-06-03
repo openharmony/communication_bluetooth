@@ -61,8 +61,8 @@ struct BleCentralManager::impl {
             }
 
             for (auto &serviceData : tempResult.GetServiceData()) {
-                    UUID uuid = UUID::ConvertFrom128Bits(serviceData.first.ConvertTo128Bits());
-                    scanResult.AddServiceData(uuid, serviceData.second);
+                UUID uuid = UUID::ConvertFrom128Bits(serviceData.first.ConvertTo128Bits());
+                scanResult.AddServiceData(uuid, serviceData.second);
             }
 
             scanResult.SetAdvertiseFlag(tempResult.GetAdvertiseFlag());
