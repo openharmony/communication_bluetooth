@@ -633,7 +633,7 @@ static napi_status ParseScanFilterParameters(const napi_env &env, napi_value &ar
     return napi_ok;
 }
 
-napi_status SetReportDelay(ScanOptions &scanOptions, BleScanSettings &outSettinngs)
+static void SetReportDelay(ScanOptions &scanOptions, BleScanSettings &outSettinngs)
 {
     // enforce ReportDelay to be either 0 or at least the floor value(5000ms)
     long currentReportDelay = scanOptions.interval;
@@ -645,7 +645,7 @@ napi_status SetReportDelay(ScanOptions &scanOptions, BleScanSettings &outSettinn
     }
 }
 
-napi_status SetCbTypeSensMode(ScanOptions &scanOptions, BleScanSettings &outSettinngs)
+static void SetCbTypeSensMode(ScanOptions &scanOptions, BleScanSettings &outSettinngs)
 {
     // reportMode -> callbackType + sensitivityMode
     uint8_t callbackType = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
@@ -693,7 +693,6 @@ napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vecto
     if (argc == ARGS_SIZE_TWO) {
         ScanOptions scanOptions;
         NAPI_BT_CALL_RETURN(ParseScanParameters(env, info, argv[PARAM1], scanOptions));
-
         SetReportDelay(scanOptions, outSettinngs);
         outSettinngs.SetReportMode(static_cast<int32_t>(scanOptions.reportMode));
         outSettinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
