@@ -325,6 +325,22 @@ public:
     int GetScanMode() const;
 
     /**
+     * @brief Set report mode.
+     *
+     * @param reportMode Report mode.
+     * @since 20
+     */
+    void SetReportMode(int reportMode);
+
+    /**
+     * @brief Get report mode.
+     *
+     * @return Report mode.
+     * @since 20
+     */
+    int GetReportMode() const;
+
+    /**
      * @brief Set legacy flag.
      *
      * @param legacy Legacy value.
@@ -406,6 +422,7 @@ public:
 private:
     long reportDelayMillis_ = 0;
     int scanMode_ = SCAN_MODE_LOW_POWER;
+    int reportMode_ = REPORT_MODE_NORMAL;
     bool legacy_ = true;
     int phy_ = PHY_LE_1M;
     uint8_t callbackType_ = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;

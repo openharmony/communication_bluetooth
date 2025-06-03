@@ -45,6 +45,7 @@ public:
     int payloadLen_;
     std::string bussinessType_;
     int scanMode_;
+    int reportMode_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

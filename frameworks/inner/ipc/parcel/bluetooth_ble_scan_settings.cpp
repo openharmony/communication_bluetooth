@@ -25,6 +25,9 @@ bool BluetoothBleScanSettings::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(scanMode_)) {
         return false;
     }
+    if (!parcel.WriteInt32(reportMode_)) {
+        return false;
+    }
     if (!parcel.WriteBool(legacy_)) {
         return false;
     }
@@ -67,6 +70,9 @@ bool BluetoothBleScanSettings::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!parcel.ReadInt32(scanMode_)) {
+        return false;
+    }
+    if (!parcel.ReadInt32(reportMode_)) {
         return false;
     }
     if (!parcel.ReadBool(legacy_)) {

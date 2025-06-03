@@ -452,6 +452,8 @@ napi_value ScanReportTypeInit(napi_env env)
         env, scanReportTypeObj, static_cast<int32_t>(ScanReportType::ON_FOUND), "ON_FOUND");
     SetNamedPropertyByInteger(
         env, scanReportTypeObj, static_cast<int32_t>(ScanReportType::ON_LOST), "ON_LOST");
+    SetNamedPropertyByInteger(
+        env, scanReportTypeObj, static_cast<int32_t>(ScanReportType::ON_BATCH), "ON_BATCH");
     return scanReportTypeObj;
 }
 
@@ -500,6 +502,8 @@ napi_value ScanReportModeInit(napi_env env)
     napi_create_object(env, &reportModeObj);
     SetNamedPropertyByInteger(
         env, reportModeObj, static_cast<int32_t>(ScanReportMode::NORMAL), "NORMAL");
+    SetNamedPropertyByInteger(
+        env, reportModeObj, static_cast<int32_t>(ScanReportMode::BATCH), "BATCH");
     SetNamedPropertyByInteger(
         env, reportModeObj, static_cast<int32_t>(ScanReportMode::FENCE_SENSITIVITY_LOW), "FENCE_SENSITIVITY_LOW");
     SetNamedPropertyByInteger(
