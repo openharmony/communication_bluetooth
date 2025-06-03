@@ -633,6 +633,43 @@ static napi_status ParseScanFilterParameters(const napi_env &env, napi_value &ar
     return napi_ok;
 }
 
+napi_status SetReportDelay(ScanOptions &scanOptions, BleScanSettings &outSettinngs)
+{
+    // enforce ReportDelay to be either 0 or at least the floor value(5000ms)
+    long currentReportDelay = scanOptions.interval;
+    long reportDelayFloorValue = 5000;
+    if (currentReportDelay == 0 || currentReportDelay >= reportDelayFloorValue) {
+        outSettinngs.SetReportDelay(currentReportDelay);
+    } else {
+        outSettinngs.SetReportDelay(reportDelayFloorValue);
+    }
+}
+
+napi_status SetCbTypeSensMode(ScanOptions &scanOptions, BleScanSettings &outSettinngs)
+{
+    // reportMode -> callbackType + sensitivityMode
+    uint8_t callbackType = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
+    uint8_t sensitivityMode = static_cast<uint8_t>(SensitivityMode::SENSITIVITY_MODE_HIGH);
+
+    switch (scanOptions.reportMode) {
+        case ScanReportMode::NORMAL:
+            callbackType = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
+            break;
+        case ScanReportMode::FENCE_SENSITIVITY_LOW:
+            callbackType = BLE_SCAN_CALLBACK_TYPE_FIRST_AND_LOST_MATCH;
+            sensitivityMode = static_cast<uint8_t>(SensitivityMode::SENSITIVITY_MODE_LOW);
+            break;
+        case ScanReportMode::FENCE_SENSITIVITY_HIGH:
+            callbackType = BLE_SCAN_CALLBACK_TYPE_FIRST_AND_LOST_MATCH;
+            sensitivityMode = static_cast<uint8_t>(SensitivityMode::SENSITIVITY_MODE_HIGH);
+            break;
+        default:
+            break;
+    }
+    outSettinngs.SetCallbackType(callbackType);
+    outSettinngs.SetSensitivityMode(sensitivityMode);
+}
+
 napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vector<BleScanFilter> &outScanfilters,
     BleScanSettings &outSettinngs)
 {
@@ -657,38 +694,11 @@ napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vecto
         ScanOptions scanOptions;
         NAPI_BT_CALL_RETURN(ParseScanParameters(env, info, argv[PARAM1], scanOptions));
 
-        // enforce ReportDelay to be either 0 or at least the floor value(5000ms)
-        long currentReportDelay = scanOptions.interval;
-        long reportDelayFloorValue = 5000;
-        if (currentReportDelay == 0 || currentReportDelay >= reportDelayFloorValue) {
-            outSettinngs.SetReportDelay(currentReportDelay);
-        } else {
-            outSettinngs.SetReportDelay(reportDelayFloorValue);
-        }
+        SetReportDelay(scanOptions, outSettinngs);
+        outSettinngs.SetReportMode(static_cast<int32_t>(scanOptions.reportMode));
         outSettinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
         outSettinngs.SetPhy(static_cast<int32_t>(scanOptions.phyType));
-        // reportMode -> callbackType + sensitivityMode
-        uint8_t callbackType = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
-        uint8_t sensitivityMode = static_cast<uint8_t>(SensitivityMode::SENSITIVITY_MODE_HIGH);
-
-        switch (scanOptions.reportMode) {
-            case ScanReportMode::NORMAL:
-                callbackType = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
-                break;
-            case ScanReportMode::FENCE_SENSITIVITY_LOW:
-                callbackType = BLE_SCAN_CALLBACK_TYPE_FIRST_AND_LOST_MATCH;
-                sensitivityMode = static_cast<uint8_t>(SensitivityMode::SENSITIVITY_MODE_LOW);
-                break;
-            case ScanReportMode::FENCE_SENSITIVITY_HIGH:
-                callbackType = BLE_SCAN_CALLBACK_TYPE_FIRST_AND_LOST_MATCH;
-                sensitivityMode = static_cast<uint8_t>(SensitivityMode::SENSITIVITY_MODE_HIGH);
-                break;
-            default:
-                break;
-        }
-        outSettinngs.SetCallbackType(callbackType);
-        outSettinngs.SetSensitivityMode(sensitivityMode);
-        outSettinngs.SetReportMode(static_cast<int32_t>(scanOptions.reportMode));
+        SetCbTypeSensMode(scanOptions, outSettinngs);
     }
 
     outScanfilters = std::move(scanfilters);

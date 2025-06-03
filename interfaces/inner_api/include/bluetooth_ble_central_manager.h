@@ -328,7 +328,7 @@ public:
      * @brief Set report mode.
      *
      * @param reportMode Report mode.
-     * @since 6
+     * @since 20
      */
     void SetReportMode(int reportMode);
 
@@ -336,14 +336,14 @@ public:
      * @brief Get report mode.
      *
      * @return Report mode.
-     * @since 6
+     * @since 20
      */
     int GetReportMode() const;
 
     /**
      * @brief Set legacy flag.
      *
-     * @param legacy Legacy value. 
+     * @param legacy Legacy value.
      * @since 6
      */
     void SetLegacy(bool legacy);
