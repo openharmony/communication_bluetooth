@@ -343,7 +343,7 @@ public:
     /**
      * @brief Set legacy flag.
      *
-     * @param legacy Legacy value.
+     * @param legacy Legacy value. 
      * @since 6
      */
     void SetLegacy(bool legacy);
