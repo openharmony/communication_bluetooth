@@ -222,6 +222,27 @@
             "header_files": []
           },
           "name": "//foundation/communication/bluetooth/frameworks/cj/connection:cj_bluetooth_connection_ffi"
+        },
+        {
+          "header": {
+            "header_base": "//foundation/communication/bluetooth/frameworks/cj/hfp/include",
+            "header_files": []
+          },
+          "name": "//foundation/communication/bluetooth/frameworks/cj/hfp:cj_bluetooth_hfp_ffi"
+        },
+        {
+          "header": {
+            "header_base": "//foundation/communication/bluetooth/frameworks/cj/hid/include",
+            "header_files": []
+          },
+          "name": "//foundation/communication/bluetooth/frameworks/cj/hid:cj_bluetooth_hid_ffi"
+        },
+        {
+          "header": {
+            "header_base": "//foundation/communication/bluetooth/frameworks/cj/socket/include",
+            "header_files": []
+          },
+          "name": "//foundation/communication/bluetooth/frameworks/cj/socket:cj_bluetooth_socket_ffi"
         }
       ]
     }
