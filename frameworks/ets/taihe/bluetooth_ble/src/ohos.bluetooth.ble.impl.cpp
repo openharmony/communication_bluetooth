@@ -59,11 +59,11 @@ public:
     {
     }
 
-    void OnBLEMtuChange(callback_view<void(int32_t)> callback)
+    void OnBLEMtuChange(callback_view<void(double)> callback)
     {
     }
 
-    void OffBLEMtuChange(optional_view<callback<void(int32_t)>> callback)
+    void OffBLEMtuChange(optional_view<callback<void(double)>> callback)
     {
     }
 
@@ -107,11 +107,11 @@ public:
     {
     }
 
-    void OnBLEMtuChange(callback_view<void(int32_t)> callback)
+    void OnBLEMtuChange(callback_view<void(double)> callback)
     {
     }
 
-    void OffBLEMtuChange(optional_view<callback<void(int32_t)>> callback)
+    void OffBLEMtuChange(optional_view<callback<void(double)>> callback)
     {
     }
 
