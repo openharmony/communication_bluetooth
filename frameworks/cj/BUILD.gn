@@ -19,5 +19,8 @@ group("bluetooth_ffi") {
     "$SUBSYSTEM_DIR/bluetooth/frameworks/cj/access:cj_bluetooth_access_ffi",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/cj/ble:cj_bluetooth_ble_ffi",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/cj/connection:cj_bluetooth_connection_ffi",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/cj/hfp:cj_bluetooth_hfp_ffi",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/cj/hid:cj_bluetooth_hid_ffi",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/cj/socket:cj_bluetooth_socket_ffi",
   ]
 }
