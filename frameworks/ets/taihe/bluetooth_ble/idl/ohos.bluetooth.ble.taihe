@@ -124,8 +124,6 @@ struct CharacteristicWriteRequest {
     serviceUuid: String;
 }
 
-function CreateGattClientDevice(deviceId: String): GattClientDevice;
-
 function StopBLEScan(): void;
 
 struct ServerResponse {
@@ -209,6 +207,7 @@ function StopAdvertising(): void;
 @gen_promise("stopAdvertising")
 function StopAdvertisingSync(advertisingId: f64): void;
 
+@class
 interface GattClientDevice {
     @on_off("BLECharacteristicChange")
     OnBLECharacteristicChange(callback: (a: BLECharacteristic) => void): void;
@@ -252,8 +251,10 @@ interface GattClientDevice {
     Close(): void;
 }
 
-function CreateGattServer(): GattServer;
+@ctor("GattClientDevice")
+function CreateGattClientDevice(deviceId: String): GattClientDevice;
 
+@class
 interface GattServer {
     @on_off("characteristicRead")
     OnCharacteristicRead(callback: (a: CharacteristicReadRequest) => void): void;
@@ -282,6 +283,9 @@ interface GattServer {
 
     Close(): void;
 }
+
+@ctor("GattServer")
+function CreateGattServer(): GattServer;
 
 struct AdvertiseData {
     serviceUuids: Array<String>;
@@ -319,12 +323,14 @@ struct BLEConnectionChangeState {
     state: ProfileConnectionState;
 }
 
-function CreateBleScanner(): BleScanner;
-
+@class
 interface BleScanner {
     @on_off("BLEDeviceFind")
     OnBLEDeviceFind(callback: (a: ScanReport) => void): void;
     @on_off("BLEDeviceFind")
     OffBLEDeviceFind(callback:Optional<(a: ScanReport)=> void>): void;
 }
+
+@ctor("BleScanner")
+function CreateBleScanner(): BleScanner;
 
