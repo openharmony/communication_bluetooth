@@ -27,9 +27,31 @@
 #include "i_bluetooth_host.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "ipc_skeleton.h"
+#ifdef RES_SCHED_SUPPORT
+#include "res_type.h"
+#include "res_sched_client.h"
+#endif
 
 namespace OHOS {
 namespace Bluetooth {
+
+static void ReportDataToRss(const std::string &action, int id, const std::string &address, int pid, int uid)
+{
+#ifdef RES_SCHED_SUPPORT
+    HILOGD("report SPP_CONNECT_STATE");
+    std::unordered_map<std::string, std::string> payload;
+    payload["ACTION"] = action;
+    payload["ID"] = std::to_string(id);
+    payload["ADDRESS"] = address;
+    payload["PID"] = std::to_string(pid);
+    payload["UID"] = std::to_string(uid);
+    ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+        OHOS::ResourceSchedule::ResType::RES_TYPE_BT_SERVICE_EVENT,
+        OHOS::ResourceSchedule::ResType::BtServiceEvent::SPP_CONNECT_STATE,
+        payload);
+#endif
+}
 
 BluetoothOppTransferInformation TransferInformation(const BluetoothIOppTransferInformation &other)
 {
@@ -424,16 +446,18 @@ int32_t Opp::CancelTransfer(bool &result)
 
 void Opp::RegisterObserver(std::shared_ptr<OppObserver> observer)
 {
-    HILOGD("enter");
+    HILOGI("enter");
     CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
     pimpl->RegisterObserver(observer);
+    ReportDataToRss("connect", -1, "empty", IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
 
 void Opp::DeregisterObserver(std::shared_ptr<OppObserver> observer)
 {
-    HILOGD("enter");
+    HILOGI("enter");
     CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
     pimpl->DeregisterObserver(observer);
+    ReportDataToRss("close", -1, "empty", IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
