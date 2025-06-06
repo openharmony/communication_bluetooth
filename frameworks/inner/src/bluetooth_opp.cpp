@@ -35,11 +35,10 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 static void ReportDataToRss(const std::string &action, int id, const std::string &address, int pid, int uid)
 {
 #ifdef RES_SCHED_SUPPORT
-    HILOGD("report SPP_CONNECT_STATE");
+    HILOGI("report SPP_CONNECT_STATE enter");
     std::unordered_map<std::string, std::string> payload;
     payload["ACTION"] = action;
     payload["ID"] = std::to_string(id);
@@ -50,6 +49,7 @@ static void ReportDataToRss(const std::string &action, int id, const std::string
         OHOS::ResourceSchedule::ResType::RES_TYPE_BT_SERVICE_EVENT,
         OHOS::ResourceSchedule::ResType::BtServiceEvent::SPP_CONNECT_STATE,
         payload);
+    HILOGI("report SPP_CONNECT_STATE end");
 #endif
 }
 
