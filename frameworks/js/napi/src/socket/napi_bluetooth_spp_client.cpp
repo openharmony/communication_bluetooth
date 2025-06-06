@@ -252,15 +252,15 @@ static napi_status CheckSppWriteParams(
 #ifdef BLUETOOTH_KIA_ENABLE
 static void ReportRefuseInfo(int32_t pid, int64_t refuseTime)
 {
-    cJson *outJson = cJSON_CreateObject();
+    cJSON *outJson = cJSON_CreateObject();
     if (outJson == nullptr) {
         HILOGE("ReportRefuseInfo json object created error");
         return;
     }
-    cJson_AddNumberToObject(outJson, "timestamp", refuseTime);
-    cJson_AddStringToObject(outJson, "type", "bluetooth_send");
-    cJson_AddStringToObject(outJson, "ftype", "1");
-    cJson_AddNumberToObject(outJson, "process_pid", pid);
+    cJSON_AddNumberToObject(outJson, "timestamp", refuseTime);
+    cJSON_AddStringToObject(outJson, "type", "bluetooth_send");
+    cJSON_AddStringToObject(outJson, "ftype", "1");
+    cJSON_AddNumberToObject(outJson, "process_pid", pid);
     char *jsonContent = cJSON_PrintUnformatted(outJson);
     if (jsonContent == nullptr) {
         HILOGE("ReportRefuseInfo print json unformatted error");
@@ -283,11 +283,11 @@ static bool ShouldRefuseConnect(int32_t pid)
     constexpr int64_t msPerSecond = 1000;
     constexpr int64_t nsPerMs = 1000000;
     struct timespec times;
-    if (clock_gettime(CLOCK_MONOTONIC, &time) < 0) {
+    if (clock_gettime(CLOCK_MONOTONIC, &times) < 0) {
         HILOGE("Failed clock_gettime:%{public}s, ShouldRefuseConnect:false", strerror(errno));
         return false;
     }
-    int64_t bootTime = ((time.tv_sec * msPerSecond) = (time.tv_nsec / nsPerMs))；
+    int64_t bootTime = ((times.tv_sec * msPerSecond) + (times.tv_nsec / nsPerMs));
     HILOGI("bootTime:%{public}lu", bootTime);
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     auto prohibitedTime = host->GetRefusePolicyProhibitedTime();
@@ -309,7 +309,7 @@ napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
     int id = -1;
 
 #ifdef BLUETOOTH_KIA_ENABLE
-    if (ShouldRefuseConnect(IPCSkeletion::GetCallingPid())) {
+    if (ShouldRefuseConnect(IPCSkeleton::GetCallingPid())) {
         HILOGE("socket refuse because of Refuse Policy");
         NAPI_BT_ASSERT_RETURN_FALSE(env, false, BT_ERR_INVALID_PARAM);
     }
@@ -551,7 +551,7 @@ napi_value NapiSppClient::SppWriteAsync(napi_env env, napi_callback_info info)
     int id = -1;
 
 #ifdef BLUETOOTH_KIA_ENABLE
-    if (ShouldRefuseConnect(IPCSkeletion::GetCallingPid())) {
+    if (ShouldRefuseConnect(IPCSkeleton::GetCallingPid())) {
         HILOGE("socket refuse because of Refuse Policy");
         NAPI_BT_ASSERT_RETURN_FALSE(env, false, BT_ERR_INVALID_PARAM);
     }

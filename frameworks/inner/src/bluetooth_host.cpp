@@ -1302,7 +1302,7 @@ int BluetoothHost::UpdateRefusePolicy(const int32_t protocolType,
 {
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
-    return proxy->UpdateRefusePolicy(protocolType,  pid, prohibitedSecondsTime);
+    return proxy->UpdateRefusePolicy(protocolType, pid, prohibitedSecondsTime);
 }
 
 int64_t BluetoothHost::GetRefusePolicyProhibitedTime()
