@@ -844,11 +844,11 @@ public:
     /**
      * @brief Update Refuse Policy
      *
-     * @param protocolType type
-     * @param pid process Pid
+     * @param protocolType protocol type
+     * @param pid process PID
      * @param prohibitedSecondsTime Boot start time + Control duration
      * @return Returns {@link BT_NO_ERROR} if the operation is successful;
-     *         returns an error code defined in {@link BtErrorCode} otherwise.
+     *         returns an error code defined in {@link BtErrCode} otherwise.
      * @since 16
      */
     int UpdateRefusePolicy(const int32_t protocolType, const int32_t pid, const int64_t prohibitedSecondsTime);

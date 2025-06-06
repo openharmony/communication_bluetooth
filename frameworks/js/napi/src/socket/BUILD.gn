@@ -68,11 +68,11 @@ ohos_shared_library("socket") {
     "napi:ace_napi",
   ]
 
-  iif(bluetooth_kia_enable) {
+  if (bluetooth_kia_enable) {
     defines += [ "BLUETOOTH_KIA_ENABLE" ]
     external_deps += [
-      "cJson:cjson",
-      "security_guard:libsg_collect_sdk"
+      "cJSON:cjson",
+      "security_guard:libsg_collect_sdk",
     ]
   }
 

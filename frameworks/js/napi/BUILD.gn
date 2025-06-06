@@ -103,11 +103,11 @@ ohos_shared_library("bluetooth") {
     "napi:ace_napi",
   ]
 
-  if(bluetooth_kia_enable) {
+  if (bluetooth_kia_enable) {
     defines += [ "BLUETOOTH_KIA_ENABLE" ]
     external_deps += [
-      "cJson:cjson",
-      "security_guard:libsg_collect_sdk"
+      "cJSON:cjson",
+      "security_guard:libsg_collect_sdk",
     ]
   }
 
@@ -205,11 +205,11 @@ ohos_shared_library("bluetoothmanager") {
     "napi:ace_napi",
   ]
 
-  if(bluetooth_kia_enable) {
+  if (bluetooth_kia_enable) {
     defines += [ "BLUETOOTH_KIA_ENABLE" ]
     external_deps += [
-      "cJson:cjson",
-      "security_guard:libsg_collect_sdk"
+      "cJSON:cjson",
+      "security_guard:libsg_collect_sdk",
     ]
   }
 
