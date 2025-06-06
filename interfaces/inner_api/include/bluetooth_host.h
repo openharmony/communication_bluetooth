@@ -842,11 +842,16 @@ public:
     int32_t UpdateCloudBluetoothDevice(const std::vector<TrustPairDeviceParam> &cloudDevices);
 
     /**
-     * @brief refuse policy
+     * @brief Update Refuse Policy
      *
+     * @param protocolType type
+     * @param pid process Pid
+     * @param prohibitedSecondsTime Boot start time + Control duration
+     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+     *         returns an error code defined in {@link BtErrorCode} otherwise.
      * @since 16
      */
-    int UpdateRefusePolicy(const int32_t pid, const int64_t prohibitedSecondsTime);
+    int UpdateRefusePolicy(const int32_t protocolType, const int32_t pid, const int64_t prohibitedSecondsTime);
 
     /**
      * @brief get refuse policy prohibitedTime.

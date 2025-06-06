@@ -1861,7 +1861,8 @@ int32_t BluetoothHostProxy::GetCloudBondState(const std::string &address, int32_
     return exception;
 }
 
-int32_t BluetoothHostProxy::UpdateRefusePolicy(const int32_t pid, const int64_t prohibitedSecondsTime)
+int32_t BluetoothHostProxy::UpdateRefusePolicy(const int32_t protocolType,
+    const int32_t pid, const int64_t prohibitedSecondsTime)
 {
     HILOGI("BluetoothHostProxy::UpdateRefusePolicy starts");
     MessageParcel data;
@@ -1869,6 +1870,8 @@ int32_t BluetoothHostProxy::UpdateRefusePolicy(const int32_t pid, const int64_t 
         HILOGE("BluetoothHostProxy::UpdateRefusePolicy WriteInterfaceToken error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(protocolType), BT_ERR_IPC_TRANS_FAILED,
+                             "write type error");
     CHECK_AND_RETURN_LOG_RET(data.WriteInt32(pid), BT_ERR_IPC_TRANS_FAILED,
                              "write pid error");
     CHECK_AND_RETURN_LOG_RET(data.WriteInt64(prohibitedSecondsTime), BT_ERR_IPC_TRANS_FAILED,
