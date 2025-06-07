@@ -29,6 +29,11 @@
 #include <unistd.h>
 #include <uv.h>
 #include "../parser/napi_parser_utils.h"
+#ifdef BLUETOOTH_KIA_ENABLE
+#include "cJSON.h"
+#include "ipc_skeleton.h"
+#include "sg_collect_client.h"
+#endif
 
 namespace OHOS {
 namespace Bluetooth {
@@ -244,6 +249,57 @@ static napi_status CheckSppWriteParams(
     return napi_ok;
 }
 
+#ifdef BLUETOOTH_KIA_ENABLE
+static void ReportRefuseInfo(int32_t pid, int64_t refuseTime)
+{
+    cJSON *outJson = cJSON_CreateObject();
+    if (outJson == nullptr) {
+        HILOGE("ReportRefuseInfo json object created error");
+        return;
+    }
+    cJSON_AddNumberToObject(outJson, "timestamp", refuseTime);
+    cJSON_AddStringToObject(outJson, "type", "bluetooth_send");
+    cJSON_AddStringToObject(outJson, "ftype", "1");
+    cJSON_AddNumberToObject(outJson, "process_pid", pid);
+    char *jsonContent = cJSON_PrintUnformatted(outJson);
+    if (jsonContent == nullptr) {
+        HILOGE("ReportRefuseInfo print json unformatted error");
+        cJSON_Delete(outJson);
+        outJson = nullptr;
+        return;
+    }
+    std::string content = std::string(jsonContent);
+    cJSON_free(jsonContent);
+    cJSON_Delete(outJson);
+    outJson = nullptr;
+    std::shared_ptr<Security::SecurityGuard::EventInfo> eventInfo =
+        std::make_shared<Security::SecurityGuard::EventInfo>(0x01C00000A, "1.0", content);
+    int ret = Security::SecurityGuard::NativeDataCollectKit::ReportSecurityInfo(eventInfo);
+    HILOGI("report pid:%{public}d, refuseTime:%{public}lu, ret:%{public}d", pid, refuseTime, ret);
+}
+
+static bool ShouldRefuseConnect(int32_t pid)
+{
+    constexpr int64_t msPerSecond = 1000;
+    constexpr int64_t nsPerMs = 1000000;
+    struct timespec times;
+    if (clock_gettime(CLOCK_MONOTONIC, &times) < 0) {
+        HILOGE("Failed clock_gettime:%{public}s, ShouldRefuseConnect:false", strerror(errno));
+        return false;
+    }
+    int64_t bootTime = ((times.tv_sec * msPerSecond) + (times.tv_nsec / nsPerMs));
+    HILOGI("bootTime:%{public}lu", bootTime);
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    auto prohibitedTime = host->GetRefusePolicyProhibitedTime();
+    if (bootTime < prohibitedTime) {
+        ReportRefuseInfo(pid, bootTime);
+        HILOGI("ShouldRefuseConnect");
+        return true;
+    }
+    return false;
+}
+#endif
+
 napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
@@ -252,12 +308,12 @@ napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
     bool isOK = false;
     int id = -1;
 
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-    auto prohibitedTime = host->GetRefusePolicyProhibitedTime();
-    if (prohibitedTime < 0 || prohibitedTime > GetSecondsSince1970ToNow()) {
+#ifdef BLUETOOTH_KIA_ENABLE
+    if (ShouldRefuseConnect(IPCSkeleton::GetCallingPid())) {
         HILOGE("socket refuse because of Refuse Policy");
         NAPI_BT_ASSERT_RETURN_FALSE(env, false, BT_ERR_INVALID_PARAM);
     }
+#endif
 
     auto status = CheckSppWriteParams(env, info, id, &totalBuf, totalSize);
     NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok, BT_ERR_INVALID_PARAM);
@@ -494,12 +550,12 @@ napi_value NapiSppClient::SppWriteAsync(napi_env env, napi_callback_info info)
     size_t totalSize = 0;
     int id = -1;
 
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-    auto prohibitedTime = host->GetRefusePolicyProhibitedTime();
-    if (prohibitedTime < 0 || prohibitedTime > GetSecondsSince1970ToNow()) {
+#ifdef BLUETOOTH_KIA_ENABLE
+    if (ShouldRefuseConnect(IPCSkeleton::GetCallingPid())) {
         HILOGE("socket refuse because of Refuse Policy");
         NAPI_BT_ASSERT_RETURN_FALSE(env, false, BT_ERR_INVALID_PARAM);
     }
+#endif
 
     auto status = CheckSppWriteParams(env, info, id, &totalBuf, totalSize);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);

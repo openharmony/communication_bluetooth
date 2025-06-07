@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 SUBSYSTEM_DIR = "//foundation/communication"
 
@@ -101,6 +102,14 @@ ohos_shared_library("bluetooth") {
     "libuv:uv",
     "napi:ace_napi",
   ]
+
+  if (bluetooth_kia_enable) {
+    defines += [ "BLUETOOTH_KIA_ENABLE" ]
+    external_deps += [
+      "cJSON:cjson",
+      "security_guard:libsg_collect_sdk",
+    ]
+  }
 
   relative_install_dir = "module"
   part_name = "bluetooth"
@@ -195,6 +204,14 @@ ohos_shared_library("bluetoothmanager") {
     "libuv:uv",
     "napi:ace_napi",
   ]
+
+  if (bluetooth_kia_enable) {
+    defines += [ "BLUETOOTH_KIA_ENABLE" ]
+    external_deps += [
+      "cJSON:cjson",
+      "security_guard:libsg_collect_sdk",
+    ]
+  }
 
   relative_install_dir = "module"
   part_name = "bluetooth"

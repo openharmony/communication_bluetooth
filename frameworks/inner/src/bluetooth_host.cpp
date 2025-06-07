@@ -1297,11 +1297,12 @@ int32_t BluetoothHost::UpdateCloudBluetoothDevice(const std::vector<TrustPairDev
     return proxy->UpdateCloudBluetoothDevice(cloudDevicesVec);
 }
 
-int BluetoothHost::UpdateRefusePolicy(const int32_t pid, const int64_t prohibitedSecondsTime)
+int BluetoothHost::UpdateRefusePolicy(const int32_t protocolType,
+    const int32_t pid, const int64_t prohibitedSecondsTime)
 {
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
-    return proxy->UpdateRefusePolicy(pid, prohibitedSecondsTime);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
+    return proxy->UpdateRefusePolicy(protocolType, pid, prohibitedSecondsTime);
 }
 
 int64_t BluetoothHost::GetRefusePolicyProhibitedTime()
