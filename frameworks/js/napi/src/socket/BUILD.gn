@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 BT_PART_DIR = "../../../../.."
 BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
@@ -66,6 +67,14 @@ ohos_shared_library("socket") {
     "libuv:uv",
     "napi:ace_napi",
   ]
+
+  if (bluetooth_kia_enable) {
+    defines += [ "BLUETOOTH_KIA_ENABLE" ]
+    external_deps += [
+      "cJSON:cjson",
+      "security_guard:libsg_collect_sdk",
+    ]
+  }
 
   relative_install_dir = "module/bluetooth"
   part_name = "bluetooth"
