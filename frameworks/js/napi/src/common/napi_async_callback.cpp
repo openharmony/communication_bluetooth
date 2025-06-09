@@ -50,6 +50,16 @@ napi_value NapiAsyncCallback::GetRet(void)
     return NapiGetUndefinedRet(env);
 }
 
+/*************************** env_cleanup_hook ********************************/
+void NapiCallbackEnvCleanupHook(void *data)
+{
+    CHECK_AND_RETURN_LOG(data, "data is nullptr");
+
+    NapiCallback *callback = static_cast<NapiCallback *>(data);
+    callback->SetNapiEnvValidity(false);
+}
+/*************************** env_cleanup_hook ********************************/
+
 NapiCallback::NapiCallback(napi_env env, napi_value callback) : env_(env)
 {
     // Use ID to identify NAPI callback.
@@ -60,13 +70,19 @@ NapiCallback::NapiCallback(napi_env env, napi_value callback) : env_(env)
     if (status != napi_ok) {
         HILOGE("napi_create_reference failed, status: %{public}d", status);
     }
+    // Used to clean up resources when env exit
+    napi_add_env_cleanup_hook(env, NapiCallbackEnvCleanupHook, this);
 }
 NapiCallback::~NapiCallback()
 {
+    if (!IsValidNapiEnv()) {
+        return;
+    }
     auto status = napi_delete_reference(env_, callbackRef_);
     if (status != napi_ok) {
         HILOGE("napi_delete_reference failed, status: %{public}d", status);
     }
+    napi_remove_env_cleanup_hook(env_, NapiCallbackEnvCleanupHook, this);
 }
 
 namespace {
@@ -101,6 +117,10 @@ void NapiCallFunction(napi_env env, napi_ref callbackRef, napi_value *argv, size
 
 void NapiCallback::CallFunction(const std::shared_ptr<NapiNativeObject> &object)
 {
+    if (!IsValidNapiEnv()) {
+        HILOGW("napi env is exit");
+        return;
+    }
     if (object == nullptr) {
         HILOGE("napi native object is nullptr");
         return;
@@ -113,6 +133,10 @@ void NapiCallback::CallFunction(const std::shared_ptr<NapiNativeObject> &object)
 
 void NapiCallback::CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object)
 {
+    if (!IsValidNapiEnv()) {
+        HILOGW("napi env is exit");
+        return;
+    }
     if (object == nullptr) {
         HILOGE("napi native object is nullptr");
         return;
@@ -132,6 +156,10 @@ napi_env NapiCallback::GetNapiEnv(void)
 
 bool NapiCallback::Equal(napi_env env, napi_value &callback) const
 {
+    if (!IsValidNapiEnv()) {
+        HILOGW("napi env is exit");
+        return false;
+    }
     if (env != env_) {
         HILOGD("Callback is not in the same thread, not uqual");
         return false;
@@ -150,16 +178,40 @@ std::string NapiCallback::ToLogString(void) const
     return "callbackId: " + std::to_string(id_);
 }
 
+/*************************** env_cleanup_hook ********************************/
+void NapiPromiseEnvCleanupHook(void *data)
+{
+    CHECK_AND_RETURN_LOG(data, "data is nullptr");
+
+    NapiPromise *callback = static_cast<NapiPromise *>(data);
+    callback->SetNapiEnvValidity(false);
+}
+/*************************** env_cleanup_hook ********************************/
+
 NapiPromise::NapiPromise(napi_env env) : env_(env)
 {
     auto status = napi_create_promise(env, &deferred_, &promise_);
     if (status != napi_ok) {
         HILOGE("napi_create_promise failed, status: %{public}d", status);
     }
+    // Used to clean up resources when env exit
+    napi_add_env_cleanup_hook(env, NapiPromiseEnvCleanupHook, this);
+}
+
+NapiPromise::~NapiPromise()
+{
+    if (!IsValidNapiEnv()) {
+        return;
+    }
+    napi_remove_env_cleanup_hook(env_, NapiPromiseEnvCleanupHook, this);
 }
 
 void NapiPromise::ResolveOrReject(int errCode, const std::shared_ptr<NapiNativeObject> &object)
 {
+    if (!IsValidNapiEnv()) {
+        HILOGW("napi env is exit");
+        return;
+    }
     if (object == nullptr) {
         HILOGE("napi native object is nullptr");
         return;

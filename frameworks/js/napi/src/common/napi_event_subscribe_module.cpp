@@ -66,6 +66,14 @@ napi_status NapiEventSubscribeModule::Register(napi_env env, napi_callback_info 
             HILOGW("The %{public}s callback is registered, no need to re-registered", name.c_str());
             return;
         }
+        // Attempt clear invalid napi env
+        callbackVec.erase(
+            std::remove_if(callbackVec.begin(), callbackVec.end(),
+                [](std::shared_ptr<NapiCallback> &callback) {
+                    return callback == nullptr || !callback->IsValidNapiEnv();
+                }),
+            callbackVec.end());
+
         auto napiCallback = std::make_shared<NapiCallback>(env, callback);
         if (napiCallback) {
             callbackVec.push_back(napiCallback);
