@@ -272,6 +272,9 @@
           },
           "name": "//foundation/communication/bluetooth/frameworks/js/napi/src/common:bt_napi_common"
         }
+      ],
+      "test": [
+        "//foundation/communication/bluetooth/test:unit_test"
       ]
     }
   }
