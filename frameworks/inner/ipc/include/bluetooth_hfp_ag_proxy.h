@@ -50,7 +50,7 @@ public:
     int GetConnectStrategy(const BluetoothRawAddress &device, int &strategy) override;
     int IsInbandRingingEnabled(bool &isEnabled) override;
     void CallDetailsChanged(int callId, int callState) override;
-    int IsVgsSupported(const BluetoothRawAddress &device, bool &isSupported) override;
+    int IsHfpFeatureSupported(const BluetoothRawAddress &device, bool &isSupported, int type) override;
     void EnableBtCallLog(bool state) override;
     void GetVirtualDeviceList(std::vector<std::string> &devices) override;
     void UpdateVirtualDevice(int32_t action, const std::string &address) override;

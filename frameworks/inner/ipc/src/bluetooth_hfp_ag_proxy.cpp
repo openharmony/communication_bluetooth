@@ -19,6 +19,7 @@
 #include "bluetooth_hfp_ag_proxy.h"
 #include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
+#include "bt_def.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -399,17 +400,19 @@ void BluetoothHfpAgProxy::CallDetailsChanged(int callId, int callState)
     SEND_IPC_REQUEST_RETURN(BluetoothHfpAgInterfaceCode::BT_HFP_AG_CALL_DETAILS_CHANGED, data, reply, option);
 }
 
-int BluetoothHfpAgProxy::IsVgsSupported(const BluetoothRawAddress &device, bool &isSupported)
+int BluetoothHfpAgProxy::IsHfpFeatureSupported(const BluetoothRawAddress &device,
+    bool &isSupported, int type)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor()),
         BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
     CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(type), BT_ERR_IPC_TRANS_FAILED, "write type error");
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
 
-    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothHfpAgInterfaceCode::BT_HFP_AG_IS_VGS_SUPPORTED,
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothHfpAgInterfaceCode::BT_HFP_AG_IS_HFP_FEATURE_SUPPORTED,
         data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     int32_t res = reply.ReadInt32();
