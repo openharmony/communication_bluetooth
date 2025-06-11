@@ -17,19 +17,64 @@
 #include "ohos.bluetooth.ble.impl.hpp"
 #include "taihe/runtime.hpp"
 #include "stdexcept"
+
 #include "bluetooth_ble_advertiser.h"
 #include "bluetooth_ble_central_manager.h"
+#include "bluetooth_remote_device.h"
+#include "bluetooth_gatt_client.h"
 #include "bluetooth_errorcode.h"
 #include "bluetooth_utils.h"
+#include "bluetooth_log.h"
+
+#include "taihe_bluetooth_ble_advertise_callback.h"
+#include "taihe_bluetooth_gatt_client_callback.h"
+#include "taihe_bluetooth_gatt_server_callback.h"
+#include "taihe_bluetooth_ble_utils.h"
+#include "taihe_bluetooth_ble_central_manager_callback.h"
 
 using namespace taihe;
 using namespace ohos::bluetooth::ble;
 
+#ifndef ANI_BT_ASSERT_RETURN
+#define ANI_BT_ASSERT_RETURN(cond, errCode, errMsg)     \
+do {                                                     \
+    if (!(cond)) {                                      \
+        set_business_error(errCode, errMsg);            \
+        HILOGE("bluetoothManager ani assert failed.");  \
+        return;                                         \
+    }                                                   \
+} while (0)
+#endif
+
 namespace {
-// To be implemented.
+
+std::shared_ptr<OHOS::Bluetooth::BleAdvertiser> BleAdvertiserGetInstance(void)
+{
+    static auto instance = OHOS::Bluetooth::BleAdvertiser::CreateInstance();
+    return instance;
+}
+
+OHOS::Bluetooth::BleCentralManager *BleCentralManagerGetInstance(void)
+{
+    static OHOS::Bluetooth::BleCentralManager
+        instance(OHOS::Bluetooth::TaiheBluetoothBleCentralManagerCallback::GetInstance());
+    return &instance;
+}
 
 class GattClientDeviceImpl {
 public:
+    explicit GattClientDeviceImpl(string_view deviceId)
+    {
+        HILOGI("enter");
+        std::string remoteAddr = std::string(deviceId);
+        device_ = std::make_shared<OHOS::Bluetooth::BluetoothRemoteDevice>(remoteAddr, 1);
+        client_ = std::make_shared<OHOS::Bluetooth::GattClient>(*device_);
+        client_->Init();
+        callback_ = std::make_shared<OHOS::Bluetooth::TaiheGattClientCallback>();
+        callback_->SetDeviceAddr(remoteAddr);
+    }
+    ~GattClientDeviceImpl() = default;
+
     void OnBLECharacteristicChange(callback_view<void(BLECharacteristic const&)> callback)
     {
     }
@@ -49,10 +94,23 @@ public:
 
     void WriteCharacteristicValueSync(BLECharacteristic const& characteristic, GattWriteType writeType)
     {
+        ANI_BT_ASSERT_RETURN(client_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
+            "WriteCharacteristicValueSync ani assert failed");
+        ANI_BT_ASSERT_RETURN(callback_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
+            "WriteCharacteristicValueSync ani assert failed");
+        
+        int ret = OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR;
+        OHOS::Bluetooth::GattCharacteristic *gattCharacteristic{};
+        // todo:将taihe类型转换为C++类型
+        ret = client_->WriteCharacteristic(*gattCharacteristic);
+
+        ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "WriteCharacteristicValueSync return error");
     }
 
-    void GetServicesSync()
+    array<GattService> GetServicesSync()
     {
+        std::vector<GattService> gattServiceVectorTaihe{};
+        return array<GattService>{taihe::copy_data_t{}, gattServiceVectorTaihe.data(), gattServiceVectorTaihe.size()};
     }
 
     void WriteDescriptorValueSync(BLEDescriptor const& descriptor)
@@ -77,27 +135,61 @@ public:
 
     void SetBLEMtuSize(double mtu)
     {
+        ANI_BT_ASSERT_RETURN(client_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
+            "SetBLEMtuSize ani assert failed");
+
+        int ret = client_->RequestBleMtuSize(mtu);
+        HILOGI("ret: %{public}d", ret);
+        ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "SetBLEMtuSize return error");
     }
 
     void Connect()
     {
+        ANI_BT_ASSERT_RETURN(client_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
+            "Connect ani assert failed");
+        ANI_BT_ASSERT_RETURN(callback_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
+            "Connect ani assert failed");
+
+        int ret = client_->Connect(callback_, false, OHOS::Bluetooth::GATT_TRANSPORT_TYPE_LE);
+        HILOGI("ret: %{public}d", ret);
+        ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "Connect return error");
     }
 
     void Disconnect()
     {
+        ANI_BT_ASSERT_RETURN(client_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
+            "Disconnect ani assert failed");
+
+        int ret = client_->Disconnect();
+        HILOGI("ret: %{public}d", ret);
+        ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "Disconnect return error");
     }
 
     void Close()
     {
+        ANI_BT_ASSERT_RETURN(client_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR, "Close ani assert failed");
+        int ret = client_->Close();
+        HILOGI("ret: %{public}d", ret);
+
+        ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "Close return error");
     }
+private:
+    std::shared_ptr<OHOS::Bluetooth::GattClient> client_ = nullptr;
+    std::shared_ptr<OHOS::Bluetooth::TaiheGattClientCallback> callback_;
+    std::shared_ptr<OHOS::Bluetooth::BluetoothRemoteDevice> device_ = nullptr;
 };
 
 class GattServerImpl {
 public:
     GattServerImpl()
     {
-        // Don't forget to implement the constructor.
+        HILOGI("enter");
+        callback_ = std::make_shared<OHOS::Bluetooth::TaiheGattServerCallback>();
+        std::shared_ptr<OHOS::Bluetooth::GattServerCallback> tmp =
+            std::static_pointer_cast<OHOS::Bluetooth::GattServerCallback>(callback_);
+        server_  = OHOS::Bluetooth::GattServer::CreateInstance(tmp);
     }
+    ~GattServerImpl() = default;
 
     void OnCharacteristicRead(callback_view<void(CharacteristicReadRequest const&)> callback)
     {
@@ -141,15 +233,25 @@ public:
 
     void Close()
     {
+        ANI_BT_ASSERT_RETURN(server_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR, "Close ani assert failed");
+        int ret = server_->Close();
+        HILOGI("ret: %{public}d", ret);
+
+        ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "Close return error");
     }
+private:
+    std::shared_ptr<OHOS::Bluetooth::GattServer> server_ = nullptr;
+    std::shared_ptr<OHOS::Bluetooth::TaiheGattServerCallback> callback_;
 };
 
 class BleScannerImpl {
 public:
     BleScannerImpl()
     {
-        // Don't forget to implement the constructor.
+        callback_ = std::make_shared<OHOS::Bluetooth::TaiheBluetoothBleCentralManagerCallback>(true);
+        bleCentralManager_ = std::make_shared<OHOS::Bluetooth::BleCentralManager>(callback_);
     }
+    ~BleScannerImpl() = default;
 
     void OnBLEDeviceFind(callback_view<void(ScanReport const&)> callback)
     {
@@ -158,6 +260,9 @@ public:
     void OffBLEDeviceFind(optional_view<callback<void(ScanReport const&)>> callback)
     {
     }
+private:
+    std::shared_ptr<OHOS::Bluetooth::BleCentralManager> bleCentralManager_ = nullptr;
+    std::shared_ptr<OHOS::Bluetooth::TaiheBluetoothBleCentralManagerCallback> callback_ = nullptr;
 };
 
 void OnBLEDeviceFind(callback_view<void(ScanReport const&)> callback)
@@ -178,6 +283,15 @@ void OffAdvertisingStateChange(optional_view<callback<void(AdvertisingStateChang
 
 void StopAdvertising()
 {
+    std::shared_ptr<OHOS::Bluetooth::BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
+    ANI_BT_ASSERT_RETURN(bleAdvertiser != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
+        "bleAdvertiser ani assert failed");
+
+    std::vector<std::shared_ptr<OHOS::Bluetooth::BleAdvertiseCallback>> callbacks = bleAdvertiser->GetAdvObservers();
+    if (callbacks.empty()) {
+        int ret = bleAdvertiser->StopAdvertising(OHOS::Bluetooth::TaiheBluetoothBleAdvertiseCallback::GetInstance());
+        ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "StopAdvertising return error");
+    }
 }
 
 void StopAdvertisingSync(double advertisingId)
@@ -186,26 +300,23 @@ void StopAdvertisingSync(double advertisingId)
 
 void StopBLEScan()
 {
+    int ret = BleCentralManagerGetInstance()->StopScan();
+    ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "StopBLEScan return error");
 }
 
 GattClientDevice CreateGattClientDevice(string_view deviceId)
 {
-    // The parameters in the make_holder function should be of the same type
-    // as the parameters in the constructor of the actual implementation class.
-    return make_holder<GattClientDeviceImpl, GattClientDevice>();
+    std::string remoteAddr = std::string(deviceId);
+    return make_holder<GattClientDeviceImpl, GattClientDevice>(remoteAddr);
 }
 
 GattServer CreateGattServer()
 {
-    // The parameters in the make_holder function should be of the same type
-    // as the parameters in the constructor of the actual implementation class.
     return make_holder<GattServerImpl, GattServer>();
 }
 
 BleScanner CreateBleScanner()
 {
-    // The parameters in the make_holder function should be of the same type
-    // as the parameters in the constructor of the actual implementation class.
     return make_holder<BleScannerImpl, BleScanner>();
 }
 }  // namespace
@@ -223,4 +334,3 @@ TH_EXPORT_CPP_API_StopAdvertising(StopAdvertising);
 TH_EXPORT_CPP_API_StopAdvertisingSync(StopAdvertisingSync);
 TH_EXPORT_CPP_API_StopBLEScan(StopBLEScan);
 // NOLINTEND
-
