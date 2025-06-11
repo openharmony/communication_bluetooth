@@ -34,7 +34,16 @@ std::shared_ptr<NapiAsyncWork> NapiAsyncWorkFactory::CreateAsyncWork(napi_env en
         HILOGE("asyncCallback is nullptr");
         return nullptr;
     }
-    auto napiAsyncWork = std::make_shared<NapiAsyncWork>(env, asyncWork, asyncCallback, needCallback);
+    // add custom deleter for destructing in JS thread.
+    std::shared_ptr<NapiAsyncWork> napiAsyncWork(
+        new NapiAsyncWork(env, asyncWork, asyncCallback, needCallback),
+        [env](NapiAsyncWork *ptr) {
+            DoInJsMainThread(env, [ptr]() {
+                if (ptr) {
+                    delete ptr;
+                }
+            });
+        });
     return napiAsyncWork;
 }
 
