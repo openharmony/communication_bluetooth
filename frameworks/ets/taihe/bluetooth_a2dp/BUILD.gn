@@ -59,6 +59,9 @@ taihe_shared_library("bluetoothA2dp_taihe_native") {
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
     "../bluetooth_baseProfile:bluetoothBaseProfile_taihe_native"
   ]
+  external_deps = [
+    "hilog:libhilog",
+  ]
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
     boundary_sanitize = true  # Enable boundary san detection
