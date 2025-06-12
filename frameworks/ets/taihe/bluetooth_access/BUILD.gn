@@ -58,6 +58,9 @@ taihe_shared_library("bluetoothAccess_taihe_native") {
     ":run_taihe",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
   ]
+  external_deps = [
+    "hilog:libhilog",
+  ]
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
     boundary_sanitize = true  # Enable boundary san detection
