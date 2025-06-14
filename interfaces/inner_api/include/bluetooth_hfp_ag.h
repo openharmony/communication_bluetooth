@@ -395,6 +395,14 @@ public:
     void GetVirtualDeviceList(std::vector<std::string> &devices) const;
 
     /**
+     * @brief get current call type.
+     *
+     * @param callType current call type.
+     * @since 20
+     */
+    int GetCurrentCallType(int &callType);
+
+    /**
      * @brief Static HandsFree AudioGateway observer instance.
      *
      * @since 6

@@ -232,6 +232,7 @@ enum BluetoothHfpAgInterfaceCode {
     BT_HFP_AG_CALL_LOG,
     BT_HFP_AG_GET_VIRTUALDEVICE_LIST,
     BT_HFP_AG_UPDATE_VIRTUALDEVICE,
+    BT_HFP_AG_GET_CALLTYPE,
     // The last code, if you want to add a new code, please add it before this
     BT_HFP_AG_BUTT
 };

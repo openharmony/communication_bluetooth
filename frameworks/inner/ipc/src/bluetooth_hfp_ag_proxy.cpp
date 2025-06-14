@@ -489,5 +489,26 @@ void BluetoothHfpAgProxy::UpdateVirtualDevice(int32_t action, const std::string 
 
     SEND_IPC_REQUEST_RETURN(BluetoothHfpAgInterfaceCode::BT_HFP_AG_UPDATE_VIRTUALDEVICE, data, reply, option);
 }
+
+int BluetoothHfpAgProxy::GetCurrentCallType(int &callType)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothHfpAgInterfaceCode::BT_HFP_AG_GET_CALLTYPE,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
+    int32_t res = reply.ReadInt32();
+    if (res == NO_ERROR) {
+        callType = reply.ReadInt32();
+    }
+
+    return res;
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS
