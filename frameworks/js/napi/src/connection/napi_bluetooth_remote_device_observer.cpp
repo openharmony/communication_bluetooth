@@ -57,13 +57,13 @@ void NapiBluetoothRemoteDeviceObserver ::OnRemoteUuidChanged(
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteNameChanged(
     const BluetoothRemoteDevice &device, const std::string &deviceName)
 {
-    HILOGD("addr:%{public}s, deviceName:%{public}s", GET_ENCRYPT_ADDR(device), deviceName.c_str());
+    HILOGD("addr:%{public}s, deviceName:%{private}s", GET_ENCRYPT_ADDR(device), deviceName.c_str());
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteAliasChanged(
     const BluetoothRemoteDevice &device, const std::string &alias)
 {
-    HILOGD("addr:%{public}s, alias:%{public}s", GET_ENCRYPT_ADDR(device), alias.c_str());
+    HILOGD("addr:%{public}s, alias:%{private}s", GET_ENCRYPT_ADDR(device), alias.c_str());
 }
 
 void NapiBluetoothRemoteDeviceObserver ::OnRemoteCodChanged(
