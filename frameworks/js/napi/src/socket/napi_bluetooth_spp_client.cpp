@@ -28,7 +28,7 @@
 #include <limits>
 #include <unistd.h>
 #include <uv.h>
-#include "../parser/napi_parser_utils.h"
+#include "parser/napi_parser_utils.h"
 #ifdef BLUETOOTH_KIA_ENABLE
 #include "cJSON.h"
 #include "ipc_skeleton.h"

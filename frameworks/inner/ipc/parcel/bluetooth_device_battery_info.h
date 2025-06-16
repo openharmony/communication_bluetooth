@@ -16,7 +16,7 @@
 #ifndef BLUETOOTH_PARCEL_BATTERY_INFO_H
 #define BLUETOOTH_PARCEL_BATTERY_INFO_H
 
-#include "../common/bt_battery_info.h"
+#include "bt_battery_info.h"
 #include "parcel.h"
 
 namespace OHOS {

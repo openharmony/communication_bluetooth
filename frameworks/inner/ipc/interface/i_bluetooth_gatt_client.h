@@ -19,11 +19,11 @@
 #include "iremote_broker.h"
 #include "bluetooth_service_ipc_interface_code.h"
 #include "i_bluetooth_gatt_client_callback.h"
-#include "../parcel/bluetooth_gatt_characteristic_parcel.h"
-#include "../parcel/bluetooth_gatt_descriptor_parcel.h"
-#include "../parcel/bluetooth_gatt_device.h"
-#include "../parcel/bluetooth_gatt_service_parcel.h"
-#include "../parcel/bluetooth_raw_address.h"
+#include "bluetooth_gatt_characteristic_parcel.h"
+#include "bluetooth_gatt_descriptor_parcel.h"
+#include "bluetooth_gatt_device.h"
+#include "bluetooth_gatt_service_parcel.h"
+#include "bluetooth_raw_address.h"
 
 namespace OHOS {
 namespace Bluetooth {

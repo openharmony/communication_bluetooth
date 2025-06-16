@@ -20,10 +20,10 @@
 #include <vector>
 #include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
-#include "../parcel/bluetooth_avrcp_meItem.h"
-#include "../parcel/bluetooth_avrcp_mpItem.h"
-#include "../common/raw_address.h"
-#include "../common/avrcp_media.h"
+#include "bluetooth_avrcp_meItem.h"
+#include "bluetooth_avrcp_mpItem.h"
+#include "raw_address.h"
+#include "avrcp_media.h"
 
 namespace OHOS {
 namespace Bluetooth {

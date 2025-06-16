@@ -15,7 +15,7 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_HFP_AG_OBSERVER_INTERFACE_H
 #define OHOS_BLUETOOTH_STANDARD_HFP_AG_OBSERVER_INTERFACE_H
 
-#include "../parcel/bluetooth_raw_address.h"
+#include "bluetooth_raw_address.h"
 #include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 

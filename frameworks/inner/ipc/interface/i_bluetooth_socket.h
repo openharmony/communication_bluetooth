@@ -19,7 +19,7 @@
 #include <string>
 
 #include "bluetooth_service_ipc_interface_code.h"
-#include "../common/bt_uuid.h"
+#include "bt_uuid.h"
 #include "bluetooth_socket_coc.h"
 #include "iremote_broker.h"
 #include "i_bluetooth_socket_observer.h"

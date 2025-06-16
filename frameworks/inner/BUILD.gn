@@ -116,7 +116,10 @@ config("btframework_config") {
   include_dirs = [
     "include",
     "ipc/include",
+    "ipc",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
   ]
 
   defines = []
@@ -132,6 +135,8 @@ config("btframework_public_config") {
   visibility = [ "*" ]
   include_dirs = [
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
   ]
 }
@@ -176,11 +181,15 @@ ohos_shared_library("btframework") {
 }
 
 config("btcommon_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "ipc",
+    ]
 }
 
 config("btcommon_public_config") {
   include_dirs = [
+    "ipc",
     "ipc/common",
     "ipc/interface",
     "ipc/parcel",

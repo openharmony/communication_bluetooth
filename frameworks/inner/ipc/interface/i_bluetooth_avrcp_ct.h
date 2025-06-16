@@ -22,7 +22,7 @@
 #include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 #include "i_bluetooth_avrcp_ct_observer.h"
-#include "../common/raw_address.h"
+#include "raw_address.h"
 
 namespace OHOS {
 namespace Bluetooth {

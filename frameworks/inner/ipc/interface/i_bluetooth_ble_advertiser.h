@@ -16,8 +16,8 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_BLE_ADVERTISER_INTERFACE_H
 #define OHOS_BLUETOOTH_STANDARD_BLE_ADVERTISER_INTERFACE_H
 
-#include "../parcel/bluetooth_ble_advertiser_data.h"
-#include "../parcel/bluetooth_ble_advertiser_settings.h"
+#include "bluetooth_ble_advertiser_data.h"
+#include "bluetooth_ble_advertiser_settings.h"
 #include "bluetooth_ble_advertiser_data.h"
 #include "bluetooth_ble_advertiser_settings.h"
 #include "bluetooth_service_ipc_interface_code.h"

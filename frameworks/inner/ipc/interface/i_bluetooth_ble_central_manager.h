@@ -17,10 +17,10 @@
 #define OHOS_BLUETOOTH_STANDARD_BLE_CENTRAL_MANAGER_INTERFACE_H
 
 #include <set>
-#include "../parcel/bluetooth_ble_scan_filter.h"
-#include "../parcel/bluetooth_ble_scan_settings.h"
-#include "../parcel/bluetooth_ble_advertiser_data.h"
-#include "../parcel/bluetooth_ble_advertiser_settings.h"
+#include "bluetooth_ble_scan_filter.h"
+#include "bluetooth_ble_scan_settings.h"
+#include "bluetooth_ble_advertiser_data.h"
+#include "bluetooth_ble_advertiser_settings.h"
 #include "bluetooth_service_ipc_interface_code.h"
 #include "i_bluetooth_ble_central_manager_callback.h"
 #include "iremote_broker.h"
