@@ -16,7 +16,7 @@
 #ifndef BLUETOOTH_PARCEL_GATT_CHARACTERISTIC_H
 #define BLUETOOTH_PARCEL_GATT_CHARACTERISTIC_H
 
-#include "../common/gatt_data.h"
+#include "gatt_data.h"
 #include "parcel.h"
 
 namespace OHOS {

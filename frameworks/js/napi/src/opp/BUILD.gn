@@ -30,6 +30,7 @@ ohos_shared_library("opp") {
 
   include_dirs = [
     "$BT_NAPI_DIR/include",
+    "$BT_NAPI_DIR/src",
     "$BT_PART_DIR/frameworks/inner/include",
   ]
 

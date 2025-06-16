@@ -22,6 +22,7 @@ ohos_shared_library("bt_napi_common") {
 
   include_dirs = [
     "$BT_NAPI_DIR/include",
+    "$BT_NAPI_DIR/src",
     "$BT_PART_DIR/frameworks/inner/include",
     "$BT_PART_DIR/interfaces/inner_api/include",
     "$BT_PART_DIR/interfaces/inner_api/include/c_header",

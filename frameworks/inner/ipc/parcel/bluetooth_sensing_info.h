@@ -17,7 +17,7 @@
 #define OHOS_BLUETOOTH_STANDARD_BLUETOOTH_PARCEL_SENSING_INFO_H
 
 #include "parcel.h"
-#include "../common/bt_sensing_info.h"
+#include "bt_sensing_info.h"
 
 namespace OHOS {
 namespace Bluetooth {

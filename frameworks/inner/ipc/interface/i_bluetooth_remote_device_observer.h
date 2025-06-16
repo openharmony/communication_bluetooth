@@ -16,11 +16,11 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_REMOTE_DEVICE_OBSERVER_INTERFACE_H
 #define OHOS_BLUETOOTH_STANDARD_REMOTE_DEVICE_OBSERVER_INTERFACE_H
 
-#include "../parcel/bluetooth_raw_address.h"
+#include "bluetooth_raw_address.h"
 #include "bluetooth_service_ipc_interface_code.h"
-#include "../common/bt_uuid.h"
+#include "bt_uuid.h"
 #include "iremote_broker.h"
-#include "../parcel/bluetooth_device_battery_info.h"
+#include "bluetooth_device_battery_info.h"
 
 namespace OHOS {
 namespace Bluetooth {

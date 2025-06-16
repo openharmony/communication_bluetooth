@@ -16,7 +16,7 @@
 #ifndef BLUETOOTH_PARCEL_BT_UUID_H
 #define BLUETOOTH_PARCEL_BT_UUID_H
 
-#include "../common/bt_uuid.h"
+#include "bt_uuid.h"
 #include "parcel.h"
 
 namespace OHOS {
