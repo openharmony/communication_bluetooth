@@ -40,7 +40,7 @@ enum BtErrCode {
     BT_ERR_MAX_CONNECTION           = BT_ERR_BASE_SYSCAP + 6,
     BT_ERR_TIMEOUT                  = BT_ERR_BASE_SYSCAP + 7,
     BT_ERR_UNAVAILABLE_PROXY        = BT_ERR_BASE_SYSCAP + 8,
-    BT_ERR_DIALOG_FOR_USER_CONFIRM  = BT_ERR_BASE_SYSCAP + 9,
+    BT_ERR_BLE_SCAN_NO_RESOURCE     = BT_ERR_BASE_SYSCAP + 9,
     BT_ERR_MAX_RESOURCES            = BT_ERR_BASE_SYSCAP + 10,
     BT_ERR_OPERATION_BUSY           = BT_ERR_BASE_SYSCAP + 11,
     BT_ERR_SPP_CONNECT_FAILED       = BT_ERR_BASE_SYSCAP + 12,
@@ -83,6 +83,9 @@ enum BtErrCode {
     NO_ERROR = BT_NO_ERROR,
     ERROR = BT_ERR_INTERNAL_ERROR,
     ERR_INVALID_STATE = BT_ERR_INVALID_STATE,
+
+    // errorCode for inner
+    BT_ERR_DIALOG_FOR_USER_CONFIRM = -100,
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
