@@ -378,6 +378,14 @@ struct HandsFreeAudioGateway::impl {
         HILOGI("end");
     }
 
+    int GetCurrentCallType(int &callType)
+    {
+        HILOGD("enter");
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is null");
+        return proxy->GetCurrentCallType(callType);
+    }
+
     int32_t profileRegisterId = 0;
 private:
     const static int HFP_AG_SLC_STATE_DISCONNECTED = static_cast<int>(BTConnectState::DISCONNECTED);
@@ -739,6 +747,14 @@ void HandsFreeAudioGateway::DeregisterObserver(std::shared_ptr<HandsFreeAudioGat
     HILOGD("enter");
     CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
     pimpl->DeregisterObserver(observer);
+}
+
+int HandsFreeAudioGateway::GetCurrentCallType(int &callType)
+{
+    HILOGD("enter");
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    return proxy->GetCurrentCallType(callType);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
