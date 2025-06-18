@@ -191,7 +191,7 @@ public:
 
     void OnDeviceNameChanged(const std::string &deviceName) override
     {
-        HILOGI("enter, deviceName: %{public}s", deviceName.c_str());
+        HILOGI("enter, deviceName: %{private}s", deviceName.c_str());
         host_.observers_.ForEach([deviceName](std::shared_ptr<BluetoothHostObserver> observer) {
             observer->OnDeviceNameChanged(deviceName);
         });
@@ -282,7 +282,7 @@ public:
 
     void OnRemoteNameChanged(const BluetoothRawAddress &device, const std::string deviceName) override
     {
-        HILOGD("enter, device: %{public}s, deviceName: %{public}s",
+        HILOGD("enter, device: %{public}s, deviceName: %{private}s",
             GET_ENCRYPT_RAW_ADDR(device), deviceName.c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
         host_.remoteObservers_.ForEach(
@@ -293,7 +293,7 @@ public:
 
     void OnRemoteAliasChanged(const BluetoothRawAddress &device, const std::string alias) override
     {
-        HILOGI("enter, device: %{public}s, alias: %{public}s",
+        HILOGI("enter, device: %{public}s, alias: %{private}s",
             GET_ENCRYPT_RAW_ADDR(device), alias.c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BREDR);
         host_.remoteObservers_.ForEach(
