@@ -137,6 +137,27 @@ bool BluetoothBleScanFilter::ReadFromParcel(Parcel &parcel)
     return true;
 }
 
+bool BluetoothBleScanFilter::operator==(const BluetoothBleScanFilter& other) const
+{
+    return (deviceId_ == other.deviceId_) &&
+        (name_ == other.name_) &&
+        (serviceUuid_ == other.serviceUuid_) &&
+        (serviceUuidMask_ == other.serviceUuidMask_) &&
+        (serviceSolicitationUuid_ == other.serviceSolicitationUuid_) &&
+        (serviceSolicitationUuidMask_ == other.serviceSolicitationUuidMask_) &&
+        (hasServiceUuid_ == other.hasServiceUuid_) &&
+        (hasServiceUuidMask_ == other.hasServiceUuidMask_) &&
+        (hasSolicitationUuid_ == other.hasSolicitationUuid_) &&
+        (hasSolicitationUuidMask_ == other.hasSolicitationUuidMask_) &&
+        (serviceData_== other.serviceData_) &&
+        (serviceDataMask_ == other.serviceDataMask_) &&
+        (manufacturerId_ == other.manufacturerId_) &&
+        (manufactureData_ == other.manufactureData_) &&
+        (manufactureDataMask_ == other.manufactureDataMask_) &&
+        (advIndReport_ == other.advIndReport_) &&
+        (filterIndex_ == other.filterIndex_);
+}
+
 bool BluetoothBleScanFilter::ReadUuidFromParcel(Parcel &parcel)
 {
     std::shared_ptr<BluetoothUuid> serviceUuid(parcel.ReadParcelable<BluetoothUuid>());
