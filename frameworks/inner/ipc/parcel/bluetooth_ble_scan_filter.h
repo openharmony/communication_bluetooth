@@ -32,6 +32,9 @@ public:
     bool WriteToParcel(Parcel &parcel);
     bool ReadFromParcel(Parcel &parcel);
 
+    // for removing duplicate filters
+    bool operator==(const BluetoothBleScanFilter& other) const;
+
 private:
     bool ReadUuidFromParcel(Parcel &parcel);
 };
