@@ -30,6 +30,7 @@
 #include "i_bluetooth_host.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "bt_def.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -354,7 +355,8 @@ struct HandsFreeAudioGateway::impl {
         HILOGD("enter");
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is null");
-        return proxy->IsVgsSupported(BluetoothRawAddress(device.GetDeviceAddr()), isSupported);
+        return proxy->IsHfpFeatureSupported(BluetoothRawAddress(device.GetDeviceAddr()), isSupported,
+            static_cast<int>(bluetooth::HfpFeatureType::VGS));
     }
 
     void EnableBtCallLog(bool state)
@@ -376,6 +378,15 @@ struct HandsFreeAudioGateway::impl {
         HILOGD("enter");
         observers_.Deregister(observer);
         HILOGI("end");
+    }
+
+    int IsVoiceRecognitionSupported(const BluetoothRemoteDevice &device, bool &isSupported) const
+    {
+        HILOGD("enter");
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is null");
+        return proxy->IsHfpFeatureSupported(BluetoothRawAddress(device.GetDeviceAddr()), isSupported,
+            static_cast<int>(bluetooth::HfpFeatureType::VOICE_RECOGNITION));
     }
 
     int GetCurrentCallType(int &callType)

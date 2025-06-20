@@ -1808,6 +1808,11 @@ enum ProfileConnectionState {
     STATE_DISCONNECTING = 3 // the current profile is being disconnected
 };
 
+enum class HfpFeatureType {
+    VGS = 1,
+    VOICE_RECOGNITION,
+};
+
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else
