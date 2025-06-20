@@ -61,8 +61,8 @@ struct BleCentralManager::impl {
             }
 
             for (auto &serviceData : tempResult.GetServiceData()) {
-                    UUID uuid = UUID::ConvertFrom128Bits(serviceData.first.ConvertTo128Bits());
-                    scanResult.AddServiceData(uuid, serviceData.second);
+                UUID uuid = UUID::ConvertFrom128Bits(serviceData.first.ConvertTo128Bits());
+                scanResult.AddServiceData(uuid, serviceData.second);
             }
 
             scanResult.SetAdvertiseFlag(tempResult.GetAdvertiseFlag());
@@ -534,7 +534,8 @@ int BleCentralManager::ChangeScanParams(const BleScanSettings &settings, const s
     int ret = pimpl->CheckScanParams(settings, filters, filters.size() != 0);
     CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "param invalid");
 
-    HILOGI("scannerId:%{public}d, callbackType:%{public}d", pimpl->scannerId_, settings.GetCallbackType());
+    HILOGI("scannerId:%{public}d, callbackType:%{public}d, scanMode:%{public}d",
+        pimpl->scannerId_, settings.GetCallbackType(), settings.GetScanMode());
     BluetoothBleScanSettings parcelSetting;
     pimpl->ConvertBleScanSetting(settings, parcelSetting);
 

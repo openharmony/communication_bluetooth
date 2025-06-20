@@ -57,6 +57,7 @@ public:
     virtual void EnableBtCallLog(bool state) = 0;
     virtual void GetVirtualDeviceList(std::vector<std::string> &devices) = 0;
     virtual void UpdateVirtualDevice(int32_t action, const std::string &address) = 0;
+    virtual int GetCurrentCallType(int &callType) = 0;
 };
 
 }  // namespace Bluetooth

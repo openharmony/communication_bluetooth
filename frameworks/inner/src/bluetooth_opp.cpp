@@ -27,7 +27,9 @@
 #include "i_bluetooth_host.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#ifndef CROSS_PLATFORM
 #include "ipc_skeleton.h"
+#endif
 #ifdef RES_SCHED_SUPPORT
 #include "res_type.h"
 #include "res_sched_client.h"
@@ -449,7 +451,9 @@ void Opp::RegisterObserver(std::shared_ptr<OppObserver> observer)
     HILOGI("enter");
     CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
     pimpl->RegisterObserver(observer);
+#ifndef CROSS_PLATFORM
     ReportDataToRss("connect", -1, "empty", IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+#endif
 }
 
 void Opp::DeregisterObserver(std::shared_ptr<OppObserver> observer)
@@ -457,7 +461,9 @@ void Opp::DeregisterObserver(std::shared_ptr<OppObserver> observer)
     HILOGI("enter");
     CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
     pimpl->DeregisterObserver(observer);
+#ifndef CROSS_PLATFORM
     ReportDataToRss("close", -1, "empty", IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+#endif
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
