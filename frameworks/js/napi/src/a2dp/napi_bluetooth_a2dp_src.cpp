@@ -782,13 +782,13 @@ static void ConvertCodecChannelModeVector(napi_env env, napi_value &object, int3
         napi_set_element(env, codecChannelModeArray, count, value);
         count++;
     }
-    if (static_cast<uint8_t>(channelMode) & A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_MONO_USER) {
-        napi_create_int32(env, CODEC_CHANNEL_MODE_MONO, &value);
+    if (static_cast<uint8_t>(channelMode) & A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_MONO_STEREO_USER) {
+        napi_create_int32(env, CODEC_CHANNEL_MODE_STEREO, &value);
         napi_set_element(env, codecChannelModeArray, count, value);
         count++;
     }
-    if (static_cast<uint8_t>(channelMode) & A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_MONO_STEREO_USER) {
-        napi_create_int32(env, CODEC_CHANNEL_MODE_STEREO, &value);
+    if (static_cast<uint8_t>(channelMode) & A2dpUserCodecChannelMode::A2DP_SBC_CHANNEL_MODE_MONO_USER) {
+        napi_create_int32(env, CODEC_CHANNEL_MODE_MONO, &value);
         napi_set_element(env, codecChannelModeArray, count, value);
         count++;
     }

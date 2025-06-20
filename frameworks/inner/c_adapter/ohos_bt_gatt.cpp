@@ -1200,7 +1200,7 @@ void BleScanNativeFilterLog(BleScanNativeFilter &filter)
         HILOGI("address: %{public}s", GetEncryptAddr(filter.address).c_str());
     }
     if (filter.deviceName != nullptr) {
-        HILOGI("deviceName: %{public}s", filter.deviceName);
+        HILOGI("deviceName: %{private}s", filter.deviceName);
     }
     if (filter.serviceUuidLength != 0) {
         if (filter.serviceUuid != nullptr) {
