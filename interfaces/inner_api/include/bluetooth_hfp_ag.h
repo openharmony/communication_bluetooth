@@ -395,6 +395,20 @@ public:
     void GetVirtualDeviceList(std::vector<std::string> &devices) const;
 
     /**
+     * @brief Check whether voice recognition is supported.
+     *
+     * @param device The address of the peer bluetooth device.
+     * @param isSupported Whether voice recognition is supported.
+     * @return Returns <b>RET_NO_ERROR</b> if the operation is successful.
+     *         Returns <b>BT_ERR_PERMISSION_FAILED</b> Permission denied.
+     *         Returns <b>BT_ERR_INVALID_PARAM</b> Input error.
+     *         Returns <b>BT_ERR_INVALID_STATE</b> BT_ERR_INVALID_STATE.
+     *         Returns <b>BT_ERR_INTERNAL_ERROR</b> Operation failed.
+     * @since 20
+     */
+    int IsVoiceRecognitionSupported(const BluetoothRemoteDevice &device, bool &isSupported) const;
+
+    /**
      * @brief get current call type.
      *
      * @param callType current call type.
