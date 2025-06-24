@@ -28,10 +28,10 @@ copy_taihe_idl("bluetooth_hfp_taihe") {
  
 subsystem_name = "communication"
 part_name = "bluetooth"
-taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
+taihe_generated_file_path_hfp = "$taihe_file_path/out/$subsystem_name/$part_name/hfp"
  
 ohos_taihe("run_taihe") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_hfp}"
   deps = [ ":bluetooth_hfp_taihe" ]
   outputs = [
     "$taihe_generated_file_path/src/ohos.bluetooth.hfp.ani.cpp",
@@ -40,7 +40,7 @@ ohos_taihe("run_taihe") {
 }
  
 taihe_shared_library("bluetoothHfp_taihe_native") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_hfp}"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
   sources = get_target_outputs(":run_taihe")
@@ -73,8 +73,8 @@ taihe_shared_library("bluetoothHfp_taihe_native") {
 }
  
 generate_static_abc("bluetoothHfp_abc") {
-  base_url = "$taihe_generated_file_path"
-  files = [ "$taihe_generated_file_path/@ohos.bluetooth.hfp.ets" ]
+  base_url = "${taihe_generated_file_path_hfp}"
+  files = [ "${taihe_generated_file_path_hfp}/@ohos.bluetooth.hfp.ets" ]
   is_boot_abc = "True"
   device_dst_file = "/system/framework/bluetoothHfp_abc.abc"
   dependencies = [ ":run_taihe" ]
