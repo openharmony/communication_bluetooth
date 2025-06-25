@@ -96,59 +96,22 @@ void SetBluetoothScanMode(ScanMode mode, double duration)
     host->SetBondableMode(OHOS::Bluetooth::BT_TRANSPORT_BREDR, bondableMode);
 }
 
-void OnDiscoveryResult(callback_view<void(array_view<DiscoveryResult>)> callback)
-{
-}
-
-void OffDiscoveryResult(optional_view<callback<void(array_view<DiscoveryResult>)>> callback)
-{
-}
-
-void OnBatteryChange(callback_view<void(BatteryInfo const&)> callback)
-{
-}
-
-void OffBatteryChange(optional_view<callback<void(BatteryInfo const&)>> callback)
-{
-}
-
-void OnBluetoothDeviceFind(callback_view<void(array_view<string>)> callback)
-{
-}
-
-void OffBluetoothDeviceFind(optional_view<callback<void(array_view<string>)>> callback)
-{
-}
-
-void OnBondStateChange(callback_view<void(BondStateParam const&)> callback)
-{
-}
-
-void OffBondStateChange(optional_view<callback<void(BondStateParam const&)>> callback)
-{
-}
-
-void OnPinRequired(callback_view<void(PinRequiredParam const&)> callback)
-{
-}
-
-void OffPinRequired(optional_view<callback<void(PinRequiredParam const&)>> callback)
-{
-}
-
 DeviceClass GetRemoteDeviceClass(string_view deviceId)
 {
     std::string remoteAddr = std::string(deviceId);
     OHOS::Bluetooth::BluetoothRemoteDevice remoteDevice = OHOS::Bluetooth::BluetoothRemoteDevice(remoteAddr);
-    int tmpCod = static_cast<int>(ohos::bluetooth::constant::MajorClass::key_t::MAJOR_UNCATEGORIZED);
-    int tmpMajorClass = static_cast<int>(ohos::bluetooth::constant::MajorClass::key_t::MAJOR_UNCATEGORIZED);
-    int tmpMajorMinorClass = static_cast<int>(ohos::bluetooth::constant::MajorClass::key_t::MAJOR_UNCATEGORIZED);
+    int tmpCod = ohos::bluetooth::constant::MajorClass(
+        ohos::bluetooth::constant::MajorClass::key_t::MAJOR_UNCATEGORIZED).get_value();
+    int tmpMajorClass = ohos::bluetooth::constant::MajorClass(
+        ohos::bluetooth::constant::MajorClass::key_t::MAJOR_UNCATEGORIZED).get_value();
+    int tmpMajorMinorClass = ohos::bluetooth::constant::MajorMinorClass(
+        ohos::bluetooth::constant::MajorMinorClass::key_t::COMPUTER_UNCATEGORIZED).get_value();
     int32_t err = remoteDevice.GetDeviceProductType(tmpCod, tmpMajorClass, tmpMajorMinorClass);
     if (err != OHOS::Bluetooth::BT_NO_ERROR) {
         set_business_error(err, "GetRemoteDeviceClass return error");
     }
-    return {static_cast<ohos::bluetooth::constant::MajorClass::key_t>(tmpMajorClass),
-        static_cast<ohos::bluetooth::constant::MajorMinorClass::key_t>(tmpMajorMinorClass), tmpCod};
+    return {ohos::bluetooth::constant::MajorClass::from_value(tmpMajorClass),
+        ohos::bluetooth::constant::MajorMinorClass::from_value(tmpMajorMinorClass), tmpCod};
 }
 }  // namespace
 
@@ -159,15 +122,5 @@ TH_EXPORT_CPP_API_GetRemoteDeviceName(GetRemoteDeviceName);
 TH_EXPORT_CPP_API_GetRemoteDeviceNameWithAlias(GetRemoteDeviceNameWithAlias);
 TH_EXPORT_CPP_API_GetPairedDevices(GetPairedDevices);
 TH_EXPORT_CPP_API_SetBluetoothScanMode(SetBluetoothScanMode);
-TH_EXPORT_CPP_API_OnDiscoveryResult(OnDiscoveryResult);
-TH_EXPORT_CPP_API_OffDiscoveryResult(OffDiscoveryResult);
-TH_EXPORT_CPP_API_OnBatteryChange(OnBatteryChange);
-TH_EXPORT_CPP_API_OffBatteryChange(OffBatteryChange);
-TH_EXPORT_CPP_API_OnBluetoothDeviceFind(OnBluetoothDeviceFind);
-TH_EXPORT_CPP_API_OffBluetoothDeviceFind(OffBluetoothDeviceFind);
-TH_EXPORT_CPP_API_OnBondStateChange(OnBondStateChange);
-TH_EXPORT_CPP_API_OffBondStateChange(OffBondStateChange);
-TH_EXPORT_CPP_API_OnPinRequired(OnPinRequired);
-TH_EXPORT_CPP_API_OffPinRequired(OffPinRequired);
 TH_EXPORT_CPP_API_GetRemoteDeviceClass(GetRemoteDeviceClass);
 // NOLINTEND
