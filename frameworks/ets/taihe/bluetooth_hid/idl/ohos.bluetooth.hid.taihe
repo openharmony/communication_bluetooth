@@ -14,6 +14,10 @@
  */
 
 @!namespace("@ohos.bluetooth.hid", "hid")
+@!sts_inject("""
+static { loadLibrary("bluetoothHid_taihe_native.z") }
+""")
+
 from ohos.bluetooth.baseProfile use BaseProfile; 
 interface HidHostProfile : BaseProfile {
 }
