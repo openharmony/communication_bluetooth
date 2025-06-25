@@ -23,10 +23,10 @@ copy_taihe_idl("bluetooth_constant_taihe") {
  
 subsystem_name = "communication"
 part_name = "bluetooth"
-taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
+taihe_generated_file_path_constant = "$taihe_file_path/out/$subsystem_name/$part_name/constant"
  
 ohos_taihe("run_taihe") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_constant}"
   deps = [ ":bluetooth_constant_taihe" ]
   outputs = [
     "$taihe_generated_file_path/src/ohos.bluetooth.constant.ani.cpp",
@@ -35,7 +35,7 @@ ohos_taihe("run_taihe") {
 }
  
 taihe_shared_library("bluetoothConstant_taihe_native") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_constant}"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
   sources = get_target_outputs(":run_taihe")
@@ -53,6 +53,9 @@ taihe_shared_library("bluetoothConstant_taihe_native") {
     ":run_taihe",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
   ]
+  external_deps = [
+    "hilog:libhilog",
+  ]
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
     boundary_sanitize = true  # Enable boundary san detection
@@ -64,8 +67,8 @@ taihe_shared_library("bluetoothConstant_taihe_native") {
 }
  
 generate_static_abc("bluetoothConstant_abc") {
-  base_url = "$taihe_generated_file_path"
-  files = [ "$taihe_generated_file_path/@ohos.bluetooth.constant.ets" ]
+  base_url = "${taihe_generated_file_path_constant}"
+  files = [ "${taihe_generated_file_path_constant}/@ohos.bluetooth.constant.ets" ]
   is_boot_abc = "True"
   device_dst_file = "/system/framework/bluetoothConstant_abc.abc"
   dependencies = [ ":run_taihe" ]

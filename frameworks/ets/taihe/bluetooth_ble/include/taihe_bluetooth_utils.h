@@ -13,13 +13,16 @@
  * limitations under the License.
  */
 
-@!namespace("@ohos.bluetooth.hfp", "hfp")
-@!sts_inject("""
-static { loadLibrary("bluetoothHfp_taihe_native.z") }
-""")
+#ifndef TAIHE_BLUETOOTH_UTILS_H_
+#define TAIHE_BLUETOOTH_UTILS_H_
 
-from ohos.bluetooth.baseProfile use BaseProfile; 
-interface HandsFreeAudioGatewayProfile : BaseProfile {
+namespace OHOS {
+namespace Bluetooth {
+
+enum class ScanReportType {
+    ON_FOUND = 1, // the found of advertisement packet
+    ON_LOST = 2 // the lost of advertisement packet
+};
 }
-
-function CreateHfpAgProfile(): HandsFreeAudioGatewayProfile;
+}
+#endif // TAIHE_BLUETOOTH_UTILS_H_

@@ -30,10 +30,6 @@ public:
     {
         // Don't forget to implement the constructor.
     }
-
-    void OnConnectionStateChange(callback_view<void(StateChangeParam const&)> callback)
-    {
-    }
 };
 }  // namespace
 

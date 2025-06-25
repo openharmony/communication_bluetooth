@@ -35,17 +35,6 @@ struct ScanResult {
     connectable: bool;
 }
 
-@on_off("BLEDeviceFind")
-function OnBLEDeviceFind(callback: (a: ScanReport) => void): void;
-@on_off("BLEDeviceFind")
-function OffBLEDeviceFind(callback:Optional<(a: ScanReport)=> void>): void;
-
-@on_off("advertisingStateChange")
-function OnAdvertisingStateChange(callback: (a: AdvertisingStateChangeInfo) => void): void;
-@on_off("advertisingStateChange")
-function OffAdvertisingStateChange(callback:Optional<(a: AdvertisingStateChangeInfo)=> void>): void;
-
-
 enum MatchMode: i32 {
     MATCH_MODE_AGGRESSIVE = 1,
     MATCH_MODE_STICKY = 2
@@ -123,8 +112,6 @@ struct CharacteristicWriteRequest {
     characteristicUuid: String;
     serviceUuid: String;
 }
-
-function CreateGattClientDevice(deviceId: String): GattClientDevice;
 
 function StopBLEScan(): void;
 
@@ -205,46 +192,7 @@ enum GattWriteType: i32 {
 
 function StopAdvertising(): void;
 
-@gen_async("stopAdvertising")
-@gen_promise("stopAdvertising")
-function StopAdvertisingSync(advertisingId: f64): void;
-
 interface GattClientDevice {
-    @on_off("BLECharacteristicChange")
-    OnBLECharacteristicChange(callback: (a: BLECharacteristic) => void): void;
-    @on_off("BLECharacteristicChange")
-    OffBLECharacteristicChange(callback:Optional<(a: BLECharacteristic)=> void>): void;
-
-    @gen_async("setCharacteristicChangeNotification")
-    @gen_promise("setCharacteristicChangeNotification")
-    SetCharacteristicChangeNotificationSync(characteristic: BLECharacteristic, enable: bool): void;
-
-    @gen_async("getRssiValue")
-    @gen_promise("getRssiValue")
-    GetRssiValueSync(): f64;
-
-    @gen_async("writeCharacteristicValue")
-    @gen_promise("writeCharacteristicValue")
-    WriteCharacteristicValueSync(characteristic: BLECharacteristic, writeType: GattWriteType): void;
-
-    @gen_async("getServices")
-    @gen_promise("getServices")
-    GetServicesSync(): void;
-
-    @gen_async("writeDescriptorValue")
-    @gen_promise("writeDescriptorValue")
-    WriteDescriptorValueSync(descriptor: BLEDescriptor): void;
-
-    @on_off("BLEMtuChange")
-    OnBLEMtuChange(callback: (a: f64) => void): void;
-    @on_off("BLEMtuChange")
-    OffBLEMtuChange(callback:Optional<(a: f64)=> void>): void;
-
-    @on_off("BLEConnectionStateChange")
-    OnBLEConnectionStateChange(callback: (a: BLEConnectionChangeState) => void): void;
-    @on_off("BLEConnectionStateChange")
-    OffBLEConnectionStateChange(callback:Optional<(a: BLEConnectionChangeState)=> void>): void;
-
     SetBLEMtuSize(mtu: f64): void;
     Connect(): void;
     Disconnect(): void;
@@ -252,36 +200,13 @@ interface GattClientDevice {
     Close(): void;
 }
 
-function CreateGattServer(): GattServer;
+function CreateGattClientDevice(deviceId: String): GattClientDevice;
 
 interface GattServer {
-    @on_off("characteristicRead")
-    OnCharacteristicRead(callback: (a: CharacteristicReadRequest) => void): void;
-    @on_off("characteristicRead")
-    OffCharacteristicRead(callback:Optional<(a: CharacteristicReadRequest)=> void>): void;
-
-    @on_off("BLEMtuChange")
-    OnBLEMtuChange(callback: (a: f64) => void): void;
-    @on_off("BLEMtuChange")
-    OffBLEMtuChange(callback:Optional<(a: f64)=> void>): void;
-
-    @on_off("descriptorRead")
-    OnDescriptorRead(callback: (a: DescriptorReadRequest) => void): void;
-    @on_off("descriptorRead")
-    OffDescriptorRead(callback:Optional<(a: DescriptorReadRequest)=> void>): void;
-
-    @on_off("descriptorWrite")
-    OnDescriptorWrite(callback: (a: DescriptorWriteRequest) => void): void;
-    @on_off("descriptorWrite")
-    OffDescriptorWrite(callback:Optional<(a: DescriptorWriteRequest)=> void>): void;
-
-    @on_off("connectionStateChange")
-    OnConnectionStateChange(callback: (a: BLEConnectionChangeState) => void): void;
-    @on_off("connectionStateChange")
-    OffConnectionStateChange(callback:Optional<(a: BLEConnectionChangeState)=> void>): void;
-
     Close(): void;
 }
+
+function CreateGattServer(): GattServer;
 
 struct AdvertiseData {
     serviceUuids: Array<String>;
@@ -319,12 +244,8 @@ struct BLEConnectionChangeState {
     state: ProfileConnectionState;
 }
 
-function CreateBleScanner(): BleScanner;
-
 interface BleScanner {
-    @on_off("BLEDeviceFind")
-    OnBLEDeviceFind(callback: (a: ScanReport) => void): void;
-    @on_off("BLEDeviceFind")
-    OffBLEDeviceFind(callback:Optional<(a: ScanReport)=> void>): void;
 }
+
+function CreateBleScanner(): BleScanner;
 

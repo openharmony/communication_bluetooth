@@ -30,11 +30,6 @@ public:
     {
         // Don't forget to implement the constructor.
     }
-
-    void OnConnectionStateChange(
-        callback_view<void(::ohos::bluetooth::baseProfile::StateChangeParam const&)> callback)
-    {
-    }
 };
 
 HandsFreeAudioGatewayProfile CreateHfpAgProfile()
