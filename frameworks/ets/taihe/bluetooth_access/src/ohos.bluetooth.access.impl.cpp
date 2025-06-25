@@ -28,14 +28,6 @@ using namespace ohos::bluetooth::access;
 namespace {
 // To be implemented.
 
-void OnStateChange(callback_view<void(BluetoothState)> callback)
-{
-}
-
-void OffStateChange(optional_view<callback<void(BluetoothState)>> callback)
-{
-}
-
 void RestrictBluetoothSync()
 {
     int32_t ret = OHOS::Bluetooth::BluetoothHost::GetDefaultHost().RestrictBluetooth();
@@ -71,8 +63,6 @@ void DisableBluetooth()
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_OnStateChange(OnStateChange);
-TH_EXPORT_CPP_API_OffStateChange(OffStateChange);
 TH_EXPORT_CPP_API_RestrictBluetoothSync(RestrictBluetoothSync);
 TH_EXPORT_CPP_API_GetState(GetState);
 TH_EXPORT_CPP_API_EnableBluetooth(EnableBluetooth);

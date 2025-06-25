@@ -140,29 +140,4 @@ function GetPairedDevices(): Array<String>;
 
 function SetBluetoothScanMode(mode: ScanMode, duration: f64): void;
 
-@on_off("discoveryResult")
-function OnDiscoveryResult(callback: (a: Array<DiscoveryResult>) => void): void;
-@on_off("discoveryResult")
-function OffDiscoveryResult(callback:Optional<(a: Array<DiscoveryResult>)=> void>): void;
-
-@on_off("batteryChange")
-function OnBatteryChange(callback: (a: BatteryInfo) => void): void;
-@on_off("batteryChange")
-function OffBatteryChange(callback:Optional<(a: BatteryInfo)=> void>): void;
-
-@on_off("bluetoothDeviceFind")
-function OnBluetoothDeviceFind(callback: (a: Array<String>) => void): void;
-@on_off("bluetoothDeviceFind")
-function OffBluetoothDeviceFind(callback:Optional<(a: Array<String>)=> void>): void;
-
-@on_off("bondStateChange")
-function OnBondStateChange(callback: (a: BondStateParam) => void): void;
-@on_off("bondStateChange")
-function OffBondStateChange(callback:Optional<(a: BondStateParam)=> void>): void;
-
-@on_off("pinRequired")
-function OnPinRequired(callback: (a: PinRequiredParam) => void): void;
-@on_off("pinRequired")
-function OffPinRequired(callback:Optional<(a: PinRequiredParam)=> void>): void;
-
 function GetRemoteDeviceClass(deviceId: String): DeviceClass;

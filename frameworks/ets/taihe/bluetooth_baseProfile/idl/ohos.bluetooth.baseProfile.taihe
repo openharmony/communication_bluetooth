@@ -36,6 +36,4 @@ enum DisconnectCause: i32 {
 }
 
 interface BaseProfile {
-    @on_off("connectionStateChange")
-    OnConnectionStateChange(callback: (a: StateChangeParam) => void): void;
 }
