@@ -13,13 +13,4 @@
  * limitations under the License.
  */
 
-@!namespace("@ohos.bluetooth.hfp", "hfp")
-@!sts_inject("""
-static { loadLibrary("bluetoothHfp_taihe_native.z") }
-""")
-
-from ohos.bluetooth.baseProfile use BaseProfile; 
-interface HandsFreeAudioGatewayProfile : BaseProfile {
-}
-
-function CreateHfpAgProfile(): HandsFreeAudioGatewayProfile;
+#include "taihe_bluetooth_utils.h"
