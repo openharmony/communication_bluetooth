@@ -74,65 +74,7 @@ public:
         callback_->SetDeviceAddr(remoteAddr);
     }
     ~GattClientDeviceImpl() = default;
-
-    void OnBLECharacteristicChange(callback_view<void(BLECharacteristic const&)> callback)
-    {
-    }
-
-    void OffBLECharacteristicChange(optional_view<callback<void(BLECharacteristic const&)>> callback)
-    {
-    }
-
-    void SetCharacteristicChangeNotificationSync(BLECharacteristic const& characteristic, bool enable)
-    {
-    }
-
-    double GetRssiValueSync()
-    {
-        return 1;
-    }
-
-    void WriteCharacteristicValueSync(BLECharacteristic const& characteristic, GattWriteType writeType)
-    {
-        ANI_BT_ASSERT_RETURN(client_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
-            "WriteCharacteristicValueSync ani assert failed");
-        ANI_BT_ASSERT_RETURN(callback_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
-            "WriteCharacteristicValueSync ani assert failed");
-        
-        int ret = OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR;
-        OHOS::Bluetooth::GattCharacteristic *gattCharacteristic{};
-        // todo:将taihe类型转换为C++类型
-        ret = client_->WriteCharacteristic(*gattCharacteristic);
-
-        ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "WriteCharacteristicValueSync return error");
-    }
-
-    array<GattService> GetServicesSync()
-    {
-        std::vector<GattService> gattServiceVectorTaihe{};
-        return array<GattService>{taihe::copy_data_t{}, gattServiceVectorTaihe.data(), gattServiceVectorTaihe.size()};
-    }
-
-    void WriteDescriptorValueSync(BLEDescriptor const& descriptor)
-    {
-    }
-
-    void OnBLEMtuChange(callback_view<void(double)> callback)
-    {
-    }
-
-    void OffBLEMtuChange(optional_view<callback<void(double)>> callback)
-    {
-    }
-
-    void OnBLEConnectionStateChange(callback_view<void(BLEConnectionChangeState const&)> callback)
-    {
-    }
-
-    void OffBLEConnectionStateChange(optional_view<callback<void(BLEConnectionChangeState const&)>> callback)
-    {
-    }
-
+    
     void SetBLEMtuSize(double mtu)
     {
         ANI_BT_ASSERT_RETURN(client_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
@@ -191,46 +133,6 @@ public:
     }
     ~GattServerImpl() = default;
 
-    void OnCharacteristicRead(callback_view<void(CharacteristicReadRequest const&)> callback)
-    {
-    }
-
-    void OffCharacteristicRead(optional_view<callback<void(CharacteristicReadRequest const&)>> callback)
-    {
-    }
-
-    void OnBLEMtuChange(callback_view<void(double)> callback)
-    {
-    }
-
-    void OffBLEMtuChange(optional_view<callback<void(double)>> callback)
-    {
-    }
-
-    void OnDescriptorRead(callback_view<void(DescriptorReadRequest const&)> callback)
-    {
-    }
-
-    void OffDescriptorRead(optional_view<callback<void(DescriptorReadRequest const&)>> callback)
-    {
-    }
-
-    void OnDescriptorWrite(callback_view<void(DescriptorWriteRequest const&)> callback)
-    {
-    }
-
-    void OffDescriptorWrite(optional_view<callback<void(DescriptorWriteRequest const&)>> callback)
-    {
-    }
-
-    void OnConnectionStateChange(callback_view<void(BLEConnectionChangeState const&)> callback)
-    {
-    }
-
-    void OffConnectionStateChange(optional_view<callback<void(BLEConnectionChangeState const&)>> callback)
-    {
-    }
-
     void Close()
     {
         ANI_BT_ASSERT_RETURN(server_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR, "Close ani assert failed");
@@ -253,33 +155,10 @@ public:
     }
     ~BleScannerImpl() = default;
 
-    void OnBLEDeviceFind(callback_view<void(ScanReport const&)> callback)
-    {
-    }
-
-    void OffBLEDeviceFind(optional_view<callback<void(ScanReport const&)>> callback)
-    {
-    }
 private:
     std::shared_ptr<OHOS::Bluetooth::BleCentralManager> bleCentralManager_ = nullptr;
     std::shared_ptr<OHOS::Bluetooth::TaiheBluetoothBleCentralManagerCallback> callback_ = nullptr;
 };
-
-void OnBLEDeviceFind(callback_view<void(ScanReport const&)> callback)
-{
-}
-
-void OffBLEDeviceFind(optional_view<callback<void(ScanReport const&)>> callback)
-{
-}
-
-void OnAdvertisingStateChange(callback_view<void(AdvertisingStateChangeInfo const&)> callback)
-{
-}
-
-void OffAdvertisingStateChange(optional_view<callback<void(AdvertisingStateChangeInfo const&)>> callback)
-{
-}
 
 void StopAdvertising()
 {
@@ -292,10 +171,6 @@ void StopAdvertising()
         int ret = bleAdvertiser->StopAdvertising(OHOS::Bluetooth::TaiheBluetoothBleAdvertiseCallback::GetInstance());
         ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "StopAdvertising return error");
     }
-}
-
-void StopAdvertisingSync(double advertisingId)
-{
 }
 
 void StopBLEScan()
@@ -323,14 +198,9 @@ BleScanner CreateBleScanner()
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_OnBLEDeviceFind(OnBLEDeviceFind);
-TH_EXPORT_CPP_API_OffBLEDeviceFind(OffBLEDeviceFind);
-TH_EXPORT_CPP_API_OnAdvertisingStateChange(OnAdvertisingStateChange);
-TH_EXPORT_CPP_API_OffAdvertisingStateChange(OffAdvertisingStateChange);
 TH_EXPORT_CPP_API_CreateGattClientDevice(CreateGattClientDevice);
 TH_EXPORT_CPP_API_CreateGattServer(CreateGattServer);
 TH_EXPORT_CPP_API_CreateBleScanner(CreateBleScanner);
 TH_EXPORT_CPP_API_StopAdvertising(StopAdvertising);
-TH_EXPORT_CPP_API_StopAdvertisingSync(StopAdvertisingSync);
 TH_EXPORT_CPP_API_StopBLEScan(StopBLEScan);
 // NOLINTEND

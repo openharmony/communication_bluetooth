@@ -30,11 +30,6 @@ enum BluetoothState: i32 {
     STATE_BLE_TURNING_OFF = 6
 }
 
-@on_off("stateChange")
-function OnStateChange(callback: (a: BluetoothState) => void): void;
-@on_off("stateChange")
-function OffStateChange(callback:Optional<(a: BluetoothState)=> void>): void;
-
 @gen_promise("restrictBluetooth")
 function RestrictBluetoothSync(): void;
 
