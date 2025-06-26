@@ -26,7 +26,7 @@
 #include "napi/native_node_api.h"
 #include "napi_bluetooth_error.h"
 #include "napi_bluetooth_spp_client.h"
-#include "../parser/napi_parser_utils.h"
+#include "parser/napi_parser_utils.h"
 #include "securec.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"

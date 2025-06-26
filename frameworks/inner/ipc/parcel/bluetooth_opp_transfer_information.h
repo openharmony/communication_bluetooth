@@ -17,7 +17,7 @@
 
 
 #include "parcel.h"
-#include "../common/opp_transfer_information.h"
+#include "opp_transfer_information.h"
 
 namespace OHOS {
 namespace Bluetooth {

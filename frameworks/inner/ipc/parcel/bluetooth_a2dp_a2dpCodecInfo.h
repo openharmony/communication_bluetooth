@@ -16,7 +16,7 @@
 #ifndef BLUETOOTH_PARCEL_A2DP_A2DPCODECINFO_H
 #define BLUETOOTH_PARCEL_A2DP_A2DPCODECINFO_H
 
-#include "../common/a2dp_parcel_codec.h"
+#include "a2dp_parcel_codec.h"
 #include "parcel.h"
 
 namespace OHOS {

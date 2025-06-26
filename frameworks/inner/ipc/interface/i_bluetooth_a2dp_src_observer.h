@@ -18,8 +18,8 @@
 
 #include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
-#include "../common/raw_address.h"
-#include "../parcel/bluetooth_a2dp_a2dpCodecInfo.h"
+#include "raw_address.h"
+#include "bluetooth_a2dp_a2dpCodecInfo.h"
 
 namespace OHOS {
 namespace Bluetooth {

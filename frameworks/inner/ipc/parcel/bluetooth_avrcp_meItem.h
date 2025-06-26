@@ -16,7 +16,7 @@
 #ifndef BLUETOOTH_AVRCP_MEITEM_H
 #define BLUETOOTH_AVRCP_MEITEM_H
 
-#include "../common/avrcp_media.h"
+#include "avrcp_media.h"
 #include "parcel.h"
 
 namespace OHOS {
