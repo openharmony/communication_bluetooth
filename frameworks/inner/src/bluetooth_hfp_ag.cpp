@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -766,6 +766,17 @@ int HandsFreeAudioGateway::GetCurrentCallType(int &callType)
     sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
     return proxy->GetCurrentCallType(callType);
+}
+
+int HandsFreeAudioGateway::IsVoiceRecognitionSupported(const BluetoothRemoteDevice &device, bool &isSupported) const
+{
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is null");
+    CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), BT_ERR_INVALID_PARAM, "input parameter error.");
+    return proxy->IsHfpFeatureSupported(BluetoothRawAddress(device.GetDeviceAddr()), isSupported,
+        static_cast<int>(bluetooth::HfpFeatureType::VOICE_RECOGNITION));
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
