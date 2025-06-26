@@ -135,8 +135,6 @@ config("btframework_public_config") {
   visibility = [ "*" ]
   include_dirs = [
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
   ]
 }
@@ -193,6 +191,8 @@ config("btcommon_public_config") {
     "ipc/common",
     "ipc/interface",
     "ipc/parcel",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
   ]
 }
 
