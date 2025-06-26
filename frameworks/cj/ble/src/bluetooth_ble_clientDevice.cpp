@@ -61,7 +61,7 @@ std::string FfiClientDevice::GetDeviceName(int32_t *errCode)
     std::string deviceAddr = GetGattClientDeviceId();
     *errCode = BluetoothHost::GetDefaultHost().GetRemoteDevice(deviceAddr, BT_TRANSPORT_BLE).GetDeviceName(deviceName);
 
-    HILOGI("err: %{public}d, deviceName: %{public}s", *errCode, deviceName.c_str());
+    HILOGI("err: %{public}d, deviceName: %{private}s", *errCode, deviceName.c_str());
     return deviceName;
 }
 
