@@ -16,6 +16,6 @@
 #ifndef BLUETOOTH_ERRORCODE_INNER_H
 #define BLUETOOTH_ERRORCODE_INNER_H
 
-#include "interfaces/inner_api/include/bluetooth_errorcode.h"
+#include "bluetooth_errorcode.h"
 
 #endif  // BLUETOOTH_ERRORCODE_INNER_H
