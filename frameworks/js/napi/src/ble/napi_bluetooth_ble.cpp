@@ -32,7 +32,7 @@
 #include "bluetooth_ble_central_manager.h"
 #include "bluetooth_errorcode.h"
 #include "bluetooth_utils.h"
-#include "../parser/napi_parser_utils.h"
+#include "parser/napi_parser_utils.h"
 #include "hitrace_meter.h"
 
 #include <memory>

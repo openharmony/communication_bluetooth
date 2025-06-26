@@ -21,9 +21,9 @@
 #include "bluetooth_service_ipc_interface_code.h"
 #include "iremote_broker.h"
 #include "i_bluetooth_a2dp_src_observer.h"
-#include "../parcel/bluetooth_raw_address.h"
-#include "../parcel/bluetooth_a2dp_a2dpCodecStatus.h"
-#include "../parcel/bluetooth_a2dp_a2dpCodecInfo.h"
+#include "bluetooth_raw_address.h"
+#include "bluetooth_a2dp_a2dpCodecStatus.h"
+#include "bluetooth_a2dp_a2dpCodecInfo.h"
 
 namespace OHOS {
 namespace Bluetooth {

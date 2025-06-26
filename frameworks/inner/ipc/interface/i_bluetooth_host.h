@@ -24,8 +24,8 @@
 #include "i_bluetooth_remote_device_observer.h"
 #include "i_bluetooth_resource_manager_observer.h"
 #include "iremote_broker.h"
-#include "../parcel/bluetooth_device_battery_info.h"
-#include "../parcel/bluetooth_remote_device_info.h"
+#include "bluetooth_device_battery_info.h"
+#include "bluetooth_remote_device_info.h"
 #include "bluetooth_trust_pair_device.h"
 
 namespace OHOS {

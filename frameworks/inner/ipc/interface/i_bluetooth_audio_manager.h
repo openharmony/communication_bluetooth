@@ -17,7 +17,7 @@
 #define OHOS_BLUETOOTH_AUDIO_MANAGER_INTERFACE_H
 
 #include <string>
-#include "../parcel/bluetooth_raw_address.h"
+#include "bluetooth_raw_address.h"
 #include "iremote_broker.h"
 
 namespace OHOS {

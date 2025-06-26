@@ -16,9 +16,9 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_RESOURCE_MANAGER_OBSERVER_INTERFACE_H
 #define OHOS_BLUETOOTH_STANDARD_RESOURCE_MANAGER_OBSERVER_INTERFACE_H
 
-#include "../parcel/bluetooth_raw_address.h"
+#include "bluetooth_raw_address.h"
 #include "iremote_broker.h"
-#include "../parcel/bluetooth_sensing_info.h"
+#include "bluetooth_sensing_info.h"
 #include "bluetooth_service_ipc_interface_code.h"
 
 namespace OHOS {

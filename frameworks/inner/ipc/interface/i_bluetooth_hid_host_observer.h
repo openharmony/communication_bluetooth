@@ -17,7 +17,7 @@
 
 #include <string_ex.h>
 #include <iremote_broker.h>
-#include "../parcel/bluetooth_raw_address.h"
+#include "bluetooth_raw_address.h"
 #include "bluetooth_service_ipc_interface_code.h"
 #include "ipc_types.h"
 

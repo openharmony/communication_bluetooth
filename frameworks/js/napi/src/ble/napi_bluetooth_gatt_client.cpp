@@ -29,7 +29,7 @@
 #include "napi_bluetooth_utils.h"
 #include "napi_ha_event_utils.h"
 #include "napi_event_subscribe_module.h"
-#include "../parser/napi_parser_utils.h"
+#include "parser/napi_parser_utils.h"
 
 
 namespace OHOS {

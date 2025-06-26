@@ -25,7 +25,7 @@
 #include "napi_bluetooth_pbap_pse.h"
 #include "napi_bluetooth_profile.h"
 #include "napi_bluetooth_utils.h"
-#include "../parser/napi_parser_utils.h"
+#include "parser/napi_parser_utils.h"
 #include "hitrace_meter.h"
 
 namespace OHOS {

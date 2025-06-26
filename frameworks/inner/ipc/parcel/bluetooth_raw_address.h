@@ -17,7 +17,7 @@
 #define OHOS_BLUETOOTH_STANDARD_BLUETOOTH_PARCEL_RAW_ADDRESS_H
 
 #include "parcel.h"
-#include "../common/raw_address.h"
+#include "raw_address.h"
 
 namespace OHOS {
 namespace Bluetooth {

@@ -17,7 +17,7 @@
 #define BLUETOOTH_PARCEL_HFP_HF_CALL_H
 
 #include "parcel.h"
-#include "../common/hands_free_unit_calls.h"
+#include "hands_free_unit_calls.h"
 
 namespace OHOS {
 namespace Bluetooth {
