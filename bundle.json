@@ -231,6 +231,9 @@
           },
           "name": "//foundation/communication/bluetooth/frameworks/cj/connection:cj_bluetooth_connection_ffi"
         }
+      ],
+      "test": [
+        "//foundation/communication/bluetooth/test:unit_test"
       ]
     }
   }
