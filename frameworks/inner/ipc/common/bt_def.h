@@ -58,6 +58,7 @@ constexpr const char *BLUETOOTH_UUID_HSP_AG = "00001112-0000-1000-8000-00805F9B3
 constexpr const char *BLUETOOTH_UUID_HSP_HS = "00001108-0000-1000-8000-00805F9B34FB";
 constexpr const char *BLUETOOTH_UUID_HOGP = "00001812-0000-1000-8000-00805F9B34FB";
 constexpr const char *ADV_AUDIO_DIST = "0000110D-0000-1000-8000-00805F9B34FB";
+constexpr const char *BLUETOOTH_UUID_HEARING_AID = "0000FDF0-0000-1000-8000-00805F9B34FB";
 
 /*********************************************
  *
@@ -190,6 +191,7 @@ const uint32_t PROFILE_ID_HID_HOST = 0x00020000;
 const uint32_t PROFILE_ID_OPP = 0x00040000;
 const uint32_t PROFILE_ID_PAN = 0x00080000;
 const uint32_t PROFILE_ID_HOST = 0x00100000;
+const uint32_t PROFILE_ID_HEARING_AID = 0x00200000;
 
 /**
  * @brief default value

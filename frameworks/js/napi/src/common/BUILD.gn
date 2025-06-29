@@ -16,17 +16,28 @@ import("//build/ohos.gni")
 BT_PART_DIR = "../../../../.."
 BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
 
-ohos_shared_library("bt_napi_common") {
-  branch_protector_ret = "pac_ret"  # Enable PAC CFI
-  innerapi_tags = [ "platformsdk" ]
-
+config("btcommon_config") {
   include_dirs = [
-    "$BT_NAPI_DIR/include",
     "$BT_NAPI_DIR/src",
     "$BT_PART_DIR/frameworks/inner/include",
     "$BT_PART_DIR/interfaces/inner_api/include",
     "$BT_PART_DIR/interfaces/inner_api/include/c_header",
   ]
+}
+
+config("btcommon_public_config") {
+  include_dirs = [
+    "$BT_NAPI_DIR/include",
+    "$BT_NAPI_DIR/src/parser",
+  ]
+}
+
+ohos_shared_library("bt_napi_common") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  innerapi_tags = [ "platformsdk" ]
+
+  configs = [":btcommon_config"]
+  public_configs = [":btcommon_public_config"]
 
   defines = [
     "BT_LOG_TAG = \"bluetooth_napi\"",

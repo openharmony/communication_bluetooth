@@ -111,6 +111,8 @@
               "bluetooth_socket_inputstream.h",
               "bluetooth_socket_outputstream.h",
               "bluetooth_socket.h",
+              "bluetooth_profile_manager.h",
+              "bluetooth_no_destructor.h",
               "c_header/ohos_bt_def.h",
               "c_header/ohos_bt_gap.h",
               "c_header/ohos_bt_gatt.h",
@@ -246,6 +248,20 @@
             "header_files": []
           },
           "name": "//foundation/communication/bluetooth/frameworks/cj/socket:cj_bluetooth_socket_ffi"
+        },
+        {
+          "header": {
+            "header_base": "//foundation/communication/bluetooth/frameworks/js/napi",
+            "header_files": [
+              "include/napi_event_subscribe_module.h",
+              "include/napi_bluetooth_utils.h",
+              "include/napi_bluetooth_event.h",
+              "include/napi_bluetooth_error.h",
+              "include/napi_native_object.h",
+              "src/parser/napi_parser_utils.h"
+            ]
+          },
+          "name": "//foundation/communication/bluetooth/frameworks/js/napi/src/common:bt_napi_common"
         }
       ]
     }
