@@ -85,12 +85,16 @@ int32_t BluetoothHostProxy::EnableBt()
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::DisableBt()
+int32_t BluetoothHostProxy::DisableBt(bool isAsync)
 {
     HILOGI("BluetoothHostProxy::DisableBt starts");
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
         HILOGE("BluetoothHostProxy::DisableBt WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteBool(isAsync)) {
+        HILOGE("BluetoothHostProxy::DisableBt WriteBool isAsync error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
 
@@ -239,7 +243,7 @@ int32_t BluetoothHostProxy::DisableBle()
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::EnableBle(bool noAutoConnect)
+int32_t BluetoothHostProxy::EnableBle(bool noAutoConnect, bool isAsync)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
@@ -247,7 +251,11 @@ int32_t BluetoothHostProxy::EnableBle(bool noAutoConnect)
         return BT_ERR_IPC_TRANS_FAILED;
     }
     if (!data.WriteBool(noAutoConnect)) {
-        HILOGE("BluetoothHostProxy::EnableBle WriteBool error");
+        HILOGE("BluetoothHostProxy::EnableBle WriteBool noAutoConnect error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteBool(isAsync)) {
+        HILOGE("BluetoothHostProxy::EnableBle WriteBool isAsync error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
     MessageParcel reply;
@@ -1971,6 +1979,26 @@ int32_t BluetoothHostProxy::SetCarKeyCardData(const std::string &address, int32_
         BluetoothHostInterfaceCode::BT_SET_CAR_KEY_CARD_DATA, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothHostProxy::SetCarKeyCardData done fail error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadInt32();
+}
+
+int32_t BluetoothHostProxy::NotifyDialogResult(uint32_t dialogType, bool dialogResult)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::NotifyDialogResult WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint32(dialogType), BT_ERR_IPC_TRANS_FAILED, "write dialogType error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteBool(dialogResult), BT_ERR_IPC_TRANS_FAILED, "write dialogResult error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::BT_NOTIFY_DIALOG_RESULT, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::NotifyDialogResult done fail error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     return reply.ReadInt32();
