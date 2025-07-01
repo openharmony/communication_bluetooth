@@ -48,7 +48,7 @@ void BluetoothSwitchModule::LogBluetoothSwitchEvent(BluetoothSwitchEvent event)
     }
 }
 
-int BluetoothSwitchModule::ProcessBluetoothSwitchEvent(BluetoothSwitchEvent event)
+int BluetoothSwitchModule::ProcessBluetoothSwitchEvent(BluetoothSwitchEvent event, bool isAsync)
 {
     CHECK_AND_RETURN_LOG_RET(switchAction_, BT_ERR_INTERNAL_ERROR, "switchAction is nullptr");
 
@@ -56,9 +56,9 @@ int BluetoothSwitchModule::ProcessBluetoothSwitchEvent(BluetoothSwitchEvent even
     LogBluetoothSwitchEvent(event);
     switch (event) {
         case BluetoothSwitchEvent::ENABLE_BLUETOOTH:
-            return ProcessEnableBluetoothEvent();
+            return ProcessEnableBluetoothEvent(isAsync);
         case BluetoothSwitchEvent::DISABLE_BLUETOOTH:
-            return ProcessDisableBluetoothEvent();
+            return ProcessDisableBluetoothEvent(isAsync);
         case BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_RESTRICE_MODE:
             return ProcessEnableBluetoothToRestrictModeEvent();
         case BluetoothSwitchEvent::BLUETOOTH_ON:
@@ -115,23 +115,23 @@ int BluetoothSwitchModule::ProcessBluetoothSwitchAction(
     return ret;
 }
 
-int BluetoothSwitchModule::ProcessEnableBluetoothEvent(void)
+int BluetoothSwitchModule::ProcessEnableBluetoothEvent(bool isAsync)
 {
     return ProcessBluetoothSwitchAction(
-        [this]() {
+        [this, isAsync]() {
             bool noAutoConnect = noAutoConnect_.load();
             if (noAutoConnect) {
                 SetNoAutoConnect(false);
             }
-            return switchAction_->EnableBluetooth(noAutoConnect);
+            return switchAction_->EnableBluetooth(noAutoConnect, isAsync);
         },
         BluetoothSwitchEvent::ENABLE_BLUETOOTH);
 }
 
-int BluetoothSwitchModule::ProcessDisableBluetoothEvent(void)
+int BluetoothSwitchModule::ProcessDisableBluetoothEvent(bool isAsync)
 {
     return ProcessBluetoothSwitchAction(
-        [this]() { return switchAction_->DisableBluetooth(); },
+        [this, isAsync]() { return switchAction_->DisableBluetooth(isAsync); },
         BluetoothSwitchEvent::DISABLE_BLUETOOTH);
 }
 
