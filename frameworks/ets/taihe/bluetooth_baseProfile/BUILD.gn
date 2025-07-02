@@ -40,6 +40,7 @@ ohos_taihe("run_taihe") {
 }
  
 taihe_shared_library("bluetoothBaseProfile_taihe_native") {
+  shlib_type = "ani"
   taihe_generated_file_path = "${taihe_generated_file_path_baseProfile}"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
