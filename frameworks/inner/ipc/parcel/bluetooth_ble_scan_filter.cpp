@@ -149,7 +149,7 @@ bool BluetoothBleScanFilter::operator==(const BluetoothBleScanFilter& other) con
         (hasServiceUuidMask_ == other.hasServiceUuidMask_) &&
         (hasSolicitationUuid_ == other.hasSolicitationUuid_) &&
         (hasSolicitationUuidMask_ == other.hasSolicitationUuidMask_) &&
-        (serviceData_== other.serviceData_) &&
+        (serviceData_ == other.serviceData_) &&
         (serviceDataMask_ == other.serviceDataMask_) &&
         (manufacturerId_ == other.manufacturerId_) &&
         (manufactureData_ == other.manufactureData_) &&
