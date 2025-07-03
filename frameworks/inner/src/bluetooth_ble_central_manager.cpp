@@ -43,6 +43,8 @@ struct BleCentralManager::impl {
     bool InitScannerId(void);
     int32_t CheckScanParams(const BleScanSettings &settings, const std::vector<BleScanFilter> &filters,
         bool checkFilter);
+    bool IsValidScannerId();
+    void ResetScannerId();
 
     class BluetoothBleCentralManagerCallbackImp : public BluetoothBleCentralManagerCallBackStub {
     public:
@@ -280,6 +282,23 @@ int32_t BleCentralManager::impl::CheckScanParams(const BleScanSettings &settings
     }
 
     return BT_NO_ERROR;
+}
+
+bool BleCentralManager::impl::IsValidScannerId()
+{
+    sptr<IBluetoothBleCentralManager> proxy =
+        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    bool isValid = true;
+    proxy->IsValidScannerId(scannerId_, isValid);
+    return isValid;
+}
+
+void BleCentralManager::impl::ResetScannerId()
+{
+    HILOGW("reset scannerId.");
+    std::lock_guard<std::mutex> lock(scannerIdMutex_);
+    scannerId_ = BLE_SCAN_INVALID_ID;
 }
 
 BleCentralManager::impl::~impl()
@@ -552,6 +571,18 @@ int BleCentralManager::ChangeScanParams(const BleScanSettings &settings, const s
 void BleCentralManager::SetNewApiFlag()
 {
     isNewApi_ = true;
+}
+
+void BleCentralManager::CheckValidScannerId()
+{
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return;
+    }
+    if (pimpl->scannerId_ != BLE_SCAN_INVALID_ID && !pimpl->IsValidScannerId()) {
+        HILOGI("The scannerId has expired, reset it to initial value.");
+        pimpl->ResetScannerId();
+    }
 }
 
 BleScanResult::BleScanResult()
