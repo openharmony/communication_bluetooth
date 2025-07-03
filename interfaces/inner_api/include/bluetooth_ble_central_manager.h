@@ -710,6 +710,7 @@ public:
         uint32_t filterAction);
 
     void SetNewApiFlag();
+    void CheckValidScannerId();
 private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleCentralManager);
     BLUETOOTH_DECLARE_IMPL();
