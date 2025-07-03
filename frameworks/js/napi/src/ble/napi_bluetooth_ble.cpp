@@ -635,15 +635,13 @@ static napi_status ParseScanFilterParameters(const napi_env &env, napi_value &ar
 
 static void SetReportDelay(ScanOptions &scanOptions, BleScanSettings &outSettinngs)
 {
-    // enforce reportDelay to be either 0 or at least the floor value(5000ms) corresponding to normal and batch mode
-    long currentReportDelay = scanOptions.interval;
-    long reportDelayFloorValue = 5000;
-    if (currentReportDelay == 0 || currentReportDelay >= reportDelayFloorValue) {
-        outSettinngs.SetReportDelay(currentReportDelay);
+    long reportDelayFloorValueBatch = 5000;
+    if (scanOptions.reportMode == ScanReportMode::BATCH && scanOptions.interval < reportDelayFloorValueBatch) {
+        outSettinngs.SetReportDelay(reportDelayFloorValueBatch);
+        HILOGW("reportDelay should be at least 5000 under batch mode, got %{public}d, enforced to 5000.",
+            scanOptions.interval);
     } else {
-        outSettinngs.SetReportDelay(reportDelayFloorValue);
-        HILOGD("reportDelay should be either 0 or at least 5000, got %{public}ld, enforced to 5000.",
-            currentReportDelay);
+        outSettinngs.SetReportDelay(scanOptions.interval);
     }
 }
 
