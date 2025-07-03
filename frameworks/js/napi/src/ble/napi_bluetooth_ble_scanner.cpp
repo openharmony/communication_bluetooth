@@ -111,6 +111,10 @@ napi_value NapiBleScanner::StartScan(napi_env env, napi_callback_info info)
 
     auto func = [napiBleScanner, settings, scanFilters]() {
         napiBleScanner->GetBleCentralManager()->SetNewApiFlag();
+        // When apps like aibase are in frozen state, enabling flight mode and then turning on Bluetooth can cause the
+        // scannerId to become invalid. The C++ interface's scannerId is reset every time scanning is turned off, so
+        // the JS interface should check the scannerId's validity before each scan.
+        napiBleScanner->GetBleCentralManager()->CheckValidScannerId();
         int ret = napiBleScanner->GetBleCentralManager()->StartScan(settings, scanFilters);
         return NapiAsyncWorkRet(ret);
     };
@@ -138,6 +142,10 @@ napi_value NapiBleScanner::StopScan(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, napiBleScanner->GetCallback() != nullptr, BT_ERR_INVALID_PARAM);
 
     auto func = [napiBleScanner]() {
+        // When apps like aibase are in frozen state, enabling flight mode and then turning on Bluetooth can cause the
+        // scannerId to become invalid. The C++ interface's scannerId is reset every time scanning is turned off, so
+        // the JS interface should check the scannerId's validity before each scan.
+        napiBleScanner->GetBleCentralManager()->CheckValidScannerId();
         int ret = napiBleScanner->GetBleCentralManager()->StopScan();
         return NapiAsyncWorkRet(ret);
     };
