@@ -552,6 +552,29 @@ int BluetoothBleCentralManagerProxy::ChangeScanParams(int32_t scannerId, const B
     return reply.ReadInt32();
 }
 
+int BluetoothBleCentralManagerProxy::IsValidScannerId(int32_t scannerId, bool &isValid)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
+        HILOGW("[IsValidScannerId] fail: write interface token failed.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    if (!data.WriteInt32(scannerId)) {
+        HILOGW("[IsValidScannerId] fail: write scannerId failed.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(BLE_IS_VALID_SCANNERID, option, data, reply);
+    if (result != NO_ERROR) {
+        HILOGE("[IsValidScannerId] fail: transact ErrCode=%{public}d", result);
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    isValid = reply.ReadBool();
+    return BT_NO_ERROR;
+}
+
 int32_t BluetoothBleCentralManagerProxy::InnerTransact(
     uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply)
 {

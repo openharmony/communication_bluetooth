@@ -713,6 +713,10 @@ napi_value StartBLEScan(napi_env env, napi_callback_info info)
     auto status = CheckBleScanParams(env, info, scanfilters, settings);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
+    // When apps like aibase are in frozen state, enabling flight mode and then turning on Bluetooth can cause the
+    // scannerId to become invalid. The C++ interface's scannerId is reset every time scanning is turned off, so
+    // the JS interface should check the scannerId's validity before each scan.
+    BleCentralManagerGetInstance()->CheckValidScannerId();
     int ret = BleCentralManagerGetInstance()->StartScan(settings, scanfilters);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR || ret == BT_ERR_BLE_SCAN_ALREADY_STARTED, ret);
 
@@ -726,6 +730,10 @@ napi_value StopBLEScan(napi_env env, napi_callback_info info)
     auto status = CheckEmptyParam(env, info);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
+    // When apps like aibase are in frozen state, enabling flight mode and then turning on Bluetooth can cause the
+    // scannerId to become invalid. The C++ interface's scannerId is reset every time scanning is turned off, so
+    // the JS interface should check the scannerId's validity before each scan.
+    BleCentralManagerGetInstance()->CheckValidScannerId();
     int ret = BleCentralManagerGetInstance()->StopScan();
     NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR, ret);
     return NapiGetUndefinedRet(env);
