@@ -422,6 +422,16 @@ public:
     int32_t GetLastConnectionTime(int64_t &connectionTime) const;
 
     int32_t GetCloudBondState(int32_t &cloudBondState) const;
+
+    /**
+     * @brief Get device transport.
+     *
+     * @param transport The transport of device.
+     * @return Returns <b>BT_NO_ERROR</b> if the operation is successful;
+     *         returns <b>Other code</b> if the operation fails.
+     * @since 20
+     */
+    int32_t GetDeviceTransport(int32_t &transport) const;
 private:
     std::string address_ = "00:00:00:00:00:00";
     int transport_ = BT_TRANSPORT_NONE;
