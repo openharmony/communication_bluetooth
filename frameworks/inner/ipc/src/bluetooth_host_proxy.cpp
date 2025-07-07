@@ -1861,6 +1861,31 @@ int32_t BluetoothHostProxy::GetCloudBondState(const std::string &address, int32_
     return exception;
 }
 
+int32_t BluetoothHostProxy::GetDeviceTransport(const std::string &address, int32_t &transport)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::GetDeviceTransport WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteString(address)) {
+        HILOGE("BluetoothHostProxy::GetDeviceTransport WriteAddress error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_DEVICE_TRANSPORT, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::GetDeviceTransport done fail error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    BtErrCode exception = static_cast<BtErrCode>(reply.ReadInt32());
+    if (exception == BT_NO_ERROR) {
+        transport = reply.ReadInt32();
+    }
+    return exception;
+}
+
 int32_t BluetoothHostProxy::UpdateRefusePolicy(const int32_t protocolType,
     const int32_t pid, const int64_t prohibitedSecondsTime)
 {

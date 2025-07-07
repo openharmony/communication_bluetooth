@@ -33,7 +33,12 @@ enum class ScanMode {
     SCAN_MODE_CONNECTABLE_LIMITED_DISCOVERABLE = 5
 };
 
-enum class BluetoothTransport { TRANSPORT_BR_EDR = 0, TRANSPORT_LE = 1 };
+enum class BluetoothTransport {
+    TRANSPORT_BR_EDR = 0,
+    TRANSPORT_LE = 1,
+    TRANSPORT_DUAL = 2,
+    TRANSPORT_UNKNOWN = 3
+};
 
 const char * const REGISTER_DEVICE_FIND_TYPE = "bluetoothDeviceFind";
 const char * const REGISTER_DISCOVERY_RESULT_TYPE = "discoveryResult";
@@ -76,6 +81,7 @@ napi_value GetPairState(napi_env env, napi_callback_info info);
 napi_value ConnectAllowedProfiles(napi_env env, napi_callback_info info);
 napi_value DisconnectAllowedProfiles(napi_env env, napi_callback_info info);
 napi_value GetRemoteProductId(napi_env env, napi_callback_info info);
+napi_value GetRemoteDeviceTransport(napi_env env, napi_callback_info info);
 #endif
 napi_value SetRemoteDeviceName(napi_env env, napi_callback_info info);
 napi_value SetRemoteDeviceType(napi_env env, napi_callback_info info);
