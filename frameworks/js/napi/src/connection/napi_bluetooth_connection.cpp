@@ -115,6 +115,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("updateCloudBluetoothDevice", UpdateCloudBluetoothDevice),
         DECLARE_NAPI_FUNCTION("getCarKeyDfxData", GetCarKeyDfxData),
         DECLARE_NAPI_FUNCTION("setCarKeyDfxData", SetCarKeyCardData),
+        DECLARE_NAPI_FUNCTION("getRemoteDeviceTransport", GetRemoteDeviceTransport),
     };
 
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
@@ -770,6 +771,20 @@ napi_value GetRemoteProductId(napi_env env, napi_callback_info info)
     return result;
 }
 
+napi_value GetRemoteDeviceTransport(napi_env env, napi_callback_info info)
+{
+    std::string remoteAddr = INVALID_MAC_ADDRESS;
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
+    int32_t transport = static_cast<int32_t>(BluetoothTransport::TRANSPORT_UNKNOWN);
+    int32_t err = remoteDevice.GetDeviceTransport(transport);
+    napi_value result = nullptr;
+    NAPI_BT_ASSERT_RETURN(env, napi_create_int32(env, transport, &result) == napi_ok, err, result);
+    NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
+    return result;
+}
+
 #endif
 
 napi_status ParseSetRemoteDeviceNameParameters(napi_env env, napi_callback_info info,
@@ -971,6 +986,10 @@ napi_value BluetoothTransportInit(napi_env env)
         env, bluetoothTransport, static_cast<int>(BluetoothTransport::TRANSPORT_BR_EDR), "TRANSPORT_BR_EDR");
     SetNamedPropertyByInteger(
         env, bluetoothTransport, static_cast<int>(BluetoothTransport::TRANSPORT_LE), "TRANSPORT_LE");
+    SetNamedPropertyByInteger(
+        env, bluetoothTransport, static_cast<int>(BluetoothTransport::TRANSPORT_DUAL), "TRANSPORT_DUAL");
+    SetNamedPropertyByInteger(
+        env, bluetoothTransport, static_cast<int>(BluetoothTransport::TRANSPORT_UNKNOWN), "TRANSPORT_UNKNOWN");
     return bluetoothTransport;
 }
 

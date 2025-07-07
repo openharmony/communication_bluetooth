@@ -579,6 +579,11 @@ constexpr uint8_t BLE_UUID_HALF_LEN = 8;
 
 constexpr int32_t BLE_SCAN_MAX_NUM = 1000;
 
+constexpr int TRANSPORT_BR_EDR_NUM = 0;
+constexpr int TRANSPORT_LE = 1;
+constexpr int TRANSPORT_DUAL = 2;
+constexpr int TRANSPORT_UNKNOWN = 3;
+
 // Phy type
 using PHY_TYPE = enum { PHY_LE_1M = 1, PHY_LE_2M = 2, PHY_LE_CODED = 3, PHY_LE_ALL_SUPPORTED = 255 };
 
