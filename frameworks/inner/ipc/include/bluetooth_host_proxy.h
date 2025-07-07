@@ -34,7 +34,7 @@ public:
     void RegisterObserver(const sptr<IBluetoothHostObserver> &observer) override;
     void DeregisterObserver(const sptr<IBluetoothHostObserver> &observer) override;
     int32_t EnableBt() override;
-    int32_t DisableBt() override;
+    int32_t DisableBt(bool isAsync) override;
     int32_t SatelliteControl(int type, int state) override;
     sptr<IRemoteObject> GetProfile(const std::string &name) override;
     sptr<IRemoteObject> GetBleRemote(const std::string &name) override;
@@ -42,7 +42,7 @@ public:
     int32_t GetBtState(int &state) override;
     int32_t GetLocalAddress(std::string &addr) override;
     int32_t DisableBle() override;
-    int32_t EnableBle(bool noAutoConnect) override;
+    int32_t EnableBle(bool noAutoConnect, bool isAsync) override;
     std::vector<uint32_t> GetProfileList() override;
     int32_t GetMaxNumConnectedAudioDevices() override;
     int32_t GetBtConnectionState(int &state) override;
@@ -121,6 +121,7 @@ public:
         int32_t command, std::vector<std::string> &deviceIdVec, bool &isValid) override;
     int32_t GetCarKeyDfxData(std::string &dfxData) override;
     int32_t SetCarKeyCardData(const std::string &address, int32_t action) override;
+    int32_t NotifyDialogResult(uint32_t dialogType, bool dialogResult) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;

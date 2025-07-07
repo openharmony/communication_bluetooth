@@ -341,11 +341,12 @@ public:
     /**
      * @brief Disable classic.
      *
+     * @param isAsync Indicate Async function flag.
      * @return Returns <b>true</b> if the operation is accepted;
      *         returns <b>false</b> if the operation is rejected.
      * @since 6
      */
-    int DisableBt();
+    int DisableBt(bool isAsync = false);
 
     /**
      * @brief Get classic enable/disable state.
@@ -403,11 +404,12 @@ public:
     /**
      * @brief Enable ble.
      *
+     * @param isAsync Indicate Async function flag.
      * @return Returns <b>true</b> if the operation is accepted;
      *         returns <b>false</b> if the operation is rejected.
      * @since 6
      */
-    int EnableBle();
+    int EnableBle(bool isAsync = false);
 
     /**
      * @brief Enable bluetooth without AutoConnect.
@@ -867,6 +869,17 @@ public:
     int GetCarKeyDfxData(std::string &dfxData) const;
 
     int SetCarKeyCardData(const std::string &address, int32_t action);
+
+    /**
+     * @brief Notify bluetooth the result of bluetooth dialog.
+     *
+     * @param dialogType The type of bluetooth dialog.
+     * @param dialogResult The result of bluetooth dialog.
+     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+     *         returns an error code defined in {@link BtErrCode} otherwise.
+     * @since 20
+     */
+    int NotifyDialogResult(uint32_t dialogType, bool dialogResult);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.

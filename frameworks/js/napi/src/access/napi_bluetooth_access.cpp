@@ -55,6 +55,9 @@ napi_value NapiAccess::DefineAccessJSFunction(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("deletePersistentDeviceId", DeletePersistentDeviceId),
         DECLARE_NAPI_FUNCTION("getPersistentDeviceIds", GetPersistentDeviceIds),
         DECLARE_NAPI_FUNCTION("isValidRandomDeviceId", isValidRandomDeviceId),
+        DECLARE_NAPI_FUNCTION("enableBluetoothAsync", EnableBluetoothAsync),
+        DECLARE_NAPI_FUNCTION("disableBluetoothAsync", DisableBluetoothAsync),
+        DECLARE_NAPI_FUNCTION("notifyDialogResult", NotifyDialogResult),
 #endif
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "access:napi_define_properties");
@@ -73,6 +76,10 @@ napi_value NapiAccess::EnableBluetooth(napi_env env, napi_callback_info info)
     HILOGI("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t ret = host->EnableBle();
+    // if return value is a specified error code, sync interface does not process.
+    if (ret == BT_ERR_DIALOG_FOR_USER_CONFIRM) {
+        ret = BT_NO_ERROR;
+    }
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
@@ -112,8 +119,10 @@ napi_value NapiAccess::AccessPropertyValueInit(napi_env env, napi_value exports)
 {
     HILOGD("enter");
     napi_value stateObj = StateChangeInit(env);
+    napi_value dialogTypeObj = DialogTypeInit(env);
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("BluetoothState", stateObj),
+        DECLARE_NAPI_PROPERTY("DialogType", dialogTypeObj),
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "access:napi_define_properties");
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
@@ -135,6 +144,15 @@ napi_value NapiAccess::StateChangeInit(napi_env env)
     SetNamedPropertyByInteger(
         env, state, static_cast<int>(BluetoothState::STATE_BLE_TURNING_OFF), "STATE_BLE_TURNING_OFF");
     return state;
+}
+
+napi_value NapiAccess::DialogTypeInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value dialogType = nullptr;
+    napi_create_object(env, &dialogType);
+    SetNamedPropertyByInteger(env, dialogType, static_cast<int>(DialogType::BLUETOOTH_SWITCH), "BLUETOOTH_SWITCH");
+    return dialogType;
 }
 
 napi_value NapiAccess::RegisterAccessObserver(napi_env env, napi_callback_info info)
@@ -253,6 +271,79 @@ napi_value NapiAccess::isValidRandomDeviceId(napi_env env, napi_callback_info in
     return object.ToNapiValue(env);
 }
 
+napi_value NapiAccess::EnableBluetoothAsync(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    auto func = []() {
+        bool isAsync = true;
+        int32_t ret = BluetoothHost::GetDefaultHost().EnableBle(isAsync);
+        HILOGI("EnableBluetoothAsync ret: %{public}d", ret);
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value NapiAccess::DisableBluetoothAsync(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    auto func = []() {
+        bool isAsync = true;
+        int32_t ret = BluetoothHost::GetDefaultHost().DisableBt(isAsync);
+        HILOGI("DisableBluetoothAsync ret: %{public}d", ret);
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_status ParseNotifyDialogResultParams(napi_env env, napi_value object,
+    NapiAccess::NotifyDialogResultParams &params)
+{
+    HILOGD("enter");
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"dialogType", "dialogResult"}));
+
+    uint32_t tmpDialogType = INVALID_DIALOG_TYPE;
+    bool tmpDialogResult = false;
+    NAPI_BT_CALL_RETURN(NapiParseObjectUint32(env, object, "dialogType", tmpDialogType));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBoolean(env, object, "dialogResult", tmpDialogResult));
+
+    HILOGI("dialogType: %{public}u, dialogResult: %{public}d", tmpDialogType, tmpDialogResult);
+
+    params.dialogType = tmpDialogType;
+    params.dialogResult = tmpDialogResult;
+    return napi_ok;
+}
+
+napi_value NapiAccess::NotifyDialogResult(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    auto checkRes = napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRes == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, argc == ARGS_SIZE_ONE, BT_ERR_INVALID_PARAM);
+
+    NotifyDialogResultParams params = { INVALID_DIALOG_TYPE, false};
+    auto status = ParseNotifyDialogResultParams(env, argv[PARAM0], params);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    uint32_t dialogType = params.dialogType;
+    bool dialogResult = params.dialogResult;
+    auto func = [dialogType, dialogResult]() {
+        int32_t ret = BluetoothHost::GetDefaultHost().NotifyDialogResult(dialogType, dialogResult);
+        HILOGI("NotifyDialogResult err: %{public}d", ret);
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
 
 }  // namespace Bluetooth
 }  // namespace OHOS
