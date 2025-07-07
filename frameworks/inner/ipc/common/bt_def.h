@@ -208,6 +208,7 @@ const int INVALID_TYPE = -1;
 const int ADDRESS_LENGTH = 17;
 const int ADDRESS_COLON_INDEX = 2;
 const int ADDRESS_SEPARATOR_UNIT = 3;
+const uint32_t INVALID_DIALOG_TYPE = 0xFFFFFFFF;
 
 /**
  * @brief discovery state
@@ -1811,6 +1812,10 @@ enum ProfileConnectionState {
 enum class HfpFeatureType {
     VGS = 1,
     VOICE_RECOGNITION,
+};
+
+enum DialogType {
+    BLUETOOTH_SWITCH = 0,
 };
 
 #ifdef BLUETOOTH_EXPORT

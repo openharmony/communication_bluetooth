@@ -30,7 +30,9 @@ public:
     static napi_value GetState(napi_env env, napi_callback_info info);
     static napi_value RegisterAccessObserver(napi_env env, napi_callback_info info);
     static napi_value DeregisterAccessObserver(napi_env env, napi_callback_info info);
-
+    static napi_value EnableBluetoothAsync(napi_env env, napi_callback_info info);
+    static napi_value DisableBluetoothAsync(napi_env env, napi_callback_info info);
+    static napi_value NotifyDialogResult(napi_env env, napi_callback_info info);
 #ifdef BLUETOOTH_API_SINCE_10
     static napi_value FactoryReset(napi_env env, napi_callback_info info);
     static napi_value GetLocalAddress(napi_env env, napi_callback_info info);
@@ -40,9 +42,14 @@ public:
     static napi_value DeletePersistentDeviceId(napi_env env, napi_callback_info info);
     static napi_value GetPersistentDeviceIds(napi_env env, napi_callback_info info);
     static napi_value isValidRandomDeviceId(napi_env env, napi_callback_info info);
+    struct NotifyDialogResultParams {
+        uint32_t dialogType;
+        bool dialogResult;
+    };
 private:
     static napi_value AccessPropertyValueInit(napi_env env, napi_value exports);
     static napi_value StateChangeInit(napi_env env);
+    static napi_value DialogTypeInit(napi_env env);
     static void RegisterAccessObserverToHost();
 };
 }  // namespace Bluetooth

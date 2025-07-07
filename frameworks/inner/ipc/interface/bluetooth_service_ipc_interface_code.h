@@ -291,6 +291,7 @@ enum BluetoothHostInterfaceCode {
     PROCESS_RANDOM_DEVICE_ID_COMMAND,
     BT_GET_CAR_KEY_DFX_DATA,
     BT_SET_CAR_KEY_CARD_DATA,
+    BT_NOTIFY_DIALOG_RESULT,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
