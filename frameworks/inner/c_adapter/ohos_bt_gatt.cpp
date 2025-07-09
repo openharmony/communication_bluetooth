@@ -56,6 +56,7 @@ using namespace std;
 namespace OHOS {
 namespace Bluetooth {
 #define MAX_BLE_ADV_NUM 7
+#define MAX_LEN 1000
 
 class BleCentralManagerCallbackWapper;
 class BleAdvCallback;
@@ -335,7 +336,7 @@ int SetDeviceName(const char *name, unsigned int len)
 
 static vector<uint8_t> ConvertDataToVec(uint8_t *data, unsigned int len)
 {
-    if (data == nullptr || len == 0) {
+    if (data == nullptr || len == 0 || len > MAX_LEN) {
         return {};
     }
 
