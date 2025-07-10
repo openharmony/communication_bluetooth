@@ -33,7 +33,6 @@ void NapiProfile::DefineProfileFunctions(napi_env env, napi_value exports)
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "profile:napi_define_properties");
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
-    ProfileEnumInit(env, exports);
 }
 
 void NapiProfile::SetProfile(napi_env env, ProfileId code, napi_value profile)
@@ -70,60 +69,6 @@ napi_value NapiProfile::GetProfile(napi_env env, napi_callback_info info)
 
     HILOGI("profileId:%{public}d", profileId);
     return profile;
-}
-
-void NapiProfile::ProfileEnumInit(napi_env env, napi_value exports)
-{
-    HILOGD("enter");
-    napi_value sppTypeObj = SppTypeInit(env);
-    napi_value playingStateObj = PlayingStateInit(env);
-    napi_value profileIdObj = ProfileIdInit(env);
-    napi_property_descriptor exportFuncs[] = {
-        DECLARE_NAPI_PROPERTY("SppType", sppTypeObj),
-        DECLARE_NAPI_PROPERTY("PlayingState", playingStateObj),
-        DECLARE_NAPI_PROPERTY("ProfileId", profileIdObj),
-    };
-    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "profile:napi_define_properties");
-    napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
-}
-
-napi_value NapiProfile::SppTypeInit(napi_env env)
-{
-    HILOGD("enter");
-    napi_value sppType = nullptr;
-    napi_create_object(env, &sppType);
-    SetNamedPropertyByInteger(env, sppType, SppType::SPP_RFCOMM, "SPP_RFCOMM");
-    return sppType;
-}
-
-napi_value NapiProfile::PlayingStateInit(napi_env env)
-{
-    HILOGD("enter");
-    napi_value playingState = nullptr;
-    napi_create_object(env, &playingState);
-    SetNamedPropertyByInteger(env, playingState, PlayingState::STATE_NOT_PLAYING, "STATE_NOT_PLAYING");
-    SetNamedPropertyByInteger(env, playingState, PlayingState::STATE_PLAYING, "STATE_PLAYING");
-    return playingState;
-}
-
-napi_value NapiProfile::ProfileIdInit(napi_env env)
-{
-    HILOGD("enter");
-    napi_value profileId = nullptr;
-    napi_create_object(env, &profileId);
-    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_A2DP_SINK, "PROFILE_A2DP_SINK");
-    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_A2DP_SOURCE, "PROFILE_A2DP_SOURCE");
-    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_AVRCP_CT, "PROFILE_AVRCP_CT");
-    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_AVRCP_TG, "PROFILE_AVRCP_TG");
-    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_HANDS_FREE_AUDIO_GATEWAY,
-        "PROFILE_HANDS_FREE_AUDIO_GATEWAY");
-    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_HANDS_FREE_UNIT, "PROFILE_HANDS_FREE_UNIT");
-    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_HID_HOST, "PROFILE_HID_HOST");
-    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PAN_NETWORK, "PROFILE_PAN_NETWORK");
-    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PBAP_CLIENT, "PROFILE_PBAP_CLIENT");
-    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PBAP_SERVER, "PROFILE_PBAP_SERVER");
-    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_OPP, "PROFILE_OPP");
-    return profileId;
 }
 } // namespace Bluetooth
 } // namespace OHOS
