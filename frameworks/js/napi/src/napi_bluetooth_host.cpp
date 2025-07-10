@@ -35,7 +35,6 @@ namespace Bluetooth {
 napi_value BluetoothHostInit(napi_env env, napi_value exports)
 {
     HILOGD("start");
-    PropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", RegisterHostObserver),
         DECLARE_NAPI_FUNCTION("off", DeregisterHostObserver),
@@ -86,22 +85,6 @@ napi_value DeregisterHostObserver(napi_env env, napi_callback_info info)
     } else {
         NAPI_BT_ASSERT_RETURN_UNDEF(env, false, BT_ERR_INVALID_PARAM);
     }
-}
-
-napi_value PropertyValueInit(napi_env env, napi_value exports)
-{
-    HILOGD("start");
-    napi_value scanDutyObject = ScanDutyInit(env);
-    napi_value matchModeObject = MatchModeInit(env);
-
-    napi_property_descriptor exportFuncs[] = {
-        DECLARE_NAPI_PROPERTY("ScanDuty", scanDutyObject),
-        DECLARE_NAPI_PROPERTY("MatchMode", matchModeObject),
-
-    };
-    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "host:napi_define_properties");
-    napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
-    return exports;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
