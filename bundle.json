@@ -73,7 +73,8 @@
         "napi",
         "samgr",
         "resource_schedule_service",
-        "security_guard"
+        "security_guard",
+        "runtime_core"
       ],
       "third_party": []
     },
@@ -85,7 +86,15 @@
           "//foundation/communication/bluetooth/frameworks/inner:btcommon",
           "//foundation/communication/bluetooth/frameworks/js/napi:bluetooth_napi",
           "//foundation/communication/bluetooth/frameworks/c_api:bluetooth_ndk",
-          "//foundation/communication/bluetooth/frameworks/cj:bluetooth_ffi"
+          "//foundation/communication/bluetooth/frameworks/cj:bluetooth_ffi",
+          "//foundation/communication/bluetooth/frameworks/ets/taihe/bluetooth_a2dp:bluetoothA2dp_taihe",
+          "//foundation/communication/bluetooth/frameworks/ets/taihe/bluetooth_access:bluetoothAccess_taihe",
+          "//foundation/communication/bluetooth/frameworks/ets/taihe/bluetooth_baseProfile:bluetoothBaseProfile_taihe",
+          "//foundation/communication/bluetooth/frameworks/ets/taihe/bluetooth_ble:bluetoothBle_taihe",
+          "//foundation/communication/bluetooth/frameworks/ets/taihe/bluetooth_connection:bluetoothConnection_taihe",
+          "//foundation/communication/bluetooth/frameworks/ets/taihe/bluetooth_constant:bluetoothConstant_taihe",
+          "//foundation/communication/bluetooth/frameworks/ets/taihe/bluetooth_hfp:bluetoothHfp_taihe",
+          "//foundation/communication/bluetooth/frameworks/ets/taihe/bluetooth_hid:bluetoothHid_taihe"
         ],
         "service_group": [
         ]
