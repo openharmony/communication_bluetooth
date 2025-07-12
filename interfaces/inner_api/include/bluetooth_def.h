@@ -317,7 +317,10 @@ enum class GattPermission : uint16_t {
 enum class GattConnectionPriority : int {
     BALANCED,
     HIGH,
-    LOW_POWER
+    LOW_POWER,
+    LOW_POWER_WEAK, /* interval 125ms latency 0 */
+    LOW_POWER_ENHANCE, /* interval 250ms latency 2 */
+    LOW_POWER_ULTRA /* interval 330ms latency 2 */
 };
 
 enum GattStatus {
