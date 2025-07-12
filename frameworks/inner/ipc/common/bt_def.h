@@ -265,8 +265,6 @@ inline int DeviceTypeToTransport(int type)
             return BT_TRANSPORT_BLE;
         case DEVICE_TYPE_BREDR:
             return BT_TRANSPORT_BREDR;
-        case DEVICE_TYPE_DUAL_MONO:
-            return BT_TRANSPORT_BREDR;
         default:
             return BT_TRANSPORT_NONE;
     }
