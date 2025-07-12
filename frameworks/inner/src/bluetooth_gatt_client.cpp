@@ -1087,9 +1087,12 @@ int GattClient::RequestConnectionPriority(int connPriority)
         HILOGE("Not connected");
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
-    if (connPriority != static_cast<int>(GattConnectionPriority::BALANCED) &&
+    if (connPriority != static_cast<int>(GattConnectionPriority::LOW_POWER) &&
+        connPriority != static_cast<int>(GattConnectionPriority::BALANCED) &&
         connPriority != static_cast<int>(GattConnectionPriority::HIGH) &&
-        connPriority != static_cast<int>(GattConnectionPriority::LOW_POWER)) {
+        connPriority != static_cast<int>(GattConnectionPriority::LOW_POWER_WEAK) &&
+        connPriority != static_cast<int>(GattConnectionPriority::LOW_POWER_ENHANCE) &&
+        connPriority != static_cast<int>(GattConnectionPriority::LOW_POWER_ULTRA)) {
         HILOGE("Invalid parameters");
         return GattStatus::INVALID_PARAMETER;
     }
