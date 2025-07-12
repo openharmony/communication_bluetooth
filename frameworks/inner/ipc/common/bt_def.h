@@ -340,7 +340,14 @@ enum class GattPermission : uint16_t {
     PERMISSON_MAX = 1 << 9,
 };
 
-enum class GattConnectionPriority : int { BALANCED, HIGH, LOW_POWER };
+enum class GattConnectionPriority : int {
+    BALANCED,
+    HIGH,
+    LOW_POWER,
+    LOW_POWER_WEAK,
+    LOW_POWER_ENHANCE,
+    LOW_POWER_ULTRA
+};
 
 enum GattStatus {
     AUTHENTICATION_FAILED = -33,
