@@ -1,0 +1,143 @@
+/*
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@!namespace("@ohos.bluetooth.connection", "connection")
+@!sts_inject("""
+static { loadLibrary("bluetoothConnection_taihe_native.z") }
+""")
+from ohos.bluetooth.constant use MajorClass, MajorMinorClass;
+
+enum BluetoothTransport: i32 {
+    TRANSPORT_BR_EDR = 0,
+    TRANSPORT_LE = 1
+}
+
+enum ScanMode: i32 {
+    SCAN_MODE_NONE = 0,
+    SCAN_MODE_CONNECTABLE = 1,
+    SCAN_MODE_GENERAL_DISCOVERABLE = 2,
+    SCAN_MODE_LIMITED_DISCOVERABLE = 3,
+    SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE = 4,
+    SCAN_MODE_CONNECTABLE_LIMITED_DISCOVERABLE = 5
+}
+
+struct DeviceClass {
+    majorClass: MajorClass;
+    majorMinorClass: MajorMinorClass;
+    classOfDevice: i32;
+}
+
+struct DiscoveryResult {
+    deviceId: String;
+    rssi: i32;
+    deviceName: String;
+    deviceClass: DeviceClass;
+}
+
+struct PinRequiredParam {
+    deviceId: String;
+    pinCode: String;
+    pinType: PinType;
+}
+
+enum PinType: i32 {
+    PIN_TYPE_ENTER_PIN_CODE = 0,
+    PIN_TYPE_ENTER_PASSKEY = 1,
+    PIN_TYPE_CONFIRM_PASSKEY = 2,
+    PIN_TYPE_NO_PASSKEY_CONSENT = 3,
+    PIN_TYPE_NOTIFY_PASSKEY = 4,
+    PIN_TYPE_DISPLAY_PIN_CODE = 5,
+    PIN_TYPE_OOB_CONSENT = 6,
+    PIN_TYPE_PIN_16_DIGITS = 7
+}
+
+struct BatteryInfo {
+    deviceId: String;
+    batteryLevel: i32;
+    leftEarBatteryLevel: i32;
+    leftEarChargeState: DeviceChargeState;
+    rightEarBatteryLevel: i32;
+    deviceClass: DeviceClass;
+    rightEarChargeState: DeviceChargeState;
+    boxBatteryLevel: i32;
+    boxChargeState: DeviceChargeState;
+}
+
+enum DeviceChargeState: i32 {
+    DEVICE_NORMAL_CHARGE_NOT_CHARGED = 0,
+    DEVICE_NORMAL_CHARGE_IN_CHARGING = 1,
+    DEVICE_SUPER_CHARGE_NOT_CHARGED = 2,
+    DEVICE_SUPER_CHARGE_IN_CHARGING = 3
+}
+
+struct BondStateParam {
+    deviceId: String;
+    state: BondState;
+    cause: UnbondCause;
+}
+
+enum BondState: i32 {
+    BOND_STATE_INVALID = 0,
+    BOND_STATE_BONDING = 1,
+    BOND_STATE_BONDED = 2
+}
+
+enum UnbondCause: i32 {
+    USER_REMOVED = 0,
+    REMOTE_DEVICE_DOWN = 1,
+    AUTH_FAILURE = 2,
+    AUTH_REJECTED = 3,
+    INTERNAL_ERROR = 4
+}
+
+struct ControlDeviceActionParams {
+    deviceId: String;
+    type: ControlType;
+    typeValue: ControlTypeValue;
+    controlObject: ControlObject;
+}
+
+enum ControlType: i32 {
+    PLAY = 0,
+    VIBRATE = 1,
+    FLASH = 2,
+    LOCK = 3,
+    ERASE = 4
+}
+
+enum ControlTypeValue: i32 {
+    DISABLE = 0,
+    ENABLE = 1,
+    QUERY = 2
+}
+
+enum ControlObject: i32 {
+    LEFT_EAR = 0,
+    RIGHT_EAR = 1,
+    LEFT_RIGHT_EAR = 2
+}
+
+function GetRemoteProductId(deviceId: String): String;
+
+@overload("getRemoteDeviceName")
+function GetRemoteDeviceNameWithAlias(deviceId: String, alias: Optional<bool>): String;
+@overload("getRemoteDeviceName")
+function GetRemoteDeviceName(deviceId: String): String;
+
+function GetPairedDevices(): Array<String>;
+
+function SetBluetoothScanMode(mode: ScanMode, duration: f64): void;
+
+function GetRemoteDeviceClass(deviceId: String): DeviceClass;
