@@ -31,10 +31,7 @@ public:
     static thread_local std::map<ProfileId, napi_ref> profiles_;
     static void SetProfile(napi_env env, ProfileId code, napi_value profile);
     static napi_value GetProfile(napi_env env, napi_callback_info info);
-    static void ProfileEnumInit(napi_env env, napi_value exports);
-    static napi_value SppTypeInit(napi_env env);
     static napi_value PlayingStateInit(napi_env env);
-    static napi_value ProfileIdInit(napi_env env);
 };
 
 }  // namespace Bluetooth
