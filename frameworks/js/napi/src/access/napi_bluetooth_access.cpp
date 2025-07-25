@@ -44,6 +44,7 @@ napi_value NapiAccess::DefineAccessJSFunction(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getState", GetState),
         DECLARE_NAPI_FUNCTION("enableBluetooth", EnableBluetooth),
+        DECLARE_WRITABLE_NAPI_FUNCTION("enableBluetooth", EnableBluetooth),
         DECLARE_NAPI_FUNCTION("disableBluetooth", DisableBluetooth),
         DECLARE_NAPI_FUNCTION("restrictBluetooth", RestrictBluetooth),
 #ifdef BLUETOOTH_API_SINCE_10
