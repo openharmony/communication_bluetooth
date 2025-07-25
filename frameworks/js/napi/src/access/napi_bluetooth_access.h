@@ -21,6 +21,10 @@
 
 namespace OHOS {
 namespace Bluetooth {
+#define DECLARE_WRITABLE_NAPI_FUNCTION(name, func)                                 \
+    {                                                                              \
+        (name), nullptr, (func), nullptr, nullptr, nullptr, napi_writable, nullptr \
+    }
 class NapiAccess {
 public:
     static napi_value DefineAccessJSFunction(napi_env env, napi_value exports);
