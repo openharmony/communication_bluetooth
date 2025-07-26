@@ -50,6 +50,23 @@ public:
             observer_->eventSubscribe_.DeregisterEvent(callback);
         }
     }
+
+    ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(string_view deviceId)
+    {
+        return {ohos::bluetooth::constant::ProfileConnectionState::key_t::STATE_DISCONNECTED};
+    }
+
+    array<string> GetConnectedDevices()
+    {
+        return {};
+    }
+
+    ohos::bluetooth::baseProfile::ConnectionStrategy GetConnectionStrategySync(string_view deviceId)
+    {
+        return {ohos::bluetooth::baseProfile::ConnectionStrategy::key_t::CONNECTION_STRATEGY_UNSUPPORTED};
+    }
+
+    void SetConnectionStrategySync(string_view deviceId, ohos::bluetooth::baseProfile::ConnectionStrategy strategy) {}
 private:
     std::shared_ptr<TaiheBluetoothHidHostObserver> observer_ = nullptr;
 };

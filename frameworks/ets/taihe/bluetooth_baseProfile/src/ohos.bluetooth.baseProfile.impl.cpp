@@ -18,6 +18,13 @@
 #include "taihe/runtime.hpp"
 #include "stdexcept"
 
+#include "bluetooth_errorcode.h"
+#include "bluetooth_log.h"
+
+#ifndef LOG_TAG
+#define LOG_TAG "bt_BaseProfile_impl_ohbluetooth"
+#endif
+
 using namespace taihe;
 using namespace ohos::bluetooth::baseProfile;
 
@@ -38,6 +45,23 @@ public:
     void Off(::taihe::string_view type, ::taihe::optional_view<::taihe::callback_view<void(
         ::ohos::bluetooth::baseProfile::StateChangeParam const& data)>> callback)
     {}
+
+    ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(string_view deviceId)
+    {
+        return {ohos::bluetooth::constant::ProfileConnectionState::key_t::STATE_DISCONNECTED};
+    }
+
+    array<string> GetConnectedDevices()
+    {
+        return {};
+    }
+
+    ConnectionStrategy GetConnectionStrategySync(string_view deviceId)
+    {
+        return {ConnectionStrategy::key_t::CONNECTION_STRATEGY_UNSUPPORTED};
+    }
+
+    void SetConnectionStrategySync(string_view deviceId, ConnectionStrategy strategy) {}
 };
 }  // namespace
 
