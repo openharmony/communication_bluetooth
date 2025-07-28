@@ -68,8 +68,6 @@ static napi_status CheckSppConnectParams(
         napi_typeof(env, argv[PARAM2], &valueType);
         if (valueType != napi_function) {
             HILOGE("Wrong argument type. Function expected.");
-            delete callbackInfo;
-            callbackInfo = nullptr;
             return napi_invalid_arg;
         }
         napi_create_reference(env, argv[PARAM2], 1, &callbackInfo->callback_);
@@ -118,6 +116,10 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
     std::string deviceId;
     SppConnectCallbackInfo *callbackInfo = new SppConnectCallbackInfo();
     auto status = CheckSppConnectParams(env, info, deviceId, callbackInfo);
+    if (status != napi_ok) {
+        delete callbackInfo;
+        callbackInfo = nullptr;
+    }
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     napi_value resource = nullptr;
