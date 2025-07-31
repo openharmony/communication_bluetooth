@@ -37,6 +37,7 @@ using namespace std;
 
 namespace OHOS {
 namespace Bluetooth {
+static mutex g_writeMutex;
 
 /**
  * @brief Creates an server listening socket based on the service record.
@@ -120,6 +121,7 @@ int SppConnect(BtCreateSocketPara *socketPara, const BdAddr *bdAddr)
  */
 int SppDisconnect(int clientId)
 {
+    lock_guard<mutex> lock(g_writeMutex);
     HILOGI("clientId: %{public}d", clientId);
     return SocketDisconnect(clientId);
 }
@@ -174,6 +176,7 @@ int SppRead(int clientId, char *buf, const unsigned int bufLen)
  */
 int SppWrite(int clientId, const char *data, const unsigned int len)
 {
+    lock_guard<mutex> lock(g_writeMutex);
     HILOGD("start, clientId: %{public}d, len: %{public}d", clientId, len);
     return SocketWrite(clientId, reinterpret_cast<const uint8_t*>(data), len);
 }
