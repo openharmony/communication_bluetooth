@@ -30,8 +30,6 @@ namespace Bluetooth {
 
 constexpr int64_t INVALID_PROCESSOR_ID = -200;
 const std::string SDK_NAME = "ConnectivityKit";
-constexpr int32_t TIMEOUT = 90; // 每90s触发上报一次
-constexpr int32_t ROW = 30; // 或30条数据触发一次上报
 constexpr int32_t TIME_MS_PER_SECOND = 1000;
 constexpr int32_t TIME_NS_PER_MS = 1000000;
 
@@ -89,32 +87,7 @@ int64_t NapiHaEventUtils::AddProcessor()
 #ifndef CROSS_PLATFORM
     HiviewDFX::HiAppEvent::ReportConfig config;
     config.name = "ha_app_event"; // 系统预制so，实现上报功能，由HA提供
-    config.appId = "com_huawei_hmos_sdk_ocg";
-    config.routeInfo = "AUTO";
-    config.triggerCond.timeout = TIMEOUT;
-    config.triggerCond.row = ROW;
-    config.eventConfigs.clear();
-    {   // 固定内容，所有Kit全量完整复制，不允许修改
-        OHOS::HiviewDFX::HiAppEvent::EventConfig event1;
-        event1.domain = "api_diagnostic";
-        event1.name = "api_exec_end";
-        event1.isRealTime = false;
-        config.eventConfigs.push_back(event1);
-    }
-    {   // 固定内容，所有Kit全量完整复制，不允许修改
-        OHOS::HiviewDFX::HiAppEvent::EventConfig event2;
-        event2.domain = "api_diagnostic";
-        event2.name = "api_called_stat";
-        event2.isRealTime = true;
-        config.eventConfigs.push_back(event2);
-    }
-    {   // 固定内容，所有Kit全量完整复制，不允许修改
-        OHOS::HiviewDFX::HiAppEvent::EventConfig event3;
-        event3.domain = "api_diagnostic";
-        event3.name = "api_called_stat_cnt";
-        event3.isRealTime = true;
-        config.eventConfigs.push_back(event3);
-    }
+    config.configName = "SDK_OCG"; // 固定内容，此配置内容由HA确认规格
     return HiviewDFX::HiAppEvent::AppEventProcessorMgr::AddProcessor(config);
 #else
     return -1;
