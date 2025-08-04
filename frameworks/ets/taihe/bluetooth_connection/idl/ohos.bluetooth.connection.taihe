@@ -17,7 +17,7 @@
 @!sts_inject("""
 static { loadLibrary("bluetoothConnection_taihe_native.z") }
 """)
-from ohos.bluetooth.constant use MajorClass, MajorMinorClass;
+from ohos.bluetooth.constant use MajorClass, MajorMinorClass, ProfileConnectionState, ProfileId, ProfileUuids;
 
 @!sts_inject("""
 export function on(type: string, cb: (arg_0: Object) => void) {
@@ -207,3 +207,33 @@ function GetPairedDevices(): Array<String>;
 function SetBluetoothScanMode(mode: ScanMode, duration: i32): void;
 
 function GetRemoteDeviceClass(deviceId: String): DeviceClass;
+
+@promise function controlDeviceAction(controlDeviceActionParams: ControlDeviceActionParams): void;
+
+@promise function getLastConnectionTime(deviceId: String): i32;
+
+@promise function getRemoteDeviceType(deviceId: String): DeviceType;
+
+@promise function updateCloudBluetoothDevice(trustedPairedDevices: TrustedPairedDevices): void;
+
+@promise function getRemoteDeviceBatteryInfo(deviceId: String): BatteryInfo;
+
+@promise function setRemoteDeviceName(deviceId: String, name: String): void;
+
+@promise function setRemoteDeviceType(deviceId: String, type: DeviceType): void;
+
+function getBluetoothScanMode(): ScanMode;
+
+function getProfileConnectionState(profileId: Optional<ProfileId>): ProfileConnectionState;
+
+function getLocalName(): String;
+
+function getPairState(deviceId: String): BondState;
+
+function startBluetoothDiscovery(): void;
+
+function isBluetoothDiscovering(): bool;
+
+function stopBluetoothDiscovery(): void;
+
+function setDevicePairingConfirmation(deviceId: String, accept: bool): void;

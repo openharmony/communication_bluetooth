@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+#ifndef LOG_TAG
+#define LOG_TAG "bt_connection_impl_ohbluetooth"
+#endif
+
 #include "ohos.bluetooth.connection.proj.hpp"
 #include "ohos.bluetooth.connection.impl.hpp"
 #include "taihe/runtime.hpp"
@@ -28,6 +32,7 @@ namespace Bluetooth {
 
 using namespace taihe;
 using namespace ohos::bluetooth::connection;
+using namespace ohos::bluetooth::constant;
 
 std::shared_ptr<TaiheBluetoothRemoteDeviceObserver> g_remoteDeviceObserver =
     TaiheBluetoothRemoteDeviceObserver::GetInstance();
@@ -273,6 +278,263 @@ void OffPinRequired(::taihe::optional_view<::taihe::callback<
         callbackVec.clear();
     }
 }
+
+void controlDeviceAction(ControlDeviceActionParams controlDeviceActionParams)
+{
+    HILOGD("enter");
+    std::string deviceId = std::string(controlDeviceActionParams.deviceId);
+    uint32_t controlType = (controlDeviceActionParams.type).get_value();
+    uint32_t controlTypeVal = (controlDeviceActionParams.typeValue).get_value();
+    uint32_t controlObject = controlDeviceActionParams.controlObject;
+    OHOS::Bluetooth::BluetoothRemoteDevice remoteDevice = OHOS::Bluetooth::BluetoothRemoteDevice(deviceId);
+    int32_t err = remoteDevice.ControlDeviceAction(controlType, controlTypeVal, controlObject);
+    if (err != OHOS::Bluetooth::BT_NO_ERROR) {
+        set_business_error(err, "controlDeviceAction return error");
+    }
+}
+
+int getLastConnectionTime(string_view deviceId)
+{
+    HILOGD("enter");
+    std::string remoteAddr = std::string(deviceId);
+    int64_t connectionTime = 0;
+    OHOS::Bluetooth::BluetoothRemoteDevice remoteDevice = OHOS::Bluetooth::BluetoothRemoteDevice(remoteAddr);
+    int32_t err = remoteDevice.GetLastConnectionTime(connectionTime);
+    if (err != OHOS::Bluetooth::BT_NO_ERROR) {
+        set_business_error(err, "getLastConnectionTime return error");
+    }
+    return static_cast<int>(connectionTime);
+}
+
+ohos::bluetooth::connection::DeviceType getRemoteDeviceType(string_view deviceId)
+{
+    HILOGD("enter");
+    std::string remoteAddr = std::string(deviceId);
+    int32_t deviceType = 0;
+    OHOS::Bluetooth::BluetoothRemoteDevice remoteDevice = OHOS::Bluetooth::BluetoothRemoteDevice(remoteAddr);
+    int32_t err = remoteDevice.GetDeviceCustomType(deviceType);
+    HILOGI("err: %{public}d", err);
+    if (err != OHOS::Bluetooth::BT_NO_ERROR) {
+        set_business_error(err, "getRemoteDeviceType return error");
+    }
+
+    return ohos::bluetooth::connection::DeviceType::from_value(deviceType);
+}
+
+void updateCloudBluetoothDevice(TrustedPairedDevices trustedPairedDevices)
+{
+    HILOGI("enter");
+    std::vector<OHOS::Bluetooth::TrustPairDeviceParam> trustPairs {};
+    for (const auto &device : trustedPairedDevices.trustedPairedDevices) {
+        OHOS::Bluetooth::TrustPairDeviceParam trustPair;
+        trustPair.sn_ = std::string(device.sn);
+        trustPair.deviceType_ = std::string(device.deviceType);
+        trustPair.modelId_ = std::string(device.modelId);
+        trustPair.manufactory_ = std::string(device.manufactory);
+        trustPair.productId_ = std::string(device.productId);
+        trustPair.hiLinkVersion_ = std::string(device.hiLinkVersion);
+        trustPair.macAddress_ = std::string(device.macAddress);
+        trustPair.serviceType_ = std::string(device.serviceType);
+        trustPair.serviceId_ = std::string(device.serviceId);
+        trustPair.deviceName_ = std::string(device.deviceName);
+        trustPair.uuids_.clear();
+        trustPair.bluetoothClass_ = device.bluetoothClass;
+        trustPair.token_.clear();
+        for (const auto &token : device.token) {
+            trustPair.token_.push_back(static_cast<uint8_t>(token));
+        }
+        trustPair.deviceNameTime_ = device.deviceNameTime;
+        trustPair.secureAdvertisingInfo_.clear();
+        for (const auto &info : device.secureAdvertisingInfo) {
+            trustPair.secureAdvertisingInfo_.push_back(static_cast<uint8_t>(info));
+        }
+        trustPair.pairState_ = device.pairState;
+        trustPairs.push_back(trustPair);
+    }
+    int32_t err = OHOS::Bluetooth::BluetoothHost::GetDefaultHost().UpdateCloudBluetoothDevice(trustPairs);
+    HILOGI("err: %{public}d", err);
+    if (err != OHOS::Bluetooth::BT_NO_ERROR) {
+        set_business_error(err, "updateCloudBluetoothDevice return error");
+    }
+}
+
+BatteryInfo getRemoteDeviceBatteryInfo(string_view deviceId)
+{
+    HILOGD("enter getRemoteDeviceBatteryInfo");
+    std::string remoteAddr = std::string(deviceId);
+    OHOS::Bluetooth::DeviceBatteryInfo batteryInfo;
+    OHOS::Bluetooth::BluetoothRemoteDevice remoteDevice = OHOS::Bluetooth::BluetoothRemoteDevice(remoteAddr);
+    int32_t err = remoteDevice.GetRemoteDeviceBatteryInfo(batteryInfo);
+    HILOGI("err: %{public}d", err);
+    if (err != OHOS::Bluetooth::BT_NO_ERROR) {
+        set_business_error(err, "getRemoteDeviceBatteryInfo return error");
+    }
+
+    int tmpCod = MajorClass(MajorClass::key_t::MAJOR_UNCATEGORIZED).get_value();
+    int tmpMajorClass = MajorClass(
+        MajorClass::key_t::MAJOR_UNCATEGORIZED).get_value();
+    int tmpMajorMinorClass = MajorMinorClass(MajorMinorClass::key_t::COMPUTER_UNCATEGORIZED).get_value();
+    DeviceClass deviceClass = {
+        MajorClass::from_value(tmpMajorClass),
+        MajorMinorClass::from_value(tmpMajorMinorClass),
+        tmpCod
+    };
+
+    BatteryInfo batterys{"1", 1, 2, 
+            DeviceChargeState::key_t::DEVICE_NORMAL_CHARGE_NOT_CHARGED,
+            3, deviceClass,
+            DeviceChargeState::key_t::DEVICE_SUPER_CHARGE_NOT_CHARGED,
+            4, DeviceChargeState::key_t::DEVICE_SUPER_CHARGE_IN_CHARGING};
+    batterys.deviceId = batteryInfo.deviceId_;
+    batterys.batteryLevel = batteryInfo.batteryLevel_;
+    batterys.leftEarBatteryLevel = batteryInfo.leftEarBatteryLevel_;
+    batterys.leftEarChargeState = (DeviceChargeState::key_t)batteryInfo.leftEarChargeState_;
+    batterys.rightEarBatteryLevel = batteryInfo.rightEarBatteryLevel_;
+    batterys.rightEarChargeState = (DeviceChargeState::key_t)batteryInfo.rightEarChargeState_;
+    batterys.boxBatteryLevel = batteryInfo.boxBatteryLevel_;
+    batterys.boxChargeState = (DeviceChargeState::key_t)batteryInfo.boxChargeState_;
+    return batterys;
+}
+
+void setRemoteDeviceName(string_view deviceId, string_view name)
+{
+    HILOGD("GetAutoPlayDisabledDuration");
+    std::string remoteAddr = static_cast<std::string>(deviceId);
+    std::string deviceName = static_cast<std::string>(name);
+    OHOS::Bluetooth::BluetoothRemoteDevice remoteDevice = OHOS::Bluetooth::BluetoothRemoteDevice(remoteAddr);
+    int32_t err = remoteDevice.SetDeviceAlias(deviceName);
+    if (err != OHOS::Bluetooth::BT_NO_ERROR) {
+        set_business_error(err, "setRemoteDeviceName return error");
+    }
+}
+
+void setRemoteDeviceType(string_view deviceId, DeviceType type)
+{
+    HILOGD("enter");
+    std::string remoteAddr = std::string(deviceId);
+    int32_t deviceType = type.get_value();
+    OHOS::Bluetooth::BluetoothRemoteDevice remoteDevice = OHOS::Bluetooth::BluetoothRemoteDevice(remoteAddr);
+    int32_t err = remoteDevice.SetDeviceCustomType(deviceType);
+    HILOGD("err: %{public}d", err);
+    if (err != OHOS::Bluetooth::BT_NO_ERROR) {
+        set_business_error(err, "getPairState return error");
+    }
+}
+
+ScanMode getBluetoothScanMode()
+{
+    HILOGD("enter");
+    OHOS::Bluetooth::BluetoothHost *host = &OHOS::Bluetooth::BluetoothHost::GetDefaultHost();
+    int32_t scanMode = 0;
+    int32_t err = host->GetBtScanMode(scanMode);
+    if (err != OHOS::Bluetooth::BT_NO_ERROR) {
+        set_business_error(err, "getPairState return error");
+    }
+    return ScanMode::from_value(scanMode);
+}
+
+ProfileConnectionState getProfileConnectionState(optional<ProfileId> profileId)
+{
+    uint32_t conProfileId = 0;
+    int state = 0;
+    OHOS::Bluetooth::BluetoothHost *host = &OHOS::Bluetooth::BluetoothHost::GetDefaultHost();
+    host->GetBtProfileConnState(conProfileId, state);
+    return ProfileConnectionState::from_value(state);
+}
+
+string getLocalName()
+{
+    HILOGD("enter");
+    OHOS::Bluetooth::BluetoothHost *host = &OHOS::Bluetooth::BluetoothHost::GetDefaultHost();
+    std::string localName = OHOS::Bluetooth::INVALID_NAME;
+    int32_t err = host->GetLocalName(localName);
+    if (err != OHOS::Bluetooth::BT_NO_ERROR) {
+        set_business_error(err, "getLocalName return error");
+    }
+    return localName;
+}
+
+void DealPairStatus(const int &status, int &bondStatus)
+{
+    HILOGD("status is %{public}d", status);
+    switch (status) {
+        case OHOS::Bluetooth::PAIR_NONE:
+            bondStatus = static_cast<int>(BondState::key_t::BOND_STATE_INVALID);
+            break;
+        case OHOS::Bluetooth::PAIR_PAIRING:
+            bondStatus = static_cast<int>(BondState::key_t::BOND_STATE_BONDING);
+            break;
+        case OHOS::Bluetooth::PAIR_PAIRED:
+            bondStatus = static_cast<int>(BondState::key_t::BOND_STATE_BONDED);
+            break;
+        default:
+            break;
+    }
+}
+
+BondState getPairState(string_view deviceId)
+{
+    HILOGD("enter");
+    std::string remoteAddr = std::string(deviceId);
+    OHOS::Bluetooth::BluetoothRemoteDevice remoteDevice = OHOS::Bluetooth::BluetoothRemoteDevice(remoteAddr);
+    int state = OHOS::Bluetooth::PAIR_NONE;
+    int32_t err = remoteDevice.GetPairState(state);
+    if (err != OHOS::Bluetooth::BT_NO_ERROR) {
+        set_business_error(err, "getPairState return error");
+    }
+    int pairState = static_cast<int>(BondState::key_t::BOND_STATE_INVALID);
+    DealPairStatus(state, pairState);
+    return BondState::from_value(pairState);
+}
+
+void startBluetoothDiscovery()
+{
+    HILOGD("enter");
+    OHOS::Bluetooth::BluetoothHost *host = &OHOS::Bluetooth::BluetoothHost::GetDefaultHost();
+    int ret = host->StartBtDiscovery();
+    if (ret != OHOS::Bluetooth::BT_NO_ERROR) {
+        set_business_error(ret, "startBluetoothDiscovery return error");
+    }
+}
+
+bool isBluetoothDiscovering()
+{
+    HILOGD("enter");
+    OHOS::Bluetooth::BluetoothHost *host = &OHOS::Bluetooth::BluetoothHost::GetDefaultHost();
+    bool isDiscovering = false;
+    int32_t err = host->IsBtDiscovering(isDiscovering);
+    if (err != OHOS::Bluetooth::BT_NO_ERROR) {
+        set_business_error(err, "startBluetoothDiscovery return error");
+    }
+    return isDiscovering;
+}
+
+void stopBluetoothDiscovery()
+{
+    HILOGD("enter");
+    OHOS::Bluetooth::BluetoothHost *host = &OHOS::Bluetooth::BluetoothHost::GetDefaultHost();
+    int ret = host->CancelBtDiscovery();
+    if (ret != OHOS::Bluetooth::BT_NO_ERROR) {
+        set_business_error(ret, "stopBluetoothDiscovery return error");
+    }
+}
+
+void setDevicePairingConfirmation(string_view deviceId, bool accept)
+{
+    HILOGD("enter");
+    std::string remoteAddr = std::string(deviceId);
+    OHOS::Bluetooth::BluetoothRemoteDevice remoteDevice = OHOS::Bluetooth::BluetoothRemoteDevice(remoteAddr);
+    int32_t ret = OHOS::Bluetooth::BT_NO_ERROR;
+    if (accept) {
+        ret = remoteDevice.SetDevicePairingConfirmation(accept);
+    } else {
+        ret = remoteDevice.CancelPairing();
+    }
+    HILOGD("ret: %{public}d", ret);
+    if (ret != OHOS::Bluetooth::BT_NO_ERROR) {
+        set_business_error(ret, "setDevicePairingConfirmation return error");
+    }
+}
 }  // Bluetooth
 }  // OHOS
 
@@ -294,4 +556,19 @@ TH_EXPORT_CPP_API_GetRemoteDeviceNameWithAlias(OHOS::Bluetooth::GetRemoteDeviceN
 TH_EXPORT_CPP_API_GetPairedDevices(OHOS::Bluetooth::GetPairedDevices);
 TH_EXPORT_CPP_API_SetBluetoothScanMode(OHOS::Bluetooth::SetBluetoothScanMode);
 TH_EXPORT_CPP_API_GetRemoteDeviceClass(OHOS::Bluetooth::GetRemoteDeviceClass);
+TH_EXPORT_CPP_API_controlDeviceAction(OHOS::Bluetooth::controlDeviceAction);
+TH_EXPORT_CPP_API_getLastConnectionTime(OHOS::Bluetooth::getLastConnectionTime);
+TH_EXPORT_CPP_API_getRemoteDeviceType(OHOS::Bluetooth::getRemoteDeviceType);
+TH_EXPORT_CPP_API_updateCloudBluetoothDevice(OHOS::Bluetooth::updateCloudBluetoothDevice);
+TH_EXPORT_CPP_API_getRemoteDeviceBatteryInfo(OHOS::Bluetooth::getRemoteDeviceBatteryInfo);
+TH_EXPORT_CPP_API_setRemoteDeviceName(OHOS::Bluetooth::setRemoteDeviceName);
+TH_EXPORT_CPP_API_setRemoteDeviceType(OHOS::Bluetooth::setRemoteDeviceType);
+TH_EXPORT_CPP_API_getBluetoothScanMode(OHOS::Bluetooth::getBluetoothScanMode);
+TH_EXPORT_CPP_API_getProfileConnectionState(OHOS::Bluetooth::getProfileConnectionState);
+TH_EXPORT_CPP_API_getLocalName(OHOS::Bluetooth::getLocalName);
+TH_EXPORT_CPP_API_getPairState(OHOS::Bluetooth::getPairState);
+TH_EXPORT_CPP_API_startBluetoothDiscovery(OHOS::Bluetooth::startBluetoothDiscovery);
+TH_EXPORT_CPP_API_isBluetoothDiscovering(OHOS::Bluetooth::isBluetoothDiscovering);
+TH_EXPORT_CPP_API_stopBluetoothDiscovery(OHOS::Bluetooth::stopBluetoothDiscovery);
+TH_EXPORT_CPP_API_setDevicePairingConfirmation(OHOS::Bluetooth::setDevicePairingConfirmation);
 // NOLINTEND
