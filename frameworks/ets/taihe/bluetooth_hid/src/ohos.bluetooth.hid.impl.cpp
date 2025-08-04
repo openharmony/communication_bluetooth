@@ -13,10 +13,19 @@
  * limitations under the License.
  */
 
+#ifndef LOG_TAG
+#define LOG_TAG "bt_hid_impl_ohbluetooth"
+#endif
+
 #include "ohos.bluetooth.hid.proj.hpp"
 #include "ohos.bluetooth.hid.impl.hpp"
 #include "taihe/runtime.hpp"
 #include "stdexcept"
+#include "bluetooth_hid_host.h"
+#include "bluetooth_log.h"
+#include "bluetooth_errorcode.h"
+#include <iostream>
+#include <string>
 #include "taihe_bluetooth_hid_host_observer.h"
 
 namespace OHOS {
@@ -51,19 +60,45 @@ public:
         }
     }
 
-    ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(string_view deviceId)
+    void connect(taihe::string_view deviceId)
     {
-        return {ohos::bluetooth::constant::ProfileConnectionState::key_t::STATE_DISCONNECTED};
+        HILOGD("ohos::bluetooth::hid connect enter");
+        std::string remoteAddr = std::string(deviceId);
+        OHOS::Bluetooth::HidHost *profile = OHOS::Bluetooth::HidHost::GetProfile();
+        OHOS::Bluetooth::BluetoothRemoteDevice device(remoteAddr, OHOS::Bluetooth::BT_TRANSPORT_BREDR);
+        int32_t errorCode = profile->Connect(device);
+        HILOGD("connect errorCode:%{public}d", errorCode);
+        if (errorCode != OHOS::Bluetooth::BT_NO_ERROR) {
+            taihe::set_business_error(errorCode, "Connect return error");
+        }
     }
 
-    array<string> GetConnectedDevices()
+    void disconnect(taihe::string_view deviceId)
     {
-        return {};
+        HILOGD("ohos::bluetooth::hid disconnect enter");
+        std::string remoteAddr = std::string(deviceId);
+        OHOS::Bluetooth::HidHost *profile = OHOS::Bluetooth::HidHost::GetProfile();
+        OHOS::Bluetooth::BluetoothRemoteDevice device(remoteAddr, OHOS::Bluetooth::BT_TRANSPORT_BREDR);
+        int32_t errorCode = profile->Disconnect(device);
+        HILOGD("disconnect errorCode:%{public}d", errorCode);
+        if (errorCode != OHOS::Bluetooth::BT_NO_ERROR) {
+            taihe::set_business_error(errorCode, "Disconnect return error");
+        }
     }
 
-    ohos::bluetooth::baseProfile::ConnectionStrategy GetConnectionStrategySync(string_view deviceId)
+    ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(taihe::string_view deviceId)
     {
-        return {ohos::bluetooth::baseProfile::ConnectionStrategy::key_t::CONNECTION_STRATEGY_UNSUPPORTED};
+        std::string remoteAddr = std::string(deviceId);
+        OHOS::Bluetooth::HidHost *profile = OHOS::Bluetooth::HidHost::GetProfile();
+        OHOS::Bluetooth::BluetoothRemoteDevice device(remoteAddr, OHOS::Bluetooth::BT_TRANSPORT_BREDR);
+        int32_t state = static_cast<int32_t>(OHOS::Bluetooth::BTConnectState::DISCONNECTED);
+        int32_t errorCode = profile->GetDeviceState(device, state);
+        if (errorCode != OHOS::Bluetooth::BT_NO_ERROR) {
+            taihe::set_business_error(errorCode, "Disconnect return error");
+        }
+
+        int profileState = GetProfileConnectionState(state);
+        return ohos::bluetooth::constant::ProfileConnectionState::from_value(profileState);
     }
 
     void SetConnectionStrategySync(string_view deviceId, ohos::bluetooth::baseProfile::ConnectionStrategy strategy) {}

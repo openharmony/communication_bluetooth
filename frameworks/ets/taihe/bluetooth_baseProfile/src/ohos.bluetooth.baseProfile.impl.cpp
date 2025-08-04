@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+#ifndef LOG_TAG
+#define LOG_TAG "bt_BaseProfile_impl_ohbluetooth"
+#endif
+
 #include "ohos.bluetooth.baseProfile.proj.hpp"
 #include "ohos.bluetooth.baseProfile.impl.hpp"
 #include "taihe/runtime.hpp"
@@ -20,10 +24,6 @@
 
 #include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
-
-#ifndef LOG_TAG
-#define LOG_TAG "bt_BaseProfile_impl_ohbluetooth"
-#endif
 
 using namespace taihe;
 using namespace ohos::bluetooth::baseProfile;
@@ -55,13 +55,6 @@ public:
     {
         return {};
     }
-
-    ConnectionStrategy GetConnectionStrategySync(string_view deviceId)
-    {
-        return {ConnectionStrategy::key_t::CONNECTION_STRATEGY_UNSUPPORTED};
-    }
-
-    void SetConnectionStrategySync(string_view deviceId, ConnectionStrategy strategy) {}
 };
 }  // namespace
 
