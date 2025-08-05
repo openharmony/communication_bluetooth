@@ -75,7 +75,7 @@ public:
     }
     ~GattClientDeviceImpl() = default;
     
-    void SetBLEMtuSize(double mtu)
+    void SetBLEMtuSize(int mtu)
     {
         ANI_BT_ASSERT_RETURN(client_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
             "SetBLEMtuSize ani assert failed");
