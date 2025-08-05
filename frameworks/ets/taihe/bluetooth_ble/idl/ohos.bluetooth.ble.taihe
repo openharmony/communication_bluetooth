@@ -193,7 +193,7 @@ enum GattWriteType: i32 {
 function StopAdvertising(): void;
 
 interface GattClientDevice {
-    SetBLEMtuSize(mtu: f64): void;
+    SetBLEMtuSize(mtu: i32): void;
     Connect(): void;
     Disconnect(): void;
 

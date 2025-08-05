@@ -84,7 +84,7 @@ array<string> GetPairedDevices()
     return result;
 }
 
-void SetBluetoothScanMode(ScanMode mode, double duration)
+void SetBluetoothScanMode(ScanMode mode, int duration)
 {
     OHOS::Bluetooth::BluetoothHost *host = &OHOS::Bluetooth::BluetoothHost::GetDefaultHost();
     int32_t bondableMode = 1;
