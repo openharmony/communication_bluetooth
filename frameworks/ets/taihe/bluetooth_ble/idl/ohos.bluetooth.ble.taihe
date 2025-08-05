@@ -196,7 +196,6 @@ interface GattClientDevice {
     SetBLEMtuSize(mtu: i32): void;
     Connect(): void;
     Disconnect(): void;
-
     Close(): void;
 }
 
@@ -204,6 +203,9 @@ function CreateGattClientDevice(deviceId: String): GattClientDevice;
 
 interface GattServer {
     Close(): void;
+    AddService(service: GattService): void;
+    RemoveService(serviceUuid: String): void;
+    SendResponse(serverResponse: ServerResponse): void;
 }
 
 function CreateGattServer(): GattServer;
@@ -249,7 +251,11 @@ struct AdvertisingDisableParams {
 }
 
 interface BleScanner {
+    @promise StartScan(filters: Array<ScanFilter>, options: Optional<ScanOptions>): void;
+    @promise StopScan(): void;
 }
 
 function CreateBleScanner(): BleScanner;
-
+function GetConnectedBLEDevices(): Array<String>;
+function StartBLEScan(filters: Array<ScanFilter>, options: Optional<ScanOptions>): void;
+function StartAdvertising(setting: AdvertiseSetting, advData: AdvertiseData, advResponse: Optional<AdvertiseData>): void;
