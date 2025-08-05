@@ -138,6 +138,6 @@ function GetRemoteDeviceName(deviceId: String): String;
 
 function GetPairedDevices(): Array<String>;
 
-function SetBluetoothScanMode(mode: ScanMode, duration: f64): void;
+function SetBluetoothScanMode(mode: ScanMode, duration: i32): void;
 
 function GetRemoteDeviceClass(deviceId: String): DeviceClass;
