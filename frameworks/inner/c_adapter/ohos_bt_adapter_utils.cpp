@@ -33,6 +33,11 @@ using namespace std;
 
 namespace OHOS {
 namespace Bluetooth {
+constexpr int HEADSET_SUPPORT_VLINK_PRODUCT_ID_MIN = 0x3500;
+constexpr int HEADSET_SUPPORT_VLINK_PRODUCT_ID_MAX = 0x48ff;
+constexpr int GLASSES_SUPPORT_VLINK_PRODUCT_ID_MIN = 0x1700;
+constexpr int GLASSES_SUPPORT_VLINK_PRODUCT_ID_MAX = 0x18ff;
+
 void ConvertAddr(const unsigned char in[6], std::string &out)
 {
     char temp[18] = {0}; // convert addr len.
@@ -121,6 +126,24 @@ void ConvertDataToHex(const unsigned char *data, unsigned int dataLen, std::stri
         outStr.push_back(hex[n >> sizeFour]);
         outStr.push_back(hex[n & 0xF]);
     }
+}
+
+void ConvertBtTransport(const int ohosTransport, int &innerTransport)
+{
+    if (ohosTransport == OHOS_BT_TRANSPORT_BR_EDR) {
+        innerTransport = BT_TRANSPORT_BREDR;
+    } else if (ohosTransport == OHOS_BT_TRANSPORT_LE) {
+        innerTransport = BT_TRANSPORT_BLE;
+    } else {
+        innerTransport = BT_TRANSPORT_NONE;
+    }
+}
+
+bool IsSupportVlinkFeature(int productId)
+{
+    return
+        ((productId >= HEADSET_SUPPORT_VLINK_PRODUCT_ID_MIN) && (productId <= HEADSET_SUPPORT_VLINK_PRODUCT_ID_MAX)) ||
+        ((productId >= GLASSES_SUPPORT_VLINK_PRODUCT_ID_MIN) && (productId <= GLASSES_SUPPORT_VLINK_PRODUCT_ID_MAX));
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
