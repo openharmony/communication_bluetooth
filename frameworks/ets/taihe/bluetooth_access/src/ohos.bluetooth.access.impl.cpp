@@ -94,6 +94,96 @@ void OffStateChange(::taihe::optional_view<::taihe::callback<void(
         callbackVec.clear();
     }
 }
+
+void enableBluetoothAsync()
+{
+    OHOS::Bluetooth::BluetoothHost *host = &OHOS::Bluetooth::BluetoothHost::GetDefaultHost();
+    int32_t ret = host->EnableBle();
+    if (ret != OHOS::Bluetooth::BT_NO_ERROR) {
+        taihe::set_business_error(ret, "enableBluetoothAsync return error");
+    }
+}
+
+void disableBluetoothAsync()
+{
+    OHOS::Bluetooth::BluetoothHost *host = &OHOS::Bluetooth::BluetoothHost::GetDefaultHost();
+    int32_t ret = host->DisableBt();
+    if (ret != OHOS::Bluetooth::BT_NO_ERROR) {
+        taihe::set_business_error(ret, "disableBluetoothAsync return error");
+    }
+}
+
+string GetLocalAddress()
+{
+    std::string localAddr = OHOS::Bluetooth::INVALID_MAC_ADDRESS;
+    int32_t ret = OHOS::Bluetooth::BluetoothHost::GetDefaultHost().GetLocalAddress(localAddr);
+    if (ret != OHOS::Bluetooth::BT_NO_ERROR) {
+        taihe::set_business_error(ret, "GetLocalAddress return error");
+    }
+    return static_cast<string>(localAddr);
+}
+
+bool IsValidRandomDeviceId(string_view deviceId)
+{
+    bool isValid = false;
+    std::vector<std::string> deviceIdVec = { static_cast<std::string>(deviceId) };
+    int32_t ret = OHOS::Bluetooth::BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
+        static_cast<int32_t>(OHOS::Bluetooth::RandomDeviceIdCommand::IS_VALID), deviceIdVec, isValid);
+    if (ret != OHOS::Bluetooth::BT_NO_ERROR) {
+        taihe::set_business_error(ret, "isValidRandomDeviceId return error");
+    }
+
+    return isValid;
+}
+
+array<string> GetPersistentDeviceIds() {
+    bool isValid = false;
+    std::vector<std::string> deviceIdVec;
+    int32_t ret = OHOS::Bluetooth::BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
+        static_cast<int32_t>(OHOS::Bluetooth::RandomDeviceIdCommand::GET), deviceIdVec, isValid);
+    if (ret != OHOS::Bluetooth::BT_NO_ERROR) {
+        taihe::set_business_error(ret, "GetPersistentDeviceIds return error");
+    }
+    array<string> result(taihe::copy_data_t{}, deviceIdVec.data(), deviceIdVec.size());
+    return result;
+}
+
+void DeletePersistentDeviceIdSync(string_view deviceId) {
+    bool isValid = false;
+    std::vector<std::string> deviceIdVec = { static_cast<std::string>(deviceId) };
+    int32_t ret = OHOS::Bluetooth::BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
+        static_cast<int32_t>(OHOS::Bluetooth::RandomDeviceIdCommand::DELETE), deviceIdVec, isValid);
+    if (ret != OHOS::Bluetooth::BT_NO_ERROR) {
+        taihe::set_business_error(ret, "DeletePersistentDeviceId return error");
+    }
+}
+
+void AddPersistentDeviceIdSync(string_view deviceId) {
+    bool isValid = false;
+    std::vector<std::string> deviceIdVec = { static_cast<std::string>(deviceId) };
+    int32_t ret = OHOS::Bluetooth::BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
+        static_cast<int32_t>(OHOS::Bluetooth::RandomDeviceIdCommand::ADD), deviceIdVec, isValid);
+    if (ret != OHOS::Bluetooth::BT_NO_ERROR) {
+        taihe::set_business_error(ret, "AddPersistentDeviceId return error");
+    }
+}
+
+void FactoryResetSync() {
+    int32_t ret = OHOS::Bluetooth::BluetoothHost::GetDefaultHost().BluetoothFactoryReset();
+    if (ret != OHOS::Bluetooth::BT_NO_ERROR) {
+        taihe::set_business_error(ret, "FactoryReset return error");
+    }
+}
+
+void notifyDialogResult(NotifyDialogResultParams notifyDialogResultParams)
+{
+    uint32_t dialogType = notifyDialogResultParams.dialogType;
+    bool dialogResult = notifyDialogResultParams.dialogResult;
+    int32_t ret = OHOS::Bluetooth::BluetoothHost::GetDefaultHost().NotifyDialogResult(dialogType, dialogResult);
+    if (ret != OHOS::Bluetooth::BT_NO_ERROR) {
+        taihe::set_business_error(ret, "notifyDialogResult return error");
+    }
+}
 }  // Bluetooth
 }  // OHOS
 
@@ -105,4 +195,13 @@ TH_EXPORT_CPP_API_RestrictBluetoothSync(OHOS::Bluetooth::RestrictBluetoothSync);
 TH_EXPORT_CPP_API_GetState(OHOS::Bluetooth::GetState);
 TH_EXPORT_CPP_API_EnableBluetooth(OHOS::Bluetooth::EnableBluetooth);
 TH_EXPORT_CPP_API_DisableBluetooth(OHOS::Bluetooth::DisableBluetooth);
+TH_EXPORT_CPP_API_enableBluetoothAsync(OHOS::Bluetooth::enableBluetoothAsync);
+TH_EXPORT_CPP_API_disableBluetoothAsync(OHOS::Bluetooth::disableBluetoothAsync);
+TH_EXPORT_CPP_API_GetLocalAddress(OHOS::Bluetooth::GetLocalAddress);
+TH_EXPORT_CPP_API_IsValidRandomDeviceId(OHOS::Bluetooth::IsValidRandomDeviceId);
+TH_EXPORT_CPP_API_GetPersistentDeviceIds(OHOS::Bluetooth::GetPersistentDeviceIds);
+TH_EXPORT_CPP_API_DeletePersistentDeviceIdSync(OHOS::Bluetooth::DeletePersistentDeviceIdSync);
+TH_EXPORT_CPP_API_AddPersistentDeviceIdSync(OHOS::Bluetooth::AddPersistentDeviceIdSync);
+TH_EXPORT_CPP_API_FactoryResetSync(OHOS::Bluetooth::FactoryResetSync);
+TH_EXPORT_CPP_API_notifyDialogResult(OHOS::Bluetooth::notifyDialogResult);
 // NOLINTEND
