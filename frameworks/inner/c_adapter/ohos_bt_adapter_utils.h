@@ -32,6 +32,8 @@ void GetAddrFromByte(unsigned char in[6], std::string &out);
 void GetAclStateName(int transport, int state, std::string &out);
 GapAclState ConvertAclState(int transport, int state);
 void ConvertDataToHex(const unsigned char *data, unsigned int dataLen, std::string &outStr);
+void ConvertBtTransport(const int ohosTransport, int &innerTransport);
+bool IsSupportVlinkFeature(int productId);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #ifdef __cplusplus

@@ -353,6 +353,13 @@ typedef struct {
  */
 int GapRegisterCallbacks(BtGapCallBacks *func);
 
+/**
+ * @brief Check whether the host is under bt vlink device connnect optimization scene.
+ * @param transport Transport type, details see {@link BtTransportId}
+ * @return Returns <b>true</b> if the host is under bt vlink device connect optimization scene otherwise <b>false</b>;
+ */
+bool IsBtVlinkDeviceConnectOptimScene(int transport);
+
 #ifdef __cplusplus
 }
 #endif
