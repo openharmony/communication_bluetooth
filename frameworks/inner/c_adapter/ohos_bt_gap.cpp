@@ -520,6 +520,68 @@ bool SetFastScan(bool isEnable)
 
     return isSuccess;
 }
+
+static bool IsBtDeviceSupportVlinkFeature(const BluetoothRemoteDevice &device)
+{
+    uint16_t productId = 0;
+    int32_t ret = device.GetDeviceProductId(productId);
+    if (ret != BT_NO_ERROR) {
+        HILOGW("device %{public}s get productId failed", GetEncryptAddr(device.GetDeviceAddr()).c_str());
+        return false;
+    }
+    int32_t cloudBondState = 0;
+    device.GetCloudBondState(cloudBondState);
+    HILOGD("productId:0x%{public}x, cloudBondState:%{public}d", productId, cloudBondState);
+    if (cloudBondState != 0 || IsSupportVlinkFeature(productId)) {
+        return true;
+    }
+    return false;
+}
+
+bool IsBtVlinkDeviceConnectOptimScene(int transport)
+{
+    HILOGD("enter, transport:%{public}d", transport);
+    int innerTransport = BT_TRANSPORT_NONE;
+    ConvertBtTransport(transport, innerTransport);
+    if (innerTransport == BT_TRANSPORT_NONE) {
+        return false;
+    }
+    if (g_BluetoothHost == nullptr) {
+        g_BluetoothHost = &BluetoothHost::GetDefaultHost();
+    }
+
+    int btConnectionState = g_BluetoothHost->GetBtConnectionState();
+    int a2dpConnectionState = static_cast<int>(BTConnectState::DISCONNECTED);
+    g_BluetoothHost->GetBtProfileConnState(PROFILE_ID_A2DP_SRC, a2dpConnectionState);
+    bool isA2dpRunning = (btConnectionState == static_cast<int>(BTConnectState::CONNECTED) &&
+        a2dpConnectionState == static_cast<int>(BTConnectState::CONNECTED));
+    HILOGI("host bt connection state:%{public}d, a2dp source connection state:%{public}d, check transport:%{public}d",
+        btConnectionState, a2dpConnectionState, transport);
+    if (isA2dpRunning) {
+        return false;
+    }
+
+    std::vector<OHOS::Bluetooth::BluetoothRemoteDevice> pairedDevices;
+    int ret = g_BluetoothHost->GetPairedDevices(innerTransport, pairedDevices);
+    if (ret != BT_NO_ERROR || pairedDevices.empty()) {
+        HILOGW("GetPairedDevices failed, ret=%{public}d", ret);
+        return false;
+    }
+
+    bool isFound = false;
+    for (const auto &device : pairedDevices) {
+        if (device.IsAclConnected()) {
+            continue;
+        }
+        if (!IsBtDeviceSupportVlinkFeature(device)) {
+            continue;
+        }
+        isFound = true;
+        HILOGI("found vlink device:%{public}s, in connect optim scene", GetEncryptAddr(device.GetDeviceAddr()).c_str());
+        break;
+    }
+    return isFound;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
 #ifdef __cplusplus
