@@ -87,6 +87,7 @@ struct SppOption {
     std::string uuid_ = "";
     bool secure_ = false;
     BtSocketType type_;
+    int32_t psm_ = SPP_SOCKET_PSM_VALUE;
 };
 
 const char * const REGISTER_STATE_CHANGE_TYPE = "stateChange";
@@ -410,7 +411,9 @@ enum MajorMinorClass {
 
 enum SppType {
     /** RFCOMM */
-    SPP_RFCOMM = 0
+    SPP_RFCOMM = 0,
+    SPP_L2CAP = 1,
+    SPP_L2CAP_BLE = 2,
 };
 
 enum PlayingState {

@@ -61,6 +61,7 @@ int BluetoothSocketProxy::Listen(ListenSocketParam &param, int &fd)
     CHECK_AND_RETURN_LOG_RET(
         data.WriteInt32(param.securityFlag), BT_ERR_IPC_TRANS_FAILED, "write param.securityFlag error");
     CHECK_AND_RETURN_LOG_RET(data.WriteInt32(param.type), BT_ERR_IPC_TRANS_FAILED, "write param.type error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(param.psm), BT_ERR_IPC_TRANS_FAILED, "write param.psm error");
     CHECK_AND_RETURN_LOG_RET(
         data.WriteRemoteObject(param.observer->AsObject()), BT_ERR_IPC_TRANS_FAILED, "write object errorr");
 

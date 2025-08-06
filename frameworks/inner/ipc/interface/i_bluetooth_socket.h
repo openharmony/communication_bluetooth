@@ -32,6 +32,7 @@ struct ListenSocketParam {
     int32_t securityFlag;
     int32_t type;
     sptr<IBluetoothServerSocketObserver> observer;
+    int32_t psm;
 };
 
 struct ConnectSocketParam {
