@@ -569,7 +569,7 @@ bool ClientSocket::IsAllowSocketConnect(int socketType)
 }
 
 struct ServerSocket::impl {
-    impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt);
+    impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt, int psm);
     ~impl()
     {
         if (fd_ > 0) {
@@ -604,7 +604,8 @@ struct ServerSocket::impl {
             .uuid = bluetooth::Uuid::ConvertFrom128Bits(uuid_.ConvertTo128Bits()),
             .securityFlag = (int32_t)getSecurityFlags(),
             .type = (int32_t)type_,
-            .observer = observer_
+            .observer = observer_,
+            .psm = psm_
         };
         int ret = proxy->Listen(param, fd_);
         if (ret != BT_NO_ERROR) {
@@ -821,6 +822,7 @@ struct ServerSocket::impl {
     bool encrypt_;
     int fd_;
     int socketStatus_;
+    int psm_;
     std::string name_ {
         ""
         };
@@ -834,15 +836,21 @@ struct ServerSocket::impl {
     std::atomic<uint32_t> maxRxPacketSize_{ 0 };
 };
 
-ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt)
-    : uuid_(uuid), type_(type), encrypt_(encrypt), fd_(-1), socketStatus_(SOCKET_INIT), name_(name)
+ServerSocket::impl::impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt, int psm)
+    : uuid_(uuid), type_(type), encrypt_(encrypt), fd_(-1), socketStatus_(SOCKET_INIT), psm_(psm), name_(name)
 {
-    HILOGD("(4 parameters) starts");
+    HILOGD("(5 parameters) starts");
     observer_ = new BluetoothServerSocketObserverStub();
 }
 
+ServerSocket::ServerSocket(const std::string &name, UUID uuid, BtSocketType type, bool encrypt, int psm)
+    : pimpl(new ServerSocket::impl(name, uuid, type, encrypt, psm))
+{
+    HILOGD("type:%{public}d encrypt:%{public}d psm:%{public}d", type, encrypt, psm);
+}
+
 ServerSocket::ServerSocket(const std::string &name, UUID uuid, BtSocketType type, bool encrypt)
-    : pimpl(new ServerSocket::impl(name, uuid, type, encrypt))
+    : pimpl(new ServerSocket::impl(name, uuid, type, encrypt, -1))
 {
     HILOGD("type:%{public}d encrypt:%{public}d", type, encrypt);
 }
