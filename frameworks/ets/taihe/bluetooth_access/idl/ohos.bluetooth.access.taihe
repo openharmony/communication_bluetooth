@@ -20,6 +20,23 @@ static { loadLibrary("bluetoothAccess_taihe_native.z") }
 
 from ohos.bluetooth.baseProfile use BaseProfile; 
 
+@!sts_inject("""
+export function on(type: string, cb: (arg_0: Object) => void) {
+    switch (type) {
+        case "stateChange": return onStateChange(cb);
+        default: throw new Error(`Unknown type: ${type}`);
+    }
+}
+export function off(type: string, cb?: (arg_0: Object) => void) {
+    switch (type) {
+        case "stateChange": return offStateChange(cb as (((arg_0: BluetoothState) => void) | undefined));
+        default: throw new Error(`Unknown type: ${type}`);
+    }
+}
+""")
+function OnStateChange(callback: (data: BluetoothState) => void): void;
+function OffStateChange(callback: Optional<(data: BluetoothState) => void>): void;
+
 enum BluetoothState: i32 {
     STATE_OFF = 0,
     STATE_TURNING_ON = 1,
