@@ -139,7 +139,7 @@ public:
         clientSptr->pimpl->DiscoverStart();
     }
 
-    void OnConnectionStateChanged(int32_t state, int32_t newState) override
+    void OnConnectionStateChanged(int32_t state, int32_t newState, int32_t disconnectReason) override
     {
         HILOGD("gattClient conn state, status: %{public}d, newState: %{public}s",
             state, GetProfileConnStateName(newState).c_str());
@@ -156,7 +156,7 @@ public:
             std::lock_guard<std::mutex> lck(clientSptr->pimpl->connStateMutex_);
             clientSptr->pimpl->connectionState_ = newState;
         }
-        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnConnectionStateChanged, newState, state);
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnConnectionStateChanged, newState, state, disconnectReason);
     }
 
     void OnCharacteristicChanged(const BluetoothGattCharacteristic &characteristic) override
