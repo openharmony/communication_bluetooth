@@ -89,6 +89,14 @@ struct SppOption {
     BtSocketType type_;
 };
 
+struct ConnStateChangeParam {
+    std::string device = "";
+    int state = -1;
+    bool isDisconnected = false;
+    int reason = -1;
+    int cause = -1;
+};
+
 const char * const REGISTER_STATE_CHANGE_TYPE = "stateChange";
 
 const char * const INVALID_DEVICE_ID = "00:00:00:00:00:00";
@@ -100,7 +108,7 @@ bool ParseArrayBuffer(napi_env env, uint8_t **data, size_t &size, napi_value arg
 napi_value GetCallbackErrorValue(napi_env env, int errCode);
 
 napi_status ConvertStringVectorToJS(napi_env env, napi_value result, const std::vector<std::string> &stringVector);
-void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state, int cause);
+void ConvertStateChangeParamToJS(napi_env env, napi_value result, const ConnStateChangeParam &stateChangeParam);
 void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
 void ConvertUuidsVectorToJS(napi_env env, napi_value result, const std::vector<std::string> &uuids);
 napi_status ConvertOppTransferInformationToJS(napi_env env,

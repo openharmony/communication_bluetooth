@@ -111,7 +111,8 @@ ErrCode BluetoothGattServerCallbackStub::OnConnectionStateChangedInner(
 
     int32_t ret = data.ReadInt32();
     int32_t state = data.ReadInt32();
-    stub->OnConnectionStateChanged(*device, ret, state);
+    int32_t disconnectReason = data.ReadInt32();
+    stub->OnConnectionStateChanged(*device, ret, state, disconnectReason);
 
     return NO_ERROR;
 }
