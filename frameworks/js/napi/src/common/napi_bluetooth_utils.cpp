@@ -219,18 +219,24 @@ napi_status ConvertStringVectorToJS(napi_env env, napi_value result, const std::
     return napi_ok;
 }
 
-void ConvertStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state, int cause)
+void ConvertStateChangeParamToJS(napi_env env, napi_value result, const ConnStateChangeParam &stateChangeParam)
 {
     napi_value deviceId = nullptr;
-    napi_create_string_utf8(env, device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
+    napi_create_string_utf8(env, stateChangeParam.device.c_str(), NAPI_AUTO_LENGTH, &deviceId);
     napi_set_named_property(env, result, "deviceId", deviceId);
 
     napi_value profileState = nullptr;
-    napi_create_int32(env, GetProfileConnectionState(state), &profileState);
+    napi_create_int32(env, GetProfileConnectionState(stateChangeParam.state), &profileState);
     napi_set_named_property(env, result, "state", profileState);
 
+    napi_value disconnectReason = nullptr;
+    if (stateChangeParam.isDisconnected) {
+        napi_create_int32(env, stateChangeParam.reason, &disconnectReason);
+        napi_set_named_property(env, result, "reason", disconnectReason);
+    }
+
     napi_value stateChangeCause = nullptr;
-    napi_create_int32(env, cause, &stateChangeCause);
+    napi_create_int32(env, stateChangeParam.cause, &stateChangeCause);
     napi_set_named_property(env, result, "cause", stateChangeCause);
 }
 

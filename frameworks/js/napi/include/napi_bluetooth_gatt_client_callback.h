@@ -32,7 +32,7 @@ class NapiGattClient;
 
 class NapiGattClientCallback : public GattClientCallback {
 public:
-    void OnConnectionStateChanged(int connectionState, int ret) override;
+    void OnConnectionStateChanged(int connectionState, int ret, int disconnectReason) override;
     void OnCharacteristicChanged(const GattCharacteristic &characteristic) override;
     void OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)  override;
     void OnCharacteristicWriteResult(const GattCharacteristic &characteristic, int ret) override;

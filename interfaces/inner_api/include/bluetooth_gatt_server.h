@@ -59,7 +59,19 @@ public:
      * @since 6
      *
      */
-    virtual void OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state) = 0;
+    virtual void OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state)
+    {}
+
+    /**
+     * @brief The callback function to notify connection state update.
+     *
+     * @param device Remote device object.
+     * @param state Connection state.
+     * @since 20
+     *
+     */
+    virtual void OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state, int disconnectReason)
+    {}
 
     /**
      * @brief The callback function to notify service add.

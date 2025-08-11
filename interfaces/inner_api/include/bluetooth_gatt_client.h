@@ -60,7 +60,19 @@ public:
      * @since 6
      *
      */
-    virtual void OnConnectionStateChanged(int connectionState, int ret) = 0;
+    virtual void OnConnectionStateChanged(int connectionState, int ret)
+    {}
+
+    /**
+     * @brief The function to OnConnectionStateChanged.
+     *
+     * @param connectionState callback of gattClientCallback.
+     * @param ret ret of GattClientCallback.
+     * @since 20
+     *
+     */
+    virtual void OnConnectionStateChanged(int connectionState, int ret, int disconnectReason)
+    {}
 
     /**
      * @brief The function to OnCharacteristicChanged.
