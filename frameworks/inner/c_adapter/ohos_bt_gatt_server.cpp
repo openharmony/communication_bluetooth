@@ -899,7 +899,7 @@ int BleGattsStartService(int serverId, int srvcHandle)
         return OHOS_BT_STATUS_PARM_INVALID;
     }
     std::lock_guard<std::mutex> lock(g_gattServersMutex);
-    if (GATTSERVER(serverId) == nullptr || GATTSERVICE(serviceId, srvcHandle) == nullptr) {
+    if (GATTSERVER(serverId) == nullptr || GATTSERVICE(serverId, srvcHandle) == nullptr) {
         HILOGE("GATTSERVER(serverId) is null!");
         return OHOS_BT_STATUS_UNHANDLED;
     }
