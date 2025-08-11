@@ -89,7 +89,9 @@ void NapiBluetoothConnectionObserver::OnScanModeChanged(int mode)
 }
 
 void NapiBluetoothConnectionObserver::OnDeviceNameChanged(const std::string &deviceName)
-{}
+{
+    HILOGI("name is %{private}s", deviceName.c_str());
+}
 
 void NapiBluetoothConnectionObserver::OnDeviceAddrChanged(const std::string &address)
 {

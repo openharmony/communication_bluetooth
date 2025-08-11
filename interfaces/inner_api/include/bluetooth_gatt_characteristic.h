@@ -208,7 +208,7 @@ public:
     const UUID &GetUuid() const;
 
     /**
-     * @brief The function to get value. In the OnCharacteristicWrite callback, the value is the initial value 0.
+     * @brief The function to get value.
      *
      * @param size size of get value.
      * @return value pointer.

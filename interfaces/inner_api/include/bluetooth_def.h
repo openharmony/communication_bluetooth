@@ -1700,7 +1700,7 @@ enum ProfileConnectionState {
     STATE_DISCONNECTING = 3 // the current profile is being disconnected
 };
 
-enum DialogType {
+enum DialogBoxType {
     BLUETOOTH_SWITCH = 0,
 };
 
