@@ -117,6 +117,19 @@ enum class BTConnectState : int {
 };
 
 /**
+ * @brief reason for gatt disconnection
+ * use to OnConnectionStateChanged()
+ *
+ * @since 20
+ */
+enum class GattDisconnectReason : int {
+    CONN_TIMEOUT = 1,               // Disconnection due to timeout.
+    CONN_TERMINATE_PEER_USER = 2,   // The connection is disconnected due to the peer.
+    CONN_TERMINATE_LOCAL_HOST = 3,  // The connection is disconnected due to the local host.
+    CONN_UNKNOWN = 4                // Disconnection due to unknown reason.
+};
+
+/**
  * @brief hdap connect state define
  * use to HdapConnectionState()...
  */

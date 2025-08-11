@@ -94,7 +94,8 @@ ErrCode BluetoothGattClientCallbackStub::OnConnectionStateChangedInner(
     HILOGD("BluetoothGattClientCallbackStub::OnConnectionStateChangedInner Triggered!");
     int32_t state = data.ReadInt32();
     int32_t newState = data.ReadInt32();
-    stub->OnConnectionStateChanged(state, newState);
+    int32_t disconnectReason = data.ReadInt32();
+    stub->OnConnectionStateChanged(state, newState, disconnectReason);
     return NO_ERROR;
 }
 

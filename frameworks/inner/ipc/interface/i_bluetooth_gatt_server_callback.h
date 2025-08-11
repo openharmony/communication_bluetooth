@@ -29,7 +29,8 @@ class IBluetoothGattServerCallback : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothGattServerCallback");
 
-    virtual void OnConnectionStateChanged(const BluetoothGattDevice &device, int32_t ret, int32_t state) = 0;
+    virtual void OnConnectionStateChanged(
+        const BluetoothGattDevice &device, int32_t ret, int32_t state, int32_t disconnectReason) = 0;
     virtual void OnAddService(int32_t ret, const BluetoothGattService &service) = 0;
     virtual void OnCharacteristicReadRequest(
         const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic) = 0;
