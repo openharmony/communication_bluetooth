@@ -40,42 +40,10 @@ std::shared_ptr<NapiBluetoothRemoteDeviceObserver> g_remoteDeviceObserver =
     std::make_shared<NapiBluetoothRemoteDeviceObserver>();
 std::mutex deviceMutex;
 
-std::map<std::string, std::function<napi_value(napi_env env)>> g_callbackDefaultValue = {
-    {REGISTER_DEVICE_FIND_TYPE,
-        [](napi_env env) -> napi_value {
-            napi_value result = 0;
-            napi_value value = 0;
-            napi_create_array(env, &result);
-            napi_create_string_utf8(env, INVALID_DEVICE_ID, NAPI_AUTO_LENGTH, &value);
-            napi_set_element(env, result, 0, value);
-            return result;
-        }},
-    {REGISTER_PIN_REQUEST_TYPE,
-        [](napi_env env) -> napi_value {
-            napi_value result = 0;
-            napi_value deviceId = nullptr;
-            napi_value pinCode = nullptr;
-            napi_create_object(env, &result);
-            napi_create_string_utf8(env, INVALID_DEVICE_ID, NAPI_AUTO_LENGTH, &deviceId);
-            napi_set_named_property(env, result, "deviceId", deviceId);
-            napi_create_string_utf8(env, INVALID_PIN_CODE, NAPI_AUTO_LENGTH, &pinCode);
-            napi_set_named_property(env, result, "pinCode", pinCode);
-            return result;
-        }},
-    {REGISTER_BOND_STATE_TYPE, [](napi_env env) -> napi_value {
-         napi_value result = 0;
-         napi_value deviceId = nullptr;
-         napi_value state = nullptr;
-         napi_create_object(env, &result);
-         napi_create_string_utf8(env, INVALID_DEVICE_ID, NAPI_AUTO_LENGTH, &deviceId);
-         napi_set_named_property(env, result, "deviceId", deviceId);
-         napi_create_int32(env, static_cast<int32_t>(BondState::BOND_STATE_INVALID), &state);
-         napi_set_named_property(env, result, "state", state);
-         return result;
-     }}};
 #ifdef BLUETOOTH_API_SINCE_10
 napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
 {
+    HILOGD("enter");
     RegisterObserverToHost();
     ConnectionPropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {
@@ -83,17 +51,6 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("pairDevice", PairDeviceAsync),
         DECLARE_NAPI_FUNCTION("cancelPairedDevice", CancelPairedDeviceAsync),
         DECLARE_NAPI_FUNCTION("getProfileConnectionState", GetProfileConnectionStateEx),
-        DECLARE_NAPI_FUNCTION("getRemoteDeviceName", GetRemoteDeviceName),
-        DECLARE_NAPI_FUNCTION("getRemoteDeviceClass", GetRemoteDeviceClass),
-        DECLARE_NAPI_FUNCTION("getLocalName", GetLocalName),
-        DECLARE_NAPI_FUNCTION("getPairedDevices", GetPairedDevices),
-        DECLARE_NAPI_FUNCTION("getProfileConnState", GetProfileConnectionState),
-        DECLARE_NAPI_FUNCTION("setDevicePairingConfirmation", SetDevicePairingConfirmation),
-        DECLARE_NAPI_FUNCTION("setLocalName", SetLocalName),
-        DECLARE_NAPI_FUNCTION("setBluetoothScanMode", SetBluetoothScanMode),
-        DECLARE_NAPI_FUNCTION("getBluetoothScanMode", GetBluetoothScanMode),
-        DECLARE_NAPI_FUNCTION("startBluetoothDiscovery", StartBluetoothDiscovery),
-        DECLARE_NAPI_FUNCTION("stopBluetoothDiscovery", StopBluetoothDiscovery),
         DECLARE_NAPI_FUNCTION("setDevicePinCode", SetDevicePinCode),
         DECLARE_NAPI_FUNCTION("cancelPairingDevice", CancelPairingDevice),
         DECLARE_NAPI_FUNCTION("pairCredibleDevice", PairCredibleDevice),
@@ -106,6 +63,17 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("connectAllowedProfiles", ConnectAllowedProfiles),
         DECLARE_NAPI_FUNCTION("disconnectAllowedProfiles", DisconnectAllowedProfiles),
         DECLARE_NAPI_FUNCTION("getRemoteProductId", GetRemoteProductId),
+        DECLARE_NAPI_FUNCTION("getRemoteDeviceName", GetRemoteDeviceName),
+        DECLARE_NAPI_FUNCTION("getRemoteDeviceClass", GetRemoteDeviceClass),
+        DECLARE_NAPI_FUNCTION("getLocalName", GetLocalName),
+        DECLARE_NAPI_FUNCTION("getPairedDevices", GetPairedDevices),
+        DECLARE_NAPI_FUNCTION("getProfileConnState", GetProfileConnectionState),
+        DECLARE_NAPI_FUNCTION("setDevicePairingConfirmation", SetDevicePairingConfirmation),
+        DECLARE_NAPI_FUNCTION("setLocalName", SetLocalName),
+        DECLARE_NAPI_FUNCTION("setBluetoothScanMode", SetBluetoothScanMode),
+        DECLARE_NAPI_FUNCTION("getBluetoothScanMode", GetBluetoothScanMode),
+        DECLARE_NAPI_FUNCTION("startBluetoothDiscovery", StartBluetoothDiscovery),
+        DECLARE_NAPI_FUNCTION("stopBluetoothDiscovery", StopBluetoothDiscovery),
         DECLARE_NAPI_FUNCTION("setRemoteDeviceName", SetRemoteDeviceName),
         DECLARE_NAPI_FUNCTION("setRemoteDeviceType", SetRemoteDeviceType),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceType", GetRemoteDeviceType),
@@ -125,6 +93,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
 #else
 napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
 {
+    HILOG("enter");
     RegisterObserverToHost();
     ConnectionPropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {
@@ -1136,6 +1105,8 @@ napi_value ControlDeviceAction(napi_env env, napi_callback_info info)
     auto checkRes = napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRes == napi_ok, BT_ERR_INVALID_PARAM);
 
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, argc == ARGS_SIZE_ONE, BT_ERR_INVALID_PARAM);
+    
     ControlDeviceActionParams params = { INVALID_MAC_ADDRESS, INVALID_CONTROL_TYPE,
         INVALID_CONTROL_TYPE_VAL, INVALID_CONTROL_OBJECT };
     auto status = ParseControlDeviceActionParams(env, argv[PARAM0], params);

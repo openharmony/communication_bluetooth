@@ -1826,7 +1826,7 @@ enum class HfpFeatureType {
     VOICE_RECOGNITION,
 };
 
-enum DialogType {
+enum DialogBoxType {
     BLUETOOTH_SWITCH = 0,
 };
 

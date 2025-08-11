@@ -269,22 +269,22 @@ napi_status NapiParseObjectGattPermissions(napi_env env, napi_value object, cons
 
     bool isExist;
     NapiGattPermission permissions {};
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, permissionObject, "read", permissions.readable, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, permissionObject, "readEncrypted", permissions.readEncrypted, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, permissionObject, "readEncryptedMitm", permissions.readEncryptedMitm, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, permissionObject, "write", permissions.writeable, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, permissionObject, "writeEncrypted", permissions.writeEncrypted, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, permissionObject, "writeEncryptedMitm", permissions.writeEncryptedMitm, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, permissionObject, "writeSigned", permissions.writeSigned, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, permissionObject, "writeSignedMitm", permissions.writeSignedMitm, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, permissionObject, "read", permissions.readable, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, permissionObject, "readEncrypted", permissions.readEncrypted, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, permissionObject, "readEncryptedMitm", permissions.readEncryptedMitm, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, permissionObject, "write", permissions.writeable, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, permissionObject, "writeEncrypted", permissions.writeEncrypted, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, permissionObject, "writeEncryptedMitm", permissions.writeEncryptedMitm, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, permissionObject, "writeSigned", permissions.writeSigned, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, permissionObject, "writeSignedMitm", permissions.writeSignedMitm, isExist));
     outPermissions = permissions;
     return napi_ok;
 }
@@ -301,22 +301,22 @@ napi_status NapiParseObjectGattProperties(napi_env env, napi_value object, const
 
     bool isExist;
     NapiGattProperties properties {};
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, propertiesObject, "write", properties.write, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, propertiesObject, "writeNoResponse", properties.writeNoResponse, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, propertiesObject, "read", properties.read, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, propertiesObject, "notify", properties.notify, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, propertiesObject, "indicate", properties.indicate, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, propertiesObject, "broadcast", properties.broadcast, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, propertiesObject, "authenticatedSignedWrite", properties.authenticatedSignedWrite, isExist));
-    NAPI_BT_CALL_RETURN(
-        NapiParseObjectBooleanOptional(env, propertiesObject, "extendedProperties", properties.extendedProperties, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, propertiesObject, "write", properties.write, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, propertiesObject, "writeNoResponse", properties.writeNoResponse, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, propertiesObject, "read", properties.read, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, propertiesObject, "notify", properties.notify, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, propertiesObject, "indicate", properties.indicate, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, propertiesObject, "broadcast", properties.broadcast, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, propertiesObject, "authenticatedSignedWrite", properties.authenticatedSignedWrite, isExist));
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(
+        env, propertiesObject, "extendedProperties", properties.extendedProperties, isExist));
     outProperties = properties;
     return napi_ok;
 }
