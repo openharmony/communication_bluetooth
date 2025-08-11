@@ -93,7 +93,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
 #else
 napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
 {
-    HILOG("enter");
+    HILOGD("enter");
     RegisterObserverToHost();
     ConnectionPropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {
