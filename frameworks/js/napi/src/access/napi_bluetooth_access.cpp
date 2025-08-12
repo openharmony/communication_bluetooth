@@ -151,7 +151,7 @@ napi_value NapiAccess::DialogTypeInit(napi_env env)
     HILOGD("enter");
     napi_value dialogType = nullptr;
     napi_create_object(env, &dialogType);
-    SetNamedPropertyByInteger(env, dialogType, static_cast<int>(DialogType::BLUETOOTH_SWITCH), "BLUETOOTH_SWITCH");
+    SetNamedPropertyByInteger(env, dialogType, static_cast<int>(DialogBoxType::BLUETOOTH_SWITCH), "BLUETOOTH_SWITCH");
     return dialogType;
 }
 
