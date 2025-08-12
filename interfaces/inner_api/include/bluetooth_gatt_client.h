@@ -71,7 +71,7 @@ public:
      * @since 20
      *
      */
-    virtual void OnConnectionStateChanged(int connectionState, int ret, int disconnectReason)
+    virtual void OnConnectionStateChangedWithReason(int connectionState, int ret, int disconnectReason)
     {}
 
     /**

@@ -57,7 +57,7 @@ void NapiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteD
     eventSubscribe_.PublishEvent(STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE, nativeObject);
 }
 
-void NapiGattServerCallback::OnConnectionStateUpdate(
+void NapiGattServerCallback::OnConnectionStateUpdateWithReason(
     const BluetoothRemoteDevice &device, int state, int disconnectReason)
 {
     HILOGI("enter, state: %{public}d, remote device address: %{public}s", state, GET_ENCRYPT_ADDR(device));
