@@ -19,7 +19,7 @@
 #include "napi_event_subscribe_module.h"
 
 #include <algorithm>
-#include "parser/napi_parser_utils.h"
+#include "napi_parser_utils.h"
 #include "string_ex.h"
 
 namespace OHOS {
