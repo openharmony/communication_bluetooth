@@ -322,6 +322,9 @@ public:
         if (serverSptr->pimpl->callback_) {
             serverSptr->pimpl->callback_->OnConnectionStateUpdate(
                 BluetoothRemoteDevice(device.addr_.GetAddress(),
+                    (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR), state);
+            serverSptr->pimpl->callback_->OnConnectionStateUpdateWithReason(
+                BluetoothRemoteDevice(device.addr_.GetAddress(),
                     (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
                 state, disconnectReason);
         }

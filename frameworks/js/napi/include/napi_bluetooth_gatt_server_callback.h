@@ -37,7 +37,7 @@ const char * const STR_BT_GATT_SERVER_CALLBACK_MTU_CHANGE = "BLEMtuChange";
 
 class NapiGattServerCallback : public GattServerCallback {
 public:
-    void OnConnectionStateUpdate(
+    void OnConnectionStateUpdateWithReason(
         const BluetoothRemoteDevice &device, int state, int disconnectReason) override;
     void OnServiceAdded(GattService service, int ret) override {}
     void OnCharacteristicReadRequest(const BluetoothRemoteDevice &device,

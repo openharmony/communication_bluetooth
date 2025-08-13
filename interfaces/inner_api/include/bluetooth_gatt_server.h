@@ -70,7 +70,7 @@ public:
      * @since 20
      *
      */
-    virtual void OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state, int disconnectReason)
+    virtual void OnConnectionStateUpdateWithReason(const BluetoothRemoteDevice &device, int state, int disconnectReason)
     {}
 
     /**
