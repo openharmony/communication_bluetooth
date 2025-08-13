@@ -21,50 +21,88 @@
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "bluetooth_errorcode.h"
+#include "taihe_bluetooth_access_observer.h"
+
+namespace OHOS {
+namespace Bluetooth {
 
 using namespace taihe;
 using namespace ohos::bluetooth::access;
 
-namespace {
-// To be implemented.
+std::shared_ptr<TaiheBluetoothAccessObserver> g_accessCallback = TaiheBluetoothAccessObserver::GetInstance();
 
 void RestrictBluetoothSync()
 {
-    int32_t ret = OHOS::Bluetooth::BluetoothHost::GetDefaultHost().RestrictBluetooth();
-    if (ret == OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR) {
+    int32_t ret = BluetoothHost::GetDefaultHost().RestrictBluetooth();
+    if (ret == BT_ERR_INTERNAL_ERROR) {
         set_business_error(ret, "RestrictBluetoothSync return error");
     }
 }
 
-BluetoothState GetState()
+::ohos::bluetooth::access::BluetoothState GetState()
 {
-    int32_t state = static_cast<int>(OHOS::Bluetooth::BluetoothHost::GetDefaultHost().GetBluetoothState());
-    return static_cast<BluetoothState::key_t>(state);
+    int32_t state = static_cast<int>(BluetoothHost::GetDefaultHost().GetBluetoothState());
+    return static_cast<ohos::bluetooth::access::BluetoothState::key_t>(state);
 }
 
 void EnableBluetooth()
 {
-    OHOS::Bluetooth::BluetoothHost *host = &OHOS::Bluetooth::BluetoothHost::GetDefaultHost();
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t ret = host->EnableBle();
-    if (ret != OHOS::Bluetooth::BT_NO_ERROR) {
+    if (ret != BT_NO_ERROR) {
         set_business_error(ret, "EnableBluetooth return error");
     }
 }
 
 void DisableBluetooth()
 {
-    OHOS::Bluetooth::BluetoothHost *host = &OHOS::Bluetooth::BluetoothHost::GetDefaultHost();
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t ret = host->DisableBt();
-    if (ret != OHOS::Bluetooth::BT_NO_ERROR) {
+    if (ret != BT_NO_ERROR) {
         set_business_error(ret, "DisableBluetooth return error");
     }
 }
-}  // namespace
+
+void OnStateChange(::taihe::callback_view<void(::ohos::bluetooth::access::BluetoothState data)> callback)
+{
+    std::unique_lock<std::shared_mutex> guard(g_accessCallback->stateChangedObserverLock);
+    auto stateChangeCb = ::taihe::optional<::taihe::callback<void(
+        ::ohos::bluetooth::access::BluetoothState data)>>{std::in_place_t{}, callback};
+    auto& callbackVec = g_accessCallback->stateChangedObserverVec;
+    // callback重复注册不处理
+    if (std::find(callbackVec.begin(), callbackVec.end(), stateChangeCb) != callbackVec.end()) {
+        return;
+    }
+    callbackVec.emplace_back(stateChangeCb);
+}
+
+void OffStateChange(::taihe::optional_view<::taihe::callback<void(
+    ::ohos::bluetooth::access::BluetoothState data)>> callback)
+{
+    std::unique_lock<std::shared_mutex> guard(g_accessCallback->stateChangedObserverLock);
+    auto& callbackVec = g_accessCallback->stateChangedObserverVec;
+    // callback有值，则删除该callback，否则删除vec中注册的所有callback
+    if (callback.has_value()) {
+        callbackVec.erase(
+            std::remove_if(callbackVec.begin(), callbackVec.end(),
+                [callback](const ::taihe::optional<
+                    ::taihe::callback<void(::ohos::bluetooth::access::BluetoothState data)>>& it) {
+                    return it == callback;
+                }),
+            callbackVec.end());
+    } else {
+        callbackVec.clear();
+    }
+}
+}  // Bluetooth
+}  // OHOS
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_RestrictBluetoothSync(RestrictBluetoothSync);
-TH_EXPORT_CPP_API_GetState(GetState);
-TH_EXPORT_CPP_API_EnableBluetooth(EnableBluetooth);
-TH_EXPORT_CPP_API_DisableBluetooth(DisableBluetooth);
+TH_EXPORT_CPP_API_OnStateChange(OHOS::Bluetooth::OnStateChange);
+TH_EXPORT_CPP_API_OffStateChange(OHOS::Bluetooth::OffStateChange);
+TH_EXPORT_CPP_API_RestrictBluetoothSync(OHOS::Bluetooth::RestrictBluetoothSync);
+TH_EXPORT_CPP_API_GetState(OHOS::Bluetooth::GetState);
+TH_EXPORT_CPP_API_EnableBluetooth(OHOS::Bluetooth::EnableBluetooth);
+TH_EXPORT_CPP_API_DisableBluetooth(OHOS::Bluetooth::DisableBluetooth);
 // NOLINTEND
