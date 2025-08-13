@@ -156,7 +156,9 @@ public:
             std::lock_guard<std::mutex> lck(clientSptr->pimpl->connStateMutex_);
             clientSptr->pimpl->connectionState_ = newState;
         }
-        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnConnectionStateChanged, newState, state, disconnectReason);
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnConnectionStateChanged, newState, state);
+        WPTR_GATT_CBACK(
+            clientSptr->pimpl->callback_, OnConnectionStateChangedWithReason, newState, state, disconnectReason);
     }
 
     void OnCharacteristicChanged(const BluetoothGattCharacteristic &characteristic) override
