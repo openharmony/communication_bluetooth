@@ -20,6 +20,12 @@ static { loadLibrary("bluetoothBaseProfile_taihe_native.z") }
 
 from ohos.bluetooth.constant use ProfileConnectionState;
 
+enum ConnectionStrategy: i32 {
+    CONNECTION_STRATEGY_UNSUPPORTED = 0,
+    CONNECTION_STRATEGY_ALLOWED = 1,
+    CONNECTION_STRATEGY_FORBIDDEN = 2
+}
+
 struct StateChangeParam {
     deviceId: String;
     state: ProfileConnectionState;

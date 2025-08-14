@@ -244,6 +244,10 @@ struct BLEConnectionChangeState {
     state: ProfileConnectionState;
 }
 
+struct AdvertisingDisableParams {
+    advertisingId: i32;
+}
+
 interface BleScanner {
 }
 
