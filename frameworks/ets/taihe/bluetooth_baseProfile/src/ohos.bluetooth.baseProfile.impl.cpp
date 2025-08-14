@@ -13,17 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef LOG_TAG
-#define LOG_TAG "bt_BaseProfile_impl_ohbluetooth"
-#endif
-
 #include "ohos.bluetooth.baseProfile.proj.hpp"
 #include "ohos.bluetooth.baseProfile.impl.hpp"
 #include "taihe/runtime.hpp"
 #include "stdexcept"
-
-#include "bluetooth_errorcode.h"
-#include "bluetooth_log.h"
 
 using namespace taihe;
 using namespace ohos::bluetooth::baseProfile;
@@ -48,7 +41,8 @@ public:
 
     ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(string_view deviceId)
     {
-        return {ohos::bluetooth::constant::ProfileConnectionState::key_t::STATE_DISCONNECTED};
+        return ohos::bluetooth::constant::ProfileConnectionState(
+            ohos::bluetooth::constant::ProfileConnectionState::key_t::STATE_DISCONNECTED);
     }
 
     array<string> GetConnectedDevices()

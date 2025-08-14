@@ -64,11 +64,11 @@ public:
     {
         HILOGD("ohos::bluetooth::hid connect enter");
         std::string remoteAddr = std::string(deviceId);
-        OHOS::Bluetooth::HidHost *profile = OHOS::Bluetooth::HidHost::GetProfile();
-        OHOS::Bluetooth::BluetoothRemoteDevice device(remoteAddr, OHOS::Bluetooth::BT_TRANSPORT_BREDR);
+        HidHost *profile = HidHost::GetProfile();
+        BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         int32_t errorCode = profile->Connect(device);
         HILOGD("connect errorCode:%{public}d", errorCode);
-        if (errorCode != OHOS::Bluetooth::BT_NO_ERROR) {
+        if (errorCode != BT_NO_ERROR) {
             taihe::set_business_error(errorCode, "Connect return error");
         }
     }
@@ -77,11 +77,11 @@ public:
     {
         HILOGD("ohos::bluetooth::hid disconnect enter");
         std::string remoteAddr = std::string(deviceId);
-        OHOS::Bluetooth::HidHost *profile = OHOS::Bluetooth::HidHost::GetProfile();
-        OHOS::Bluetooth::BluetoothRemoteDevice device(remoteAddr, OHOS::Bluetooth::BT_TRANSPORT_BREDR);
+        HidHost *profile = HidHost::GetProfile();
+        BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         int32_t errorCode = profile->Disconnect(device);
         HILOGD("disconnect errorCode:%{public}d", errorCode);
-        if (errorCode != OHOS::Bluetooth::BT_NO_ERROR) {
+        if (errorCode != BT_NO_ERROR) {
             taihe::set_business_error(errorCode, "Disconnect return error");
         }
     }
@@ -89,11 +89,11 @@ public:
     ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(taihe::string_view deviceId)
     {
         std::string remoteAddr = std::string(deviceId);
-        OHOS::Bluetooth::HidHost *profile = OHOS::Bluetooth::HidHost::GetProfile();
-        OHOS::Bluetooth::BluetoothRemoteDevice device(remoteAddr, OHOS::Bluetooth::BT_TRANSPORT_BREDR);
-        int32_t state = static_cast<int32_t>(OHOS::Bluetooth::BTConnectState::DISCONNECTED);
+        HidHost *profile = HidHost::GetProfile();
+        BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
+        int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
         int32_t errorCode = profile->GetDeviceState(device, state);
-        if (errorCode != OHOS::Bluetooth::BT_NO_ERROR) {
+        if (errorCode != BT_NO_ERROR) {
             taihe::set_business_error(errorCode, "Disconnect return error");
         }
 

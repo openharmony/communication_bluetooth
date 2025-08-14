@@ -25,9 +25,10 @@
 #include "bluetooth_log.h"
 #include "bluetooth_errorcode.h"
 #include "taihe_bluetooth_hfp_ag_observer.h"
+
 namespace OHOS {
 namespace Bluetooth {
-    
+
 using namespace taihe;
 using namespace ohos::bluetooth::hfp;
 
@@ -64,11 +65,11 @@ public:
     {
         HILOGD("ohos::bluetooth::hfp connect enter");
         std::string remoteAddr = std::string(deviceId);
-        OHOS::Bluetooth::HandsFreeAudioGateway *profile = OHOS::Bluetooth::HandsFreeAudioGateway::GetProfile();
-        OHOS::Bluetooth::BluetoothRemoteDevice device(remoteAddr, OHOS::Bluetooth::BT_TRANSPORT_BREDR);
+        HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
+        BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         int32_t errorCode = profile->Connect(device);
         HILOGD("connect errorCode:%{public}d", errorCode);
-        if (errorCode != OHOS::Bluetooth::BT_NO_ERROR) {
+        if (errorCode != BT_NO_ERROR) {
             taihe::set_business_error(errorCode, "Connect return error");
         }
     }
@@ -77,11 +78,11 @@ public:
     {
         HILOGD("ohos::bluetooth::hfp disconnect enter");
         std::string remoteAddr = std::string(deviceId);
-        OHOS::Bluetooth::HandsFreeAudioGateway *profile = OHOS::Bluetooth::HandsFreeAudioGateway::GetProfile();
-        OHOS::Bluetooth::BluetoothRemoteDevice device(remoteAddr, OHOS::Bluetooth::BT_TRANSPORT_BREDR);
+        HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
+        BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         int32_t errorCode = profile->Disconnect(device);
         HILOGD("disconnect errorCode:%{public}d", errorCode);
-        if (errorCode != OHOS::Bluetooth::BT_NO_ERROR) {
+        if (errorCode != BT_NO_ERROR) {
             taihe::set_business_error(errorCode, "Connect return error");
         }
     }
@@ -89,11 +90,11 @@ public:
     ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(taihe::string_view deviceId)
     {
         std::string remoteAddr = std::string(deviceId);
-        OHOS::Bluetooth::HandsFreeAudioGateway *profile = OHOS::Bluetooth::HandsFreeAudioGateway::GetProfile();
-        OHOS::Bluetooth::BluetoothRemoteDevice device(remoteAddr, OHOS::Bluetooth::BT_TRANSPORT_BREDR);
-        int32_t state = static_cast<int32_t>(OHOS::Bluetooth::BTConnectState::DISCONNECTED);
+        HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
+        BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
+        int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
         int32_t errorCode = profile->GetDeviceState(device, state);
-        if (errorCode != OHOS::Bluetooth::BT_NO_ERROR) {
+        if (errorCode != BT_NO_ERROR) {
             taihe::set_business_error(errorCode, "Disconnect return error");
         }
 
@@ -103,10 +104,10 @@ public:
 
     array<string> GetConnectedDevices()
     {
-        OHOS::Bluetooth::HandsFreeAudioGateway *profile = OHOS::Bluetooth::HandsFreeAudioGateway::GetProfile();
-        std::vector<OHOS::Bluetooth::BluetoothRemoteDevice> devices;
+        HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
+        std::vector<BluetoothRemoteDevice> devices;
         int errorCode = profile->GetConnectedDevices(devices);
-        if (errorCode != OHOS::Bluetooth::BT_NO_ERROR) {
+        if (errorCode != BT_NO_ERROR) {
             taihe::set_business_error(errorCode, "GetConnectedDevices return error");
         }
 
@@ -117,37 +118,6 @@ public:
 
         return deviceVector.empty() ? taihe::array<taihe::string>{}
             : taihe::array<::taihe::string>(taihe::copy_data_t{}, deviceVector.data(), deviceVector.size());
-    }
-private:
-    int GetProfileConnectionState(int state)
-    {
-        int32_t profileConnectionState = ohos::bluetooth::constant::ProfileConnectionState(
-            ohos::bluetooth::constant::ProfileConnectionState::key_t::STATE_DISCONNECTED).get_value();
-        switch (state) {
-            case static_cast<int32_t>(OHOS::Bluetooth::BTConnectState::CONNECTING):
-                HILOGD("STATE_CONNECTING(1)");
-                profileConnectionState = ohos::bluetooth::constant::ProfileConnectionState(
-                    ohos::bluetooth::constant::ProfileConnectionState::key_t::STATE_CONNECTING).get_value();
-                break;
-            case static_cast<int32_t>(OHOS::Bluetooth::BTConnectState::CONNECTED):
-                HILOGD("STATE_CONNECTED(2)");
-                profileConnectionState = ohos::bluetooth::constant::ProfileConnectionState(
-                    ohos::bluetooth::constant::ProfileConnectionState::key_t::STATE_CONNECTED).get_value();
-                break;
-            case static_cast<int32_t>(OHOS::Bluetooth::BTConnectState::DISCONNECTING):
-                HILOGD("STATE_DISCONNECTING(3)");
-                profileConnectionState = ohos::bluetooth::constant::ProfileConnectionState(
-                    ohos::bluetooth::constant::ProfileConnectionState::key_t::STATE_DISCONNECTING).get_value();
-                break;
-            case static_cast<int32_t>(OHOS::Bluetooth::BTConnectState::DISCONNECTED):
-                HILOGD("STATE_DISCONNECTED(0)");
-                profileConnectionState = ohos::bluetooth::constant::ProfileConnectionState(
-                    ohos::bluetooth::constant::ProfileConnectionState::key_t::STATE_DISCONNECTED).get_value();
-                break;
-            default:
-                break;
-        }
-        return profileConnectionState;
     }
 
     void SetConnectionStrategySync(string_view deviceId, ohos::bluetooth::baseProfile::ConnectionStrategy strategy) {}
