@@ -100,7 +100,7 @@ public:
     /**
      * @brief The function to OnCharacteristicWriteResult.
      *
-     * @param characteristic Characteristic object.
+     * @param characteristic Characteristic object. The value attribute is the initial value 0.
      * @param ret ret of GattClientCallback.
      * @since 6
      *
