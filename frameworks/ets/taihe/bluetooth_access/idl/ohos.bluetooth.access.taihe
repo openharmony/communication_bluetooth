@@ -47,6 +47,15 @@ enum BluetoothState: i32 {
     STATE_BLE_TURNING_OFF = 6
 }
 
+enum DialogType: i32 {
+    BLUETOOTH_SWITCH = 0
+}
+
+struct NotifyDialogResultParams {
+    dialogType: DialogType;
+    dialogResult: bool;
+}
+
 @gen_promise("restrictBluetooth")
 function RestrictBluetoothSync(): void;
 

@@ -114,6 +114,17 @@ enum DeviceChargeState: i32 {
     DEVICE_SUPER_CHARGE_IN_CHARGING = 3
 }
 
+enum DeviceType: i32 {
+    DEVICE_TYPE_DEFAULT = 0,
+    DEVICE_TYPE_CAR = 1,
+    DEVICE_TYPE_HEADSET = 2,
+    DEVICE_TYPE_HEARING = 3,
+    DEVICE_TYPE_GLASSES = 4,
+    DEVICE_TYPE_WATCH = 5,
+    DEVICE_TYPE_SPEAKER = 6,
+    DEVICE_TYPE_OTHERS = 7
+}
+
 struct BondStateParam {
     deviceId: String;
     state: BondState;
@@ -159,6 +170,29 @@ enum ControlObject: i32 {
     LEFT_EAR = 0,
     RIGHT_EAR = 1,
     LEFT_RIGHT_EAR = 2
+}
+
+struct TrustedPairedDevices {
+    trustedPairedDevices: Array<TrustedPairedDevice>;
+}
+
+struct TrustedPairedDevice {
+    sn: String;
+    deviceType: String;
+    modelId: String;
+    manufactory: String;
+    productId: String;
+    hiLinkVersion: String;
+    macAddress: String;
+    serviceType: String;
+    serviceId: String;
+    deviceName: String;
+    uuids: String;
+    bluetoothClass: i32;
+    token: @arraybuffer Array<u8>;
+    deviceNameTime: i32;
+    secureAdvertisingInfo: @arraybuffer Array<u8>;
+    pairState: i32;
 }
 
 function GetRemoteProductId(deviceId: String): String;
