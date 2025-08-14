@@ -19,8 +19,6 @@ static { loadLibrary("bluetoothHfp_taihe_native.z") }
 """)
 
 from ohos.bluetooth.baseProfile use BaseProfile; 
-
-@class
 interface HandsFreeAudioGatewayProfile : BaseProfile {
     connect(deviceId: String): void;
     disconnect(deviceId: String): void;
