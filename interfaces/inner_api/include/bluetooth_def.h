@@ -1430,11 +1430,11 @@ enum A2dpUserCodecBitsPerSample : uint8_t {
 };
 
 /**
- * @brief A2dp codec bit rate enum.
+ * @brief A2dp codec L2HCST bit rate enum.
  *
  * @since 19
  */
-enum A2dpUserCodecBitRate : uint32_t {
+enum A2dpUserL2hcStCodecBitRate : uint32_t {
     A2DP_L2HCST_BIT_RATE_DEFAULT = 0x0,
     A2DP_L2HCST_BIT_RATE_320K = 0x01,
     A2DP_L2HCST_BIT_RATE_640K = 0x01 << 1,
@@ -1446,6 +1446,21 @@ enum A2dpUserCodecBitRate : uint32_t {
     A2DP_L2HCST_BIT_RATE_192K = 0x01 << 7,
     A2DP_L2HCST_BIT_RATE_256K = 0x01 << 8,
     A2DP_L2HCST_BIT_RATE_480K = 0x01 << 9,
+};
+
+/**
+ * @brief A2dp codec L2HCV2 bit rate enum.
+ *
+ * @since 21
+ */
+enum A2dpUserL2hcV2CodecBitRate : uint32_t {
+    A2DP_L2HCV2_BIT_RATE_DEFAULT = 0x0,
+    A2DP_L2HCV2_BIT_RATE_320K = 0x01,
+    A2DP_L2HCV2_BIT_RATE_640K = 0x01 << 1,
+    A2DP_L2HCV2_BIT_RATE_960K = 0x01 << 2,
+    A2DP_L2HCV2_BIT_RATE_AUTO_RATE = 0x01 << 3,
+    A2DP_L2HCV2_BIT_RATE_1500K = 0x01 << 4,
+    A2DP_L2HCV2_BIT_RATE_2300K = 0x01 << 5,
 };
 
 /**
