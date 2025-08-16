@@ -42,6 +42,7 @@ struct NapiSppServer {
     static napi_value SppCloseServerSocket(napi_env env, napi_callback_info info);
     static napi_value RegisterSocketObserver(napi_env env, napi_callback_info info);
     static napi_value DeRegisterSocketObserver(napi_env env, napi_callback_info info);
+    static napi_value getL2capPsm(napi_env env, napi_callback_info info);
 
     static std::map<int, std::shared_ptr<NapiSppServer>> serverMap;
     static int count;
