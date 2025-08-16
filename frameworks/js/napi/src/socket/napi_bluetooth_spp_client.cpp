@@ -56,7 +56,10 @@ static napi_status CheckSppConnectParams(
 
     callbackInfo->env_ = env;
     callbackInfo->sppOption_ = GetSppOptionFromJS(env, argv[PARAM1]);
-    NAPI_BT_RETURN_IF((callbackInfo->sppOption_ == nullptr), "GetSppOptionFromJS faild.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF((callbackInfo->sppOption_ == nullptr), "GetSppOptionFromJS failed.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF((
+        (callbackInfo->sppOption_->type_ == TYPE_L2CAP || callbackInfo->sppOption_->type_ == TYPE_L2CAP_LE) &&
+        callbackInfo->sppOption_->psm_ <= 0), "GetSppOptionFromJS failed", napi_invalid_arg);
     callbackInfo->deviceId_ = deviceId;
 
     napi_value promise = nullptr;
@@ -89,7 +92,7 @@ std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object)
     napi_create_string_utf8(env, "uuid", NAPI_AUTO_LENGTH, &propertyNameValue);
     napi_get_property(env, object, propertyNameValue, &value);
     bool isSuccess = ParseString(env, sppOption->uuid_, value);
-    if (!isSuccess || (!IsValidUuid(sppOption->uuid_))) {
+    if (sppOption->uuid_ != "" && (!isSuccess || (!IsValidUuid(sppOption->uuid_)))) {
         HILOGE("Parse UUID faild.");
         return nullptr;
     }
@@ -107,6 +110,17 @@ std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object)
     sppOption->type_ = BtSocketType(type);
     HILOGI("uuid: %{public}s, secure: %{public}d, type: %{public}d",
         sppOption->uuid_.c_str(), sppOption->secure_, sppOption->type_);
+    if (sppOption->type_ == TYPE_RFCOMM && sppOption->uuid_ == "") {
+        HILOGE("RFCOMM type but uuid is nullptr");
+        return nullptr;
+    }
+    int psm = -1;
+    napi_create_string_utf8(env, "psm", NAPI_AUTO_LENGTH, &propertyNameValue);
+    napi_get_property(env, object, propertyNameValue, &value);
+    ParseInt32(env, psm, value);
+    sppOption->psm_ = psm;
+    HILOGI("uuid: %{public}s, secure: %{public}d, type: %{public}d, psm: %{public}d",
+        sppOption->uuid_.c_str(), sppOption->secure_, sppOption->type_, sppOption->psm_);
     return sppOption;
 }
 
@@ -135,7 +149,7 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
                 UUID::FromString(callbackInfo->sppOption_->uuid_),
                 callbackInfo->sppOption_->type_, callbackInfo->sppOption_->secure_);
             HILOGI("SppConnect client_ constructed");
-            callbackInfo->errorCode_ = callbackInfo->client_->Connect(SPP_SOCKET_PSM_VALUE);
+            callbackInfo->errorCode_ = callbackInfo->client_->Connect(callbackInfo->sppOption_->psm_);
             if (callbackInfo->errorCode_ == BtStatus::BT_SUCCESS) {
                 HILOGI("SppConnect successfully");
                 callbackInfo->errorCode_ = CODE_SUCCESS;

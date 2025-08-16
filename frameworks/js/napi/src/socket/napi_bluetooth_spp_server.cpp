@@ -40,6 +40,7 @@ void DefineSppFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("sppCloseClientSocket", NapiSppClient::SppCloseClientSocket),
         DECLARE_NAPI_FUNCTION("sppWrite", NapiSppClient::SppWrite),
         DECLARE_NAPI_FUNCTION("getDeviceId", NapiSppClient::GetDeviceId),
+        DECLARE_NAPI_FUNCTION("getL2capPsm", NapiSppServer::getL2capPsm),
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("on", NapiSppServer::RegisterSocketObserver),
         DECLARE_NAPI_FUNCTION("off", NapiSppServer::DeRegisterSocketObserver),
@@ -67,6 +68,8 @@ napi_value SppTypeInit(napi_env env)
     napi_value sppType = nullptr;
     napi_create_object(env, &sppType);
     SetNamedPropertyByInteger(env, sppType, SppType::SPP_RFCOMM, "SPP_RFCOMM");
+    SetNamedPropertyByInteger(env, sppType, SppType::SPP_L2CAP, "SPP_L2CAP");
+    SetNamedPropertyByInteger(env, sppType, SppType::SPP_L2CAP_BLE, "SPP_L2CAP_BLE");
     return sppType;
 }
 
@@ -137,7 +140,7 @@ napi_value NapiSppServer::SppListen(napi_env env, napi_callback_info info)
             SppListenCallbackInfo* callbackInfo = static_cast<SppListenCallbackInfo*>(data);
             callbackInfo->server_ = std::make_shared<ServerSocket>(callbackInfo->name_,
                 UUID::FromString(callbackInfo->sppOption_->uuid_), callbackInfo->sppOption_->type_,
-                callbackInfo->sppOption_->secure_);
+                callbackInfo->sppOption_->secure_, callbackInfo->sppOption_->psm_);
             int errorCode = callbackInfo->server_->Listen();
             HILOGI("SppListen ServerSocket constructor end");
             if (callbackInfo->server_ ->GetStringTag() != "") {
@@ -352,5 +355,32 @@ napi_value NapiSppServer::SppCloseServerSocket(napi_env env, napi_callback_info 
 
     return NapiGetBooleanRet(env, isOK);
 }
+
+static napi_status CheckSppFdParams(napi_env env, napi_callback_info info, int &id)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {0};
+
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 arguments.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM0]), "Wrong argument type. int expected.", napi_invalid_arg);
+    return napi_ok;
+}
+
+napi_value NapiSppServer::getL2capPsm(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    int id = -1;
+    auto status = CheckSppFdParams(env, info, id);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    auto server = serverMap[id];
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, server != nullptr, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, server->server_ != nullptr, BT_ERR_INVALID_PARAM);
+    int32_t l2capPsm = server->server_->GetL2capPsm();
+    napi_value result = nullptr;
+    napi_create_int32(env, l2capPsm, &result);
+    return result;
+}
+
 } // namespace Bluetooth
 } // namespace OHOS

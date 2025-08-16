@@ -288,6 +288,18 @@ public:
     ServerSocket(const std::string &name, UUID uuid, BtSocketType type, bool encrypt);
 
     /**
+     * @brief A constructor used to create an ServerSocket instance.
+     *
+     * @param name Server name.
+     * @param uuid Uuid.
+     * @param type Socket type.
+     * @param encrypt Remote device auth and encrypt connection.
+     * @param psm L2CAP socket psm.
+     * @since 20
+     */
+    ServerSocket(const std::string &name, UUID uuid, BtSocketType type, bool encrypt, int psm);
+
+    /**
      * @brief Destroy the ServerSocket object.
      *
      * @since 6
