@@ -36,4 +36,6 @@ enum DisconnectCause: i32 {
 }
 
 interface BaseProfile {
+    On(type: String, callback: (data: StateChangeParam) => void): void;
+    Off(type: String, callback: Optional<(data: StateChangeParam) => void>): void;
 }
