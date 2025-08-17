@@ -48,16 +48,19 @@ taihe_shared_library("bluetoothHfp_taihe_native") {
     "include",
     "src",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include"
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common"
   ]
   sources += [
     "src/ani_constructor.cpp",
     "src/ohos.bluetooth.hfp.impl.cpp",
+    "src/taihe_bluetooth_hfp_ag_observer.cpp",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_event_module.cpp"
   ]
   deps = [
     ":run_taihe",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
-    "../bluetooth_baseProfile:bluetoothBaseProfile_taihe_native"
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/bluetooth_baseProfile:bluetoothBaseProfile_taihe_native"
   ]
   external_deps = [
     "hilog:libhilog",
