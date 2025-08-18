@@ -1292,6 +1292,7 @@ void BluetoothHost::Close(void)
 {
     std::lock_guard<std::mutex> lock(pimpl->switchModuleMutex_);
     pimpl->switchModule_ = nullptr;
+    BluetoothProfileManager::ClearSystemAbility();
 }
 
 int32_t BluetoothHost::UpdateCloudBluetoothDevice(const std::vector<TrustPairDeviceParam> &cloudDevices)
