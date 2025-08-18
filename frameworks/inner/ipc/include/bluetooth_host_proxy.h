@@ -34,7 +34,7 @@ public:
     void RegisterObserver(const sptr<IBluetoothHostObserver> &observer) override;
     void DeregisterObserver(const sptr<IBluetoothHostObserver> &observer) override;
     int32_t EnableBt() override;
-    int32_t DisableBt(bool isAsync) override;
+    int32_t DisableBt(bool isAsync, const std::string &callingName) override;
     int32_t SatelliteControl(int type, int state) override;
     sptr<IRemoteObject> GetProfile(const std::string &name) override;
     sptr<IRemoteObject> GetBleRemote(const std::string &name) override;
@@ -42,7 +42,7 @@ public:
     int32_t GetBtState(int &state) override;
     int32_t GetLocalAddress(std::string &addr) override;
     int32_t DisableBle() override;
-    int32_t EnableBle(bool noAutoConnect, bool isAsync) override;
+    int32_t EnableBle(bool noAutoConnect, bool isAsync, const std::string &callingName) override;
     std::vector<uint32_t> GetProfileList() override;
     int32_t GetMaxNumConnectedAudioDevices() override;
     int32_t GetBtConnectionState(int &state) override;
@@ -109,7 +109,7 @@ public:
     int32_t SetVirtualAutoConnectType(const std::string &address, int connType, int businessType) override;
     int32_t SetFastScanLevel(int level) override;
     void UpdateVirtualDevice(int32_t action, const std::string &address) override;
-    int32_t EnableBluetoothToRestrictMode(void) override;
+    int32_t EnableBluetoothToRestrictMode(const std::string &callingName) override;
     int32_t ControlDeviceAction(const std::string &deviceId, uint32_t controlType,
         uint32_t controlTypeVal, uint32_t controlObject) override;
     int32_t GetLastConnectionTime(const std::string &address, int64_t &connectionTime) override;

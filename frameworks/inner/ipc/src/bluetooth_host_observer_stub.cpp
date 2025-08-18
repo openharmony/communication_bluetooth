@@ -42,6 +42,8 @@ BluetoothHostObserverStub::BluetoothHostObserverStub()
         BluetoothHostObserverStub::OnDeviceAddrChangedInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_STATE_CHANGE_V2)] =
         BluetoothHostObserverStub::OnBluetoothStateChangedInner;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_SWITCH_ACTION_TRANSFER)] =
+        BluetoothHostObserverStub::OnBluetoothSwitchActionInner;
     memberFuncMap_[static_cast<uint32_t>(BluetoothHostObserverInterfaceCode::BT_HOST_OBSERVER_REFUSE_POLICY_CHANGE)] =
         BluetoothHostObserverStub::OnBluetoothRefusePolicyChangedInner;
 }
@@ -184,6 +186,15 @@ int32_t BluetoothHostObserverStub::OnBluetoothStateChangedInner(BluetoothHostObs
 {
     int32_t state = data.ReadInt32();
     stub->OnBluetoothStateChanged(state);
+    return NO_ERROR;
+}
+
+int32_t BluetoothHostObserverStub::OnBluetoothSwitchActionInner(BluetoothHostObserverStub *stub,
+    MessageParcel &data, MessageParcel &reply)
+{
+    int32_t action = data.ReadInt32();
+    std::string name = data.ReadString();
+    stub->OnBluetoothSwitchAction(action, name);
     return NO_ERROR;
 }
 
