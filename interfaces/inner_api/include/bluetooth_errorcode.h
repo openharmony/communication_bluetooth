@@ -88,6 +88,7 @@ enum BtErrCode {
 
     // errorCode for inner
     BT_ERR_DIALOG_FOR_USER_CONFIRM = -100,
+    BT_ERR_SWITCH_OP_TRANSFERRED = -101,
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -39,6 +39,7 @@ public:
     virtual void OnDeviceNameChanged(const std::string &deviceName) = 0;
     virtual void OnDeviceAddrChanged(const std::string &address) = 0;
     virtual void OnBluetoothStateChanged(int32_t state) = 0;
+    virtual void OnBluetoothSwitchAction(int32_t action, const std::string &callingName) = 0;
     virtual void OnRefusePolicyChanged(const int32_t pid, const int64_t prohibitedSecondsTime) = 0;
 };
 }  // namespace Bluetooth

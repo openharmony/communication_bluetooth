@@ -341,12 +341,13 @@ public:
     /**
      * @brief Disable classic.
      *
+     * @param name Indicate the calling application to disable bluetooth. The default value is current application.
      * @param isAsync Indicate Async function flag.
      * @return Returns <b>true</b> if the operation is accepted;
      *         returns <b>false</b> if the operation is rejected.
      * @since 6
      */
-    int DisableBt(bool isAsync = false);
+    int DisableBt(std::string name = "", bool isAsync = false);
 
     /**
      * @brief Get classic enable/disable state.
@@ -404,12 +405,13 @@ public:
     /**
      * @brief Enable ble.
      *
+     * @param name Indicate the calling application to enable bluetooth. The default value is current application.
      * @param isAsync Indicate Async function flag.
      * @return Returns <b>true</b> if the operation is accepted;
      *         returns <b>false</b> if the operation is rejected.
      * @since 6
      */
-    int EnableBle(bool isAsync = false);
+    int EnableBle(std::string name = "", bool isAsync = false);
 
     /**
      * @brief Enable bluetooth without AutoConnect.
@@ -423,11 +425,12 @@ public:
     /**
      * @brief Enable bluetooth to restrict mode.
      *
+     * @param name Indicate the calling application to enable bluetooth. The default value is current application.
      * @return Returns BT_NO_ERROR if the operation is accepted;
      *         returns others if the operation is rejected.
      * @since 12
      */
-    int EnableBluetoothToRestrictMode(void);
+    int EnableBluetoothToRestrictMode(std::string name = "");
 
     /**
      * @brief Get br/edr enable/disable state.
@@ -784,12 +787,12 @@ public:
     /**
     * @brief Restrict Bluetooth BR/EDR ability, just BLE ability available.
     *
-    * @param remoteAddr remote device addr.
+    * @param name Indicate the calling application to restrict bluetooth. The default value is current application.
     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
     *         returns an error code defined in {@link BtErrCode} otherwise.
     * @since 12
     */
-    int RestrictBluetooth();
+    int RestrictBluetooth(std::string name = "");
     /**
     * @brief update virtual device
     *
