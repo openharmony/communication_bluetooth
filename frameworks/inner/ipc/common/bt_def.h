@@ -1800,6 +1800,12 @@ enum BluetoothSwitchState {
     STATE_HALF,
 };
 
+enum BluetoothTransferredSwitchAction {
+    TRANS_ACTION_ENABLE_BLUETOOTH = 0,
+    TRANS_ACTION_DISABLE_BLUETOOTH,
+    TRANS_ACTION_ENABLE_BLUETOOTH_TO_RESTRICT_MODE,
+};
+
 enum ControlType {
     PLAY = 0,
     VIBRATE = 1,
