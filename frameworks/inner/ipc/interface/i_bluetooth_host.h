@@ -60,7 +60,7 @@ public:
     virtual void RegisterObserver(const sptr<IBluetoothHostObserver> &observer) = 0;
     virtual void DeregisterObserver(const sptr<IBluetoothHostObserver> &observer) = 0;
     virtual int32_t EnableBt() = 0;
-    virtual int32_t DisableBt(bool isAsync) = 0;
+    virtual int32_t DisableBt(bool isAsync, const std::string &callingName) = 0;
     virtual int32_t SatelliteControl(int type, int state) = 0;
     virtual sptr<IRemoteObject> GetProfile(const std::string &name) = 0;
     virtual sptr<IRemoteObject> GetBleRemote(const std::string &name) = 0;
@@ -68,7 +68,7 @@ public:
     virtual int32_t GetBtState(int &state) = 0;
     virtual int32_t GetLocalAddress(std::string &addr) = 0;
     virtual int32_t DisableBle() = 0;
-    virtual int32_t EnableBle(bool noAutoConnect, bool isAsync) = 0;
+    virtual int32_t EnableBle(bool noAutoConnect, bool isAsync, const std::string &callingName) = 0;
     virtual std::vector<uint32_t> GetProfileList() = 0;
     virtual int32_t GetMaxNumConnectedAudioDevices() = 0;
     virtual int32_t GetBtConnectionState(int &state) = 0;
@@ -136,7 +136,7 @@ public:
     virtual int32_t SetVirtualAutoConnectType(const std::string &address, int connType, int businessType) = 0;
     virtual int32_t SetFastScanLevel(int level) = 0;
     virtual void UpdateVirtualDevice(int32_t action, const std::string &address) = 0;
-    virtual int32_t EnableBluetoothToRestrictMode(void) = 0;
+    virtual int32_t EnableBluetoothToRestrictMode(const std::string &callingName) = 0;
     virtual int32_t ControlDeviceAction(const std::string &deviceId, uint32_t controlType,
         uint32_t controlTypeVal, uint32_t controlObject) = 0;
     virtual int32_t GetLastConnectionTime(const std::string &address, int64_t &connectionTime) = 0;
