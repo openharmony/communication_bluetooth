@@ -276,7 +276,7 @@ napi_value NapiAccess::EnableBluetoothAsync(napi_env env, napi_callback_info inf
     HILOGI("enter");
     auto func = []() {
         bool isAsync = true;
-        int32_t ret = BluetoothHost::GetDefaultHost().EnableBle(isAsync);
+        int32_t ret = BluetoothHost::GetDefaultHost().EnableBle("", isAsync);
         HILOGI("EnableBluetoothAsync ret: %{public}d", ret);
         return NapiAsyncWorkRet(ret);
     };
@@ -291,7 +291,7 @@ napi_value NapiAccess::DisableBluetoothAsync(napi_env env, napi_callback_info in
     HILOGI("enter");
     auto func = []() {
         bool isAsync = true;
-        int32_t ret = BluetoothHost::GetDefaultHost().DisableBt(isAsync);
+        int32_t ret = BluetoothHost::GetDefaultHost().DisableBt("", isAsync);
         HILOGI("DisableBluetoothAsync ret: %{public}d", ret);
         return NapiAsyncWorkRet(ret);
     };

@@ -196,6 +196,7 @@ enum BluetoothHostObserverInterfaceCode {
     BT_HOST_OBSERVER_DEVICE_ADDR_CHANGED,
     BT_HOST_OBSERVER_STATE_CHANGE_V2,
     BT_HOST_OBSERVER_REFUSE_POLICY_CHANGE,
+    BT_HOST_OBSERVER_SWITCH_ACTION_TRANSFER,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_OBSERVER_BUTT
 };
