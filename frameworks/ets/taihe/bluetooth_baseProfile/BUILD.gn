@@ -61,6 +61,7 @@ taihe_shared_library("bluetoothBaseProfile_taihe_native") {
   ]
   external_deps = [
     "hilog:libhilog",
+    "c_utils:utils"
   ]
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection

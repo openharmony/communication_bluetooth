@@ -30,6 +30,14 @@ public:
     {
         // Don't forget to implement the constructor.
     }
+
+    void On(::taihe::string_view type, ::taihe::callback_view<void(
+        ::ohos::bluetooth::baseProfile::StateChangeParam const& data)> callback)
+    {}
+    
+    void Off(::taihe::string_view type, ::taihe::optional_view<::taihe::callback_view<void(
+        ::ohos::bluetooth::baseProfile::StateChangeParam const& data)>> callback)
+    {}
 };
 }  // namespace
 
