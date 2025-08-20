@@ -29,8 +29,7 @@ class HidHostProfileImpl {
 public:
     HidHostProfileImpl()
     {
-        std::shared_ptr<TaiheBluetoothHidHostObserver> observer_ =
-            std::make_shared<TaiheBluetoothHidHostObserver>();
+        observer_ = std::make_shared<TaiheBluetoothHidHostObserver>();
         HidHost *profile = HidHost::GetProfile();
         profile->RegisterObserver(observer_);
     }
