@@ -17,30 +17,55 @@
 #include "ohos.bluetooth.hfp.impl.hpp"
 #include "taihe/runtime.hpp"
 #include "stdexcept"
+#include "taihe_bluetooth_hfp_ag_observer.h"
 
+namespace OHOS {
+namespace Bluetooth {
+    
 using namespace taihe;
 using namespace ohos::bluetooth::hfp;
-
-namespace {
-// To be implemented.
 
 class HandsFreeAudioGatewayProfileImpl {
 public:
     HandsFreeAudioGatewayProfileImpl()
     {
-        // Don't forget to implement the constructor.
+        std::shared_ptr<TaiheHandsFreeAudioGatewayObserver> observer_ =
+            std::make_shared<TaiheHandsFreeAudioGatewayObserver>();
     }
+
+    void On(::taihe::string_view type, ::taihe::callback_view<void(
+        ::ohos::bluetooth::baseProfile::StateChangeParam const& data)> callback)
+    {
+        if (observer_) {
+            observer_->eventSubscribe_.RegisterEvent(callback);
+        }
+        if (!isRegistered_) {
+            HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
+            profile->RegisterObserver(observer_);
+            isRegistered_ = true;
+        }
+    }
+    
+    void Off(::taihe::string_view type, ::taihe::optional_view<::taihe::callback<void(
+        ::ohos::bluetooth::baseProfile::StateChangeParam const& data)>> callback)
+    {
+        if (observer_) {
+            observer_->eventSubscribe_.DeregisterEvent(callback);
+        }
+    }
+private:
+    std::shared_ptr<TaiheHandsFreeAudioGatewayObserver> observer_ = nullptr;
+    bool isRegistered_ = false;
 };
 
 HandsFreeAudioGatewayProfile CreateHfpAgProfile()
 {
-    // The parameters in the make_holder function should be of the same type
-    // as the parameters in the constructor of the actual implementation class.
-    return make_holder<HandsFreeAudioGatewayProfileImpl, HandsFreeAudioGatewayProfile>();
+    return make_holder<HandsFreeAudioGatewayProfileImpl, ohos::bluetooth::hfp::HandsFreeAudioGatewayProfile>();
 }
-}  // namespace
+}  // namespace Bluetooth
+}  // namespace OHOS
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_CreateHfpAgProfile(CreateHfpAgProfile);
+TH_EXPORT_CPP_API_CreateHfpAgProfile(OHOS::Bluetooth::CreateHfpAgProfile);
 // NOLINTEND
