@@ -150,6 +150,7 @@ public:
     virtual int32_t GetCarKeyDfxData(std::string &dfxData) = 0;
     virtual int32_t SetCarKeyCardData(const std::string &address, int32_t action) = 0;
     virtual int32_t NotifyDialogResult(uint32_t dialogType, bool dialogResult) = 0;
+    virtual void SetCallingPackageName(const std::string &address, const std::string &packageName) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

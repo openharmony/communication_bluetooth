@@ -1362,5 +1362,13 @@ int BluetoothHost::NotifyDialogResult(uint32_t dialogType, bool dialogResult)
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
     return proxy->NotifyDialogResult(dialogType, dialogResult);
 }
+
+void BluetoothHost::SetCallingPackageName(const std::string &address, const std::string &packageName)
+{
+    HILOGI("enter");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
+    proxy->SetCallingPackageName(address, packageName);
+}
 } // namespace Bluetooth
 } // namespace OHOS

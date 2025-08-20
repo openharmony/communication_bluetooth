@@ -883,6 +883,15 @@ public:
      * @since 20
      */
     int NotifyDialogResult(uint32_t dialogType, bool dialogResult);
+
+    /**
+     * @brief set the package name of calling app which is pairing or connecting remote bluetooth device.
+     *
+     * @param address The address of remote bluetooth device.
+     * @param packageName The package name of calling app.
+     * @since 21
+     */
+    void SetCallingPackageName(const std::string &address, const std::string &packageName);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
