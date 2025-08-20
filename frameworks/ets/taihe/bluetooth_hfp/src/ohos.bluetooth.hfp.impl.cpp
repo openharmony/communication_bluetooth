@@ -29,8 +29,7 @@ class HandsFreeAudioGatewayProfileImpl {
 public:
     HandsFreeAudioGatewayProfileImpl()
     {
-        std::shared_ptr<TaiheHandsFreeAudioGatewayObserver> observer_ =
-            std::make_shared<TaiheHandsFreeAudioGatewayObserver>();
+        observer_ = std::make_shared<TaiheHandsFreeAudioGatewayObserver>();
     }
 
     void On(::taihe::string_view type, ::taihe::callback_view<void(
