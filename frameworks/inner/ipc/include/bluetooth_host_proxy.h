@@ -123,6 +123,7 @@ public:
     int32_t GetCarKeyDfxData(std::string &dfxData) override;
     int32_t SetCarKeyCardData(const std::string &address, int32_t action) override;
     int32_t NotifyDialogResult(uint32_t dialogType, bool dialogResult) override;
+    void SetCallingPackageName(const std::string &address, const std::string &packageName) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;

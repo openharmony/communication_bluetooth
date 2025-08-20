@@ -2038,5 +2038,24 @@ int32_t BluetoothHostProxy::NotifyDialogResult(uint32_t dialogType, bool dialogR
     }
     return reply.ReadInt32();
 }
+
+void BluetoothHostProxy::SetCallingPackageName(const std::string &address, const std::string &packageName)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::SetCallingPackageName WriteInterfaceToken error");
+        return;
+    }
+    CHECK_AND_RETURN_LOG(data.WriteString(address), "write address error");
+    CHECK_AND_RETURN_LOG(data.WriteString(packageName), "write packageName error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::BT_SET_CALLING_PACKAGE_NAME, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::SetCallingPackageName done fail error: %{public}d", error);
+        return;
+    }
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
