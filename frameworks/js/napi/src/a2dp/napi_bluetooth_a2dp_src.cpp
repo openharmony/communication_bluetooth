@@ -37,50 +37,6 @@ std::shared_ptr<NapiA2dpSourceObserver> NapiA2dpSource::observer_ = std::make_sh
 bool NapiA2dpSource::isRegistered_ = false;
 thread_local napi_ref g_napiProfile = nullptr;
 
-const static std::map<int32_t, int32_t> g_codecTypeMap = {
-    {CODEC_TYPE_SBC, A2DP_CODEC_TYPE_SBC_USER},
-    {CODEC_TYPE_AAC, A2DP_CODEC_TYPE_AAC_USER},
-    {CODEC_TYPE_L2HC, A2DP_CODEC_TYPE_L2HCV2_USER},
-    {CODEC_TYPE_L2HCST, A2DP_CODEC_TYPE_L2HCST_USER},
-    {CODEC_TYPE_LDAC, A2DP_CODEC_TYPE_LDAC_USER},
-    {CODEC_TYPE_INVALID, A2DP_CODEC_TYPE_NONA2DP_USER},
-};
-
-const static std::map<int32_t, int32_t> g_codecBitsPerSampleMap = {
-    {CODEC_BITS_PER_SAMPLE_NONE, A2DP_SAMPLE_BITS_NONE_USER},
-    {CODEC_BITS_PER_SAMPLE_16, A2DP_SAMPLE_BITS_16_USER},
-    {CODEC_BITS_PER_SAMPLE_24, A2DP_SAMPLE_BITS_24_USER},
-    {CODEC_BITS_PER_SAMPLE_32, A2DP_SAMPLE_BITS_32_USER},
-};
-
-const static std::map<int32_t, int32_t> g_codecChannelModeMap = {
-    {CODEC_CHANNEL_MODE_NONE, A2DP_CHANNEL_MODE_NONE_USER},
-    {CODEC_CHANNEL_MODE_MONO, A2DP_SBC_CHANNEL_MODE_MONO_USER},
-    {CODEC_CHANNEL_MODE_STEREO, A2DP_SBC_CHANNEL_MODE_STEREO_USER},
-};
-
-const static std::map<int32_t, int32_t> g_codecSampleRateMap = {
-    {CODEC_SAMPLE_RATE_NONE, A2DP_SAMPLE_RATE_NONE_USER},
-    {CODEC_SAMPLE_RATE_44100, A2DP_SBC_SAMPLE_RATE_44100_USER},
-    {CODEC_SAMPLE_RATE_48000, A2DP_L2HCV2_SAMPLE_RATE_48000_USER},
-    {CODEC_SAMPLE_RATE_88200, A2DP_SAMPLE_RATE_NONE_USER},
-    {CODEC_SAMPLE_RATE_96000, A2DP_L2HCV2_SAMPLE_RATE_96000_USER},
-    {CODEC_SAMPLE_RATE_176400, A2DP_SAMPLE_RATE_NONE_USER},
-    {CODEC_SAMPLE_RATE_192000, A2DP_SAMPLE_RATE_NONE_USER},
-};
-
-const static std::map<int32_t, int32_t> g_codecBitRateMap = {
-    {CODEC_BIT_RATE_96000, A2DP_L2HCST_BIT_RATE_96K},
-    {CODEC_BIT_RATE_128000, A2DP_L2HCST_BIT_RATE_128K},
-    {CODEC_BIT_RATE_192000, A2DP_L2HCST_BIT_RATE_192K},
-    {CODEC_BIT_RATE_256000, A2DP_L2HCST_BIT_RATE_256K},
-    {CODEC_BIT_RATE_320000, A2DP_L2HCST_BIT_RATE_320K},
-    {CODEC_BIT_RATE_480000, A2DP_L2HCST_BIT_RATE_480K},
-    {CODEC_BIT_RATE_640000, A2DP_L2HCST_BIT_RATE_640K},
-    {CODEC_BIT_RATE_960000, A2DP_L2HCST_BIT_RATE_960K},
-    {CODEC_BIT_RATE_ABR, A2DP_L2HCST_BIT_RATE_AUTO_RATE},
-};
-
 const static std::map<int32_t, int32_t> g_codecFrameLengthMap = {
     {CODEC_FRAME_LENGTH_5MS, A2DP_L2HCST_FRAME_LENGTH_5MS},
     {CODEC_FRAME_LENGTH_10MS, A2DP_L2HCST_FRAME_LENGTH_10MS},
@@ -126,6 +82,15 @@ const static std::map<int32_t, CodecBitRate> g_a2dpCodecBitRateMap = {
     {A2DP_L2HCST_BIT_RATE_640K, CODEC_BIT_RATE_640000},
     {A2DP_L2HCST_BIT_RATE_960K, CODEC_BIT_RATE_960000},
     {A2DP_L2HCST_BIT_RATE_AUTO_RATE, CODEC_BIT_RATE_ABR},
+};
+
+const static std::map<int32_t, CodecBitRate> g_a2dpL2hcV2BitRateMap = {
+    {A2DP_L2HCV2_BIT_RATE_320K, CODEC_BIT_RATE_320000},
+    {A2DP_L2HCV2_BIT_RATE_640K, CODEC_BIT_RATE_640000},
+    {A2DP_L2HCV2_BIT_RATE_960K, CODEC_BIT_RATE_960000},
+    {A2DP_L2HCV2_BIT_RATE_1500K, CODEC_BIT_RATE_1500000},
+    {A2DP_L2HCV2_BIT_RATE_2300K, CODEC_BIT_RATE_2300000},
+    {A2DP_L2HCV2_BIT_RATE_AUTO_RATE, CODEC_BIT_RATE_ABR},
 };
 
 const static std::map<int32_t, CodecFrameLength> g_a2dpCodecFrameLengthMap = {
@@ -359,6 +324,10 @@ napi_value CodecBitRateInit(napi_env env)
         CodecBitRate::CODEC_BIT_RATE_640000, "CODEC_BIT_RATE_640000");
     SetNamedPropertyByInteger(env, codecBitRate,
         CodecBitRate::CODEC_BIT_RATE_960000, "CODEC_BIT_RATE_960000");
+    SetNamedPropertyByInteger(env, codecBitRate,
+        CodecBitRate::CODEC_BIT_RATE_1500000, "CODEC_BIT_RATE_1500000");
+    SetNamedPropertyByInteger(env, codecBitRate,
+        CodecBitRate::CODEC_BIT_RATE_2300000, "CODEC_BIT_RATE_2300000");
     SetNamedPropertyByInteger(env, codecBitRate,
         CodecBitRate::CODEC_BIT_RATE_ABR, "CODEC_BIT_RATE_ABR");
     return codecBitRate;
@@ -618,41 +587,61 @@ napi_value NapiA2dpSource::DisableAbsoluteVolume(napi_env env, napi_callback_inf
 
 static void ConvertCodecType(A2dpCodecInfo &a2dpCodecInfo, int32_t codecType)
 {
-    auto iter = g_codecTypeMap.find(codecType);
-    if (iter != g_codecTypeMap.end()) {
-        a2dpCodecInfo.codecType = iter->second;
+    for (const auto& codecType_ : g_a2dpCodecTypeMap) {
+        if (codecType_.second == codecType) {
+            a2dpCodecInfo.codecType = codecType_.first;
+            break;
+        }
     }
 }
 
 static void ConvertCodecBitsPerSample(A2dpCodecInfo &a2dpCodecInfo, int32_t codecBitsPerSample)
 {
-    auto iter = g_codecBitsPerSampleMap.find(codecBitsPerSample);
-    if (iter != g_codecBitsPerSampleMap.end()) {
-        a2dpCodecInfo.bitsPerSample = iter->second;
+    for (const auto& bitsPerSample_ : g_a2dpCodecBitsPerSampleMap) {
+        if (bitsPerSample_.second == codecBitsPerSample) {
+            a2dpCodecInfo.bitsPerSample = bitsPerSample_.first;
+            break;
+        }
     }
 }
 
 static void ConvertCodecChannelMode(A2dpCodecInfo &a2dpCodecInfo, int32_t codecChannelMode)
 {
-    auto iter = g_codecChannelModeMap.find(codecChannelMode);
-    if (iter != g_codecChannelModeMap.end()) {
-        a2dpCodecInfo.channelMode = iter->second;
+    for (const auto& channelMode : g_a2dpCodecChannelModeMap) {
+        if (channelMode.second == codecChannelMode) {
+            a2dpCodecInfo.channelMode = channelMode.first;
+            break;
+        }
     }
 }
 
 static void ConvertCodecSampleRate(A2dpCodecInfo &a2dpCodecInfo, int32_t codecSampleRate)
 {
-    auto iter = g_codecSampleRateMap.find(codecSampleRate);
-    if (iter != g_codecSampleRateMap.end()) {
-        a2dpCodecInfo.sampleRate = iter->second;
+    for (const auto& sampleRate : g_a2dpCodecSampleRateMap) {
+        if (sampleRate.second == codecSampleRate) {
+            a2dpCodecInfo.sampleRate = sampleRate.first;
+            break;
+        }
     }
 }
 
-static void ConvertCodecBitRate(A2dpCodecInfo &a2dpCodecInfo, int32_t codecBitRate)
+static void ConvertL2hcStCodecBitRate(A2dpCodecInfo &a2dpCodecInfo, int32_t codecBitRate)
 {
-    auto iter = g_codecBitRateMap.find(codecBitRate);
-    if (iter != g_codecBitRateMap.end()) {
-        a2dpCodecInfo.codecSpecific4 = iter->second;
+    for (const auto& bitRate : g_a2dpCodecBitRateMap) {
+        if (bitRate.second == codecBitRate) {
+            a2dpCodecInfo.codecSpecific4 = bitRate.first;
+            break;
+        }
+    }
+}
+
+static void ConvertL2hcV2BitRate(A2dpCodecInfo &a2dpCodecInfo, int32_t codecBitRate)
+{
+    for (const auto& bitRate : g_a2dpL2hcV2BitRateMap) {
+        if (bitRate.second == codecBitRate) {
+            a2dpCodecInfo.codecSpecific4 = bitRate.first;
+            break;
+        }
     }
 }
 
@@ -698,6 +687,16 @@ static void ConvertCodecBitRateToCodecInfo(CodecInfo &codecInfo, int32_t codecBi
     }
 }
 
+static void ConvertL2hcV2BitRateToCodecInfo(CodecInfo &codecInfo, int32_t codecBitRate)
+{
+    auto iter = g_a2dpL2hcV2BitRateMap.find(codecBitRate);
+    if (iter != g_a2dpL2hcV2BitRateMap.end()) {
+        codecInfo.codecBitRate = iter->second;
+    } else {
+        codecInfo.codecBitRate = CODEC_BIT_RATE_ABR; // default value is ABR
+    }
+}
+
 static void ConvertCodecInfoToJs(napi_env env, napi_value &object, const A2dpCodecInfo &a2dpCodecInfo)
 {
     // convert A2dpCodecInfo to CodecInfo
@@ -706,7 +705,12 @@ static void ConvertCodecInfoToJs(napi_env env, napi_value &object, const A2dpCod
     ConvertCodecChannelModeToCodecInfo(codecInfo, a2dpCodecInfo.channelMode);
     ConvertCodecBitsPerSampleToCodecInfo(codecInfo, a2dpCodecInfo.bitsPerSample);
     ConvertCodecTypeToCodecInfo(codecInfo, a2dpCodecInfo.codecType);
-    ConvertCodecBitRateToCodecInfo(codecInfo, a2dpCodecInfo.codecSpecific4);
+    if (a2dpCodecInfo.codecType == A2DP_CODEC_TYPE_L2HCST_USER) {
+        ConvertCodecBitRateToCodecInfo(codecInfo, a2dpCodecInfo.codecSpecific4);
+    } else if (a2dpCodecInfo.codecType == A2DP_CODEC_TYPE_L2HCV2_USER) {
+        ConvertL2hcV2BitRateToCodecInfo(codecInfo, a2dpCodecInfo.codecSpecific4);
+    }
+
     // convert CodecInfo to JS
     napi_value value = nullptr;
     napi_create_int32(env, codecInfo.codecType, &value);
@@ -752,8 +756,8 @@ static void ConvertCodecBitsPerSampleVector(napi_env env, napi_value &object, in
         napi_set_element(env, codecBitsPerSampleArray, count, value);
         count++;
     }
-    if (static_cast<uint8_t>(codecSampleRate) & A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_16_USER) {
-        napi_create_int32(env, CODEC_BITS_PER_SAMPLE_16, &value);
+    if (static_cast<uint8_t>(codecSampleRate) & A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_32_USER) {
+        napi_create_int32(env, CODEC_BITS_PER_SAMPLE_32, &value);
         napi_set_element(env, codecBitsPerSampleArray, count, value);
         count++;
     }
@@ -762,8 +766,8 @@ static void ConvertCodecBitsPerSampleVector(napi_env env, napi_value &object, in
         napi_set_element(env, codecBitsPerSampleArray, count, value);
         count++;
     }
-    if (static_cast<uint8_t>(codecSampleRate) & A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_32_USER) {
-        napi_create_int32(env, CODEC_BITS_PER_SAMPLE_32, &value);
+    if (static_cast<uint8_t>(codecSampleRate) & A2dpUserCodecBitsPerSample::A2DP_SAMPLE_BITS_16_USER) {
+        napi_create_int32(env, CODEC_BITS_PER_SAMPLE_16, &value);
         napi_set_element(env, codecBitsPerSampleArray, count, value);
         count++;
     }
@@ -807,8 +811,8 @@ static void ConvertCodecSampleRateVector(napi_env env, napi_value &object, int32
         napi_set_element(env, codecSampleRateArray, count, value);
         count++;
     }
-    if (static_cast<uint32_t>(codecSampleRate) & A2dpUserCodecSampleRate::A2DP_SBC_SAMPLE_RATE_44100_USER) {
-        napi_create_int32(env, CODEC_SAMPLE_RATE_44100, &value);
+    if (static_cast<uint32_t>(codecSampleRate) & A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_96000_USER) {
+        napi_create_int32(env, CODEC_SAMPLE_RATE_96000, &value);
         napi_set_element(env, codecSampleRateArray, count, value);
         count++;
     }
@@ -817,8 +821,8 @@ static void ConvertCodecSampleRateVector(napi_env env, napi_value &object, int32
         napi_set_element(env, codecSampleRateArray, count, value);
         count++;
     }
-    if (static_cast<uint32_t>(codecSampleRate) & A2dpUserCodecSampleRate::A2DP_L2HCV2_SAMPLE_RATE_96000_USER) {
-        napi_create_int32(env, CODEC_SAMPLE_RATE_96000, &value);
+    if (static_cast<uint32_t>(codecSampleRate) & A2dpUserCodecSampleRate::A2DP_SBC_SAMPLE_RATE_44100_USER) {
+        napi_create_int32(env, CODEC_SAMPLE_RATE_44100, &value);
         napi_set_element(env, codecSampleRateArray, count, value);
         count++;
     }
@@ -826,49 +830,88 @@ static void ConvertCodecSampleRateVector(napi_env env, napi_value &object, int32
     napi_set_named_property(env, object, "codecSampleRateArray", codecSampleRateArray);
 }
 
-static void ConvertCodecBitRateVector(napi_env env, napi_value &object, int32_t codecBitRate)
+static void ConvertL2hcV2CodecBitRateVector(napi_env env, napi_value &object, int32_t codecBitRate)
 {
     int count = 0;
     napi_value value = nullptr;
     napi_value codecBitRateArray = nullptr;
     napi_create_array(env, &codecBitRateArray);
-    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_96K) {
-        napi_create_int32(env, CODEC_BIT_RATE_96000, &value);
+    if (static_cast<uint32_t>(codecBitRate) & A2dpUserL2hcV2CodecBitRate::A2DP_L2HCV2_BIT_RATE_AUTO_RATE) {
+        napi_create_int32(env, CODEC_BIT_RATE_ABR, &value);
         napi_set_element(env, codecBitRateArray, count, value);
         count++;
     }
-    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_192K) {
-        napi_create_int32(env, CODEC_BIT_RATE_192000, &value);
-        napi_set_element(env, codecBitRateArray, count, value);
-        count++;
-    }
-    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_256K) {
-        napi_create_int32(env, CODEC_BIT_RATE_256000, &value);
-        napi_set_element(env, codecBitRateArray, count, value);
-        count++;
-    }
-    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_320K) {
+    if (static_cast<uint32_t>(codecBitRate) & A2dpUserL2hcV2CodecBitRate::A2DP_L2HCV2_BIT_RATE_320K) {
         napi_create_int32(env, CODEC_BIT_RATE_320000, &value);
         napi_set_element(env, codecBitRateArray, count, value);
         count++;
     }
-    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_480K) {
-        napi_create_int32(env, CODEC_BIT_RATE_480000, &value);
-        napi_set_element(env, codecBitRateArray, count, value);
-        count++;
-    }
-    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_640K) {
+    if (static_cast<uint32_t>(codecBitRate) & A2dpUserL2hcV2CodecBitRate::A2DP_L2HCV2_BIT_RATE_640K) {
         napi_create_int32(env, CODEC_BIT_RATE_640000, &value);
         napi_set_element(env, codecBitRateArray, count, value);
         count++;
     }
-    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_960K) {
+    if (static_cast<uint32_t>(codecBitRate) & A2dpUserL2hcV2CodecBitRate::A2DP_L2HCV2_BIT_RATE_960K) {
         napi_create_int32(env, CODEC_BIT_RATE_960000, &value);
         napi_set_element(env, codecBitRateArray, count, value);
         count++;
     }
-    if (static_cast<uint8_t>(codecBitRate) & A2dpUserCodecBitRate::A2DP_L2HCST_BIT_RATE_AUTO_RATE) {
+    if (static_cast<uint32_t>(codecBitRate) & A2dpUserL2hcV2CodecBitRate::A2DP_L2HCV2_BIT_RATE_1500K) {
+        napi_create_int32(env, CODEC_BIT_RATE_1500000, &value);
+        napi_set_element(env, codecBitRateArray, count, value);
+        count++;
+    }
+    if (static_cast<uint32_t>(codecBitRate) & A2dpUserL2hcV2CodecBitRate::A2DP_L2HCV2_BIT_RATE_2300K) {
+        napi_create_int32(env, CODEC_BIT_RATE_2300000, &value);
+        napi_set_element(env, codecBitRateArray, count, value);
+        count++;
+    }
+    napi_set_named_property(env, object, "codecBitRateArray", codecBitRateArray);
+}
+
+static void ConvertL2hcStCodecBitRateVector(napi_env env, napi_value &object, int32_t codecBitRate)
+{
+    int count = 0;
+    napi_value value = nullptr;
+    napi_value codecBitRateArray = nullptr;
+    napi_create_array(env, &codecBitRateArray);
+    if (static_cast<uint32_t>(codecBitRate) & A2dpUserL2hcStCodecBitRate::A2DP_L2HCST_BIT_RATE_AUTO_RATE) {
         napi_create_int32(env, CODEC_BIT_RATE_ABR, &value);
+        napi_set_element(env, codecBitRateArray, count, value);
+        count++;
+    }
+    if (static_cast<uint32_t>(codecBitRate) & A2dpUserL2hcStCodecBitRate::A2DP_L2HCST_BIT_RATE_96K) {
+        napi_create_int32(env, CODEC_BIT_RATE_96000, &value);
+        napi_set_element(env, codecBitRateArray, count, value);
+        count++;
+    }
+    if (static_cast<uint32_t>(codecBitRate) & A2dpUserL2hcStCodecBitRate::A2DP_L2HCST_BIT_RATE_192K) {
+        napi_create_int32(env, CODEC_BIT_RATE_192000, &value);
+        napi_set_element(env, codecBitRateArray, count, value);
+        count++;
+    }
+    if (static_cast<uint32_t>(codecBitRate) & A2dpUserL2hcStCodecBitRate::A2DP_L2HCST_BIT_RATE_256K) {
+        napi_create_int32(env, CODEC_BIT_RATE_256000, &value);
+        napi_set_element(env, codecBitRateArray, count, value);
+        count++;
+    }
+    if (static_cast<uint32_t>(codecBitRate) & A2dpUserL2hcStCodecBitRate::A2DP_L2HCST_BIT_RATE_320K) {
+        napi_create_int32(env, CODEC_BIT_RATE_320000, &value);
+        napi_set_element(env, codecBitRateArray, count, value);
+        count++;
+    }
+    if (static_cast<uint32_t>(codecBitRate) & A2dpUserL2hcStCodecBitRate::A2DP_L2HCST_BIT_RATE_480K) {
+        napi_create_int32(env, CODEC_BIT_RATE_480000, &value);
+        napi_set_element(env, codecBitRateArray, count, value);
+        count++;
+    }
+    if (static_cast<uint32_t>(codecBitRate) & A2dpUserL2hcStCodecBitRate::A2DP_L2HCST_BIT_RATE_640K) {
+        napi_create_int32(env, CODEC_BIT_RATE_640000, &value);
+        napi_set_element(env, codecBitRateArray, count, value);
+        count++;
+    }
+    if (static_cast<uint32_t>(codecBitRate) & A2dpUserL2hcStCodecBitRate::A2DP_L2HCST_BIT_RATE_960K) {
+        napi_create_int32(env, CODEC_BIT_RATE_960000, &value);
         napi_set_element(env, codecBitRateArray, count, value);
         count++;
     }
@@ -892,7 +935,11 @@ static void ConvertCodecInfoListToJS(napi_env env, napi_value &object, const A2d
     ConvertCodecBitsPerSampleVector(env, object, a2dpCodecInfo.bitsPerSample);
     ConvertCodecChannelModeVector(env, object, a2dpCodecInfo.channelMode);
     ConvertCodecSampleRateVector(env, object, a2dpCodecInfo.sampleRate);
-    ConvertCodecBitRateVector(env, object, a2dpCodecInfo.codecSpecific3);
+    if (a2dpCodecInfo.codecType == A2DP_CODEC_TYPE_L2HCST_USER) {
+        ConvertL2hcStCodecBitRateVector(env, object, a2dpCodecInfo.codecSpecific3);
+    } else if (a2dpCodecInfo.codecType == A2DP_CODEC_TYPE_L2HCV2_USER) {
+        ConvertL2hcV2CodecBitRateVector(env, object, a2dpCodecInfo.codecSpecific3);
+    }
     if (a2dpCodecInfo.codecType == A2DP_CODEC_TYPE_L2HCST_USER ||
         a2dpCodecInfo.codecType == A2DP_CODEC_TYPE_L2HCV2_USER) {
         ConvertCodecFrameLengthVector(env, object, a2dpCodecInfo.codecSpecific2);
@@ -938,7 +985,11 @@ static napi_status CheckSetCodecPreferenceParam(napi_env env, napi_callback_info
     if (NapiIsObjectPropertyExist(env, argv[PARAM1], "codecBitRate")) {
         int32_t codecBitRate = 0;
         NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, argv[PARAM1], "codecBitRate", codecBitRate));
-        ConvertCodecBitRate(a2dpCodecInfo, codecBitRate);
+        if (a2dpCodecInfo.codecType == A2DP_CODEC_TYPE_L2HCST_USER) {
+            ConvertL2hcStCodecBitRate(a2dpCodecInfo, codecBitRate);
+        } else if (a2dpCodecInfo.codecType == A2DP_CODEC_TYPE_L2HCV2_USER) {
+            ConvertL2hcV2BitRate(a2dpCodecInfo, codecBitRate);
+        }
     }
     return napi_ok;
 }
