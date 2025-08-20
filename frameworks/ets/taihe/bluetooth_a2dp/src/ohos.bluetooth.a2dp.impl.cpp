@@ -17,30 +17,59 @@
 #include "ohos.bluetooth.a2dp.impl.hpp"
 #include "taihe/runtime.hpp"
 #include "stdexcept"
+#include "bluetooth_a2dp_src.h"
+#include "taihe_bluetooth_a2dp_src_observer.h"
+#include "bluetooth_log.h"
+#include "bluetooth_errorcode.h"
+
+namespace OHOS {
+namespace Bluetooth {
 
 using namespace taihe;
 using namespace ohos::bluetooth::a2dp;
-
-namespace {
-// To be implemented.
 
 class A2dpSourceProfileImpl {
 public:
     A2dpSourceProfileImpl()
     {
-        // Don't forget to implement the constructor.
+        observer_ = std::make_shared<TaiheA2dpSourceObserver>();
     }
+
+    void On(::taihe::string_view type, ::taihe::callback_view<void(
+        ::ohos::bluetooth::baseProfile::StateChangeParam const& data)> callback)
+    {
+        if (observer_) {
+            observer_->eventSubscribe_.RegisterEvent(callback);
+        }
+        if (!isRegistered_) {
+            A2dpSource *profile = A2dpSource::GetProfile();
+            profile->RegisterObserver(observer_);
+            isRegistered_ = true;
+        }
+    }
+    
+    void Off(::taihe::string_view type, ::taihe::optional_view<::taihe::callback<void(
+        ::ohos::bluetooth::baseProfile::StateChangeParam const& data)>> callback)
+    {
+        if (observer_) {
+            observer_->eventSubscribe_.DeregisterEvent(callback);
+        }
+    }
+private:
+    std::shared_ptr<TaiheA2dpSourceObserver> observer_ = nullptr;
+    bool isRegistered_ = false;
 };
 
 A2dpSourceProfile CreateA2dpSrcProfile()
 {
     // The parameters in the make_holder function should be of the same type
     // as the parameters in the constructor of the actual implementation class.
-    return make_holder<A2dpSourceProfileImpl, A2dpSourceProfile>();
+    return make_holder<A2dpSourceProfileImpl, ohos::bluetooth::a2dp::A2dpSourceProfile>();
 }
-}  // namespace
+}  // namespace Bluetooth
+}  // namespace OHOS
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_CreateA2dpSrcProfile(CreateA2dpSrcProfile);
+TH_EXPORT_CPP_API_CreateA2dpSrcProfile(OHOS::Bluetooth::CreateA2dpSrcProfile);
 // NOLINTEND

@@ -17,30 +17,53 @@
 #include "ohos.bluetooth.hid.impl.hpp"
 #include "taihe/runtime.hpp"
 #include "stdexcept"
+#include "taihe_bluetooth_hid_host_observer.h"
+
+namespace OHOS {
+namespace Bluetooth {
 
 using namespace taihe;
 using namespace ohos::bluetooth::hid;
-
-namespace {
-// To be implemented.
 
 class HidHostProfileImpl {
 public:
     HidHostProfileImpl()
     {
-        // Don't forget to implement the constructor.
+        std::shared_ptr<TaiheBluetoothHidHostObserver> observer_ =
+            std::make_shared<TaiheBluetoothHidHostObserver>();
+        HidHost *profile = HidHost::GetProfile();
+        profile->RegisterObserver(observer_);
     }
+
+    void On(::taihe::string_view type, ::taihe::callback_view<void(
+        ::ohos::bluetooth::baseProfile::StateChangeParam const& data)> callback)
+    {
+        if (observer_) {
+            observer_->eventSubscribe_.RegisterEvent(callback);
+        }
+    }
+    
+    void Off(::taihe::string_view type, ::taihe::optional_view<::taihe::callback<void(
+        ::ohos::bluetooth::baseProfile::StateChangeParam const& data)>> callback)
+    {
+        if (observer_) {
+            observer_->eventSubscribe_.DeregisterEvent(callback);
+        }
+    }
+private:
+    std::shared_ptr<TaiheBluetoothHidHostObserver> observer_ = nullptr;
 };
 
 HidHostProfile CreateHidHostProfile()
 {
     // The parameters in the make_holder function should be of the same type
     // as the parameters in the constructor of the actual implementation class.
-    return make_holder<HidHostProfileImpl, HidHostProfile>();
+    return make_holder<HidHostProfileImpl, ::ohos::bluetooth::hid::HidHostProfile>();
 }
-}  // namespace
+}  // namespace Bluetooth
+}  // namespace OHOS
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_CreateHidHostProfile(CreateHidHostProfile);
+TH_EXPORT_CPP_API_CreateHidHostProfile(OHOS::Bluetooth::CreateHidHostProfile);
 // NOLINTEND
