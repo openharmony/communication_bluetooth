@@ -456,8 +456,10 @@ void GattClient::impl::DiscoverComplete(int state)
     if (ret) {
         std::shared_ptr<GattClientCallback> clientSptr = (callback_).lock();
         if (!clientSptr) {
-            clientSptr->OnServicesDiscovered(state);
+            HILOGE("callback is nullptr");
+            return;
         }
+        clientSptr->OnServicesDiscovered(state);
     }
 }
 
