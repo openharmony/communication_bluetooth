@@ -511,6 +511,21 @@ napi_value ScanReportModeInit(napi_env env)
     return reportModeObj;
 }
 
+napi_value GattDisconnectReasonInit(napi_env env)
+{
+    napi_value gattDisconnectReasonObj = nullptr;
+    napi_create_object(env, &gattDisconnectReasonObj);
+    SetNamedPropertyByInteger(env, gattDisconnectReasonObj,
+        static_cast<int32_t>(GattDisconnectReason::CONN_TIMEOUT), "CONN_TIMEOUT");
+    SetNamedPropertyByInteger(env, gattDisconnectReasonObj,
+        static_cast<int32_t>(GattDisconnectReason::CONN_TERMINATE_PEER_USER), "CONN_TERMINATE_PEER_USER");
+    SetNamedPropertyByInteger(env, gattDisconnectReasonObj,
+        static_cast<int32_t>(GattDisconnectReason::CONN_TERMINATE_LOCAL_HOST), "CONN_TERMINATE_LOCAL_HOST");
+    SetNamedPropertyByInteger(env, gattDisconnectReasonObj,
+        static_cast<int32_t>(GattDisconnectReason::CONN_UNKNOWN), "CONN_UNKNOWN");
+    return gattDisconnectReasonObj;
+}
+
 void SetGattClientDeviceId(const std::string &deviceId)
 {
     deviceAddr = deviceId;
