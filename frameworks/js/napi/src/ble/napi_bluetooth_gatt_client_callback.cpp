@@ -62,7 +62,7 @@ void NapiGattClientCallback::OnConnectionStateChangedWithReason(int connectionSt
         connectionState, disconnectReason, ret);
     if (connectionState == static_cast<int>(BTConnectState::DISCONNECTED)) {
         auto nativeObject = std::make_shared<NapiNativeBleConnectionStateChangeParam>(
-            deviceAddr_, connectionState, true, disconnectReason);
+            deviceAddr_, connectionState, 0, true, disconnectReason);
         eventSubscribe_.PublishEvent(STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE, nativeObject);
         return;
     }
