@@ -140,18 +140,18 @@ private:
 class NapiNativeStateChangeParam : public NapiNativeObject {
 public:
     NapiNativeStateChangeParam(std::string deviceAddr, int connectState,
-        bool isDisconnected = false, int disconnectReason = -1, int cause = 0)
-        : deviceAddr_(deviceAddr), connectState_(connectState), isDisconnected_(isDisconnected),
-          disconnectReason_(disconnectReason), stateChangeCause_(cause) {}
+        int cause = 0, bool isDisconnected = false, int disconnectReason = -1)
+        : deviceAddr_(deviceAddr), connectState_(connectState), stateChangeCause_(cause),
+          isDisconnected_(isDisconnected), disconnectReason_(disconnectReason) {}
     virtual ~NapiNativeStateChangeParam() override = default;
 
     napi_value ToNapiValue(napi_env env) const override;
 private:
     std::string deviceAddr_ = "";
     int connectState_ = -1;
+    int stateChangeCause_ = -1;
     bool isDisconnected_ = false;
     int disconnectReason_ = -1;
-    int stateChangeCause_ = -1;
 };
 
 class NapiNativeBleConnectionStateChangeParam : public NapiNativeStateChangeParam {
@@ -159,8 +159,8 @@ public:
     NapiNativeBleConnectionStateChangeParam(std::string deviceAddr, int connectState)
         : NapiNativeStateChangeParam(deviceAddr, connectState) {}
     NapiNativeBleConnectionStateChangeParam(
-        std::string deviceAddr, int connectState, bool isDisconnected, int disconnectReason)
-        : NapiNativeStateChangeParam(deviceAddr, connectState, isDisconnected, disconnectReason) {}
+        std::string deviceAddr, int connectState, int cause, bool isDisconnected, int disconnectReason)
+        : NapiNativeStateChangeParam(deviceAddr, connectState, cause, isDisconnected, disconnectReason) {}
     ~NapiNativeBleConnectionStateChangeParam() override = default;
 };
 
