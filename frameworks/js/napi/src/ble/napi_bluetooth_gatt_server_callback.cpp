@@ -88,7 +88,7 @@ void NapiGattServerCallback::OnConnectionStateUpdateWithReason(
             }
         }
         auto nativeObject = std::make_shared<NapiNativeBleConnectionStateChangeParam>(
-            device.GetDeviceAddr(), state, true, disconnectReason);
+            device.GetDeviceAddr(), state, 0, true, disconnectReason);
         eventSubscribe_.PublishEvent(STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE, nativeObject);
     }
 }
