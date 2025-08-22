@@ -176,14 +176,6 @@ void AddPersistentDeviceIdSync(string_view deviceId)
     }
 }
 
-void FactoryResetSync()
-{
-    int32_t ret = BluetoothHost::GetDefaultHost().BluetoothFactoryReset();
-    if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "factoryReset return error");
-    }
-}
-
 void NotifyDialogResultSync(NotifyDialogResultParams notifyDialogResultParams)
 {
     uint32_t dialogType = notifyDialogResultParams.dialogType;
@@ -215,9 +207,6 @@ TH_EXPORT_CPP_API_DeletePersistentDeviceIdSync(OHOS::Bluetooth::DeletePersistent
 TH_EXPORT_CPP_API_DeletePersistentDeviceId(OHOS::Bluetooth::DeletePersistentDeviceIdSync);
 TH_EXPORT_CPP_API_AddPersistentDeviceIdSync(OHOS::Bluetooth::AddPersistentDeviceIdSync);
 TH_EXPORT_CPP_API_AddPersistentDeviceId(OHOS::Bluetooth::AddPersistentDeviceIdSync);
-TH_EXPORT_CPP_API_FactoryResetSync(OHOS::Bluetooth::FactoryResetSync);
-TH_EXPORT_CPP_API_FactoryResetWithCallback(OHOS::Bluetooth::FactoryResetSync);
-TH_EXPORT_CPP_API_FactoryResetReturnsPromise(OHOS::Bluetooth::FactoryResetSync);
 TH_EXPORT_CPP_API_NotifyDialogResultSync(OHOS::Bluetooth::NotifyDialogResultSync);
 TH_EXPORT_CPP_API_NotifyDialogResult(OHOS::Bluetooth::NotifyDialogResultSync);
 // NOLINTEND
