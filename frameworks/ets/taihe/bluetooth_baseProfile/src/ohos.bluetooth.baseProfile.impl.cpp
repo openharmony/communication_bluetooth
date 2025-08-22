@@ -49,33 +49,6 @@ public:
     {
         return {};
     }
-
-    ConnectionStrategy GetConnectionStrategySync(string_view deviceId)
-    {
-        return ConnectionStrategy(ConnectionStrategy::key_t::CONNECTION_STRATEGY_UNSUPPORTED);
-    }
-
-    ConnectionStrategy GetConnectionStrategyWithCallback(string_view deviceId)
-    {
-        return GetConnectionStrategySync(deviceId);
-    }
-
-    ConnectionStrategy GetConnectionStrategyReturnsPromise(string_view deviceId)
-    {
-        return GetConnectionStrategySync(deviceId);
-    }
-
-    void SetConnectionStrategySync(string_view deviceId, ConnectionStrategy strategy) {}
-
-    void SetConnectionStrategyWithCallback(string_view deviceId, ConnectionStrategy strategy)
-    {
-        SetConnectionStrategySync(deviceId, strategy);
-    }
-
-    void SetConnectionStrategyReturnsPromise(string_view deviceId, ConnectionStrategy strategy)
-    {
-        SetConnectionStrategySync(deviceId, strategy);
-    }
 };
 }  // namespace
 
