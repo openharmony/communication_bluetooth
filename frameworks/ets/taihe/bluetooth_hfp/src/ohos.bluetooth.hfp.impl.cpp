@@ -114,61 +114,6 @@ public:
         return deviceVector.empty() ? taihe::array<taihe::string>{}
             : taihe::array<::taihe::string>(taihe::copy_data_t{}, deviceVector.data(), deviceVector.size());
     }
-
-    ohos::bluetooth::baseProfile::ConnectionStrategy GetConnectionStrategySync(taihe::string_view deviceId)
-    {
-        std::string remoteAddr = std::string(deviceId);
-        int strategy = 0;
-        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
-        HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
-        int32_t err = profile->GetConnectStrategy(remoteDevice, strategy);
-        if (err != BT_NO_ERROR) {
-            taihe::set_business_error(err, "GetConnectionStrategy return error");
-        }
-
-        int maxStrategy = ohos::bluetooth::baseProfile::ConnectionStrategy(
-            ohos::bluetooth::baseProfile::ConnectionStrategy::key_t::CONNECTION_STRATEGY_FORBIDDEN). get_value();
-        int minStrategy = ohos::bluetooth::baseProfile::ConnectionStrategy(
-            ohos::bluetooth::baseProfile::ConnectionStrategy::key_t::CONNECTION_STRATEGY_UNSUPPORTED). get_value();
-        if (strategy < minStrategy || strategy > maxStrategy) {
-            taihe::set_business_error(BT_ERR_INVALID_PARAM, "GetConnectionStrategy return error");
-        }
-
-        return ohos::bluetooth::baseProfile::ConnectionStrategy::from_value(strategy);
-    }
-
-    ohos::bluetooth::baseProfile::ConnectionStrategy GetConnectionStrategyWithCallback(string_view deviceId)
-    {
-        return GetConnectionStrategySync(deviceId);
-    }
-
-    ohos::bluetooth::baseProfile::ConnectionStrategy GetConnectionStrategyReturnsPromise(string_view deviceId)
-    {
-        return GetConnectionStrategySync(deviceId);
-    }
-
-    void SetConnectionStrategySync(string_view deviceId, ohos::bluetooth::baseProfile::ConnectionStrategy strategy)
-    {
-        std::string remoteAddr = std::string(deviceId);
-        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
-        HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
-        int32_t err = profile->SetConnectStrategy(remoteDevice, strategy.get_value());
-        if (err != BT_NO_ERROR) {
-            taihe::set_business_error(err, "SetConnectionStrategy return error");
-        }
-    }
-
-    void SetConnectionStrategyWithCallback(taihe::string_view deviceId,
-                                           ohos::bluetooth::baseProfile::ConnectionStrategy strategy)
-    {
-        SetConnectionStrategySync(deviceId, strategy);
-    }
-
-    void SetConnectionStrategyReturnsPromise(taihe::string_view deviceId,
-                                             ohos::bluetooth::baseProfile::ConnectionStrategy strategy)
-    {
-        SetConnectionStrategySync(deviceId, strategy);
-    }
 private:
     std::shared_ptr<TaiheHandsFreeAudioGatewayObserver> observer_ = nullptr;
     bool isRegistered_ = false;

@@ -48,20 +48,4 @@ interface BaseProfile {
     GetConnectionState(deviceId: String): ProfileConnectionState;
 
     GetConnectedDevices(): Array<String>;
-
-    @static_overload("getConnectionStrategy")
-    @async GetConnectionStrategyWithCallback(deviceId: String): ConnectionStrategy;
-
-    @static_overload("getConnectionStrategy")
-    @promise GetConnectionStrategyReturnsPromise(deviceId: String): ConnectionStrategy;
-
-    GetConnectionStrategySync(deviceId: String): ConnectionStrategy;
-
-    @static_overload("setConnectionStrategy")
-    @async SetConnectionStrategyWithCallback(deviceId: String, strategy: ConnectionStrategy): void;
-
-    @static_overload("setConnectionStrategy")
-    @promise SetConnectionStrategyReturnsPromise(deviceId: String, strategy: ConnectionStrategy): void;
-
-    SetConnectionStrategySync(deviceId: String, strategy: ConnectionStrategy): void;
 }
