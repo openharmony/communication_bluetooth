@@ -1216,6 +1216,7 @@ napi_value PropertyInit(napi_env env, napi_value exports)
     SetNamedPropertyByInteger(env, advertisingStateObj, static_cast<int32_t>(AdvertisingState::STOPPED), "STOPPED");
 
     napi_value scanReportTypeObj = ScanReportTypeInit(env);
+    napi_value gattDisconnectReasonObj = GattDisconnectReasonInit(env);
 #endif
 
     napi_property_descriptor exportFuncs[] = {
@@ -1228,6 +1229,7 @@ napi_value PropertyInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("GattWriteType", gattWriteTypeObj),
         DECLARE_NAPI_PROPERTY("AdvertisingState", advertisingStateObj),
         DECLARE_NAPI_PROPERTY("ScanReportType", scanReportTypeObj),
+        DECLARE_NAPI_PROPERTY("GattDisconnectReason", gattDisconnectReasonObj),
 #endif
     };
 
