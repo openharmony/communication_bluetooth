@@ -84,16 +84,6 @@ function DeletePersistentDeviceIdSync(deviceId: String): void;
 
 function AddPersistentDeviceIdSync(deviceId: String): void;
 
-@static_overload("factoryReset")
-@async function FactoryResetWithCallback(): void;
-
-@static_overload("factoryReset")
-@promise function FactoryResetReturnsPromise(): void;
-
-function FactoryResetSync(): void;
-
-function GetLocalAddress(): String;
-
 @promise function NotifyDialogResult(notifyDialogResultParams: NotifyDialogResultParams): void;
 
 function NotifyDialogResultSync(notifyDialogResultParams: NotifyDialogResultParams): void;
