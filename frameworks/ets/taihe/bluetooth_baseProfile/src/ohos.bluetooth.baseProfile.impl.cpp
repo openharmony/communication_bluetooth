@@ -34,7 +34,7 @@ public:
     void On(::taihe::string_view type, ::taihe::callback_view<void(
         ::ohos::bluetooth::baseProfile::StateChangeParam const& data)> callback)
     {}
-    
+
     void Off(::taihe::string_view type, ::taihe::optional_view<::taihe::callback_view<void(
         ::ohos::bluetooth::baseProfile::StateChangeParam const& data)>> callback)
     {}
@@ -48,6 +48,33 @@ public:
     array<string> GetConnectedDevices()
     {
         return {};
+    }
+
+    ConnectionStrategy GetConnectionStrategySync(string_view deviceId)
+    {
+        return ConnectionStrategy(ConnectionStrategy::key_t::CONNECTION_STRATEGY_UNSUPPORTED);
+    }
+
+    ConnectionStrategy GetConnectionStrategyWithCallback(string_view deviceId)
+    {
+        return GetConnectionStrategySync(deviceId);
+    }
+
+    ConnectionStrategy GetConnectionStrategyReturnsPromise(string_view deviceId)
+    {
+        return GetConnectionStrategySync(deviceId);
+    }
+
+    void SetConnectionStrategySync(string_view deviceId, ConnectionStrategy strategy) {}
+
+    void SetConnectionStrategyWithCallback(string_view deviceId, ConnectionStrategy strategy)
+    {
+        SetConnectionStrategySync(deviceId, strategy);
+    }
+
+    void SetConnectionStrategyReturnsPromise(string_view deviceId, ConnectionStrategy strategy)
+    {
+        SetConnectionStrategySync(deviceId, strategy);
     }
 };
 }  // namespace

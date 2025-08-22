@@ -29,6 +29,47 @@ interface A2dpSourceProfile : BaseProfile {
     Connect(deviceId: String): void;
 
     Disconnect(deviceId: String): void;
+
+    @promise GetAutoPlayDisabledDuration(deviceId: String): i32;
+    GetAutoPlayDisabledDurationSync(deviceId: String): i32;
+
+    @promise DisableAutoPlay(deviceId: String, duration: i32): void;
+    DisableAutoPlaySync(deviceId: String, duration: i32): void;
+
+    @promise EnableAutoPlay(deviceId: String): void;
+    EnableAutoPlaySync(deviceId: String): void;
+
+    @static_overload("disableAbsoluteVolume")
+    @async DisableAbsoluteVolumeWithCallback(deviceId: String): void;
+
+    @static_overload("disableAbsoluteVolume")
+    @promise DisableAbsoluteVolumeReturnsPromise(deviceId: String): void;
+
+    DisableAbsoluteVolumeSync(deviceId: String): void;
+
+    @static_overload("enableAbsoluteVolume")
+    @async EnableAbsoluteVolumeWithCallback(deviceId: String): void;
+
+    @static_overload("enableAbsoluteVolume")
+    @promise EnableAbsoluteVolumeReturnsPromise(deviceId: String): void;
+
+    EnableAbsoluteVolumeSync(deviceId: String): void;
+
+    @static_overload("isAbsoluteVolumeEnabled")
+    @async IsAbsoluteVolumeEnabledWithCallback(deviceId: String): bool;
+
+    @static_overload("isAbsoluteVolumeEnabled")
+    @promise IsAbsoluteVolumeEnabledReturnsPromise(deviceId: String): bool;
+
+    IsAbsoluteVolumeEnabledSync(deviceId: String): bool;
+
+    @static_overload("isAbsoluteVolumeSupported")
+    @async IsAbsoluteVolumeSupportedWithCallback(deviceId: String): bool;
+
+    @static_overload("isAbsoluteVolumeSupported")
+    @promise IsAbsoluteVolumeSupportedReturnsPromise(deviceId: String): bool;
+
+    IsAbsoluteVolumeSupportedSync(deviceId: String): bool;
 }
 
 enum CodecType: i32 {
