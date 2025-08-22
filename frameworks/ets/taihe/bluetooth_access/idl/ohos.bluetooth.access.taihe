@@ -64,27 +64,36 @@ function GetState(): BluetoothState;
 function EnableBluetooth(): void;
 function DisableBluetooth(): void;
 
-@promise
-function enableBluetoothAsync(): void;
+@promise function EnableBluetoothAsync(): void;
 
-@promise
-function disableBluetoothAsync(): void;
+function EnableBluetoothAsyncSync(): void;
+
+@promise function DisableBluetoothAsync(): void;
+
+function DisableBluetoothAsyncSync(): void;
 
 function IsValidRandomDeviceId(deviceId: String): bool;
 
 function GetPersistentDeviceIds(): Array<String>;
 
-@gen_promise("deletePersistentDeviceId")
+@promise function DeletePersistentDeviceId(deviceId: String): void;
+
 function DeletePersistentDeviceIdSync(deviceId: String): void;
 
-@gen_promise("addPersistentDeviceId")
+@promise function AddPersistentDeviceId(deviceId: String): void;
+
 function AddPersistentDeviceIdSync(deviceId: String): void;
 
-@gen_async("factoryReset")
-@gen_promise("factoryReset")
+@static_overload("factoryReset")
+@async function FactoryResetWithCallback(): void;
+
+@static_overload("factoryReset")
+@promise function FactoryResetReturnsPromise(): void;
+
 function FactoryResetSync(): void;
 
 function GetLocalAddress(): String;
 
-@promise
-function notifyDialogResult(notifyDialogResultParams: NotifyDialogResultParams): void;
+@promise function NotifyDialogResult(notifyDialogResultParams: NotifyDialogResultParams): void;
+
+function NotifyDialogResultSync(notifyDialogResultParams: NotifyDialogResultParams): void;
