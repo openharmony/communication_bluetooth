@@ -208,32 +208,32 @@ function SetBluetoothScanMode(mode: ScanMode, duration: i32): void;
 
 function GetRemoteDeviceClass(deviceId: String): DeviceClass;
 
-@promise function controlDeviceAction(controlDeviceActionParams: ControlDeviceActionParams): void;
+@promise function ControlDeviceAction(controlDeviceActionParams: ControlDeviceActionParams): void;
 
-@promise function getLastConnectionTime(deviceId: String): i32;
+@promise function GetLastConnectionTime(deviceId: String): i32;
 
-@promise function getRemoteDeviceType(deviceId: String): DeviceType;
+@promise function GetRemoteDeviceType(deviceId: String): DeviceType;
 
-@promise function updateCloudBluetoothDevice(trustedPairedDevices: TrustedPairedDevices): void;
+@promise function UpdateCloudBluetoothDevice(trustedPairedDevices: TrustedPairedDevices): void;
 
-@promise function getRemoteDeviceBatteryInfo(deviceId: String): BatteryInfo;
+@promise function GetRemoteDeviceBatteryInfo(deviceId: String): BatteryInfo;
 
-@promise function setRemoteDeviceName(deviceId: String, name: String): void;
+@promise function SetRemoteDeviceName(deviceId: String, name: String): void;
 
-@promise function setRemoteDeviceType(deviceId: String, type: DeviceType): void;
+@promise function SetRemoteDeviceType(deviceId: String, type: DeviceType): void;
 
-function getBluetoothScanMode(): ScanMode;
+function GetBluetoothScanMode(): ScanMode;
 
-function getProfileConnectionState(profileId: Optional<ProfileId>): ProfileConnectionState;
+function GetProfileConnectionState(profileId: Optional<ProfileId>): ProfileConnectionState;
 
-function getLocalName(): String;
+function GetLocalName(): String;
 
-function getPairState(deviceId: String): BondState;
+function GetPairState(deviceId: String): BondState;
 
-function startBluetoothDiscovery(): void;
+function StartBluetoothDiscovery(): void;
 
-function isBluetoothDiscovering(): bool;
+function IsBluetoothDiscovering(): bool;
 
-function stopBluetoothDiscovery(): void;
+function StopBluetoothDiscovery(): void;
 
-function setDevicePairingConfirmation(deviceId: String, accept: bool): void;
+function SetDevicePairingConfirmation(deviceId: String, accept: bool): void;
