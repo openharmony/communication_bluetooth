@@ -209,18 +209,25 @@ function SetBluetoothScanMode(mode: ScanMode, duration: i32): void;
 function GetRemoteDeviceClass(deviceId: String): DeviceClass;
 
 @promise function ControlDeviceAction(controlDeviceActionParams: ControlDeviceActionParams): void;
+function ControlDeviceActionSync(controlDeviceActionParams: ControlDeviceActionParams): void;
 
 @promise function GetLastConnectionTime(deviceId: String): i32;
+function GetLastConnectionTimeSync(deviceId: String): i32;
 
 @promise function GetRemoteDeviceType(deviceId: String): DeviceType;
+function GetRemoteDeviceTypeSync(deviceId: String): DeviceType;
 
 @promise function UpdateCloudBluetoothDevice(trustedPairedDevices: TrustedPairedDevices): void;
+function UpdateCloudBluetoothDeviceSync(trustedPairedDevices: TrustedPairedDevices): void;
 
 @promise function GetRemoteDeviceBatteryInfo(deviceId: String): BatteryInfo;
+function GetRemoteDeviceBatteryInfoSync(deviceId: String): BatteryInfo;
 
 @promise function SetRemoteDeviceName(deviceId: String, name: String): void;
+function SetRemoteDeviceNameSync(deviceId: String, name: String): void;
 
 @promise function SetRemoteDeviceType(deviceId: String, type: DeviceType): void;
+function SetRemoteDeviceTypeSync(deviceId: String, type: DeviceType): void;
 
 function GetBluetoothScanMode(): ScanMode;
 

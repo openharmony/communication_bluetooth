@@ -279,16 +279,6 @@ void OffPinRequired(::taihe::optional_view<::taihe::callback<
     }
 }
 
-void ConnectAllowedProfilesSync(string_view deviceId)
-{
-    std::string remoteAddr = static_cast<std::string>(deviceId);
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-    int32_t ret = host->ConnectAllowedProfiles(remoteAddr);
-    if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "ConnectAllowedProfilesSync return error");
-    }
-}
-
 void ControlDeviceActionSync(ControlDeviceActionParams controlDeviceActionParams)
 {
     std::string deviceId = std::string(controlDeviceActionParams.deviceId);
@@ -435,50 +425,6 @@ void SetRemoteDeviceTypeSync(string_view deviceId, DeviceType type)
     }
 }
 
-array<ohos::bluetooth::constant::ProfileUuids> GetRemoteProfileUuidsSync(string_view deviceId)
-{
-    std::string address = std::string(deviceId);
-    std::vector<std::string> uuids{};
-    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(address);
-    int32_t err = remoteDevice.GetDeviceUuids(uuids);
-    if (err != BT_NO_ERROR) {
-        set_business_error(err, "getPairState return error");
-    }
-    if (std::find(uuids.begin(), uuids.end(), "0000111F-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_HFP_AG};
-    } else if (std::find(uuids.begin(), uuids.end(), "0000111E-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_HFP_HF};
-    } else if (std::find(uuids.begin(), uuids.end(), "00001112-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_HSP_AG};
-    } else if (std::find(uuids.begin(), uuids.end(), "00001108-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_HSP_HS};
-    } else if (std::find(uuids.begin(), uuids.end(), "0000110A-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_A2DP_SRC};
-    } else if (std::find(uuids.begin(), uuids.end(), "0000110B-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_A2DP_SINK};
-    } else if (std::find(uuids.begin(), uuids.end(), "0000110E-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_AVRCP_CT};
-    } else if (std::find(uuids.begin(), uuids.end(), "0000110C-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_AVRCP_TG};
-    } else if (std::find(uuids.begin(), uuids.end(), "00001124-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_HID};
-    } else if (std::find(uuids.begin(), uuids.end(), "00001812-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_HOGP};
-    } else {
-        return {};
-    }
-}
-
-void PairDeviceSync(string_view deviceId)
-{
-    std::string remoteAddr = static_cast<std::string>(deviceId);
-    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
-    int32_t ret = remoteDevice.StartPair();
-    if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "pairDevice return error");
-    }
-}
-
 ScanMode GetBluetoothScanMode()
 {
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
@@ -576,59 +522,6 @@ void StopBluetoothDiscovery()
     }
 }
 
-void DisconnectAllowedProfilesSync(string_view deviceId)
-{
-    std::string remoteAddr = static_cast<std::string>(deviceId);
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-    int32_t ret = host->DisconnectAllowedProfiles(remoteAddr);
-    if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "disconnectAllowedProfiles return error");
-    }
-}
-
-array<ohos::bluetooth::constant::ProfileUuids> GetLocalProfileUuidsSync()
-{
-    std::vector<std::string> uuids{};
-    int32_t err = BluetoothHost::GetDefaultHost().GetLocalProfileUuids(uuids);
-    if (err != BT_NO_ERROR) {
-        set_business_error(err, "disconnectAllowedProfiles return error");
-    }
-    if (std::find(uuids.begin(), uuids.end(), "0000111F-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_HFP_AG};
-    } else if (std::find(uuids.begin(), uuids.end(), "0000111E-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_HFP_HF};
-    } else if (std::find(uuids.begin(), uuids.end(), "00001112-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_HSP_AG};
-    } else if (std::find(uuids.begin(), uuids.end(), "00001108-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_HSP_HS};
-    } else if (std::find(uuids.begin(), uuids.end(), "0000110A-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_A2DP_SRC};
-    } else if (std::find(uuids.begin(), uuids.end(), "0000110B-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_A2DP_SINK};
-    } else if (std::find(uuids.begin(), uuids.end(), "0000110E-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_AVRCP_CT};
-    } else if (std::find(uuids.begin(), uuids.end(), "0000110C-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_AVRCP_TG};
-    } else if (std::find(uuids.begin(), uuids.end(), "00001124-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_HID};
-    } else if (std::find(uuids.begin(), uuids.end(), "00001812-0000-1000-8000-00805F9B34FB") != uuids.end()) {
-        return {ohos::bluetooth::constant::ProfileUuids::key_t::PROFILE_UUID_HOGP};
-    } else {
-        return {};
-    }
-}
-
-void SetDevicePinCodeSync(string_view deviceId, string_view code)
-{
-    std::string remoteAddr = std::string(deviceId);
-    std::string pinCode = std::string(code);
-    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
-    int32_t err = remoteDevice.SetDevicePin(pinCode);
-    if (err != BT_NO_ERROR) {
-        set_business_error(err, "setDevicePinCode return error");
-    }
-}
-
 void SetDevicePairingConfirmation(string_view deviceId, bool accept)
 {
     std::string remoteAddr = std::string(deviceId);
@@ -641,38 +534,6 @@ void SetDevicePairingConfirmation(string_view deviceId, bool accept)
     }
     if (ret != BT_NO_ERROR) {
         set_business_error(ret, "setDevicePairingConfirmation return error");
-    }
-}
-
-void CancelPairingDeviceSync(string_view deviceId)
-{
-    std::string remoteAddr = std::string(deviceId);
-    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
-    int32_t err = remoteDevice.CancelPairing();
-    if (err != BT_NO_ERROR) {
-        set_business_error(err, "cancelPairingDevice return error");
-    }
-}
-
-void CancelPairedDeviceSync(string_view deviceId)
-{
-    std::string remoteAddr = std::string(deviceId);
-    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
-    int32_t err = host->RemovePair(remoteDevice);
-    if (err != BT_NO_ERROR) {
-        set_business_error(err, "cancelPairedDevice return error");
-    }
-}
-
-void PairCredibleDeviceSync(string_view deviceId, ohos::bluetooth::connection::BluetoothTransport transport)
-{
-    std::string remoteAddr = std::string(deviceId);
-    int port = transport.get_value();
-    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, port);
-    int32_t err = remoteDevice.StartCrediblePair();
-    if (err != BT_NO_ERROR) {
-        set_business_error(err, "pairCredibleDevice return error");
     }
 }
 }  // Bluetooth
@@ -696,9 +557,6 @@ TH_EXPORT_CPP_API_GetRemoteDeviceNameWithAlias(OHOS::Bluetooth::GetRemoteDeviceN
 TH_EXPORT_CPP_API_GetPairedDevices(OHOS::Bluetooth::GetPairedDevices);
 TH_EXPORT_CPP_API_SetBluetoothScanMode(OHOS::Bluetooth::SetBluetoothScanMode);
 TH_EXPORT_CPP_API_GetRemoteDeviceClass(OHOS::Bluetooth::GetRemoteDeviceClass);
-TH_EXPORT_CPP_API_ConnectAllowedProfilesSync(OHOS::Bluetooth::ConnectAllowedProfilesSync);
-TH_EXPORT_CPP_API_ConnectAllowedProfilesCallback(OHOS::Bluetooth::ConnectAllowedProfilesSync);
-TH_EXPORT_CPP_API_ConnectAllowedProfilesReturnsPromise(OHOS::Bluetooth::ConnectAllowedProfilesSync);
 TH_EXPORT_CPP_API_ControlDeviceActionSync(OHOS::Bluetooth::ControlDeviceActionSync);
 TH_EXPORT_CPP_API_ControlDeviceAction(OHOS::Bluetooth::ControlDeviceActionSync);
 TH_EXPORT_CPP_API_GetLastConnectionTimeSync(OHOS::Bluetooth::GetLastConnectionTimeSync);
@@ -713,12 +571,6 @@ TH_EXPORT_CPP_API_SetRemoteDeviceNameSync(OHOS::Bluetooth::SetRemoteDeviceNameSy
 TH_EXPORT_CPP_API_SetRemoteDeviceName(OHOS::Bluetooth::SetRemoteDeviceNameSync);
 TH_EXPORT_CPP_API_SetRemoteDeviceTypeSync(OHOS::Bluetooth::SetRemoteDeviceTypeSync);
 TH_EXPORT_CPP_API_SetRemoteDeviceType(OHOS::Bluetooth::SetRemoteDeviceTypeSync);
-TH_EXPORT_CPP_API_GetRemoteProfileUuidsSync(OHOS::Bluetooth::GetRemoteProfileUuidsSync);
-TH_EXPORT_CPP_API_GetRemoteProfileUuidsCallback(OHOS::Bluetooth::GetRemoteProfileUuidsSync);
-TH_EXPORT_CPP_API_GetRemoteProfileUuidsReturnsPromise(OHOS::Bluetooth::GetRemoteProfileUuidsSync);
-TH_EXPORT_CPP_API_PairDeviceSync(OHOS::Bluetooth::PairDeviceSync);
-TH_EXPORT_CPP_API_PairDeviceCallback(OHOS::Bluetooth::PairDeviceSync);
-TH_EXPORT_CPP_API_PairDeviceReturnsPromise(OHOS::Bluetooth::PairDeviceSync);
 TH_EXPORT_CPP_API_GetBluetoothScanMode(OHOS::Bluetooth::GetBluetoothScanMode);
 TH_EXPORT_CPP_API_GetProfileConnectionState(OHOS::Bluetooth::GetProfileConnectionState);
 TH_EXPORT_CPP_API_GetLocalName(OHOS::Bluetooth::GetLocalName);
@@ -726,23 +578,5 @@ TH_EXPORT_CPP_API_GetPairState(OHOS::Bluetooth::GetPairState);
 TH_EXPORT_CPP_API_StartBluetoothDiscovery(OHOS::Bluetooth::StartBluetoothDiscovery);
 TH_EXPORT_CPP_API_IsBluetoothDiscovering(OHOS::Bluetooth::IsBluetoothDiscovering);
 TH_EXPORT_CPP_API_StopBluetoothDiscovery(OHOS::Bluetooth::StopBluetoothDiscovery);
-TH_EXPORT_CPP_API_DisconnectAllowedProfilesSync(OHOS::Bluetooth::DisconnectAllowedProfilesSync);
-TH_EXPORT_CPP_API_DisconnectAllowedProfilesCallback(OHOS::Bluetooth::DisconnectAllowedProfilesSync);
-TH_EXPORT_CPP_API_DisconnectAllowedProfilesReturnsPromise(OHOS::Bluetooth::DisconnectAllowedProfilesSync);
-TH_EXPORT_CPP_API_GetLocalProfileUuidsSync(OHOS::Bluetooth::GetLocalProfileUuidsSync);
-TH_EXPORT_CPP_API_GetLocalProfileUuidsCallback(OHOS::Bluetooth::GetLocalProfileUuidsSync);
-TH_EXPORT_CPP_API_GetLocalProfileUuidsReturnsPromise(OHOS::Bluetooth::GetLocalProfileUuidsSync);
-TH_EXPORT_CPP_API_SetDevicePinCodeSync(OHOS::Bluetooth::SetDevicePinCodeSync);
-TH_EXPORT_CPP_API_SetDevicePinCodeCallback(OHOS::Bluetooth::SetDevicePinCodeSync);
-TH_EXPORT_CPP_API_SetDevicePinCodeReturnsPromise(OHOS::Bluetooth::SetDevicePinCodeSync);
 TH_EXPORT_CPP_API_SetDevicePairingConfirmation(OHOS::Bluetooth::SetDevicePairingConfirmation);
-TH_EXPORT_CPP_API_CancelPairingDeviceSync(OHOS::Bluetooth::CancelPairingDeviceSync);
-TH_EXPORT_CPP_API_CancelPairingDeviceCallback(OHOS::Bluetooth::CancelPairingDeviceSync);
-TH_EXPORT_CPP_API_CancelPairingDeviceReturnsPromise(OHOS::Bluetooth::CancelPairingDeviceSync);
-TH_EXPORT_CPP_API_CancelPairedDeviceSync(OHOS::Bluetooth::CancelPairedDeviceSync);
-TH_EXPORT_CPP_API_CancelPairedDeviceCallback(OHOS::Bluetooth::CancelPairedDeviceSync);
-TH_EXPORT_CPP_API_CancelPairedDeviceReturnsPromise(OHOS::Bluetooth::CancelPairedDeviceSync);
-TH_EXPORT_CPP_API_PairCredibleDeviceSync(OHOS::Bluetooth::PairCredibleDeviceSync);
-TH_EXPORT_CPP_API_PairCredibleDeviceCallback(OHOS::Bluetooth::PairCredibleDeviceSync);
-TH_EXPORT_CPP_API_PairCredibleDeviceReturnsPromise(OHOS::Bluetooth::PairCredibleDeviceSync);
 // NOLINTEND
