@@ -415,12 +415,12 @@ int GattClient::impl::DiscoverStart()
 
     {
         std::unique_lock<std::mutex> lock(discoverInformation_.mutex_);
-        while (discoverInformation_.isDiscovering_) {
-            auto ret = discoverInformation_.condition_.wait_for(lock, std::chrono::seconds(WAIT_TIMEOUT));
-            if (ret == std::cv_status::timeout) {
-                HILOGE("timeout");
-                return BT_ERR_INTERNAL_ERROR;
-            }
+        auto ret = discoverInformation_.condition_.wait_for(lock, std::chrono::seconds(WAIT_TIMEOUT), [this] {
+            return !discoverInformation_.isDiscovering_;
+        });
+        if (ret == false) {
+            HILOGE("timeout");
+            return BT_ERR_INTERNAL_ERROR;
         }
         discoverInformation_.isDiscovering_ = true;
     }
@@ -890,7 +890,7 @@ int GattClient::SetNotifyCharacteristicInner(GattCharacteristic &characteristic,
     CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     bool isValid = (pimpl != nullptr && pimpl->Init(weak_from_this()));
     CHECK_AND_RETURN_LOG_RET(isValid, BT_ERR_INTERNAL_ERROR, "pimpl or gatt client proxy is nullptr");
-    
+
     std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
         HILOGE("Request not supported");
