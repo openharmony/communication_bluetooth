@@ -620,6 +620,7 @@ void BluetoothHost::RegisterObserver(std::shared_ptr<BluetoothHostObserver> obse
 {
     HILOGD("enter");
     CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    CHECK_AND_RETURN_LOG(observer != nullptr, "observer is null.");
     pimpl->observers_.Register(observer);
 }
 
