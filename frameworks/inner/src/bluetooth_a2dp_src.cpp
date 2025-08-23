@@ -171,6 +171,7 @@ void A2dpSource::RegisterObserver(std::shared_ptr<A2dpSourceObserver> observer)
 {
     HILOGD("enter");
     CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    CHECK_AND_RETURN_LOG(observer != nullptr, "observer is null.");
     pimpl->observers_.Register(observer);
 }
 
