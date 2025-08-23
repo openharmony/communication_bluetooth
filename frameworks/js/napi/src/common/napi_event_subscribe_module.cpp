@@ -75,9 +75,6 @@ napi_status NapiEventSubscribeModule::Register(napi_env env, napi_callback_info 
             callbackVec.end());
 
         auto napiCallback = std::make_shared<NapiCallback>(env, callback);
-        if (napiCallback) {
-            callbackVec.push_back(napiCallback);
-        }
         HILOGI("Register one %{public}s callback in %{public}s module, %{public}s, %{public}zu callback left",
             name.c_str(), moduleName_.c_str(), napiCallback->ToLogString().c_str(), callbackVec.size());
     });
