@@ -891,7 +891,7 @@ public:
      * @param packageName The package name of calling app.
      * @since 21
      */
-    void SetCallingPackageName(const std::string &address, const std::string &packageName);
+    int32_t SetCallingPackageName(const std::string &address, const std::string &packageName);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
