@@ -889,6 +889,8 @@ public:
      *
      * @param address The address of remote bluetooth device.
      * @param packageName The package name of calling app.
+     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+     *         returns an error code defined in {@link BtErrCode} otherwise.
      * @since 21
      */
     int32_t SetCallingPackageName(const std::string &address, const std::string &packageName);
