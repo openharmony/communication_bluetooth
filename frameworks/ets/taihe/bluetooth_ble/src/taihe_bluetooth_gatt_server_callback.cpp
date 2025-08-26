@@ -20,6 +20,9 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
+std::vector<std::string> TaiheGattServerCallback::deviceList_;
+std::mutex TaiheGattServerCallback::deviceListMutex_;
+
 TaiheGattServerCallback::TaiheGattServerCallback()
 {}
 
@@ -40,6 +43,32 @@ void TaiheGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemote
 void TaiheGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state)
 {
     HILOGI("enter, state: %{public}d, remote device address: %{public}s", state, GET_ENCRYPT_ADDR(device));
+    std::lock_guard<std::mutex> lock(TaiheGattServerCallback::deviceListMutex_);
+    if (state == static_cast<int>(BTConnectState::CONNECTED)) {
+        HILOGI("connected");
+        bool hasAddr = false;
+        for (auto it = TaiheGattServerCallback::deviceList_.begin();
+                it != TaiheGattServerCallback::deviceList_.end(); ++it) {
+            if (*it == device.GetDeviceAddr()) {
+                hasAddr = true;
+                break;
+            }
+        }
+        if (!hasAddr) {
+            HILOGI("add devices");
+            TaiheGattServerCallback::deviceList_.push_back(device.GetDeviceAddr());
+        }
+    } else if (state == static_cast<int>(BTConnectState::DISCONNECTED)) {
+        HILOGI("disconnected");
+        for (auto it = TaiheGattServerCallback::deviceList_.begin();
+                it != TaiheGattServerCallback::deviceList_.end(); ++it) {
+            if (*it == device.GetDeviceAddr()) {
+                HILOGI("romove device");
+                TaiheGattServerCallback::deviceList_.erase(it);
+                break;
+            }
+        }
+    }
 }
 
 void TaiheGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevice &device,

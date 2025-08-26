@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+#ifndef LOG_TAG
+#define LOG_TAG "bt_ble_impl_ohbluetooth"
+#endif
+
 #include "ohos.bluetooth.ble.proj.hpp"
 #include "ohos.bluetooth.ble.impl.hpp"
 #include "taihe/runtime.hpp"
@@ -33,6 +37,9 @@
 #include "taihe_bluetooth_ble_utils.h"
 #include "taihe_bluetooth_ble_central_manager_callback.h"
 
+namespace OHOS {
+namespace Bluetooth {
+
 using namespace taihe;
 using namespace ohos::bluetooth::ble;
 
@@ -47,41 +54,10 @@ do {                                                     \
 } while (0)
 #endif
 
-static void AdvertiseSettingProcess(const AdvertiseSetting &setIn, OHOS::Bluetooth::BleAdvertiserSettings &setOut)
-{
-    if (setIn.interval.has_value()) {
-        setOut.SetInterval(setIn.interval.value());
-    }
-    if (setIn.txPower.has_value()) {
-        setOut.SetTxPower(setIn.txPower.value());
-    }
-    if (setIn.connectable.has_value()) {
-        setOut.SetConnectable(setIn.connectable.value());
-    }
-}
-
-static void AdvertiseDataProcess(AdvertiseData &advDataIn, OHOS::Bluetooth::BleAdvertiserData &advDataOut)
-{
-    for (auto &serviceUuid: advDataIn.serviceUuids) {
-        advDataOut.AddServiceUuid(OHOS::Bluetooth::UUID::FromString(std::string(serviceUuid)));
-    }
-    for (auto &manufacture: advDataIn.manufactureData) {
-        advDataOut.AddManufacturerData(manufacture.manufactureId,
-            std::string(manufacture.manufactureValue.begin(), manufacture.manufactureValue.end()));
-    }
-    for (auto &service: advDataIn.serviceData) {
-        advDataOut.AddServiceData(OHOS::Bluetooth::UUID::FromString(std::string(service.serviceUuid)),
-            std::string(service.serviceValue.begin(), service.serviceValue.end()));
-    }
-    if (advDataIn.includeTxPower.has_value()) {
-        advDataOut.SetIncludeTxPower(advDataIn.includeTxPower.value());
-    }
-    if (advDataIn.includeDeviceName.has_value()) {
-        advDataOut.SetIncludeDeviceName(advDataIn.includeDeviceName.value());
-    }
-}
-
-namespace {
+enum class SensitivityMode {
+    SENSITIVITY_MODE_HIGH = 1,  //  high sensitivity mode
+    SENSITIVITY_MODE_LOW = 2    //  low sensitivity mode
+};
 
 std::shared_ptr<OHOS::Bluetooth::BleAdvertiser> BleAdvertiserGetInstance(void)
 {
@@ -150,22 +126,6 @@ public:
 
         ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "Close return error");
     }
-
-    string GetDeviceNameSync()
-    {
-        std::string deviceName = device_->GetDeviceName();
-        return deviceName;
-    }
-
-    string GetDeviceNameCallback()
-    {
-        return GetDeviceNameSync();
-    }
-
-    string GetDeviceNameReturnsPromise()
-    {
-        return GetDeviceNameSync();
-    }
 private:
     std::shared_ptr<OHOS::Bluetooth::GattClient> client_ = nullptr;
     std::shared_ptr<OHOS::Bluetooth::TaiheGattClientCallback> callback_;
@@ -193,63 +153,64 @@ public:
         ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "Close return error");
     }
 
-    void AddService(GattService service)
+    void AddService(ohos::bluetooth::ble::GattService service)
     {
-        std::unique_ptr<OHOS::Bluetooth::GattService> gattService {nullptr};
-        OHOS::Bluetooth::GattServiceType type = service.isPrimary ?
-            OHOS::Bluetooth::GattServiceType::PRIMARY : OHOS::Bluetooth::GattServiceType::SECONDARY;
-        OHOS::Bluetooth::UUID serviceUuid = OHOS::Bluetooth::UUID::FromString(std::string(service.serviceUuid));
-        gattService = std::make_unique<OHOS::Bluetooth::GattService>(serviceUuid, type);
+        ANI_BT_ASSERT_RETURN(server_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR, "AddService ani assert failed");
+        std::unique_ptr<GattService> gattService {nullptr};
+        GattServiceType type = service.isPrimary ? GattServiceType::PRIMARY : GattServiceType::SECONDARY;
+        UUID serviceUuid = UUID::FromString(std::string(service.serviceUuid));
+        gattService = std::make_unique<GattService>(serviceUuid, type);
 
         for (auto &characteristic : service.characteristics) {
             int charPermissions = 0;
             int charProperties = 0;
-            OHOS::Bluetooth::UUID characteristicUuid =
-                OHOS::Bluetooth::UUID::FromString(std::string(characteristic.serviceUuid));
-            OHOS::Bluetooth::GattCharacteristic character(characteristicUuid, charPermissions, charProperties);
+            UUID characteristicUuid = UUID::FromString(std::string(characteristic.serviceUuid));
+            GattCharacteristic character(characteristicUuid, charPermissions, charProperties);
             character.SetValue(characteristic.characteristicValue.data(), characteristic.characteristicValue.size());
 
             for (const auto &descriptor : characteristic.descriptors) {
-                OHOS::Bluetooth::UUID descriptorUuid =
-                    OHOS::Bluetooth::UUID::FromString(std::string(descriptor.descriptorUuid));
-                OHOS::Bluetooth::GattDescriptor gattDescriptor(descriptorUuid, 0);
+                UUID descriptorUuid = UUID::FromString(std::string(descriptor.descriptorUuid));
+                GattDescriptor gattDescriptor(descriptorUuid, 0);
                 gattDescriptor.SetValue(descriptor.descriptorValue.data(), descriptor.descriptorValue.size());
                 character.AddDescriptor(gattDescriptor);
             }
             gattService->AddCharacteristic(character);
         }
         int ret = server_->AddService(*gattService);
-        ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "AddService return error");
+        ANI_BT_ASSERT_RETURN(ret == BT_NO_ERROR, ret, "AddService return error");
     }
 
     void RemoveService(string_view serviceUuid)
     {
-        OHOS::Bluetooth::UUID uuid = OHOS::Bluetooth::UUID::FromString(std::string(serviceUuid));
+        ANI_BT_ASSERT_RETURN(server_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
+            "RemoveService ani assert failed");
+        UUID uuid = UUID::FromString(std::string(serviceUuid));
 
-        int ret = OHOS::Bluetooth::BT_NO_ERROR;
+        int ret = BT_NO_ERROR;
         auto primaryService = server_->GetService(uuid, true);
         if (primaryService.has_value()) {
             ret = server_->RemoveGattService(primaryService.value());
-            ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "RemoveService return error");
+            ANI_BT_ASSERT_RETURN(ret == BT_NO_ERROR, ret, "Primary RemoveService return error");
         }
 
         auto secondService = server_->GetService(uuid, false);
         if (secondService.has_value()) {
             ret = server_->RemoveGattService(secondService.value());
-            ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "RemoveService return error");
+            ANI_BT_ASSERT_RETURN(ret == BT_NO_ERROR, ret, "Second RemoveService return error");
         }
     }
 
     void SendResponse(ServerResponse serverResponse)
     {
-        OHOS::Bluetooth::BluetoothRemoteDevice remoteDevice(std::string(serverResponse.deviceId),
-            OHOS::Bluetooth::BTTransport::ADAPTER_BLE);
+        ANI_BT_ASSERT_RETURN(server_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
+            "SendResponse ani assert failed");
+        BluetoothRemoteDevice remoteDevice(std::string(serverResponse.deviceId), BTTransport::ADAPTER_BLE);
         int32_t transId = serverResponse.transId;
         int32_t status = serverResponse.status;
         int32_t offset = serverResponse.offset;
         int ret = server_->SendResponse(remoteDevice, transId, status, offset,
             serverResponse.value.data(), serverResponse.value.size());
-        ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "SendResponse return error");
+        ANI_BT_ASSERT_RETURN(ret == BT_NO_ERROR, ret, "SendResponse return error");
     }
 private:
     std::shared_ptr<OHOS::Bluetooth::GattServer> server_ = nullptr;
@@ -264,29 +225,6 @@ public:
         bleCentralManager_ = std::make_shared<OHOS::Bluetooth::BleCentralManager>(callback_);
     }
     ~BleScannerImpl() = default;
-
-    void StartScan(array_view<ScanFilter> filters, optional_view<ScanOptions> options)
-    {
-        std::vector<OHOS::Bluetooth::BleScanFilter> scanFilters;
-        OHOS::Bluetooth::BleScanFilter emptyFilter;
-        scanFilters.push_back(emptyFilter);
-
-        OHOS::Bluetooth::BleScanSettings settings;
-        if (options.has_value()) {
-            const auto &opts = options.value();
-            settings.SetReportDelay(opts.interval.value());
-            settings.SetScanMode(opts.dutyMode.value());
-            settings.SetPhy(opts.phyType.value());
-        }
-        int ret = BleCentralManagerGetInstance()->StartScan(settings, scanFilters);
-        ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "StartScan return error");
-    }
-
-    void StopScan()
-    {
-        int ret = BleCentralManagerGetInstance()->StopScan();
-        ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "StopScan return error");
-    }
 
 private:
     std::shared_ptr<OHOS::Bluetooth::BleCentralManager> bleCentralManager_ = nullptr;
@@ -318,9 +256,9 @@ GattClientDevice CreateGattClientDevice(string_view deviceId)
     return make_holder<GattClientDeviceImpl, GattClientDevice>(remoteAddr);
 }
 
-GattServer CreateGattServer()
+ohos::bluetooth::ble::GattServer CreateGattServer()
 {
-    return make_holder<GattServerImpl, GattServer>();
+    return make_holder<GattServerImpl, ohos::bluetooth::ble::GattServer>();
 }
 
 BleScanner CreateBleScanner()
@@ -328,80 +266,206 @@ BleScanner CreateBleScanner()
     return make_holder<BleScannerImpl, BleScanner>();
 }
 
-void DisableAdvertisingSync(AdvertisingDisableParams advertisingDisableParams)
+static void ParseScanFilterDeviceIdParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
+                                              BleScanFilter &bleScanFilter)
 {
-    int32_t advHandle = advertisingDisableParams.advertisingId;
-    std::shared_ptr<OHOS::Bluetooth::BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
-    if (bleAdvertiser == nullptr) {
-        HILOGE("bleAdvertiser is nullptr");
-        return;
+    if (scanFilter.deviceId.has_value()) {
+        bleScanFilter.SetDeviceId(std::string(scanFilter.deviceId.value()));
     }
-    int ret = bleAdvertiser->DisableAdvertising(advHandle,
-        OHOS::Bluetooth::TaiheBluetoothBleAdvertiseCallback::GetInstance());
-    ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "DisableAdvertisingSync return error");
 }
 
-void EnableAdvertisingSync(AdvertisingEnableParams advertisingEnableParams)
+static void ParseScanFilterLocalNameParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
+                                               BleScanFilter &bleScanFilter)
 {
-    int32_t advHandle = advertisingEnableParams.advertisingId;
-    uint16_t duration = 0;
-    if (advertisingEnableParams.duration.has_value()) {
-        duration = advertisingEnableParams.duration.value();
+    if (scanFilter.name.has_value()) {
+        bleScanFilter.SetName(std::string(scanFilter.name.value()));
     }
-    std::shared_ptr<OHOS::Bluetooth::BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
-    if (bleAdvertiser == nullptr) {
-        HILOGE("bleAdvertiser is nullptr");
-        return;
-    }
-    int ret = bleAdvertiser->EnableAdvertising(advHandle, duration,
-        OHOS::Bluetooth::TaiheBluetoothBleAdvertiseCallback::GetInstance());
-    ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "EnableAdvertisingSync return error");
 }
 
-void StartBLEScan(array<ScanFilter> filters, optional_view<ScanOptions> options)
+static void ParseScanFilterServiceUuidParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
+                                                 BleScanFilter &bleScanFilter)
 {
-    std::vector<OHOS::Bluetooth::BleScanFilter> scanFilters;
-    OHOS::Bluetooth::BleScanFilter emptyFilter;
-    scanFilters.push_back(emptyFilter);
-    OHOS::Bluetooth::BleScanSettings settings;
+    if (scanFilter.serviceUuid.has_value()) {
+        std::string uuid = std::string(scanFilter.serviceUuid.value());
+        UUID outUuid = ParcelUuid::FromString(uuid);
+        bleScanFilter.SetServiceUuid(outUuid);
+    }
+
+    if (scanFilter.serviceUuidMask.has_value()) {
+        std::string uuid = std::string(scanFilter.serviceUuidMask.value());
+        UUID outUuid = ParcelUuid::FromString(uuid);
+        bleScanFilter.SetServiceUuidMask(outUuid);
+    }
+}
+
+static void ParseScanFilterSolicitationUuidParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
+                                                      BleScanFilter &bleScanFilter)
+{
+    if (scanFilter.serviceSolicitationUuid.has_value()) {
+        std::string uuid = std::string(scanFilter.serviceSolicitationUuid.value());
+        UUID outUuid = ParcelUuid::FromString(uuid);
+        bleScanFilter.SetServiceSolicitationUuid(outUuid);
+    }
+
+    if (scanFilter.serviceSolicitationUuidMask.has_value()) {
+        std::string uuid = std::string(scanFilter.serviceSolicitationUuidMask.value());
+        UUID outUuid = ParcelUuid::FromString(uuid);
+        bleScanFilter.SetServiceSolicitationUuidMask(outUuid);
+    }
+}
+
+static void ParseArrayBufferParams(const taihe::array<uint8_t>& data, std::vector<uint8_t> &outParam)
+{
+    for (const auto item : data) {
+        outParam.push_back(item);
+    }
+}
+
+static void ParseScanFilterServiceDataParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
+                                                 BleScanFilter &bleScanFilter)
+{
+    if (scanFilter.serviceData.has_value()) {
+        std::vector<uint8_t> data {};
+        ParseArrayBufferParams(scanFilter.serviceData.value(), data);
+        bleScanFilter.SetServiceData(std::move(data));
+    }
+    if (scanFilter.serviceDataMask.has_value()) {
+        std::vector<uint8_t> dataMask {};
+        ParseArrayBufferParams(scanFilter.serviceDataMask.value(), dataMask);
+        bleScanFilter.SetServiceDataMask(std::move(dataMask));
+    }
+}
+
+static void ParseScanFilterManufactureDataParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
+                                                     BleScanFilter &bleScanFilter)
+{
+    if (scanFilter.manufactureId.has_value()) {
+        bleScanFilter.SetManufacturerId(scanFilter.manufactureId.value());
+    }
+
+    if (scanFilter.manufactureData.has_value()) {
+        std::vector<uint8_t> data {};
+        ParseArrayBufferParams(scanFilter.manufactureData.value(), data);
+        bleScanFilter.SetManufactureData(std::move(data));
+    }
+
+    if (scanFilter.manufactureDataMask.has_value()) {
+        std::vector<uint8_t> dataMask {};
+        ParseArrayBufferParams(scanFilter.manufactureDataMask.value(), dataMask);
+        bleScanFilter.SetManufactureDataMask(std::move(dataMask));
+    }
+}
+
+static void ParseScanFilter(const ohos::bluetooth::ble::ScanFilter &scanFilter, BleScanFilter &bleScanFilter)
+{
+    ParseScanFilterDeviceIdParameters(scanFilter, bleScanFilter);
+    ParseScanFilterLocalNameParameters(scanFilter, bleScanFilter);
+    ParseScanFilterServiceUuidParameters(scanFilter, bleScanFilter);
+    ParseScanFilterSolicitationUuidParameters(scanFilter, bleScanFilter);
+    ParseScanFilterServiceDataParameters(scanFilter, bleScanFilter);
+    ParseScanFilterManufactureDataParameters(scanFilter, bleScanFilter);
+}
+
+static void ParseScanFilterParameters(array<ohos::bluetooth::ble::ScanFilter> filters,
+                                      std::vector<BleScanFilter> &params)
+{
+    for (const auto& scanFilter : filters) {
+        BleScanFilter bleScanFilter;
+        ParseScanFilter(scanFilter, bleScanFilter);
+        params.push_back(bleScanFilter);
+    }
+}
+
+static void SetReportDelay(ohos::bluetooth::ble::ScanOptions &scanOptions, BleScanSettings &outSettinngs)
+{
+    // enforce reportDelay to be either 0 or at least the floor value(5000ms) corresponding to normal and batch mode
+    long currentReportDelay = scanOptions.interval.value();
+    long reportDelayFloorValue = 5000;
+    if (currentReportDelay == 0 || currentReportDelay >= reportDelayFloorValue) {
+        outSettinngs.SetReportDelay(currentReportDelay);
+    } else {
+        outSettinngs.SetReportDelay(reportDelayFloorValue);
+        HILOGD("reportDelay should be either 0 or at least 5000, got %{public}ld, enforced to 5000.",
+            currentReportDelay);
+    }
+}
+
+static void SetCbTypeSensMode(ohos::bluetooth::ble::ScanOptions &scanOptions, BleScanSettings &outSettinngs)
+{
+    // reportMode -> callbackType + sensitivityMode
+    uint8_t callbackType = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
+    uint8_t sensitivityMode = static_cast<uint8_t>(SensitivityMode::SENSITIVITY_MODE_HIGH);
+
+    switch ((scanOptions.reportMode.value()).get_key()) {
+        case ohos::bluetooth::ble::ScanReportMode::key_t::NORMAL:
+            callbackType = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
+            break;
+        case ohos::bluetooth::ble::ScanReportMode::key_t::FENCE_SENSITIVITY_LOW:
+            callbackType = BLE_SCAN_CALLBACK_TYPE_FIRST_AND_LOST_MATCH;
+            sensitivityMode = static_cast<uint8_t>(SensitivityMode::SENSITIVITY_MODE_LOW);
+            break;
+        case ohos::bluetooth::ble::ScanReportMode::key_t::FENCE_SENSITIVITY_HIGH:
+            callbackType = BLE_SCAN_CALLBACK_TYPE_FIRST_AND_LOST_MATCH;
+            sensitivityMode = static_cast<uint8_t>(SensitivityMode::SENSITIVITY_MODE_HIGH);
+            break;
+        default:
+            break;
+    }
+    outSettinngs.SetCallbackType(callbackType);
+    outSettinngs.SetSensitivityMode(sensitivityMode);
+}
+
+void StartBLEScan(array<ohos::bluetooth::ble::ScanFilter> filters,
+                  optional_view<ohos::bluetooth::ble::ScanOptions> options)
+{
+    std::vector<BleScanFilter> scanFilters;
+    BleScanSettings settings;
+    if (filters.empty()) {
+        BleScanFilter emptyFilter;
+        scanFilters.push_back(emptyFilter);
+    } else {
+        ParseScanFilterParameters(filters, scanFilters);
+    }
+
     if (options.has_value()) {
-        const auto &opts = options.value();
-        settings.SetReportDelay(opts.interval.value());
-        settings.SetScanMode(opts.dutyMode.value());
-        settings.SetPhy(opts.phyType.value());
+        auto scanOptions = options.value();
+        if (scanOptions.interval.has_value()) {
+            SetReportDelay(scanOptions, settings);
+        }
+        if (scanOptions.reportMode.has_value()) {
+            settings.SetReportMode((scanOptions.reportMode.value()).get_value());
+        }
+        if (scanOptions.dutyMode.has_value()) {
+            settings.SetScanMode((scanOptions.dutyMode.value()).get_value());
+        }
+        if (scanOptions.phyType.has_value()) {
+            settings.SetPhy((scanOptions.phyType.value()).get_value());
+        }
+        if (scanOptions.reportMode.has_value()) {
+            SetCbTypeSensMode(scanOptions, settings);
+        }
     }
     int ret = BleCentralManagerGetInstance()->StartScan(settings, scanFilters);
-    ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "StartBLEScan return error");
+    ANI_BT_ASSERT_RETURN(ret == BT_NO_ERROR, ret, "StartBLEScan return error");
 }
 
 array<string> GetConnectedBLEDevices()
 {
-    OHOS::Bluetooth::BluetoothHost *host = &OHOS::Bluetooth::BluetoothHost::GetDefaultHost();
-    std::vector<OHOS::Bluetooth::BluetoothRemoteDevice> remoteDeviceLists;
-    std::vector<std::string> dstDevicesvec;
-    int32_t err = host->GetPairedDevices(OHOS::Bluetooth::BT_TRANSPORT_BLE, remoteDeviceLists);
-    if (err != OHOS::Bluetooth::BT_NO_ERROR) {
-        set_business_error(err, "GetPairedDevices return error");
-        return {};
-    }
-    for (auto vec : remoteDeviceLists) {
-        dstDevicesvec.push_back(vec.GetDeviceAddr().c_str());
-    }
+    std::lock_guard<std::mutex> lock(TaiheGattServerCallback::deviceListMutex_);
+    std::vector<std::string> dstDevicesvec = TaiheGattServerCallback::deviceList_;
     array<string> result(taihe::copy_data_t{}, dstDevicesvec.data(), dstDevicesvec.size());
     return result;
 }
-}  // namespace
+}  // Bluetooth
+}  // OHOS
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_CreateGattClientDevice(CreateGattClientDevice);
-TH_EXPORT_CPP_API_CreateGattServer(CreateGattServer);
-TH_EXPORT_CPP_API_CreateBleScanner(CreateBleScanner);
-TH_EXPORT_CPP_API_StopAdvertising(StopAdvertising);
-TH_EXPORT_CPP_API_StopBLEScan(StopBLEScan);
-TH_EXPORT_CPP_API_GetConnectedBLEDevices(GetConnectedBLEDevices);
-TH_EXPORT_CPP_API_StartBLEScan(StartBLEScan);
-TH_EXPORT_CPP_API_EnableAdvertisingSync(EnableAdvertisingSync);
-TH_EXPORT_CPP_API_EnableAdvertisingCallback(EnableAdvertisingSync);
-TH_EXPORT_CPP_API_EnableAdvertisingReturnsPromise(EnableAdvertisingSync);
+TH_EXPORT_CPP_API_CreateGattClientDevice(OHOS::Bluetooth::CreateGattClientDevice);
+TH_EXPORT_CPP_API_CreateGattServer(OHOS::Bluetooth::CreateGattServer);
+TH_EXPORT_CPP_API_CreateBleScanner(OHOS::Bluetooth::CreateBleScanner);
+TH_EXPORT_CPP_API_StopAdvertising(OHOS::Bluetooth::StopAdvertising);
+TH_EXPORT_CPP_API_StopBLEScan(OHOS::Bluetooth::StopBLEScan);
+TH_EXPORT_CPP_API_GetConnectedBLEDevices(OHOS::Bluetooth::GetConnectedBLEDevices);
+TH_EXPORT_CPP_API_StartBLEScan(OHOS::Bluetooth::StartBLEScan);
 // NOLINTEND
