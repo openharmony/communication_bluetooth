@@ -329,6 +329,7 @@ void HidHost::RegisterObserver(std::shared_ptr<HidHostObserver> observer)
 {
     HILOGD("enter");
     CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    CHECK_AND_RETURN_LOG(observer != nullptr, "observer is null.");
     pimpl->RegisterObserver(observer);
 }
 
