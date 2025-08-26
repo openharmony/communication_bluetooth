@@ -129,6 +129,7 @@ void A2dpSink::RegisterObserver(std::shared_ptr<A2dpSinkObserver> observer)
 {
     HILOGD("enter");
     CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
+    CHECK_AND_RETURN_LOG(observer != nullptr, "observer is null.");
     pimpl->observers_.Register(observer);
 }
 
