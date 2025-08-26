@@ -516,12 +516,12 @@ void GattClient::impl::GetServices()
     }
 
     std::unique_lock<std::mutex> lock(discoverInformation_.mutex_);
-    while (discoverInformation_.isDiscovering_) {
-        auto ret = discoverInformation_.condition_.wait_for(lock, std::chrono::seconds(WAIT_TIMEOUT));
-        if (ret == std::cv_status::timeout) {
-            HILOGE("timeout");
-            return;
-        }
+    auto ret = discoverInformation_.condition_.wait_for(lock, std::chrono::seconds(WAIT_TIMEOUT), [this] {
+        return !discoverInformation_.isDiscovering_;
+    });
+    if (ret == false) {
+        HILOGE("timeout");
+        return;
     }
     if (isGetServiceYet_) {
         HILOGD("isGetServiceYet_ is true");
