@@ -57,7 +57,7 @@ public:
         }
     }
 
-    void connect(taihe::string_view deviceId)
+    void Connect(taihe::string_view deviceId)
     {
         std::string remoteAddr = std::string(deviceId);
         HidHost *profile = HidHost::GetProfile();
@@ -68,7 +68,7 @@ public:
         }
     }
 
-    void disconnect(taihe::string_view deviceId)
+    void Disconnect(taihe::string_view deviceId)
     {
         std::string remoteAddr = std::string(deviceId);
         HidHost *profile = HidHost::GetProfile();
@@ -87,7 +87,7 @@ public:
         int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
         int32_t errorCode = profile->GetDeviceState(device, state);
         if (errorCode != BT_NO_ERROR) {
-            taihe::set_business_error(errorCode, "Disconnect return error");
+            taihe::set_business_error(errorCode, "GetConnectionState return error");
         }
 
         int profileState = TaiheUtils::GetProfileConnectionState(state);
@@ -101,7 +101,7 @@ public:
         std::vector<BluetoothRemoteDevice> devices;
         int errorCode = profile->GetDevicesByStates(states, devices);
         if (errorCode != BT_NO_ERROR) {
-            // taihe::set_business_error(errorCode, "GetConnectedDevices return error");
+            taihe::set_business_error(errorCode, "GetConnectedDevices return error");
         }
 
         std::vector<std::string> deviceVector;

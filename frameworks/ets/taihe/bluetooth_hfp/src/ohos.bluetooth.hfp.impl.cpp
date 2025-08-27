@@ -60,7 +60,7 @@ public:
         }
     }
 
-    void connect(taihe::string_view deviceId)
+    void Connect(taihe::string_view deviceId)
     {
         std::string remoteAddr = std::string(deviceId);
         HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
@@ -71,14 +71,14 @@ public:
         }
     }
 
-    void disconnect(taihe::string_view deviceId)
+    void Disconnect(taihe::string_view deviceId)
     {
         std::string remoteAddr = std::string(deviceId);
         HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         int32_t errorCode = profile->Disconnect(device);
         if (errorCode != BT_NO_ERROR) {
-            taihe::set_business_error(errorCode, "Connect return error");
+            taihe::set_business_error(errorCode, "Disconnect return error");
         }
     }
 
@@ -90,7 +90,7 @@ public:
         int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
         int32_t errorCode = profile->GetDeviceState(device, state);
         if (errorCode != BT_NO_ERROR) {
-            taihe::set_business_error(errorCode, "Disconnect return error");
+            taihe::set_business_error(errorCode, "GetConnectionState return error");
         }
 
         int32_t profileState = TaiheUtils::GetProfileConnectionState(state);

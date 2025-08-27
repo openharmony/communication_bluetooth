@@ -31,13 +31,10 @@ interface A2dpSourceProfile : BaseProfile {
     Disconnect(deviceId: String): void;
 
     @promise GetAutoPlayDisabledDuration(deviceId: String): i32;
-    GetAutoPlayDisabledDurationSync(deviceId: String): i32;
 
     @promise DisableAutoPlay(deviceId: String, duration: i32): void;
-    DisableAutoPlaySync(deviceId: String, duration: i32): void;
 
     @promise EnableAutoPlay(deviceId: String): void;
-    EnableAutoPlaySync(deviceId: String): void;
 }
 
 enum CodecType: i32 {
