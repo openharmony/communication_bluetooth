@@ -110,7 +110,7 @@ public:
         if (err != BT_NO_ERROR) {
             taihe::set_business_error(err, "GetPlayingState return error");
         }
-        return static_cast<PlayingState::key_t>(state);
+        return PlayingState::from_value(state);
     }
 
     void Connect(taihe::string_view deviceId)
@@ -135,7 +135,7 @@ public:
         }
     }
 
-    int32_t GetAutoPlayDisabledDurationSync(taihe::string_view deviceId)
+    int32_t GetAutoPlayDisabledDuration(taihe::string_view deviceId)
     {
         int32_t duration = 0;
         std::string remoteAddr = static_cast<std::string>(deviceId);
@@ -148,12 +148,7 @@ public:
         return duration;
     }
 
-    int32_t GetAutoPlayDisabledDuration(taihe::string_view deviceId)
-    {
-        return GetAutoPlayDisabledDurationSync(deviceId);
-    }
-
-    void DisableAutoPlaySync(taihe::string_view deviceId, int32_t duration)
+    void DisableAutoPlay(taihe::string_view deviceId, int32_t duration)
     {
         std::string remoteAddr = static_cast<std::string>(deviceId);
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
@@ -164,12 +159,7 @@ public:
         }
     }
 
-    void DisableAutoPlay(taihe::string_view deviceId, int32_t duration)
-    {
-        DisableAutoPlaySync(deviceId, duration);
-    }
-
-    void EnableAutoPlaySync(taihe::string_view deviceId)
+    void EnableAutoPlay(taihe::string_view deviceId)
     {
         std::string remoteAddr = static_cast<std::string>(deviceId);
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
@@ -180,15 +170,10 @@ public:
         }
     }
 
-    void EnableAutoPlay(taihe::string_view deviceId)
-    {
-        EnableAutoPlaySync(deviceId);
-    }
-
     ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(taihe::string_view deviceId)
     {
         std::string remoteAddr = std::string(deviceId);
-        PbapPse *profile = PbapPse::GetProfile();
+        A2dpSource *profile = A2dpSource::GetProfile();
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
         int32_t errorCode = profile->GetDeviceState(device, state);
@@ -197,7 +182,7 @@ public:
         }
 
         int32_t profileState = TaiheUtils::GetProfileConnectionState(state);
-        return (ohos::bluetooth::constant::ProfileConnectionState::key_t)profileState;
+        return ohos::bluetooth::constant::ProfileConnectionState::from_value(profileState);
     }
 
     array<string> GetConnectedDevices()

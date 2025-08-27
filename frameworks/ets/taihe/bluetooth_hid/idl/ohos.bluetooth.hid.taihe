@@ -20,7 +20,7 @@ static { loadLibrary("bluetoothHid_taihe_native.z") }
 
 from ohos.bluetooth.baseProfile use BaseProfile; 
 interface HidHostProfile : BaseProfile {
-    connect(deviceId: String): void;
-    disconnect(deviceId: String): void;
+    Connect(deviceId: String): void;
+    Disconnect(deviceId: String): void;
 }
 function CreateHidHostProfile(): HidHostProfile;
