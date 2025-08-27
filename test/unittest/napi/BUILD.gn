@@ -31,6 +31,7 @@ config("module_private_config") {
         ".",
         "$FRAMWORK_DIR/frameworks/inner/include",
         "$FRAMWORK_DIR/frameworks/js/napi/include",
+        "$FRAMWORK_DIR/frameworks/js/napi/src/parser",
         "$FRAMWORK_DIR/interfaces/inner_api/include",
         "$FRAMWORK_DIR/interfaces/inner_api/include/c_header",
     ]
