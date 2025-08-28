@@ -26,7 +26,6 @@
 #include "bluetooth_log.h"
 #include "bluetooth_errorcode.h"
 #include "taihe_bluetooth_connection_callback.h"
-#include <sstream>
 
 namespace OHOS {
 namespace Bluetooth {
@@ -334,12 +333,17 @@ void UpdateCloudBluetoothDevice(TrustedPairedDevices trustedPairedDevices)
         trustPair.deviceName_ = std::string(device.deviceName);
         trustPair.uuids_.clear();
         std::string uuidStr = device.uuids.c_str();
-        std::istringstream ss(uuidStr);
-        std::string uuid;
-        while (std::getline(ss, uuid, ',')) {
+        auto first = uuidStr.begin();
+        while (first != uuidStr.end()) {
+            auto last = std::find(first, uuidStr.end(), ',');
+            std::string uuid(first, last);
             if (!uuid.empty()) {
                 trustPair.uuids_.push_back(uuid);
             }
+            if (last == uuidStr.end()) {
+                break;
+            }
+            first = last + 1;
         }
         trustPair.bluetoothClass_ = device.bluetoothClass;
         trustPair.token_.clear();
