@@ -100,21 +100,21 @@ void OffStateChange(::taihe::optional_view<::taihe::callback<void(
     }
 }
 
-void EnableBluetoothAsyncSync()
+void EnableBluetoothAsync()
 {
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t ret = host->EnableBle();
     if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "enableBluetoothAsync return error");
+        set_business_error(ret, "EnableBluetoothAsync return error");
     }
 }
 
-void DisableBluetoothAsyncSync()
+void DisableBluetoothAsync()
 {
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t ret = host->DisableBt();
     if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "disableBluetoothAsync return error");
+        set_business_error(ret, "DisableBluetoothAsync return error");
     }
 }
 
@@ -123,9 +123,9 @@ string GetLocalAddress()
     std::string localAddr = INVALID_MAC_ADDRESS;
     int32_t ret = BluetoothHost::GetDefaultHost().GetLocalAddress(localAddr);
     if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "getLocalAddress return error");
+        set_business_error(ret, "GetLocalAddress return error");
     }
-    return static_cast<string>(localAddr);
+    return localAddr;
 }
 
 bool IsValidRandomDeviceId(string_view deviceId)
@@ -135,7 +135,7 @@ bool IsValidRandomDeviceId(string_view deviceId)
     int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
         static_cast<int32_t>(RandomDeviceIdCommand::IS_VALID), deviceIdVec, isValid);
     if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "isValidRandomDeviceId return error");
+        set_business_error(ret, "IsValidRandomDeviceId return error");
     }
 
     return isValid;
@@ -148,41 +148,41 @@ array<string> GetPersistentDeviceIds()
     int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
         static_cast<int32_t>(RandomDeviceIdCommand::GET), deviceIdVec, isValid);
     if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "getPersistentDeviceIds return error");
+        set_business_error(ret, "GetPersistentDeviceIds return error");
     }
     array<string> result(taihe::copy_data_t{}, deviceIdVec.data(), deviceIdVec.size());
     return result;
 }
 
-void DeletePersistentDeviceIdSync(string_view deviceId)
+void DeletePersistentDeviceId(string_view deviceId)
 {
     bool isValid = false;
     std::vector<std::string> deviceIdVec = { static_cast<std::string>(deviceId) };
     int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
         static_cast<int32_t>(RandomDeviceIdCommand::DELETE), deviceIdVec, isValid);
     if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "deletePersistentDeviceId return error");
+        set_business_error(ret, "DeletePersistentDeviceId return error");
     }
 }
 
-void AddPersistentDeviceIdSync(string_view deviceId)
+void AddPersistentDeviceId(string_view deviceId)
 {
     bool isValid = false;
     std::vector<std::string> deviceIdVec = { static_cast<std::string>(deviceId) };
     int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
         static_cast<int32_t>(RandomDeviceIdCommand::ADD), deviceIdVec, isValid);
     if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "addPersistentDeviceId return error");
+        set_business_error(ret, "AddPersistentDeviceId return error");
     }
 }
 
-void NotifyDialogResultSync(NotifyDialogResultParams notifyDialogResultParams)
+void NotifyDialogResult(NotifyDialogResultParams notifyDialogResultParams)
 {
-    uint32_t dialogType = notifyDialogResultParams.dialogType;
+    uint32_t dialogType = notifyDialogResultParams.dialogType.get_value();
     bool dialogResult = notifyDialogResultParams.dialogResult;
     int32_t ret = BluetoothHost::GetDefaultHost().NotifyDialogResult(dialogType, dialogResult);
     if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "notifyDialogResult return error");
+        set_business_error(ret, "NotifyDialogResult return error");
     }
 }
 }  // Bluetooth
@@ -196,17 +196,12 @@ TH_EXPORT_CPP_API_RestrictBluetoothSync(OHOS::Bluetooth::RestrictBluetoothSync);
 TH_EXPORT_CPP_API_GetState(OHOS::Bluetooth::GetState);
 TH_EXPORT_CPP_API_EnableBluetooth(OHOS::Bluetooth::EnableBluetooth);
 TH_EXPORT_CPP_API_DisableBluetooth(OHOS::Bluetooth::DisableBluetooth);
-TH_EXPORT_CPP_API_EnableBluetoothAsyncSync(OHOS::Bluetooth::EnableBluetoothAsyncSync);
-TH_EXPORT_CPP_API_EnableBluetoothAsync(OHOS::Bluetooth::EnableBluetoothAsyncSync);
-TH_EXPORT_CPP_API_DisableBluetoothAsyncSync(OHOS::Bluetooth::DisableBluetoothAsyncSync);
-TH_EXPORT_CPP_API_DisableBluetoothAsync(OHOS::Bluetooth::DisableBluetoothAsyncSync);
+TH_EXPORT_CPP_API_EnableBluetoothAsync(OHOS::Bluetooth::EnableBluetoothAsync);
+TH_EXPORT_CPP_API_DisableBluetoothAsync(OHOS::Bluetooth::DisableBluetoothAsync);
 TH_EXPORT_CPP_API_GetLocalAddress(OHOS::Bluetooth::GetLocalAddress);
 TH_EXPORT_CPP_API_IsValidRandomDeviceId(OHOS::Bluetooth::IsValidRandomDeviceId);
 TH_EXPORT_CPP_API_GetPersistentDeviceIds(OHOS::Bluetooth::GetPersistentDeviceIds);
-TH_EXPORT_CPP_API_DeletePersistentDeviceIdSync(OHOS::Bluetooth::DeletePersistentDeviceIdSync);
-TH_EXPORT_CPP_API_DeletePersistentDeviceId(OHOS::Bluetooth::DeletePersistentDeviceIdSync);
-TH_EXPORT_CPP_API_AddPersistentDeviceIdSync(OHOS::Bluetooth::AddPersistentDeviceIdSync);
-TH_EXPORT_CPP_API_AddPersistentDeviceId(OHOS::Bluetooth::AddPersistentDeviceIdSync);
-TH_EXPORT_CPP_API_NotifyDialogResultSync(OHOS::Bluetooth::NotifyDialogResultSync);
-TH_EXPORT_CPP_API_NotifyDialogResult(OHOS::Bluetooth::NotifyDialogResultSync);
+TH_EXPORT_CPP_API_DeletePersistentDeviceId(OHOS::Bluetooth::DeletePersistentDeviceId);
+TH_EXPORT_CPP_API_AddPersistentDeviceId(OHOS::Bluetooth::AddPersistentDeviceId);
+TH_EXPORT_CPP_API_NotifyDialogResult(OHOS::Bluetooth::NotifyDialogResult);
 // NOLINTEND
