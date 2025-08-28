@@ -76,4 +76,6 @@ function GetPersistentDeviceIds(): Array<String>;
 
 @promise function AddPersistentDeviceId(deviceId: String): void;
 
+function GetLocalAddress(): String;
+
 @promise function NotifyDialogResult(notifyDialogResultParams: NotifyDialogResultParams): void;
