@@ -278,7 +278,7 @@ void OffPinRequired(::taihe::optional_view<::taihe::callback<
     }
 }
 
-void ControlDeviceAction(ControlDeviceActionParams controlDeviceActionParams)
+void ControlDeviceAction(ohos::bluetooth::connection::ControlDeviceActionParams controlDeviceActionParams)
 {
     std::string deviceId = std::string(controlDeviceActionParams.deviceId);
     uint32_t controlType = (controlDeviceActionParams.type).get_value();
@@ -316,7 +316,7 @@ ohos::bluetooth::connection::DeviceType GetRemoteDeviceType(string_view deviceId
     return ohos::bluetooth::connection::DeviceType::from_value(deviceType);
 }
 
-void UpdateCloudBluetoothDevice(TrustedPairedDevices trustedPairedDevices)
+void UpdateCloudBluetoothDevice(ohos::bluetooth::connection::TrustedPairedDevices trustedPairedDevices)
 {
     std::vector<TrustPairDeviceParam> trustPairs {};
     for (const auto &device : trustedPairedDevices.trustedPairedDevices) {
@@ -364,7 +364,7 @@ void UpdateCloudBluetoothDevice(TrustedPairedDevices trustedPairedDevices)
     }
 }
 
-BatteryInfo GetRemoteDeviceBatteryInfo(string_view deviceId)
+ohos::bluetooth::connection::BatteryInfo GetRemoteDeviceBatteryInfo(string_view deviceId)
 {
     std::string remoteAddr = std::string(deviceId);
     DeviceBatteryInfo batteryInfo;
@@ -378,7 +378,7 @@ BatteryInfo GetRemoteDeviceBatteryInfo(string_view deviceId)
         ohos::bluetooth::constant::MajorClass::key_t::MAJOR_UNCATEGORIZED).get_value();
     int tmpMajorClass = ohos::bluetooth::constant::MajorClass(
         ohos::bluetooth::constant::MajorClass::key_t::MAJOR_UNCATEGORIZED).get_value();
-    int tmpMajorMinorClass =ohos::bluetooth::constant::MajorMinorClass(
+    int tmpMajorMinorClass = ohos::bluetooth::constant::MajorMinorClass(
         ohos::bluetooth::constant::MajorMinorClass::key_t::COMPUTER_UNCATEGORIZED).get_value();
     remoteDevice.GetDeviceProductType(tmpCod, tmpMajorClass, tmpMajorMinorClass);
 
@@ -418,7 +418,7 @@ void SetRemoteDeviceName(string_view deviceId, string_view name)
     }
 }
 
-void SetRemoteDeviceType(string_view deviceId, DeviceType type)
+void SetRemoteDeviceType(string_view deviceId, ohos::bluetooth::connection::DeviceType type)
 {
     std::string remoteAddr = std::string(deviceId);
     int32_t deviceType = type.get_value();
@@ -429,7 +429,7 @@ void SetRemoteDeviceType(string_view deviceId, DeviceType type)
     }
 }
 
-ScanMode GetBluetoothScanMode()
+ohos::bluetooth::connection::ScanMode GetBluetoothScanMode()
 {
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t scanMode = 0;
@@ -437,7 +437,7 @@ ScanMode GetBluetoothScanMode()
     if (err != BT_NO_ERROR) {
         set_business_error(err, "GetBluetoothScanMode return error");
     }
-    return ScanMode::from_value(scanMode);
+    return ohos::bluetooth::connection::ScanMode::from_value(scanMode);
 }
 
 ohos::bluetooth::constant::ProfileConnectionState GetProfileConnectionState(
@@ -488,7 +488,7 @@ void DealPairStatus(const int &status, int &bondStatus)
     }
 }
 
-BondState GetPairState(string_view deviceId)
+ohos::bluetooth::connection::BondState GetPairState(string_view deviceId)
 {
     std::string remoteAddr = std::string(deviceId);
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
@@ -500,7 +500,7 @@ BondState GetPairState(string_view deviceId)
     int pairState = ohos::bluetooth::connection::BondState(
         ohos::bluetooth::connection::BondState::key_t::BOND_STATE_INVALID).get_value();
     DealPairStatus(state, pairState);
-    return BondState::from_value(pairState);
+    return ohos::bluetooth::connection::BondState::from_value(pairState);
 }
 
 void StartBluetoothDiscovery()
