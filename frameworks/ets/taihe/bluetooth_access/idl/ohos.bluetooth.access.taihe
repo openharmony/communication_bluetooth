@@ -63,3 +63,19 @@ function GetState(): BluetoothState;
 
 function EnableBluetooth(): void;
 function DisableBluetooth(): void;
+
+@promise function EnableBluetoothAsync(): void;
+
+@promise function DisableBluetoothAsync(): void;
+
+function IsValidRandomDeviceId(deviceId: String): bool;
+
+function GetPersistentDeviceIds(): Array<String>;
+
+@promise function DeletePersistentDeviceId(deviceId: String): void;
+
+@promise function AddPersistentDeviceId(deviceId: String): void;
+
+function GetLocalAddress(): String;
+
+@promise function NotifyDialogResult(notifyDialogResultParams: NotifyDialogResultParams): void;
