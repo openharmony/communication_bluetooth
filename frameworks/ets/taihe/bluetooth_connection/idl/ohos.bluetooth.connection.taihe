@@ -190,7 +190,7 @@ struct TrustedPairedDevice {
     uuids: String;
     bluetoothClass: i32;
     token: @arraybuffer Array<u8>;
-    deviceNameTime: i32;
+    deviceNameTime: i64;
     secureAdvertisingInfo: @arraybuffer Array<u8>;
     pairState: i32;
 }

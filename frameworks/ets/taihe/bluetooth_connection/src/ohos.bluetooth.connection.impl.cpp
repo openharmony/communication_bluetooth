@@ -284,7 +284,7 @@ void ControlDeviceAction(ControlDeviceActionParams controlDeviceActionParams)
     std::string deviceId = std::string(controlDeviceActionParams.deviceId);
     uint32_t controlType = (controlDeviceActionParams.type).get_value();
     uint32_t controlTypeVal = (controlDeviceActionParams.typeValue).get_value();
-    uint32_t controlObject = controlDeviceActionParams.controlObject;
+    uint32_t controlObject = (controlDeviceActionParams.controlObject).get_value();
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(deviceId);
     int32_t err = remoteDevice.ControlDeviceAction(controlType, controlTypeVal, controlObject);
     if (err != BT_NO_ERROR) {
@@ -431,7 +431,7 @@ ScanMode GetBluetoothScanMode()
     int32_t scanMode = 0;
     int32_t err = host->GetBtScanMode(scanMode);
     if (err != BT_NO_ERROR) {
-        set_business_error(err, "getBluetoothScanMode return error");
+        set_business_error(err, "GetBluetoothScanMode return error");
     }
     return ScanMode::from_value(scanMode);
 }
@@ -440,6 +440,9 @@ ohos::bluetooth::constant::ProfileConnectionState GetProfileConnectionState(
     optional<ohos::bluetooth::constant::ProfileId> profileId)
 {
     uint32_t conProfileId = 0;
+    if (profileId.has_value()) {
+        conProfileId = profileId.value().get_value();
+    }
     int state = 0;
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t err = host->GetBtProfileConnState(conProfileId, state);
@@ -488,7 +491,7 @@ BondState GetPairState(string_view deviceId)
     int state = PAIR_NONE;
     int32_t err = remoteDevice.GetPairState(state);
     if (err != BT_NO_ERROR) {
-        set_business_error(err, "getPairState return error");
+        set_business_error(err, "GetPairState return error");
     }
     int pairState = ohos::bluetooth::connection::BondState(
         ohos::bluetooth::connection::BondState::key_t::BOND_STATE_INVALID).get_value();
@@ -501,7 +504,7 @@ void StartBluetoothDiscovery()
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int ret = host->StartBtDiscovery();
     if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "startBluetoothDiscovery return error");
+        set_business_error(ret, "StartBluetoothDiscovery return error");
     }
 }
 
@@ -511,7 +514,7 @@ bool IsBluetoothDiscovering()
     bool isDiscovering = false;
     int32_t err = host->IsBtDiscovering(isDiscovering);
     if (err != BT_NO_ERROR) {
-        set_business_error(err, "startBluetoothDiscovery return error");
+        set_business_error(err, "IsBluetoothDiscovering return error");
     }
     return isDiscovering;
 }
@@ -521,7 +524,7 @@ void StopBluetoothDiscovery()
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int ret = host->CancelBtDiscovery();
     if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "stopBluetoothDiscovery return error");
+        set_business_error(ret, "StopBluetoothDiscovery return error");
     }
 }
 
@@ -536,7 +539,7 @@ void SetDevicePairingConfirmation(string_view deviceId, bool accept)
         ret = remoteDevice.CancelPairing();
     }
     if (ret != BT_NO_ERROR) {
-        set_business_error(ret, "setDevicePairingConfirmation return error");
+        set_business_error(ret, "SetDevicePairingConfirmation return error");
     }
 }
 }  // Bluetooth
