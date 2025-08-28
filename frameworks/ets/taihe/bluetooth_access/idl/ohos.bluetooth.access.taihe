@@ -66,11 +66,7 @@ function DisableBluetooth(): void;
 
 @promise function EnableBluetoothAsync(): void;
 
-function EnableBluetoothAsyncSync(): void;
-
 @promise function DisableBluetoothAsync(): void;
-
-function DisableBluetoothAsyncSync(): void;
 
 function IsValidRandomDeviceId(deviceId: String): bool;
 
@@ -78,12 +74,6 @@ function GetPersistentDeviceIds(): Array<String>;
 
 @promise function DeletePersistentDeviceId(deviceId: String): void;
 
-function DeletePersistentDeviceIdSync(deviceId: String): void;
-
 @promise function AddPersistentDeviceId(deviceId: String): void;
 
-function AddPersistentDeviceIdSync(deviceId: String): void;
-
 @promise function NotifyDialogResult(notifyDialogResultParams: NotifyDialogResultParams): void;
-
-function NotifyDialogResultSync(notifyDialogResultParams: NotifyDialogResultParams): void;
