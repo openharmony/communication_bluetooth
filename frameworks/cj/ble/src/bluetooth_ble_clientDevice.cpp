@@ -112,6 +112,8 @@ int32_t FfiClientDevice::ReadCharacteristicValue(NativeBLECharacteristic &charac
         HILOGE("character is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
+    auto readCharacteristicFunc = CJLambda::Create(reinterpret_cast<void (*)(RetNativeBLECharacteristic)>(callback));
+    callback_->RegisterReadCharacteristicCallback(readCharacteristicFunc);
     int ret = BT_ERR_INTERNAL_ERROR;
     if (client_) {
         ret = client_->ReadCharacteristic(*character);
@@ -119,8 +121,6 @@ int32_t FfiClientDevice::ReadCharacteristicValue(NativeBLECharacteristic &charac
     if (ret != BT_NO_ERROR) {
         return ret;
     }
-    auto readCharacteristicFunc = CJLambda::Create(reinterpret_cast<void (*)(RetNativeBLECharacteristic)>(callback));
-    callback_->RegisterReadCharacteristicCallback(readCharacteristicFunc);
     return BT_NO_ERROR;
 }
 
@@ -151,6 +151,8 @@ int32_t FfiClientDevice::ReadDescriptorValue(NativeBLEDescriptor &inputDescripto
         HILOGE("descriptor is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
+    auto readDescriptorFunc = CJLambda::Create(reinterpret_cast<void (*)(RetNativeBLEDescriptor)>(callback));
+    callback_->RegisterReadDescriptorCallback(readDescriptorFunc);
     int ret = BT_ERR_INTERNAL_ERROR;
     if (client_) {
         ret = client_->ReadDescriptor(*descriptor);
@@ -158,8 +160,6 @@ int32_t FfiClientDevice::ReadDescriptorValue(NativeBLEDescriptor &inputDescripto
     if (ret != BT_NO_ERROR) {
         return ret;
     }
-    auto readDescriptorFunc = CJLambda::Create(reinterpret_cast<void (*)(RetNativeBLEDescriptor)>(callback));
-    callback_->RegisterReadDescriptorCallback(readDescriptorFunc);
     return BT_NO_ERROR;
 }
 
@@ -173,6 +173,8 @@ int32_t FfiClientDevice::WriteCharacteristicValue(NativeBLECharacteristic charac
         HILOGE("character is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
+    auto writeCharacteristicFunc = CJLambda::Create(reinterpret_cast<void (*)(int32_t)>(callback));
+    callback_->RegisterWriteCharacteristicCallback(writeCharacteristicFunc);
     character->SetWriteType(writeType);
 
     int ret = BT_ERR_INTERNAL_ERROR;
@@ -182,8 +184,6 @@ int32_t FfiClientDevice::WriteCharacteristicValue(NativeBLECharacteristic charac
     if (ret != BT_NO_ERROR) {
         return ret;
     }
-    auto writeCharacteristicFunc = CJLambda::Create(reinterpret_cast<void (*)(int32_t)>(callback));
-    callback_->RegisterWriteCharacteristicCallback(writeCharacteristicFunc);
     return BT_NO_ERROR;
 }
 
@@ -195,6 +195,8 @@ int32_t FfiClientDevice::WriteDescriptorValue(NativeBLEDescriptor inputDescripto
         HILOGE("descriptor is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
+    auto writeDescriptorValueFunc = CJLambda::Create(reinterpret_cast<void (*)(int32_t)>(callback));
+    callback_->RegisterWriteDescriptorCallback(writeDescriptorValueFunc);
     int ret = BT_ERR_INTERNAL_ERROR;
     if (client_) {
         ret = client_->WriteDescriptor(*descriptor);
@@ -202,8 +204,6 @@ int32_t FfiClientDevice::WriteDescriptorValue(NativeBLEDescriptor inputDescripto
     if (ret != BT_NO_ERROR) {
         return ret;
     }
-    auto writeDescriptorValueFunc = CJLambda::Create(reinterpret_cast<void (*)(int32_t)>(callback));
-    callback_->RegisterWriteDescriptorCallback(writeDescriptorValueFunc);
     return BT_NO_ERROR;
 }
 
@@ -253,6 +253,44 @@ int32_t FfiClientDevice::SetCharacteristicChangeIndication(NativeBLECharacterist
         ret = client_->SetIndicateCharacteristic(*character, enable);
     }
     return ret;
+}
+
+int32_t FfiClientDevice::SetCharacteristicChangeNotificationCallback(NativeBLECharacteristic characteristic, bool enable, void (*callback)())
+{
+    GattCharacteristic *character = GetGattcCharacteristic(client_, characteristic);
+    if (character == nullptr) {
+        HILOGE("character is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    auto characteristicChangeIndicationFunc = CJLambda::Create(reinterpret_cast<void (*)(int32_t)>(callback));
+    callback_->RegisterCharacteristicChangeIndicationCallback(characteristicChangeIndicationFunc);
+    int ret = BT_ERR_INTERNAL_ERROR;
+    if (client_) {
+        ret = client_->SetNotifyCharacteristic(*character, enable);
+    }
+    if (ret != BT_NO_ERROR) {
+        return ret;
+    }
+    return BT_NO_ERROR;
+}
+
+int32_t FfiClientDevice::SetCharacteristicChangeIndicationCallback(NativeBLECharacteristic characteristic, bool enable, void (*callback)())
+{
+    GattCharacteristic *character = GetGattcCharacteristic(client_, characteristic);
+    if (character == nullptr) {
+        HILOGE("character is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    auto characteristicChangeNotificationFunc = CJLambda::Create(reinterpret_cast<void (*)(int32_t)>(callback));
+    callback_->RegisterCharacteristicChangeNotificationCallback(characteristicChangeNotificationFunc);
+    int ret = BT_ERR_INTERNAL_ERROR;
+    if (client_) {
+        ret = client_->SetIndicateCharacteristic(*character, enable);
+    }
+    if (ret != BT_NO_ERROR) {
+        return ret;
+    }
+    return BT_NO_ERROR;
 }
 
 int32_t FfiClientDevice::RegisterBleGattClientDeviceObserver(int32_t callbackType, void (*callback)())

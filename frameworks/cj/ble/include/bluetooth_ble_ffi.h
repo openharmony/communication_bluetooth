@@ -289,6 +289,10 @@ FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotificati
     NativeBLECharacteristic characteristic, bool enable, int32_t *errCode);
 FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndication(int64_t id,
     NativeBLECharacteristic characteristic, bool enable, int32_t *errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotificationV2(int64_t id,
+    NativeBLECharacteristic characteristic, bool enable, void (*callback)(), int32_t *errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndicationV2(int64_t id,
+    NativeBLECharacteristic characteristic, bool enable, void (*callback)(), int32_t *errCode);
 FFI_EXPORT void FfiBluetoothBleGattClientDeviceOn(int64_t id, int32_t callbackType, void (*callback)(),
     int32_t *errCode);
 

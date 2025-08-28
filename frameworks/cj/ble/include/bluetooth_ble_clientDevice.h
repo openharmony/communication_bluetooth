@@ -44,7 +44,7 @@ public:
     void OnMtuUpdate(int mtu, int ret) override;
     void OnServicesDiscovered(int status) override{};
     void OnConnectionParameterChanged(int interval, int latency, int timeout, int status) override{};
-    void OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status) override{};
+    void OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status) override;
     void OnReadRemoteRssiValueResult(int rssi, int status) override;
 
     void RegisterBLECharacteristicChangeFunc(std::function<void(NativeBLECharacteristic)> cjCallback);
@@ -55,6 +55,8 @@ public:
     void RegisterReadDescriptorCallback(std::function<void(RetNativeBLEDescriptor)> cjCallback);
     void RegisterWriteCharacteristicCallback(std::function<void(int32_t)> cjCallback);
     void RegisterWriteDescriptorCallback(std::function<void(int32_t)> cjCallback);
+    void RegisterCharacteristicChangeNotificationCallback(std::function<void(int32_t)> cjCallback);
+    void RegisterCharacteristicChangeIndicationCallback(std::function<void(int32_t)> cjCallback);
 
     FfiGattClientCallback();
     ~FfiGattClientCallback() override = default;
@@ -73,6 +75,8 @@ private:
     std::function<void(RetNativeBLEDescriptor)> readDescriptorFunc{nullptr};
     std::function<void(int32_t)> writeCharacteristicFunc{nullptr};
     std::function<void(int32_t)> writeDescriptorValueFunc{nullptr};
+    std::function<void(int32_t)> characteristicChangeNotificationFunc{nullptr};
+    std::function<void(int32_t)> characteristicChangeIndicationFunc{nullptr};
 };
 
 class FfiClientDevice : public OHOS::FFI::FFIData {
@@ -99,6 +103,8 @@ public:
     int32_t SetBLEMtuSize(int32_t mut);
     int32_t SetCharacteristicChangeNotification(NativeBLECharacteristic characteristic, bool enable);
     int32_t SetCharacteristicChangeIndication(NativeBLECharacteristic characteristic, bool enable);
+    int32_t SetCharacteristicChangeNotificationCallback(NativeBLECharacteristic characteristic, bool enable, void (*callback)());
+    int32_t SetCharacteristicChangeIndicationCallback(NativeBLECharacteristic characteristic, bool enable, void (*callback)());
 
     int32_t RegisterBleGattClientDeviceObserver(int32_t callbackType, void (*callback)());
 

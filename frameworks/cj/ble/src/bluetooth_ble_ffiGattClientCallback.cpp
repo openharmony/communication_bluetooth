@@ -125,6 +125,16 @@ void FfiGattClientCallback::OnMtuUpdate(int mtu, int ret)
         bleMtuChangeFunc(mtu);
     }
 }
+void FfiGattClientCallback::OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status)
+{
+    HILOGI("UUID: %{public}s, ret: %{public}d", characteristic.GetUuid().ToString().c_str(), status);
+    if (characteristicChangeNotificationFunc != nullptr) {
+        characteristicChangeNotificationFunc(status);
+    }
+    if (characteristicChangeIndicationFunc != nullptr) {
+        characteristicChangeIndicationFunc(status);
+    }
+}
 
 void FfiGattClientCallback::RegisterBLECharacteristicChangeFunc(std::function<void(NativeBLECharacteristic)> cjCallback)
 {
@@ -165,6 +175,16 @@ void FfiGattClientCallback::RegisterWriteCharacteristicCallback(std::function<vo
 void FfiGattClientCallback::RegisterWriteDescriptorCallback(std::function<void(int32_t)> cjCallback)
 {
     writeDescriptorValueFunc = cjCallback;
+}
+
+void FfiGattClientCallback::RegisterCharacteristicChangeNotificationCallback(std::function<void(int32_t)> cjCallback)
+{
+    characteristicChangeNotificationFunc = cjCallback;
+}
+
+void FfiGattClientCallback::RegisterCharacteristicChangeIndicationCallback(std::function<void(int32_t)> cjCallback)
+{
+    characteristicChangeIndicationFunc = cjCallback;
 }
 
 } // namespace CJBluetoothBle

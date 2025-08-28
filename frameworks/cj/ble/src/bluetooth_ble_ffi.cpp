@@ -264,6 +264,32 @@ void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndication(int64_t id
     return;
 }
 
+void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotificationV2(int64_t id,
+                                                                        NativeBLECharacteristic characteristic,
+                                                                        bool enable, void (*callback)(), int32_t *errCode)
+{
+    auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
+    if (clientDevice == nullptr) {
+        *errCode = BT_ERR_INTERNAL_ERROR;
+        return;
+    }
+    *errCode = clientDevice->SetCharacteristicChangeNotificationCallback(characteristic, enable, callback);
+    return;
+}
+
+void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndicationV2(int64_t id,
+                                                                      NativeBLECharacteristic characteristic,
+                                                                      bool enable, void (*callback)(), int32_t *errCode)
+{
+    auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
+    if (clientDevice == nullptr) {
+        *errCode = BT_ERR_INTERNAL_ERROR;
+        return;
+    }
+    *errCode = clientDevice->SetCharacteristicChangeIndicationCallback(characteristic, enable, callback);
+    return;
+}
+
 void FfiBluetoothBleGattClientDeviceOn(int64_t id, int32_t callbackType, void (*callback)(), int32_t *errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
