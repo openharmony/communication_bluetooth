@@ -257,7 +257,7 @@ struct HandsFreeAudioGateway::impl {
 
     bool OpenVoiceRecognition(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+        HILOG_COMM_INFO("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
         if (proxy != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy->OpenVoiceRecognition(BluetoothRawAddress(device.GetDeviceAddr()));
@@ -267,7 +267,7 @@ struct HandsFreeAudioGateway::impl {
 
     bool CloseVoiceRecognition(const BluetoothRemoteDevice &device)
     {
-        HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+        HILOG_COMM_INFO("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
         if (proxy != nullptr && device.IsValidBluetoothRemoteDevice()) {
             return proxy->CloseVoiceRecognition(BluetoothRawAddress(device.GetDeviceAddr()));
