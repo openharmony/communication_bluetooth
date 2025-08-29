@@ -20,6 +20,21 @@ static { loadLibrary("bluetoothA2dp_taihe_native.z") }
 
 from ohos.bluetooth.baseProfile use BaseProfile; 
 interface A2dpSourceProfile : BaseProfile {
+    SetCurrentCodecInfo(deviceId: String, codecInfo: CodecInfo): void;
+
+    GetCurrentCodecInfo(deviceId: String): CodecInfo;
+
+    GetPlayingState(deviceId: String): PlayingState;
+
+    Connect(deviceId: String): void;
+
+    Disconnect(deviceId: String): void;
+
+    @promise GetAutoPlayDisabledDuration(deviceId: String): i32;
+
+    @promise DisableAutoPlay(deviceId: String, duration: i32): void;
+
+    @promise EnableAutoPlay(deviceId: String): void;
 }
 
 enum CodecType: i32 {
