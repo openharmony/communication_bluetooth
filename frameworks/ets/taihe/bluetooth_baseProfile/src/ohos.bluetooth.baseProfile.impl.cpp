@@ -34,10 +34,21 @@ public:
     void On(::taihe::string_view type, ::taihe::callback_view<void(
         ::ohos::bluetooth::baseProfile::StateChangeParam const& data)> callback)
     {}
-    
+
     void Off(::taihe::string_view type, ::taihe::optional_view<::taihe::callback_view<void(
         ::ohos::bluetooth::baseProfile::StateChangeParam const& data)>> callback)
     {}
+
+    ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(string_view deviceId)
+    {
+        return ohos::bluetooth::constant::ProfileConnectionState(
+            ohos::bluetooth::constant::ProfileConnectionState::key_t::STATE_DISCONNECTED);
+    }
+
+    array<string> GetConnectedDevices()
+    {
+        return {};
+    }
 };
 }  // namespace
 
