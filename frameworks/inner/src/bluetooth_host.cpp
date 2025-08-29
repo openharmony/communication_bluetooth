@@ -683,7 +683,8 @@ int BluetoothHost::RestrictBluetooth()
 int BluetoothHost::SatelliteControl(int type, int state)
 {
     HILOGI("type: %{public}d, state: %{public}d", type, state);
-    if (type == static_cast<int>(SATELLITE_CONTROL_MODE::ANTENNA)) {
+    if (type == static_cast<int>(SATELLITE_CONTROL_MODE::ANTENNA) ||
+        type == static_cast<int>(SATELLITE_CONTROL_MODE::SIGNALHUB_MAC_SWITCH)) {
         CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     } else if (type == static_cast<int>(SATELLITE_CONTROL_MODE::BLUETOOTH_SWITCH)) {
         pimpl->LoadBluetoothHostService();

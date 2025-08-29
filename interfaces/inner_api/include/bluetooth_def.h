@@ -1678,6 +1678,7 @@ struct SensingInfo {
 enum class SATELLITE_CONTROL_MODE {
     ANTENNA = 0,
     BLUETOOTH_SWITCH = 1,
+    SIGNALHUB_MAC_SWITCH = 2,
 };
 
 struct TrustPairDeviceParam {
