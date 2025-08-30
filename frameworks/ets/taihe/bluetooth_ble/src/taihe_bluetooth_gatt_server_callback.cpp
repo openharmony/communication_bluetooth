@@ -41,12 +41,12 @@ void TaiheGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemote
 void TaiheGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state)
 {
     HILOGI("enter, state: %{public}d, remote device address: %{public}s", state, GET_ENCRYPT_ADDR(device));
-    std::lock_guard<std::mutex> lock(TaiheGattServer::deviceListMutex_);
+    std::lock_guard<std::mutex> lock(GattServerImpl::deviceListMutex_);
     if (state == static_cast<int>(BTConnectState::CONNECTED)) {
         HILOGI("connected");
         bool hasAddr = false;
-        for (auto it = TaiheGattServer::deviceList_.begin();
-                it != TaiheGattServer::deviceList_.end(); ++it) {
+        for (auto it = GattServerImpl::deviceList_.begin();
+                it != GattServerImpl::deviceList_.end(); ++it) {
             if (*it == device.GetDeviceAddr()) {
                 hasAddr = true;
                 break;
@@ -54,15 +54,15 @@ void TaiheGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevic
         }
         if (!hasAddr) {
             HILOGI("add devices");
-            TaiheGattServer::deviceList_.push_back(device.GetDeviceAddr());
+            GattServerImpl::deviceList_.push_back(device.GetDeviceAddr());
         }
     } else if (state == static_cast<int>(BTConnectState::DISCONNECTED)) {
         HILOGI("disconnected");
-        for (auto it = TaiheGattServer::deviceList_.begin();
-                it != TaiheGattServer::deviceList_.end(); ++it) {
+        for (auto it = GattServerImpl::deviceList_.begin();
+                it != GattServerImpl::deviceList_.end(); ++it) {
             if (*it == device.GetDeviceAddr()) {
                 HILOGI("romove device");
-                TaiheGattServer::deviceList_.erase(it);
+                GattServerImpl::deviceList_.erase(it);
                 break;
             }
         }

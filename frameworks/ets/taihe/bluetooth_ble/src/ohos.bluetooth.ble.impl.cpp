@@ -42,27 +42,6 @@ namespace Bluetooth {
 using namespace taihe;
 using namespace ohos::bluetooth::ble;
 
-enum ani_status {
-    ani_ok = 0,
-    ani_invalid_arg,
-};
-
-#ifndef ANI_BT_CALL_RETURN
-#define ANI_BT_CALL_RETURN(func)                                          \
-    do {                                                                   \
-        ani_status ret = (func);                                          \
-        if (ret != ani_ok) {                                              \
-            HILOGE("api call function failed. ret:%{public}d", ret);      \
-            return ret;                                                    \
-        }                                                                  \
-    } while (0)
-#endif
-
-enum class SensitivityMode {
-    SENSITIVITY_MODE_HIGH = 1,  //  high sensitivity mode
-    SENSITIVITY_MODE_LOW = 2    //  low sensitivity mode
-};
-
 std::shared_ptr<OHOS::Bluetooth::BleAdvertiser> BleAdvertiserGetInstance(void)
 {
     static auto instance = OHOS::Bluetooth::BleAdvertiser::CreateInstance();
@@ -177,7 +156,7 @@ GattClientDevice CreateGattClientDevice(string_view deviceId)
 
 ohos::bluetooth::ble::GattServer CreateGattServer()
 {
-    return make_holder<TaiheGattServer, ohos::bluetooth::ble::GattServer>();
+    return make_holder<GattServerImpl, ohos::bluetooth::ble::GattServer>();
 }
 
 ohos::bluetooth::ble::BleScanner CreateBleScanner()
@@ -185,19 +164,8 @@ ohos::bluetooth::ble::BleScanner CreateBleScanner()
     return make_holder<BleScannerImpl, ohos::bluetooth::ble::BleScanner>();
 }
 
-static bool IsValidAddress(std::string bdaddr)
-{
-#if defined(IOS_PLATFORM)
-    const std::regex deviceIdRegex("^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$");
-    return regex_match(bdaddr, deviceIdRegex);
-#else
-    const std::regex deviceIdRegex("^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}$");
-    return regex_match(bdaddr, deviceIdRegex);
-#endif
-}
-
 static ani_status ParseScanFilterDeviceIdParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
-                                              BleScanFilter &bleScanFilter)
+                                                    BleScanFilter &bleScanFilter)
 {
     if (scanFilter.deviceId.has_value()) {
         std::string deviceId = std::string(scanFilter.deviceId.value());
@@ -211,7 +179,7 @@ static ani_status ParseScanFilterDeviceIdParameters(const ohos::bluetooth::ble::
 }
 
 static ani_status ParseScanFilterLocalNameParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
-                                               BleScanFilter &bleScanFilter)
+                                                     BleScanFilter &bleScanFilter)
 {
     if (scanFilter.name.has_value()) {
         std::string name = std::string(scanFilter.name.value());
@@ -225,7 +193,7 @@ static ani_status ParseScanFilterLocalNameParameters(const ohos::bluetooth::ble:
 }
 
 static ani_status ParseScanFilterServiceUuidParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
-                                                 BleScanFilter &bleScanFilter)
+                                                       BleScanFilter &bleScanFilter)
 {
     if (scanFilter.serviceUuid.has_value()) {
         std::string uuid = std::string(scanFilter.serviceUuid.value());
@@ -242,7 +210,7 @@ static ani_status ParseScanFilterServiceUuidParameters(const ohos::bluetooth::bl
 }
 
 static ani_status ParseScanFilterSolicitationUuidParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
-                                                      BleScanFilter &bleScanFilter)
+                                                            BleScanFilter &bleScanFilter)
 {
     if (scanFilter.serviceSolicitationUuid.has_value()) {
         std::string uuid = std::string(scanFilter.serviceSolicitationUuid.value());
@@ -266,7 +234,7 @@ static void ParseArrayBufferParams(const taihe::array<uint8_t>& data, std::vecto
 }
 
 static ani_status ParseScanFilterServiceDataParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
-                                                 BleScanFilter &bleScanFilter)
+                                                       BleScanFilter &bleScanFilter)
 {
     if (scanFilter.serviceData.has_value()) {
         std::vector<uint8_t> data {};
@@ -282,7 +250,7 @@ static ani_status ParseScanFilterServiceDataParameters(const ohos::bluetooth::bl
 }
 
 static ani_status ParseScanFilterManufactureDataParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
-                                                     BleScanFilter &bleScanFilter)
+                                                           BleScanFilter &bleScanFilter)
 {
     if (scanFilter.manufactureId.has_value()) {
         bleScanFilter.SetManufacturerId(scanFilter.manufactureId.value());
@@ -314,7 +282,7 @@ static ani_status ParseScanFilter(const ohos::bluetooth::ble::ScanFilter &scanFi
 }
 
 static ani_status ParseScanFilterParameters(array<ohos::bluetooth::ble::ScanFilter> filters,
-                                      std::vector<BleScanFilter> &params)
+                                            std::vector<BleScanFilter> &params)
 {
     for (const auto& scanFilter : filters) {
         BleScanFilter bleScanFilter;
@@ -400,8 +368,8 @@ void StartBLEScan(array<ohos::bluetooth::ble::ScanFilter> filters,
 
 array<string> GetConnectedBLEDevices()
 {
-    std::lock_guard<std::mutex> lock(TaiheGattServer::deviceListMutex_);
-    std::vector<std::string> dstDevicesvec = TaiheGattServer::deviceList_;
+    std::lock_guard<std::mutex> lock(GattServerImpl::deviceListMutex_);
+    std::vector<std::string> dstDevicesvec = GattServerImpl::deviceList_;
     array<string> result(taihe::copy_data_t{}, dstDevicesvec.data(), dstDevicesvec.size());
     return result;
 }

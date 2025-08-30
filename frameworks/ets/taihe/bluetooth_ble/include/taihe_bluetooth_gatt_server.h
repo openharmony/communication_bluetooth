@@ -29,8 +29,7 @@ namespace Bluetooth {
 
 using namespace taihe;
 using namespace ohos::bluetooth::ble;
-class TaiheGattServer {
-
+class GattServerImpl {
 public:
     void AddService(ohos::bluetooth::ble::GattService service);
     void Close();
@@ -40,15 +39,14 @@ public:
     static std::vector<std::string> deviceList_;
     static std::mutex deviceListMutex_;
 
-    TaiheGattServer()
+    GattServerImpl()
     {
-        HILOGI("[BTTEST] GattServerImpl enter");
         callback_ = std::make_shared<OHOS::Bluetooth::TaiheGattServerCallback>();
         std::shared_ptr<OHOS::Bluetooth::GattServerCallback> tmp =
             std::static_pointer_cast<OHOS::Bluetooth::GattServerCallback>(callback_);
         server_  = OHOS::Bluetooth::GattServer::CreateInstance(tmp);
     }
-    ~TaiheGattServer() = default;
+    ~GattServerImpl() = default;
 
 private:
     std::shared_ptr<GattServer> server_ = nullptr;
