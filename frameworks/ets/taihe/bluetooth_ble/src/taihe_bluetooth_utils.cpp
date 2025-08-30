@@ -13,4 +13,26 @@
  * limitations under the License.
  */
 
+#ifndef LOG_TAG
+#define LOG_TAG "bt_taihe_bluetooth_utils"
+#endif
+
 #include "taihe_bluetooth_utils.h"
+#include "bluetooth_log.h"
+
+#include <regex>
+
+namespace OHOS {
+namespace Bluetooth {
+bool IsValidAddress(std::string bdaddr)
+{
+#if defined(IOS_PLATFORM)
+    const std::regex deviceIdRegex("^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$");
+    return regex_match(bdaddr, deviceIdRegex);
+#else
+    const std::regex deviceIdRegex("^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}$");
+    return regex_match(bdaddr, deviceIdRegex);
+#endif
+}
+} // namespace Bluetooth
+} // namespace OHOS

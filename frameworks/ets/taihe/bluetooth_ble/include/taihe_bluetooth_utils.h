@@ -16,6 +16,8 @@
 #ifndef TAIHE_BLUETOOTH_UTILS_H_
 #define TAIHE_BLUETOOTH_UTILS_H_
 
+#include <string>
+
 namespace OHOS {
 namespace Bluetooth {
 
@@ -23,6 +25,29 @@ enum class ScanReportType {
     ON_FOUND = 1, // the found of advertisement packet
     ON_LOST = 2 // the lost of advertisement packet
 };
+
+enum class SensitivityMode {
+    SENSITIVITY_MODE_HIGH = 1,  //  high sensitivity mode
+    SENSITIVITY_MODE_LOW = 2    //  low sensitivity mode
+};
+
+enum ani_status {
+    ani_ok = 0,
+    ani_invalid_arg,
+};
+
+#ifndef ANI_BT_CALL_RETURN
+#define ANI_BT_CALL_RETURN(func)                                          \
+    do {                                                                   \
+        ani_status ret = (func);                                          \
+        if (ret != ani_ok) {                                              \
+            HILOGE("api call function failed. ret:%{public}d", ret);      \
+            return ret;                                                    \
+        }                                                                  \
+    } while (0)
+#endif
+
+bool IsValidAddress(std::string bdaddr);
 }
 }
 #endif // TAIHE_BLUETOOTH_UTILS_H_
