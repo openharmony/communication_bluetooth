@@ -40,9 +40,6 @@ public:
 
     TaiheGattServerCallback();
     ~TaiheGattServerCallback() override = default;
-
-    static std::vector<std::string> deviceList_;
-    static std::mutex deviceListMutex_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
