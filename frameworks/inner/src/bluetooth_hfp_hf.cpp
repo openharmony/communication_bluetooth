@@ -54,7 +54,8 @@ public:
 
     void OnScoStateChanged(const BluetoothRawAddress &device, int32_t state) override
     {
-        HILOGI("enter, device: %{public}s, state: %{public}d", GetEncryptAddr((device).GetAddress()).c_str(), state);
+        HILOG_COMM_INFO("OnScoStateChanged: %{public}s, state: %{public}d",
+            GetEncryptAddr((device).GetAddress()).c_str(), state);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), 0);
         observers_.ForEach([remoteDevice, state](std::shared_ptr<HandsFreeUnitObserver> observer) {
             observer->OnScoStateChanged(remoteDevice, state);
