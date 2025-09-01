@@ -239,7 +239,7 @@ struct HandsFreeAudioGateway::impl {
 
     void PhoneStateChanged(BluetoothPhoneState &phoneState)
     {
-        HILOGI("numActive: %{public}d, numHeld: %{public}d, callState: %{public}d, type: %{public}d",
+        HILOG_COMM_INFO("numActive: %{public}d, numHeld: %{public}d, callState: %{public}d, type: %{public}d",
             phoneState.GetActiveNum(), phoneState.GetHeldNum(), phoneState.GetCallState(), phoneState.GetCallType());
         sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is null");
@@ -610,7 +610,7 @@ void HandsFreeAudioGateway::ClccResponse(
 
 bool HandsFreeAudioGateway::OpenVoiceRecognition(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+    HILOG_COMM_INFO("OpenVoiceRecognition: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return false;
@@ -624,7 +624,7 @@ bool HandsFreeAudioGateway::OpenVoiceRecognition(const BluetoothRemoteDevice &de
 
 bool HandsFreeAudioGateway::CloseVoiceRecognition(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+    HILOG_COMM_INFO("CloseVoiceRecognition: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return false;
