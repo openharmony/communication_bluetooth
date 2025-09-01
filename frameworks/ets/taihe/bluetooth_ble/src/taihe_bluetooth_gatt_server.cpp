@@ -30,7 +30,7 @@ std::mutex GattServerImpl::deviceListMutex_;
 
 void GattServerImpl::AddService(ohos::bluetooth::ble::GattService service)
 {
-    ANI_BT_ASSERT(server_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR, "AddService ani assert failed");
+    ANI_BT_ASSERT(server_ != nullptr, BT_ERR_INTERNAL_ERROR, "AddService ani assert failed");
     std::unique_ptr<GattService> gattService {nullptr};
     GattServiceType type = service.isPrimary ? GattServiceType::PRIMARY : GattServiceType::SECONDARY;
     UUID serviceUuid = UUID::FromString(std::string(service.serviceUuid));
@@ -57,16 +57,16 @@ void GattServerImpl::AddService(ohos::bluetooth::ble::GattService service)
 
 void GattServerImpl::Close()
 {
-    ANI_BT_ASSERT(server_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR, "Close ani assert failed");
+    ANI_BT_ASSERT(server_ != nullptr, BT_ERR_INTERNAL_ERROR, "Close ani assert failed");
     int ret = server_->Close();
     HILOGI("ret: %{public}d", ret);
 
-    ANI_BT_ASSERT(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "Close return error");
+    ANI_BT_ASSERT(ret == BT_NO_ERROR, ret, "Close return error");
 }
 
 void GattServerImpl::RemoveService(string_view serviceUuid)
 {
-    ANI_BT_ASSERT(server_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR, "RemoveService ani assert failed");
+    ANI_BT_ASSERT(server_ != nullptr, BT_ERR_INTERNAL_ERROR, "RemoveService ani assert failed");
     UUID uuid = UUID::FromString(std::string(serviceUuid));
 
     int ret = BT_NO_ERROR;
@@ -85,7 +85,7 @@ void GattServerImpl::RemoveService(string_view serviceUuid)
 
 void GattServerImpl::SendResponse(ServerResponse serverResponse)
 {
-    ANI_BT_ASSERT(server_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR, "SendResponse ani assert failed");
+    ANI_BT_ASSERT(server_ != nullptr, BT_ERR_INTERNAL_ERROR, "SendResponse ani assert failed");
     BluetoothRemoteDevice remoteDevice(std::string(serverResponse.deviceId), BTTransport::ADAPTER_BLE);
     int32_t transId = serverResponse.transId;
     int32_t status = serverResponse.status;

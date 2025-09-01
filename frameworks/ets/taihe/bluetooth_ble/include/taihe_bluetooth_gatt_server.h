@@ -41,10 +41,9 @@ public:
 
     GattServerImpl()
     {
-        callback_ = std::make_shared<OHOS::Bluetooth::TaiheGattServerCallback>();
-        std::shared_ptr<OHOS::Bluetooth::GattServerCallback> tmp =
-            std::static_pointer_cast<OHOS::Bluetooth::GattServerCallback>(callback_);
-        server_  = OHOS::Bluetooth::GattServer::CreateInstance(tmp);
+        callback_ = std::make_shared<TaiheGattServerCallback>();
+        std::shared_ptr<GattServerCallback> tmp = std::static_pointer_cast<GattServerCallback>(callback_);
+        server_  = GattServer::CreateInstance(tmp);
     }
     ~GattServerImpl() = default;
 
