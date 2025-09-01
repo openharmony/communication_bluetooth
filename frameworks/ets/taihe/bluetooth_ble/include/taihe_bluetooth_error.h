@@ -21,8 +21,8 @@
 
 namespace OHOS {
 namespace Bluetooth {
-#ifndef ANI_BT_ASSERT_RETURN
-#define ANI_BT_ASSERT_RETURN(cond, errCode, errMsg)     \
+#ifndef ANI_BT_ASSERT
+#define ANI_BT_ASSERT(cond, errCode, errMsg)     \
 do {                                                     \
     if (!(cond)) {                                      \
         taihe::set_business_error(errCode, errMsg);            \
