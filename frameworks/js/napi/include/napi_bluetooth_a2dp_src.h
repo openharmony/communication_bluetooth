@@ -66,6 +66,8 @@ enum CodecBitRate {
     CODEC_BIT_RATE_640000 = 6,
     CODEC_BIT_RATE_960000 = 7,
     CODEC_BIT_RATE_ABR = 8,
+    CODEC_BIT_RATE_1500000 = 9,
+    CODEC_BIT_RATE_2300000 = 10,
 };
 
 enum CodecFrameLength {
