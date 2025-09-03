@@ -21,6 +21,7 @@
 #include "taihe_bluetooth_error.h"
 #include "bluetooth_utils.h"
 #include "taihe_bluetooth_utils.h"
+#include "taihe_parser_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -30,22 +31,24 @@ std::mutex GattServerImpl::deviceListMutex_;
 
 void GattServerImpl::AddService(ohos::bluetooth::ble::GattService service)
 {
-    ANI_BT_ASSERT(server_ != nullptr, BT_ERR_INTERNAL_ERROR, "AddService ani assert failed");
+    ANI_BT_ASSERT(server_ != nullptr, BT_ERR_INVALID_PARAM, "AddService ani assert failed");
     std::unique_ptr<GattService> gattService {nullptr};
     GattServiceType type = service.isPrimary ? GattServiceType::PRIMARY : GattServiceType::SECONDARY;
     UUID serviceUuid = UUID::FromString(std::string(service.serviceUuid));
     gattService = std::make_unique<GattService>(serviceUuid, type);
 
-    for (auto &characteristic : service.characteristics) {
-        int charPermissions = 0;
-        int charProperties = 0;
-        UUID characteristicUuid = UUID::FromString(std::string(characteristic.serviceUuid));
-        GattCharacteristic character(characteristicUuid, charPermissions, charProperties);
+    AniGattService aniGattService;
+    ANI_BT_ASSERT(AniParseGattService(service, aniGattService) == ani_ok, BT_ERR_INTERNAL_ERROR,
+                  "AniParseGattService ani parase failed");
+
+    for (auto &characteristic : aniGattService.characteristics) {
+        int charPermissions = characteristic.permissions;
+        int charProperties = characteristic.properties;
+        GattCharacteristic character(characteristic.characteristicUuid, charPermissions, charProperties);
         character.SetValue(characteristic.characteristicValue.data(), characteristic.characteristicValue.size());
 
         for (const auto &descriptor : characteristic.descriptors) {
-            UUID descriptorUuid = UUID::FromString(std::string(descriptor.descriptorUuid));
-            GattDescriptor gattDescriptor(descriptorUuid, 0);
+            GattDescriptor gattDescriptor(descriptor.descriptorUuid, descriptor.permissions);
             gattDescriptor.SetValue(descriptor.descriptorValue.data(), descriptor.descriptorValue.size());
             character.AddDescriptor(gattDescriptor);
         }
@@ -57,7 +60,7 @@ void GattServerImpl::AddService(ohos::bluetooth::ble::GattService service)
 
 void GattServerImpl::Close()
 {
-    ANI_BT_ASSERT(server_ != nullptr, BT_ERR_INTERNAL_ERROR, "Close ani assert failed");
+    ANI_BT_ASSERT(server_ != nullptr, BT_ERR_INVALID_PARAM, "Close ani assert failed");
     int ret = server_->Close();
     HILOGI("ret: %{public}d", ret);
 
@@ -66,8 +69,9 @@ void GattServerImpl::Close()
 
 void GattServerImpl::RemoveService(string_view serviceUuid)
 {
-    ANI_BT_ASSERT(server_ != nullptr, BT_ERR_INTERNAL_ERROR, "RemoveService ani assert failed");
-    UUID uuid = UUID::FromString(std::string(serviceUuid));
+    UUID uuid;
+    auto status = ParseUuidParams(std::string(serviceUuid), uuid);
+    ANI_BT_ASSERT((status && server_ != nullptr), BT_ERR_INVALID_PARAM, "RemoveService ani assert failed");
 
     int ret = BT_NO_ERROR;
     auto primaryService = server_->GetService(uuid, true);
@@ -81,11 +85,13 @@ void GattServerImpl::RemoveService(string_view serviceUuid)
         ret = server_->RemoveGattService(secondService.value());
         ANI_BT_ASSERT(ret == BT_NO_ERROR, ret, "Second RemoveService return error");
     }
+    ANI_BT_ASSERT((primaryService.has_value() || secondService.has_value()),
+        BT_ERR_INVALID_PARAM, "RemoveGattService return error");
 }
 
 void GattServerImpl::SendResponse(ServerResponse serverResponse)
 {
-    ANI_BT_ASSERT(server_ != nullptr, BT_ERR_INTERNAL_ERROR, "SendResponse ani assert failed");
+    ANI_BT_ASSERT(server_ != nullptr, BT_ERR_INVALID_PARAM, "SendResponse ani assert failed");
     BluetoothRemoteDevice remoteDevice(std::string(serverResponse.deviceId), BTTransport::ADAPTER_BLE);
     int32_t transId = serverResponse.transId;
     int32_t status = serverResponse.status;

@@ -16,7 +16,9 @@
 #ifndef TAIHE_BLUETOOTH_UTILS_H_
 #define TAIHE_BLUETOOTH_UTILS_H_
 
-#include <string>
+#include "bluetooth_types.h"
+#include "taihe/runtime.hpp"
+#include "taihe/array.hpp"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -48,6 +50,14 @@ enum ani_status {
 #endif
 
 bool IsValidAddress(std::string bdaddr);
+bool ParseUuidParams(const std::string &uuid, UUID &outUuid);
+template<typename T>
+void ParseArrayBufferParams(const taihe::array<T>& data, std::vector<T> &outParam)
+{
+    for (const auto item : data) {
+        outParam.push_back(item);
+    }
 }
-}
+} // namespace Bluetooth
+} // namespace OHOS
 #endif // TAIHE_BLUETOOTH_UTILS_H_

@@ -34,5 +34,16 @@ bool IsValidAddress(std::string bdaddr)
     return regex_match(bdaddr, deviceIdRegex);
 #endif
 }
+
+bool ParseUuidParams(const std::string &uuid, UUID &outUuid)
+{
+    if (!IsValidUuid(uuid)) {
+        HILOGE("match the UUID faild.");
+        return false;
+    }
+    outUuid = ParcelUuid::FromString(uuid);
+
+    return true;
+}
 } // namespace Bluetooth
 } // namespace OHOS

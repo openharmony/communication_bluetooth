@@ -61,7 +61,7 @@ void TaiheGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevic
         for (auto it = GattServerImpl::deviceList_.begin();
                 it != GattServerImpl::deviceList_.end(); ++it) {
             if (*it == device.GetDeviceAddr()) {
-                HILOGI("romove device");
+                HILOGI("remove device");
                 GattServerImpl::deviceList_.erase(it);
                 break;
             }
