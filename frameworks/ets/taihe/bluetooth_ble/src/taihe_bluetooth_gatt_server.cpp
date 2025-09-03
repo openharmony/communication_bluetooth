@@ -37,8 +37,8 @@ void GattServerImpl::AddService(ohos::bluetooth::ble::GattService service)
     UUID serviceUuid = UUID::FromString(std::string(service.serviceUuid));
     gattService = std::make_unique<GattService>(serviceUuid, type);
 
-    AniGattService aniGattService;
-    ANI_BT_ASSERT(AniParseGattService(service, aniGattService) == ani_ok, BT_ERR_INTERNAL_ERROR,
+    TaiheGattService aniGattService;
+    ANI_BT_ASSERT(TaiheParseGattService(service, aniGattService) == ani_ok, BT_ERR_INTERNAL_ERROR,
                   "AniParseGattService ani parase failed");
 
     for (auto &characteristic : aniGattService.characteristics) {
