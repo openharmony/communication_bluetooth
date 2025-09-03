@@ -68,8 +68,8 @@ struct DescriptorReadRequest {
 }
 
 struct AdvertiseSetting {
-    interval: Optional<i16>;
-    txPower: Optional<i8>;
+    interval: Optional<i32>;
+    txPower: Optional<i32>;
     connectable: Optional<bool>;
 }
 
@@ -144,6 +144,7 @@ enum PhyType: i32 {
 
 enum ScanReportMode: i32 {
     NORMAL = 1,
+    BATCH = 2,
     FENCE_SENSITIVITY_LOW = 10,
     FENCE_SENSITIVITY_HIGH = 11
 }
@@ -155,6 +156,7 @@ struct BLECharacteristic {
     descriptors: Array<BLEDescriptor>;
     properties: Optional<GattProperties>;
     characteristicValueHandle: Optional<i16>;
+    permissions: Optional<GattPermissions>;
 }
 
 struct AdvertisingStateChangeInfo {
@@ -175,6 +177,7 @@ struct BLEDescriptor {
     descriptorUuid: String;
     descriptorValue: @arraybuffer Array<u8>;
     descriptorHandle: Optional<i16>;
+    permissions: Optional<GattPermissions>;
 }
 
 struct GattProperties {
@@ -188,6 +191,17 @@ struct GattProperties {
 enum GattWriteType: i32 {
     WRITE = 1,
     WRITE_NO_RESPONSE = 2
+}
+
+struct GattPermissions {
+    read: Optional<bool>;
+    readEncrypted: Optional<bool>;
+    readEncryptedMitm: Optional<bool>;
+    write: Optional<bool>;
+    writeEncrypted: Optional<bool>;
+    writeEncryptedMitm: Optional<bool>;
+    writeSigned: Optional<bool>;
+    writeSignedMitm: Optional<bool>;
 }
 
 function StopAdvertising(): void;
@@ -226,7 +240,7 @@ struct AdvertisingParams {
     duration: Optional<i16>;
 }
 struct ManufactureData {
-    manufactureId: i16;
+    manufactureId: i32;
     manufactureValue: @arraybuffer Array<u8>;
 }
 
@@ -257,3 +271,4 @@ interface BleScanner {
 function CreateBleScanner(): BleScanner;
 function GetConnectedBLEDevices(): Array<String>;
 function StartBLEScan(filters: Array<ScanFilter>, options: Optional<ScanOptions>): void;
+function StartAdvertising(setting: AdvertiseSetting, advData: AdvertiseData, advResponse: Optional<AdvertiseData>): void;
