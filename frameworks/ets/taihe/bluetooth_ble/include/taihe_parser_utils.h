@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-struct AniBleDescriptor {
+struct TaiheBleDescriptor {
     UUID serviceUuid;
     UUID characteristicUuid;
     UUID descriptorUuid;
@@ -33,30 +33,24 @@ struct AniBleDescriptor {
     int permissions;
 };
 
-struct AniBleCharacteristic {
+struct TaiheBleCharacteristic {
     UUID serviceUuid;
     UUID characteristicUuid;
     std::vector<uint8_t> characteristicValue;
-    std::vector<AniBleDescriptor> descriptors;
+    std::vector<TaiheBleDescriptor> descriptors;
     int properties;
     uint16_t characteristicValueHandle;
     int permissions;
 };
 
-struct FileHolder {
-    std::string filePath = "";
-    int64_t fileSize = 0;
-    int32_t fileFd = -1;
-};
-
-struct AniGattService {
+struct TaiheGattService {
     UUID serviceUuid;
     bool isPrimary;
-    std::vector<AniBleCharacteristic> characteristics;
-    std::vector<AniGattService> includeServices;
+    std::vector<TaiheBleCharacteristic> characteristics;
+    std::vector<TaiheGattService> includeServices;
 };
 
-struct AniGattPermission {
+struct TaiheGattPermission {
     bool readable = false;
     bool readEncrypted = false;
     bool readEncryptedMitm = false;
@@ -67,7 +61,7 @@ struct AniGattPermission {
     bool writeSignedMitm = false;
 };
 
-struct AniGattProperties {
+struct TaiheGattProperties {
     bool write = false;
     bool writeNoResponse = false;
     bool read = false;
@@ -78,16 +72,17 @@ struct AniGattProperties {
     bool extendedProperties = false;
 };
 
-ani_status AniParseGattService(ohos::bluetooth::ble::GattService object, AniGattService &outService);
-ani_status AniParseIncludeService(taihe::array<::ohos::bluetooth::ble::GattService> object,
-    std::vector<AniGattService> &outIncludeService);
-ani_status AniParseGattCharacteristic(taihe::array<::ohos::bluetooth::ble::BLECharacteristic> object,
-    std::vector<AniBleCharacteristic> &outCharacteristic);
-ani_status AniParseGattDescriptor(taihe::array<::ohos::bluetooth::ble::BLEDescriptor> object,
-    std::vector<AniBleDescriptor> &outDescriptor);
-ani_status AniParseObjectGattPermissions(ohos::bluetooth::ble::GattPermissions object,
-    AniGattPermission &outPermissions);
-ani_status AniParseObjectGattProperties(ohos::bluetooth::ble::GattProperties object, AniGattProperties &outProperties);
+ani_status TaiheParseGattService(ohos::bluetooth::ble::GattService object, TaiheGattService &outService);
+ani_status TaiheParseIncludeService(taihe::array<::ohos::bluetooth::ble::GattService> object,
+    std::vector<TaiheGattService> &outIncludeService);
+ani_status TaiheParseGattCharacteristic(taihe::array<::ohos::bluetooth::ble::BLECharacteristic> object,
+    std::vector<TaiheBleCharacteristic> &outCharacteristic);
+ani_status TaiheParseGattDescriptor(taihe::array<::ohos::bluetooth::ble::BLEDescriptor> object,
+    std::vector<TaiheBleDescriptor> &outDescriptor);
+ani_status TaiheParseObjectGattPermissions(ohos::bluetooth::ble::GattPermissions object,
+    TaiheGattPermission &outPermissions);
+ani_status TaiheParseObjectGattProperties(ohos::bluetooth::ble::GattProperties object,
+    TaiheGattProperties &outProperties);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // TAIHE_PARSER_UTILS_H

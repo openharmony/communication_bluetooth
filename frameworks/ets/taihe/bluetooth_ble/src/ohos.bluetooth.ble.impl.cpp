@@ -330,18 +330,18 @@ static void SetCbTypeSensMode(ohos::bluetooth::ble::ScanOptions &scanOptions, Bl
     outSettinngs.SetSensitivityMode(sensitivityMode);
 }
 
-
-ani_status CheckBleScanParams(array<ohos::bluetooth::ble::ScanFilter> filters,
+ani_status CheckBleScanParams(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
                               optional_view<ohos::bluetooth::ble::ScanOptions> options,
                               std::vector<BleScanFilter> &outScanfilters,
                               BleScanSettings &outSettinngs)
 {
     std::vector<BleScanFilter> scanfilters;
-    if (filters.empty()) {
+    if (filters.get_tag() == ohos::bluetooth::ble::ScanFilterNullValue::tag_t::nValue) {
         BleScanFilter emptyFilter;
         scanfilters.push_back(emptyFilter);
     } else {
-        ANI_BT_CALL_RETURN(ParseScanFilterParameters(filters, scanfilters));
+        array<ohos::bluetooth::ble::ScanFilter> inFilters = filters.get_filters_ref();
+        ANI_BT_CALL_RETURN(ParseScanFilterParameters(inFilters, scanfilters));
     }
 
     if (options.has_value()) {
@@ -366,7 +366,7 @@ ani_status CheckBleScanParams(array<ohos::bluetooth::ble::ScanFilter> filters,
     return ani_ok;
 }
 
-void StartBLEScan(array<ohos::bluetooth::ble::ScanFilter> filters,
+void StartBLEScan(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
                   optional_view<ohos::bluetooth::ble::ScanOptions> options)
 {
     std::vector<BleScanFilter> scanfilters;

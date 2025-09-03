@@ -23,30 +23,28 @@
 
 namespace OHOS {
 namespace Bluetooth {
-ani_status AniParseGattService(ohos::bluetooth::ble::GattService object, AniGattService &outService)
+ani_status TaiheParseGattService(ohos::bluetooth::ble::GattService object, TaiheGattService &outService)
 {
     std::string uuid {};
     bool isPrimary = true;
-    std::vector<AniBleCharacteristic> characteristics {};
+    std::vector<TaiheBleCharacteristic> characteristics {};
 
     if (!object.serviceUuid.empty()) {
         uuid = object.serviceUuid;
     }
 
-    if (object.isPrimary) {
-        isPrimary = object.isPrimary;
-    }
+    isPrimary = object.isPrimary;
 
     taihe::array<::ohos::bluetooth::ble::BLECharacteristic> objectCharacteristics = object.characteristics;
     if (objectCharacteristics.size() > 0) {
-        AniParseGattCharacteristic(objectCharacteristics, characteristics);
+        TaiheParseGattCharacteristic(objectCharacteristics, characteristics);
     }
 
     if (object.includeServices.has_value()) {
         taihe::array<::ohos::bluetooth::ble::GattService> objectIncludeServices = object.includeServices.value();
         if (objectIncludeServices.size() > 0) {
-            std::vector<AniGattService> includeServices {};
-            AniParseIncludeService(objectIncludeServices, includeServices);
+            std::vector<TaiheGattService> includeServices {};
+            TaiheParseIncludeService(objectIncludeServices, includeServices);
             outService.includeServices = std::move(includeServices);
         }
     }
@@ -59,101 +57,101 @@ ani_status AniParseGattService(ohos::bluetooth::ble::GattService object, AniGatt
 }
 
 namespace {
-const AniGattPermission DEFAULT_GATT_PERMISSIONS = {
+const TaiheGattPermission DEFAULT_GATT_PERMISSIONS = {
     .readable = true,
     .writeable = true,
 };
-const AniGattProperties DEFAULT_GATT_PROPERTIES = {
+const TaiheGattProperties DEFAULT_GATT_PROPERTIES = {
     .write = true,
     .writeNoResponse = true,
     .read = true,
 };
-uint16_t ConvertGattPermissions(const AniGattPermission &napiPermissions)
+uint16_t ConvertGattPermissions(const TaiheGattPermission &taihePermissions)
 {
     uint16_t permissions = 0;
-    if (napiPermissions.readable) {
+    if (taihePermissions.readable) {
         permissions |= static_cast<uint16_t>(GattPermission::READABLE);
     }
-    if (napiPermissions.readEncrypted) {
+    if (taihePermissions.readEncrypted) {
         permissions |= static_cast<uint16_t>(GattPermission::READ_ENCRYPTED);
     }
-    if (napiPermissions.readEncryptedMitm) {
+    if (taihePermissions.readEncryptedMitm) {
         permissions |= static_cast<uint16_t>(GattPermission::READ_ENCRYPTED_MITM);
     }
-    if (napiPermissions.writeable) {
+    if (taihePermissions.writeable) {
         permissions |= static_cast<uint16_t>(GattPermission::WRITEABLE);
     }
-    if (napiPermissions.writeEncrypted) {
+    if (taihePermissions.writeEncrypted) {
         permissions |= static_cast<uint16_t>(GattPermission::WRITE_ENCRYPTED);
     }
-    if (napiPermissions.writeEncryptedMitm) {
+    if (taihePermissions.writeEncryptedMitm) {
         permissions |= static_cast<uint16_t>(GattPermission::WRITE_ENCRYPTED_MITM);
     }
-    if (napiPermissions.writeSigned) {
+    if (taihePermissions.writeSigned) {
         permissions |= static_cast<uint16_t>(GattPermission::WRITE_SIGNED);
     }
-    if (napiPermissions.writeSignedMitm) {
+    if (taihePermissions.writeSignedMitm) {
         permissions |= static_cast<uint16_t>(GattPermission::WRITE_SIGNED_MITM);
     }
     return permissions;
 }
 
-uint16_t ConvertGattProperties(const AniGattProperties &napiProperties)
+uint16_t ConvertGattProperties(const TaiheGattProperties &taiheProperties)
 {
     uint16_t properties = 0;
-    if (napiProperties.read) {
+    if (taiheProperties.read) {
         properties |= static_cast<uint16_t>(GattCharacteristic::READ);
     }
-    if (napiProperties.write) {
+    if (taiheProperties.write) {
         properties |= static_cast<uint16_t>(GattCharacteristic::WRITE);
     }
-    if (napiProperties.writeNoResponse) {
+    if (taiheProperties.writeNoResponse) {
         properties |= static_cast<uint16_t>(GattCharacteristic::WRITE_WITHOUT_RESPONSE);
     }
-    if (napiProperties.notify) {
+    if (taiheProperties.notify) {
         properties |= static_cast<uint16_t>(GattCharacteristic::NOTIFY);
     }
-    if (napiProperties.indicate) {
+    if (taiheProperties.indicate) {
         properties |= static_cast<uint16_t>(GattCharacteristic::INDICATE);
     }
-    if (napiProperties.broadcast) {
+    if (taiheProperties.broadcast) {
         properties |= static_cast<uint16_t>(GattCharacteristic::BROADCAST);
     }
-    if (napiProperties.authenticatedSignedWrite) {
+    if (taiheProperties.authenticatedSignedWrite) {
         properties |= static_cast<uint16_t>(GattCharacteristic::AUTHENTICATED_SIGNED_WRITES);
     }
-    if (napiProperties.extendedProperties) {
+    if (taiheProperties.extendedProperties) {
         properties |= static_cast<uint16_t>(GattCharacteristic::EXTENDED_PROPERTIES);
     }
     return properties;
 }
 }  // namespace {}
 
-ani_status AniParseIncludeService(taihe::array<::ohos::bluetooth::ble::GattService> object,
-                                  std::vector<AniGattService> &outIncludeService)
+ani_status TaiheParseIncludeService(taihe::array<::ohos::bluetooth::ble::GattService> object,
+                                    std::vector<TaiheGattService> &outIncludeService)
 {
     for (size_t i = 0; i < object.size(); i++) {
         ohos::bluetooth::ble::GattService element = object[i];
-        AniGattService includeService {};
-        AniParseGattService(element, includeService);
+        TaiheGattService includeService {};
+        TaiheParseGattService(element, includeService);
         outIncludeService.push_back(std::move(includeService));
     }
     return ani_ok;
 }
 
-ani_status AniParseGattCharacteristic(taihe::array<::ohos::bluetooth::ble::BLECharacteristic> object,
-                                      std::vector<AniBleCharacteristic> &outCharacteristic)
+ani_status TaiheParseGattCharacteristic(taihe::array<::ohos::bluetooth::ble::BLECharacteristic> object,
+                                        std::vector<TaiheBleCharacteristic> &outCharacteristic)
 {
     for (size_t i = 0; i < object.size(); i++) {
         ohos::bluetooth::ble::BLECharacteristic element = object[i];
-        AniBleCharacteristic characteristic {};
+        TaiheBleCharacteristic characteristic {};
         std::string serviceUuid {};
         std::string characterUuid {};
         std::vector<uint8_t> characterValue {};
-        std::vector<AniBleDescriptor> descriptors {};
+        std::vector<TaiheBleDescriptor> descriptors {};
         uint32_t characteristicValueHandle = 0;
-        AniGattProperties properties = DEFAULT_GATT_PROPERTIES;
-        AniGattPermission permissions = DEFAULT_GATT_PERMISSIONS;
+        TaiheGattProperties properties = DEFAULT_GATT_PROPERTIES;
+        TaiheGattPermission permissions = DEFAULT_GATT_PERMISSIONS;
         if (!element.serviceUuid.empty()) {
             serviceUuid = element.serviceUuid;
         }
@@ -165,18 +163,18 @@ ani_status AniParseGattCharacteristic(taihe::array<::ohos::bluetooth::ble::BLECh
         }
         if (element.descriptors.size() > 0) {
             taihe::array<::ohos::bluetooth::ble::BLEDescriptor> objectDescriptors = element.descriptors;
-            AniParseGattDescriptor(objectDescriptors, descriptors);
+            TaiheParseGattDescriptor(objectDescriptors, descriptors);
         }
         if (element.properties.has_value()) {
             ohos::bluetooth::ble::GattProperties objectProperties = element.properties.value();
-            AniParseObjectGattProperties(objectProperties, properties);
+            TaiheParseObjectGattProperties(objectProperties, properties);
         }
         if (element.characteristicValueHandle.has_value()) {
             characteristicValueHandle = element.characteristicValueHandle.value();
         }
         if (element.permissions.has_value()) {
             ohos::bluetooth::ble::GattPermissions objectPermissions = element.permissions.value();
-            AniParseObjectGattPermissions(objectPermissions, permissions);
+            TaiheParseObjectGattPermissions(objectPermissions, permissions);
         }
 
         characteristic.serviceUuid = UUID::FromString(serviceUuid);
@@ -192,18 +190,18 @@ ani_status AniParseGattCharacteristic(taihe::array<::ohos::bluetooth::ble::BLECh
     return ani_ok;
 }
 
-ani_status AniParseGattDescriptor(taihe::array<::ohos::bluetooth::ble::BLEDescriptor> object,
-                                  std::vector<AniBleDescriptor> &outDescriptor)
+ani_status TaiheParseGattDescriptor(taihe::array<::ohos::bluetooth::ble::BLEDescriptor> object,
+                                    std::vector<TaiheBleDescriptor> &outDescriptor)
 {
     for (size_t i = 0; i < object.size(); i++) {
         ohos::bluetooth::ble::BLEDescriptor element = object[i];
-        AniBleDescriptor descriptor {};
+        TaiheBleDescriptor descriptor {};
         std::string serviceUuid {};
         std::string characterUuid {};
         std::string descriptorUuid {};
         std::vector<uint8_t> descriptorValue {};
         uint32_t descriptorHandle = 0;
-        AniGattPermission permissions = DEFAULT_GATT_PERMISSIONS;
+        TaiheGattPermission permissions = DEFAULT_GATT_PERMISSIONS;
 
         if (!element.serviceUuid.empty()) {
             serviceUuid = element.serviceUuid;
@@ -222,7 +220,7 @@ ani_status AniParseGattDescriptor(taihe::array<::ohos::bluetooth::ble::BLEDescri
         }
         if (element.permissions.has_value()) {
             ohos::bluetooth::ble::GattPermissions objectPermissions = element.permissions.value();
-            AniParseObjectGattPermissions(objectPermissions, permissions);
+            TaiheParseObjectGattPermissions(objectPermissions, permissions);
         }
 
         descriptor.serviceUuid = UUID::FromString(serviceUuid);
@@ -237,10 +235,10 @@ ani_status AniParseGattDescriptor(taihe::array<::ohos::bluetooth::ble::BLEDescri
     return ani_ok;
 }
 
-ani_status AniParseObjectGattPermissions(ohos::bluetooth::ble::GattPermissions object,
-                                         AniGattPermission &outPermissions)
+ani_status TaiheParseObjectGattPermissions(ohos::bluetooth::ble::GattPermissions object,
+                                           TaiheGattPermission &outPermissions)
 {
-    AniGattPermission permissions {};
+    TaiheGattPermission permissions {};
     if (object.read.has_value()) {
         permissions.readable = object.read.value();
     }
@@ -269,10 +267,10 @@ ani_status AniParseObjectGattPermissions(ohos::bluetooth::ble::GattPermissions o
     return ani_ok;
 }
 
-ani_status AniParseObjectGattProperties(ohos::bluetooth::ble::GattProperties object,
-                                        AniGattProperties &outProperties)
+ani_status TaiheParseObjectGattProperties(ohos::bluetooth::ble::GattProperties object,
+                                          TaiheGattProperties &outProperties)
 {
-    AniGattProperties properties {};
+    TaiheGattProperties properties {};
     if (object.write.has_value()) {
         properties.write = object.write.value();
     }
@@ -287,6 +285,15 @@ ani_status AniParseObjectGattProperties(ohos::bluetooth::ble::GattProperties obj
     }
     if (object.indicate.has_value()) {
         properties.indicate = object.indicate.value();
+    }
+    if (object.broadcast.has_value()) {
+        properties.broadcast = object.broadcast.value();
+    }
+    if (object.authenticatedSignedWrite.has_value()) {
+        properties.authenticatedSignedWrite = object.authenticatedSignedWrite.value();
+    }
+    if (object.extendedProperties.has_value()) {
+        properties.extendedProperties = object.extendedProperties.value();
     }
     outProperties = properties;
     return ani_ok;
