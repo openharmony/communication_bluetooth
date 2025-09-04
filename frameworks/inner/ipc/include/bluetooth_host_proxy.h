@@ -65,6 +65,7 @@ public:
     void RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer) override;
     void DeregisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer) override;
     int32_t GetBleMaxAdvertisingDataLength() override;
+    int32_t GetConnectedBLEDevices(int32_t bleProfile, std::vector<std::string> &connectedDevices) override;
     int32_t GetDeviceType(int32_t transport, const std::string &address) override;
     int32_t GetPhonebookPermission(const std::string &address) override;
     bool SetPhonebookPermission(const std::string &address, int32_t permission) override;
