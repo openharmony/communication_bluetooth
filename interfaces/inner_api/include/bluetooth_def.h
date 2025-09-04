@@ -124,6 +124,17 @@ enum class GattDisconnectReason : int {
 };
 
 /**
+ * @brief The profile in the BLE protocol.
+ *
+ * @since 21
+ */
+enum class BleProfile : int {
+    GATT = 1,
+    GATT_CLIENT = 2,
+    GATT_SERVER = 3
+};
+
+/**
  * @brief hdap connect state define
  * use to HdapConnectionState()...
  */

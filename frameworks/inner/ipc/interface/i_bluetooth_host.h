@@ -91,6 +91,7 @@ public:
     virtual void RegisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer) = 0;
     virtual void DeregisterRemoteDeviceObserver(const sptr<IBluetoothRemoteDeviceObserver> &observer) = 0;
     virtual int32_t GetBleMaxAdvertisingDataLength() = 0;
+    virtual int32_t GetConnectedBLEDevices(int32_t bleProfile, std::vector<std::string> &connectedDevices) = 0;
     virtual int32_t GetDeviceType(int32_t transport, const std::string &address) = 0;
     virtual int32_t GetPhonebookPermission(const std::string &address) = 0;
     virtual bool SetPhonebookPermission(const std::string &address, int32_t permission) = 0;

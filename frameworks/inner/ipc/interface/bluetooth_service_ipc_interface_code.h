@@ -295,6 +295,7 @@ enum BluetoothHostInterfaceCode {
     BT_SET_CAR_KEY_CARD_DATA,
     BT_NOTIFY_DIALOG_RESULT,
     BT_SET_CALLING_PACKAGE_NAME,
+    BT_GET_CONNECTED_BLE_DEVICES,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
