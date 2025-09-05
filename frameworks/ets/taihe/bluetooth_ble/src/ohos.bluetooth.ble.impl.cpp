@@ -295,8 +295,9 @@ static ani_status ParseScanFilterParameters(array<ohos::bluetooth::ble::ScanFilt
 static void SetReportDelay(ohos::bluetooth::ble::ScanOptions &scanOptions, BleScanSettings &outSettinngs)
 {
     long reportDelayFloorValueBatch = 5000;
-    if ((scanOptions.reportMode.value()).get_key() == ohos::bluetooth::ble::ScanReportMode::key_t::BATCH
-        && scanOptions.interval.value() < reportDelayFloorValueBatch) {
+    if (scanOptions.reportMode.has_value()
+        && ((scanOptions.reportMode.value()).get_key() == ohos::bluetooth::ble::ScanReportMode::key_t::BATCH)
+        && (scanOptions.interval.value() < reportDelayFloorValueBatch)) {
         outSettinngs.SetReportDelay(reportDelayFloorValueBatch);
         HILOGW("reportDelay should be at least 5000 under batch mode, got %{public}d, enforced to 5000.",
             scanOptions.interval.value());
