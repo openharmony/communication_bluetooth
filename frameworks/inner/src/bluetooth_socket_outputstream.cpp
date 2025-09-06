@@ -94,7 +94,6 @@ int OutputStream::Write(const uint8_t *buf, size_t length)
     if (ret <= 0) {
         setTimeoutFlag_ = false;
         HILOGE("socket write exception! ret:%{public}zd errno:%{public}d", ret, errno);
-        return errno;
     }
     return ret;
 }
