@@ -1153,6 +1153,14 @@ int BluetoothHost::GetBleMaxAdvertisingDataLength() const
     return proxy->GetBleMaxAdvertisingDataLength();
 }
 
+int32_t BluetoothHost::GetConnectedBLEDevices(int32_t bleProfile, std::vector<std::string> &connectedDevices)
+{
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
+
+    return proxy->GetConnectedBLEDevices(bleProfile, connectedDevices);
+}
+
 void BluetoothHost::LoadSystemAbilitySuccess(const sptr<IRemoteObject> &remoteObject)
 {
     CHECK_AND_RETURN_LOG(pimpl, "pimpl is null.");

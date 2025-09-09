@@ -763,6 +763,42 @@ int32_t BluetoothHostProxy::GetBleMaxAdvertisingDataLength()
     return reply.ReadInt32();
 }
 
+int32_t BluetoothHostProxy::GetConnectedBLEDevices(int32_t bleProfile, std::vector<std::string> &connectedDevices)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::GetConnectedBLEDevices WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteInt32(bleProfile)) {
+        HILOGE("BluetoothHostProxy::GetConnectedBLEDevices write bleProfile error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_CONNECTED_BLE_DEVICES, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::GetConnectedBLEDevices done fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    BtErrCode exception = static_cast<BtErrCode>(reply.ReadInt32());
+    if (exception != BT_NO_ERROR) {
+        return exception;
+    }
+    uint32_t size = reply.ReadUint32();
+    const uint32_t maxSize = 20;
+    if (size > maxSize) {
+        HILOGE("max size of connected devices reaches upper limit.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    std::string device;
+    for (uint32_t i = 0; i < size; i++) {
+        device = reply.ReadString();
+        connectedDevices.push_back(device);
+    }
+    return BT_NO_ERROR;
+}
+
 int32_t BluetoothHostProxy::GetDeviceType(int32_t transport, const std::string &address)
 {
     MessageParcel data;

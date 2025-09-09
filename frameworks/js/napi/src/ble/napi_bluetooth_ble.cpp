@@ -28,6 +28,7 @@
 #include "napi_bluetooth_ble_utils.h"
 #include "napi_ha_event_utils.h"
 
+#include "bluetooth_host.h"
 #include "bluetooth_ble_advertiser.h"
 #include "bluetooth_ble_central_manager.h"
 #include "bluetooth_errorcode.h"
@@ -1181,14 +1182,40 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
     }
 }
 
+napi_status CheckBleProfileParams(napi_env env, napi_callback_info info, int32_t &outBleProfile)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_BT_RETURN_IF((argc > ARGS_SIZE_ONE), "Requires 0 or 1 arguments.", napi_invalid_arg);
+
+    if (argc == ARGS_SIZE_ONE) {
+        NAPI_BT_CALL_RETURN(NapiParseInt32(env, argv[PARAM0], outBleProfile));
+        int32_t maxValue = static_cast<int32_t>(BleProfile::GATT_SERVER);
+        int32_t minValue = static_cast<int32_t>(BleProfile::GATT);
+        if (outBleProfile < minValue || outBleProfile > maxValue) {
+            return napi_invalid_arg;
+        }
+    }
+    return napi_ok;
+}
+
 napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
     napi_value result = nullptr;
     napi_create_array(env, &result);
 
-    std::lock_guard<std::mutex> lock(NapiGattServer::deviceListMutex_);
-    auto status = ConvertStringVectorToJS(env, result, NapiGattServer::deviceList_);
+    int32_t bleProfile = static_cast<int32_t>(BleProfile::GATT_SERVER);
+    auto checkStatus = CheckBleProfileParams(env, info, bleProfile);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkStatus == napi_ok, BT_ERR_INTERNAL_ERROR);
+
+    std::vector<std::string> connectedDevices;
+    int32_t ret = BluetoothHost::GetDefaultHost().GetConnectedBLEDevices(bleProfile, connectedDevices);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+    
+    auto status = ConvertStringVectorToJS(env, result, connectedDevices);
     NAPI_BT_ASSERT_RETURN(env, status == napi_ok, BT_ERR_INTERNAL_ERROR, result);
     return result;
 }
@@ -1217,6 +1244,7 @@ napi_value PropertyInit(napi_env env, napi_value exports)
 
     napi_value scanReportTypeObj = ScanReportTypeInit(env);
     napi_value gattDisconnectReasonObj = GattDisconnectReasonInit(env);
+    napi_value bleProfileObj = BleProfileInit(env);
 #endif
 
     napi_property_descriptor exportFuncs[] = {
@@ -1230,6 +1258,7 @@ napi_value PropertyInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("AdvertisingState", advertisingStateObj),
         DECLARE_NAPI_PROPERTY("ScanReportType", scanReportTypeObj),
         DECLARE_NAPI_PROPERTY("GattDisconnectReason", gattDisconnectReasonObj),
+        DECLARE_NAPI_PROPERTY("BleProfile", bleProfileObj),
 #endif
     };
 
