@@ -526,6 +526,19 @@ napi_value GattDisconnectReasonInit(napi_env env)
     return gattDisconnectReasonObj;
 }
 
+napi_value BleProfileInit(napi_env env)
+{
+    napi_value bleProfileObj = nullptr;
+    napi_create_object(env, &bleProfileObj);
+    SetNamedPropertyByInteger(env, bleProfileObj,
+        static_cast<int32_t>(BleProfile::GATT), "GATT");
+    SetNamedPropertyByInteger(env, bleProfileObj,
+        static_cast<int32_t>(BleProfile::GATT_CLIENT), "GATT_CLIENT");
+    SetNamedPropertyByInteger(env, bleProfileObj,
+        static_cast<int32_t>(BleProfile::GATT_SERVER), "GATT_SERVER");
+    return bleProfileObj;
+}
+
 void SetGattClientDeviceId(const std::string &deviceId)
 {
     deviceAddr = deviceId;

@@ -730,6 +730,18 @@ public:
      */
     int GetBleMaxAdvertisingDataLength() const;
 
+    /**
+     * @brief Get connected BLE devices.
+     *
+     * @param bleProfile The profile in the BLE protocol.
+     *    GATT: the local device is acting as client and server, return all connected peer server and client devices.
+     *    GATT_CLIENT: the local device is acting as client, return the list of all connected peer server devices.
+     *    GATT_SERVER: the local device is acting as server, return the list of all connected peer client devices.
+     * @return Returns connected BLE devices.
+     * @since 21
+     */
+    int32_t GetConnectedBLEDevices(int32_t bleProfile, std::vector<std::string> &connectedDevices);
+
     void LoadSystemAbilitySuccess(const sptr<IRemoteObject> &remoteObject);
 
     void LoadSystemAbilityFail();
