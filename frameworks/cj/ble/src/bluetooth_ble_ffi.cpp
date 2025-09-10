@@ -29,9 +29,9 @@ using Bluetooth::BT_ERR_INTERNAL_ERROR;
 using Bluetooth::BT_NO_ERROR;
 
 extern "C" {
-int64_t FfiBluetoothBleCreateGattServer(int32_t *errCode)
+int64_t FfiBluetoothBleCreateGattServer(int32_t* errCode)
 {
-    FfiGattServer *nativeGattServer = nullptr;
+    FfiGattServer* nativeGattServer = nullptr;
     *errCode = BleImpl::CreateGattServer(nativeGattServer);
     if (*errCode != BT_NO_ERROR) {
         return -1;
@@ -39,9 +39,9 @@ int64_t FfiBluetoothBleCreateGattServer(int32_t *errCode)
     return nativeGattServer->GetID();
 }
 
-int64_t FfiBluetoothBleCreateGattClientDevice(const char *deviceId, int32_t *errCode)
+int64_t FfiBluetoothBleCreateGattClientDevice(const char* deviceId, int32_t* errCode)
 {
-    FfiClientDevice *nativeGattClientDevice = nullptr;
+    FfiClientDevice* nativeGattClientDevice = nullptr;
     *errCode = BleImpl::CreateGattClientDevice(deviceId, nativeGattClientDevice);
     if (*errCode != BT_NO_ERROR) {
         return -1;
@@ -49,70 +49,70 @@ int64_t FfiBluetoothBleCreateGattClientDevice(const char *deviceId, int32_t *err
     return nativeGattClientDevice->GetID();
 }
 
-CArrString FfiBluetoothBleGetConnectedBleDevices(int32_t *errCode)
+CArrString FfiBluetoothBleGetConnectedBleDevices(int32_t* errCode)
 {
-    CArrString res{};
+    CArrString res {};
     *errCode = BleImpl::GetConnectedBleDevices(res);
     return res;
 }
 
-void FfiBluetoothBleStartBleScan(CArrNativeScanFilter filters, NativeScanOptions *options, int32_t *errCode)
+void FfiBluetoothBleStartBleScan(CArrNativeScanFilter filters, NativeScanOptions* options, int32_t* errCode)
 {
     *errCode = BleImpl::StartBleScan(filters, options);
     return;
 }
 
-void FfiBluetoothBleStopBleScan(int32_t *errCode)
+void FfiBluetoothBleStopBleScan(int32_t* errCode)
 {
     *errCode = BleImpl::StopBleScan();
     return;
 }
 
-void FfiBluetoothBleStartAdvertising(NativeAdvertiseSetting setting, NativeAdvertiseData advData,
-                                     NativeAdvertiseData *advResponse, int32_t *errCode)
+void FfiBluetoothBleStartAdvertising(
+    NativeAdvertiseSetting setting, NativeAdvertiseData advData, NativeAdvertiseData* advResponse, int32_t* errCode)
 {
     *errCode = BleImpl::StartAdvertising(setting, advData, advResponse);
     return;
 }
 
-void FfiBluetoothBleStopAdvertising(int32_t *errCode)
+void FfiBluetoothBleStopAdvertising(int32_t* errCode)
 {
     *errCode = BleImpl::StopAdvertising();
     return;
 }
 
-int32_t FfiBluetoothBleStartAdvertisingWithId(NativeAdvertisingParams advertisingParams, int32_t *errCode)
+int32_t FfiBluetoothBleStartAdvertisingWithId(NativeAdvertisingParams advertisingParams, int32_t* errCode)
 {
     int32_t id = -1;
     *errCode = BleImpl::StartAdvertising(advertisingParams, id);
     return id;
 }
 
-void FfiBluetoothBleEnableAdvertising(NativeAdvertisingEnableParams advertisingEnableParams, int32_t *errCode)
+void FfiBluetoothBleEnableAdvertising(NativeAdvertisingEnableParams advertisingEnableParams, int32_t* errCode)
 {
     *errCode = BleImpl::EnableAdvertising(advertisingEnableParams);
     return;
 }
 
-void FfiBluetoothBleDisableAdvertising(NativeAdvertisingDisableParams advertisingDisableParams, int32_t *errCode)
+void FfiBluetoothBleDisableAdvertising(NativeAdvertisingDisableParams advertisingDisableParams, int32_t* errCode)
 {
     *errCode = BleImpl::DisableAdvertising(advertisingDisableParams);
     return;
 }
 
-void FfiBluetoothBleStopAdvertisingWithId(uint32_t advertisingId, int32_t *errCode)
+void FfiBluetoothBleStopAdvertisingWithId(uint32_t advertisingId, int32_t* errCode)
 {
     *errCode = BleImpl::StopAdvertising(advertisingId);
     return;
 }
 
-void FfiBluetoothBleOn(int32_t callbackType, void (*callback)(), int32_t *errCode)
+void FfiBluetoothBleOn(int32_t callbackType, void (*callback)(), int32_t* errCode)
 {
     *errCode = BleImpl::RegisterBleObserver(callbackType, callback);
     return;
 }
 
-void FfiBluetoothBleGattClientDeviceConnect(int64_t id, int32_t *errCode)
+void FfiBluetoothBleGattClientDeviceConnect(int64_t id, int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -123,7 +123,7 @@ void FfiBluetoothBleGattClientDeviceConnect(int64_t id, int32_t *errCode)
     return;
 }
 
-void FfiBluetoothBleGattClientDeviceDisconnect(int64_t id, int32_t *errCode)
+void FfiBluetoothBleGattClientDeviceDisconnect(int64_t id, int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -134,7 +134,7 @@ void FfiBluetoothBleGattClientDeviceDisconnect(int64_t id, int32_t *errCode)
     return;
 }
 
-void FfiBluetoothBleGattClientDeviceClose(int64_t id, int32_t *errCode)
+void FfiBluetoothBleGattClientDeviceClose(int64_t id, int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -145,7 +145,7 @@ void FfiBluetoothBleGattClientDeviceClose(int64_t id, int32_t *errCode)
     return;
 }
 
-char *FfiBluetoothBleGattClientDeviceGetDeviceName(int64_t id, int32_t *errCode)
+char* FfiBluetoothBleGattClientDeviceGetDeviceName(int64_t id, int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -156,9 +156,9 @@ char *FfiBluetoothBleGattClientDeviceGetDeviceName(int64_t id, int32_t *errCode)
     return MallocCString(name);
 }
 
-CArrGattService FfiBluetoothBleGattClientDeviceGetServices(int64_t id, int32_t *errCode)
+CArrGattService FfiBluetoothBleGattClientDeviceGetServices(int64_t id, int32_t* errCode)
 {
-    CArrGattService service{};
+    CArrGattService service {};
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
         *errCode = BT_ERR_INTERNAL_ERROR;
@@ -168,8 +168,8 @@ CArrGattService FfiBluetoothBleGattClientDeviceGetServices(int64_t id, int32_t *
     return service;
 }
 
-void FfiBluetoothBleGattClientDeviceReadCharacteristicValue(int64_t id, NativeBLECharacteristic characteristic,
-                                                            void (*callback)(), int32_t *errCode)
+void FfiBluetoothBleGattClientDeviceReadCharacteristicValue(
+    int64_t id, NativeBLECharacteristic characteristic, void (*callback)(), int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -180,8 +180,8 @@ void FfiBluetoothBleGattClientDeviceReadCharacteristicValue(int64_t id, NativeBL
     return;
 }
 
-void FfiBluetoothBleGattClientDeviceReadDescriptorValue(int64_t id, NativeBLEDescriptor descriptor, void (*callback)(),
-                                                        int32_t *errCode)
+void FfiBluetoothBleGattClientDeviceReadDescriptorValue(
+    int64_t id, NativeBLEDescriptor descriptor, void (*callback)(), int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -192,8 +192,8 @@ void FfiBluetoothBleGattClientDeviceReadDescriptorValue(int64_t id, NativeBLEDes
     return;
 }
 
-void FfiBluetoothBleGattClientDeviceWriteCharacteristicValue(int64_t id, NativeBLECharacteristic characteristic,
-                                                             int32_t writeType, void (*callback)(), int32_t *errCode)
+void FfiBluetoothBleGattClientDeviceWriteCharacteristicValue(
+    int64_t id, NativeBLECharacteristic characteristic, int32_t writeType, void (*callback)(), int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -204,8 +204,8 @@ void FfiBluetoothBleGattClientDeviceWriteCharacteristicValue(int64_t id, NativeB
     return;
 }
 
-void FfiBluetoothBleGattClientDeviceWriteDescriptorValue(int64_t id, NativeBLEDescriptor descriptor, void (*callback)(),
-                                                         int32_t *errCode)
+void FfiBluetoothBleGattClientDeviceWriteDescriptorValue(
+    int64_t id, NativeBLEDescriptor descriptor, void (*callback)(), int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -216,7 +216,7 @@ void FfiBluetoothBleGattClientDeviceWriteDescriptorValue(int64_t id, NativeBLEDe
     return;
 }
 
-void FfiBluetoothBleGattClientDeviceGetRssiValue(int64_t id, void (*callback)(), int32_t *errCode)
+void FfiBluetoothBleGattClientDeviceGetRssiValue(int64_t id, void (*callback)(), int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -227,7 +227,7 @@ void FfiBluetoothBleGattClientDeviceGetRssiValue(int64_t id, void (*callback)(),
     return;
 }
 
-void FfiBluetoothBleGattClientDeviceSetBLEMtuSize(int64_t id, int32_t mut, int32_t *errCode)
+void FfiBluetoothBleGattClientDeviceSetBLEMtuSize(int64_t id, int32_t mut, int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -238,9 +238,8 @@ void FfiBluetoothBleGattClientDeviceSetBLEMtuSize(int64_t id, int32_t mut, int32
     return;
 }
 
-void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotification(int64_t id,
-                                                                        NativeBLECharacteristic characteristic,
-                                                                        bool enable, int32_t *errCode)
+void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotification(
+    int64_t id, NativeBLECharacteristic characteristic, bool enable, int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -251,9 +250,8 @@ void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotification(int64_t 
     return;
 }
 
-void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndication(int64_t id,
-                                                                      NativeBLECharacteristic characteristic,
-                                                                      bool enable, int32_t *errCode)
+void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndication(
+    int64_t id, NativeBLECharacteristic characteristic, bool enable, int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -264,9 +262,8 @@ void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndication(int64_t id
     return;
 }
 
-void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotificationV2(int64_t id,
-                                                                        NativeBLECharacteristic characteristic,
-                                                                        bool enable, void (*callback)(), int32_t *errCode)
+void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotificationV2(
+    int64_t id, NativeBLECharacteristic characteristic, bool enable, void (*callback)(), int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -277,9 +274,8 @@ void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotificationV2(int64_
     return;
 }
 
-void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndicationV2(int64_t id,
-                                                                      NativeBLECharacteristic characteristic,
-                                                                      bool enable, void (*callback)(), int32_t *errCode)
+void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndicationV2(
+    int64_t id, NativeBLECharacteristic characteristic, bool enable, void (*callback)(), int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -290,7 +286,7 @@ void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndicationV2(int64_t 
     return;
 }
 
-void FfiBluetoothBleGattClientDeviceOn(int64_t id, int32_t callbackType, void (*callback)(), int32_t *errCode)
+void FfiBluetoothBleGattClientDeviceOn(int64_t id, int32_t callbackType, void (*callback)(), int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
@@ -301,7 +297,7 @@ void FfiBluetoothBleGattClientDeviceOn(int64_t id, int32_t callbackType, void (*
     return;
 }
 
-void FfiBluetoothBleGattServerAddService(int64_t id, NativeGattService service, int32_t *errCode)
+void FfiBluetoothBleGattServerAddService(int64_t id, NativeGattService service, int32_t* errCode)
 {
     auto gattServer = FFIData::GetData<FfiGattServer>(id);
     if (gattServer == nullptr) {
@@ -312,7 +308,7 @@ void FfiBluetoothBleGattServerAddService(int64_t id, NativeGattService service, 
     return;
 }
 
-void FfiBluetoothBleGattServerRemoveService(int64_t id, char *serviceUuid, int32_t *errCode)
+void FfiBluetoothBleGattServerRemoveService(int64_t id, char* serviceUuid, int32_t* errCode)
 {
     auto gattServer = FFIData::GetData<FfiGattServer>(id);
     if (gattServer == nullptr) {
@@ -323,7 +319,7 @@ void FfiBluetoothBleGattServerRemoveService(int64_t id, char *serviceUuid, int32
     return;
 }
 
-void FfiBluetoothBleGattServerClose(int64_t id, int32_t *errCode)
+void FfiBluetoothBleGattServerClose(int64_t id, int32_t* errCode)
 {
     auto gattServer = FFIData::GetData<FfiGattServer>(id);
     if (gattServer == nullptr) {
@@ -334,8 +330,8 @@ void FfiBluetoothBleGattServerClose(int64_t id, int32_t *errCode)
     return;
 }
 
-void FfiBluetoothBleGattServerNotifyCharacteristicChanged(int64_t id, char *deviceId,
-                                                          NativeNotifyCharacteristic characteristic, int32_t *errCode)
+void FfiBluetoothBleGattServerNotifyCharacteristicChanged(
+    int64_t id, char* deviceId, NativeNotifyCharacteristic characteristic, int32_t* errCode)
 {
     auto gattServer = FFIData::GetData<FfiGattServer>(id);
     if (gattServer == nullptr) {
@@ -346,7 +342,7 @@ void FfiBluetoothBleGattServerNotifyCharacteristicChanged(int64_t id, char *devi
     return;
 }
 
-void FfiBluetoothBleGattServerSendResponse(int64_t id, NativeServerResponse serverResponse, int32_t *errCode)
+void FfiBluetoothBleGattServerSendResponse(int64_t id, NativeServerResponse serverResponse, int32_t* errCode)
 {
     auto gattServer = FFIData::GetData<FfiGattServer>(id);
     if (gattServer == nullptr) {
@@ -357,7 +353,7 @@ void FfiBluetoothBleGattServerSendResponse(int64_t id, NativeServerResponse serv
     return;
 }
 
-void FfiBluetoothBleGattServerOn(int64_t id, int32_t callbackType, void (*callback)(), int32_t *errCode)
+void FfiBluetoothBleGattServerOn(int64_t id, int32_t callbackType, void (*callback)(), int32_t* errCode)
 {
     auto gattServer = FFIData::GetData<FfiGattServer>(id);
     if (gattServer == nullptr) {

@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-#include "bluetooth_ble_gattServer.h"
-
 #include "bluetooth_ble_common.h"
+#include "bluetooth_ble_gattServer.h"
 #include "bluetooth_gatt_characteristic.h"
 #include "bluetooth_gatt_descriptor.h"
 #include "bluetooth_log.h"
@@ -27,17 +26,15 @@ using Bluetooth::BTConnectState;
 using Bluetooth::GattCharacteristic;
 using Bluetooth::GattDescriptor;
 
-FfiGattServerCallback::FfiGattServerCallback()
-{
-}
+FfiGattServerCallback::FfiGattServerCallback() {}
 
-void FfiGattServerCallback::OnCharacteristicReadRequest(const BluetoothRemoteDevice &device,
-                                                        GattCharacteristic &characteristic, int requestId)
+void FfiGattServerCallback::OnCharacteristicReadRequest(
+    const BluetoothRemoteDevice& device, GattCharacteristic& characteristic, int requestId)
 {
     int transId_ = requestId;
     std::string deviceAddr_ = device.GetDeviceAddr();
 
-    NativeCharacteristicReadRequest request{};
+    NativeCharacteristicReadRequest request {};
     request.deviceId = MallocCString(deviceAddr_.c_str());
     request.transId = transId_;
     request.offset = 0;
@@ -57,13 +54,13 @@ void FfiGattServerCallback::OnCharacteristicReadRequest(const BluetoothRemoteDev
     request.serviceUuid = nullptr;
 }
 
-void FfiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteDevice &device,
-                                                         GattCharacteristic &characteristic, int requestId)
+void FfiGattServerCallback::OnCharacteristicWriteRequest(
+    const BluetoothRemoteDevice& device, GattCharacteristic& characteristic, int requestId)
 {
     int transId_ = requestId;
     std::string deviceAddr_ = device.GetDeviceAddr();
 
-    NativeCharacteristicWriteRequest request{};
+    NativeCharacteristicWriteRequest request {};
     request.deviceId = MallocCString(deviceAddr_.c_str());
     request.transId = transId_;
     request.offset = 0;
@@ -71,9 +68,9 @@ void FfiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteDe
     request.needRsp = characteristic.GetWriteType() == GattCharacteristic::WriteType::DEFAULT;
 
     size_t valueSize;
-    uint8_t *valueData = characteristic.GetValue(&valueSize).get();
+    uint8_t* valueData = characteristic.GetValue(&valueSize).get();
 
-    CArrUI8 arr{};
+    CArrUI8 arr {};
     arr.head = valueData;
     arr.size = static_cast<int64_t>(valueSize);
     request.value = arr;
@@ -93,13 +90,13 @@ void FfiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteDe
     request.serviceUuid = nullptr;
 }
 
-void FfiGattServerCallback::OnDescriptorReadRequest(const BluetoothRemoteDevice &device, GattDescriptor &descriptor,
-                                                    int requestId)
+void FfiGattServerCallback::OnDescriptorReadRequest(
+    const BluetoothRemoteDevice& device, GattDescriptor& descriptor, int requestId)
 {
     int transId_ = requestId;
     std::string deviceAddr_ = device.GetDeviceAddr();
 
-    NativeDescriptorReadRequest request{};
+    NativeDescriptorReadRequest request {};
 
     request.deviceId = MallocCString(deviceAddr_.c_str());
     request.transId = transId_;
@@ -124,13 +121,13 @@ void FfiGattServerCallback::OnDescriptorReadRequest(const BluetoothRemoteDevice 
     request.serviceUuid = nullptr;
 }
 
-void FfiGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevice &device, GattDescriptor &descriptor,
-                                                     int requestId)
+void FfiGattServerCallback::OnDescriptorWriteRequest(
+    const BluetoothRemoteDevice& device, GattDescriptor& descriptor, int requestId)
 {
     int transId_ = requestId;
     std::string deviceAddr_ = device.GetDeviceAddr();
 
-    NativeDescriptorWriteRequest request{};
+    NativeDescriptorWriteRequest request {};
 
     request.deviceId = MallocCString(deviceAddr_.c_str());
     request.transId = transId_;
@@ -139,9 +136,9 @@ void FfiGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevice
     request.needRsp = true;
 
     size_t valueSize;
-    uint8_t *valueData = descriptor.GetValue(&valueSize).get();
+    uint8_t* valueData = descriptor.GetValue(&valueSize).get();
 
-    CArrUI8 arr{};
+    CArrUI8 arr {};
     arr.head = valueData;
     arr.size = static_cast<int64_t>(valueSize);
     request.value = arr;
@@ -168,7 +165,7 @@ void FfiGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevice
     request.serviceUuid = nullptr;
 }
 
-void FfiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state)
+void FfiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice& device, int state)
 {
     std::lock_guard<std::mutex> lock(FfiGattServer::deviceListMutex_);
     if (state == static_cast<int>(BTConnectState::CONNECTED)) {
@@ -198,7 +195,7 @@ void FfiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice 
     std::string deviceAddr_ = device.GetDeviceAddr();
     int connectState_ = GetProfileConnectionState(state);
 
-    NativeBLEConnectionChangeState changeState{};
+    NativeBLEConnectionChangeState changeState {};
 
     changeState.deviceId = MallocCString(deviceAddr_.c_str());
     changeState.state = connectState_;
@@ -210,7 +207,7 @@ void FfiGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice 
     changeState.deviceId = nullptr;
 }
 
-void FfiGattServerCallback::OnMtuUpdate(const BluetoothRemoteDevice &device, int mtu)
+void FfiGattServerCallback::OnMtuUpdate(const BluetoothRemoteDevice& device, int mtu)
 {
     if (bleMtuChangeFunc != nullptr) {
         bleMtuChangeFunc(mtu);

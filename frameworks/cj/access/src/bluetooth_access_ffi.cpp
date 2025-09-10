@@ -17,6 +17,7 @@
 #endif
 
 #include "bluetooth_access_ffi.h"
+
 #include "bluetooth_access_impl.h"
 #include "bluetooth_log.h"
 
@@ -47,6 +48,6 @@ void FfiBluetoothAccOn(int32_t callbackType, void (*callback)(), int32_t* errCod
     return AccessImpl::RegisterAccessObserver(callbackType, callback, errCode);
 }
 }
-} // namespace BluetoothAccess
+} // namespace CJBluetoothAccess
 } // namespace CJSystemapi
 } // namespace OHOS

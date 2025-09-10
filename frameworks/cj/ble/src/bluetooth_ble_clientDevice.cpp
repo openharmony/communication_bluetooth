@@ -55,7 +55,7 @@ int32_t FfiClientDevice::Close()
     return client_->Close();
 }
 
-std::string FfiClientDevice::GetDeviceName(int32_t *errCode)
+std::string FfiClientDevice::GetDeviceName(int32_t* errCode)
 {
     std::string deviceName = "";
     std::string deviceAddr = GetGattClientDeviceId();
@@ -65,7 +65,7 @@ std::string FfiClientDevice::GetDeviceName(int32_t *errCode)
     return deviceName;
 }
 
-int32_t FfiClientDevice::GetServices(CArrGattService &service)
+int32_t FfiClientDevice::GetServices(CArrGattService& service)
 {
     if (client_ == nullptr) {
         return BT_ERR_INTERNAL_ERROR;
@@ -79,10 +79,10 @@ int32_t FfiClientDevice::GetServices(CArrGattService &service)
     return ret;
 }
 
-static GattCharacteristic *GetCharacteristic(const std::shared_ptr<GattClient> &client, const UUID &serviceUuid,
-                                             const UUID &characterUuid)
+static GattCharacteristic* GetCharacteristic(
+    const std::shared_ptr<GattClient>& client, const UUID& serviceUuid, const UUID& characterUuid)
 {
-    GattCharacteristic *character = nullptr;
+    GattCharacteristic* character = nullptr;
     if (client) {
         auto service = client->GetService(serviceUuid);
         if (service.has_value()) {
@@ -92,21 +92,21 @@ static GattCharacteristic *GetCharacteristic(const std::shared_ptr<GattClient> &
     return character;
 }
 
-static GattCharacteristic *GetGattcCharacteristic(const std::shared_ptr<GattClient> &client,
-                                                  NativeBLECharacteristic &nativeCharacteristic)
+static GattCharacteristic* GetGattcCharacteristic(
+    const std::shared_ptr<GattClient>& client, NativeBLECharacteristic& nativeCharacteristic)
 {
-    GattCharacteristic *character = GetCharacteristic(client, UUID::FromString(nativeCharacteristic.serviceUuid),
-                                                      UUID::FromString(nativeCharacteristic.characteristicUuid));
+    GattCharacteristic* character = GetCharacteristic(client, UUID::FromString(nativeCharacteristic.serviceUuid),
+        UUID::FromString(nativeCharacteristic.characteristicUuid));
     if (character) {
-        character->SetValue(nativeCharacteristic.characteristicValue.head,
-                            nativeCharacteristic.characteristicValue.size);
+        character->SetValue(
+            nativeCharacteristic.characteristicValue.head, nativeCharacteristic.characteristicValue.size);
     }
     return character;
 }
 
-int32_t FfiClientDevice::ReadCharacteristicValue(NativeBLECharacteristic &characteristic, void (*callback)())
+int32_t FfiClientDevice::ReadCharacteristicValue(NativeBLECharacteristic& characteristic, void (*callback)())
 {
-    GattCharacteristic *character = GetGattcCharacteristic(client_, characteristic);
+    GattCharacteristic* character = GetGattcCharacteristic(client_, characteristic);
 
     if (character == nullptr) {
         HILOGE("character is nullptr");
@@ -124,13 +124,13 @@ int32_t FfiClientDevice::ReadCharacteristicValue(NativeBLECharacteristic &charac
     return BT_NO_ERROR;
 }
 
-static GattDescriptor *GetGattcDescriptor(const std::shared_ptr<GattClient> &client,
-                                          const NativeBLEDescriptor &nativeDescriptor)
+static GattDescriptor* GetGattcDescriptor(
+    const std::shared_ptr<GattClient>& client, const NativeBLEDescriptor& nativeDescriptor)
 {
-    GattDescriptor *descriptor = nullptr;
+    GattDescriptor* descriptor = nullptr;
     if (client) {
-        auto *character = GetCharacteristic(client, UUID::FromString(nativeDescriptor.serviceUuid),
-                                            UUID::FromString(nativeDescriptor.characteristicUuid));
+        auto* character = GetCharacteristic(client, UUID::FromString(nativeDescriptor.serviceUuid),
+            UUID::FromString(nativeDescriptor.characteristicUuid));
         if (character == nullptr) {
             HILOGE("character is nullptr");
             return nullptr;
@@ -143,9 +143,9 @@ static GattDescriptor *GetGattcDescriptor(const std::shared_ptr<GattClient> &cli
     return descriptor;
 }
 
-int32_t FfiClientDevice::ReadDescriptorValue(NativeBLEDescriptor &inputDescriptor, void (*callback)())
+int32_t FfiClientDevice::ReadDescriptorValue(NativeBLEDescriptor& inputDescriptor, void (*callback)())
 {
-    GattDescriptor *descriptor = GetGattcDescriptor(client_, inputDescriptor);
+    GattDescriptor* descriptor = GetGattcDescriptor(client_, inputDescriptor);
 
     if (descriptor == nullptr) {
         HILOGE("descriptor is nullptr");
@@ -163,11 +163,11 @@ int32_t FfiClientDevice::ReadDescriptorValue(NativeBLEDescriptor &inputDescripto
     return BT_NO_ERROR;
 }
 
-int32_t FfiClientDevice::WriteCharacteristicValue(NativeBLECharacteristic characteristic, int32_t writeType,
-                                                  void (*callback)())
+int32_t FfiClientDevice::WriteCharacteristicValue(
+    NativeBLECharacteristic characteristic, int32_t writeType, void (*callback)())
 {
-    GattCharacteristic *character = GetGattcCharacteristic(client_, characteristic);
-    std::vector<uint8_t> value{};
+    GattCharacteristic* character = GetGattcCharacteristic(client_, characteristic);
+    std::vector<uint8_t> value {};
 
     if (character == nullptr) {
         HILOGE("character is nullptr");
@@ -189,7 +189,7 @@ int32_t FfiClientDevice::WriteCharacteristicValue(NativeBLECharacteristic charac
 
 int32_t FfiClientDevice::WriteDescriptorValue(NativeBLEDescriptor inputDescriptor, void (*callback)())
 {
-    GattDescriptor *descriptor = GetGattcDescriptor(client_, inputDescriptor);
+    GattDescriptor* descriptor = GetGattcDescriptor(client_, inputDescriptor);
 
     if (descriptor == nullptr) {
         HILOGE("descriptor is nullptr");
@@ -229,7 +229,7 @@ int32_t FfiClientDevice::SetBLEMtuSize(int32_t mut)
 
 int32_t FfiClientDevice::SetCharacteristicChangeNotification(NativeBLECharacteristic characteristic, bool enable)
 {
-    GattCharacteristic *character = GetGattcCharacteristic(client_, characteristic);
+    GattCharacteristic* character = GetGattcCharacteristic(client_, characteristic);
     if (character == nullptr) {
         HILOGE("character is nullptr");
         return BT_ERR_INTERNAL_ERROR;
@@ -243,7 +243,7 @@ int32_t FfiClientDevice::SetCharacteristicChangeNotification(NativeBLECharacteri
 
 int32_t FfiClientDevice::SetCharacteristicChangeIndication(NativeBLECharacteristic characteristic, bool enable)
 {
-    GattCharacteristic *character = GetGattcCharacteristic(client_, characteristic);
+    GattCharacteristic* character = GetGattcCharacteristic(client_, characteristic);
     if (character == nullptr) {
         HILOGE("character is nullptr");
         return BT_ERR_INTERNAL_ERROR;
@@ -255,9 +255,10 @@ int32_t FfiClientDevice::SetCharacteristicChangeIndication(NativeBLECharacterist
     return ret;
 }
 
-int32_t FfiClientDevice::SetCharacteristicChangeNotificationCallback(NativeBLECharacteristic characteristic, bool enable, void (*callback)())
+int32_t FfiClientDevice::SetCharacteristicChangeNotificationCallback(
+    NativeBLECharacteristic characteristic, bool enable, void (*callback)())
 {
-    GattCharacteristic *character = GetGattcCharacteristic(client_, characteristic);
+    GattCharacteristic* character = GetGattcCharacteristic(client_, characteristic);
     if (character == nullptr) {
         HILOGE("character is nullptr");
         return BT_ERR_INTERNAL_ERROR;
@@ -274,9 +275,10 @@ int32_t FfiClientDevice::SetCharacteristicChangeNotificationCallback(NativeBLECh
     return BT_NO_ERROR;
 }
 
-int32_t FfiClientDevice::SetCharacteristicChangeIndicationCallback(NativeBLECharacteristic characteristic, bool enable, void (*callback)())
+int32_t FfiClientDevice::SetCharacteristicChangeIndicationCallback(
+    NativeBLECharacteristic characteristic, bool enable, void (*callback)())
 {
-    GattCharacteristic *character = GetGattcCharacteristic(client_, characteristic);
+    GattCharacteristic* character = GetGattcCharacteristic(client_, characteristic);
     if (character == nullptr) {
         HILOGE("character is nullptr");
         return BT_ERR_INTERNAL_ERROR;
