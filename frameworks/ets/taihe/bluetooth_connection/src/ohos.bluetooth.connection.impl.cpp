@@ -91,7 +91,7 @@ taihe::array<taihe::string> GetPairedDevices()
 
 void SetBluetoothScanMode(ohos::bluetooth::connection::ScanMode mode, int duration)
 {
-     HILOGD("enter");
+    HILOGD("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t ret = host->SetBtScanMode(mode, duration);
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
