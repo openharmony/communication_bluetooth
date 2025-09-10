@@ -16,9 +16,9 @@
 #ifndef BLUETOOTH_ACCESS_FFI_H
 #define BLUETOOTH_ACCESS_FFI_H
 
-#include "native/ffi_remote_data.h"
-
 #include <cstdint>
+
+#include "native/ffi_remote_data.h"
 
 extern "C" {
 const int32_t REGISTER_STATE_CHANGE_TYPE = 0;

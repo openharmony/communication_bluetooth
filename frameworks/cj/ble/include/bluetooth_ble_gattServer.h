@@ -33,20 +33,20 @@ using Bluetooth::GattService;
 
 class FfiGattServerCallback : public GattServerCallback {
 public:
-    void OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state) override;
-    void OnServiceAdded(GattService service, int ret) override{};
-    void OnCharacteristicReadRequest(const BluetoothRemoteDevice &device, GattCharacteristic &characteristic,
-                                     int requestId) override;
-    void OnCharacteristicWriteRequest(const BluetoothRemoteDevice &device, GattCharacteristic &characteristic,
-                                      int requestId) override;
-    void OnDescriptorReadRequest(const BluetoothRemoteDevice &device, GattDescriptor &descriptor,
-                                 int requestId) override;
-    void OnDescriptorWriteRequest(const BluetoothRemoteDevice &device, GattDescriptor &descriptor,
-                                  int requestId) override;
-    void OnMtuUpdate(const BluetoothRemoteDevice &device, int mtu) override;
-    void OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device, int result) override{};
-    void OnConnectionParameterChanged(const BluetoothRemoteDevice &device, int interval, int latency, int timeout,
-                                      int status) override{};
+    void OnConnectionStateUpdate(const BluetoothRemoteDevice& device, int state) override;
+    void OnServiceAdded(GattService service, int ret) override {};
+    void OnCharacteristicReadRequest(
+        const BluetoothRemoteDevice& device, GattCharacteristic& characteristic, int requestId) override;
+    void OnCharacteristicWriteRequest(
+        const BluetoothRemoteDevice& device, GattCharacteristic& characteristic, int requestId) override;
+    void OnDescriptorReadRequest(
+        const BluetoothRemoteDevice& device, GattDescriptor& descriptor, int requestId) override;
+    void OnDescriptorWriteRequest(
+        const BluetoothRemoteDevice& device, GattDescriptor& descriptor, int requestId) override;
+    void OnMtuUpdate(const BluetoothRemoteDevice& device, int mtu) override;
+    void OnNotificationCharacteristicChanged(const BluetoothRemoteDevice& device, int result) override {};
+    void OnConnectionParameterChanged(
+        const BluetoothRemoteDevice& device, int interval, int latency, int timeout, int status) override {};
 
     void RegisterCharacteristicReadFunc(std::function<void(NativeCharacteristicReadRequest)> cjCallback);
     void RegisterCharacteristicWriteFunc(std::function<void(NativeCharacteristicWriteRequest)> cjCallback);
@@ -59,12 +59,12 @@ public:
     ~FfiGattServerCallback() override = default;
 
 private:
-    std::function<void(NativeCharacteristicReadRequest)> characteristicReadFunc{nullptr};
-    std::function<void(NativeCharacteristicWriteRequest)> characteristicWriteFunc{nullptr};
-    std::function<void(NativeDescriptorReadRequest)> descriptorReadFunc{nullptr};
-    std::function<void(NativeDescriptorWriteRequest)> descriptorWriteFunc{nullptr};
-    std::function<void(NativeBLEConnectionChangeState)> connectionStateChangeFunc{nullptr};
-    std::function<void(int32_t)> bleMtuChangeFunc{nullptr};
+    std::function<void(NativeCharacteristicReadRequest)> characteristicReadFunc { nullptr };
+    std::function<void(NativeCharacteristicWriteRequest)> characteristicWriteFunc { nullptr };
+    std::function<void(NativeDescriptorReadRequest)> descriptorReadFunc { nullptr };
+    std::function<void(NativeDescriptorWriteRequest)> descriptorWriteFunc { nullptr };
+    std::function<void(NativeBLEConnectionChangeState)> connectionStateChangeFunc { nullptr };
+    std::function<void(int32_t)> bleMtuChangeFunc { nullptr };
 };
 
 class FfiGattServer : public OHOS::FFI::FFIData {
@@ -83,7 +83,7 @@ public:
     int32_t SendResponse(NativeServerResponse serverResponse);
     int32_t RegisterBleGattServerObserver(int32_t callbackType, void (*callback)());
 
-    std::shared_ptr<GattServer> &GetServer()
+    std::shared_ptr<GattServer>& GetServer()
     {
         return server_;
     }

@@ -20,11 +20,9 @@ namespace OHOS {
 namespace CJSystemapi {
 namespace CJBluetoothBle {
 
-FfiBluetoothBleCentralManagerCallback::FfiBluetoothBleCentralManagerCallback()
-{
-}
+FfiBluetoothBleCentralManagerCallback::FfiBluetoothBleCentralManagerCallback() {}
 
-FfiBluetoothBleCentralManagerCallback &FfiBluetoothBleCentralManagerCallback::GetInstance(void)
+FfiBluetoothBleCentralManagerCallback& FfiBluetoothBleCentralManagerCallback::GetInstance(void)
 {
     static FfiBluetoothBleCentralManagerCallback instance;
     return instance;
@@ -35,20 +33,20 @@ void FfiBluetoothBleCentralManagerCallback::RegisterBLEDeviceFindFunc(std::funct
     bleDeviceFindFunc = cjCallback;
 }
 
-void FfiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult &result)
+void FfiBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult& result)
 {
     if (bleDeviceFindFunc == nullptr) {
         return;
     }
-    CArrScanResult outResults{};
+    CArrScanResult outResults {};
     outResults.size = 1;
-    NativeScanResult *resultValue = static_cast<NativeScanResult *>(malloc(sizeof(NativeScanResult) * outResults.size));
+    NativeScanResult* resultValue = static_cast<NativeScanResult*>(malloc(sizeof(NativeScanResult) * outResults.size));
     if (resultValue == nullptr) {
         return;
     }
     for (int i = 0; i < outResults.size; i++) {
         BleScanResult bleScanResult = result;
-        NativeScanResult nativeResult{};
+        NativeScanResult nativeResult {};
         nativeResult.deviceId = MallocCString(bleScanResult.GetPeripheralDevice().GetDeviceAddr());
         nativeResult.rssi = bleScanResult.GetRssi();
         nativeResult.data = Convert2CArrUI8(bleScanResult.GetPayload());

@@ -16,19 +16,19 @@
 #ifndef BLUETOOTH_BLE_FFI_H
 #define BLUETOOTH_BLE_FFI_H
 
+#include <cstdint>
+
 #include "cj_common_ffi.h"
 #include "native/ffi_remote_data.h"
 
-#include <cstdint>
-
 extern "C" {
 typedef struct {
-    char *deviceId;
-    char *name;
-    char *serviceUuid;
-    char *serviceUuidMask;
-    char *serviceSolicitationUuid;
-    char *serviceSolicitationUuidMask;
+    char* deviceId;
+    char* name;
+    char* serviceUuid;
+    char* serviceUuidMask;
+    char* serviceSolicitationUuid;
+    char* serviceSolicitationUuidMask;
     CArrUI8 serviceData;
     CArrUI8 serviceDataMask;
     uint16_t manufactureId;
@@ -37,7 +37,7 @@ typedef struct {
 } NativeScanFilter;
 
 typedef struct {
-    NativeScanFilter *head;
+    NativeScanFilter* head;
     int64_t size;
 } CArrNativeScanFilter;
 
@@ -60,17 +60,17 @@ typedef struct {
 } NativeManufactureData;
 
 typedef struct {
-    NativeManufactureData *head;
+    NativeManufactureData* head;
     int64_t size;
 } CArrNativeManufactureData;
 
 typedef struct {
-    char *serviceUuid;
+    char* serviceUuid;
     CArrUI8 serviceValue;
 } NativeServiceData;
 
 typedef struct {
-    NativeServiceData *head;
+    NativeServiceData* head;
     int64_t size;
 } CArrNativeServiceData;
 
@@ -103,22 +103,22 @@ typedef struct {
 } CAdvertisingStateChangeInfo;
 
 typedef struct {
-    char *deviceId;
+    char* deviceId;
     int32_t rssi;
     CArrUI8 data;
-    char *deviceName;
+    char* deviceName;
     bool connectable;
 } NativeScanResult;
 
 typedef struct {
-    NativeScanResult *head;
+    NativeScanResult* head;
     int64_t size;
 } CArrScanResult;
 
 typedef struct {
-    char *serviceUuid;
-    char *characteristicUuid;
-    char *descriptorUuid;
+    char* serviceUuid;
+    char* characteristicUuid;
+    char* descriptorUuid;
     CArrUI8 descriptorValue;
 } NativeBLEDescriptor;
 
@@ -128,7 +128,7 @@ typedef struct {
 } RetNativeBLEDescriptor;
 
 typedef struct {
-    NativeBLEDescriptor *head;
+    NativeBLEDescriptor* head;
     int64_t size;
 } CArrBLEDescriptor;
 
@@ -141,8 +141,8 @@ typedef struct {
 } NativeGattProperties;
 
 typedef struct {
-    char *serviceUuid;
-    char *characteristicUuid;
+    char* serviceUuid;
+    char* characteristicUuid;
     CArrUI8 characteristicValue;
     CArrBLEDescriptor descriptors;
     NativeGattProperties properties;
@@ -154,33 +154,33 @@ typedef struct {
 } RetNativeBLECharacteristic;
 
 typedef struct {
-    NativeBLECharacteristic *head;
+    NativeBLECharacteristic* head;
     int64_t size;
 } CArrBLECharacteristic;
 
 struct NativeGattService;
 
 struct CArrGattService {
-    NativeGattService *head;
+    NativeGattService* head;
     int64_t size;
 };
 
 struct NativeGattService {
-    char *serviceUuid;
+    char* serviceUuid;
     bool isPrimary;
     CArrBLECharacteristic characteristics;
     CArrGattService includeServices;
 };
 
 typedef struct {
-    char *serviceUuid;
-    char *characteristicUuid;
+    char* serviceUuid;
+    char* characteristicUuid;
     CArrUI8 characteristicValue;
     bool confirm;
 } NativeNotifyCharacteristic;
 
 typedef struct {
-    char *deviceId;
+    char* deviceId;
     int32_t transId;
     int32_t status;
     int32_t offset;
@@ -189,47 +189,47 @@ typedef struct {
 } NativeServerResponse;
 
 typedef struct {
-    char *deviceId;
+    char* deviceId;
     int32_t transId;
     int32_t offset;
-    char *characteristicUuid;
-    char *serviceUuid;
+    char* characteristicUuid;
+    char* serviceUuid;
 } NativeCharacteristicReadRequest;
 
 typedef struct {
-    char *deviceId;
+    char* deviceId;
     int32_t transId;
     int32_t offset;
     bool isPrepared;
     bool needRsp;
     CArrUI8 value;
-    char *characteristicUuid;
-    char *serviceUuid;
+    char* characteristicUuid;
+    char* serviceUuid;
 } NativeCharacteristicWriteRequest;
 
 typedef struct {
-    char *deviceId;
+    char* deviceId;
     int32_t transId;
     int32_t offset;
-    char *descriptorUuid;
-    char *characteristicUuid;
-    char *serviceUuid;
+    char* descriptorUuid;
+    char* characteristicUuid;
+    char* serviceUuid;
 } NativeDescriptorReadRequest;
 
 typedef struct {
-    char *deviceId;
+    char* deviceId;
     int32_t transId;
     int32_t offset;
     bool isPrepared;
     bool needRsp;
     CArrUI8 value;
-    char *descriptorUuid;
-    char *characteristicUuid;
-    char *serviceUuid;
+    char* descriptorUuid;
+    char* characteristicUuid;
+    char* serviceUuid;
 } NativeDescriptorWriteRequest;
 
 typedef struct {
-    char *deviceId;
+    char* deviceId;
     int32_t state;
 } NativeBLEConnectionChangeState;
 
@@ -254,56 +254,56 @@ struct NativeGattPermission {
     bool writeEncrypted = false;
 };
 
-FFI_EXPORT int64_t FfiBluetoothBleCreateGattServer(int32_t *errCode);
-FFI_EXPORT int64_t FfiBluetoothBleCreateGattClientDevice(const char *deviceId, int32_t *errCode);
-FFI_EXPORT CArrString FfiBluetoothBleGetConnectedBleDevices(int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleStartBleScan(CArrNativeScanFilter filters, NativeScanOptions *options, int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleStopBleScan(int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleStartAdvertising(NativeAdvertiseSetting setting, NativeAdvertiseData advData,
-    NativeAdvertiseData *advResponse, int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleStopAdvertising(int32_t *errCode);
-FFI_EXPORT int32_t FfiBluetoothBleStartAdvertisingWithId(NativeAdvertisingParams advertisingParams, int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleEnableAdvertising(NativeAdvertisingEnableParams advertisingEnableParams,
-    int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleDisableAdvertising(NativeAdvertisingDisableParams advertisingDisableParams,
-    int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleStopAdvertisingWithId(uint32_t advertisingId, int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleOn(int32_t callbackType, void (*callback)(), int32_t *errCode);
+FFI_EXPORT int64_t FfiBluetoothBleCreateGattServer(int32_t* errCode);
+FFI_EXPORT int64_t FfiBluetoothBleCreateGattClientDevice(const char* deviceId, int32_t* errCode);
+FFI_EXPORT CArrString FfiBluetoothBleGetConnectedBleDevices(int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleStartBleScan(CArrNativeScanFilter filters, NativeScanOptions* options, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleStopBleScan(int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleStartAdvertising(
+    NativeAdvertiseSetting setting, NativeAdvertiseData advData, NativeAdvertiseData* advResponse, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleStopAdvertising(int32_t* errCode);
+FFI_EXPORT int32_t FfiBluetoothBleStartAdvertisingWithId(NativeAdvertisingParams advertisingParams, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleEnableAdvertising(
+    NativeAdvertisingEnableParams advertisingEnableParams, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleDisableAdvertising(
+    NativeAdvertisingDisableParams advertisingDisableParams, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleStopAdvertisingWithId(uint32_t advertisingId, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleOn(int32_t callbackType, void (*callback)(), int32_t* errCode);
 
-FFI_EXPORT void FfiBluetoothBleGattClientDeviceConnect(int64_t id, int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattClientDeviceDisconnect(int64_t id, int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattClientDeviceClose(int64_t id, int32_t *errCode);
-FFI_EXPORT char *FfiBluetoothBleGattClientDeviceGetDeviceName(int64_t id, int32_t *errCode);
-FFI_EXPORT CArrGattService FfiBluetoothBleGattClientDeviceGetServices(int64_t id, int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattClientDeviceReadCharacteristicValue(int64_t id,
-    NativeBLECharacteristic characteristic, void (*callback)(), int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattClientDeviceReadDescriptorValue(int64_t id, NativeBLEDescriptor descriptor,
-    void (*callback)(), int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattClientDeviceWriteCharacteristicValue(int64_t id,
-    NativeBLECharacteristic characteristic, int32_t writeType, void (*callback)(), int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattClientDeviceWriteDescriptorValue(int64_t id, NativeBLEDescriptor descriptor,
-    void (*callback)(), int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattClientDeviceGetRssiValue(int64_t id, void (*callback)(), int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetBLEMtuSize(int64_t id, int32_t mut, int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotification(int64_t id,
-    NativeBLECharacteristic characteristic, bool enable, int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndication(int64_t id,
-    NativeBLECharacteristic characteristic, bool enable, int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotificationV2(int64_t id,
-    NativeBLECharacteristic characteristic, bool enable, void (*callback)(), int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndicationV2(int64_t id,
-    NativeBLECharacteristic characteristic, bool enable, void (*callback)(), int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattClientDeviceOn(int64_t id, int32_t callbackType, void (*callback)(),
-    int32_t *errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceConnect(int64_t id, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceDisconnect(int64_t id, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceClose(int64_t id, int32_t* errCode);
+FFI_EXPORT char* FfiBluetoothBleGattClientDeviceGetDeviceName(int64_t id, int32_t* errCode);
+FFI_EXPORT CArrGattService FfiBluetoothBleGattClientDeviceGetServices(int64_t id, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceReadCharacteristicValue(
+    int64_t id, NativeBLECharacteristic characteristic, void (*callback)(), int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceReadDescriptorValue(
+    int64_t id, NativeBLEDescriptor descriptor, void (*callback)(), int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceWriteCharacteristicValue(
+    int64_t id, NativeBLECharacteristic characteristic, int32_t writeType, void (*callback)(), int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceWriteDescriptorValue(
+    int64_t id, NativeBLEDescriptor descriptor, void (*callback)(), int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceGetRssiValue(int64_t id, void (*callback)(), int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetBLEMtuSize(int64_t id, int32_t mut, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotification(
+    int64_t id, NativeBLECharacteristic characteristic, bool enable, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndication(
+    int64_t id, NativeBLECharacteristic characteristic, bool enable, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotificationV2(
+    int64_t id, NativeBLECharacteristic characteristic, bool enable, void (*callback)(), int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndicationV2(
+    int64_t id, NativeBLECharacteristic characteristic, bool enable, void (*callback)(), int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattClientDeviceOn(
+    int64_t id, int32_t callbackType, void (*callback)(), int32_t* errCode);
 
-FFI_EXPORT void FfiBluetoothBleGattServerAddService(int64_t id, NativeGattService service, int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattServerRemoveService(int64_t id, char *serviceUuid, int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattServerClose(int64_t id, int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattServerNotifyCharacteristicChanged(int64_t id, char *deviceId,
-    NativeNotifyCharacteristic characteristic, int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattServerSendResponse(int64_t id, NativeServerResponse serverResponse,
-    int32_t *errCode);
-FFI_EXPORT void FfiBluetoothBleGattServerOn(int64_t id, int32_t callbackType, void (*callback)(), int32_t *errCode);
+FFI_EXPORT void FfiBluetoothBleGattServerAddService(int64_t id, NativeGattService service, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattServerRemoveService(int64_t id, char* serviceUuid, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattServerClose(int64_t id, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattServerNotifyCharacteristicChanged(
+    int64_t id, char* deviceId, NativeNotifyCharacteristic characteristic, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattServerSendResponse(
+    int64_t id, NativeServerResponse serverResponse, int32_t* errCode);
+FFI_EXPORT void FfiBluetoothBleGattServerOn(int64_t id, int32_t callbackType, void (*callback)(), int32_t* errCode);
 }
 
 #endif // BLUETOOTH_BLE_FFI_H

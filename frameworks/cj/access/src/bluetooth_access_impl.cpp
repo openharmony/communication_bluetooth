@@ -17,6 +17,7 @@
 #endif
 
 #include "bluetooth_access_impl.h"
+
 #include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 
@@ -24,19 +25,19 @@ namespace OHOS {
 namespace CJSystemapi {
 namespace CJBluetoothAccess {
 using Bluetooth::BluetoothHost;
-using Bluetooth::BTStateID;
 using Bluetooth::BluetoothState;
+using Bluetooth::BTStateID;
 
 void AccessImpl::EnableBluetooth(int32_t* errCode)
 {
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    BluetoothHost* host = &BluetoothHost::GetDefaultHost();
     *errCode = host->EnableBle();
     return;
 }
 
 void AccessImpl::DisableBluetooth(int32_t* errCode)
 {
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    BluetoothHost* host = &BluetoothHost::GetDefaultHost();
     *errCode = host->DisableBt();
     return;
 }
