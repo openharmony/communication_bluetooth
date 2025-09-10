@@ -26,13 +26,11 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
-using namespace taihe;
 class GattServerImpl {
 public:
     void AddService(ohos::bluetooth::ble::GattService service);
     void Close();
-    void RemoveService(string_view serviceUuid);
+    void RemoveService(taihe::string_view serviceUuid);
     void SendResponse(ohos::bluetooth::ble::ServerResponse serverResponse);
 
     static std::vector<std::string> deviceList_;

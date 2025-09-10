@@ -131,7 +131,7 @@ bool IsValidRandomDeviceId(::taihe::string_view deviceId)
     TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM, checkRet);
 
     bool isValid = false;
-    std::vector<std::string> deviceIdVec = { remoteAddr};
+    std::vector<std::string> deviceIdVec = { remoteAddr };
     int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
         static_cast<int32_t>(RandomDeviceIdCommand::IS_VALID), deviceIdVec, isValid);
     TAIHE_BT_ASSERT_RETURN(ret == BT_NO_ERROR, ret, isValid);

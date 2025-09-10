@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
- #ifndef LOG_TAG
+#ifndef LOG_TAG
 #define LOG_TAG "bt_taihe_error"
 #endif
 

@@ -70,7 +70,7 @@ public:
     {
         HILOGI("enter");
         TAIHE_BT_ASSERT_RETURN_VOID(client_ != nullptr, BT_ERR_INTERNAL_ERROR);
- 
+
         int ret = client_->RequestBleMtuSize(mtu);
         HILOGI("ret: %{public}d", ret);
         TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
@@ -91,7 +91,7 @@ public:
     {
         HILOGI("enter");
         TAIHE_BT_ASSERT_RETURN_VOID(client_ != nullptr, BT_ERR_INTERNAL_ERROR);
- 
+
         int ret = client_->Disconnect();
         HILOGI("ret: %{public}d", ret);
         TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
@@ -103,7 +103,7 @@ public:
         TAIHE_BT_ASSERT_RETURN_VOID(client_ != nullptr, BT_ERR_INTERNAL_ERROR);
         int ret = client_->Close();
         HILOGI("ret: %{public}d", ret);
- 
+
         TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
     }
 private:
@@ -152,20 +152,20 @@ ohos::bluetooth::ble::GattClientDevice CreateGattClientDevice(taihe::string_view
     std::string remoteAddr = std::string(deviceId);
     bool checkRet = CheckDeivceIdParam(remoteAddr);
     TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM, 
-        (make_holder<GattClientDeviceImpl, ohos::bluetooth::ble::GattClientDevice>(nullptr)));
-    return make_holder<GattClientDeviceImpl, ohos::bluetooth::ble::GattClientDevice>(remoteAddr);
+        (taihe::make_holder<GattClientDeviceImpl, ohos::bluetooth::ble::GattClientDevice>(nullptr)));
+    return taihe::make_holder<GattClientDeviceImpl, ohos::bluetooth::ble::GattClientDevice>(remoteAddr);
 }
 
 ohos::bluetooth::ble::GattServer CreateGattServer()
 {
     HILOGI("enter");
-    return make_holder<GattServerImpl, ohos::bluetooth::ble::GattServer>();
+    return taihe::make_holder<GattServerImpl, ohos::bluetooth::ble::GattServer>();
 }
 
 ohos::bluetooth::ble::BleScanner CreateBleScanner()
 {
     HILOGI("enter");
-    return make_holder<BleScannerImpl, ohos::bluetooth::ble::BleScanner>();
+    return taihe::make_holder<BleScannerImpl, ohos::bluetooth::ble::BleScanner>();
 }
 
 static taihe_status ParseScanFilterDeviceIdParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
@@ -191,6 +191,7 @@ static taihe_status ParseScanFilterLocalNameParameters(const ohos::bluetooth::bl
             HILOGE("name is empty");
             return taihe_invalid_arg;
         }
+        HILOGI("Scan filter name is %{public}s", name.c_str());
         bleScanFilter.SetName(name);
     }
     return taihe_ok;
@@ -278,7 +279,7 @@ static taihe_status ParseScanFilter(const ohos::bluetooth::ble::ScanFilter &scan
     return taihe_ok;
 }
 
-static taihe_status ParseScanFilterParameters(array<ohos::bluetooth::ble::ScanFilter> filters,
+static taihe_status ParseScanFilterParameters(taihe::array<ohos::bluetooth::ble::ScanFilter> filters,
                                               std::vector<BleScanFilter> &params)
 {
     TAIHE_BT_RETURN_IF(filters.empty(), "Requires array length > 0", taihe_invalid_arg);
@@ -330,17 +331,17 @@ static void SetCbTypeSensMode(ohos::bluetooth::ble::ScanOptions &scanOptions, Bl
     outSettinngs.SetSensitivityMode(sensitivityMode);
 }
 
-taihe_status CheckBleScanParams(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
-                              optional_view<ohos::bluetooth::ble::ScanOptions> options,
-                              std::vector<BleScanFilter> &outScanfilters,
-                              BleScanSettings &outSettinngs)
+taihe_status CheckBleScanParams(ohos::bluetooth::ble::ScanFilterNullValue const& filters,
+                                taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options,
+                                std::vector<BleScanFilter> &outScanfilters,
+                                BleScanSettings &outSettinngs)
 {
     std::vector<BleScanFilter> scanfilters;
     if (filters.get_tag() == ohos::bluetooth::ble::ScanFilterNullValue::tag_t::nValue) {
         BleScanFilter emptyFilter;
         scanfilters.push_back(emptyFilter);
     } else {
-        array<ohos::bluetooth::ble::ScanFilter> inFilters = filters.get_filters_ref();
+        taihe::array<ohos::bluetooth::ble::ScanFilter> inFilters = filters.get_filters_ref();
         TAIHE_BT_CALL_RETURN(ParseScanFilterParameters(inFilters, scanfilters));
     }
 
@@ -367,7 +368,7 @@ taihe_status CheckBleScanParams(ohos::bluetooth::ble::ScanFilterNullValue const 
 }
 
 void StartBLEScan(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
-                  optional_view<ohos::bluetooth::ble::ScanOptions> options)
+                  taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options)
 {
     std::vector<BleScanFilter> scanfilters;
     BleScanSettings settings;
@@ -378,11 +379,11 @@ void StartBLEScan(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
 }
 
-array<string> GetConnectedBLEDevices()
+taihe::array<taihe::string> GetConnectedBLEDevices()
 {
     std::lock_guard<std::mutex> lock(GattServerImpl::deviceListMutex_);
     std::vector<std::string> dstDevicesvec = GattServerImpl::deviceList_;
-    array<string> result(taihe::copy_data_t{}, dstDevicesvec.data(), dstDevicesvec.size());
+    taihe::array<taihe::string> result(taihe::copy_data_t{}, dstDevicesvec.data(), dstDevicesvec.size());
     return result;
 }
 
@@ -443,7 +444,7 @@ static taihe_status ParseAdvertisDataParameters(ohos::bluetooth::ble::AdvertiseD
 }
 
 void StartAdvertising(ohos::bluetooth::ble::AdvertiseSetting setting, ohos::bluetooth::ble::AdvertiseData advData,
-                      optional_view<ohos::bluetooth::ble::AdvertiseData> advResponse)
+                      taihe::optional_view<ohos::bluetooth::ble::AdvertiseData> advResponse)
 {
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
     TAIHE_BT_ASSERT_RETURN_VOID(bleAdvertiser != nullptr, BT_ERR_INTERNAL_ERROR);
