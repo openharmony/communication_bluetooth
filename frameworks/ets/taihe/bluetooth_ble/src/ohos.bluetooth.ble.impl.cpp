@@ -331,7 +331,7 @@ static void SetCbTypeSensMode(ohos::bluetooth::ble::ScanOptions &scanOptions, Bl
     outSettinngs.SetSensitivityMode(sensitivityMode);
 }
 
-taihe_status CheckBleScanParams(ohos::bluetooth::ble::ScanFilterNullValue const& filters,
+taihe_status CheckBleScanParams(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
                                 taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options,
                                 std::vector<BleScanFilter> &outScanfilters,
                                 BleScanSettings &outSettinngs)

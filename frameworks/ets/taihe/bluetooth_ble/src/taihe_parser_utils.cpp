@@ -206,6 +206,7 @@ taihe_status TaiheParseGattDescriptor(taihe::array<::ohos::bluetooth::ble::BLEDe
         }
         if (element.descriptorHandle.has_value()) {
             descriptorHandle = element.descriptorHandle.value();
+            TAIHE_BT_RETURN_IF(descriptorHandle > 0xFFFF, "Invalid characteristicValueHandle", taihe_invalid_arg);
         }
         if (element.permissions.has_value()) {
             ohos::bluetooth::ble::GattPermissions objectPermissions = element.permissions.value();
