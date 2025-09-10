@@ -224,6 +224,16 @@ const int ADDRESS_SEPARATOR_UNIT = 3;
 const uint32_t INVALID_DIALOG_TYPE = 0xFFFFFFFF;
 
 /**
+ * @brief bluetooth address type, virtual or real
+ * use to PairDevice()...
+ */
+enum BluetoothAddressType {
+    UNSET_ADDRESS_TYPE = 0,
+    VIRTUAL_ADDRESS_TYPE,
+    REAL_ADDRESS_TYPE,
+};
+
+/**
  * @brief discovery state
  * use to
  * GetBtScanMode(), SetBtScanMode()
