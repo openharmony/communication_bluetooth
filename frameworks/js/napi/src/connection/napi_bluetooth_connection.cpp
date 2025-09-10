@@ -512,16 +512,41 @@ napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::st
     return napi_ok;
 }
 
+napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::string &addr, int32_t &addressType)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO, "Requires 1 or 2 arguments", napi_invalid_arg);
+    bool isObject = NapiIsObject(env, argv[PARAM0]) == napi_ok;
+    bool isString = NapiIsString(env, argv[PARAM0]) == napi_ok;
+    NAPI_BT_RETURN_IF(!(isObject || isString), "1st argument should be String or Object", napi_invalid_arg);
+    if (isObject) {
+        napi_value addrValue;
+        NAPI_BT_CALL_RETURN(napi_get_named_property(env, argv[PARAM0], "address", &addrValue));
+        NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, addrValue, addr));
+        napi_value addrTypeValue;
+        NAPI_BT_CALL_RETURN(napi_get_named_property(env, argv[PARAM0], "addressType", &addrTypeValue));
+        NAPI_BT_CALL_RETURN(NapiParseInt32(env, addrTypeValue, addressType));
+        NAPI_BT_RETURN_IF(!(addressType == VIRTUAL_ADDRESS_TYPE || addressType == REAL_ADDRESS_TYPE),
+            "addressType should be 1 or 2", napi_invalid_arg);
+    }
+    if (isString) {
+        NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr))
+    }
+    return napi_ok;
+}
+
 napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
     std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "connection.PairDeviceAsync");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
-    auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
+    int32_t addressType = UNSET_ADDRESS_TYPE;
+    auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr, addressType);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
-
-    auto func = [remoteAddr]() {
-        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
+    auto func = [remoteAddr, addressType]() {
+        BluetoothRemoteDevice remoteDevice(addressType, remoteAddr);
         int32_t err = remoteDevice.StartPair();
         HILOGI("err: %{public}d", err);
         return NapiAsyncWorkRet(err);

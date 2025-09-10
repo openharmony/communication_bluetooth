@@ -204,7 +204,8 @@
               "parcel/bluetooth_phone_state.h",
               "parcel/bluetooth_raw_address.h",
               "parcel/bluetooth_socket_coc.h",
-              "parcel/parcel_bt_uuid.h"
+              "parcel/parcel_bt_uuid.h",
+              "parcel/bluetooth_address.h"
             ]
           },
           "name": "//foundation/communication/bluetooth/frameworks/inner:btcommon"
@@ -271,6 +272,13 @@
             ]
           },
           "name": "//foundation/communication/bluetooth/frameworks/js/napi/src/common:bt_napi_common"
+        },
+        {
+          "header": {
+            "header_base": "//foundation/communication/bluetooth/frameworks/js/napi",
+            "header_files": []
+          },
+          "name": "//foundation/communication/bluetooth/frameworks/js/napi/src/common:common"
         }
       ],
       "test": [
