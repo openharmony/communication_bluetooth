@@ -532,7 +532,7 @@ napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::st
             "addressType should be 1 or 2", napi_invalid_arg);
     }
     if (isString) {
-        NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr))
+        NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr));
     }
     return napi_ok;
 }
