@@ -151,7 +151,7 @@ ohos::bluetooth::ble::GattClientDevice CreateGattClientDevice(taihe::string_view
     HILOGI("enter");
     std::string remoteAddr = std::string(deviceId);
     bool checkRet = CheckDeivceIdParam(remoteAddr);
-    TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM, 
+    TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM,
         (taihe::make_holder<GattClientDeviceImpl, ohos::bluetooth::ble::GattClientDevice>(nullptr)));
     return taihe::make_holder<GattClientDeviceImpl, ohos::bluetooth::ble::GattClientDevice>(remoteAddr);
 }
@@ -376,7 +376,7 @@ void StartBLEScan(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
     TAIHE_BT_ASSERT_RETURN_VOID(status == taihe_ok, BT_ERR_INVALID_PARAM);
 
     int ret = BleCentralManagerGetInstance()->StartScan(settings, scanfilters);
-    TAIHE_BT_ASSERT_RETURN_VOID( ret == NO_ERROR || ret == BT_ERR_BLE_SCAN_ALREADY_STARTED, ret);
+    TAIHE_BT_ASSERT_RETURN_VOID(ret == NO_ERROR || ret == BT_ERR_BLE_SCAN_ALREADY_STARTED, ret);
 }
 
 taihe::array<taihe::string> GetConnectedBLEDevices()
