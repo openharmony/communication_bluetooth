@@ -427,6 +427,7 @@ static taihe_status ParseAdvertisDataParameters(ohos::bluetooth::ble::AdvertiseD
         advDataOut.AddServiceUuid(UUID::FromString(std::string(serviceUuid)));
     }
     for (auto &manufacture: advDataIn.manufactureData) {
+        TAIHE_BT_RETURN_IF(manufacture.manufactureId > 0xFFFF, "Invalid manufactureId", taihe_invalid_arg);
         advDataOut.AddManufacturerData(manufacture.manufactureId,
             std::string(manufacture.manufactureValue.begin(), manufacture.manufactureValue.end()));
     }
