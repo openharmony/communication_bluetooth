@@ -166,7 +166,8 @@ taihe_status TaiheParseGattCharacteristic(taihe::array<::ohos::bluetooth::ble::B
         }
         if (element.characteristicValueHandle.has_value()) {
             characteristicValueHandle = element.characteristicValueHandle.value();
-            TAIHE_BT_RETURN_IF(characteristicValueHandle > 0xFFFF, "Invalid characteristicValueHandle", taihe_invalid_arg);
+            TAIHE_BT_RETURN_IF(characteristicValueHandle > 0xFFFF, "Invalid characteristicValueHandle",
+                taihe_invalid_arg);
         }
         if (element.permissions.has_value()) {
             ohos::bluetooth::ble::GattPermissions objectPermissions = element.permissions.value();
