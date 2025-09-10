@@ -31,15 +31,15 @@ std::mutex GattServerImpl::deviceListMutex_;
 
 void GattServerImpl::AddService(ohos::bluetooth::ble::GattService service)
 {
-    ANI_BT_ASSERT(server_ != nullptr, BT_ERR_INVALID_PARAM, "AddService ani assert failed");
+    HILOGI("enter");
+    TAIHE_BT_ASSERT_RETURN_VOID(server_ != nullptr, BT_ERR_INVALID_PARAM);
     std::unique_ptr<GattService> gattService {nullptr};
     GattServiceType type = service.isPrimary ? GattServiceType::PRIMARY : GattServiceType::SECONDARY;
     UUID serviceUuid = UUID::FromString(std::string(service.serviceUuid));
     gattService = std::make_unique<GattService>(serviceUuid, type);
 
     TaiheGattService aniGattService;
-    ANI_BT_ASSERT(TaiheParseGattService(service, aniGattService) == ani_ok, BT_ERR_INTERNAL_ERROR,
-                  "AniParseGattService ani parase failed");
+    TAIHE_BT_ASSERT_RETURN_VOID(!TaiheParseGattService(service, aniGattService), BT_ERR_INTERNAL_ERROR);
 
     for (auto &characteristic : aniGattService.characteristics) {
         int charPermissions = characteristic.permissions;
@@ -55,50 +55,52 @@ void GattServerImpl::AddService(ohos::bluetooth::ble::GattService service)
         gattService->AddCharacteristic(character);
     }
     int ret = server_->AddService(*gattService);
-    ANI_BT_ASSERT(ret == BT_NO_ERROR, ret, "AddService return error");
+    TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
 }
 
 void GattServerImpl::Close()
 {
-    ANI_BT_ASSERT(server_ != nullptr, BT_ERR_INVALID_PARAM, "Close ani assert failed");
+    HILOGI("enter");
+    TAIHE_BT_ASSERT_RETURN_VOID(server_ != nullptr, BT_ERR_INTERNAL_ERROR);
     int ret = server_->Close();
     HILOGI("ret: %{public}d", ret);
-
-    ANI_BT_ASSERT(ret == BT_NO_ERROR, ret, "Close return error");
+    TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
 }
 
 void GattServerImpl::RemoveService(string_view serviceUuid)
 {
+    HILOGI("enter");
     UUID uuid;
     auto status = ParseUuidParams(std::string(serviceUuid), uuid);
-    ANI_BT_ASSERT((status && server_ != nullptr), BT_ERR_INVALID_PARAM, "RemoveService ani assert failed");
+    TAIHE_BT_ASSERT_RETURN_VOID((status == taihe_ok && server_ != nullptr), BT_ERR_INVALID_PARAM);
 
     int ret = BT_NO_ERROR;
     auto primaryService = server_->GetService(uuid, true);
     if (primaryService.has_value()) {
         ret = server_->RemoveGattService(primaryService.value());
-        ANI_BT_ASSERT(ret == BT_NO_ERROR, ret, "Primary RemoveService return error");
+        TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
     }
 
     auto secondService = server_->GetService(uuid, false);
     if (secondService.has_value()) {
         ret = server_->RemoveGattService(secondService.value());
-        ANI_BT_ASSERT(ret == BT_NO_ERROR, ret, "Second RemoveService return error");
+        TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
     }
-    ANI_BT_ASSERT((primaryService.has_value() || secondService.has_value()),
-        BT_ERR_INVALID_PARAM, "RemoveGattService return error");
+    TAIHE_BT_ASSERT_RETURN_VOID((primaryService.has_value() || secondService.has_value()),
+        BT_ERR_INVALID_PARAM);
 }
 
-void GattServerImpl::SendResponse(ServerResponse serverResponse)
+void GattServerImpl::SendResponse(ohos::bluetooth::ble::ServerResponse serverResponse)
 {
-    ANI_BT_ASSERT(server_ != nullptr, BT_ERR_INVALID_PARAM, "SendResponse ani assert failed");
+    HILOGI("enter");
+    TAIHE_BT_ASSERT_RETURN_VOID(server_ != nullptr, BT_ERR_INVALID_PARAM);
     BluetoothRemoteDevice remoteDevice(std::string(serverResponse.deviceId), BTTransport::ADAPTER_BLE);
     int32_t transId = serverResponse.transId;
     int32_t status = serverResponse.status;
     int32_t offset = serverResponse.offset;
     int ret = server_->SendResponse(remoteDevice, transId, status, offset,
         serverResponse.value.data(), serverResponse.value.size());
-    ANI_BT_ASSERT(ret == BT_NO_ERROR, ret, "SendResponse return error");
+    TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
 }
 } // namespace Bluetooth
 } // namespace OHOS

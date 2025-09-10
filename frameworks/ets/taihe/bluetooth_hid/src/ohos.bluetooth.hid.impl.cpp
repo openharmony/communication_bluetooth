@@ -21,17 +21,14 @@
 #include "ohos.bluetooth.hid.impl.hpp"
 #include "taihe/runtime.hpp"
 #include "stdexcept"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_hid_host.h"
 #include "bluetooth_log.h"
-#include "bluetooth_errorcode.h"
 #include "taihe_bluetooth_hid_host_observer.h"
+#include "taihe_bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
-
-using namespace taihe;
-using namespace ohos::bluetooth::hid;
-
 class HidHostProfileImpl {
 public:
     HidHostProfileImpl()
@@ -59,50 +56,57 @@ public:
 
     void Connect(taihe::string_view deviceId)
     {
+        HILOGD("enter");
         std::string remoteAddr = std::string(deviceId);
+        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
+
         HidHost *profile = HidHost::GetProfile();
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         int32_t errorCode = profile->Connect(device);
-        if (errorCode != BT_NO_ERROR) {
-            taihe::set_business_error(errorCode, "Connect return error");
-        }
+        TAIHE_BT_ASSERT_RETURN_VOID(errorCode == BT_NO_ERROR, errorCode);
     }
 
     void Disconnect(taihe::string_view deviceId)
     {
+        HILOGD("enter");
         std::string remoteAddr = std::string(deviceId);
+        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
+
         HidHost *profile = HidHost::GetProfile();
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         int32_t errorCode = profile->Disconnect(device);
-        if (errorCode != BT_NO_ERROR) {
-            taihe::set_business_error(errorCode, "Disconnect return error");
-        }
+        TAIHE_BT_ASSERT_RETURN_VOID(errorCode == BT_NO_ERROR, errorCode);
     }
 
     ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(taihe::string_view deviceId)
     {
+        HILOGD("enter");
         std::string remoteAddr = std::string(deviceId);
+        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM,
+            ohos::bluetooth::constant::ProfileConnectionState::from_value(0));
+
         HidHost *profile = HidHost::GetProfile();
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
         int32_t errorCode = profile->GetDeviceState(device, state);
-        if (errorCode != BT_NO_ERROR) {
-            taihe::set_business_error(errorCode, "GetConnectionState return error");
-        }
+        int32_t profileState = TaiheUtils::GetProfileConnectionState(state);
+        TAIHE_BT_ASSERT_RETURN(errorCode == BT_NO_ERROR, errorCode,
+            ohos::bluetooth::constant::ProfileConnectionState::from_value(profileState));
 
-        int profileState = TaiheUtils::GetProfileConnectionState(state);
         return ohos::bluetooth::constant::ProfileConnectionState::from_value(profileState);
     }
 
     taihe::array<taihe::string> GetConnectedDevices()
     {
+        HILOGD("enter");
         HidHost *profile = HidHost::GetProfile();
         std::vector<int> states = { static_cast<int>(BTConnectState::CONNECTED) };
         std::vector<BluetoothRemoteDevice> devices;
         int errorCode = profile->GetDevicesByStates(states, devices);
-        if (errorCode != BT_NO_ERROR) {
-            taihe::set_business_error(errorCode, "GetConnectedDevices return error");
-        }
+        TAIHE_BT_ASSERT_RETURN(errorCode == BT_NO_ERROR, errorCode, taihe::array<taihe::string>{});
 
         std::vector<std::string> deviceVector;
         for (auto &device: devices) {
@@ -116,11 +120,11 @@ private:
     std::shared_ptr<TaiheBluetoothHidHostObserver> observer_ = nullptr;
 };
 
-HidHostProfile CreateHidHostProfile()
+::ohos::bluetooth::hid::HidHostProfile CreateHidHostProfile()
 {
     // The parameters in the make_holder function should be of the same type
     // as the parameters in the constructor of the actual implementation class.
-    return make_holder<HidHostProfileImpl, ::ohos::bluetooth::hid::HidHostProfile>();
+    return taihe::make_holder<HidHostProfileImpl, ::ohos::bluetooth::hid::HidHostProfile>();
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

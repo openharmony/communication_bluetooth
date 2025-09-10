@@ -28,19 +28,19 @@ namespace OHOS {
 namespace Bluetooth {
 
 using namespace taihe;
-using namespace ohos::bluetooth::ble;
 class GattServerImpl {
 public:
     void AddService(ohos::bluetooth::ble::GattService service);
     void Close();
     void RemoveService(string_view serviceUuid);
-    void SendResponse(ServerResponse serverResponse);
+    void SendResponse(ohos::bluetooth::ble::ServerResponse serverResponse);
 
     static std::vector<std::string> deviceList_;
     static std::mutex deviceListMutex_;
 
     GattServerImpl()
     {
+        HILOGI("enter");
         callback_ = std::make_shared<TaiheGattServerCallback>();
         std::shared_ptr<GattServerCallback> tmp = std::static_pointer_cast<GattServerCallback>(callback_);
         server_  = GattServer::CreateInstance(tmp);

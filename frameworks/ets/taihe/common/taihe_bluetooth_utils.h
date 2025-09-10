@@ -19,38 +19,41 @@
 #include "bluetooth_types.h"
 #include "taihe/runtime.hpp"
 #include "taihe/array.hpp"
+#include <shared_mutex>
+#include <vector>
+#include "taihe/runtime.hpp"
+#include "stdexcept"
+#include "taihe_bluetooth_error.h"
 
 namespace OHOS {
 namespace Bluetooth {
 
-enum class ScanReportType {
-    ON_FOUND = 1, // the found of advertisement packet
-    ON_LOST = 2 // the lost of advertisement packet
+enum taihe_status {
+    taihe_ok = 0,
+    taihe_invalid_arg,
 };
 
-enum class SensitivityMode {
-    SENSITIVITY_MODE_HIGH = 1,  //  high sensitivity mode
-    SENSITIVITY_MODE_LOW = 2    //  low sensitivity mode
-};
-
-enum ani_status {
-    ani_ok = 0,
-    ani_invalid_arg,
-};
-
-#ifndef ANI_BT_CALL_RETURN
-#define ANI_BT_CALL_RETURN(func)                                          \
+#ifndef TAIHE_BT_CALL_RETURN
+#define TAIHE_BT_CALL_RETURN(func)                                          \
     do {                                                                   \
-        ani_status ret = (func);                                          \
-        if (ret != ani_ok) {                                              \
+        taihe_status ret = (func);                                          \
+        if (ret != taihe_ok) {                                              \
             HILOGE("api call function failed. ret:%{public}d", ret);      \
             return ret;                                                    \
         }                                                                  \
     } while (0)
 #endif
+#define TAIHE_BT_RETURN_IF(condition, msg, ret)              \
+    do {                                                    \
+        if ((condition)) {                                  \
+            HILOGE(msg);                                    \
+            return (ret);                                   \
+        }                                                   \
+    } while (0)
 
 bool IsValidAddress(std::string bdaddr);
-bool ParseUuidParams(const std::string &uuid, UUID &outUuid);
+bool CheckDeivceIdParam(std::string &addr);
+taihe_status ParseUuidParams(const std::string &uuid, UUID &outUuid);
 template<typename T>
 void ParseArrayBufferParams(const taihe::array<T>& data, std::vector<T> &outParam)
 {

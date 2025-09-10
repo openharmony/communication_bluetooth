@@ -14,16 +14,20 @@
  */
 
 #ifndef LOG_TAG
-#define LOG_TAG "bt_taihe_bluetooth_utils"
+#define LOG_TAG "bt_taihe_utils"
 #endif
 
-#include "taihe_bluetooth_utils.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
+#include "taihe_bluetooth_utils.h"
 
+#include <algorithm>
 #include <regex>
 
 namespace OHOS {
 namespace Bluetooth {
+using namespace std;
+
 bool IsValidAddress(std::string bdaddr)
 {
 #if defined(IOS_PLATFORM)
@@ -35,15 +39,22 @@ bool IsValidAddress(std::string bdaddr)
 #endif
 }
 
-bool ParseUuidParams(const std::string &uuid, UUID &outUuid)
+// This function applies to interfaces with a single address as a parameter.
+bool CheckDeivceIdParam(std::string &addr)
+{
+    TAIHE_BT_RETURN_IF(!IsValidAddress(addr), "Invalid addr", false);
+    return true;
+}
+
+taihe_status ParseUuidParams(const std::string &uuid, UUID &outUuid)
 {
     if (!IsValidUuid(uuid)) {
         HILOGE("match the UUID faild.");
-        return false;
+        return taihe_invalid_arg;
     }
     outUuid = ParcelUuid::FromString(uuid);
 
-    return true;
+    return taihe_ok;
 }
 } // namespace Bluetooth
 } // namespace OHOS

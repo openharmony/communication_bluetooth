@@ -197,10 +197,7 @@ struct TrustedPairedDevice {
 
 function GetRemoteProductId(deviceId: String): String;
 
-@overload("getRemoteDeviceName")
-function GetRemoteDeviceNameWithAlias(deviceId: String, alias: Optional<bool>): String;
-@overload("getRemoteDeviceName")
-function GetRemoteDeviceName(deviceId: String): String;
+function GetRemoteDeviceName(deviceId: String, alias: Optional<bool>): String;
 
 function GetPairedDevices(): Array<String>;
 

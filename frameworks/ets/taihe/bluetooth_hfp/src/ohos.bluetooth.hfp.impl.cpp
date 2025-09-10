@@ -21,17 +21,14 @@
 #include "ohos.bluetooth.hfp.impl.hpp"
 #include "taihe/runtime.hpp"
 #include "stdexcept"
+#include "bluetooth_errorcode.h"
 #include "bluetooth_hfp_ag.h"
 #include "bluetooth_log.h"
-#include "bluetooth_errorcode.h"
 #include "taihe_bluetooth_hfp_ag_observer.h"
+#include "taihe_bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
-
-using namespace taihe;
-using namespace ohos::bluetooth::hfp;
-
 class HandsFreeAudioGatewayProfileImpl {
 public:
     HandsFreeAudioGatewayProfileImpl()
@@ -62,49 +59,59 @@ public:
 
     void Connect(taihe::string_view deviceId)
     {
+        HILOGD("enter");
         std::string remoteAddr = std::string(deviceId);
+        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
+
         HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         int32_t errorCode = profile->Connect(device);
-        if (errorCode != BT_NO_ERROR) {
-            taihe::set_business_error(errorCode, "Connect return error");
-        }
+        HILOGD("[BTTEST] errorCode:%{public}d", errorCode);
+        TAIHE_BT_ASSERT_RETURN_VOID(errorCode == BT_NO_ERROR, errorCode);
     }
 
     void Disconnect(taihe::string_view deviceId)
     {
+        HILOGD("enter");
         std::string remoteAddr = std::string(deviceId);
+        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
+
         HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         int32_t errorCode = profile->Disconnect(device);
-        if (errorCode != BT_NO_ERROR) {
-            taihe::set_business_error(errorCode, "Disconnect return error");
-        }
+        HILOGD("[BTTEST] errorCode:%{public}d", errorCode);
+        TAIHE_BT_ASSERT_RETURN_VOID(errorCode == BT_NO_ERROR, errorCode);
     }
 
     ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(taihe::string_view deviceId)
     {
+        HILOGD("enter");
         std::string remoteAddr = std::string(deviceId);
+        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM,
+            ohos::bluetooth::constant::ProfileConnectionState::from_value(0));
+
         HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
         int32_t errorCode = profile->GetDeviceState(device, state);
-        if (errorCode != BT_NO_ERROR) {
-            taihe::set_business_error(errorCode, "GetConnectionState return error");
-        }
-
         int32_t profileState = TaiheUtils::GetProfileConnectionState(state);
+        TAIHE_BT_ASSERT_RETURN(errorCode == BT_NO_ERROR, errorCode,
+            ohos::bluetooth::constant::ProfileConnectionState::from_value(profileState));
+
         return ohos::bluetooth::constant::ProfileConnectionState::from_value(profileState);
     }
 
-    array<string> GetConnectedDevices()
+    taihe::array<taihe::string> GetConnectedDevices()
     {
+        HILOGI("enter");
         HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
         std::vector<BluetoothRemoteDevice> devices;
         int errorCode = profile->GetConnectedDevices(devices);
-        if (errorCode != BT_NO_ERROR) {
-            taihe::set_business_error(errorCode, "GetConnectedDevices return error");
-        }
+        HILOGI("errorCode:%{public}d, devices size:%{public}zu", errorCode, devices.size());
+        TAIHE_BT_ASSERT_RETURN(errorCode == BT_NO_ERROR, errorCode, taihe::array<taihe::string>{});
 
         std::vector<std::string> deviceVector;
         for (auto &device: devices) {
@@ -119,9 +126,9 @@ private:
     bool isRegistered_ = false;
 };
 
-HandsFreeAudioGatewayProfile CreateHfpAgProfile()
+::ohos::bluetooth::hfp::HandsFreeAudioGatewayProfile CreateHfpAgProfile()
 {
-    return make_holder<HandsFreeAudioGatewayProfileImpl, ohos::bluetooth::hfp::HandsFreeAudioGatewayProfile>();
+    return taihe::make_holder<HandsFreeAudioGatewayProfileImpl, ohos::bluetooth::hfp::HandsFreeAudioGatewayProfile>();
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
