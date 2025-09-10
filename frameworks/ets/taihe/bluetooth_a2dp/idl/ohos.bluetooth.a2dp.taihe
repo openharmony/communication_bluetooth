@@ -18,7 +18,7 @@
 static { loadLibrary("bluetoothA2dp_taihe_native.z") }
 """)
 
-from ohos.bluetooth.baseProfile use BaseProfile; 
+from ohos.bluetooth.baseProfile use BaseProfile;
 interface A2dpSourceProfile : BaseProfile {
     SetCurrentCodecInfo(deviceId: String, codecInfo: CodecInfo): void;
 

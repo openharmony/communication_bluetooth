@@ -17,7 +17,7 @@
 #define TAIHE_BLUETOOTH_BLE_CENTRAL_MANAGER_H
 
 #include "bluetooth_ble_central_manager.h"
-#include "taihe_bluetooth_utils.h"
+#include "taihe_bluetooth_ble_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {

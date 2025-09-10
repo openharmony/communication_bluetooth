@@ -10,7 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
- 
+
 import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 import("//build/ohos/taihe_idl/taihe.gni")
@@ -29,7 +29,7 @@ copy_taihe_idl("bluetooth_ble_taihe") {
 subsystem_name = "communication"
 part_name = "bluetooth"
 taihe_generated_file_path_ble = "$taihe_file_path/out/$subsystem_name/$part_name/ble"
- 
+
 ohos_taihe("run_taihe") {
   taihe_generated_file_path = "${taihe_generated_file_path_ble}"
   deps = [ ":bluetooth_ble_taihe" ]
@@ -38,7 +38,7 @@ ohos_taihe("run_taihe") {
     "$taihe_generated_file_path/src/ohos.bluetooth.ble.abi.c",
   ]
 }
- 
+
 taihe_shared_library("bluetoothBle_taihe_native") {
   taihe_generated_file_path = "${taihe_generated_file_path_ble}"
   part_name = "$part_name"
@@ -49,6 +49,7 @@ taihe_shared_library("bluetoothBle_taihe_native") {
     "src",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common"
   ]
   sources += [
     "src/ani_constructor.cpp",
@@ -59,8 +60,9 @@ taihe_shared_library("bluetoothBle_taihe_native") {
     "src/taihe_bluetooth_gatt_client_callback.cpp",
     "src/taihe_bluetooth_gatt_server_callback.cpp",
     "src/taihe_bluetooth_gatt_server.cpp",
-    "src/taihe_bluetooth_utils.cpp",
     "src/taihe_parser_utils.cpp",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_bluetooth_utils.cpp",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_bluetooth_error.cpp"
   ]
   deps = [
     ":run_taihe",
@@ -78,7 +80,7 @@ taihe_shared_library("bluetoothBle_taihe_native") {
     debug = false
   }
 }
- 
+
 generate_static_abc("bluetoothBle_abc") {
   base_url = "${taihe_generated_file_path_ble}"
   files = [ "${taihe_generated_file_path_ble}/@ohos.bluetooth.ble.ets" ]
@@ -88,7 +90,7 @@ generate_static_abc("bluetoothBle_abc") {
 }
 
 ohos_prebuilt_etc("bluetoothBle_etc") {
-  source = "$target_out_dir/bluetoothBle_abc.abc"           
+  source = "$target_out_dir/bluetoothBle_abc.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"

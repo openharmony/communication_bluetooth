@@ -72,16 +72,16 @@ struct TaiheGattProperties {
     bool extendedProperties = false;
 };
 
-ani_status TaiheParseGattService(ohos::bluetooth::ble::GattService object, TaiheGattService &outService);
-ani_status TaiheParseIncludeService(taihe::array<::ohos::bluetooth::ble::GattService> object,
+taihe_status TaiheParseGattService(ohos::bluetooth::ble::GattService object, TaiheGattService &outService);
+taihe_status TaiheParseIncludeService(taihe::array<::ohos::bluetooth::ble::GattService> object,
     std::vector<TaiheGattService> &outIncludeService);
-ani_status TaiheParseGattCharacteristic(taihe::array<::ohos::bluetooth::ble::BLECharacteristic> object,
+taihe_status TaiheParseGattCharacteristic(taihe::array<::ohos::bluetooth::ble::BLECharacteristic> object,
     std::vector<TaiheBleCharacteristic> &outCharacteristic);
-ani_status TaiheParseGattDescriptor(taihe::array<::ohos::bluetooth::ble::BLEDescriptor> object,
+taihe_status TaiheParseGattDescriptor(taihe::array<::ohos::bluetooth::ble::BLEDescriptor> object,
     std::vector<TaiheBleDescriptor> &outDescriptor);
-ani_status TaiheParseObjectGattPermissions(ohos::bluetooth::ble::GattPermissions object,
+void TaiheParseObjectGattPermissions(ohos::bluetooth::ble::GattPermissions object,
     TaiheGattPermission &outPermissions);
-ani_status TaiheParseObjectGattProperties(ohos::bluetooth::ble::GattProperties object,
+void TaiheParseObjectGattProperties(ohos::bluetooth::ble::GattProperties object,
     TaiheGattProperties &outProperties);
 }  // namespace Bluetooth
 }  // namespace OHOS
