@@ -38,10 +38,10 @@ void GattServerImpl::AddService(ohos::bluetooth::ble::GattService service)
     UUID serviceUuid = UUID::FromString(std::string(service.serviceUuid));
     gattService = std::make_unique<GattService>(serviceUuid, type);
 
-    TaiheGattService aniGattService;
-    TAIHE_BT_ASSERT_RETURN_VOID(!TaiheParseGattService(service, aniGattService), BT_ERR_INTERNAL_ERROR);
+    TaiheGattService taiheGattService;
+    TAIHE_BT_ASSERT_RETURN_VOID(!TaiheParseGattService(service, taiheGattService), BT_ERR_INTERNAL_ERROR);
 
-    for (auto &characteristic : aniGattService.characteristics) {
+    for (auto &characteristic : taiheGattService.characteristics) {
         int charPermissions = characteristic.permissions;
         int charProperties = characteristic.properties;
         GattCharacteristic character(characteristic.characteristicUuid, charPermissions, charProperties);
@@ -67,7 +67,7 @@ void GattServerImpl::Close()
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
 }
 
-void GattServerImpl::RemoveService(string_view serviceUuid)
+void GattServerImpl::RemoveService(taihe::string_view serviceUuid)
 {
     HILOGI("enter");
     UUID uuid;
