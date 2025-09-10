@@ -376,7 +376,7 @@ void StartBLEScan(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
     TAIHE_BT_ASSERT_RETURN_VOID(status == taihe_ok, BT_ERR_INVALID_PARAM);
 
     int ret = BleCentralManagerGetInstance()->StartScan(settings, scanfilters);
-    TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
+    TAIHE_BT_ASSERT_RETURN_VOID( ret == NO_ERROR || ret == BT_ERR_BLE_SCAN_ALREADY_STARTED, ret);
 }
 
 taihe::array<taihe::string> GetConnectedBLEDevices()
