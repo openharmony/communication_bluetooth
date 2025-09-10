@@ -31,4 +31,4 @@ private:
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
-#endif /* NAPI_BLUETOOTH_CONMMON_H_ */
+#endif /* NAPI_BLUETOOTH_COMMON_H_ */
