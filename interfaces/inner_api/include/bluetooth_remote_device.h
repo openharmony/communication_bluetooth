@@ -440,7 +440,7 @@ public:
     int32_t GetDeviceTransport(int32_t &transport) const;
 private:
     std::string address_ = "00:00:00:00:00:00";
-    int32_t addressType = UNSET_ADDRESS_TYPE;
+    int32_t addressType_ = UNSET_ADDRESS_TYPE;
     int transport_ = BT_TRANSPORT_NONE;
 };
 }  // namespace Bluetooth
