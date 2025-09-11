@@ -65,13 +65,13 @@ static BtGattCallbacks *g_AppCallback;
 
 static std::shared_ptr<BleAdvCallback> g_bleAdvCallbacks[MAX_BLE_ADV_NUM];
 static std::shared_ptr<BleAdvertiser> g_BleAdvertiser = nullptr;
-static mutex g_advMutex;
+static ffrt::mutex g_advMutex;
 
 constexpr int32_t MAX_BLE_SCAN_NUM = 5;
 static BluetoothObjectMap<std::shared_ptr<BleCentralManager>, (MAX_BLE_SCAN_NUM + 1)> g_bleCentralManagerMap;
 
 static uint32_t g_advAddrTimerIds[MAX_BLE_ADV_NUM];
-static mutex g_advTimerMutex;
+static ffrt::mutex g_advTimerMutex;
 // ffrt queue
 static ffrt::queue startAdvQueue("startAdv_Queue");
 
@@ -227,7 +227,7 @@ public:
             HILOGW("call back is null.");
         }
         {
-            lock_guard<mutex> lock(g_advTimerMutex);
+            lock_guard<ffrt::mutex> lock(g_advTimerMutex);
             if (g_advAddrTimerIds[advId_] != 0) {
                 BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[advId_]);
                 g_advAddrTimerIds[advId_] = 0;
@@ -235,7 +235,7 @@ public:
                 HILOGD("TimerId no registered, is 0.");
             }
         }
-        lock_guard<mutex> lock(g_advMutex);
+        lock_guard<ffrt::mutex> lock(g_advMutex);
         g_bleAdvCallbacks[advId_] = nullptr;
         int i = 0;
         for (; i < MAX_BLE_ADV_NUM; i++) {
@@ -358,7 +358,7 @@ int BleSetAdvData(int advId, const StartAdvRawData data)
         HILOGE("Invalid advId (%{public}d)", advId);
         return OHOS_BT_STATUS_PARM_INVALID;
     }
-    lock_guard<mutex> lock(g_advMutex);
+    lock_guard<ffrt::mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
         HILOGE("Adv is not started, need call 'BleStartAdvEx' first.");
         return OHOS_BT_STATUS_FAIL;
@@ -400,20 +400,20 @@ int BleStopAdv(int advId)
         HILOGE("BleStopAdv fail, advId is invalid.");
         return OHOS_BT_STATUS_FAIL;
     }
-    lock_guard<mutex> lock(g_advMutex);
+    lock_guard<ffrt::mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
         HILOGE("BleStopAdv fail, the current adv is not started.");
         return OHOS_BT_STATUS_FAIL;
     }
     {
-        lock_guard<mutex> lock(g_advTimerMutex);
+        lock_guard<ffrt::mutex> lock(g_advTimerMutex);
         BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[advId]);
         g_advAddrTimerIds[advId] = 0;
     }
 
     std::function stopAdvFunc = [advId]() {
         HILOGD("stop adv in adv_Queue thread, advId = %{public}d", advId);
-        lock_guard<mutex> lock(g_advMutex);
+        lock_guard<ffrt::mutex> lock(g_advMutex);
         int ret = g_BleAdvertiser->StopAdvertising(g_bleAdvCallbacks[advId]);
         if (ret != BT_NO_ERROR) {
             HILOGE("fail, advId: %{public}d, ret: %{public}d", advId, ret);
@@ -646,7 +646,7 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
         *advId = -1;
         return OHOS_BT_STATUS_NOT_READY;
     }
-    lock_guard<mutex> lock(g_advMutex);
+    lock_guard<ffrt::mutex> lock(g_advMutex);
     int i = CheckAndAllocateAdvHandle();
     CHECK_AND_RETURN_LOG_RET(i != MAX_BLE_ADV_NUM, OHOS_BT_STATUS_UNHANDLED, "reach the max num of adv");
     *advId = i;
@@ -677,14 +677,14 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
 
     std::function startAdvFunc = [i, advData, scanResponse, settings]() {
         HILOGI("start adv in startAdv_Queue thread, handle = %{public}d", i);
-        lock_guard<mutex> lock(g_advMutex);
+        lock_guard<ffrt::mutex> lock(g_advMutex);
         int ret = g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
         if (ret != BT_NO_ERROR) {
             HILOGE("fail, ret: %{public}d", ret);
             //StartAdvertise fail, return default handle -1 to softbus
             g_bleAdvCallbacks[i] = nullptr;
             {
-                lock_guard<mutex> lock(g_advTimerMutex);
+                lock_guard<ffrt::mutex> lock(g_advTimerMutex);
                 BluetoothTimer::GetInstance()->UnRegister(g_advAddrTimerIds[i]);
                 g_advAddrTimerIds[i] = 0;
             }
@@ -716,7 +716,7 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
         return OHOS_BT_STATUS_NOT_READY;
     }
 
-    lock_guard<mutex> lock(g_advMutex);
+    lock_guard<ffrt::mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr) {
         g_BleAdvertiser = BleAdvertiser::CreateInstance();
     }
@@ -733,7 +733,7 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
 
     std::function startAdvFunc = [i, advData, scanResponse, settings]() {
         HILOGI("start adv in startAdv_Queue thread, handle = %{public}d", i);
-        lock_guard<mutex> lock(g_advMutex);
+        lock_guard<ffrt::mutex> lock(g_advMutex);
         int ret = g_BleAdvertiser->StartAdvertising(settings, advData, scanResponse, 0, g_bleAdvCallbacks[i]);
         if (ret != BT_NO_ERROR) {
             HILOGE("fail, ret: %{public}d", ret);
@@ -763,7 +763,7 @@ int BleEnableAdvEx(int advId)
         HILOGE("BleEnableAdv fail, advId is invalid.");
         return OHOS_BT_STATUS_FAIL;
     }
-    lock_guard<mutex> lock(g_advMutex);
+    lock_guard<ffrt::mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
         HILOGE("BleEnableAdv fail, the current adv is not started.");
         return OHOS_BT_STATUS_FAIL;
@@ -795,7 +795,7 @@ int BleDisableAdvEx(int advId)
         HILOGE("BleDisableAdv fail, advId is invalid.");
         return OHOS_BT_STATUS_FAIL;
     }
-    lock_guard<mutex> lock(g_advMutex);
+    lock_guard<ffrt::mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
         HILOGE("BleDisableAdv fail, the current adv is not started.");
         return OHOS_BT_STATUS_FAIL;
@@ -1134,7 +1134,7 @@ int GetAdvHandle(int advId, int *advHandle)
         HILOGE("GetAdvHandle fail, advId is invalid.advId: %{public}d.", advId);
         return OHOS_BT_STATUS_PARM_INVALID;
     }
-    lock_guard<mutex> lock(g_advMutex);
+    lock_guard<ffrt::mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
         HILOGE("GetAdvHandle fail, the current adv is not started.");
         return OHOS_BT_STATUS_FAIL;
@@ -1426,7 +1426,7 @@ int RemoveLpDeviceParam(BtUuid uuid)
 void ClearGlobalResource(void)
 {
     int i = 0;
-    lock_guard<mutex> lock(g_advMutex);
+    lock_guard<ffrt::mutex> lock(g_advMutex);
     for (i = 0; i < MAX_BLE_ADV_NUM; i++) {
         if (g_bleAdvCallbacks[i] != nullptr) {
             g_bleAdvCallbacks[i] = nullptr;
@@ -1452,7 +1452,7 @@ bool StartAdvAddrTimer(int advHandle, const AdvOwnAddrParams *ownAddrParams)
     uint32_t timerId = 0;
     BluetoothTimer::GetInstance()->Register(timerCallback, timerId, ADV_ADDR_TIME_THRESHOLD);
     {
-        lock_guard<mutex> lock(g_advTimerMutex);
+        lock_guard<ffrt::mutex> lock(g_advTimerMutex);
         g_advAddrTimerIds[advHandle] = timerId;
     }
     return true;
@@ -1475,7 +1475,7 @@ int BleChangeAdvParams(int advId, const BleAdvParams advParam)
         HILOGW("Invaild advId:%{public}d", advId);
         return OHOS_BT_STATUS_PARM_INVALID;
     }
-    lock_guard<mutex> lock(g_advMutex);
+    lock_guard<ffrt::mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
         HILOGE("Adv is not started, need call BleStartAdvEx first.");
         return OHOS_BT_STATUS_FAIL;
