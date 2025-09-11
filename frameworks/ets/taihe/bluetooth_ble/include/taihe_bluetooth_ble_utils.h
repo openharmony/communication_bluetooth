@@ -16,4 +16,17 @@
 #ifndef TAIHE_BLUETOOTH_BLE_UTILS_H_
 #define TAIHE_BLUETOOTH_BLE_UTILS_H_
 
+namespace OHOS {
+namespace Bluetooth {
+enum class ScanReportType {
+    ON_FOUND = 1, // the found of advertisement packet
+    ON_LOST = 2 // the lost of advertisement packet
+};
+
+enum class SensitivityMode {
+    SENSITIVITY_MODE_HIGH = 1,  //  high sensitivity mode
+    SENSITIVITY_MODE_LOW = 2    //  low sensitivity mode
+};
+} // namespace Bluetooth
+} // namespace OHOS
 #endif // TAIHE_BLUETOOTH_BLE_UTILS_H_
