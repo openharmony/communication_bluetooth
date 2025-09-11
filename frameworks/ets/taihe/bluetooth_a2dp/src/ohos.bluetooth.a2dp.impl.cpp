@@ -76,6 +76,7 @@ public:
 
     ohos::bluetooth::a2dp::CodecInfo GetCurrentCodecInfo(taihe::string_view deviceId)
     {
+        HILOGI("start");
         std::string remoteAddr = static_cast<std::string>(deviceId);
         bool checkRet = CheckDeivceIdParam(remoteAddr);
         ohos::bluetooth::a2dp::CodecInfo codecInfo = {
@@ -103,6 +104,7 @@ public:
 
     ohos::bluetooth::a2dp::PlayingState GetPlayingState(taihe::string_view deviceId)
     {
+        HILOGD("start");
         std::string remoteAddr = static_cast<std::string>(deviceId);
         bool checkRet = CheckDeivceIdParam(remoteAddr);
         TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM, ohos::bluetooth::a2dp::PlayingState::from_value(0));
@@ -111,6 +113,7 @@ public:
         BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
         A2dpSource *profile = A2dpSource::GetProfile();
         int32_t errorCode = profile->GetPlayingState(remoteDevice, state);
+        HILOGI("errorCode: %{public}d", errorCode);
         TAIHE_BT_ASSERT_RETURN(errorCode == BT_NO_ERROR, errorCode,
             ohos::bluetooth::a2dp::PlayingState::from_value(state));
 
@@ -119,6 +122,7 @@ public:
 
     void Connect(taihe::string_view deviceId)
     {
+        HILOGD("start");
         std::string remoteAddr = static_cast<std::string>(deviceId);
         bool checkRet = CheckDeivceIdParam(remoteAddr);
         TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
@@ -131,6 +135,7 @@ public:
 
     void Disconnect(taihe::string_view deviceId)
     {
+        HILOGD("start");
         std::string remoteAddr = static_cast<std::string>(deviceId);
         bool checkRet = CheckDeivceIdParam(remoteAddr);
         TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
@@ -196,6 +201,7 @@ public:
 
     taihe::array<taihe::string> GetConnectedDevices()
     {
+        HILOGI("enter");
         A2dpSource *profile = A2dpSource::GetProfile();
         std::vector<int> states;
         states.push_back(1);
