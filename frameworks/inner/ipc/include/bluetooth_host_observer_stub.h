@@ -51,6 +51,8 @@ private:
         MessageParcel &data, MessageParcel &reply);
     static int32_t OnBluetoothStateChangedInner(BluetoothHostObserverStub *stub,
         MessageParcel &data, MessageParcel &reply);
+    static int32_t OnBluetoothSwitchActionInner(BluetoothHostObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
     static int32_t OnBluetoothRefusePolicyChangedInner(BluetoothHostObserverStub *stub,
         MessageParcel &data, MessageParcel &reply);
 

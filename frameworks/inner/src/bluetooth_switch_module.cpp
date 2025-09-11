@@ -48,7 +48,8 @@ void BluetoothSwitchModule::LogBluetoothSwitchEvent(BluetoothSwitchEvent event)
     }
 }
 
-int BluetoothSwitchModule::ProcessBluetoothSwitchEvent(BluetoothSwitchEvent event, bool isAsync)
+int BluetoothSwitchModule::ProcessBluetoothSwitchEvent(
+    BluetoothSwitchEvent event, std::string callingName, bool isAsync)
 {
     CHECK_AND_RETURN_LOG_RET(switchAction_, BT_ERR_INTERNAL_ERROR, "switchAction is nullptr");
 
@@ -56,11 +57,11 @@ int BluetoothSwitchModule::ProcessBluetoothSwitchEvent(BluetoothSwitchEvent even
     LogBluetoothSwitchEvent(event);
     switch (event) {
         case BluetoothSwitchEvent::ENABLE_BLUETOOTH:
-            return ProcessEnableBluetoothEvent(isAsync);
+            return ProcessEnableBluetoothEvent(callingName, isAsync);
         case BluetoothSwitchEvent::DISABLE_BLUETOOTH:
-            return ProcessDisableBluetoothEvent(isAsync);
+            return ProcessDisableBluetoothEvent(callingName, isAsync);
         case BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_RESTRICE_MODE:
-            return ProcessEnableBluetoothToRestrictModeEvent();
+            return ProcessEnableBluetoothToRestrictModeEvent(callingName);
         case BluetoothSwitchEvent::BLUETOOTH_ON:
             return ProcessBluetoothOnEvent();
         case BluetoothSwitchEvent::BLUETOOTH_OFF:
@@ -107,38 +108,41 @@ int BluetoothSwitchModule::ProcessBluetoothSwitchAction(
         isBtSwitchProcessing_ = false;
         ffrtQueue_.cancel(taskTimeoutHandle_);
     }
-    // Considering interface compatibility, when a thiry party app invokes the Bluetooth switch interface,
-    // a dialog box is displayed, indicating that the call is success.
-    if (ret == BT_ERR_DIALOG_FOR_USER_CONFIRM) {
+    // Considering interface compatibility,
+    // 1) when a thiry party app invokes the Bluetooth switch interface, a dialog box is displayed,
+    //    indicating that the call is success.
+    // 2) when the switch operation of the system application is transferred to another module,
+    //    the interface call is considered successful.
+    if (ret == BT_ERR_DIALOG_FOR_USER_CONFIRM || ret == BT_ERR_SWITCH_OP_TRANSFERRED) {
         ret = BT_NO_ERROR;
     }
     return ret;
 }
 
-int BluetoothSwitchModule::ProcessEnableBluetoothEvent(bool isAsync)
+int BluetoothSwitchModule::ProcessEnableBluetoothEvent(const std::string &callingName, bool isAsync)
 {
     return ProcessBluetoothSwitchAction(
-        [this, isAsync]() {
+        [this, callingName, isAsync]() {
             bool noAutoConnect = noAutoConnect_.load();
             if (noAutoConnect) {
                 SetNoAutoConnect(false);
             }
-            return switchAction_->EnableBluetooth(noAutoConnect, isAsync);
+            return switchAction_->EnableBluetooth(noAutoConnect, callingName, isAsync);
         },
         BluetoothSwitchEvent::ENABLE_BLUETOOTH);
 }
 
-int BluetoothSwitchModule::ProcessDisableBluetoothEvent(bool isAsync)
+int BluetoothSwitchModule::ProcessDisableBluetoothEvent(const std::string &callingName, bool isAsync)
 {
     return ProcessBluetoothSwitchAction(
-        [this, isAsync]() { return switchAction_->DisableBluetooth(isAsync); },
+        [this, callingName, isAsync]() { return switchAction_->DisableBluetooth(callingName, isAsync); },
         BluetoothSwitchEvent::DISABLE_BLUETOOTH);
 }
 
-int BluetoothSwitchModule::ProcessEnableBluetoothToRestrictModeEvent(void)
+int BluetoothSwitchModule::ProcessEnableBluetoothToRestrictModeEvent(const std::string &callingName)
 {
     return ProcessBluetoothSwitchAction(
-        [this]() { return switchAction_->EnableBluetoothToRestrictMode(); },
+        [this, callingName]() { return switchAction_->EnableBluetoothToRestrictMode(callingName); },
         BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_RESTRICE_MODE);
 }
 

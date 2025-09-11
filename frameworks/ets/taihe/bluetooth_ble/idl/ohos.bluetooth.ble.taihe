@@ -42,9 +42,8 @@ enum MatchMode: i32 {
 
 struct AdvertisingEnableParams {
     advertisingId: i32;
-    duration: Optional<i16>;
+    duration: Optional<i32>;
 }
-
 
 struct DescriptorWriteRequest {
     deviceId: String;
@@ -68,8 +67,8 @@ struct DescriptorReadRequest {
 }
 
 struct AdvertiseSetting {
-    interval: Optional<i16>;
-    txPower: Optional<i8>;
+    interval: Optional<i32>;
+    txPower: Optional<i32>;
     connectable: Optional<bool>;
 }
 
@@ -89,9 +88,14 @@ struct ScanFilter {
     serviceSolicitationUuidMask: Optional<String>;
     serviceData: Optional<@arraybuffer Array<u8>>;
     serviceDataMask: Optional<@arraybuffer Array<u8>>;
-    manufactureId: Optional<i16>;
+    manufactureId: Optional<i32>;
     manufactureData: Optional<@arraybuffer Array<u8>>;
     manufactureDataMask: Optional<@arraybuffer Array<u8>>;
+}
+
+union ScanFilterNullValue {
+    filters: Array<ScanFilter>;
+    @null nValue;
 }
 
 struct CharacteristicReadRequest {
@@ -144,6 +148,7 @@ enum PhyType: i32 {
 
 enum ScanReportMode: i32 {
     NORMAL = 1,
+    BATCH = 2,
     FENCE_SENSITIVITY_LOW = 10,
     FENCE_SENSITIVITY_HIGH = 11
 }
@@ -154,7 +159,8 @@ struct BLECharacteristic {
     characteristicValue: @arraybuffer Array<u8>;
     descriptors: Array<BLEDescriptor>;
     properties: Optional<GattProperties>;
-    characteristicValueHandle: Optional<i16>;
+    characteristicValueHandle: Optional<i32>;
+    permissions: Optional<GattPermissions>;
 }
 
 struct AdvertisingStateChangeInfo {
@@ -174,7 +180,8 @@ struct BLEDescriptor {
     characteristicUuid: String;
     descriptorUuid: String;
     descriptorValue: @arraybuffer Array<u8>;
-    descriptorHandle: Optional<i16>;
+    descriptorHandle: Optional<i32>;
+    permissions: Optional<GattPermissions>;
 }
 
 struct GattProperties {
@@ -183,11 +190,25 @@ struct GattProperties {
     read: Optional<bool>;
     notify: Optional<bool>;
     indicate: Optional<bool>;
+    broadcast: Optional<bool>;
+    authenticatedSignedWrite: Optional<bool>;
+    extendedProperties: Optional<bool>;
 }
 
 enum GattWriteType: i32 {
     WRITE = 1,
     WRITE_NO_RESPONSE = 2
+}
+
+struct GattPermissions {
+    read: Optional<bool>;
+    readEncrypted: Optional<bool>;
+    readEncryptedMitm: Optional<bool>;
+    write: Optional<bool>;
+    writeEncrypted: Optional<bool>;
+    writeEncryptedMitm: Optional<bool>;
+    writeSigned: Optional<bool>;
+    writeSignedMitm: Optional<bool>;
 }
 
 function StopAdvertising(): void;
@@ -204,6 +225,9 @@ function CreateGattClientDevice(deviceId: String): GattClientDevice;
 
 interface GattServer {
     Close(): void;
+    AddService(service: GattService): void;
+    RemoveService(serviceUuid: String): void;
+    SendResponse(serverResponse: ServerResponse): void;
 }
 
 function CreateGattServer(): GattServer;
@@ -220,10 +244,10 @@ struct AdvertisingParams {
     advertisingSettings: AdvertiseSetting;
     advertisingData: AdvertiseData;
     advertisingResponse: Optional<AdvertiseData>;
-    duration: Optional<i16>;
+    duration: Optional<i32>;
 }
 struct ManufactureData {
-    manufactureId: i16;
+    manufactureId: i32;
     manufactureValue: @arraybuffer Array<u8>;
 }
 
@@ -252,4 +276,6 @@ interface BleScanner {
 }
 
 function CreateBleScanner(): BleScanner;
-
+function GetConnectedBLEDevices(): Array<String>;
+function StartBLEScan(filters: ScanFilterNullValue, options: Optional<ScanOptions>): void;
+function StartAdvertising(setting: AdvertiseSetting, advData: AdvertiseData, advResponse: Optional<AdvertiseData>): void;

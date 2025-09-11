@@ -18,7 +18,7 @@
 static { loadLibrary("bluetoothAccess_taihe_native.z") }
 """)
 
-from ohos.bluetooth.baseProfile use BaseProfile; 
+from ohos.bluetooth.baseProfile use BaseProfile;
 
 @!sts_inject("""
 export function on(type: string, cb: (arg_0: Object) => void) {

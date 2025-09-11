@@ -85,7 +85,7 @@ int32_t BluetoothHostProxy::EnableBt()
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::DisableBt(bool isAsync)
+int32_t BluetoothHostProxy::DisableBt(bool isAsync, const std::string &callingName)
 {
     HILOGI("BluetoothHostProxy::DisableBt starts");
     MessageParcel data;
@@ -95,6 +95,9 @@ int32_t BluetoothHostProxy::DisableBt(bool isAsync)
     }
     if (!data.WriteBool(isAsync)) {
         HILOGE("BluetoothHostProxy::DisableBt WriteBool isAsync error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteString(callingName)) {
         return BT_ERR_IPC_TRANS_FAILED;
     }
 
@@ -243,7 +246,7 @@ int32_t BluetoothHostProxy::DisableBle()
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::EnableBle(bool noAutoConnect, bool isAsync)
+int32_t BluetoothHostProxy::EnableBle(bool noAutoConnect, bool isAsync, const std::string &callingName)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
@@ -256,6 +259,9 @@ int32_t BluetoothHostProxy::EnableBle(bool noAutoConnect, bool isAsync)
     }
     if (!data.WriteBool(isAsync)) {
         HILOGE("BluetoothHostProxy::EnableBle WriteBool isAsync error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteString(callingName)) {
         return BT_ERR_IPC_TRANS_FAILED;
     }
     MessageParcel reply;
@@ -1763,13 +1769,16 @@ int32_t BluetoothHostProxy::SetFastScanLevel(int level)
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::EnableBluetoothToRestrictMode(void)
+int32_t BluetoothHostProxy::EnableBluetoothToRestrictMode(const std::string &callingName)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), BT_ERR_IPC_TRANS_FAILED,
         "WriteInterfaceToken error");
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
+    if (!data.WriteString(callingName)) {
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
     int32_t error = InnerTransact(
         BluetoothHostInterfaceCode::BT_ENABLE_BLUETOOTH_TO_RESTRICT_MODE, option, data, reply);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
