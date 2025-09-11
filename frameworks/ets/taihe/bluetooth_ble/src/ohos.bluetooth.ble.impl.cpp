@@ -270,6 +270,7 @@ static taihe_status ParseScanFilterManufactureDataParameters(const ohos::bluetoo
 
 static taihe_status ParseScanFilter(const ohos::bluetooth::ble::ScanFilter &scanFilter, BleScanFilter &bleScanFilter)
 {
+    HILOGD("enter");
     TAIHE_BT_CALL_RETURN(ParseScanFilterDeviceIdParameters(scanFilter, bleScanFilter));
     TAIHE_BT_CALL_RETURN(ParseScanFilterLocalNameParameters(scanFilter, bleScanFilter));
     TAIHE_BT_CALL_RETURN(ParseScanFilterServiceUuidParameters(scanFilter, bleScanFilter));
@@ -282,6 +283,7 @@ static taihe_status ParseScanFilter(const ohos::bluetooth::ble::ScanFilter &scan
 static taihe_status ParseScanFilterParameters(taihe::array<ohos::bluetooth::ble::ScanFilter> filters,
                                               std::vector<BleScanFilter> &params)
 {
+    HILOGD("enter");
     TAIHE_BT_RETURN_IF(filters.empty(), "Requires array length > 0", taihe_invalid_arg);
 
     for (const auto& scanFilter : filters) {
@@ -370,6 +372,7 @@ taihe_status CheckBleScanParams(ohos::bluetooth::ble::ScanFilterNullValue const 
 void StartBLEScan(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
                   taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options)
 {
+    HILOGD("enter");
     std::vector<BleScanFilter> scanfilters;
     BleScanSettings settings;
     auto status = CheckBleScanParams(filters, options, scanfilters, settings);
@@ -381,6 +384,7 @@ void StartBLEScan(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
 
 taihe::array<taihe::string> GetConnectedBLEDevices()
 {
+    HILOGD("enter");
     std::lock_guard<std::mutex> lock(GattServerImpl::deviceListMutex_);
     std::vector<std::string> dstDevicesvec = GattServerImpl::deviceList_;
     taihe::array<taihe::string> result(taihe::copy_data_t{}, dstDevicesvec.data(), dstDevicesvec.size());
@@ -390,6 +394,7 @@ taihe::array<taihe::string> GetConnectedBLEDevices()
 static taihe_status ParseAdvertisingSettingsParameters(const ohos::bluetooth::ble::AdvertiseSetting &inSettings,
                                                        BleAdvertiserSettings &outSettings)
 {
+    HILOGD("enter");
     if (inSettings.interval.has_value()) {
         uint32_t interval = inSettings.interval.value();
         const uint32_t minInterval = 32;

@@ -207,7 +207,7 @@ function GetRemoteDeviceClass(deviceId: String): DeviceClass;
 
 @promise function ControlDeviceAction(controlDeviceActionParams: ControlDeviceActionParams): void;
 
-@promise function GetLastConnectionTime(deviceId: String): i32;
+@promise function GetLastConnectionTime(deviceId: String): i64;
 
 @promise function GetRemoteDeviceType(deviceId: String): DeviceType;
 

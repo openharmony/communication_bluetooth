@@ -47,7 +47,7 @@ taihe::string GetRemoteProductId(taihe::string_view deviceId)
     std::string productId = "";
     int32_t err = remoteDevice.GetDeviceProductId(productId);
     TAIHE_BT_ASSERT_RETURN(err == BT_NO_ERROR, err, productId);
-
+    HILOGI("GetRemoteProductId :%{public}s", productId.c_str());
     return productId;
 }
 
@@ -85,7 +85,7 @@ taihe::array<taihe::string> GetPairedDevices()
     }
     taihe::array<taihe::string> result(taihe::copy_data_t{}, dstDevicesvec.data(), dstDevicesvec.size());
     TAIHE_BT_ASSERT_RETURN(err == BT_NO_ERROR, err, result);
-
+    HILOGI("end");
     return result;
 }
 
@@ -285,6 +285,7 @@ void OffPinRequired(::taihe::optional_view<::taihe::callback<
 
 void ControlDeviceAction(ohos::bluetooth::connection::ControlDeviceActionParams controlDeviceActionParams)
 {
+    HILOGD("ControlDeviceAction enter");
     std::string deviceId = std::string(controlDeviceActionParams.deviceId);
     bool checkRet = CheckDeivceIdParam(deviceId);
     TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
@@ -294,11 +295,13 @@ void ControlDeviceAction(ohos::bluetooth::connection::ControlDeviceActionParams 
     uint32_t controlObject = (controlDeviceActionParams.controlObject).get_value();
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(deviceId);
     int32_t err = remoteDevice.ControlDeviceAction(controlType, controlTypeVal, controlObject);
+    HILOGI("ControlDeviceAction err: %{public}d", err);
     TAIHE_BT_ASSERT_RETURN_VOID(err == BT_NO_ERROR, err);
 }
 
-int GetLastConnectionTime(taihe::string_view deviceId)
+int64_t GetLastConnectionTime(taihe::string_view deviceId)
 {
+    HILOGD("enter");
     std::string remoteAddr = std::string(deviceId);
     bool checkRet = CheckDeivceIdParam(remoteAddr);
     TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM, 0);
@@ -306,13 +309,15 @@ int GetLastConnectionTime(taihe::string_view deviceId)
     int64_t connectionTime = 0;
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
     int32_t err = remoteDevice.GetLastConnectionTime(connectionTime);
+    HILOGI("GetRemoteDeviceConnectionTime GetLastConnectionTime err: %{public}d", err);
     TAIHE_BT_ASSERT_RETURN(err == BT_NO_ERROR, err, connectionTime);
 
-    return static_cast<int>(connectionTime);
+    return connectionTime;
 }
 
 ohos::bluetooth::connection::DeviceType GetRemoteDeviceType(taihe::string_view deviceId)
 {
+    HILOGD("enter");
     std::string remoteAddr = std::string(deviceId);
     bool checkRet = CheckDeivceIdParam(remoteAddr);
     TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM, ohos::bluetooth::connection::DeviceType::from_value(0));
@@ -320,6 +325,7 @@ ohos::bluetooth::connection::DeviceType GetRemoteDeviceType(taihe::string_view d
     int32_t deviceType = 0;
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
     int32_t err = remoteDevice.GetDeviceCustomType(deviceType);
+    HILOGI("GetRemoteDeviceType err: %{public}d", err);
     TAIHE_BT_ASSERT_RETURN(err == BT_NO_ERROR, err, ohos::bluetooth::connection::DeviceType::from_value(deviceType));
 
     return ohos::bluetooth::connection::DeviceType::from_value(deviceType);
@@ -327,6 +333,7 @@ ohos::bluetooth::connection::DeviceType GetRemoteDeviceType(taihe::string_view d
 
 void UpdateCloudBluetoothDevice(ohos::bluetooth::connection::TrustedPairedDevices trustedPairedDevices)
 {
+    HILOGI("[CLOUD_DEV] UpdateCloudBluetoothDevice enter");
     std::vector<TrustPairDeviceParam> trustPairs {};
     for (const auto &device : trustedPairedDevices.trustedPairedDevices) {
         TrustPairDeviceParam trustPair;
@@ -368,11 +375,13 @@ void UpdateCloudBluetoothDevice(ohos::bluetooth::connection::TrustedPairedDevice
         trustPairs.push_back(trustPair);
     }
     int32_t err = BluetoothHost::GetDefaultHost().UpdateCloudBluetoothDevice(trustPairs);
+    HILOGI("[CLOUD_DEV] UpdateCloudBluetoothDevice err: %{public}d", err);
     TAIHE_BT_ASSERT_RETURN_VOID(err == BT_NO_ERROR, err);
 }
 
 ohos::bluetooth::connection::BatteryInfo GetRemoteDeviceBatteryInfo(taihe::string_view deviceId)
 {
+    HILOGD("enter");
     std::string remoteAddr = std::string(deviceId);
     bool checkRet = CheckDeivceIdParam(remoteAddr);
     ohos::bluetooth::connection::BatteryInfo batterys {"1", 1, 2,
@@ -390,6 +399,7 @@ ohos::bluetooth::connection::BatteryInfo GetRemoteDeviceBatteryInfo(taihe::strin
     DeviceBatteryInfo batteryInfo;
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
     int32_t err = remoteDevice.GetRemoteDeviceBatteryInfo(batteryInfo);
+    HILOGI("err: %{public}d", err);
     TAIHE_BT_ASSERT_RETURN(err == BT_NO_ERROR, err, batterys);
 
     int tmpCod = ohos::bluetooth::constant::MajorClass(
@@ -417,6 +427,7 @@ ohos::bluetooth::connection::BatteryInfo GetRemoteDeviceBatteryInfo(taihe::strin
 
 void SetRemoteDeviceName(taihe::string_view deviceId, taihe::string_view name)
 {
+    HILOGD("enter");
     std::string remoteAddr = std::string(deviceId);
     bool checkRet = CheckDeivceIdParam(remoteAddr);
     TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
@@ -424,11 +435,13 @@ void SetRemoteDeviceName(taihe::string_view deviceId, taihe::string_view name)
     std::string deviceName = static_cast<std::string>(name);
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
     int32_t err = remoteDevice.SetDeviceAlias(deviceName);
+    HILOGI("SetDeviceName err: %{public}d", err);
     TAIHE_BT_ASSERT_RETURN_VOID(err == BT_NO_ERROR, err);
 }
 
 void SetRemoteDeviceType(taihe::string_view deviceId, ohos::bluetooth::connection::DeviceType type)
 {
+    HILOGD("enter");
     std::string remoteAddr = std::string(deviceId);
     bool checkRet = CheckDeivceIdParam(remoteAddr);
     TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
@@ -436,11 +449,13 @@ void SetRemoteDeviceType(taihe::string_view deviceId, ohos::bluetooth::connectio
     int32_t deviceType = type.get_value();
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
     int32_t err = remoteDevice.SetDeviceCustomType(deviceType);
+    HILOGI("SetRemoteDeviceType err: %{public}d", err);
     TAIHE_BT_ASSERT_RETURN_VOID(err == BT_NO_ERROR, err);
 }
 
 ohos::bluetooth::connection::ScanMode GetBluetoothScanMode()
 {
+    HILOGD("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t scanMode = 0;
     int32_t err = host->GetBtScanMode(scanMode);
@@ -452,6 +467,7 @@ ohos::bluetooth::connection::ScanMode GetBluetoothScanMode()
 ohos::bluetooth::constant::ProfileConnectionState GetProfileConnectionState(
     taihe::optional<ohos::bluetooth::constant::ProfileId> profileId)
 {
+    HILOGD("enter");
     int state = static_cast<int>(BTConnectState::DISCONNECTED);
 
     if (profileId.has_value()) {
@@ -474,6 +490,7 @@ ohos::bluetooth::constant::ProfileConnectionState GetProfileConnectionState(
 
 taihe::string GetLocalName()
 {
+    HILOGD("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     std::string localName = INVALID_NAME;
     int32_t err = host->GetLocalName(localName);
@@ -522,6 +539,7 @@ ohos::bluetooth::connection::BondState GetPairState(taihe::string_view deviceId)
 
 void StartBluetoothDiscovery()
 {
+    HILOGD("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int ret = host->StartBtDiscovery();
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
@@ -539,6 +557,7 @@ bool IsBluetoothDiscovering()
 
 void StopBluetoothDiscovery()
 {
+    HILOGD("enter");
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int ret = host->CancelBtDiscovery();
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
@@ -546,10 +565,12 @@ void StopBluetoothDiscovery()
 
 void SetDevicePairingConfirmation(taihe::string_view deviceId, bool accept)
 {
+    HILOGD("enter");
     std::string remoteAddr = std::string(deviceId);
     bool checkRet = CheckDeivceIdParam(remoteAddr);
     TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
 
+    HILOGI("SetDevicePairingConfirmation::accept = %{public}d", accept);
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
     int32_t ret = BT_NO_ERROR;
     if (accept) {
