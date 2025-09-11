@@ -1155,6 +1155,7 @@ int BluetoothHost::GetBleMaxAdvertisingDataLength() const
 
 int32_t BluetoothHost::GetConnectedBLEDevices(int32_t bleProfile, std::vector<std::string> &connectedDevices)
 {
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
 
