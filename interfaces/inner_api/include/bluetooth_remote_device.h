@@ -438,6 +438,16 @@ public:
      * @since 20
      */
     int32_t GetDeviceTransport(int32_t &transport) const;
+
+    /**
+    * @brief bluetooth adress type
+    * @since 21
+    */
+    enum AddressType {
+        UNSET_ADDRESS = 0;
+        VIRTUAL_ADDRESS,
+        REAL_ADDRESS
+    };
 private:
     std::string address_ = "00:00:00:00:00:00";
     int32_t addressType_ = UNSET_ADDRESS;
