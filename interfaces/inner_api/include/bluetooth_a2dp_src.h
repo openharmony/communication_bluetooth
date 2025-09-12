@@ -406,7 +406,7 @@ public:
      * brief Get a2dp encoding data path information of connected sink device.
      *
      * @param device remote bluetooth sink device.
-     * @info streams detail information
+     * @param streams detail information. if streams size is 0, only get a2dp encoding data path.
      * @return Returns <b>UNKNOWN_ENCODING_PATH: 0</b>, bt unable to judge encoding data path
      *         Returns <b>SOFTWARE_ENCODING_PATH: 1</b>, a2dp audio encoding path should select a2dp hdi.
      *         Returns <b>HARDWARE_ENCODING_PATH: 2</b>, a2dp audio encoding path should select a2dp offload hdi.
