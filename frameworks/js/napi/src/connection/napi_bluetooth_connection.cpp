@@ -512,7 +512,7 @@ napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::st
     return napi_ok;
 }
 
-napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::string &addr, int32_t &addressType)
+napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::string &addr, int32_t &addrType)
 {
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = {nullptr};
@@ -522,16 +522,26 @@ napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::st
     bool isString = NapiIsString(env, argv[PARAM0]) == napi_ok;
     NAPI_BT_RETURN_IF(!(isObject || isString), "1st argument should be String or Object", napi_invalid_arg);
     if (isObject) {
-        napi_value addrValue;
-        NAPI_BT_CALL_RETURN(napi_get_named_property(env, argv[PARAM0], "address", &addrValue));
-        NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, addrValue, addr));
-        napi_value addrTypeValue;
-        NAPI_BT_CALL_RETURN(napi_get_named_property(env, argv[PARAM0], "addressType", &addrTypeValue));
-        NAPI_BT_CALL_RETURN(NapiParseInt32(env, addrTypeValue, addressType));
-        NAPI_BT_RETURN_IF(!(addressType == VIRTUAL_ADDRESS_TYPE || addressType == REAL_ADDRESS_TYPE),
-            "addressType should be 1 or 2", napi_invalid_arg);
+        // Adapt to pairDevice(deviceId: BluetoothAddress): Promise<void>
+        NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, argv[PARAM0], {"address", "addressType"}));
+        std::string address {};
+        bool exist = false; // not necessary after NapiCheckObjectPropertiesName
+        NAPI_BT_CALL_RETURN(ParseStringParams(env, argv[PARAM0], "address", exist, address));
+        if (!IsValidAddress(address)) {
+            HILOGE("invalid address");
+            return napi_invalid_arg;
+        }
+        addr = address;
+        int32_t addressType = 0;
+        NAPI_BT_CALL_RETURN(ParseInt32Params(env, argv[PARAM0], "addressType", exist, addressType));
+        if (!(addressType == VIRTUAL_ADDRESS || addressType == REAL_ADDRESS)) {
+            HILOGE("invalid addressType, should be 1 or 2");
+            return napi_invalid_arg;
+        }
+        addrType = addressType;   
     }
     if (isString) {
+        // pairDevice(deviceId: string): Promise<void> or pairDevice(deviceId: string, cb: AsyncCb<void>): <void>
         NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr));
     }
     return napi_ok;
@@ -542,7 +552,7 @@ napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
     HILOGD("enter");
     std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "connection.PairDeviceAsync");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
-    int32_t addressType = UNSET_ADDRESS_TYPE;
+    int32_t addressType = UNSET_ADDRESS;
     auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr, addressType);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
     auto func = [remoteAddr, addressType]() {
