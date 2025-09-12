@@ -15,7 +15,7 @@
 
 @!namespace("@ohos.bluetooth.a2dp", "a2dp")
 @!sts_inject("""
-static { loadLibrary("bluetoothA2dp_taihe_native.z") }
+static { loadLibraryWithPermissionCheck("bluetoothA2dp_taihe_native.z", "@ohos.bluetooth.a2dp") }
 """)
 
 from ohos.bluetooth.baseProfile use BaseProfile; 
