@@ -15,7 +15,7 @@
 
 @!namespace("@ohos.bluetooth.constant", "constant")
 @!sts_inject("""
-static { loadLibrary("bluetoothConstant_taihe_native.z") }
+static { loadLibraryWithPermissionCheck("bluetoothConstant_taihe_native.z", "@ohos.bluetooth.constant") }
 """)
 
 enum ProfileConnectionState: i32 {

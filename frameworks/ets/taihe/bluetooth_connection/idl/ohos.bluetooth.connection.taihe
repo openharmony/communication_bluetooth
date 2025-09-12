@@ -15,7 +15,7 @@
 
 @!namespace("@ohos.bluetooth.connection", "connection")
 @!sts_inject("""
-static { loadLibrary("bluetoothConnection_taihe_native.z") }
+static { loadLibraryWithPermissionCheck("bluetoothConnection_taihe_native.z", "@ohos.bluetooth.connection") }
 """)
 from ohos.bluetooth.constant use MajorClass, MajorMinorClass;
 
