@@ -450,7 +450,7 @@ public:
     };
 private:
     std::string address_ = "00:00:00:00:00:00";
-    int32_t addressType_ = UNSET_ADDRESS; // to support real mac in some pair&connect APIs 
+    int32_t addressType_ = UNSET_ADDRESS; // to support real mac in some pair&connect APIs
     int transport_ = BT_TRANSPORT_NONE;
 };
 }  // namespace Bluetooth

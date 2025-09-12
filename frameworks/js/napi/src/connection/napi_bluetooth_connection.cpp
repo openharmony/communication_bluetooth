@@ -538,7 +538,7 @@ napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::st
             HILOGE("invalid addressType, should be 1 or 2");
             return napi_invalid_arg;
         }
-        addrType = addressType;   
+        addrType = addressType;
     }
     if (isString) {
         // pairDevice(deviceId: string): Promise<void> or pairDevice(deviceId: string, cb: AsyncCb<void>): <void>
@@ -1120,7 +1120,7 @@ napi_status ParseControlDeviceActionParams(napi_env env, napi_value object, Cont
         ControlTypeVal::DISABLE, ControlTypeVal::QUERY));
     NAPI_BT_CALL_RETURN(NapiParseObjectUint32Check(napiObject, "controlObject", tmpControlObject,
         ControlObject::LEFT_EAR, ControlObject::LEFT_RIGHT_EAR));
-    
+
     HILOGI("deviceId: %{public}s, controlType: %{public}u, controlTypeVal: %{public}u, controlObject: %{public}u",
         GetEncryptAddr(tmpDeviceId).c_str(), tmpControlType, tmpControlTypeVal, tmpControlObject);
 
@@ -1141,7 +1141,7 @@ napi_value ControlDeviceAction(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRes == napi_ok, BT_ERR_INVALID_PARAM);
 
     NAPI_BT_ASSERT_RETURN_UNDEF(env, argc == ARGS_SIZE_ONE, BT_ERR_INVALID_PARAM);
-    
+
     ControlDeviceActionParams params = { INVALID_MAC_ADDRESS, INVALID_CONTROL_TYPE,
         INVALID_CONTROL_TYPE_VAL, INVALID_CONTROL_OBJECT };
     auto status = ParseControlDeviceActionParams(env, argv[PARAM0], params);

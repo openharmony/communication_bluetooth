@@ -161,7 +161,7 @@ public:
     bool operator==(const RawAddress &rhs) const;
 
 protected:
-    int32_t addressType_ = UNSET_ADDRESS; // to support real mac in some pair&connect APIs 
+    int32_t addressType_ = UNSET_ADDRESS; // to support real mac in some pair&connect APIs
     std::string address_ = "";
 };
 }  // namespace bluetooth
