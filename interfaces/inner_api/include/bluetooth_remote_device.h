@@ -444,13 +444,13 @@ public:
     * @since 21
     */
     enum AddressType {
-        UNSET_ADDRESS = 0;
+        UNSET_ADDRESS = 0,
         VIRTUAL_ADDRESS,
-        REAL_ADDRESS
+        REAL_ADDRES,
     };
 private:
     std::string address_ = "00:00:00:00:00:00";
-    int32_t addressType_ = UNSET_ADDRESS;
+    int32_t addressType_ = UNSET_ADDRESS; // to support real mac in some pair&connect APIs 
     int transport_ = BT_TRANSPORT_NONE;
 };
 }  // namespace Bluetooth
