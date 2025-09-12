@@ -19,7 +19,6 @@
 #include "napi_bluetooth_common.h"
 
 #include "bluetooth_log.h"
-#include "bluetooth_def.h"
 #include "napi_bluetooth_utils.h"
 #include "hitrace_meter.h"
 
@@ -51,8 +50,8 @@ napi_value NapiCommon::BluetoothAddressTypeInit(napi_env env)
     HILOGD("enter");
     napi_value bluetoothAddressType = nullptr;
     napi_create_object(env, &bluetoothAddressType);
-    SetNamedPropertyByInteger(env, bluetoothAddressType, BluetoothAddressType::VIRTUAL_ADDRESS_TYPE, "VIRTUAL");
-    SetNamedPropertyByInteger(env, bluetoothAddressType, BluetoothAddressType::REAL_ADDRESS_TYPE, "REAL");
+    SetNamedPropertyByInteger(env, bluetoothAddressType, AddressType::VIRTUAL_ADDRESS, "VIRTUAL");
+    SetNamedPropertyByInteger(env, bluetoothAddressType, AddressType::REAL_ADDRESS, "REAL");
     return bluetoothAddressType;
 }
 }  // namespace Bluetooth

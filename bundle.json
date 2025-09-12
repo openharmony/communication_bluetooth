@@ -1,6 +1,6 @@
 {
   "name": "@ohos/bluetooth",
-  "version": "",
+  "version": "1.0.0",
   "description": "Provides basic Bluetooth and BLE functions for applications",
   "homePage": "https://gitee.com/openharmony",
   "license": "Apache License 2.0",
@@ -204,8 +204,7 @@
               "parcel/bluetooth_phone_state.h",
               "parcel/bluetooth_raw_address.h",
               "parcel/bluetooth_socket_coc.h",
-              "parcel/parcel_bt_uuid.h",
-              "parcel/bluetooth_address.h"
+              "parcel/parcel_bt_uuid.h"
             ]
           },
           "name": "//foundation/communication/bluetooth/frameworks/inner:btcommon"

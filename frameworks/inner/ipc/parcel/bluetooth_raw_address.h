@@ -28,6 +28,8 @@ public:
     {}
     BluetoothRawAddress(const BluetoothRawAddress &other) : bluetooth::RawAddress(other)
     {}
+    BluetoothRawAddress(int32_t addressType, const std::string &address) : bluetooth::RawAddress(addressType, address)
+    {}
     explicit BluetoothRawAddress(const std::string &address) : bluetooth::RawAddress(address)
     {}
     ~BluetoothRawAddress() override = default;

@@ -37,6 +37,12 @@ public:
     const static int BT_NAP_HIGH_BYTE = 1;
     const static int BT_NAP_LOW_BYTE = 0;
 
+    enum AddressType {
+        UNSET_ADDRESS = 0,
+        VIRTUAL_ADDRESS,
+        REAL_ADDRESS,
+    };
+
     /**
      * @brief A constructor used to create an <b>RawAddress</b> instance.
      *
@@ -51,6 +57,14 @@ public:
      * @since 6
      */
     RawAddress(const RawAddress &other) = default;
+
+    /**
+     * @brief A constructor used to create an <b>RawAddress</b> instance.
+     *
+     * @param address Address string.
+     * @since 21
+     */
+    RawAddress(int32_t addressType, const std::string &address) : addressType_(addressType), address_(address) {};
 
     /**
      * @brief A constructor used to create an <b>RawAddress</b> instance.
@@ -86,6 +100,27 @@ public:
     void SetAddress(const std::string &address)
     {
         address_ = address;
+    };
+
+    /**
+     * @brief Get address type.
+     *
+     * @return Returns address type.
+     * @since 21
+     */
+    const int32_t &GetAddressType() const
+    {
+        return addressType_;
+    };
+
+    /**
+     * @brief Set address type.
+     *
+     * @since 21
+     */
+    void SetAddressType(int32_t addressType)
+    {
+        addressType_ = addressType;
     };
 
     /**
@@ -126,6 +161,7 @@ public:
     bool operator==(const RawAddress &rhs) const;
 
 protected:
+    int32_t addressType_ = UNSET_ADDRESS;
     std::string address_ = "";
 };
 }  // namespace bluetooth

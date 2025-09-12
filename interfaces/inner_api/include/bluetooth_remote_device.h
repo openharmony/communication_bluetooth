@@ -44,9 +44,9 @@ public:
     /**
      * @brief A structor used to create the <b>BluetoothRemoteDevice</b> instance.
      *
-     * @since 6
+     * @since 21
      */
-    BluetoothRemoteDevice(const int32_t &addressType, const std::string &addr, const int transport = BT_TRANSPORT_NONE);
+    BluetoothRemoteDevice(int32_t addressType, const std::string &addr, const int transport = BT_TRANSPORT_NONE);
     /**
      * @brief A destructor used to delete the <b>BluetoothRemoteDevice</b> instance.
      *
@@ -440,7 +440,7 @@ public:
     int32_t GetDeviceTransport(int32_t &transport) const;
 private:
     std::string address_ = "00:00:00:00:00:00";
-    int32_t addressType_ = UNSET_ADDRESS_TYPE;
+    int32_t addressType_ = UNSET_ADDRESS;
     int transport_ = BT_TRANSPORT_NONE;
 };
 }  // namespace Bluetooth

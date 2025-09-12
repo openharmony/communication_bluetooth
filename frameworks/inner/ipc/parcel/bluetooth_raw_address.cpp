@@ -23,6 +23,9 @@ bool BluetoothRawAddress::Marshalling(Parcel &parcel) const
     if (!parcel.WriteString(address_)) {
         return false;
     }
+    if (!parcel.WriteInt32(addressType_)) {
+        return false;
+    }
     return true;
 }
 
@@ -44,6 +47,9 @@ bool BluetoothRawAddress::WriteToParcel(Parcel &parcel)
 bool BluetoothRawAddress::ReadFromParcel(Parcel &parcel)
 {
     if (!parcel.ReadString(address_)) {
+        return false;
+    }
+    if (!parcel.ReadInt32(addressType_)) {
         return false;
     }
     return true;
