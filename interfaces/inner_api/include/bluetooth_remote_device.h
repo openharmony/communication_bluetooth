@@ -440,7 +440,7 @@ public:
     int32_t GetDeviceTransport(int32_t &transport) const;
 
     /**
-    * @brief bluetooth adress type
+    * @brief bluetooth address type
     * @since 21
     */
     enum AddressType {
