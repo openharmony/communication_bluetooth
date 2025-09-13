@@ -649,7 +649,6 @@ int A2dpSource::A2dpOffloadSessionRequest(const BluetoothRemoteDevice &device, c
 {
     CHECK_AND_RETURN_LOG_RET(device.IsValidBluetoothRemoteDevice(), A2DP_STREAM_ENCODE_UNKNOWN, "device err");
     CHECK_AND_RETURN_LOG_RET(device.GetDeviceAddr() != INVALID_MAC_ADDRESS, A2DP_STREAM_ENCODE_UNKNOWN, "invaild mac");
-    CHECK_AND_RETURN_LOG_RET(info.size() != 0, A2DP_STREAM_ENCODE_SOFTWARE, "empty stream");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), A2DP_STREAM_ENCODE_UNKNOWN, "bluetooth is off.");
     sptr<IBluetoothA2dpSrc> proxy = GetRemoteProxy<IBluetoothA2dpSrc>(PROFILE_A2DP_SRC);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, A2DP_STREAM_ENCODE_UNKNOWN, "a2dpSrc proxy is nullptr");
