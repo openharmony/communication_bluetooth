@@ -41,6 +41,13 @@ BluetoothRemoteDevice::BluetoothRemoteDevice(const std::string &addr, const int 
     transport_ = transport;
 }
 
+BluetoothRemoteDevice::BluetoothRemoteDevice(int32_t addressType, const std::string &addr, const int transport)
+{
+    address_ = addr;
+    addressType_ = addressType;
+    transport_ = transport;
+}
+
 int BluetoothRemoteDevice::GetDeviceType() const
 {
     HILOGI("enter");
@@ -192,7 +199,8 @@ int BluetoothRemoteDevice::StartPair()
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
-    return hostProxy->StartPair(transport_, address_);
+    BluetoothRawAddress bluetoothRawAddress(addressType_, address_);
+    return hostProxy->StartPair(transport_, bluetoothRawAddress);
 }
 
 int BluetoothRemoteDevice::StartCrediblePair()

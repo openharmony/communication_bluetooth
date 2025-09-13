@@ -104,7 +104,7 @@ public:
     virtual int32_t SetDeviceAlias(const std::string &address, const std::string &aliasName) = 0;
     virtual int32_t GetRemoteDeviceBatteryInfo(const std::string &address, BluetoothBatteryInfo &batteryInfo) = 0;
     virtual int32_t GetPairState(int32_t transport, const std::string &address, int32_t &pairState) = 0;
-    virtual int32_t StartPair(int32_t transport, const std::string &address) = 0;
+    virtual int32_t StartPair(int32_t transport, const BluetoothRawAddress &bluetoothRawAddress) = 0;
     virtual int32_t StartCrediblePair(int32_t transport, const std::string &address) = 0;
     virtual bool CancelPairing(int32_t transport, const std::string &address) = 0;
     virtual bool IsBondedFromLocal(int32_t transport, const std::string &address) = 0;

@@ -86,3 +86,58 @@ ohos_shared_library("bt_napi_common") {
   part_name = "bluetooth"
   subsystem_name = "communication"
 }
+
+ohos_shared_library("common") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+
+  #install_enable = true
+  include_dirs = [
+    "$BT_NAPI_DIR/include",
+    "$BT_NAPI_DIR/src/common",
+    "$BT_PART_DIR/frameworks/inner/include",
+  ]
+
+  defines = [
+    "BT_LOG_TAG = \"bluetooth_napi\"",
+    "BT_LOG_DOMAIN = 0xD000100",
+    "ENABLE_NAPI_BLUETOOTH_MANAGER",
+    "BLUETOOTH_API_SINCE_10",
+    "BT_MODULE_NAME = \"bluetooth.common\"",
+  ]
+
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
+    debug = false
+  }
+
+  sources = [
+    "napi_bluetooth_common.cpp",
+    "module_common.cpp",
+  ]
+
+  deps = [
+    "$BT_PART_DIR/frameworks/inner:btframework",
+    "$BT_PART_DIR/frameworks/js/napi/src/common:bt_napi_common",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:ability_manager",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_single",
+    "libuv:uv",
+    "napi:ace_napi",
+  ]
+
+  relative_install_dir = "module/bluetooth"
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}
