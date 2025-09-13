@@ -512,16 +512,51 @@ napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::st
     return napi_ok;
 }
 
+napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::string &addr, int32_t &addrType)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO, "Requires 1 or 2 arguments", napi_invalid_arg);
+    bool isObject = NapiIsObject(env, argv[PARAM0]) == napi_ok;
+    bool isString = NapiIsString(env, argv[PARAM0]) == napi_ok;
+    NAPI_BT_RETURN_IF(!(isObject || isString), "1st argument should be String or Object", napi_invalid_arg);
+    if (isObject) {
+        // Adapt to pairDevice(deviceId: BluetoothAddress): Promise<void>
+        NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, argv[PARAM0], {"address", "addressType"}));
+        std::string address {};
+        bool exist = false; // not necessary after NapiCheckObjectPropertiesName
+        NAPI_BT_CALL_RETURN(ParseStringParams(env, argv[PARAM0], "address", exist, address));
+        if (!IsValidAddress(address)) {
+            HILOGE("invalid address");
+            return napi_invalid_arg;
+        }
+        addr = address;
+        int32_t addressType = 0;
+        NAPI_BT_CALL_RETURN(ParseInt32Params(env, argv[PARAM0], "addressType", exist, addressType));
+        if (!(addressType == VIRTUAL_ADDRESS || addressType == REAL_ADDRESS)) {
+            HILOGE("invalid addressType, should be 1 or 2");
+            return napi_invalid_arg;
+        }
+        addrType = addressType;
+    }
+    if (isString) {
+        // pairDevice(deviceId: string): Promise<void> or pairDevice(deviceId: string, cb: AsyncCb<void>): <void>
+        NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], addr));
+    }
+    return napi_ok;
+}
+
 napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
     std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "connection.PairDeviceAsync");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
-    auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr);
+    int32_t addressType = UNSET_ADDRESS;
+    auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr, addressType);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
-
-    auto func = [remoteAddr]() {
-        BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
+    auto func = [remoteAddr, addressType]() {
+        BluetoothRemoteDevice remoteDevice(addressType, remoteAddr);
         int32_t err = remoteDevice.StartPair();
         HILOGI("err: %{public}d", err);
         return NapiAsyncWorkRet(err);
@@ -1085,7 +1120,7 @@ napi_status ParseControlDeviceActionParams(napi_env env, napi_value object, Cont
         ControlTypeVal::DISABLE, ControlTypeVal::QUERY));
     NAPI_BT_CALL_RETURN(NapiParseObjectUint32Check(napiObject, "controlObject", tmpControlObject,
         ControlObject::LEFT_EAR, ControlObject::LEFT_RIGHT_EAR));
-    
+
     HILOGI("deviceId: %{public}s, controlType: %{public}u, controlTypeVal: %{public}u, controlObject: %{public}u",
         GetEncryptAddr(tmpDeviceId).c_str(), tmpControlType, tmpControlTypeVal, tmpControlObject);
 
@@ -1106,7 +1141,7 @@ napi_value ControlDeviceAction(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRes == napi_ok, BT_ERR_INVALID_PARAM);
 
     NAPI_BT_ASSERT_RETURN_UNDEF(env, argc == ARGS_SIZE_ONE, BT_ERR_INVALID_PARAM);
-    
+
     ControlDeviceActionParams params = { INVALID_MAC_ADDRESS, INVALID_CONTROL_TYPE,
         INVALID_CONTROL_TYPE_VAL, INVALID_CONTROL_OBJECT };
     auto status = ParseControlDeviceActionParams(env, argv[PARAM0], params);

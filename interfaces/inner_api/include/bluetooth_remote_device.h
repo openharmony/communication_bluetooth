@@ -42,6 +42,12 @@ public:
      */
     BluetoothRemoteDevice(const std::string &addr, const int transport = BT_TRANSPORT_NONE);
     /**
+     * @brief A structor used to create the <b>BluetoothRemoteDevice</b> instance.
+     *
+     * @since 21
+     */
+    BluetoothRemoteDevice(int32_t addressType, const std::string &addr, const int transport = BT_TRANSPORT_NONE);
+    /**
      * @brief A destructor used to delete the <b>BluetoothRemoteDevice</b> instance.
      *
      * @since 6
@@ -432,8 +438,19 @@ public:
      * @since 20
      */
     int32_t GetDeviceTransport(int32_t &transport) const;
+
+    /**
+    * @brief bluetooth address type
+    * @since 21
+    */
+    enum AddressType {
+        UNSET_ADDRESS = 0,
+        VIRTUAL_ADDRESS,
+        REAL_ADDRES,
+    };
 private:
     std::string address_ = "00:00:00:00:00:00";
+    int32_t addressType_ = UNSET_ADDRESS; // to support real mac in some pair&connect APIs
     int transport_ = BT_TRANSPORT_NONE;
 };
 }  // namespace Bluetooth

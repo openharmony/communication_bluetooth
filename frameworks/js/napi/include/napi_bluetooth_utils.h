@@ -449,6 +449,12 @@ enum AccessAuthorization {
     REJECTED = 2,
 };
 
+enum AddressType {
+    UNSET_ADDRESS = 0,
+    VIRTUAL_ADDRESS,
+    REAL_ADDRESS,
+};
+
 template<typename T1, typename T2, typename T3>
 struct AfterWorkCallbackData {
     T1* object;

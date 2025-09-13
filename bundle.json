@@ -1,6 +1,6 @@
 {
   "name": "@ohos/bluetooth",
-  "version": "",
+  "version": "1.0.0",
   "description": "Provides basic Bluetooth and BLE functions for applications",
   "homePage": "https://gitee.com/openharmony",
   "license": "Apache License 2.0",
@@ -271,6 +271,13 @@
             ]
           },
           "name": "//foundation/communication/bluetooth/frameworks/js/napi/src/common:bt_napi_common"
+        },
+        {
+          "header": {
+            "header_base": "//foundation/communication/bluetooth/frameworks/js/napi",
+            "header_files": []
+          },
+          "name": "//foundation/communication/bluetooth/frameworks/js/napi/src/common:common"
         }
       ],
       "test": [
