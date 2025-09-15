@@ -39,8 +39,6 @@ namespace OHOS {
 namespace Bluetooth {
 std::map<int, std::shared_ptr<NapiSppClient>> NapiSppClient::clientMap;
 int NapiSppClient::count = 0;
-const int RFCOMM_SOCKET_BUFFER_SIZE = 1024;
-const int L2CAP_SOCKET_BUFFER_SIZE = 65535;
 
 static napi_status CheckSppConnectParams(
     napi_env env, napi_callback_info info, std::string &deviceId, SppConnectCallbackInfo *callbackInfo)
