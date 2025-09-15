@@ -85,6 +85,7 @@ public:
 
 private:
     int socketFd_;
+    const int POLL_SIZE = 1;
     InputStream() = delete;
 };
 } // namespace Bluetooth
