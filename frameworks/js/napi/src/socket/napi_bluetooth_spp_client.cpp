@@ -24,7 +24,6 @@
 #include "napi_bluetooth_utils.h"
 #include "napi_async_work.h"
 #include "napi_native_object.h"
-#include "securec.h"
 #include <limits>
 #include <unistd.h>
 #include <uv.h>
