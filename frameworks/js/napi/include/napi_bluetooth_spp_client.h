@@ -18,7 +18,6 @@
 #include <thread>
 #include <map>
 #include <queue>
-#include <memory>
 #include "securec.h"
 #include "bluetooth_socket.h"
 #include "napi_bluetooth_utils.h"
