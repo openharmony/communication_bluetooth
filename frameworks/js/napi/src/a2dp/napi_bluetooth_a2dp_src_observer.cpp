@@ -31,6 +31,9 @@ void NapiA2dpSourceObserver::OnConnectionStateChanged(const BluetoothRemoteDevic
 {
     HILOGD("enter, remote device address: %{public}s, state: %{public}d, cause: %{public}d",
         GET_ENCRYPT_ADDR(device), state, cause);
+    if (state == static_cast<int>(BTConnectState::CONNECTED)) {
+        cause = static_cast<int>(ConnChangeCause::CONNECT_CHANGE_COMMON_CAUSE);
+    }
     auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state, cause);
     eventSubscribe_.PublishEvent(STR_BT_A2DP_SOURCE_CONNECTION_STATE_CHANGE, nativeObject);
 }

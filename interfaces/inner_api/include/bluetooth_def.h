@@ -152,6 +152,7 @@ enum class ConnChangeCause : int {
     DISCONNECT_CAUSE_CONNECT_FROM_CAR = 3,      // The connection needs to be initiated from the car side.
     DISCONNECT_TOO_MANY_CONNECTED_DEVICES = 4,  // Too many devices are currently connected.
     DISCONNECT_CAUSE_CONNECT_FAIL_INTERNAL = 5, // Connection failed due to an internal error.
+    CONNECT_FROM_LOCAL = 1001,                  // Connect from local.
 };
 /**
  * @brief access permission define
