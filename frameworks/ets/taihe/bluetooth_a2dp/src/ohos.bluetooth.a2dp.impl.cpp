@@ -60,7 +60,7 @@ public:
     void SetCurrentCodecInfo(taihe::string_view deviceId, ohos::bluetooth::a2dp::CodecInfo codecInfo)
     {
         std::string remoteAddr = static_cast<std::string>(deviceId);
-        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
         TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
 
         A2dpCodecInfo a2dpCodecInfo;
@@ -71,6 +71,7 @@ public:
         BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
         A2dpSource *profile = A2dpSource::GetProfile();
         int32_t errorCode = profile->SetCodecPreference(remoteDevice, a2dpCodecInfo);
+        HILOGI("err: %{public}d", errorCode);
         TAIHE_BT_ASSERT_RETURN_VOID(errorCode == BT_NO_ERROR, errorCode);
     }
 
@@ -78,7 +79,7 @@ public:
     {
         HILOGI("start");
         std::string remoteAddr = static_cast<std::string>(deviceId);
-        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
         ohos::bluetooth::a2dp::CodecInfo codecInfo = {
             ohos::bluetooth::a2dp::CodecType::key_t::CODEC_TYPE_INVALID,
             ohos::bluetooth::a2dp::CodecBitsPerSample::key_t::CODEC_BITS_PER_SAMPLE_NONE,
@@ -106,7 +107,7 @@ public:
     {
         HILOGD("start");
         std::string remoteAddr = static_cast<std::string>(deviceId);
-        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
         TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM, ohos::bluetooth::a2dp::PlayingState::from_value(0));
 
         int state = 0;
@@ -124,7 +125,7 @@ public:
     {
         HILOGD("start");
         std::string remoteAddr = static_cast<std::string>(deviceId);
-        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
         TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
 
         BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
@@ -137,7 +138,7 @@ public:
     {
         HILOGD("start");
         std::string remoteAddr = static_cast<std::string>(deviceId);
-        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
         TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
 
         BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
@@ -149,38 +150,42 @@ public:
     int32_t GetAutoPlayDisabledDuration(taihe::string_view deviceId)
     {
         std::string remoteAddr = static_cast<std::string>(deviceId);
-        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
         TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM, 0);
 
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         A2dpSource *profile = A2dpSource::GetProfile();
         int32_t duration = 0;
         int err = profile->GetAutoPlayDisabledDuration(device, duration);
+        HILOGI("err: %{public}d, duration: %{public}d", err, duration);
         TAIHE_BT_ASSERT_RETURN(err == BT_NO_ERROR, err, duration);
+
         return duration;
     }
 
     void DisableAutoPlay(taihe::string_view deviceId, int32_t duration)
     {
         std::string remoteAddr = static_cast<std::string>(deviceId);
-        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
         TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
 
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         A2dpSource *profile = A2dpSource::GetProfile();
         int err = profile->DisableAutoPlay(device, duration);
+        HILOGI("err: %{public}d", err);
         TAIHE_BT_ASSERT_RETURN_VOID(err == BT_NO_ERROR, err);
     }
 
     void EnableAutoPlay(taihe::string_view deviceId)
     {
         std::string remoteAddr = static_cast<std::string>(deviceId);
-        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
         TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
 
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         A2dpSource *profile = A2dpSource::GetProfile();
         int err = profile->EnableAutoPlay(device);
+        HILOGI("err: %{public}d", err);
         TAIHE_BT_ASSERT_RETURN_VOID(err == BT_NO_ERROR, err);
     }
 
@@ -190,13 +195,14 @@ public:
         std::string remoteAddr = std::string(deviceId);
         A2dpSource *profile = A2dpSource::GetProfile();
         BluetoothRemoteDevice device(remoteAddr, 1);
-        int32_t btConnectState = static_cast<int32_t>(BTConnectState::DISCONNECTED);
-        int32_t errorCode = profile->GetDeviceState(device, btConnectState);
-        int32_t profileState = TaiheUtils::GetProfileConnectionState(btConnectState);
+        int btConnectState = static_cast<int32_t>(BTConnectState::DISCONNECTED);
+        int errorCode = profile->GetDeviceState(device, btConnectState);
+        int status = TaiheUtils::GetProfileConnectionState(btConnectState);
         TAIHE_BT_ASSERT_RETURN(errorCode == BT_NO_ERROR, errorCode,
-            ohos::bluetooth::constant::ProfileConnectionState::from_value(profileState));
+            ohos::bluetooth::constant::ProfileConnectionState::from_value(status));
+        HILOGD("status: %{public}d", status);
 
-        return ohos::bluetooth::constant::ProfileConnectionState::from_value(profileState);
+        return ohos::bluetooth::constant::ProfileConnectionState::from_value(status);
     }
 
     taihe::array<taihe::string> GetConnectedDevices()
