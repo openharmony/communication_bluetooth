@@ -95,6 +95,7 @@ void GattServerImpl::SendResponse(ohos::bluetooth::ble::ServerResponse serverRes
     HILOGI("enter");
     TAIHE_BT_ASSERT_RETURN_VOID(server_ != nullptr, BT_ERR_INVALID_PARAM);
     BluetoothRemoteDevice remoteDevice(std::string(serverResponse.deviceId), BTTransport::ADAPTER_BLE);
+    HILOGI("Remote device address: %{public}s", GET_ENCRYPT_ADDR(remoteDevice));
     int32_t transId = serverResponse.transId;
     int32_t status = serverResponse.status;
     int32_t offset = serverResponse.offset;

@@ -56,8 +56,7 @@ struct NotifyDialogResultParams {
     dialogResult: bool;
 }
 
-@gen_promise("restrictBluetooth")
-function RestrictBluetoothSync(): void;
+@promise function RestrictBluetooth(): void;
 
 function GetState(): BluetoothState;
 

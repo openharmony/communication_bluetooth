@@ -17,6 +17,7 @@
 #define LOG_TAG "bt_taihe_utils"
 #endif
 
+#include "bluetooth_def.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "taihe_bluetooth_utils.h"
@@ -27,6 +28,8 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace std;
+constexpr int startPos = 6;
+constexpr int endPos = 13;
 
 bool IsValidAddress(std::string bdaddr)
 {
@@ -40,7 +43,7 @@ bool IsValidAddress(std::string bdaddr)
 }
 
 // This function applies to interfaces with a single address as a parameter.
-bool CheckDeivceIdParam(std::string &addr)
+bool CheckDeviceIdParam(std::string &addr)
 {
     TAIHE_BT_RETURN_IF(!IsValidAddress(addr), "Invalid addr", false);
     return true;
@@ -55,6 +58,34 @@ taihe_status ParseUuidParams(const std::string &uuid, UUID &outUuid)
     outUuid = ParcelUuid::FromString(uuid);
 
     return taihe_ok;
+}
+
+std::string GetEncryptAddr(std::string addr)
+{
+#if defined(IOS_PLATFORM)
+    const std::regex deviceIdRegex("^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$");
+    if (!regex_match(addr, deviceIdRegex)) {
+        return std::string("");
+    }
+    std::string tmp = "********-****-****-****-************";
+    std::string out = addr;
+    for (int i = START_POS_IOS_PLATFORM; i <= END_POS_IOS_PLATFORM; i++) {
+        out[i] = tmp[i];
+    }
+    return out;
+#else
+    if (addr.empty() || addr.length() != ADDRESS_LENGTH) {
+        HILOGD("addr is invalid.");
+        return std::string("");
+    }
+    std::string tmp = "**:**:**:**:**:**";
+    std::string out = addr;
+    // 00:01:**:**:**:05
+    for (int i = startPos; i <= endPos; i++) {
+        out[i] = tmp[i];
+    }
+    return out;
+#endif
 }
 } // namespace Bluetooth
 } // namespace OHOS
