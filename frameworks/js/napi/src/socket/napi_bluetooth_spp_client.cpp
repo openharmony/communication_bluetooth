@@ -568,8 +568,6 @@ void NapiSppClient::ProcessReceivedData(std::shared_ptr<NapiSppClient> client, u
     }
 }
 
-
-
 void NapiSppClient::SppRead(int id)
 {
     auto client = clientMap[id];
@@ -675,7 +673,7 @@ napi_value NapiSppClient::SppReadAsync(napi_env env, napi_callback_info info)
     auto func = [inputStream, id, type] {
         int err = 0;
         SppCallbackBuffer buffer;
-        if(type == TYPE_RFCOMM) {
+        if (type == TYPE_RFCOMM) {
             buffer = SppCallbackBuffer(RFCOMM_SOCKET_BUFFER_SIZE);
             err = ReadData(inputStream, RFCOMM_SOCKET_BUFFER_SIZE, buffer);
         } else {
@@ -683,7 +681,7 @@ napi_value NapiSppClient::SppReadAsync(napi_env env, napi_callback_info info)
             while (length < 0) {
                 length = inputStream->PollWait();
             }
-            if(length > 0) {
+            if (length > 0) {
                 buffer = SppCallbackBuffer(length);
                 err = ReadData(inputStream, length, buffer);
             }

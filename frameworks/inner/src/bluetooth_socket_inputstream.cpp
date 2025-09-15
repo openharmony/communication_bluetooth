@@ -34,7 +34,7 @@ InputStream::~InputStream()
 
 int InputStream::PollWait()
 {
-    struct pollfd fd[1];
+    struct pollfd fd[POLL_SIZE];
     int availableBytes = 0;
     fd[0].fd = socketFd_;
     fd[0].events = POLLIN;

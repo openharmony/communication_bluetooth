@@ -31,21 +31,28 @@ struct SppConnectCallbackInfo : public AsyncCallbackInfo {
 };
 
 struct SppCallbackBuffer {
-    SppCallbackBuffer(int length):len_(length) {
+    SppCallbackBuffer(int length):len_(length)
+    {
+        if (length <=0 || length > L2CAP_SOCKET_BUFFER_SIZE){
+            data_ = nullptr;
+        }
         data_ = new char[length];
     }
 
-    SppCallbackBuffer():len_(1024) {
-        data_ = new char[1024];
+    SppCallbackBuffer():len_(RFCOMM_SOCKET_BUFFER_SIZE)
+    {
+        data_ = new char[RFCOMM_SOCKET_BUFFER_SIZE];
     }
 
-    SppCallbackBuffer(const SppCallbackBuffer& other) {
+    SppCallbackBuffer(const SppCallbackBuffer& other)
+    {
         len_ = other.len_;
         data_ = new char[len_];
         memcpy_s(data_, len_, other.data_, other.len_);
     }
 
-    SppCallbackBuffer& operator=(const SppCallbackBuffer& other) {
+    SppCallbackBuffer& operator=(const SppCallbackBuffer& other)
+    {
         if (this == &other) {
             return *this;
         }
@@ -56,7 +63,8 @@ struct SppCallbackBuffer {
         return *this;
     }
 
-    ~SppCallbackBuffer() {
+    ~SppCallbackBuffer()
+    {
         delete[] data_;
     }
     ssize_t len_;
