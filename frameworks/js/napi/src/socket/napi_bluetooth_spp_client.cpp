@@ -506,7 +506,7 @@ void NapiSppClient::ProcessL2capRead(std::shared_ptr<NapiSppClient> client, int 
         HILOGI("thread start.");
         int length = -1;
         while (length <= 0) {
-            length = InputStream->PollWait();
+            length = inputStream->PollWait();
         }
 
         uint8_t buf[length];
