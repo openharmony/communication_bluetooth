@@ -996,6 +996,12 @@ int SetLpDeviceParam(const BtLpDeviceParam *lpDeviceParam);
 int RemoveLpDeviceParam(BtUuid uuid);
 
 /**
+ * @brief Clear advertising resource when ble advertising stopped.
+ * @since 16
+ */
+void ClearAdvertisingResource(int advId);
+
+/**
  * @brief Clear global resource when ble turn on or bluetooth_serivce unload.
  * @since 11
  */

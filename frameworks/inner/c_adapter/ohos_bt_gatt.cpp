@@ -222,6 +222,7 @@ public:
         int ret = (result == 0) ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
         advHandle_ = 0xFF; // restore invalid advHandle
         if (g_AppCallback != nullptr && g_AppCallback->advDisableCb != nullptr) {
+            ClearAdvertisingResource(advId_);
             g_AppCallback->advDisableCb(advId_, ret);
         } else {
             HILOGW("call back is null.");
@@ -234,17 +235,6 @@ public:
             } else {
                 HILOGD("TimerId no registered, is 0.");
             }
-        }
-        lock_guard<ffrt::mutex> lock(g_advMutex);
-        g_bleAdvCallbacks[advId_] = nullptr;
-        int i = 0;
-        for (; i < MAX_BLE_ADV_NUM; i++) {
-            if (g_bleAdvCallbacks[i] != nullptr) {
-                break;
-            }
-        }
-        if (i == MAX_BLE_ADV_NUM) {
-            g_BleAdvertiser = nullptr;
         }
     }
 
@@ -1421,6 +1411,27 @@ int RemoveLpDeviceParam(BtUuid uuid)
         return OHOS_BT_STATUS_FAIL;
     }
     return OHOS_BT_STATUS_SUCCESS;
+}
+
+void ClearAdvertisingResource(int advId)
+{
+    if (advId < 0 || advId >= MAX_BLE_ADV_NUM) {
+        HILOGE("fail, invalid advId: %{public}d", advId);
+        return;
+    }
+    lock_guard<ffrt::mutex> lock(g_advMutex);
+    HILOGI("clear advId: %{public}d", advId);
+    g_bleAdvCallbacks[advId] = nullptr;
+    int i = 0;
+    for (; i < MAX_BLE_ADV_NUM; i++) {
+        if (g_bleAdvCallbacks[i] != nullptr) {
+            break;
+        }
+    }
+    if(i == MAX_BLE_ADV_NUM) {
+        HILOGI("no advId in use, clear g_BleAdvertiser");
+        g_BleAdvertiser = nullptr;
+    }
 }
 
 void ClearGlobalResource(void)
