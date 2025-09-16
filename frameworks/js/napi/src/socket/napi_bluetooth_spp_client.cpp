@@ -487,11 +487,9 @@ void NapiSppClient::ProcessRfcommRead(std::shared_ptr<NapiSppClient> client, int
     while (true) {
         HILOGI("thread start.");
         (void)memset_s(buf, sizeof(buf), 0, sizeof(buf));
-        HILOGI("inputStream.Read start");
         int ret = inputStream->Read(buf, sizeof(buf));
-        HILOGI("inputStream.Read end");
         if (ret <= 0) {
-            HILOGI("inputStream.Read failed, ret = %{public}d", ret);
+            HILOGE("inputStream.Read failed, ret = %{public}d", ret);
             return;
         } else {
             ProcessReceivedData(client, buf, RFCOMM_SOCKET_BUFFER_SIZE, ret);
@@ -511,11 +509,9 @@ void NapiSppClient::ProcessL2capRead(std::shared_ptr<NapiSppClient> client, int 
 
         uint8_t buf[length];
         (void)memset_s(buf, sizeof(buf), 0, sizeof(buf));
-        HILOGI("inputStream.Read start");
         int ret = inputStream->Read(buf, sizeof(buf));
-        HILOGI("inputStream.Read end");
         if (ret <= 0) {
-            HILOGI("inputStream.Read failed, ret = %{public}d", ret);
+            HILOGE("inputStream.Read failed, ret = %{public}d", ret);
             return;
         } else {
             ProcessReceivedData(client, buf, length, ret);
@@ -675,7 +671,7 @@ napi_value NapiSppClient::SppReadAsync(napi_env env, napi_callback_info info)
             err = ReadData(inputStream, RFCOMM_SOCKET_BUFFER_SIZE, buffer);
         } else {
             int length = -1;
-            while (length < 0) {
+            while (length <= 0) {
                 length = inputStream->PollWait();
             }
             if (length > 0) {
