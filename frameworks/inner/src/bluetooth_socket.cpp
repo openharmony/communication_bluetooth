@@ -555,6 +555,12 @@ bool ClientSocket::IsAllowSocketConnect(int socketType)
     return isAllowed;
 }
 
+BtSocketType ClientSocket::GetType()
+{
+    HILOGD("enter");
+    return pimpl->type_;
+}
+
 struct ServerSocket::impl {
     impl(const std::string &name, UUID uuid, BtSocketType type, bool encrypt, int psm);
     ~impl()
