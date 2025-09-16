@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -104,9 +104,9 @@ public:
     int32_t SetCharacteristicChangeNotification(NativeBLECharacteristic characteristic, bool enable);
     int32_t SetCharacteristicChangeIndication(NativeBLECharacteristic characteristic, bool enable);
     int32_t SetCharacteristicChangeNotificationCallback(
-        NativeBLECharacteristic characteristic, bool enable, void (*callback)());
+        NativeBLECharacteristic characteristic, bool enable, int64_t callback);
     int32_t SetCharacteristicChangeIndicationCallback(
-        NativeBLECharacteristic characteristic, bool enable, void (*callback)());
+        NativeBLECharacteristic characteristic, bool enable, int64_t callback);
 
     int32_t RegisterBleGattClientDeviceObserver(int32_t callbackType, void (*callback)());
 

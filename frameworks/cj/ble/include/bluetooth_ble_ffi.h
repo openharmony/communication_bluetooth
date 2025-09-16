@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -290,9 +290,9 @@ FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotificati
 FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndication(
     int64_t id, NativeBLECharacteristic characteristic, bool enable, int32_t* errCode);
 FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotificationV2(
-    int64_t id, NativeBLECharacteristic characteristic, bool enable, void (*callback)(), int32_t* errCode);
+    int64_t id, NativeBLECharacteristic* characteristic, bool enable, int64_t callback, int32_t* errCode);
 FFI_EXPORT void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndicationV2(
-    int64_t id, NativeBLECharacteristic characteristic, bool enable, void (*callback)(), int32_t* errCode);
+    int64_t id, NativeBLECharacteristic* characteristic, bool enable, int64_t callback, int32_t* errCode);
 FFI_EXPORT void FfiBluetoothBleGattClientDeviceOn(
     int64_t id, int32_t callbackType, void (*callback)(), int32_t* errCode);
 
