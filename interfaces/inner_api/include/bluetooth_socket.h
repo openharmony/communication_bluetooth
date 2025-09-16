@@ -264,6 +264,14 @@ public:
      */
     bool IsAllowSocketConnect(int socketType);
 
+    /**
+     * @brief Get the connection type of the socket type
+     *
+     * @return Returns BtSocketType socket type
+     * @since 20
+     */
+    BtSocketType GetType();
+
 private:
     ClientSocket() = delete;
     BLUETOOTH_DECLARE_IMPL();
