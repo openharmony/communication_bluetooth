@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,7 @@ int64_t FfiBluetoothBleCreateGattServer(int32_t* errCode)
     FfiGattServer* nativeGattServer = nullptr;
     *errCode = BleImpl::CreateGattServer(nativeGattServer);
     if (*errCode != BT_NO_ERROR) {
+        HILOGE("Failed to creat the gatt server object");
         return -1;
     }
     return nativeGattServer->GetID();
@@ -44,6 +45,7 @@ int64_t FfiBluetoothBleCreateGattClientDevice(const char* deviceId, int32_t* err
     FfiClientDevice* nativeGattClientDevice = nullptr;
     *errCode = BleImpl::CreateGattClientDevice(deviceId, nativeGattClientDevice);
     if (*errCode != BT_NO_ERROR) {
+        HILOGE("Failed to creat the gatt client object");
         return -1;
     }
     return nativeGattClientDevice->GetID();
@@ -116,6 +118,7 @@ void FfiBluetoothBleGattClientDeviceConnect(int64_t id, int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
+        HILOGE("Failed to obtain the gatt client object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -127,6 +130,7 @@ void FfiBluetoothBleGattClientDeviceDisconnect(int64_t id, int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
+        HILOGE("Failed to obtain the gatt client object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -138,6 +142,7 @@ void FfiBluetoothBleGattClientDeviceClose(int64_t id, int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
+        HILOGE("Failed to obtain the gatt client object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -149,6 +154,7 @@ char* FfiBluetoothBleGattClientDeviceGetDeviceName(int64_t id, int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
+        HILOGE("Failed to obtain the gatt client object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return nullptr;
     }
@@ -161,6 +167,7 @@ CArrGattService FfiBluetoothBleGattClientDeviceGetServices(int64_t id, int32_t* 
     CArrGattService service {};
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
+        HILOGE("Failed to obtain the gatt client object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return service;
     }
@@ -173,6 +180,7 @@ void FfiBluetoothBleGattClientDeviceReadCharacteristicValue(
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
+        HILOGE("Failed to obtain the gatt client object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -185,6 +193,7 @@ void FfiBluetoothBleGattClientDeviceReadDescriptorValue(
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
+        HILOGE("Failed to obtain the gatt client object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -197,6 +206,7 @@ void FfiBluetoothBleGattClientDeviceWriteCharacteristicValue(
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
+        HILOGE("Failed to obtain the gatt client object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -209,6 +219,7 @@ void FfiBluetoothBleGattClientDeviceWriteDescriptorValue(
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
+        HILOGE("Failed to obtain the gatt client object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -220,6 +231,7 @@ void FfiBluetoothBleGattClientDeviceGetRssiValue(int64_t id, void (*callback)(),
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
+        HILOGE("Failed to obtain the gatt client object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -231,6 +243,7 @@ void FfiBluetoothBleGattClientDeviceSetBLEMtuSize(int64_t id, int32_t mut, int32
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
+        HILOGE("Failed to obtain the gatt client object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -263,26 +276,28 @@ void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndication(
 }
 
 void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeNotificationV2(
-    int64_t id, NativeBLECharacteristic characteristic, bool enable, void (*callback)(), int32_t* errCode)
+    int64_t id, NativeBLECharacteristic* characteristic, bool enable, int64_t callback, int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
+        HILOGE("Failed to obtain the gatt client object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
-    *errCode = clientDevice->SetCharacteristicChangeNotificationCallback(characteristic, enable, callback);
+    *errCode = clientDevice->SetCharacteristicChangeNotificationCallback(*characteristic, enable, callback);
     return;
 }
 
 void FfiBluetoothBleGattClientDeviceSetCharacteristicChangeIndicationV2(
-    int64_t id, NativeBLECharacteristic characteristic, bool enable, void (*callback)(), int32_t* errCode)
+    int64_t id, NativeBLECharacteristic* characteristic, bool enable, int64_t callback, int32_t* errCode)
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
+        HILOGE("Failed to obtain the gatt client object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
-    *errCode = clientDevice->SetCharacteristicChangeIndicationCallback(characteristic, enable, callback);
+    *errCode = clientDevice->SetCharacteristicChangeIndicationCallback(*characteristic, enable, callback);
     return;
 }
 
@@ -290,6 +305,7 @@ void FfiBluetoothBleGattClientDeviceOn(int64_t id, int32_t callbackType, void (*
 {
     auto clientDevice = FFIData::GetData<FfiClientDevice>(id);
     if (clientDevice == nullptr) {
+        HILOGE("Failed to obtain the gatt client object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -301,6 +317,7 @@ void FfiBluetoothBleGattServerAddService(int64_t id, NativeGattService service, 
 {
     auto gattServer = FFIData::GetData<FfiGattServer>(id);
     if (gattServer == nullptr) {
+        HILOGE("Failed to obtain the gatt server object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -312,6 +329,7 @@ void FfiBluetoothBleGattServerRemoveService(int64_t id, char* serviceUuid, int32
 {
     auto gattServer = FFIData::GetData<FfiGattServer>(id);
     if (gattServer == nullptr) {
+        HILOGE("Failed to obtain the gatt server object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -323,6 +341,7 @@ void FfiBluetoothBleGattServerClose(int64_t id, int32_t* errCode)
 {
     auto gattServer = FFIData::GetData<FfiGattServer>(id);
     if (gattServer == nullptr) {
+        HILOGE("Failed to obtain the gatt server object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -335,6 +354,7 @@ void FfiBluetoothBleGattServerNotifyCharacteristicChanged(
 {
     auto gattServer = FFIData::GetData<FfiGattServer>(id);
     if (gattServer == nullptr) {
+        HILOGE("Failed to obtain the gatt server object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -346,6 +366,7 @@ void FfiBluetoothBleGattServerSendResponse(int64_t id, NativeServerResponse serv
 {
     auto gattServer = FFIData::GetData<FfiGattServer>(id);
     if (gattServer == nullptr) {
+        HILOGE("Failed to obtain the gatt server object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
@@ -357,6 +378,7 @@ void FfiBluetoothBleGattServerOn(int64_t id, int32_t callbackType, void (*callba
 {
     auto gattServer = FFIData::GetData<FfiGattServer>(id);
     if (gattServer == nullptr) {
+        HILOGE("Failed to obtain the gatt server object");
         *errCode = BT_ERR_INTERNAL_ERROR;
         return;
     }
