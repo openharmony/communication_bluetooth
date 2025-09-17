@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
 #include "taihe_bluetooth_gatt_server_callback.h"
 
 namespace OHOS {
@@ -25,33 +26,45 @@ TaiheGattServerCallback::TaiheGattServerCallback()
 void TaiheGattServerCallback::OnCharacteristicReadRequest(
     const BluetoothRemoteDevice &device, GattCharacteristic &characteristic, int requestId)
 {
+    HILOGI("enter, remote device address: %{public}s, requestId: %{public}d",
+        GET_ENCRYPT_ADDR(device), requestId);
 }
 
 void TaiheGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteDevice &device,
     GattCharacteristic &characteristic, int requestId)
 {
+    HILOGI("enter, remote device address: %{public}s, requestId: %{public}d",
+        GET_ENCRYPT_ADDR(device), requestId);
 }
 
 void TaiheGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state)
 {
+    HILOGI("enter, state: %{public}d, remote device address: %{public}s", state, GET_ENCRYPT_ADDR(device));
 }
 
 void TaiheGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevice &device,
     GattDescriptor &descriptor, int requestId)
 {
+    HILOGI("enter, remote device address: %{public}s, requestId: %{public}d",
+        GET_ENCRYPT_ADDR(device), requestId);
 }
 
 void TaiheGattServerCallback::OnDescriptorReadRequest(const BluetoothRemoteDevice &device,
     GattDescriptor &descriptor, int requestId)
 {
+    HILOGI("enter, remote device address: %{public}s, requestId: %{public}d",
+        GET_ENCRYPT_ADDR(device), requestId);
 }
 
 void TaiheGattServerCallback::OnMtuUpdate(const BluetoothRemoteDevice &device, int mtu)
 {
+    HILOGI("enter, remote device address: %{public}s, mtu: %{public}d",
+        GET_ENCRYPT_ADDR(device), mtu);
 }
 
 void TaiheGattServerCallback::OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device, int ret)
 {
+    HILOGI("ret: %{public}d", ret);
 }
 } // namespace Bluetooth
 } // namespace OHOS

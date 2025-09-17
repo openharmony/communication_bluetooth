@@ -19,6 +19,39 @@ static { loadLibraryWithPermissionCheck("bluetoothConnection_taihe_native.z", "@
 """)
 from ohos.bluetooth.constant use MajorClass, MajorMinorClass;
 
+@!sts_inject("""
+export function on(type: string, cb: (arg_0: Object) => void) {
+    switch (type) {
+        case "discoveryResult": return onDiscoveryResult(cb);
+        case "batteryChange": return onBatteryChange(cb);
+        case "bluetoothDeviceFind": return onBluetoothDeviceFind(cb);
+        case "bondStateChange": return onBondStateChange(cb);
+        case "pinRequired": return onPinRequired(cb);
+        default: throw new Error(`Unknown type: ${type}`);
+    }
+}
+export function off(type: string, cb?: (arg_0: Object) => void) {
+    switch (type) {
+        case "discoveryResult": return offDiscoveryResult(cb as (((arg_0: Array<DiscoveryResult>) => void) | undefined));
+        case "batteryChange": return offBatteryChange(cb as (((arg_0: BatteryInfo) => void) | undefined));
+        case "bluetoothDeviceFind": return offBluetoothDeviceFind(cb as (((arg_0: Array<String>) => void) | undefined));
+        case "bondStateChange": return offBondStateChange(cb as (((arg_0: BondStateParam) => void) | undefined));
+        case "pinRequired": return offPinRequired(cb as (((arg_0: PinRequiredParam) => void) | undefined));
+        default: throw new Error(`Unknown type: ${type}`);
+    }
+}
+""")
+function OnDiscoveryResult(callback: (data: Array<DiscoveryResult>) => void): void;
+function OffDiscoveryResult(callback: Optional<(data: Array<DiscoveryResult>) => void>): void;
+function OnBatteryChange(callback: (data: BatteryInfo) => void): void;
+function OffBatteryChange(callback: Optional<(data: BatteryInfo) => void>): void;
+function OnBluetoothDeviceFind(callback: (data: Array<String>) => void): void;
+function OffBluetoothDeviceFind(callback: Optional<(data: Array<String>) => void>): void;
+function OnBondStateChange(callback: (data: BondStateParam) => void): void;
+function OffBondStateChange(callback: Optional<(data: BondStateParam) => void>): void;
+function OnPinRequired(callback: (data: PinRequiredParam) => void): void;
+function OffPinRequired(callback: Optional<(data: PinRequiredParam) => void>): void;
+
 enum BluetoothTransport: i32 {
     TRANSPORT_BR_EDR = 0,
     TRANSPORT_LE = 1
@@ -69,7 +102,6 @@ struct BatteryInfo {
     leftEarBatteryLevel: i32;
     leftEarChargeState: DeviceChargeState;
     rightEarBatteryLevel: i32;
-    deviceClass: DeviceClass;
     rightEarChargeState: DeviceChargeState;
     boxBatteryLevel: i32;
     boxChargeState: DeviceChargeState;
@@ -138,6 +170,6 @@ function GetRemoteDeviceName(deviceId: String): String;
 
 function GetPairedDevices(): Array<String>;
 
-function SetBluetoothScanMode(mode: ScanMode, duration: f64): void;
+function SetBluetoothScanMode(mode: ScanMode, duration: i32): void;
 
 function GetRemoteDeviceClass(deviceId: String): DeviceClass;

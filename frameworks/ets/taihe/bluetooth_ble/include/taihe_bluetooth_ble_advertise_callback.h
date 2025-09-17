@@ -16,11 +16,13 @@
 #ifndef TAIHE_BLUETOOTH_BLE_ADVERTISE_CALLBACK_H
 #define TAIHE_BLUETOOTH_BLE_ADVERTISE_CALLBACK_H
 
-#include "bluetooth_ble_advertiser.h"
+#include "stdexcept"
+
 #include "ohos.bluetooth.ble.proj.hpp"
 #include "ohos.bluetooth.ble.impl.hpp"
 #include "taihe/runtime.hpp"
-#include "stdexcept"
+
+#include "bluetooth_ble_advertiser.h"
 
 namespace OHOS {
 namespace Bluetooth {

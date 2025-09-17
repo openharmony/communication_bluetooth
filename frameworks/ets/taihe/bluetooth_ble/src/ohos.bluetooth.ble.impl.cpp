@@ -13,23 +13,26 @@
  * limitations under the License.
  */
 
+#include "stdexcept"
+
 #include "ohos.bluetooth.ble.proj.hpp"
 #include "ohos.bluetooth.ble.impl.hpp"
 #include "taihe/runtime.hpp"
-#include "stdexcept"
+
 
 #include "bluetooth_ble_advertiser.h"
 #include "bluetooth_ble_central_manager.h"
-#include "bluetooth_remote_device.h"
-#include "bluetooth_gatt_client.h"
 #include "bluetooth_errorcode.h"
+#include "bluetooth_gatt_client.h"
 #include "bluetooth_log.h"
+#include "bluetooth_remote_device.h"
+#include "bluetooth_utils.h"
 
 #include "taihe_bluetooth_ble_advertise_callback.h"
+#include "taihe_bluetooth_ble_central_manager_callback.h"
+#include "taihe_bluetooth_ble_utils.h"
 #include "taihe_bluetooth_gatt_client_callback.h"
 #include "taihe_bluetooth_gatt_server_callback.h"
-#include "taihe_bluetooth_ble_utils.h"
-#include "taihe_bluetooth_ble_central_manager_callback.h"
 
 using namespace taihe;
 using namespace ohos::bluetooth::ble;
@@ -74,9 +77,8 @@ public:
     }
     ~GattClientDeviceImpl() = default;
     
-    void SetBLEMtuSize(double mtu)
+    void SetBLEMtuSize(int mtu)
     {
-        HILOGI("enter");
         ANI_BT_ASSERT_RETURN(client_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
             "SetBLEMtuSize ani assert failed");
 
@@ -87,7 +89,6 @@ public:
 
     void Connect()
     {
-        HILOGI("enter");
         ANI_BT_ASSERT_RETURN(client_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
             "Connect ani assert failed");
         ANI_BT_ASSERT_RETURN(callback_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
@@ -100,7 +101,6 @@ public:
 
     void Disconnect()
     {
-        HILOGI("enter");
         ANI_BT_ASSERT_RETURN(client_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
             "Disconnect ani assert failed");
 
@@ -111,7 +111,6 @@ public:
 
     void Close()
     {
-        HILOGI("enter");
         ANI_BT_ASSERT_RETURN(client_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR, "Close ani assert failed");
         int ret = client_->Close();
         HILOGI("ret: %{public}d", ret);
@@ -138,7 +137,6 @@ public:
 
     void Close()
     {
-        HILOGI("enter");
         ANI_BT_ASSERT_RETURN(server_ != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR, "Close ani assert failed");
         int ret = server_->Close();
         HILOGI("ret: %{public}d", ret);
@@ -154,7 +152,6 @@ class BleScannerImpl {
 public:
     BleScannerImpl()
     {
-        HILOGI("enter");
         callback_ = std::make_shared<OHOS::Bluetooth::TaiheBluetoothBleCentralManagerCallback>(true);
         bleCentralManager_ = std::make_shared<OHOS::Bluetooth::BleCentralManager>(callback_);
     }
@@ -167,7 +164,6 @@ private:
 
 void StopAdvertising()
 {
-    HILOGI("enter");
     std::shared_ptr<OHOS::Bluetooth::BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
     ANI_BT_ASSERT_RETURN(bleAdvertiser != nullptr, OHOS::Bluetooth::BT_ERR_INTERNAL_ERROR,
         "bleAdvertiser ani assert failed");
@@ -181,7 +177,6 @@ void StopAdvertising()
 
 void StopBLEScan()
 {
-    HILOGI("enter");
     int ret = BleCentralManagerGetInstance()->StopScan();
     ANI_BT_ASSERT_RETURN(ret == OHOS::Bluetooth::BT_NO_ERROR, ret, "StopBLEScan return error");
 }
