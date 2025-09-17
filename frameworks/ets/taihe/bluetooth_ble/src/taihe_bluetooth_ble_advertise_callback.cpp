@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "taihe_bluetooth_ble_advertise_callback.h"
 
 #include "bluetooth_log.h"
+#include "taihe_bluetooth_ble_advertise_callback.h"
 
 namespace OHOS {
 namespace Bluetooth {

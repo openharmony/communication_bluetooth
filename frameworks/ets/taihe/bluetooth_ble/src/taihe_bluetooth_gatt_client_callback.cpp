@@ -15,7 +15,6 @@
 
 #include "bluetooth_log.h"
 #include "bluetooth_errorcode.h"
-
 #include "taihe_bluetooth_gatt_client_callback.h"
 
 namespace OHOS {

@@ -13,10 +13,11 @@
  * limitations under the License.
  */
 
+#include "stdexcept"
+
 #include "ohos.bluetooth.baseProfile.proj.hpp"
 #include "ohos.bluetooth.baseProfile.impl.hpp"
 #include "taihe/runtime.hpp"
-#include "stdexcept"
 
 using namespace taihe;
 using namespace ohos::bluetooth::baseProfile;
@@ -30,6 +31,14 @@ public:
     {
         // Don't forget to implement the constructor.
     }
+
+    void On(::taihe::string_view type, ::taihe::callback_view<void(
+        ::ohos::bluetooth::baseProfile::StateChangeParam const& data)> callback)
+    {}
+    
+    void Off(::taihe::string_view type, ::taihe::optional_view<::taihe::callback_view<void(
+        ::ohos::bluetooth::baseProfile::StateChangeParam const& data)>> callback)
+    {}
 };
 }  // namespace
 
