@@ -1428,7 +1428,7 @@ void ClearAdvertisingResource(int advId)
             break;
         }
     }
-    if(i == MAX_BLE_ADV_NUM) {
+    if (i == MAX_BLE_ADV_NUM) {
         HILOGI("no advId in use, clear g_BleAdvertiser");
         g_BleAdvertiser = nullptr;
     }
