@@ -275,6 +275,14 @@ struct HandsFreeAudioGateway::impl {
         return false;
     }
 
+    int32_t IsAudioConnected(bool &isAudioOn)
+    {
+        HILOGI("enter");
+        sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is null");
+        return proxy->IsAudioConnected(isAudioOn);
+    }
+
     bool SetActiveDevice(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
@@ -634,6 +642,19 @@ bool HandsFreeAudioGateway::CloseVoiceRecognition(const BluetoothRemoteDevice &d
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
 
     return pimpl->CloseVoiceRecognition(device);
+}
+
+int32_t HandsFreeAudioGateway::IsAudioConnected(bool &isAudioOn)
+{
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+
+    return pimpl->IsAudioConnected(isAudioOn);
 }
 
 bool HandsFreeAudioGateway::SetActiveDevice(const BluetoothRemoteDevice &device)
