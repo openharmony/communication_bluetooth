@@ -40,6 +40,7 @@ public:
         int type) override;
     bool OpenVoiceRecognition(const BluetoothRawAddress &device) override;
     bool CloseVoiceRecognition(const BluetoothRawAddress &device) override;
+    int32_t IsAudioConnected(bool &isAudioOn) override;
     bool SetActiveDevice(const BluetoothRawAddress &device) override;
     bool IntoMock(const BluetoothRawAddress &device, int state) override;
     bool SendNoCarrier(const BluetoothRawAddress &device) override;
