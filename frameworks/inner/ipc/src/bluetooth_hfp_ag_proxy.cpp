@@ -271,6 +271,25 @@ bool BluetoothHfpAgProxy::CloseVoiceRecognition(const BluetoothRawAddress &devic
     return reply.ReadBool();
 }
 
+int32_t BluetoothHfpAgProxy::IsAudioConnected(bool &isAudioOn)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHfpAgProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothHfpAgInterfaceCode::BT_HFP_AG_IS_AUDIO_CONNECTED,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
+    int ret = reply.ReadInt32();
+    if (ret == BT_NO_ERROR) {
+        isAudioOn = reply.ReadBool();
+    }
+    return ret;
+}
+
 bool BluetoothHfpAgProxy::SetActiveDevice(const BluetoothRawAddress &device)
 {
     MessageParcel data;

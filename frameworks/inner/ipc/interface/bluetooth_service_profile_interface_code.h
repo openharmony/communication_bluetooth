@@ -233,6 +233,7 @@ enum BluetoothHfpAgInterfaceCode {
     BT_HFP_AG_GET_VIRTUALDEVICE_LIST,
     BT_HFP_AG_UPDATE_VIRTUALDEVICE,
     BT_HFP_AG_GET_CALLTYPE,
+    BT_HFP_AG_IS_AUDIO_CONNECTED,
     // The last code, if you want to add a new code, please add it before this
     BT_HFP_AG_BUTT
 };

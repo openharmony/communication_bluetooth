@@ -271,6 +271,8 @@ public:
      */
     bool CloseVoiceRecognition(const BluetoothRemoteDevice &device);
 
+    int32_t IsAudioConnected(bool &isAudioOn);
+
     /**
      * @brief Set the active device for audio connection.
      *
