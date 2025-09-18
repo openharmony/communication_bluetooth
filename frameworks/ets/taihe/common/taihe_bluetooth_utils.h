@@ -42,6 +42,7 @@ enum taihe_status {
         }                                                                  \
     } while (0)
 #endif
+
 #define TAIHE_BT_RETURN_IF(condition, msg, ret)              \
     do {                                                    \
         if ((condition)) {                                  \
@@ -60,8 +61,6 @@ void ParseArrayBufferParams(const taihe::array<T>& data, std::vector<T> &outPara
         outParam.push_back(item);
     }
 }
-std::string GetEncryptAddr(std::string addr);
-#define GET_ENCRYPT_ADDR(device) (GetEncryptAddr((device).GetDeviceAddr()).c_str())
 } // namespace Bluetooth
 } // namespace OHOS
 #endif // TAIHE_BLUETOOTH_UTILS_H_
