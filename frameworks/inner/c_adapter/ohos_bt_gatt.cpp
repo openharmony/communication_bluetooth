@@ -75,6 +75,8 @@ static mutex g_advTimerMutex;
 // ffrt queue
 static ffrt::queue startAdvQueue("startAdv_Queue");
 
+static void ClearAdvertisingResource(int advId);
+
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
 public:
     /**
@@ -1422,6 +1424,27 @@ int RemoveLpDeviceParam(BtUuid uuid)
         return OHOS_BT_STATUS_FAIL;
     }
     return OHOS_BT_STATUS_SUCCESS;
+}
+
+static void ClearAdvertisingResource(int advId)
+{
+    if (advId < 0 || advId >= MAX_BLE_ADV_NUM) {
+        HILOGE("fail, invalid advId: %{public}d", advId);
+        return;
+    }
+    lock_guard<ffrt::mutex> lock(g_advMutex);
+    HILOGI("clear advId: %{public}d", advId);
+    g_bleAdvCallbacks[advId] = nullptr;
+    int i = 0;
+    for (; i < MAX_BLE_ADV_NUM; i++) {
+        if (g_bleAdvCallbacks[i] != nullptr) {
+            break;
+        }
+    }
+    if (i == MAX_BLE_ADV_NUM) {
+        HILOGI("no advId in use, clear g_BleAdvertiser");
+        g_BleAdvertiser = nullptr;
+    }
 }
 
 void ClearGlobalResource(void)
