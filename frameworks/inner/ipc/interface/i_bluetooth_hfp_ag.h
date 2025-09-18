@@ -44,6 +44,7 @@ public:
     virtual bool OpenVoiceRecognition(const BluetoothRawAddress &device) = 0;
     virtual bool CloseVoiceRecognition(const BluetoothRawAddress &device) = 0;
     virtual bool SetActiveDevice(const BluetoothRawAddress &device) = 0;
+    virtual int32_t IsAudioConnected(bool &isAudioOn) = 0;
     virtual std::string GetActiveDevice() = 0;
     virtual bool IntoMock(const BluetoothRawAddress &device, int state) = 0;
     virtual bool SendNoCarrier(const BluetoothRawAddress &device) = 0;
