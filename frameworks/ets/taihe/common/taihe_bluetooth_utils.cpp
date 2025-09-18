@@ -27,10 +27,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace std;
-constexpr int startPos = 6;
-constexpr int endPos = 13;
-
 bool IsValidAddress(std::string bdaddr)
 {
 #if defined(IOS_PLATFORM)
@@ -58,34 +54,6 @@ taihe_status ParseUuidParams(const std::string &uuid, UUID &outUuid)
     outUuid = ParcelUuid::FromString(uuid);
 
     return taihe_ok;
-}
-
-std::string GetEncryptAddr(std::string addr)
-{
-#if defined(IOS_PLATFORM)
-    const std::regex deviceIdRegex("^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$");
-    if (!regex_match(addr, deviceIdRegex)) {
-        return std::string("");
-    }
-    std::string tmp = "********-****-****-****-************";
-    std::string out = addr;
-    for (int i = START_POS_IOS_PLATFORM; i <= END_POS_IOS_PLATFORM; i++) {
-        out[i] = tmp[i];
-    }
-    return out;
-#else
-    if (addr.empty() || addr.length() != ADDRESS_LENGTH) {
-        HILOGD("addr is invalid.");
-        return std::string("");
-    }
-    std::string tmp = "**:**:**:**:**:**";
-    std::string out = addr;
-    // 00:01:**:**:**:05
-    for (int i = startPos; i <= endPos; i++) {
-        out[i] = tmp[i];
-    }
-    return out;
-#endif
 }
 } // namespace Bluetooth
 } // namespace OHOS
