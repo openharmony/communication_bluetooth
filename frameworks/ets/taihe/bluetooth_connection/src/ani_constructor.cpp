@@ -14,6 +14,7 @@
  */
 
 #include "ohos.bluetooth.connection.ani.hpp"
+#include "taihe_bluetooth_connection_callback.h"
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
     ani_env *env;
@@ -25,5 +26,6 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_ERROR;
     }
     *result = ANI_VERSION_1;
+    OHOS::Bluetooth::TaiheBluetoothConnectionInit::RegisterConnectionObserverToHost();
     return ANI_OK;
 }

@@ -13,10 +13,11 @@
  * limitations under the License.
  */
 
+#include "stdexcept"
+
 #include "ohos.bluetooth.constant.proj.hpp"
 #include "ohos.bluetooth.constant.impl.hpp"
 #include "taihe/runtime.hpp"
-#include "stdexcept"
 
 using namespace taihe;
 using namespace ohos::bluetooth::constant;
