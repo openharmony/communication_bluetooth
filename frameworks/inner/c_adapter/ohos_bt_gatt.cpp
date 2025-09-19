@@ -223,8 +223,8 @@ public:
         HILOGD("advId: %{public}d, advHandle: %{public}d, ret: %{public}d", advId_, advHandle, result);
         int ret = (result == 0) ? OHOS_BT_STATUS_SUCCESS : OHOS_BT_STATUS_FAIL;
         advHandle_ = 0xFF; // restore invalid advHandle
+        ClearAdvertisingResource(advId_);
         if (g_AppCallback != nullptr && g_AppCallback->advDisableCb != nullptr) {
-            ClearAdvertisingResource(advId_);
             g_AppCallback->advDisableCb(advId_, ret);
         } else {
             HILOGW("call back is null.");
