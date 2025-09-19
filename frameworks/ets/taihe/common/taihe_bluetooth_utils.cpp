@@ -38,10 +38,22 @@ bool IsValidAddress(std::string bdaddr)
 #endif
 }
 
+bool IsValidConnectStrategy(int strategy)
+{
+    return strategy == static_cast<int>(BTStrategyType::CONNECTION_ALLOWED)
+        || strategy == static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN);
+}
+
 // This function applies to interfaces with a single address as a parameter.
 bool CheckDeviceIdParam(std::string &addr)
 {
     TAIHE_BT_RETURN_IF(!IsValidAddress(addr), "Invalid addr", false);
+    return true;
+}
+
+bool CheckConnectStrategyParam(int32_t strategy)
+{
+    TAIHE_BT_RETURN_IF(!IsValidConnectStrategy(strategy), "Invalid strategy", false);
     return true;
 }
 
