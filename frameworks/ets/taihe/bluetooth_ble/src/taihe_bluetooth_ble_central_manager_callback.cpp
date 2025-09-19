@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "taihe_bluetooth_ble_central_manager_callback.h"
 #include "bluetooth_log.h"
+#include "bluetooth_utils.h"
+#include "taihe_bluetooth_ble_central_manager_callback.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -32,18 +33,22 @@ TaiheBluetoothBleCentralManagerCallback &TaiheBluetoothBleCentralManagerCallback
 
 void TaiheBluetoothBleCentralManagerCallback::OnScanCallback(const BleScanResult &result)
 {
+    HILOGD("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(result.GetPeripheralDevice()));
 }
 
 void TaiheBluetoothBleCentralManagerCallback::OnFoundOrLostCallback(const BleScanResult &result, uint8_t callbackType)
 {
+    HILOGD("enter, remote device address: %{public}s", GET_ENCRYPT_ADDR(result.GetPeripheralDevice()));
 }
 
 void TaiheBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results)
 {
+    HILOGI("enter, scan result size: %{public}zu", results.size());
 }
 
 void TaiheBluetoothBleCentralManagerCallback::OnStartOrStopScanEvent(int resultCode, bool isStartScan)
 {
+    HILOGI("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
 }
 
 void TaiheBluetoothBleCentralManagerCallback::ConvertScanReportType(
