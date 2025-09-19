@@ -48,4 +48,12 @@ interface BaseProfile {
     GetConnectionState(deviceId: String): ProfileConnectionState;
 
     GetConnectedDevices(): Array<String>;
+
+    @gen_async("getConnectionStrategy")
+    @gen_promise("getConnectionStrategy")
+    GetConnectionStrategySync(deviceId: String): ConnectionStrategy;
+
+    @gen_async("setConnectionStrategy")
+    @gen_promise("setConnectionStrategy")
+    SetConnectionStrategySync(deviceId: String, strategy: ConnectionStrategy): void;
 }

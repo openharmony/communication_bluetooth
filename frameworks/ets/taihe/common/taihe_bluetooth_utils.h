@@ -52,7 +52,9 @@ enum taihe_status {
     } while (0)
 
 bool IsValidAddress(std::string bdaddr);
+bool IsValidConnectStrategy(int strategy);
 bool CheckDeviceIdParam(std::string &addr);
+bool CheckConnectStrategyParam(int32_t strategy);
 taihe_status ParseUuidParams(const std::string &uuid, UUID &outUuid);
 template<typename T>
 void ParseArrayBufferParams(const taihe::array<T>& data, std::vector<T> &outParam)

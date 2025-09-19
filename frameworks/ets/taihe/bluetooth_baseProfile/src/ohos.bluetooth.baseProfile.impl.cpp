@@ -49,6 +49,13 @@ public:
     {
         return {};
     }
+
+    ConnectionStrategy GetConnectionStrategySync(taihe::string_view deviceId)
+    {
+        return ConnectionStrategy(ConnectionStrategy::key_t::CONNECTION_STRATEGY_UNSUPPORTED);
+    }
+
+    void SetConnectionStrategySync(taihe::string_view deviceId, ConnectionStrategy strategy) {}
 };
 }  // namespace
 

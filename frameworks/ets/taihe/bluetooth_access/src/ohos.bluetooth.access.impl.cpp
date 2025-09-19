@@ -192,6 +192,14 @@ void NotifyDialogResult(::ohos::bluetooth::access::NotifyDialogResultParams noti
     HILOGI("NotifyDialogResult err: %{public}d", ret);
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
 }
+
+void FactoryResetSync()
+{
+    HILOGD("enter");
+    int32_t ret = BluetoothHost::GetDefaultHost().BluetoothFactoryReset();
+    HILOGI("factoryReset ret: %{public}d", ret);
+    TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
+}
 }  // Bluetooth
 }  // OHOS
 
@@ -211,4 +219,5 @@ TH_EXPORT_CPP_API_GetPersistentDeviceIds(OHOS::Bluetooth::GetPersistentDeviceIds
 TH_EXPORT_CPP_API_DeletePersistentDeviceId(OHOS::Bluetooth::DeletePersistentDeviceId);
 TH_EXPORT_CPP_API_AddPersistentDeviceId(OHOS::Bluetooth::AddPersistentDeviceId);
 TH_EXPORT_CPP_API_NotifyDialogResult(OHOS::Bluetooth::NotifyDialogResult);
+TH_EXPORT_CPP_API_FactoryResetSync(OHOS::Bluetooth::FactoryResetSync);
 // NOLINTEND
