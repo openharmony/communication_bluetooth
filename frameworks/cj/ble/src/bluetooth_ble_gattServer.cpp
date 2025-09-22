@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,7 +31,7 @@ using Bluetooth::BTTransport;
 using Bluetooth::GattServiceType;
 using Bluetooth::UUID;
 
-static int CheckGattsAddService(NativeGattService service, std::unique_ptr<GattService> &outService)
+static int CheckGattsAddService(NativeGattService service, std::unique_ptr<GattService>& outService)
 {
     GattServiceType type = service.isPrimary ? GattServiceType::PRIMARY : GattServiceType::SECONDARY;
     outService = std::make_unique<GattService>(UUID::FromString(service.serviceUuid), type);
@@ -46,8 +46,8 @@ static int CheckGattsAddService(NativeGattService service, std::unique_ptr<GattS
         };
         int charPermissions = ConvertGattPermissions(permissions);
         int charProperties = ConvertGattProperties(nativeCharacter.properties);
-        GattCharacteristic character(UUID::FromString(nativeCharacter.characteristicUuid), charPermissions,
-                                     charProperties);
+        GattCharacteristic character(
+            UUID::FromString(nativeCharacter.characteristicUuid), charPermissions, charProperties);
         character.SetValue(nativeCharacter.characteristicValue.head, nativeCharacter.characteristicValue.size);
 
         CArrBLEDescriptor descriptors = nativeCharacter.descriptors;
@@ -64,7 +64,7 @@ static int CheckGattsAddService(NativeGattService service, std::unique_ptr<GattS
 
 int32_t FfiGattServer::AddService(NativeGattService service)
 {
-    std::unique_ptr<GattService> gattService{nullptr};
+    std::unique_ptr<GattService> gattService { nullptr };
     auto status = CheckGattsAddService(service, gattService);
     if (status != BT_NO_ERROR) {
         return status;
@@ -108,8 +108,8 @@ int32_t FfiGattServer::Close()
     return server_->Close();
 }
 
-static GattCharacteristic *GetGattCharacteristic(const std::shared_ptr<GattServer> &server, const UUID &serviceUuid,
-                                                 const UUID &characterUuid)
+static GattCharacteristic* GetGattCharacteristic(
+    const std::shared_ptr<GattServer>& server, const UUID& serviceUuid, const UUID& characterUuid)
 {
     auto service = server->GetService(serviceUuid, true);
     if (!service.has_value()) {
@@ -119,7 +119,7 @@ static GattCharacteristic *GetGattCharacteristic(const std::shared_ptr<GattServe
         HILOGE("not found service uuid: %{public}s", serviceUuid.ToString().c_str());
         return nullptr;
     }
-    GattCharacteristic *character = service.value().get().GetCharacteristic(characterUuid);
+    GattCharacteristic* character = service.value().get().GetCharacteristic(characterUuid);
     return character;
 }
 
@@ -128,8 +128,8 @@ int32_t FfiGattServer::NotifyCharacteristicChanged(std::string deviceId, NativeN
     if (server_ == nullptr) {
         return BT_ERR_INTERNAL_ERROR;
     }
-    auto character = GetGattCharacteristic(server_, UUID::FromString(characteristic.serviceUuid),
-                                           UUID::FromString(characteristic.characteristicUuid));
+    auto character = GetGattCharacteristic(
+        server_, UUID::FromString(characteristic.serviceUuid), UUID::FromString(characteristic.characteristicUuid));
     if (character == nullptr) {
         return BT_ERR_INVALID_PARAM;
     }
@@ -146,7 +146,7 @@ int32_t FfiGattServer::SendResponse(NativeServerResponse serverResponse)
         return BT_ERR_INTERNAL_ERROR;
     }
     return server_->SendResponse(remoteDevice, serverResponse.transId, serverResponse.status, serverResponse.offset,
-                                 serverResponse.value.head, static_cast<int>(serverResponse.value.size));
+        serverResponse.value.head, static_cast<int>(serverResponse.value.size));
     ;
 }
 

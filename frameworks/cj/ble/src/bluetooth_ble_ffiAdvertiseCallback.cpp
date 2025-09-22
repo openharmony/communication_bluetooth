@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,9 +20,7 @@ namespace CJSystemapi {
 namespace CJBluetoothBle {
 using Bluetooth::AdvertisingState;
 
-FfiBluetoothBleAdvertiseCallback::FfiBluetoothBleAdvertiseCallback()
-{
-}
+FfiBluetoothBleAdvertiseCallback::FfiBluetoothBleAdvertiseCallback() {}
 
 std::shared_ptr<FfiBluetoothBleAdvertiseCallback> FfiBluetoothBleAdvertiseCallback::GetInstance(void)
 {
@@ -39,7 +37,7 @@ void FfiBluetoothBleAdvertiseCallback::RegisterAdvertisingStateChangeFunc(
 
 void FfiBluetoothBleAdvertiseCallback::OnStartResultEvent(int result, int advHandle)
 {
-    CAdvertisingStateChangeInfo info{0};
+    CAdvertisingStateChangeInfo info { 0 };
     info.advertisingId = advHandle;
     info.state = static_cast<int>(AdvertisingState::STARTED);
     if (advertisingStateChangeFunc != nullptr) {
@@ -50,7 +48,7 @@ void FfiBluetoothBleAdvertiseCallback::OnStartResultEvent(int result, int advHan
 
 void FfiBluetoothBleAdvertiseCallback::OnEnableResultEvent(int result, int advHandle)
 {
-    CAdvertisingStateChangeInfo info{0};
+    CAdvertisingStateChangeInfo info { 0 };
     info.advertisingId = advHandle;
     info.state = static_cast<int>(AdvertisingState::ENABLED);
     if (advertisingStateChangeFunc != nullptr) {
@@ -61,7 +59,7 @@ void FfiBluetoothBleAdvertiseCallback::OnEnableResultEvent(int result, int advHa
 
 void FfiBluetoothBleAdvertiseCallback::OnDisableResultEvent(int result, int advHandle)
 {
-    CAdvertisingStateChangeInfo info{0};
+    CAdvertisingStateChangeInfo info { 0 };
     info.advertisingId = advHandle;
     info.state = static_cast<int>(AdvertisingState::DISABLED);
     if (advertisingStateChangeFunc != nullptr) {
@@ -72,7 +70,7 @@ void FfiBluetoothBleAdvertiseCallback::OnDisableResultEvent(int result, int advH
 
 void FfiBluetoothBleAdvertiseCallback::OnStopResultEvent(int result, int advHandle)
 {
-    CAdvertisingStateChangeInfo info{0};
+    CAdvertisingStateChangeInfo info { 0 };
     info.advertisingId = advHandle;
     info.state = static_cast<int>(AdvertisingState::STOPPED);
     if (advertisingStateChangeFunc != nullptr) {
@@ -87,8 +85,7 @@ void FfiBluetoothBleAdvertiseCallback::OnGetAdvHandleEvent(int result, int advHa
     return;
 }
 
-void FfiBluetoothBleAdvertiseCallback::OnChangeAdvResultEvent(int result, int advHandle)
-{}
+void FfiBluetoothBleAdvertiseCallback::OnChangeAdvResultEvent(int result, int advHandle) {}
 
 int32_t FfiBluetoothBleAdvertiseCallback::GetAdvHandleEvent()
 {

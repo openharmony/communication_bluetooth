@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,6 @@
  */
 
 #include "bluetooth_ble_clientDevice.h"
-
 #include "bluetooth_ble_common.h"
 #include "bluetooth_log.h"
 
@@ -22,34 +21,32 @@ namespace OHOS {
 namespace CJSystemapi {
 namespace CJBluetoothBle {
 
-FfiGattClientCallback::FfiGattClientCallback()
-{
-}
+FfiGattClientCallback::FfiGattClientCallback() {}
 
 void FfiGattClientCallback::OnReadRemoteRssiValueResult(int rssi, int status)
 {
     if (getRssiValueFunc != nullptr) {
-        RetDataI32 res{};
+        RetDataI32 res {};
         res.code = status;
         res.data = rssi;
         getRssiValueFunc(res);
     }
 }
 
-void FfiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &characteristic)
+void FfiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic& characteristic)
 {
-    NativeBLECharacteristic outCharacteristic{};
+    NativeBLECharacteristic outCharacteristic {};
 
-    GattCharacteristic character_ = const_cast<GattCharacteristic &>(characteristic);
+    GattCharacteristic character_ = const_cast<GattCharacteristic&>(characteristic);
 
     outCharacteristic.characteristicUuid = MallocCString(character_.GetUuid().ToString().c_str());
     if (character_.GetService() != nullptr) {
         outCharacteristic.serviceUuid = MallocCString(character_.GetService()->GetUuid().ToString().c_str());
     }
     size_t valueSize = 0;
-    uint8_t *valueData = character_.GetValue(&valueSize).get();
+    uint8_t* valueData = character_.GetValue(&valueSize).get();
 
-    CArrUI8 arr{};
+    CArrUI8 arr {};
     arr.head = valueData;
     arr.size = static_cast<int64_t>(valueSize);
     outCharacteristic.characteristicValue = arr;
@@ -63,11 +60,11 @@ void FfiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &ch
     FreeNativeBLECharacteristic(outCharacteristic);
 }
 
-void FfiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
+void FfiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic& characteristic, int ret)
 {
     HILOGI("UUID: %{public}s, ret: %{public}d", characteristic.GetUuid().ToString().c_str(), ret);
-    RetNativeBLECharacteristic res{};
-    res.data = ConvertBLECharacteristicToCJ(const_cast<GattCharacteristic &>(characteristic));
+    RetNativeBLECharacteristic res {};
+    res.data = ConvertBLECharacteristicToCJ(const_cast<GattCharacteristic&>(characteristic));
     res.code = ret;
     if (readCharacteristicFunc != nullptr) {
         readCharacteristicFunc(res);
@@ -75,7 +72,7 @@ void FfiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic 
     FreeNativeBLECharacteristic(res.data);
 }
 
-void FfiGattClientCallback::OnCharacteristicWriteResult(const GattCharacteristic &characteristic, int ret)
+void FfiGattClientCallback::OnCharacteristicWriteResult(const GattCharacteristic& characteristic, int ret)
 {
     HILOGI("UUID: %{public}s, ret: %{public}d", characteristic.GetUuid().ToString().c_str(), ret);
     if (writeCharacteristicFunc != nullptr) {
@@ -83,11 +80,11 @@ void FfiGattClientCallback::OnCharacteristicWriteResult(const GattCharacteristic
     }
 }
 
-void FfiGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descriptor, int ret)
+void FfiGattClientCallback::OnDescriptorReadResult(const GattDescriptor& descriptor, int ret)
 {
     HILOGI("UUID: %{public}s, ret: %{public}d", descriptor.GetUuid().ToString().c_str(), ret);
-    RetNativeBLEDescriptor res{};
-    res.data = ConvertBLEDescriptorToCJ(const_cast<GattDescriptor &>(descriptor));
+    RetNativeBLEDescriptor res {};
+    res.data = ConvertBLEDescriptorToCJ(const_cast<GattDescriptor&>(descriptor));
     res.code = ret;
     if (readDescriptorFunc != nullptr) {
         readDescriptorFunc(res);
@@ -95,7 +92,7 @@ void FfiGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descrip
     FreeNativeBLEDescriptor(res.data);
 }
 
-void FfiGattClientCallback::OnDescriptorWriteResult(const GattDescriptor &descriptor, int ret)
+void FfiGattClientCallback::OnDescriptorWriteResult(const GattDescriptor& descriptor, int ret)
 {
     HILOGI("UUID: %{public}s, ret: %{public}d", descriptor.GetUuid().ToString().c_str(), ret);
     if (writeDescriptorValueFunc != nullptr) {
@@ -107,7 +104,7 @@ void FfiGattClientCallback::OnConnectionStateChanged(int connectionState, int re
 {
     int connectState_ = connectionState;
 
-    NativeBLEConnectionChangeState outState{};
+    NativeBLEConnectionChangeState outState {};
 
     outState.deviceId = MallocCString(deviceAddr_.c_str());
     outState.state = GetProfileConnectionState(connectState_);
@@ -123,6 +120,16 @@ void FfiGattClientCallback::OnMtuUpdate(int mtu, int ret)
 {
     if (bleMtuChangeFunc != nullptr) {
         bleMtuChangeFunc(mtu);
+    }
+}
+void FfiGattClientCallback::OnSetNotifyCharacteristic(const GattCharacteristic& characteristic, int status)
+{
+    HILOGI("UUID: %{public}s, ret: %{public}d", characteristic.GetUuid().ToString().c_str(), status);
+    if (characteristicChangeNotificationFunc != nullptr) {
+        characteristicChangeNotificationFunc(status);
+    }
+    if (characteristicChangeIndicationFunc != nullptr) {
+        characteristicChangeIndicationFunc(status);
     }
 }
 
@@ -165,6 +172,16 @@ void FfiGattClientCallback::RegisterWriteCharacteristicCallback(std::function<vo
 void FfiGattClientCallback::RegisterWriteDescriptorCallback(std::function<void(int32_t)> cjCallback)
 {
     writeDescriptorValueFunc = cjCallback;
+}
+
+void FfiGattClientCallback::RegisterCharacteristicChangeNotificationCallback(std::function<void(int32_t)> cjCallback)
+{
+    characteristicChangeNotificationFunc = cjCallback;
+}
+
+void FfiGattClientCallback::RegisterCharacteristicChangeIndicationCallback(std::function<void(int32_t)> cjCallback)
+{
+    characteristicChangeIndicationFunc = cjCallback;
 }
 
 } // namespace CJBluetoothBle

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #endif
 
 #include "bluetooth_access_impl.h"
+
 #include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 
@@ -24,19 +25,19 @@ namespace OHOS {
 namespace CJSystemapi {
 namespace CJBluetoothAccess {
 using Bluetooth::BluetoothHost;
-using Bluetooth::BTStateID;
 using Bluetooth::BluetoothState;
+using Bluetooth::BTStateID;
 
 void AccessImpl::EnableBluetooth(int32_t* errCode)
 {
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    BluetoothHost* host = &BluetoothHost::GetDefaultHost();
     *errCode = host->EnableBle();
     return;
 }
 
 void AccessImpl::DisableBluetooth(int32_t* errCode)
 {
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    BluetoothHost* host = &BluetoothHost::GetDefaultHost();
     *errCode = host->DisableBt();
     return;
 }

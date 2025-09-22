@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,10 +15,10 @@
 #ifndef BLUETOOTH_ACCESS_IMPL_H
 #define BLUETOOTH_ACCESS_IMPL_H
 
+#include <cstdint>
+
 #include "bluetooth_host.h"
 #include "napi_bluetooth_utils.h"
-
-#include <cstdint>
 
 namespace OHOS {
 namespace CJSystemapi {
@@ -39,29 +39,29 @@ public:
 };
 
 class CjBluetoothAccessObserver : public BluetoothHostObserver {
-    public:
+public:
     CjBluetoothAccessObserver();
     ~CjBluetoothAccessObserver() override = default;
 
     void OnStateChanged(const int transport, const int status) override;
-    void OnDiscoveryStateChanged(int status) override{};
+    void OnDiscoveryStateChanged(int status) override {};
     void OnDiscoveryResult(
-        const BluetoothRemoteDevice &device, int rssi, const std::string deviceName, int deviceClass) override{};
-    void OnPairRequested(const BluetoothRemoteDevice &device) override{};
-    void OnPairConfirmed(const BluetoothRemoteDevice &device, int reqType, int number) override{};
-    void OnScanModeChanged(int mode) override{};
-    void OnDeviceNameChanged(const std::string &deviceName) override{};
-    void OnDeviceAddrChanged(const std::string &address) override{};
+        const BluetoothRemoteDevice& device, int rssi, const std::string deviceName, int deviceClass) override {};
+    void OnPairRequested(const BluetoothRemoteDevice& device) override {};
+    void OnPairConfirmed(const BluetoothRemoteDevice& device, int reqType, int number) override {};
+    void OnScanModeChanged(int mode) override {};
+    void OnDeviceNameChanged(const std::string& deviceName) override {};
+    void OnDeviceAddrChanged(const std::string& address) override {};
 
     void RegisterStateChangeFunc(std::function<void(int32_t)> cjCallback);
 
 private:
-    bool DealStateChange(const int transport, const int status, BluetoothState &state);
-    void GetBrStateByStatus(const int status, BluetoothState &state, bool &isCallback);
-    void GetBleStateByStatus(const int status, BluetoothState &state);
-    std::function<void(int32_t)> stateChangeFunc{nullptr};
+    bool DealStateChange(const int transport, const int status, BluetoothState& state);
+    void GetBrStateByStatus(const int status, BluetoothState& state, bool& isCallback);
+    void GetBleStateByStatus(const int status, BluetoothState& state);
+    std::function<void(int32_t)> stateChangeFunc { nullptr };
 };
-} // namespace BluetoothAccess
+} // namespace CJBluetoothAccess
 } // namespace CJSystemapi
 } // namespace OHOS
 

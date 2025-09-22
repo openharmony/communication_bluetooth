@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,11 +15,11 @@
 
 #include "bluetooth_ble_common.h"
 
-#include "bluetooth_ble_ffi.h"
-#include "bluetooth_log.h"
-
 #include <regex>
 #include <vector>
+
+#include "bluetooth_ble_ffi.h"
+#include "bluetooth_log.h"
 
 namespace OHOS {
 namespace CJSystemapi {
@@ -35,31 +35,31 @@ namespace {
 std::string g_deviceAddr;
 } // namespace
 
-char *MallocCString(const std::string &origin)
+char* MallocCString(const std::string& origin)
 {
     if (origin.empty()) {
         return nullptr;
     }
     auto length = origin.length() + 1;
-    char *res = static_cast<char *>(malloc(sizeof(char) * length));
+    char* res = static_cast<char*>(malloc(sizeof(char) * length));
     if (res == nullptr) {
         return nullptr;
     }
     return std::char_traits<char>::copy(res, origin.c_str(), length);
 }
 
-CArrString Convert2CArrString(std::vector<std::string> &tids)
+CArrString Convert2CArrString(std::vector<std::string>& tids)
 {
-    CArrString res{};
+    CArrString res {};
     if (tids.empty()) {
         return res;
     }
 
     size_t size = tids.size();
-    if (size == 0 || size > std::numeric_limits<size_t>::max() / sizeof(char *)) {
+    if (size == 0 || size > std::numeric_limits<size_t>::max() / sizeof(char*)) {
         return res;
     }
-    res.head = static_cast<char **>(malloc(sizeof(char *) * size));
+    res.head = static_cast<char**>(malloc(sizeof(char*) * size));
     if (res.head == nullptr) {
         return res;
     }
@@ -75,7 +75,7 @@ CArrString Convert2CArrString(std::vector<std::string> &tids)
 
 CArrUI8 Convert2CArrUI8(std::vector<uint8_t> vec)
 {
-    CArrUI8 res{};
+    CArrUI8 res {};
     if (vec.empty()) {
         return res;
     }
@@ -83,7 +83,7 @@ CArrUI8 Convert2CArrUI8(std::vector<uint8_t> vec)
     if (size == 0 || size > std::numeric_limits<size_t>::max() / sizeof(uint8_t)) {
         return res;
     }
-    res.head = static_cast<uint8_t *>(malloc(sizeof(uint8_t) * vec.size()));
+    res.head = static_cast<uint8_t*>(malloc(sizeof(uint8_t) * vec.size()));
     if (res.head == nullptr) {
         return res;
     }
@@ -95,9 +95,9 @@ CArrUI8 Convert2CArrUI8(std::vector<uint8_t> vec)
     return res;
 }
 
-NativeBLEDescriptor ConvertBLEDescriptorToCJ(GattDescriptor &descriptor)
+NativeBLEDescriptor ConvertBLEDescriptorToCJ(GattDescriptor& descriptor)
 {
-    NativeBLEDescriptor outDescriptor{};
+    NativeBLEDescriptor outDescriptor {};
     outDescriptor.descriptorUuid = MallocCString(descriptor.GetUuid().ToString());
     if (descriptor.GetCharacteristic() != nullptr) {
         outDescriptor.characteristicUuid = MallocCString(descriptor.GetCharacteristic()->GetUuid().ToString());
@@ -108,15 +108,15 @@ NativeBLEDescriptor ConvertBLEDescriptorToCJ(GattDescriptor &descriptor)
     }
 
     size_t valueSize;
-    uint8_t *valueData = descriptor.GetValue(&valueSize).get();
+    uint8_t* valueData = descriptor.GetValue(&valueSize).get();
     vector<uint8_t> vec(valueData, valueData + valueSize);
     outDescriptor.descriptorValue = Convert2CArrUI8(vec);
     return outDescriptor;
 }
 
-CArrBLEDescriptor Convert2CArrBLEDescriptor(vector<GattDescriptor> &descriptors)
+CArrBLEDescriptor Convert2CArrBLEDescriptor(vector<GattDescriptor>& descriptors)
 {
-    CArrBLEDescriptor res{};
+    CArrBLEDescriptor res {};
     if (descriptors.empty()) {
         return res;
     }
@@ -124,7 +124,7 @@ CArrBLEDescriptor Convert2CArrBLEDescriptor(vector<GattDescriptor> &descriptors)
     if (size == 0 || size > (std::numeric_limits<size_t>::max() / sizeof(NativeBLEDescriptor))) {
         return res;
     }
-    res.head = static_cast<NativeBLEDescriptor *>(malloc(sizeof(NativeBLEDescriptor) * size));
+    res.head = static_cast<NativeBLEDescriptor*>(malloc(sizeof(NativeBLEDescriptor) * size));
     if (res.head == nullptr) {
         return res;
     }
@@ -147,7 +147,7 @@ bool HasProperty(int properties, int propertyMask)
 
 NativeGattProperties ConvertGattPropertiesToCJ(int properties)
 {
-    NativeGattProperties outProperties{};
+    NativeGattProperties outProperties {};
     outProperties.write = HasProperty(properties, GattCharacteristic::WRITE);
     outProperties.writeNoResponse = HasProperty(properties, GattCharacteristic::WRITE_WITHOUT_RESPONSE);
     outProperties.read = HasProperty(properties, GattCharacteristic::READ);
@@ -156,16 +156,16 @@ NativeGattProperties ConvertGattPropertiesToCJ(int properties)
     return outProperties;
 }
 
-NativeBLECharacteristic ConvertBLECharacteristicToCJ(GattCharacteristic &characteristic)
+NativeBLECharacteristic ConvertBLECharacteristicToCJ(GattCharacteristic& characteristic)
 {
-    NativeBLECharacteristic outCharacteristic{};
+    NativeBLECharacteristic outCharacteristic {};
     outCharacteristic.characteristicUuid = MallocCString(characteristic.GetUuid().ToString());
     if (characteristic.GetService() != nullptr) {
         outCharacteristic.serviceUuid = MallocCString(characteristic.GetService()->GetUuid().ToString());
     }
 
     size_t valueSize = 0;
-    uint8_t *valueData = characteristic.GetValue(&valueSize).get();
+    uint8_t* valueData = characteristic.GetValue(&valueSize).get();
     vector<uint8_t> vec(valueData, valueData + valueSize);
     outCharacteristic.characteristicValue = Convert2CArrUI8(vec);
 
@@ -178,7 +178,7 @@ NativeBLECharacteristic ConvertBLECharacteristicToCJ(GattCharacteristic &charact
 
 CArrBLECharacteristic Convert2CArrBLECharacteristic(std::vector<GattCharacteristic> characteristics)
 {
-    CArrBLECharacteristic res{};
+    CArrBLECharacteristic res {};
     if (characteristics.empty()) {
         return res;
     }
@@ -186,7 +186,7 @@ CArrBLECharacteristic Convert2CArrBLECharacteristic(std::vector<GattCharacterist
     if (size == 0 || size > std::numeric_limits<size_t>::max() / sizeof(NativeBLECharacteristic)) {
         return res;
     }
-    res.head = static_cast<NativeBLECharacteristic *>(malloc(sizeof(NativeBLECharacteristic) * size));
+    res.head = static_cast<NativeBLECharacteristic*>(malloc(sizeof(NativeBLECharacteristic) * size));
     if (res.head == nullptr) {
         return res;
     }
@@ -200,13 +200,13 @@ CArrBLECharacteristic Convert2CArrBLECharacteristic(std::vector<GattCharacterist
 
 NativeGattService ConvertGattServiceToCJ(GattService service)
 {
-    NativeGattService outService{};
+    NativeGattService outService {};
     outService.serviceUuid = MallocCString(service.GetUuid().ToString());
     outService.isPrimary = service.IsPrimary();
     outService.characteristics = Convert2CArrBLECharacteristic(service.GetCharacteristics());
     vector<GattService> services;
     vector<std::reference_wrapper<GattService>> srvs = service.GetIncludedServices();
-    for (auto &srv : srvs) {
+    for (auto& srv : srvs) {
         services.push_back(srv.get());
     }
     outService.includeServices = Convert2CArrGattService(services);
@@ -215,7 +215,7 @@ NativeGattService ConvertGattServiceToCJ(GattService service)
 
 CArrGattService Convert2CArrGattService(std::vector<GattService> services)
 {
-    CArrGattService res{};
+    CArrGattService res {};
     if (services.empty()) {
         return res;
     }
@@ -223,7 +223,7 @@ CArrGattService Convert2CArrGattService(std::vector<GattService> services)
     if (size == 0 || size > std::numeric_limits<size_t>::max() / sizeof(NativeGattService)) {
         return res;
     }
-    res.head = static_cast<NativeGattService *>(malloc(sizeof(NativeGattService) * services.size()));
+    res.head = static_cast<NativeGattService*>(malloc(sizeof(NativeGattService) * services.size()));
     if (res.head == nullptr) {
         return res;
     }
@@ -240,7 +240,7 @@ std::string GetGattClientDeviceId()
     return g_deviceAddr;
 }
 
-uint16_t ConvertGattPermissions(const NativeGattPermission &nativePermissions)
+uint16_t ConvertGattPermissions(const NativeGattPermission& nativePermissions)
 {
     uint16_t permissions = 0;
     if (nativePermissions.readable) {
@@ -258,7 +258,7 @@ uint16_t ConvertGattPermissions(const NativeGattPermission &nativePermissions)
     return permissions;
 }
 
-uint16_t ConvertGattProperties(const NativeGattProperties &nativeProperties)
+uint16_t ConvertGattProperties(const NativeGattProperties& nativeProperties)
 {
     uint16_t properties = 0;
     if (nativeProperties.read) {
