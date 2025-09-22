@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,8 @@
 #ifndef BLUETOOTH_BLE_IMPL_H
 #define BLUETOOTH_BLE_IMPL_H
 
+#include <cstdint>
+
 #include "bluetooth_ble_advertiser.h"
 #include "bluetooth_ble_central_manager.h"
 #include "bluetooth_ble_clientDevice.h"
@@ -22,8 +24,6 @@
 #include "bluetooth_ble_gattServer.h"
 #include "bluetooth_host.h"
 #include "napi_bluetooth_utils.h"
-
-#include <cstdint>
 
 namespace OHOS {
 namespace CJSystemapi {
@@ -42,18 +42,18 @@ public:
     FfiBluetoothBleCentralManagerCallback();
     ~FfiBluetoothBleCentralManagerCallback() override = default;
 
-    static FfiBluetoothBleCentralManagerCallback &GetInstance(void);
+    static FfiBluetoothBleCentralManagerCallback& GetInstance(void);
 
-    void OnScanCallback(const BleScanResult &result) override;
-    void OnFoundOrLostCallback(const BleScanResult &result, uint8_t callbackType) override{};
-    void OnBleBatchScanResultsEvent(const std::vector<BleScanResult> &results) override{};
-    void OnStartOrStopScanEvent(int resultCode, bool isStartScan) override{};
-    void OnNotifyMsgReportFromLpDevice(const UUID &uuid, int msgType, const std::vector<uint8_t> &value) override{};
+    void OnScanCallback(const BleScanResult& result) override;
+    void OnFoundOrLostCallback(const BleScanResult& result, uint8_t callbackType) override {};
+    void OnBleBatchScanResultsEvent(const std::vector<BleScanResult>& results) override {};
+    void OnStartOrStopScanEvent(int resultCode, bool isStartScan) override {};
+    void OnNotifyMsgReportFromLpDevice(const UUID& uuid, int msgType, const std::vector<uint8_t>& value) override {};
 
     void RegisterBLEDeviceFindFunc(std::function<void(CArrScanResult)> cjCallback);
 
 private:
-    std::function<void(CArrScanResult)> bleDeviceFindFunc{nullptr};
+    std::function<void(CArrScanResult)> bleDeviceFindFunc { nullptr };
 };
 
 class FfiBluetoothBleAdvertiseCallback : public BleAdvertiseCallback {
@@ -67,7 +67,7 @@ public:
     void OnEnableResultEvent(int result, int advHandle) override;
     void OnDisableResultEvent(int result, int advHandle) override;
     void OnStopResultEvent(int result, int advHandle) override;
-    void OnSetAdvDataEvent(int result) override{};
+    void OnSetAdvDataEvent(int result) override {};
     void OnGetAdvHandleEvent(int result, int advHandle) override;
     void OnChangeAdvResultEvent(int result, int advHandle) override;
 
@@ -75,8 +75,8 @@ public:
     int32_t GetAdvHandleEvent();
 
 private:
-    int32_t handleEvent{-1};
-    std::function<void(CAdvertisingStateChangeInfo)> advertisingStateChangeFunc{nullptr};
+    int32_t handleEvent { -1 };
+    std::function<void(CAdvertisingStateChangeInfo)> advertisingStateChangeFunc { nullptr };
 };
 
 class BleImpl {
@@ -84,15 +84,15 @@ public:
     BleImpl() = default;
     ~BleImpl() = default;
 
-    static int32_t CreateGattServer(FfiGattServer *&ffiGattServer);
-    static int32_t CreateGattClientDevice(std::string deviceId, FfiClientDevice *&ffiClientDevice);
-    static int32_t GetConnectedBleDevices(CArrString &res);
-    static int32_t StartBleScan(CArrNativeScanFilter filters, NativeScanOptions *options);
+    static int32_t CreateGattServer(FfiGattServer*& ffiGattServer);
+    static int32_t CreateGattClientDevice(std::string deviceId, FfiClientDevice*& ffiClientDevice);
+    static int32_t GetConnectedBleDevices(CArrString& res);
+    static int32_t StartBleScan(CArrNativeScanFilter filters, NativeScanOptions* options);
     static int32_t StopBleScan();
-    static int32_t StartAdvertising(NativeAdvertiseSetting setting, NativeAdvertiseData advData,
-                                    NativeAdvertiseData *advResponse);
+    static int32_t StartAdvertising(
+        NativeAdvertiseSetting setting, NativeAdvertiseData advData, NativeAdvertiseData* advResponse);
     static int32_t StopAdvertising();
-    static int32_t StartAdvertising(NativeAdvertisingParams advertisingParams, int32_t &id);
+    static int32_t StartAdvertising(NativeAdvertisingParams advertisingParams, int32_t& id);
     static int32_t EnableAdvertising(NativeAdvertisingEnableParams advertisingEnableParams);
     static int32_t DisableAdvertising(NativeAdvertisingDisableParams advertisingDisableParams);
     static int32_t StopAdvertising(uint32_t advertisingId);

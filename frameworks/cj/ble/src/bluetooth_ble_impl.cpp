@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,14 +52,14 @@ std::shared_ptr<BleAdvertiser> BleAdvertiserGetInstance(void)
     return instance;
 }
 
-BleCentralManager *BleCentralManagerGetInstance(void)
+BleCentralManager* BleCentralManagerGetInstance(void)
 {
     static BleCentralManager instance(FfiBluetoothBleCentralManagerCallback::GetInstance());
     return &instance;
 }
 } // namespace
 
-int32_t BleImpl::CreateGattServer(FfiGattServer *&ffiGattServer)
+int32_t BleImpl::CreateGattServer(FfiGattServer*& ffiGattServer)
 {
     ffiGattServer = FFIData::Create<FfiGattServer>();
     if (ffiGattServer == nullptr) {
@@ -68,7 +68,7 @@ int32_t BleImpl::CreateGattServer(FfiGattServer *&ffiGattServer)
     return BT_NO_ERROR;
 }
 
-int32_t BleImpl::CreateGattClientDevice(std::string deviceId, FfiClientDevice *&ffiClientDevice)
+int32_t BleImpl::CreateGattClientDevice(std::string deviceId, FfiClientDevice*& ffiClientDevice)
 {
     if (!IsValidAddress(deviceId)) {
         HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
@@ -78,7 +78,7 @@ int32_t BleImpl::CreateGattClientDevice(std::string deviceId, FfiClientDevice *&
     return BT_NO_ERROR;
 }
 
-int32_t BleImpl::GetConnectedBleDevices(CArrString &res)
+int32_t BleImpl::GetConnectedBleDevices(CArrString& res)
 {
     std::lock_guard<std::mutex> lock(FfiGattServer::deviceListMutex_);
     std::vector<std::string> devicesList = FfiGattServer::deviceList_;
@@ -86,8 +86,8 @@ int32_t BleImpl::GetConnectedBleDevices(CArrString &res)
     return BT_NO_ERROR;
 }
 
-static void ParseScanFilterDeviceIdParameters(int32_t &status, NativeScanFilter &scanFilter,
-                                              BleScanFilter &bleScanFilter)
+static void ParseScanFilterDeviceIdParameters(
+    int32_t& status, NativeScanFilter& scanFilter, BleScanFilter& bleScanFilter)
 {
     if (scanFilter.deviceId != nullptr) {
         std::string deviceId = std::string(scanFilter.deviceId);
@@ -99,8 +99,8 @@ static void ParseScanFilterDeviceIdParameters(int32_t &status, NativeScanFilter 
     }
 }
 
-static void ParseScanFilterLocalNameParameters(int32_t &status, NativeScanFilter &scanFilter,
-                                               BleScanFilter &bleScanFilter)
+static void ParseScanFilterLocalNameParameters(
+    int32_t& status, NativeScanFilter& scanFilter, BleScanFilter& bleScanFilter)
 {
     if (scanFilter.name != nullptr) {
         std::string name = std::string(scanFilter.name);
@@ -112,7 +112,7 @@ static void ParseScanFilterLocalNameParameters(int32_t &status, NativeScanFilter
     }
 }
 
-static int32_t ParseUuidParams(char *name, UUID &outUuid)
+static int32_t ParseUuidParams(char* name, UUID& outUuid)
 {
     std::string uuid = std::string(name);
     if (!IsValidUuid(uuid)) {
@@ -123,11 +123,11 @@ static int32_t ParseUuidParams(char *name, UUID &outUuid)
     return BT_NO_ERROR;
 }
 
-static void ParseScanFilterServiceUuidParameters(int32_t &status, NativeScanFilter &scanFilter,
-                                                 BleScanFilter &bleScanFilter)
+static void ParseScanFilterServiceUuidParameters(
+    int32_t& status, NativeScanFilter& scanFilter, BleScanFilter& bleScanFilter)
 {
     if (scanFilter.serviceUuid != nullptr) {
-        UUID uuid{};
+        UUID uuid {};
         status = ParseUuidParams(scanFilter.serviceUuid, uuid);
         if (status != BT_NO_ERROR) {
             return;
@@ -136,7 +136,7 @@ static void ParseScanFilterServiceUuidParameters(int32_t &status, NativeScanFilt
     }
 
     if (scanFilter.serviceUuidMask != nullptr) {
-        UUID uuidMask{};
+        UUID uuidMask {};
         status = ParseUuidParams(scanFilter.serviceUuidMask, uuidMask);
         if (status != BT_NO_ERROR) {
             return;
@@ -145,11 +145,11 @@ static void ParseScanFilterServiceUuidParameters(int32_t &status, NativeScanFilt
     }
 }
 
-static void ParseScanFilterSolicitationUuidParameters(int32_t &status, NativeScanFilter &scanFilter,
-                                                      BleScanFilter &bleScanFilter)
+static void ParseScanFilterSolicitationUuidParameters(
+    int32_t& status, NativeScanFilter& scanFilter, BleScanFilter& bleScanFilter)
 {
     if (scanFilter.serviceSolicitationUuid != nullptr) {
-        UUID uuid{};
+        UUID uuid {};
         status = ParseUuidParams(scanFilter.serviceSolicitationUuid, uuid);
         if (status != BT_NO_ERROR) {
             return;
@@ -158,7 +158,7 @@ static void ParseScanFilterSolicitationUuidParameters(int32_t &status, NativeSca
     }
 
     if (scanFilter.serviceSolicitationUuidMask != nullptr) {
-        UUID uuidMask{};
+        UUID uuidMask {};
         status = ParseUuidParams(scanFilter.serviceSolicitationUuidMask, uuidMask);
         if (status != BT_NO_ERROR) {
             return;
@@ -167,29 +167,29 @@ static void ParseScanFilterSolicitationUuidParameters(int32_t &status, NativeSca
     }
 }
 
-static void ParseScanFilterServiceDataParameters(int32_t &status, NativeScanFilter &scanFilter,
-                                                 BleScanFilter &bleScanFilter)
+static void ParseScanFilterServiceDataParameters(
+    int32_t& status, NativeScanFilter& scanFilter, BleScanFilter& bleScanFilter)
 {
-    std::vector<uint8_t> data{};
+    std::vector<uint8_t> data {};
     if (scanFilter.serviceData.head != nullptr) {
         bleScanFilter.SetServiceData(std::move(data));
     }
 
-    std::vector<uint8_t> dataMask{};
+    std::vector<uint8_t> dataMask {};
     if (scanFilter.serviceDataMask.head != nullptr) {
         bleScanFilter.SetServiceDataMask(std::move(dataMask));
     }
 }
 
-static void ParseScanFilterManufactureDataParameters(int32_t &status, NativeScanFilter &scanFilter,
-                                                     BleScanFilter &bleScanFilter)
+static void ParseScanFilterManufactureDataParameters(
+    int32_t& status, NativeScanFilter& scanFilter, BleScanFilter& bleScanFilter)
 {
     if (scanFilter.manufactureId != 0) {
         bleScanFilter.SetManufacturerId(scanFilter.manufactureId);
         HILOGI("Scan filter manufacturerId is %{public}#x", scanFilter.manufactureId);
     }
 
-    std::vector<uint8_t> data{};
+    std::vector<uint8_t> data {};
     if (scanFilter.manufactureData.head != nullptr) {
         for (int64_t i = 0; i < scanFilter.manufactureData.size; i++) {
             data.push_back(scanFilter.manufactureData.head[i]);
@@ -197,7 +197,7 @@ static void ParseScanFilterManufactureDataParameters(int32_t &status, NativeScan
         bleScanFilter.SetManufactureData(std::move(data));
     }
 
-    std::vector<uint8_t> dataMask{};
+    std::vector<uint8_t> dataMask {};
     if (scanFilter.manufactureDataMask.head != nullptr) {
         for (int64_t i = 0; i < scanFilter.manufactureDataMask.size; i++) {
             dataMask.push_back(scanFilter.manufactureDataMask.head[i]);
@@ -206,7 +206,7 @@ static void ParseScanFilterManufactureDataParameters(int32_t &status, NativeScan
     }
 }
 
-static void ParseScanFilter(int32_t &status, NativeScanFilter &scanFilter, BleScanFilter &bleScanFilter)
+static void ParseScanFilter(int32_t& status, NativeScanFilter& scanFilter, BleScanFilter& bleScanFilter)
 {
     ParseScanFilterDeviceIdParameters(status, scanFilter, bleScanFilter);
     ParseScanFilterLocalNameParameters(status, scanFilter, bleScanFilter);
@@ -216,8 +216,8 @@ static void ParseScanFilter(int32_t &status, NativeScanFilter &scanFilter, BleSc
     ParseScanFilterManufactureDataParameters(status, scanFilter, bleScanFilter);
 }
 
-static int32_t CheckBleScanParams(CArrNativeScanFilter filters, NativeScanOptions *scanOptions,
-                                  std::vector<BleScanFilter> &outScanfilters, BleScanSettings &outSettinngs)
+static int32_t CheckBleScanParams(CArrNativeScanFilter filters, NativeScanOptions* scanOptions,
+    std::vector<BleScanFilter>& outScanfilters, BleScanSettings& outSettinngs)
 {
     std::vector<BleScanFilter> scanfilters;
     uint32_t length = static_cast<uint32_t>(filters.size);
@@ -241,7 +241,7 @@ static int32_t CheckBleScanParams(CArrNativeScanFilter filters, NativeScanOption
     return BT_NO_ERROR;
 }
 
-int32_t BleImpl::StartBleScan(CArrNativeScanFilter filters, NativeScanOptions *options)
+int32_t BleImpl::StartBleScan(CArrNativeScanFilter filters, NativeScanOptions* options)
 {
     std::vector<BleScanFilter> scanfilters;
     BleScanSettings settings;
@@ -263,8 +263,8 @@ int32_t BleImpl::StopBleScan()
     return BleCentralManagerGetInstance()->StopScan();
 }
 
-static void ParseAdvertisingSettingsParameters(int32_t *errCode, NativeAdvertiseSetting &setting,
-                                               BleAdvertiserSettings &outSettings)
+static void ParseAdvertisingSettingsParameters(
+    int32_t* errCode, NativeAdvertiseSetting& setting, BleAdvertiserSettings& outSettings)
 {
     uint32_t interval = setting.interval;
     const uint32_t minInterval = 32;
@@ -295,10 +295,10 @@ static void ParseAdvertisingSettingsParameters(int32_t *errCode, NativeAdvertise
     return;
 }
 
-static void ParseServiceUuidParameters(int32_t *errCode, NativeAdvertiseData advData, BleAdvertiserData &outData)
+static void ParseServiceUuidParameters(int32_t* errCode, NativeAdvertiseData advData, BleAdvertiserData& outData)
 {
     for (int64_t i = 0; i < advData.serviceUuids.size; ++i) {
-        UUID uuid{};
+        UUID uuid {};
         *errCode = ParseUuidParams(advData.serviceUuids.head[i], uuid);
         if (*errCode != BT_NO_ERROR) {
             return;
@@ -309,30 +309,30 @@ static void ParseServiceUuidParameters(int32_t *errCode, NativeAdvertiseData adv
     return;
 }
 
-static void ParseManufactureDataParameters(int32_t *errCode, NativeAdvertiseData advData, BleAdvertiserData &outData)
+static void ParseManufactureDataParameters(int32_t* errCode, NativeAdvertiseData advData, BleAdvertiserData& outData)
 {
     CArrNativeManufactureData parameter = advData.manufactureData;
     for (int64_t i = 0; i < parameter.size; ++i) {
         NativeManufactureData manufactureData = parameter.head[i];
         CArrUI8 manufactureValue = manufactureData.manufactureValue;
-        std::string value(reinterpret_cast<char *>(manufactureValue.head), manufactureValue.size);
+        std::string value(reinterpret_cast<char*>(manufactureValue.head), manufactureValue.size);
         outData.AddManufacturerData(manufactureData.manufactureId, value);
     }
     return;
 }
 
-static void ParseServiceDataParameters(int32_t *errCode, NativeAdvertiseData advData, BleAdvertiserData &outData)
+static void ParseServiceDataParameters(int32_t* errCode, NativeAdvertiseData advData, BleAdvertiserData& outData)
 {
     CArrNativeServiceData data = advData.serviceData;
     for (int64_t i = 0; i < data.size; ++i) {
         NativeServiceData serviceData = data.head[i];
-        std::string value(reinterpret_cast<char *>(serviceData.serviceValue.head), serviceData.serviceValue.size);
+        std::string value(reinterpret_cast<char*>(serviceData.serviceValue.head), serviceData.serviceValue.size);
         outData.AddServiceData(ParcelUuid::FromString(std::string(serviceData.serviceUuid)), value);
     }
     return;
 }
 
-static void ParseAdvertisDataParameters(int32_t *errCode, NativeAdvertiseData advData, BleAdvertiserData &outData)
+static void ParseAdvertisDataParameters(int32_t* errCode, NativeAdvertiseData advData, BleAdvertiserData& outData)
 {
     ParseServiceUuidParameters(errCode, advData, outData);
     ParseManufactureDataParameters(errCode, advData, outData);
@@ -343,8 +343,8 @@ static void ParseAdvertisDataParameters(int32_t *errCode, NativeAdvertiseData ad
     return;
 }
 
-int32_t BleImpl::StartAdvertising(NativeAdvertiseSetting setting, NativeAdvertiseData advData,
-                                  NativeAdvertiseData *advResponse)
+int32_t BleImpl::StartAdvertising(
+    NativeAdvertiseSetting setting, NativeAdvertiseData advData, NativeAdvertiseData* advResponse)
 {
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
     BleAdvertiserSettings nativeSettings;
@@ -361,8 +361,8 @@ int32_t BleImpl::StartAdvertising(NativeAdvertiseSetting setting, NativeAdvertis
     if (errCode != BT_NO_ERROR) {
         return errCode;
     }
-    return bleAdvertiser->StartAdvertising(nativeSettings, nativeAdvData, nativeRspData, 0,
-                                           FfiBluetoothBleAdvertiseCallback::GetInstance());
+    return bleAdvertiser->StartAdvertising(
+        nativeSettings, nativeAdvData, nativeRspData, 0, FfiBluetoothBleAdvertiseCallback::GetInstance());
 }
 
 int32_t BleImpl::StopAdvertising()
@@ -385,7 +385,7 @@ static bool IsValidAdvertiserDuration(uint32_t duration)
     return true;
 }
 
-int32_t BleImpl::StartAdvertising(NativeAdvertisingParams advertisingParams, int32_t &id)
+int32_t BleImpl::StartAdvertising(NativeAdvertisingParams advertisingParams, int32_t& id)
 {
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
     BleAdvertiserSettings nativeSettings;
@@ -402,8 +402,8 @@ int32_t BleImpl::StartAdvertising(NativeAdvertisingParams advertisingParams, int
         return BT_ERR_INVALID_PARAM;
     }
     HILOGI("duration: %{public}u", duration);
-    errCode = bleAdvertiser->StartAdvertising(nativeSettings, nativeAdvData, nativeRspData, duration,
-                                              FfiBluetoothBleAdvertiseCallback::GetInstance());
+    errCode = bleAdvertiser->StartAdvertising(
+        nativeSettings, nativeAdvData, nativeRspData, duration, FfiBluetoothBleAdvertiseCallback::GetInstance());
     if (errCode != BT_NO_ERROR) {
         return errCode;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,8 @@
 #define LOG_TAG "bt_cj_access_callback"
 #endif
 
-#include "bluetooth_access_impl.h"
-
 #include "bluetooth_access_ffi.h"
+#include "bluetooth_access_impl.h"
 #include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "cj_lambda.h"
@@ -27,22 +26,20 @@ namespace OHOS {
 namespace CJSystemapi {
 namespace CJBluetoothAccess {
 using Bluetooth::BluetoothHost;
-using Bluetooth::BT_ERR_INTERNAL_ERROR;
 using Bluetooth::BluetoothState;
-using Bluetooth::BT_TRANSPORT_BREDR;
+using Bluetooth::BT_ERR_INTERNAL_ERROR;
 using Bluetooth::BT_TRANSPORT_BLE;
+using Bluetooth::BT_TRANSPORT_BREDR;
 using Bluetooth::BTStateID;
 
-CjBluetoothAccessObserver::CjBluetoothAccessObserver()
-{}
+CjBluetoothAccessObserver::CjBluetoothAccessObserver() {}
 
-std::shared_ptr<CjBluetoothAccessObserver> g_bluetoothAccessObserver =
-    std::make_shared<CjBluetoothAccessObserver>();
+std::shared_ptr<CjBluetoothAccessObserver> g_bluetoothAccessObserver = std::make_shared<CjBluetoothAccessObserver>();
 bool g_flag = false;
 
 static void RegisterAccessObserverToHost()
 {
-    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    BluetoothHost* host = &BluetoothHost::GetDefaultHost();
     host->RegisterObserver(g_bluetoothAccessObserver);
 }
 
@@ -62,7 +59,7 @@ void CjBluetoothAccessObserver::OnStateChanged(const int transport, const int st
     stateChangeFunc(static_cast<int32_t>(state));
 }
 
-bool CjBluetoothAccessObserver::DealStateChange(const int transport, const int status, BluetoothState &state)
+bool CjBluetoothAccessObserver::DealStateChange(const int transport, const int status, BluetoothState& state)
 {
     HILOGD("transport is %{public}d, status is %{public}d", transport, status);
     bool isCallback = true;
@@ -74,7 +71,7 @@ bool CjBluetoothAccessObserver::DealStateChange(const int transport, const int s
     return isCallback;
 }
 
-void CjBluetoothAccessObserver::GetBrStateByStatus(const int status, BluetoothState &state, bool &isCallback)
+void CjBluetoothAccessObserver::GetBrStateByStatus(const int status, BluetoothState& state, bool& isCallback)
 {
     switch (status) {
         case BTStateID::STATE_TURNING_ON:
@@ -98,7 +95,7 @@ void CjBluetoothAccessObserver::GetBrStateByStatus(const int status, BluetoothSt
     }
 }
 
-void CjBluetoothAccessObserver::GetBleStateByStatus(const int status, BluetoothState &state)
+void CjBluetoothAccessObserver::GetBleStateByStatus(const int status, BluetoothState& state)
 {
     switch (status) {
         case BTStateID::STATE_TURNING_ON:
@@ -146,6 +143,6 @@ void AccessImpl::RegisterAccessObserver(int32_t callbackType, void (*callback)()
     return;
 }
 
-} // namespace BluetoothAccess
+} // namespace CJBluetoothAccess
 } // namespace CJSystemapi
 } // namespace OHOS

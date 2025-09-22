@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,19 +34,19 @@ enum ProfileConnectionState {
     STATE_DISCONNECTING = 3 // the current profile is being disconnected
 };
 
-char *MallocCString(const std::string &origin);
-CArrString Convert2CArrString(std::vector<std::string> &tids);
+char* MallocCString(const std::string& origin);
+CArrString Convert2CArrString(std::vector<std::string>& tids);
 CArrUI8 Convert2CArrUI8(std::vector<uint8_t> vec);
 std::string GetGattClientDeviceId();
 CArrBLECharacteristic Convert2CArrBLECharacteristic(std::vector<GattCharacteristic> characteristics);
 CArrGattService Convert2CArrGattService(std::vector<GattService> services);
-CArrBLEDescriptor Convert2CArrBLEDescriptor(std::vector<GattDescriptor> &descriptors);
+CArrBLEDescriptor Convert2CArrBLEDescriptor(std::vector<GattDescriptor>& descriptors);
 NativeGattProperties ConvertGattPropertiesToCJ(int properties);
-NativeBLECharacteristic ConvertBLECharacteristicToCJ(GattCharacteristic &characteristic);
+NativeBLECharacteristic ConvertBLECharacteristicToCJ(GattCharacteristic& characteristic);
 NativeGattService ConvertGattServiceToCJ(GattService service);
-NativeBLEDescriptor ConvertBLEDescriptorToCJ(GattDescriptor &descriptor);
-uint16_t ConvertGattPermissions(const NativeGattPermission &nativePermissions);
-uint16_t ConvertGattProperties(const NativeGattProperties &nativeProperties);
+NativeBLEDescriptor ConvertBLEDescriptorToCJ(GattDescriptor& descriptor);
+uint16_t ConvertGattPermissions(const NativeGattPermission& nativePermissions);
+uint16_t ConvertGattProperties(const NativeGattProperties& nativeProperties);
 int GetProfileConnectionState(int state);
 void FreeNativeBLECharacteristic(NativeBLECharacteristic characteristic);
 void FreeNativeBLEDescriptor(NativeBLEDescriptor descriptor);
