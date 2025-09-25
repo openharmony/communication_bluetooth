@@ -39,7 +39,7 @@ public:
         ::ohos::bluetooth::baseProfile::StateChangeParam const& data)>> callback)
     {}
 
-    ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(string_view deviceId)
+    ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(taihe::string_view deviceId)
     {
         return ohos::bluetooth::constant::ProfileConnectionState(
             ohos::bluetooth::constant::ProfileConnectionState::key_t::STATE_DISCONNECTED);
