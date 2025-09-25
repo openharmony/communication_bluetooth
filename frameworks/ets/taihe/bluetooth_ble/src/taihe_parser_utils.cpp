@@ -152,7 +152,7 @@ taihe_status TaiheParseGattCharacteristic(taihe::array<::ohos::bluetooth::ble::B
         TaiheGattProperties properties = DEFAULT_GATT_PROPERTIES;
         TaiheGattPermission permissions = DEFAULT_GATT_PERMISSIONS;
         TAIHE_BT_CALL_RETURN(ParseUuidParams(std::string(element.serviceUuid), serviceUuid));
-        TAIHE_BT_CALL_RETURN(ParseUuidParams(std::string(element.characteristicUuid), serviceUuid));
+        TAIHE_BT_CALL_RETURN(ParseUuidParams(std::string(element.characteristicUuid), characterUuid));
         if (element.characteristicValue.size() > 0) {
             ParseArrayBufferParams(element.characteristicValue, characterValue);
         }

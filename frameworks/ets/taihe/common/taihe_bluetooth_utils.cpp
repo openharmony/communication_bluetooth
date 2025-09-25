@@ -17,6 +17,7 @@
 #define LOG_TAG "bt_taihe_utils"
 #endif
 
+#include "bluetooth_def.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "taihe_bluetooth_utils.h"
@@ -26,8 +27,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace std;
-
 bool IsValidAddress(std::string bdaddr)
 {
 #if defined(IOS_PLATFORM)
@@ -40,7 +39,7 @@ bool IsValidAddress(std::string bdaddr)
 }
 
 // This function applies to interfaces with a single address as a parameter.
-bool CheckDeivceIdParam(std::string &addr)
+bool CheckDeviceIdParam(std::string &addr)
 {
     TAIHE_BT_RETURN_IF(!IsValidAddress(addr), "Invalid addr", false);
     return true;

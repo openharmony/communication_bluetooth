@@ -56,35 +56,36 @@ public:
 
     void Connect(taihe::string_view deviceId)
     {
-        HILOGD("enter");
+        HILOGI("enter");
         std::string remoteAddr = std::string(deviceId);
-        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
         TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
 
         HidHost *profile = HidHost::GetProfile();
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         int32_t errorCode = profile->Connect(device);
+        HILOGI("errorCode:%{public}s", GetTaiheErrMsg(errorCode).c_str());
         TAIHE_BT_ASSERT_RETURN_VOID(errorCode == BT_NO_ERROR, errorCode);
     }
 
     void Disconnect(taihe::string_view deviceId)
     {
-        HILOGD("enter");
+        HILOGI("Disconnect called");
         std::string remoteAddr = std::string(deviceId);
-        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
         TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
 
         HidHost *profile = HidHost::GetProfile();
         BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
         int32_t errorCode = profile->Disconnect(device);
+        HILOGI("errorCode:%{public}s", GetTaiheErrMsg(errorCode).c_str());
         TAIHE_BT_ASSERT_RETURN_VOID(errorCode == BT_NO_ERROR, errorCode);
     }
 
     ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(taihe::string_view deviceId)
     {
-        HILOGD("enter");
         std::string remoteAddr = std::string(deviceId);
-        bool checkRet = CheckDeivceIdParam(remoteAddr);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
         TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM,
             ohos::bluetooth::constant::ProfileConnectionState::from_value(0));
 
@@ -101,11 +102,12 @@ public:
 
     taihe::array<taihe::string> GetConnectedDevices()
     {
-        HILOGD("enter");
+        HILOGI("enter");
         HidHost *profile = HidHost::GetProfile();
         std::vector<int> states = { static_cast<int>(BTConnectState::CONNECTED) };
         std::vector<BluetoothRemoteDevice> devices;
         int errorCode = profile->GetDevicesByStates(states, devices);
+        HILOGI("errorCode:%{public}s, devices size:%{public}zu", GetTaiheErrMsg(errorCode).c_str(), devices.size());
         TAIHE_BT_ASSERT_RETURN(errorCode == BT_NO_ERROR, errorCode, taihe::array<taihe::string>{});
 
         std::vector<std::string> deviceVector;

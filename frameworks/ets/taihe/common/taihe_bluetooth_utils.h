@@ -21,7 +21,6 @@
 #include "taihe/array.hpp"
 #include <shared_mutex>
 #include <vector>
-#include "taihe/runtime.hpp"
 #include "stdexcept"
 #include "taihe_bluetooth_error.h"
 
@@ -43,6 +42,7 @@ enum taihe_status {
         }                                                                  \
     } while (0)
 #endif
+
 #define TAIHE_BT_RETURN_IF(condition, msg, ret)              \
     do {                                                    \
         if ((condition)) {                                  \
@@ -52,7 +52,7 @@ enum taihe_status {
     } while (0)
 
 bool IsValidAddress(std::string bdaddr);
-bool CheckDeivceIdParam(std::string &addr);
+bool CheckDeviceIdParam(std::string &addr);
 taihe_status ParseUuidParams(const std::string &uuid, UUID &outUuid);
 template<typename T>
 void ParseArrayBufferParams(const taihe::array<T>& data, std::vector<T> &outParam)

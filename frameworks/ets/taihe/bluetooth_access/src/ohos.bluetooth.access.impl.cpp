@@ -33,7 +33,7 @@ namespace OHOS {
 namespace Bluetooth {
 std::shared_ptr<TaiheBluetoothAccessObserver> g_accessCallback = TaiheBluetoothAccessObserver::GetInstance();
 
-void RestrictBluetoothSync()
+void RestrictBluetooth()
 {
     HILOGI("enter");
     int32_t ret = BluetoothHost::GetDefaultHost().RestrictBluetooth();
@@ -44,7 +44,7 @@ void RestrictBluetoothSync()
 {
     HILOGI("enter");
     int32_t state = static_cast<int>(BluetoothHost::GetDefaultHost().GetBluetoothState());
-    return static_cast<ohos::bluetooth::access::BluetoothState::key_t>(state);
+    return ohos::bluetooth::access::BluetoothState::from_value(state);
 }
 
 void EnableBluetooth()
@@ -103,6 +103,7 @@ void EnableBluetoothAsync()
     HILOGI("enter");
     bool isAsync = true;
     int32_t ret = BluetoothHost::GetDefaultHost().EnableBle("", isAsync);
+    HILOGI("EnableBluetoothAsync ret: %{public}d", ret);
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
 }
 
@@ -111,6 +112,7 @@ void DisableBluetoothAsync()
     HILOGI("enter");
     bool isAsync = true;
     int32_t ret = BluetoothHost::GetDefaultHost().DisableBt("", isAsync);
+    HILOGI("DisableBluetoothAsync ret: %{public}d", ret);
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
 }
 
@@ -127,13 +129,14 @@ void DisableBluetoothAsync()
 bool IsValidRandomDeviceId(::taihe::string_view deviceId)
 {
     std::string remoteAddr = std::string(deviceId);
-    bool checkRet = CheckDeivceIdParam(remoteAddr);
+    bool checkRet = CheckDeviceIdParam(remoteAddr);
     TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM, checkRet);
 
     bool isValid = false;
     std::vector<std::string> deviceIdVec = { remoteAddr };
     int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
         static_cast<int32_t>(RandomDeviceIdCommand::IS_VALID), deviceIdVec, isValid);
+    HILOGI("isValidRandomDeviceId ret: %{public}d", ret);
     TAIHE_BT_ASSERT_RETURN(ret == BT_NO_ERROR, ret, isValid);
 
     return isValid;
@@ -145,7 +148,7 @@ bool IsValidRandomDeviceId(::taihe::string_view deviceId)
     std::vector<std::string> deviceIdVec;
     int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
         static_cast<int32_t>(RandomDeviceIdCommand::GET), deviceIdVec, isValid);
-
+    HILOGI("GetPersistentDeviceIds ret: %{public}d", ret);
     ::taihe::array<::taihe::string> result(taihe::copy_data_t{}, deviceIdVec.data(), deviceIdVec.size());
     TAIHE_BT_ASSERT_RETURN(ret == BT_NO_ERROR, ret, result);
 
@@ -155,26 +158,28 @@ bool IsValidRandomDeviceId(::taihe::string_view deviceId)
 void DeletePersistentDeviceId(::taihe::string_view deviceId)
 {
     std::string remoteAddr = std::string(deviceId);
-    bool checkRet = CheckDeivceIdParam(remoteAddr);
+    bool checkRet = CheckDeviceIdParam(remoteAddr);
     TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
 
     bool isValid = false;
     std::vector<std::string> deviceIdVec = { static_cast<std::string>(deviceId) };
     int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
         static_cast<int32_t>(RandomDeviceIdCommand::DELETE), deviceIdVec, isValid);
+    HILOGI("DeletePersistentDeviceId ret: %{public}d", ret);
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
 }
 
 void AddPersistentDeviceId(::taihe::string_view deviceId)
 {
     std::string remoteAddr = std::string(deviceId);
-    bool checkRet = CheckDeivceIdParam(remoteAddr);
+    bool checkRet = CheckDeviceIdParam(remoteAddr);
     TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
 
     bool isValid = false;
     std::vector<std::string> deviceIdVec = { static_cast<std::string>(deviceId) };
     int32_t ret = BluetoothHost::GetDefaultHost().ProcessRandomDeviceIdCommand(
         static_cast<int32_t>(RandomDeviceIdCommand::ADD), deviceIdVec, isValid);
+    HILOGI("AddPersistentDeviceId ret: %{public}d", ret);
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
 }
 
@@ -184,6 +189,7 @@ void NotifyDialogResult(::ohos::bluetooth::access::NotifyDialogResultParams noti
     uint32_t dialogType = notifyDialogResultParams.dialogType.get_value();
     bool dialogResult = notifyDialogResultParams.dialogResult;
     int32_t ret = BluetoothHost::GetDefaultHost().NotifyDialogResult(dialogType, dialogResult);
+    HILOGI("NotifyDialogResult err: %{public}d", ret);
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
 }
 }  // Bluetooth
@@ -193,7 +199,7 @@ void NotifyDialogResult(::ohos::bluetooth::access::NotifyDialogResultParams noti
 // NOLINTBEGIN
 TH_EXPORT_CPP_API_OnStateChange(OHOS::Bluetooth::OnStateChange);
 TH_EXPORT_CPP_API_OffStateChange(OHOS::Bluetooth::OffStateChange);
-TH_EXPORT_CPP_API_RestrictBluetoothSync(OHOS::Bluetooth::RestrictBluetoothSync);
+TH_EXPORT_CPP_API_RestrictBluetooth(OHOS::Bluetooth::RestrictBluetooth);
 TH_EXPORT_CPP_API_GetState(OHOS::Bluetooth::GetState);
 TH_EXPORT_CPP_API_EnableBluetooth(OHOS::Bluetooth::EnableBluetooth);
 TH_EXPORT_CPP_API_DisableBluetooth(OHOS::Bluetooth::DisableBluetooth);
