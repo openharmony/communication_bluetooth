@@ -44,13 +44,17 @@ static void ConvertUuidsVectorToTaiheArray(std::vector<std::string> const& uuids
     }
 
     std::vector<ohos::bluetooth::constant::ProfileUuids> profileUuidsVec;
-    for (auto uuid : uuids) {
+    for (auto& uuid : uuids) {
         ohos::bluetooth::constant::ProfileUuids uuidEnum =
             ohos::bluetooth::constant::ProfileUuids::from_value(uuid);
         if (uuidEnum == ohos::bluetooth::constant::ProfileUuids::key_t(-1)) {
             continue;
         }
         profileUuidsVec.push_back(uuidEnum);
+    }
+
+    if (profileUuidsVec.empty()) {
+        return;
     }
 
     result = taihe::array<ohos::bluetooth::constant::ProfileUuids>(
@@ -643,8 +647,9 @@ void PairDeviceSync(taihe::string_view deviceId)
     TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
 
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
-    int32_t ret = remoteDevice.StartPair();
-    TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
+    int32_t err = remoteDevice.StartPair();
+    HILOGI("err: %{public}d", err);
+    TAIHE_BT_ASSERT_RETURN_VOID(err == BT_NO_ERROR, err);
 }
 
 void DisconnectAllowedProfilesSync(taihe::string_view deviceId)
@@ -718,10 +723,11 @@ void PairCredibleDeviceSync(taihe::string_view deviceId, ohos::bluetooth::connec
 {
     HILOGD("enter");
     std::string remoteAddr = std::string(deviceId);
-    bool checkRet = CheckDeviceIdParam(remoteAddr);
+    int transportType = transport.get_value();
+    bool checkRet = CheckPairCredibleDeviceParam(remoteAddr, transportType);
     TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
 
-    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transport.get_value());
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr, transportType);
     int32_t err = remoteDevice.StartCrediblePair();
     HILOGI("err: %{public}d", err);
     TAIHE_BT_ASSERT_RETURN_VOID(err == BT_NO_ERROR, err);

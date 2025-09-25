@@ -44,6 +44,11 @@ bool IsValidConnectStrategy(int strategy)
         || strategy == static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN);
 }
 
+bool IsValidTransport(int transport)
+{
+    return transport == BT_TRANSPORT_BREDR || transport == BT_TRANSPORT_BLE;
+}
+
 // This function applies to interfaces with a single address as a parameter.
 bool CheckDeviceIdParam(std::string &addr)
 {
@@ -51,9 +56,17 @@ bool CheckDeviceIdParam(std::string &addr)
     return true;
 }
 
-bool CheckConnectStrategyParam(int32_t strategy)
+bool CheckSetConnectStrategyParam(std::string &addr, int32_t &strategy)
 {
+    TAIHE_BT_RETURN_IF(!IsValidAddress(addr), "Invalid addr", false);
     TAIHE_BT_RETURN_IF(!IsValidConnectStrategy(strategy), "Invalid strategy", false);
+    return true;
+}
+
+bool CheckPairCredibleDeviceParam(std::string &addr, int &transport)
+{
+    TAIHE_BT_RETURN_IF(!IsValidAddress(addr), "Invalid addr", false);
+    TAIHE_BT_RETURN_IF(!IsValidTransport(transport), "Invalid transport", false);
     return true;
 }
 

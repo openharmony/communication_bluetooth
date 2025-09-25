@@ -134,7 +134,7 @@ public:
         BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
         HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
         int32_t err = profile->GetConnectStrategy(remoteDevice, strategy);
-        HILOGI("err: %{public}d, deviceName: %{public}d", err, strategy);
+        HILOGI("err: %{public}d, strategy: %{public}d", err, strategy);
         TAIHE_BT_ASSERT_RETURN(err == BT_NO_ERROR, err,
             ohos::bluetooth::baseProfile::ConnectionStrategy::from_value(strategy));
 
@@ -146,11 +146,8 @@ public:
     {
         HILOGD("start");
         std::string remoteAddr = std::string(deviceId);
-        bool checkRet = CheckDeviceIdParam(remoteAddr);
-        TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
-
         int32_t connStrategy = strategy.get_value();
-        checkRet = CheckConnectStrategyParam(connStrategy);
+        bool checkRet = CheckSetConnectStrategyParam(remoteAddr, connStrategy);
         TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
 
         BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);

@@ -18,12 +18,8 @@
 #include "taihe/runtime.hpp"
 #include "stdexcept"
 
-using namespace taihe;
-using namespace ohos::bluetooth::baseProfile;
-
-namespace {
-// To be implemented.
-
+namespace OHOS {
+namespace Bluetooth {
 class BaseProfileImpl {
 public:
     BaseProfileImpl()
@@ -45,19 +41,22 @@ public:
             ohos::bluetooth::constant::ProfileConnectionState::key_t::STATE_DISCONNECTED);
     }
 
-    array<string> GetConnectedDevices()
+    taihe::array<taihe::string> GetConnectedDevices()
     {
         return {};
     }
 
-    ConnectionStrategy GetConnectionStrategySync(taihe::string_view deviceId)
+    ohos::bluetooth::baseProfile::ConnectionStrategy GetConnectionStrategySync(taihe::string_view deviceId)
     {
-        return ConnectionStrategy(ConnectionStrategy::key_t::CONNECTION_STRATEGY_UNSUPPORTED);
+        return ohos::bluetooth::baseProfile::ConnectionStrategy(
+            ohos::bluetooth::baseProfile::ConnectionStrategy::key_t::CONNECTION_STRATEGY_UNSUPPORTED);
     }
 
-    void SetConnectionStrategySync(taihe::string_view deviceId, ConnectionStrategy strategy) {}
+    void SetConnectionStrategySync(taihe::string_view deviceId,
+                                   ohos::bluetooth::baseProfile::ConnectionStrategy strategy) {}
 };
-}  // namespace
+}  // namespace Bluetooth
+}  // namespace OHOS
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
