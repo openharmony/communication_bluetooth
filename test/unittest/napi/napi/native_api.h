@@ -16,6 +16,22 @@
 #ifndef NAPI_NATIVE_API_H
 #define NAPI_NATIVE_API_H
 
+#include "securec.h"
+#define NAPI_AUTO_LENGTH 0xFFFFFFFF
+typedef enum {
+    napi_int8_array,
+    napi_uint8_array,
+    napi_uint8_clamped_array,
+    napi_int16_array,
+    napi_uint16_array,
+    napi_int32_array,
+    napi_uint32_array,
+    napi_float32_array,
+    napi_float64_array,
+    napi_bigint64_array,
+    napi_biguint64_array,
+} napi_typedarray_type;
+
 struct napi_env {};
 using napi_value = void *;
 enum napi_status {
@@ -50,6 +66,13 @@ napi_status napi_open_handle_scope(napi_env env, napi_handle_scope* result);
 napi_status napi_get_cb_info(napi_env env, napi_callback_info cbinfo, size_t* argc, napi_value* argv,
     napi_value* this_arg, void** data);
 napi_status napi_close_handle_scope(napi_env env, napi_handle_scope scope);
+
+napi_status napi_create_uint32(napi_env env, uint32_t value, napi_value* result);
+napi_status napi_create_string_utf8(napi_env env, const char* str, size_t length, napi_value* result);
+napi_status napi_create_arraybuffer(napi_env env, size_t byte_length, void** data, napi_value* result);
+napi_status napi_create_typedarray(napi_env env, napi_typedarray_type type, size_t length,
+    napi_value arraybuffer, size_t byte_offset, napi_value* result);
+
 
 using napi_threadsafe_function = void *;
 #endif // NAPI_NATIVE_API_H

@@ -792,6 +792,22 @@ public:
     int8_t GetRSSI() const;
 
     /**
+    * @brief Get device txPower.
+    *
+    * @return Returns device txPower.
+    * @since 22
+    */
+    int8_t GetTXPower() const;
+
+    /**
+     * @brief Get advertising data.
+     *
+     * @return Returns advertising data.
+     * @since 22
+     */
+    std::map<uint8_t, std::string> GetAdvertisingData() const;
+
+    /**
      * @brief Get service Data.
      *
      * @return Returns service data.
@@ -890,6 +906,24 @@ public:
      * @since 6
      */
     bool IsRSSI() const;
+
+    /**
+    * @brief Check if the device txPower level is included.
+    *
+    * @return Returns <b>true</b> if include device txPower level;
+    *         Returns <b>false</b> otherwise.
+    * @since 22
+    */
+    bool IsTXPower() const;
+
+    /**
+    * @brief Check if advertising data is included.
+    *
+    * @return Returns <b>true</b> if advertising data is included;
+    *         Returns <b>false</b> otherwise.
+    * @since 22
+    */
+    bool IsAdvertisingData() const;
 
     /**
      * @brief Check if include service data.
@@ -1164,6 +1198,15 @@ public:
      */
     void SetManufacturerData(std::string manufacturerData);
 
+    /**
+     * @brief Add advertising data.
+     *
+     * @param advType Type of advertising data.
+     * @param advData Advertising data.
+     * @since 22
+     */
+    void AddAdvertisingData(uint8_t advType, const std::string &advData);
+
 /**
  * @brief Sets adv event type.
  *
@@ -1237,6 +1280,8 @@ private:
     bool isName_ = false;
     /// include rssi value?
     bool isRSSI_ = false;
+    /// include advertising data value?
+    bool isAdvertisingData_ = false;
     /// include service data?
     bool isServiceData_ = false;
     /// include service uuid?
@@ -1281,6 +1326,7 @@ private:
     // include eventType value
     bool isEventType_ = false;
     uint16_t eventType_ = BLE_LEGACY_ADV_NONCONN_IND_WITH_EX_ADV;
+    std::map<uint8_t, std::string> advertisingData_ {};
 };
 
 /**
@@ -1345,6 +1391,17 @@ public:
     }
 
     /**
+     * @brief Get advertising data.
+     *
+     * @return Returns advertising data.
+     * @since 22
+     */
+    std::map<uint8_t, std::string> GetAdvertisingData() const
+    {
+        return advertisingData_;
+    }
+
+    /**
      * @brief Get service data.
      *
      * @return Returns service data.
@@ -1364,6 +1421,17 @@ public:
     int8_t GetRssi() const
     {
         return rssi_;
+    }
+
+    /**
+     * @brief Get peer device txPower level.
+     *
+     * @return Returns peer device txPower level.
+     * @since 22
+     */
+    int8_t GetTxPowerLevel() const
+    {
+        return txPowerLevel_;
     }
 
     /**
@@ -1424,6 +1492,18 @@ public:
     }
 
     /**
+     * @brief Add advertising data.
+     *
+     * @param advType Type of advertising data.
+     * @param advData Advertising data.
+     * @since 22
+     */
+    void AddAdvertisingData(uint8_t advType, const std::string &advData)
+    {
+        advertisingData_.insert(std::make_pair(advType, advData));
+    }
+
+    /**
      * @brief Set peripheral device.
      *
      * @param device Remote device.
@@ -1443,6 +1523,17 @@ public:
     void SetRssi(int8_t rssi)
     {
         rssi_ = rssi;
+    }
+
+    /**
+     * @brief Set peer device txPower level.
+     *
+     * @param txPowerLevel Peer device txPower level.
+     * @since 22
+     */
+    void SetTxPowerLevel(int8_t txPowerLevel)
+    {
+        txPowerLevel_ = txPowerLevel;
     }
 
     /**
@@ -1477,6 +1568,8 @@ private:
     int8_t rssi_ {};
     bool connectable_ {};
     uint8_t advertiseFlag_ {};
+    int8_t txPowerLevel_ {};
+    std::map<uint8_t, std::string> advertisingData_ {};
 };
 
 struct BleActiveDeviceInfoImpl {

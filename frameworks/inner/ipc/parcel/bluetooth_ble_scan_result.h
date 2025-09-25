@@ -40,12 +40,14 @@ public:
     bool ReadFromParcel(Parcel &parcel);
 
 private:
-    bool WirteServiceUuidsToParcel(Parcel &parcel) const;
+    bool WriteServiceUuidsToParcel(Parcel &parcel) const;
     bool ReadServiceUuidsFromParcel(Parcel &parcel);
-    bool WirteManufacturerDataToParcel(Parcel &parcel) const;
+    bool WriteManufacturerDataToParcel(Parcel &parcel) const;
     bool ReadManufacturerDataFromParcel(Parcel &parcel);
-    bool WirteServiceDataToParcel(Parcel &parcel) const;
+    bool WriteServiceDataToParcel(Parcel &parcel) const;
     bool ReadServiceDataFromParcel(Parcel &parcel);
+    bool WriteAdvertisingDataToParcel(Parcel &parcel) const;
+    bool ReadAdvertisingDataFromParcel(Parcel &parcel);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

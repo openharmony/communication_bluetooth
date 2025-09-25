@@ -913,6 +913,28 @@ int8_t BlePeripheralDevice::GetRSSI() const
 }
 
 /**
+ * @brief Get device txPower.
+ *
+ * @return Returns device txPower.
+ * @since 22
+ */
+int8_t BlePeripheralDevice::GetTXPower() const
+{
+    return txPower_;
+}
+
+/**
+ * @brief Get the advertising data.
+ *
+ * @return Returns the advertising data.
+ * @since 22
+ */
+std::map<uint8_t, std::string> BlePeripheralDevice::GetAdvertisingData() const
+{
+    return advertisingData_;
+}
+
+/**
  * @brief Get service data.
  *
  * @return Returns service data.
@@ -1028,6 +1050,30 @@ bool BlePeripheralDevice::IsManufacturerData() const
 bool BlePeripheralDevice::IsRSSI() const
 {
     return isRSSI_;
+}
+
+/**
+ * @brief Check if the device txPower level is included.
+ *
+ * @return Returns <b>true</b> if include device txPower level;
+ *         Returns <b>false</b> otherwise.
+ * @since 22
+ */
+bool BlePeripheralDevice::IsTXPower() const
+{
+    return isTXPower_;
+}
+
+/**
+ * @brief Check if advertising data is included.
+ *
+ * @return Returns <b>true</b> if advertising data is included;
+ *         Returns <b>false</b> otherwise.
+ * @since 22
+ */
+bool BlePeripheralDevice::IsAdvertisingData() const
+{
+    return isAdvertisingData_;
 }
 
 /**
@@ -1174,10 +1220,12 @@ void BlePeripheralDevice::ParseAdvertiserment(BlePeripheralDeviceParseAdvData &p
 
 void BlePeripheralDevice::BuildAdvertiserData(uint8_t advType, BlePeripheralDeviceParseAdvData &parseAdvData)
 {
+    std::string advData = std::string(reinterpret_cast<char *>(parseAdvData.payload), parseAdvData.length);
+    AddAdvertisingData(advType, advData);
     switch (advType) {
         case BLE_AD_TYPE_NAME_CMPL:   /// Data Type: 0x09
         case BLE_AD_TYPE_NAME_SHORT:  /// Data Type: 0x08
-            SetName(std::string(reinterpret_cast<char *>(parseAdvData.payload), parseAdvData.length));
+            SetName(advData);
             break;
         case BLE_AD_TYPE_TX_PWR:  /// Data Type: 0x0A
             SetTXPower(*parseAdvData.payload);
@@ -1201,7 +1249,7 @@ void BlePeripheralDevice::BuildAdvertiserData(uint8_t advType, BlePeripheralDevi
             SetServiceUUID128Bits(parseAdvData);
             break;
         case BLE_AD_MANUFACTURER_SPECIFIC_TYPE:
-            SetManufacturerData(std::string(reinterpret_cast<char *>(parseAdvData.payload), parseAdvData.length));
+            SetManufacturerData(advData);
             break;
         case BLE_AD_TYPE_SERVICE_DATA:  /// Data Type: 0x16
             SetServiceDataUUID16Bits(parseAdvData);
@@ -1538,6 +1586,19 @@ void BlePeripheralDevice::SetManufacturerData(std::string manufacturerData)
         manufacturerData_.clear();
         isManufacturerData_ = false;
     }
+}
+
+/**
+* @brief Add advertising data.
+*
+* @param advType Type of advertising data.
+* @param advData Advertising data.
+* @since 22
+*/
+void BlePeripheralDevice::AddAdvertisingData(uint8_t advType, const std::string &advData)
+{
+    isAdvertisingData_ = true;
+    advertisingData_.insert(std::make_pair(advType, advData));
 }
 
 /**

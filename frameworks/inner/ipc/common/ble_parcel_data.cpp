@@ -58,6 +58,17 @@ ScanResult::ScanResult(const BleScanResultImpl &other)
         this->SetEventType(device.GetEventType());
     }
 
+    if (device.IsTXPower()) {
+        this->SetTxPowerLevel(device.GetTXPower());
+    }
+
+    if (device.IsAdvertisingData()) {
+        auto advDataMap = device.GetAdvertisingData();
+        for (auto it = advDataMap.begin(); it != advDataMap.end(); it++) {
+            this->AddAdvertisingData(it->first, it->second);
+        }
+    }
+
     this->SetPeripheralDevice(device.GetRawAddress());
     this->SetPayload(std::string(device.GetPayload(), device.GetPayload() + device.GetPayloadLen()));
 }

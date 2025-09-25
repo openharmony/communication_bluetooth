@@ -35,6 +35,7 @@
 #include "uv.h"
 
 #include "bluetooth_socket.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -98,6 +99,11 @@ struct ConnStateChangeParam {
     int cause = -1;
 };
 
+struct NapiMap {
+    napi_value instance;
+    napi_value set_function;
+};
+
 const char * const REGISTER_STATE_CHANGE_TYPE = "stateChange";
 
 const char * const INVALID_DEVICE_ID = "00:00:00:00:00:00";
@@ -112,6 +118,9 @@ napi_status ConvertStringVectorToJS(napi_env env, napi_value result, const std::
 void ConvertStateChangeParamToJS(napi_env env, napi_value result, const ConnStateChangeParam &stateChangeParam);
 void ConvertScoStateChangeParamToJS(napi_env env, napi_value result, const std::string &device, int state);
 void ConvertUuidsVectorToJS(napi_env env, napi_value result, const std::vector<std::string> &uuids);
+napi_status ConvertServiceUuidsToJS(const napi_env env, napi_value &uuidsNapi,
+    const std::vector<UUID> &uuids);
+
 napi_status ConvertOppTransferInformationToJS(napi_env env,
     napi_value result, const BluetoothOppTransferInformation& transferInformation);
 
@@ -538,6 +547,42 @@ napi_status NapiGetOnOffCallbackName(napi_env env, napi_callback_info info, std:
 
 int GetCurrentSdkVersion(void);
 int GetSDKAdaptedStatusCode(int status);
+
+NapiMap CreateNapiMap(napi_env env);
+template <typename KeyType>
+napi_status ConvertDataMapToJS(const napi_env env, NapiMap &dataMapNapi,
+    const std::map<KeyType, std::string> &dataMap)
+{
+    for (const auto &[key, value] : dataMap) {
+        napi_value napiKey;
+        
+        napi_value napiBuffer;
+        napi_value napiValue;
+        size_t valueSize = value.size();
+        const uint8_t* valueData = reinterpret_cast<const uint8_t*>(value.data());
+        uint8_t* bufferData = nullptr;
+
+        if constexpr (std::is_same_v<KeyType, uint16_t> || std::is_same_v<KeyType, uint8_t>) {
+            NAPI_BT_CALL_RETURN(napi_create_uint32(env, static_cast<uint32_t>(key), &napiKey));
+        } else if constexpr (std::is_same_v<KeyType, UUID>) {
+            NAPI_BT_CALL_RETURN(napi_create_string_utf8(env, key.ToString().c_str(), NAPI_AUTO_LENGTH, &napiKey));
+        } else {
+            HILOGE("Unsupported key type.");
+            return napi_invalid_arg;
+        }
+
+        NAPI_BT_CALL_RETURN(napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &napiBuffer));
+        if (memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
+            HILOGE("memcpy_s error");
+            return napi_invalid_arg;
+        }
+        napi_create_typedarray(env, napi_uint8_array, valueSize, napiBuffer, 0, &napiValue);
+        napi_value args[ARGS_SIZE_TWO] = {napiKey, napiValue};
+        NAPI_BT_CALL_RETURN(napi_call_function(
+            env, dataMapNapi.instance, dataMapNapi.set_function, ARGS_SIZE_TWO, args, nullptr));
+    }
+    return napi_ok;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_BLUETOOTH_UTILS_H
