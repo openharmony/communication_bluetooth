@@ -78,6 +78,14 @@ public:
     std::map<uint16_t, std::string> GetManufacturerData() const;
 
     /**
+     * @brief Get advertising data.
+     *
+     * @return Returns advertising data.
+     * @since 22
+     */
+    std::map<uint8_t, std::string> GetAdvertisingData() const;
+
+    /**
      * @brief Get service data.
      *
      * @return Returns service data.
@@ -100,6 +108,14 @@ public:
      * @since 6
      */
     int8_t GetRssi() const;
+
+    /**
+     * @brief Get peer device txPower level.
+     *
+     * @return Returns peer device txPower level.
+     * @since 22
+     */
+    int8_t GetTxPowerLevel() const;
 
     /**
      * @brief Check if device is connctable.
@@ -153,6 +169,15 @@ public:
     void AddServiceUuid(const UUID &serviceUuid);
 
     /**
+     * @brief Add advertising data.
+     *
+     * @param advType Type of advertising data.
+     * @param advData Advertising data.
+     * @since 22
+     */
+    void AddAdvertisingData(uint8_t advType, const std::string &advData);
+
+    /**
      * @brief Add data to payload.
      *
      * @param payload Added payload.
@@ -175,6 +200,14 @@ public:
      * @since 6
      */
     void SetRssi(int8_t rssi);
+
+    /**
+     * @brief Set peer device txPower level.
+     *
+     * @param txPowerLevel Peer device txPower level.
+     * @since 22
+     */
+    void SetTxPowerLevel(int8_t txPowerLevel);
 
     /**
      * @brief Set connectable.
@@ -209,6 +242,8 @@ private:
     std::vector<uint8_t> payload_ {};
     std::string name_ {};
     uint16_t eventType_ {};
+    int8_t txPowerLevel_ {};
+    std::map<uint8_t, std::string> advertisingData_ {};
 };
 /**
  * @brief Represents central manager callback.
