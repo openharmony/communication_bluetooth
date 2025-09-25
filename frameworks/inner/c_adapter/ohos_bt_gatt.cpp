@@ -238,17 +238,6 @@ public:
                 HILOGD("TimerId no registered, is 0.");
             }
         }
-        lock_guard<mutex> lock(g_advMutex);
-        g_bleAdvCallbacks[advId_] = nullptr;
-        int i = 0;
-        for (; i < MAX_BLE_ADV_NUM; i++) {
-            if (g_bleAdvCallbacks[i] != nullptr) {
-                break;
-            }
-        }
-        if (i == MAX_BLE_ADV_NUM) {
-            g_BleAdvertiser = nullptr;
-        }
     }
 
     void OnSetAdvDataEvent(int result) override
@@ -1432,7 +1421,7 @@ static void ClearAdvertisingResource(int advId)
         HILOGE("fail, invalid advId: %{public}d", advId);
         return;
     }
-    lock_guard<ffrt::mutex> lock(g_advMutex);
+    lock_guard<mutex> lock(g_advMutex);
     HILOGI("clear advId: %{public}d", advId);
     g_bleAdvCallbacks[advId] = nullptr;
     int i = 0;
