@@ -32,6 +32,8 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
+std::vector<std::string> NapiGattServer::deviceList_;
+std::mutex NapiGattServer::deviceListMutex_;
 thread_local napi_ref NapiGattServer::consRef_ = nullptr;
 
 napi_value NapiGattServer::CreateGattServer(napi_env env, napi_callback_info info)
