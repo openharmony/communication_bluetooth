@@ -106,7 +106,7 @@ bool ParseScanParameters(napi_env env, napi_value arg, ScanOptions &info)
         if (value) {
             RegisterBLEObserver(env, value, i, REGISTER_SYS_BLE_SCAN_TYPE);
         } else {
-            UnregisterSysBLEObserver(REGISTER_SYS_BLE_SCAN_TYPE);
+            UnregisterSysBLEObserver(env, REGISTER_SYS_BLE_SCAN_TYPE);
             return false;
         }
     }
@@ -149,7 +149,7 @@ void SysStopBLEScanExec(napi_env env, void *data)
 {
     HILOGI("SysStopBLEScanExec");
     BleCentralManagerGetInstance()->StopScan();
-    UnregisterSysBLEObserver(REGISTER_SYS_BLE_SCAN_TYPE);
+    UnregisterSysBLEObserver(env, REGISTER_SYS_BLE_SCAN_TYPE);
 }
 
 void SysStopBLEScanComplete(napi_env env, napi_status status, void *data)
@@ -228,7 +228,7 @@ bool ParseDeviceFoundParameters(napi_env env, napi_value arg)
         if (value) {
             RegisterBLEObserver(env, value, i, REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
         } else {
-            UnregisterSysBLEObserver(REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
+            UnregisterSysBLEObserver(env, REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
             return false;
         }
     }
@@ -257,7 +257,7 @@ napi_value SysSubscribeBLEFound(napi_env env, napi_callback_info info)
 
 napi_value SysUnsubscribeBLEFound(napi_env env, napi_callback_info info)
 {
-    UnregisterSysBLEObserver(REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
+    UnregisterSysBLEObserver(env, REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
     return NapiGetNull(env);
 }
 } // namespace

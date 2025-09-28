@@ -174,7 +174,7 @@ std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> GetObserver();
 const sysBLEMap &GetSysBLEObserver();
 
 void RegisterSysBLEObserver(const std::shared_ptr<BluetoothCallbackInfo> &, int32_t, const std::string &);
-void UnregisterSysBLEObserver(const std::string &);
+void UnregisterSysBLEObserver(napi_env env, const std::string &);
 std::shared_ptr<BluetoothCallbackInfo> GetCallbackInfoByType(const std::string &type);
 
 struct ScanFilter {
