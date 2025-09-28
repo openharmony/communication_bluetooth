@@ -445,12 +445,20 @@ void RegisterSysBLEObserver(
     g_sysBLEObserver[type][callbackIndex] = info;
 }
 
-void UnregisterSysBLEObserver(const std::string &type)
+void UnregisterSysBLEObserver(napi_env env, const std::string &type)
 {
     std::lock_guard<std::mutex> lock(g_sysBLEObserverMutex);
-    auto itor = g_sysBLEObserver.find(type);
-    if (itor != g_sysBLEObserver.end()) {
-        g_sysBLEObserver.erase(itor);
+    auto iter = g_sysBLEObserver.find(type);
+    if (iter != g_sysBLEObserver.end()) {
+        std::array<std::shared_ptr<BluetoothCallbackInfo>, ARGS_SIZE_THREE> &callbackArray = iter->second;
+        for (auto &callback: callbackArray) {
+            if (callback != nullptr && env == callback->env_) {
+                napi_delete_reference(env, callback->callback_);
+                callback->callback_ = nullptr;
+                HILOGI("delete ref success");
+            }
+        }
+        g_sysBLEObserver.erase(iter);
     }
 }
 
