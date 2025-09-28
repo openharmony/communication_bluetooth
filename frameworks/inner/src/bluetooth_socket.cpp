@@ -53,6 +53,9 @@ const int SOCKET_RECV_TXRX_SIZE = 2;
 const int SOCKET_RECV_CHANNEL_SIZE = 4;
 const int SOCKET_RECV_FD_SIZE = 14;
 const int SOCKET_RECV_FD_SIGNAL = 11; // state(1)+addr(6)+tx(2)+rx(2)
+const int INVALID_FD = -1;
+const int BUFFER_SIZE_ONE = 1;
+const int RECEIVED_DATA_SIZE_ZERO = 0;
 
 constexpr char BLUETOOTH_UE_DOMAIN[] = "BLUETOOTH_UE";
 std::mutex g_socketProxyMutex;
@@ -207,7 +210,21 @@ struct ClientSocket::impl {
     bool IsConnected()
     {
         HILOGD("enter");
-        return socketStatus_ == SOCKET_CONNECTED;
+        if (fd_ == INVALID_FD) {
+            return false;
+        }
+        char buffer[BUFFER_SIZE_ONE];
+        ssize_t result = recv(fd_, buffer, sizeof(buffer), MSG_PEEK | MSG_DONTWAIT);
+        if (result == RECEIVED_DATA_SIZE_ZERO) {
+            return false; // 对端关闭连接
+        }
+        if (result > RECEIVED_DATA_SIZE_ZERO) {
+            return true; // 有数据可读，连接正常
+        }
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            return true; // 无数据可读，但连接正常
+        }
+        return false;
     }
 
     int SetBufferSize(int bufferSize)
@@ -532,16 +549,24 @@ int ClientSocket::GetRfcommScn()
     return pimpl->socketChannel_;
 }
 
+void ClientSocket::SetMaxTransmitPacketSize(uint32_t size)
+{
+    pimpl->maxTxPacketSize_.store(size);
+}
+
+void ClientSocket::SetMaxReceivePacketSize(uint32_t size)
+{
+    pimpl->maxRxPacketSize_.store(size);
+}
+
 uint32_t ClientSocket::GetMaxTransmitPacketSize()
 {
-    HILOGI("MaxTransmitPacketSize:%{public}d", pimpl->maxTxPacketSize_.load());
-    return pimpl->maxTxPacketSize_;
+    return pimpl->maxTxPacketSize_.load();
 }
 
 uint32_t ClientSocket::GetMaxReceivePacketSize()
 {
-    HILOGI("MaxReceivePacketSize:%{public}d", pimpl->maxRxPacketSize_.load());
-    return pimpl->maxRxPacketSize_;
+    return pimpl->maxRxPacketSize_.load();
 }
 
 bool ClientSocket::IsAllowSocketConnect(int socketType)
@@ -663,7 +688,8 @@ struct ServerSocket::impl {
         }
 
         std::shared_ptr<ClientSocket> clientSocket = std::make_shared<ClientSocket>(acceptFd_, acceptAddress_, type_);
-
+        clientSocket->SetMaxTransmitPacketSize(maxTxPacketSize_.load());
+        clientSocket->SetMaxReceivePacketSize(maxRxPacketSize_.load());
         HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BLUETOOTH, "SPP_CONNECT_STATE",
             HiviewDFX::HiSysEvent::EventType::STATISTIC, "ACTION", "connect", "ID", acceptFd_, "ADDRESS",
             GetEncryptAddr(acceptAddress_), "PID", IPCSkeleton::GetCallingPid(), "UID", IPCSkeleton::GetCallingUid());
