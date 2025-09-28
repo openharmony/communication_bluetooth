@@ -239,6 +239,17 @@ public:
      */
     std::optional<std::reference_wrapper<GattService>> GetService(const UUID &uuid, bool isPrimary);
     /**
+     * @brief The function to get service by UUID.
+     *
+     * @param uuid UUID of service.
+     * @param isPrimary Type of service.
+     * @param outService The service has been obtained.
+     * @return int    api accept status.
+     * @since 22
+     *
+     */
+    int GetService(const UUID &uuid, bool isPrimary, GattService &outService);
+    /**
      * @brief The function to get all services.
      *
      * @return list of services.
@@ -246,6 +257,15 @@ public:
      *
      */
     std::list<GattService> &GetServices();
+    /**
+     * @brief The function to get all services.
+     *
+     * @param outServices The list of services has been obtained.
+     * @return int    api accept status.
+     * @since 22
+     *
+     */
+    int GetServices(std::list<GattService> &outServices);
     /**
      * @brief The function to notify characteristic change.
      *
@@ -323,7 +343,7 @@ private:
     };
 public:
     explicit GattServer(PassKey, std::shared_ptr<GattServerCallback> callback) : GattServer(callback) {};
-    
+
 };
 } // namespace Bluetooth
 } // namespace OHOS
