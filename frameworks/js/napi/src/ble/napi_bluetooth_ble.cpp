@@ -1245,6 +1245,7 @@ napi_value PropertyInit(napi_env env, napi_value exports)
     napi_value scanReportTypeObj = ScanReportTypeInit(env);
     napi_value gattDisconnectReasonObj = GattDisconnectReasonInit(env);
     napi_value bleProfileObj = BleProfileInit(env);
+    napi_value connectionParamObj = ConnectionParamInit(env);
 #endif
 
     napi_property_descriptor exportFuncs[] = {
@@ -1259,6 +1260,7 @@ napi_value PropertyInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("ScanReportType", scanReportTypeObj),
         DECLARE_NAPI_PROPERTY("GattDisconnectReason", gattDisconnectReasonObj),
         DECLARE_NAPI_PROPERTY("BleProfile", bleProfileObj),
+        DECLARE_NAPI_PROPERTY("ConnectionParam", connectionParamObj),
 #endif
     };
 

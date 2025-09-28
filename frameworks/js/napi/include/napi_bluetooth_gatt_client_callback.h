@@ -40,7 +40,7 @@ public:
     void OnDescriptorWriteResult(const GattDescriptor &descriptor, int ret) override;
     void OnMtuUpdate(int mtu, int ret) override;
     void OnServicesDiscovered(int status) override;
-    void OnConnectionParameterChanged(int interval, int latency, int timeout, int status) override {}
+    void OnConnectionParameterChanged(int interval, int latency, int timeout, int status) override;
     void OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status) override;
     void OnReadRemoteRssiValueResult(int rssi, int status)  override;
 
