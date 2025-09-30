@@ -234,3 +234,39 @@ function IsBluetoothDiscovering(): bool;
 function StopBluetoothDiscovery(): void;
 
 function SetDevicePairingConfirmation(deviceId: String, accept: bool): void;
+
+@gen_async("connectAllowedProfiles")
+@gen_promise("connectAllowedProfiles")
+function ConnectAllowedProfilesSync(deviceId: String): void;
+
+@gen_async("getRemoteProfileUuids")
+@gen_promise("getRemoteProfileUuids")
+function GetRemoteProfileUuidsSync(deviceId: String): Array<ProfileUuids>;
+
+@gen_async("pairDevice")
+@gen_promise("pairDevice")
+function PairDeviceSync(deviceId: String): void;
+
+@gen_async("disconnectAllowedProfiles")
+@gen_promise("disconnectAllowedProfiles")
+function DisconnectAllowedProfilesSync(deviceId: String): void;
+
+@gen_async("getLocalProfileUuids")
+@gen_promise("getLocalProfileUuids")
+function GetLocalProfileUuidsSync(): Array<ProfileUuids>;
+
+@gen_async("setDevicePinCode")
+@gen_promise("setDevicePinCode")
+function SetDevicePinCodeSync(deviceId: String, code: String): void;
+
+@gen_async("cancelPairingDevice")
+@gen_promise("cancelPairingDevice")
+function CancelPairingDeviceSync(deviceId: String): void;
+
+@gen_async("cancelPairedDevice")
+@gen_promise("cancelPairedDevice")
+function CancelPairedDeviceSync(deviceId: String): void;
+
+@gen_async("pairCredibleDevice")
+@gen_promise("pairCredibleDevice")
+function PairCredibleDeviceSync(deviceId: String, transport: BluetoothTransport): void;

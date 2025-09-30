@@ -35,6 +35,22 @@ interface A2dpSourceProfile : BaseProfile {
     @promise DisableAutoPlay(deviceId: String, duration: i32): void;
 
     @promise EnableAutoPlay(deviceId: String): void;
+
+    @gen_async("disableAbsoluteVolume")
+    @gen_promise("disableAbsoluteVolume")
+    DisableAbsoluteVolumeSync(deviceId: String): void;
+
+    @gen_async("enableAbsoluteVolume")
+    @gen_promise("enableAbsoluteVolume")
+    EnableAbsoluteVolumeSync(deviceId: String): void;
+
+    @gen_async("isAbsoluteVolumeEnabled")
+    @gen_promise("isAbsoluteVolumeEnabled")
+    IsAbsoluteVolumeEnabledSync(deviceId: String): bool;
+
+    @gen_async("isAbsoluteVolumeSupported")
+    @gen_promise("isAbsoluteVolumeSupported")
+    IsAbsoluteVolumeSupportedSync(deviceId: String): bool;
 }
 
 enum CodecType: i32 {
