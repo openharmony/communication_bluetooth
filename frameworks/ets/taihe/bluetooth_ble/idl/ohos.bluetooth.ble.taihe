@@ -14,6 +14,8 @@
  */
 
 @!namespace("@ohos.bluetooth.ble", "ble")
+
+@!sts_inject_into_module("import { BusinessError, AsyncCallback } from '@ohos.base';")
 @!sts_inject("""
 static { loadLibrary("bluetoothBle_taihe_native.z") }
 """)
@@ -219,6 +221,10 @@ interface GattClientDevice {
     Disconnect(): void;
 
     Close(): void;
+
+    @gen_async("getDeviceName")
+    @gen_promise("getDeviceName")
+    GetDeviceNameSync(): String;
 }
 
 function CreateGattClientDevice(deviceId: String): GattClientDevice;
@@ -279,3 +285,53 @@ function CreateBleScanner(): BleScanner;
 function GetConnectedBLEDevices(): Array<String>;
 function StartBLEScan(filters: ScanFilterNullValue, options: Optional<ScanOptions>): void;
 function StartAdvertising(setting: AdvertiseSetting, advData: AdvertiseData, advResponse: Optional<AdvertiseData>): void;
+
+@!sts_inject("""
+native function StartAdvertisingReturnsPromise_inner(advertisingParams: AdvertisingParams): Promise<int>;
+export function startAdvertising(advertisingParams: AdvertisingParams): Promise<int> {
+    console.info("taskpool.execute promise");
+    return taskpool.execute((): Promise<int> => {
+        console.info("taskpool.execute promise enter");
+        return StartAdvertisingReturnsPromise_inner(advertisingParams);
+    })
+    .then((ret: Any): int => {
+        console.info("taskpool.execute promise then, ret: " + ret);
+        return ret as int;
+    })
+};
+
+native function StartAdvertisingWithCallback_inner(advertisingParams: AdvertisingParams, callback: AsyncCallback<int>): void;
+export function startAdvertising(advertisingParams: AdvertisingParams, callback: AsyncCallback<int>): void {
+    console.info("taskpool.execute callback");
+    taskpool.execute((): void => {
+        console.info("taskpool.execute callback enter");
+        return StartAdvertisingWithCallback_inner(advertisingParams, callback);
+    })
+};
+
+native function DisableAdvertisingReturnsPromise_inner(advertisingDisableParams: AdvertisingDisableParams): Promise<void>;
+export function disableAdvertising(advertisingDisableParams: AdvertisingDisableParams): Promise<void> {
+    console.info("taskpool.execute promise");
+    return taskpool.execute((): Promise<void> => {
+        console.info("taskpool.execute promise enter");
+        return DisableAdvertisingReturnsPromise_inner(advertisingDisableParams);
+    })
+    .then((ret: Any): void => {
+        console.info("taskpool.execute promise then, ret: " + ret);
+        return;
+    })
+};
+
+native function DisableAdvertisingWithCallback_inner(advertisingDisableParams: AdvertisingDisableParams, callback: AsyncCallback<void>): void;
+export function disableAdvertising(advertisingDisableParams: AdvertisingDisableParams, callback: AsyncCallback<void>): void {
+    console.info("taskpool.execute callback");
+    taskpool.execute((): void => {
+        console.info("taskpool.execute callback enter");
+        return DisableAdvertisingWithCallback_inner(advertisingDisableParams, callback);
+    })
+};
+""")
+
+@gen_async("enableAdvertising")
+@gen_promise("enableAdvertising")
+function EnableAdvertisingSync(advertisingEnableParams: AdvertisingEnableParams): void;

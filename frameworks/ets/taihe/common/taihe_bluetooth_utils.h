@@ -26,11 +26,46 @@
 
 namespace OHOS {
 namespace Bluetooth {
+constexpr size_t ARGS_SIZE_ZERO = 0;
+constexpr size_t ARGS_SIZE_ONE = 1;
+constexpr size_t ARGS_SIZE_TWO = 2;
+constexpr size_t ARGS_SIZE_THREE = 3;
+constexpr size_t ARGS_SIZE_FOUR = 4;
+
+ani_ref TaiheGetNull(ani_env *env);
+ani_ref TaiheGetUndefined(ani_env *env);
+ani_ref TaiheGetUndefinedRet(ani_env *env);
+ani_ref GetCallbackErrorValue(ani_env *env, int errCode);
 
 enum taihe_status {
     taihe_ok = 0,
     taihe_invalid_arg,
+    taihe_object_expected,
+    taihe_string_expected,
+    taihe_name_expected,
+    taihe_function_expected,
+    taihe_number_expected,
+    taihe_boolean_expected,
+    taihe_array_expected,
+    taihe_generic_failure,
+    taihe_pending_exception,
+    taihe_cancelled,
+    taihe_escape_called_twice,
+    taihe_handle_scope_mismatch,
+    taihe_callback_scope_mismatch,
+    taihe_queue_full,
+    taihe_closing,
+    taihe_bigint_expected,
+    taihe_date_expected,
+    taihe_arraybuffer_expected,
+    taihe_detachable_arraybuffer_expected,
+    taihe_would_deadlock,  // unused
+    taihe_create_ark_runtime_too_many_envs = 22,
+    taihe_create_ark_runtime_only_one_env_per_thread = 23,
+    taihe_destroy_ark_runtime_env_not_exist = 24
 };
+
+taihe_status TaiheIsFunction(ani_env *env, ani_object object);
 
 #ifndef TAIHE_BT_CALL_RETURN
 #define TAIHE_BT_CALL_RETURN(func)                                          \

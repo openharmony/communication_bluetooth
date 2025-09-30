@@ -12,15 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "taihe_bluetooth_ble_advertise_callback.h"
+#ifndef LOG_TAG
+#define LOG_TAG "bt_taihe_ble_advertise_callback"
+#endif
 
+#include "taihe_bluetooth_ble_advertise_callback.h"
+#include "ohos.bluetooth.ble.impl.h"
 #include "bluetooth_log.h"
 
 namespace OHOS {
 namespace Bluetooth {
 TaiheBluetoothBleAdvertiseCallback::TaiheBluetoothBleAdvertiseCallback()
 {}
-    
+
 std::shared_ptr<TaiheBluetoothBleAdvertiseCallback> TaiheBluetoothBleAdvertiseCallback::GetInstance(void)
 {
     static std::shared_ptr<TaiheBluetoothBleAdvertiseCallback> instance =
@@ -31,6 +35,12 @@ std::shared_ptr<TaiheBluetoothBleAdvertiseCallback> TaiheBluetoothBleAdvertiseCa
 void TaiheBluetoothBleAdvertiseCallback::OnStartResultEvent(int result, int advHandle)
 {
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
+    if (advHandle_ == advHandle) {
+        HILOGI("OnStartResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
+        result = GetSDKAdaptedStatusCode(result); // Adaptation for old sdk
+        auto napiAdvHandle = std::make_shared<TaiheNativeInt>(advHandle);
+        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::GET_ADVERTISING_HANDLE, napiAdvHandle, result);
+    }
 }
 
 void TaiheBluetoothBleAdvertiseCallback::OnEnableResultEvent(int result, int advHandle)
@@ -41,6 +51,12 @@ void TaiheBluetoothBleAdvertiseCallback::OnEnableResultEvent(int result, int adv
 void TaiheBluetoothBleAdvertiseCallback::OnDisableResultEvent(int result, int advHandle)
 {
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
+    if (advHandle_ == advHandle) {
+        HILOGI("OnDisableResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
+        result = GetSDKAdaptedStatusCode(result); // Adaptation for old sdk
+        auto napiAdvResult = std::make_shared<TaiheNativeInt>(result);
+        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::BLE_DISABLE_ADVERTISING, napiAdvResult, result);
+    }
 }
 
 void TaiheBluetoothBleAdvertiseCallback::OnStopResultEvent(int result, int advHandle)
@@ -53,10 +69,13 @@ void TaiheBluetoothBleAdvertiseCallback::OnSetAdvDataEvent(int result)
 
 void TaiheBluetoothBleAdvertiseCallback::OnGetAdvHandleEvent(int result, int advHandle)
 {
+    HILOGI("OnGetAdvHandleEvent enter, result: %{public}d advHandle: %{public}d", result, advHandle);
     advHandle_ = advHandle;
+    HILOGI("OnGetAdvHandleEvent leave");
 }
 
 void TaiheBluetoothBleAdvertiseCallback::OnChangeAdvResultEvent(int result, int advHandle)
 {}
+
 }  // namespace Bluetooth
 }  // namespace OHOS

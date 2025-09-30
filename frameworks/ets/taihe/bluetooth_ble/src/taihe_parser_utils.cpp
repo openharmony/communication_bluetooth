@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 
+#include "taihe_async_callback.h"
+
 namespace OHOS {
 namespace Bluetooth {
 taihe_status TaiheParseGattService(ohos::bluetooth::ble::GattService object, TaiheGattService &outService)
@@ -287,6 +289,21 @@ void TaiheParseObjectGattProperties(ohos::bluetooth::ble::GattProperties object,
         properties.extendedProperties = object.extendedProperties.value();
     }
     outProperties = properties;
+}
+
+std::shared_ptr<TaiheAsyncCallback> TaiheParseAsyncCallback(ani_vm *vm, ani_env *env, ani_object info)
+{
+    // "argc - 1" is AsyncCallback parameter's index
+    auto asyncCallback = std::make_shared<TaiheAsyncCallback>();
+    asyncCallback->env = env;
+    if (TaiheIsFunction(env, info) == taihe_ok) {
+        HILOGD("callback mode");
+        asyncCallback->callback = std::make_shared<TaiheCallback>(vm, env, info);
+    } else {
+        HILOGD("promise mode");
+        asyncCallback->promise = std::make_shared<TaihePromise>(vm, env);
+    }
+    return asyncCallback;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

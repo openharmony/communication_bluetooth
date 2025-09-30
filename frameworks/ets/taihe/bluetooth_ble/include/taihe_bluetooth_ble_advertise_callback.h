@@ -21,6 +21,12 @@
 #include "ohos.bluetooth.ble.impl.hpp"
 #include "taihe/runtime.hpp"
 #include "stdexcept"
+#include "event_handler.h"
+#include "ohos.bluetooth.ble.impl.h"
+#include "bluetooth_errorcode.h"
+#include "bluetooth_log.h"
+
+#include "taihe_async_callback.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -38,6 +44,8 @@ public:
     void OnSetAdvDataEvent(int result) override;
     void OnGetAdvHandleEvent(int result, int advHandle) override;
     void OnChangeAdvResultEvent(int result, int advHandle) override;
+
+    TaiheAsyncWorkMap asyncWorkMap_ {};
 
     int advHandle_ = -1;
 };

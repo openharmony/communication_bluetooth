@@ -83,6 +83,9 @@ void TaiheParseObjectGattPermissions(ohos::bluetooth::ble::GattPermissions objec
     TaiheGattPermission &outPermissions);
 void TaiheParseObjectGattProperties(ohos::bluetooth::ble::GattProperties object,
     TaiheGattProperties &outProperties);
+
+struct TaiheAsyncCallback;
+std::shared_ptr<TaiheAsyncCallback> TaiheParseAsyncCallback(ani_vm *vm, ani_env *env, ani_object info);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // TAIHE_PARSER_UTILS_H
