@@ -22,6 +22,7 @@
 #include "taihe/runtime.hpp"
 #include "stdexcept"
 #include "bluetooth_a2dp_src.h"
+#include "bluetooth_avrcp_tg.h"
 #include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "taihe_bluetooth_a2dp_src_observer.h"
@@ -222,6 +223,103 @@ public:
 
         return deviceVector.empty() ? taihe::array<taihe::string>{}
             : taihe::array<taihe::string>(taihe::copy_data_t{}, deviceVector.data(), deviceVector.size());
+    }
+
+    void DisableAbsoluteVolumeSync(taihe::string_view deviceId)
+    {
+        HILOGD("start");
+        std::string remoteAddr = static_cast<std::string>(deviceId);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
+
+        int32_t ability = DeviceAbsVolumeAbility::DEVICE_ABSVOL_CLOSE;
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        int32_t err = AvrcpTarget::GetProfile()->SetDeviceAbsVolumeAbility(remoteDevice, ability);
+        TAIHE_BT_ASSERT_RETURN_VOID(err == BT_NO_ERROR, err);
+    }
+
+    void EnableAbsoluteVolumeSync(taihe::string_view deviceId)
+    {
+        HILOGD("start");
+        std::string remoteAddr = static_cast<std::string>(deviceId);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
+
+        int32_t ability = DeviceAbsVolumeAbility::DEVICE_ABSVOL_OPEN;
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        int32_t err = AvrcpTarget::GetProfile()->SetDeviceAbsVolumeAbility(remoteDevice, ability);
+        TAIHE_BT_ASSERT_RETURN_VOID(err == BT_NO_ERROR, err);
+    }
+
+    bool IsAbsoluteVolumeEnabledSync(taihe::string_view deviceId)
+    {
+        HILOGD("start");
+        std::string remoteAddr = static_cast<std::string>(deviceId);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM, false);
+
+        int32_t ability = DeviceAbsVolumeAbility::DEVICE_ABSVOL_UNSUPPORT;
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        int32_t err = AvrcpTarget::GetProfile()->GetDeviceAbsVolumeAbility(remoteDevice, ability);
+        TAIHE_BT_ASSERT_RETURN(err == BT_NO_ERROR, err, false);
+        if (ability == DeviceAbsVolumeAbility::DEVICE_ABSVOL_OPEN) {
+            return true;
+        }
+        return false;
+    }
+
+    bool IsAbsoluteVolumeSupportedSync(taihe::string_view deviceId)
+    {
+        HILOGD("start");
+        std::string remoteAddr = static_cast<std::string>(deviceId);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM, false);
+
+        int32_t ability = DeviceAbsVolumeAbility::DEVICE_ABSVOL_UNSUPPORT;
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        int32_t err = AvrcpTarget::GetProfile()->GetDeviceAbsVolumeAbility(remoteDevice, ability);
+        TAIHE_BT_ASSERT_RETURN(err == BT_NO_ERROR, err, false);
+        if (ability == DeviceAbsVolumeAbility::DEVICE_ABSVOL_UNSUPPORT) {
+            return false;
+        }
+        return true;
+    }
+
+    ohos::bluetooth::baseProfile::ConnectionStrategy GetConnectionStrategySync(taihe::string_view deviceId)
+    {
+        HILOGD("start");
+        std::string remoteAddr = std::string(deviceId);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM,
+            ohos::bluetooth::baseProfile::ConnectionStrategy::from_value(0));
+
+        int transport = BT_TRANSPORT_BREDR;
+        int strategy = 0;
+        BluetoothRemoteDevice remoteDevice(remoteAddr, transport);
+        A2dpSource *profile = A2dpSource::GetProfile();
+        int32_t err = profile->GetConnectStrategy(remoteDevice, strategy);
+        HILOGD("err: %{public}d, strategy: %{public}d", err, strategy);
+        TAIHE_BT_ASSERT_RETURN(err == BT_NO_ERROR, err,
+            ohos::bluetooth::baseProfile::ConnectionStrategy::from_value(strategy));
+
+        return ohos::bluetooth::baseProfile::ConnectionStrategy::from_value(strategy);
+    }
+
+    void SetConnectionStrategySync(taihe::string_view deviceId,
+                                   ohos::bluetooth::baseProfile::ConnectionStrategy strategy)
+    {
+        HILOGD("start");
+        std::string remoteAddr = std::string(deviceId);
+        int32_t connStrategy = strategy.get_value();
+        bool checkRet = CheckSetConnectStrategyParam(remoteAddr, connStrategy);
+        TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
+
+        int transport = BT_TRANSPORT_BREDR;
+        BluetoothRemoteDevice remoteDevice(remoteAddr, transport);
+        A2dpSource *profile = A2dpSource::GetProfile();
+        int32_t err = profile->SetConnectStrategy(remoteDevice, connStrategy);
+        HILOGI("err: %{public}d", err);
+        TAIHE_BT_ASSERT_RETURN_VOID(err == BT_NO_ERROR, err);
     }
 private:
     std::shared_ptr<TaiheA2dpSourceObserver> observer_ = nullptr;
