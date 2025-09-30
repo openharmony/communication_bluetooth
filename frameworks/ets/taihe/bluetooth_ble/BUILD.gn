@@ -49,6 +49,7 @@ taihe_shared_library("bluetoothBle_taihe_native") {
     "src",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common"
   ]
   sources += [
@@ -62,14 +63,28 @@ taihe_shared_library("bluetoothBle_taihe_native") {
     "src/taihe_bluetooth_gatt_server.cpp",
     "src/taihe_parser_utils.cpp",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_bluetooth_utils.cpp",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_bluetooth_error.cpp"
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_bluetooth_error.cpp",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_async_callback.cpp",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_async_work.cpp",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_ha_event_utils.cpp",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_native_object.cpp",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_timer.cpp",
   ]
   deps = [
     ":run_taihe",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
   ]
   external_deps = [
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "ipc:ipc_single",
+    "runtime_core:ani_helpers",
+    "hitrace:hitrace_meter",
+    "hiappevent:hiappevent_innerapi",
+    "samgr:samgr_proxy",
   ]
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection

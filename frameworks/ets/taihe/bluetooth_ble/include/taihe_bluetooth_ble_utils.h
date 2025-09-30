@@ -16,17 +16,43 @@
 #ifndef TAIHE_BLUETOOTH_BLE_UTILS_H_
 #define TAIHE_BLUETOOTH_BLE_UTILS_H_
 
+#include "bluetooth_ble_advertiser.h"
+
+#include "ohos.bluetooth.ble.proj.hpp"
+#include "ohos.bluetooth.ble.impl.hpp"
+#include "taihe/runtime.hpp"
+#include "stdexcept"
+
 namespace OHOS {
 namespace Bluetooth {
+constexpr int SDK_VERSION_20 = 20;
+
 enum class ScanReportType {
     ON_FOUND = 1, // the found of advertisement packet
-    ON_LOST = 2 // the lost of advertisement packet
+    ON_LOST = 2   // the lost of advertisement packet
 };
 
 enum class SensitivityMode {
     SENSITIVITY_MODE_HIGH = 1,  //  high sensitivity mode
     SENSITIVITY_MODE_LOW = 2    //  low sensitivity mode
 };
+
+class Util {
+public:
+static void TaiheToBleAdvertiserSettings(BleAdvertiserSettings &advertiserSettings,
+                                         ohos::bluetooth::ble::AdvertiseSetting advertiseSettingsTaihe);
+
+static void TaiheToBleAdvertiserData(BleAdvertiserData &advertiserData,
+                                     ohos::bluetooth::ble::AdvertiseData advertiseDataTaihe);
+
+static void TaiheToBleManufactureData(std::map<uint16_t, std::string> &manufactureData,
+                                      taihe::array<ohos::bluetooth::ble::ManufactureData> manufactureDataTaihe);
+
+static void TaiheToBleServiceData(std::map<ParcelUuid, std::string> &serviceData,
+                                  taihe::array<ohos::bluetooth::ble::ServiceData> serviceDataTaihe);
+};
+int GetCurrentSdkVersion(void);
+int GetSDKAdaptedStatusCode(int status);
 } // namespace Bluetooth
 } // namespace OHOS
 #endif // TAIHE_BLUETOOTH_BLE_UTILS_H_

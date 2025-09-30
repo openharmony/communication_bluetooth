@@ -27,6 +27,133 @@
 
 namespace OHOS {
 namespace Bluetooth {
+ani_ref TaiheGetNull(ani_env *env)
+{
+    ani_ref nullRef = nullptr;
+    ani_status status = ANI_ERROR;
+    if (env == nullptr) {
+        HILOGE("null env");
+        return nullptr;
+    }
+
+    if ((status = env->GetNull(&nullRef)) != ANI_OK) {
+        HILOGE("GetNull failed, status: %{public}d", status);
+        return nullptr;
+    }
+    return nullRef;
+}
+
+ani_ref TaiheGetUndefined(ani_env *env)
+{
+    ani_ref undefinedRef = nullptr;
+    ani_status status = ANI_ERROR;
+    if (env == nullptr) {
+        HILOGE("null env");
+        return nullptr;
+    }
+
+    if ((status = env->GetUndefined(&undefinedRef)) != ANI_OK) {
+        HILOGE("GetUndefined failed, status: %{public}d", status);
+        return nullptr;
+    }
+    return undefinedRef;
+}
+
+ani_ref TaiheGetUndefinedRet(ani_env *env)
+{
+    HILOGI("TaiheGetUndefinedRet enter");
+    ani_ref undefRef;
+    ani_status status = ANI_ERROR;
+    if (env == nullptr) {
+        HILOGE("null env");
+        return nullptr;
+    }
+    HILOGI("TaiheGetUndefinedRet env not null");
+    if ((status = env->GetUndefined(&undefRef)) != ANI_OK) {
+        HILOGE("TaiheGetUndefinedRet GetUndefined failed, status: %{public}d", status);
+        return nullptr;
+    }
+    HILOGI("TaiheGetUndefinedRet leave");
+    return undefRef;
+}
+
+static ani_ref CreateBusinessError(ani_env *env, int code, const std::string &msg)
+{
+    HILOGI("CreateBusinessError2 enter, code: %{public}d, msg: %{public}s", code, msg.c_str());
+    ani_class cls{};
+    ani_method method{};
+    ani_object obj = nullptr;
+    ani_status status = ANI_ERROR;
+    if (env == nullptr) {
+        HILOGE("null env");
+        return nullptr;
+    }
+    HILOGI("CreateBusinessError2 111111");
+    if ((status = env->FindClass("@ohos.base.BusinessError", &cls)) != ANI_OK) {
+        HILOGE("FindClass failed %{public}d", status);
+        return nullptr;
+    }
+    HILOGI("CreateBusinessError2 222222");
+    if ((status = env->Class_FindMethod(cls, "<ctor>", ":", &method)) != ANI_OK) {
+        HILOGE("Class_FindMethod failed %{public}d", status);
+        return nullptr;
+    }
+    HILOGI("CreateBusinessError2 333333");
+    if ((status = env->Object_New(cls, method, &obj)) != ANI_OK) {
+        HILOGE("Object_New failed %{public}d", status);
+        return nullptr;
+    }
+    HILOGI("CreateBusinessError2 444444");
+    ani_int errCode = static_cast<ani_int>(code);
+    ani_string errMsg;
+    if ((status = env->String_NewUTF8(msg.c_str(), msg.size(), &errMsg)) != ANI_OK) {
+        HILOGE("String_NewUTF8 failed %{public}d", status);
+        return nullptr;
+    }
+    HILOGI("CreateBusinessError2 555555");
+    if ((status = env->Object_SetFieldByName_Int(obj, "code", errCode)) != ANI_OK) {
+        HILOGE("Object_SetFieldByName_Int failed %{public}d", status);
+        return nullptr;
+    }
+    HILOGI("CreateBusinessError2 666666");
+    if ((status = env->Object_SetPropertyByName_Ref(obj, "message", errMsg)) != ANI_OK) {
+        HILOGE("Object_SetPropertyByName_Ref failed %{public}d", status);
+        return nullptr;
+    }
+    HILOGI("CreateBusinessError2 leave");
+    return reinterpret_cast<ani_ref>(obj);
+}
+
+ani_ref GetCallbackErrorValue(ani_env *env, int errCode)
+{
+    HILOGE("errCode: %{public}d", errCode);
+    ani_ref result = TaiheGetNull(env);
+    if (errCode == BT_NO_ERROR) {
+        return result;
+    }
+
+    std::string errMsg = GetTaiheErrMsg(errCode);
+    HILOGI("GetCallbackErrorValue errMsg: %{public}s", errMsg.c_str());
+    result = CreateBusinessError(env, errCode, errMsg);
+    HILOGI("GetCallbackErrorValue leave");
+    return result;
+}
+
+taihe_status TaiheIsFunction(ani_env *env, ani_object object)
+{
+    HILOGI("TaiheIsFunction enter");
+    if (env == nullptr) {
+        HILOGE("null env");
+        return taihe_invalid_arg;
+    }
+    if (object == nullptr) {
+        HILOGE("null object");
+        return taihe_invalid_arg;
+    }
+
+    return taihe_ok;
+}
+
 bool IsValidAddress(std::string bdaddr)
 {
 #if defined(IOS_PLATFORM)
