@@ -75,6 +75,15 @@ public:
     {}
 
     /**
+     * @brief The function to OnServicesChanged.
+     *
+     * @since 22
+     *
+     */
+    virtual void OnServicesChanged()
+    {}
+
+    /**
      * @brief The function to OnCharacteristicChanged.
      *
      * @param characteristic Characteristic object to changed.
