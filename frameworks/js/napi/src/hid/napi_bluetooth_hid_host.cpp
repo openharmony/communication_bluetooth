@@ -42,7 +42,7 @@ void NapiBluetoothHidHost::DefineHidHostJSClass(napi_env env, napi_value exports
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
 #ifdef BLUETOOTH_API_SINCE_10
-        DECLARE_NAPI_FUNCTION("getConnectedDevices", GetConnectionDevices),
+        DECLARE_WRITABLE_NAPI_FUNCTION("getConnectedDevices", GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getConnectionState", GetDeviceState),
 #else
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
