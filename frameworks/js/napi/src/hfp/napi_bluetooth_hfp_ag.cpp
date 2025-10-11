@@ -41,7 +41,7 @@ void NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(napi_env env,
     napi_value constructor;
     napi_property_descriptor properties[] = {
 #ifdef BLUETOOTH_API_SINCE_10
-        DECLARE_NAPI_FUNCTION("getConnectedDevices", GetConnectionDevices),
+        DECLARE_WRITABLE_NAPI_FUNCTION("getConnectedDevices", GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getConnectionState", GetDeviceState),
 #else
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
