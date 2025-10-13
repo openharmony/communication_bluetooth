@@ -41,6 +41,9 @@ void DefineSppFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("sppWrite", NapiSppClient::SppWrite),
         DECLARE_NAPI_FUNCTION("getDeviceId", NapiSppClient::GetDeviceId),
         DECLARE_NAPI_FUNCTION("getL2capPsm", NapiSppServer::getL2capPsm),
+        DECLARE_NAPI_FUNCTION("isConnected", NapiSppClient::IsConnected),
+        DECLARE_NAPI_FUNCTION("getMaxReceiveDataSize", NapiSppClient::GetMaxReceiveDataSize),
+        DECLARE_NAPI_FUNCTION("getMaxTransmitDataSize", NapiSppClient::GetMaxTransmitDataSize),
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("on", NapiSppServer::RegisterSocketObserver),
         DECLARE_NAPI_FUNCTION("off", NapiSppServer::DeRegisterSocketObserver),

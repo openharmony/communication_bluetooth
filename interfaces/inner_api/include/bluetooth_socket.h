@@ -239,6 +239,20 @@ public:
     int GetRfcommScn();
 
     /**
+     * @brief Set the maximum supported transmit packet size for the underlying transport
+     *
+     * @since 22
+     */
+    void SetMaxTransmitPacketSize(uint32_t size);
+
+    /**
+     * @brief Set the maximum supported receive packet size for the underlying transport
+     *
+     * @since 22
+     */
+    void SetMaxReceivePacketSize(uint32_t size);
+
+    /**
      * @brief Get the maximum supported transmit packet size for the underlying transport
      *
      * @return int the maximum supported transmit packet size
