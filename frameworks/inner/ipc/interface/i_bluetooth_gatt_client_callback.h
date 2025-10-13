@@ -38,7 +38,7 @@ public:
     virtual void OnMtuChanged(int32_t state, int32_t mtu) = 0;
     virtual void OnServicesDiscovered(int32_t status) = 0;
     virtual void OnConnectionParameterChanged(int32_t interval, int32_t latency, int32_t timeout, int32_t status) = 0;
-    virtual void OnServicesChanged(std::vector<BluetoothGattService> &service) = 0;
+    virtual void OnServicesChanged() = 0;
     virtual void OnReadRemoteRssiValue(const bluetooth::RawAddress &addr, int rssi, int status) = 0;
 };
 }  // namespace Bluetooth

@@ -28,12 +28,14 @@ namespace Bluetooth {
 const char * const STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE = "BLECharacteristicChange";
 const char * const STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE = "BLEConnectionStateChange";
 const char * const STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE = "BLEMtuChange";
+const char * const STR_BT_GATT_CLIENT_CALLBACK_SERVICE_CHANGE = "serviceChange";
 class NapiGattClient;
 
 class NapiGattClientCallback : public GattClientCallback {
 public:
     void OnConnectionStateChangedWithReason(int connectionState, int ret, int disconnectReason) override;
     void OnCharacteristicChanged(const GattCharacteristic &characteristic) override;
+    void OnServicesChanged() override;
     void OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)  override;
     void OnCharacteristicWriteResult(const GattCharacteristic &characteristic, int ret) override;
     void OnDescriptorReadResult(const GattDescriptor &descriptor, int ret) override;
