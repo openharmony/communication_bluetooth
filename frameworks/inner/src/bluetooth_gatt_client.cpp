@@ -128,7 +128,7 @@ struct GattClient::impl {
 
 class GattClient::impl::BluetoothGattClientCallbackStubImpl : public BluetoothGattClientCallbackStub {
 public:
-    void OnServicesChanged(std::vector<BluetoothGattService> &service) override
+    void OnServicesChanged() override
     {
         HILOGI("enter");
         std::shared_ptr<GattClient> clientSptr = (client_).lock();
@@ -136,7 +136,7 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
-        clientSptr->pimpl->DiscoverStart();
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnServicesChanged);
     }
 
     void OnConnectionStateChanged(int32_t state, int32_t newState, int32_t disconnectReason) override

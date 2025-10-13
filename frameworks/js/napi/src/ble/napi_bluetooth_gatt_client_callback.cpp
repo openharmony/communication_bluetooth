@@ -30,7 +30,8 @@ namespace Bluetooth {
 NapiGattClientCallback::NapiGattClientCallback()
     : eventSubscribe_({STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE,
         STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE,
-        STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE},
+        STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE,
+        STR_BT_GATT_CLIENT_CALLBACK_SERVICE_CHANGE},
         BT_MODULE_NAME)
 {}
 
@@ -38,6 +39,12 @@ void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &c
 {
     auto nativeObject = std::make_shared<NapiNativeBleCharacteristic>(characteristic);
     eventSubscribe_.PublishEvent(STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE, nativeObject);
+}
+
+void NapiGattClientCallback::OnServicesChanged()
+{
+    auto nativeObject = std::make_shared<NapiNativeInt>(BT_NO_ERROR);
+    eventSubscribe_.PublishEvent(STR_BT_GATT_CLIENT_CALLBACK_SERVICE_CHANGE, nativeObject);
 }
 
 void NapiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
