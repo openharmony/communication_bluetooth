@@ -259,7 +259,7 @@ napi_value NapiGattServer::GetService(napi_env env, napi_callback_info info)
     std::shared_ptr<GattServer> server {nullptr};
     UUID serviceUuid;
     auto status = CheckGattsServiceUuid(env, info, server, serviceUuid);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
 
     UUID fakeUuid = UUID::FromString("00000000-0000-0000-0000-000000000000");
     GattService outService(fakeUuid, GattServiceType::PRIMARY);
@@ -267,7 +267,7 @@ napi_value NapiGattServer::GetService(napi_env env, napi_callback_info info)
     if (ret != BT_NO_ERROR) {
         ret = server->GetService(serviceUuid, false, outService);
     }
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
 
     napi_value obj = nullptr;
     napi_create_object(env, &obj);
@@ -280,11 +280,11 @@ napi_value NapiGattServer::GetServices(napi_env env, napi_callback_info info)
     HILOGI("enter");
     std::shared_ptr<GattServer> server {nullptr};
     auto status = CheckGattsEmptyParam(env, info, server);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
 
     std::list<GattService> serviceList;
     int ret = server->GetServices(serviceList);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
 
     std::vector<GattService> serviceVec(serviceList.begin(), serviceList.end());
     napi_value obj = nullptr;
