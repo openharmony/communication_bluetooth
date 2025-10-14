@@ -311,6 +311,8 @@ public:
      */
     GattServer() = delete;
 
+    int GetConnectedState(const std::string &deviceId, int &state);
+
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(GattServer);
 
 private:

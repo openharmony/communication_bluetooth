@@ -82,6 +82,17 @@ void NapiGattClientCallback::OnServicesDiscovered(int status)
     HILOGI("status:%{public}d", status);
 }
 
+void NapiGattClientCallback::OnConnectionParameterChanged(int interval, int latency, int timeout, int status)
+{
+    int ret = -1;
+    if (status == static_cast<int>(GattStatus::GATT_SUCCESS)) {
+        ret = static_cast<int>(BT_NO_ERROR);
+    } else {
+        ret = static_cast<int>(BT_ERR_INTERNAL_ERROR);
+    }
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_UPDATE_CONNECTION_PRIORITY, nullptr, ret);
+}
+
 void NapiGattClientCallback::OnReadRemoteRssiValueResult(int rssi, int ret)
 {
     HILOGI("rssi: %{public}d, ret: %{public}d", rssi, ret);

@@ -125,6 +125,7 @@ enum BluetoothGattClientInterfaceCode {
     BT_GATT_CLIENT_REQUEST_FASTEST_CONNECTION,
     BT_GATT_CLIENT_READ_REMOTE_RSSI_VALUE,
     BT_GATT_CLIENT_REQUEST_NOTIFICATION,
+    BT_GATT_CLIENT_GET_CONNECTED_STATE,
     // The last code, if you want to add a new code, please add it before this
     BT_GATT_CLIENT_BUTT
 };
@@ -157,6 +158,7 @@ enum BluetoothGattServerInterfaceCode {
     GATT_SERVER_RESPOND_DESCRIPTOR_READ,
     GATT_SERVER_RESPOND_DESCRIPTOR_WRITE,
     GATT_SERVER_CONNECT,
+    GATT_SERVER_GET_CONNECTED_STATE,
     // The last code, if you want to add a new code, please add it before this
     GATT_SERVER_BUTT
 };

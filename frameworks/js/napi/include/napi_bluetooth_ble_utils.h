@@ -74,6 +74,7 @@ napi_value PhyTypeInit(napi_env env);
 napi_value ScanReportModeInit(napi_env env);
 napi_value GattDisconnectReasonInit(napi_env env);
 napi_value BleProfileInit(napi_env env);
+napi_value ConnectionParamInit(napi_env env);
 
 void SetGattClientDeviceId(const std::string &deviceId);
 std::string GetGattClientDeviceId();
