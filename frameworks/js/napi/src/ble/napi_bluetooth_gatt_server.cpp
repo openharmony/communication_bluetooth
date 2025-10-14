@@ -59,6 +59,8 @@ void NapiGattServer::DefineGattServerJSClass(napi_env env)
 #endif
         DECLARE_NAPI_FUNCTION("addService", AddService),
         DECLARE_NAPI_FUNCTION("removeService", RemoveGattService),
+        DECLARE_NAPI_FUNCTION("getService", GetService),
+        DECLARE_NAPI_FUNCTION("getServices", GetServices),
         DECLARE_NAPI_FUNCTION("close", Close),
         DECLARE_NAPI_FUNCTION("sendResponse", SendResponse),
         DECLARE_NAPI_FUNCTION("on", On),
@@ -187,7 +189,7 @@ napi_value NapiGattServer::AddService(napi_env env, napi_callback_info info)
     return NapiGetBooleanTrue(env);
 }
 
-static napi_status CheckGattsClose(napi_env env, napi_callback_info info, std::shared_ptr<GattServer> &outServer)
+static napi_status CheckGattsEmptyParam(napi_env env, napi_callback_info info, std::shared_ptr<GattServer> &outServer)
 {
     size_t argc = 0;
     napi_value thisVar = nullptr;
@@ -204,7 +206,7 @@ napi_value NapiGattServer::Close(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
     std::shared_ptr<GattServer> server {nullptr};
-    auto status = CheckGattsClose(env, info, server);
+    auto status = CheckGattsEmptyParam(env, info, server);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
 
     int ret = server->Close();
@@ -212,7 +214,7 @@ napi_value NapiGattServer::Close(napi_env env, napi_callback_info info)
     return NapiGetUndefinedRet(env);
 }
 
-static napi_status CheckGattsRemoveService(napi_env env, napi_callback_info info,
+static napi_status CheckGattsServiceUuid(napi_env env, napi_callback_info info,
     std::shared_ptr<GattServer> &outServer, UUID &outUuid)
 {
     size_t argc = 1;
@@ -236,7 +238,7 @@ napi_value NapiGattServer::RemoveGattService(napi_env env, napi_callback_info in
     HILOGI("enter");
     std::shared_ptr<GattServer> server {nullptr};
     UUID serviceUuid;
-    auto status = CheckGattsRemoveService(env, info, server, serviceUuid);
+    auto status = CheckGattsServiceUuid(env, info, server, serviceUuid);
     NAPI_BT_ASSERT_RETURN_FALSE(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
 
     int ret = BT_ERR_INTERNAL_ERROR;
@@ -252,6 +254,46 @@ napi_value NapiGattServer::RemoveGattService(napi_env env, napi_callback_info in
     }
     NAPI_BT_ASSERT_RETURN_FALSE(env, (primaryService.has_value() || secondService.has_value()), BT_ERR_INVALID_PARAM);
     return NapiGetBooleanRet(env, ret == BT_NO_ERROR);
+}
+
+napi_value NapiGattServer::GetService(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::shared_ptr<GattServer> server {nullptr};
+    UUID serviceUuid;
+    auto status = CheckGattsServiceUuid(env, info, server, serviceUuid);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
+
+    UUID fakeUuid = UUID::FromString("00000000-0000-0000-0000-000000000000");
+    GattService outService(fakeUuid, GattServiceType::PRIMARY);
+    int ret = server->GetService(serviceUuid, true, outService);
+    if (ret != BT_NO_ERROR) {
+        ret = server->GetService(serviceUuid, false, outService);
+    }
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+
+    napi_value obj = nullptr;
+    napi_create_object(env, &obj);
+    ConvertGattServiceToJS(env, obj, outService);
+    return obj;
+}
+
+napi_value NapiGattServer::GetServices(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::shared_ptr<GattServer> server {nullptr};
+    auto status = CheckGattsEmptyParam(env, info, server);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
+
+    std::list<GattService> serviceList;
+    int ret = server->GetServices(serviceList);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+
+    std::vector<GattService> serviceVec(serviceList.begin(), serviceList.end());
+    napi_value obj = nullptr;
+    napi_create_array(env, &obj);
+    ConvertGattServiceVectorToJS(env, obj, serviceVec);
+    return obj;
 }
 
 static napi_status CheckGattsSendRsp(napi_env env, napi_callback_info info, std::shared_ptr<GattServer> &outServer,
