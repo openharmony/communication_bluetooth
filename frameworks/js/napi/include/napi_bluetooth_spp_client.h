@@ -35,44 +35,20 @@ struct SppConnectCallbackInfo : public AsyncCallbackInfo {
 };
 
 struct SppCallbackBuffer {
-    SppCallbackBuffer(int length) : len_(length)
+    SppCallbackBuffer(int size) : len_(size), data_(size) {}
+    SppCallbackBuffer() : len_(RFCOMM_SOCKET_BUFFER_SIZE), data_(RFCOMM_SOCKET_BUFFER_SIZE) {}
+    SppCallbackBuffer(const SppCallbackBuffer &other) : len_(other.len_), data_(other.data_) {}
+    SppCallbackBuffer &operator=(const SppCallbackBuffer &other)
     {
-        if (length <= 0 || length > L2CAP_SOCKET_BUFFER_SIZE) {
-            data_ = nullptr;
+        if (this != &other) {
+            this->data_ = other.data_;
+            this->len_ = other.len_;
         }
-        data_ = new char[length];
-    }
-
-    SppCallbackBuffer() : len_(RFCOMM_SOCKET_BUFFER_SIZE)
-    {
-        data_ = new char[RFCOMM_SOCKET_BUFFER_SIZE];
-    }
-
-    SppCallbackBuffer(const SppCallbackBuffer& other)
-    {
-        len_ = other.len_;
-        data_ = new char[len_];
-        (void)memcpy_s(data_, len_, other.data_, other.len_);
-    }
-
-    SppCallbackBuffer& operator=(const SppCallbackBuffer& other)
-    {
-        if (this == &other) {
-            return *this;
-        }
-        delete[] data_;
-        len_ = other.len_;
-        data_ = new char[len_];
-        (void)memcpy_s(data_, len_, other.data_, other.len_);
         return *this;
     }
 
-    ~SppCallbackBuffer()
-    {
-        delete[] data_;
-    }
     ssize_t len_;
-    char* data_;
+    std::vector<uint8_t> data_;
 };
 
 struct BufferCallbackInfo : public BluetoothCallbackInfo {
@@ -106,13 +82,13 @@ struct NapiSppClient {
     static napi_value SppWrite(napi_env env, napi_callback_info info);
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
-    static void ProcessRfcommRead(std::shared_ptr<NapiSppClient> client, int id);
-    static void ProcessL2capRead(std::shared_ptr<NapiSppClient> client, int id);
-    static void ProcessReceivedData(std::shared_ptr<NapiSppClient> client, uint8_t* buf, int length, int ret);
     static void SppRead(int id);
     static napi_value SppWriteAsync(napi_env env, napi_callback_info info);
     static napi_value SppReadAsync(napi_env env, napi_callback_info info);
     static napi_value GetDeviceId(napi_env env, napi_callback_info info);
+    static napi_value GetMaxReceiveDataSize(napi_env env, napi_callback_info info);
+    static napi_value GetMaxTransmitDataSize(napi_env env, napi_callback_info info);
+    static napi_value IsConnected(napi_env env, napi_callback_info info);
 
     static int count;
     static std::map<int, std::shared_ptr<NapiSppClient>> clientMap;

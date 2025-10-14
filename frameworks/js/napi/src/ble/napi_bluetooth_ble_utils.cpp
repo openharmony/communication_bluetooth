@@ -539,6 +539,19 @@ napi_value BleProfileInit(napi_env env)
     return bleProfileObj;
 }
 
+napi_value ConnectionParamInit(napi_env env)
+{
+    napi_value connectionParamObj = nullptr;
+    napi_create_object(env, &connectionParamObj);
+    SetNamedPropertyByInteger(
+        env, connectionParamObj, static_cast<int32_t>(NapiGattPriority::LOW_POWER), "LOW_POWER");
+    SetNamedPropertyByInteger(
+        env, connectionParamObj, static_cast<int32_t>(NapiGattPriority::BALANCED), "BALANCED");
+    SetNamedPropertyByInteger(
+        env, connectionParamObj, static_cast<int32_t>(NapiGattPriority::HIGH), "HIGH");
+    return connectionParamObj;
+}
+
 void SetGattClientDeviceId(const std::string &deviceId)
 {
     deviceAddr = deviceId;

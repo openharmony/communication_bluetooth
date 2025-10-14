@@ -128,7 +128,7 @@ struct GattClient::impl {
 
 class GattClient::impl::BluetoothGattClientCallbackStubImpl : public BluetoothGattClientCallbackStub {
 public:
-    void OnServicesChanged(std::vector<BluetoothGattService> &service) override
+    void OnServicesChanged() override
     {
         HILOGI("enter");
         std::shared_ptr<GattClient> clientSptr = (client_).lock();
@@ -136,7 +136,7 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
-        clientSptr->pimpl->DiscoverStart();
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnServicesChanged);
     }
 
     void OnConnectionStateChanged(int32_t state, int32_t newState, int32_t disconnectReason) override
@@ -1091,8 +1091,8 @@ int GattClient::RequestConnectionPriority(int connPriority)
 
     std::lock_guard<std::mutex> lockConn(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
-        HILOGE("Not connected");
-        return GattStatus::REQUEST_NOT_SUPPORT;
+        HILOGE("Request not supported");
+        return BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED;
     }
     if (connPriority != static_cast<int>(GattConnectionPriority::LOW_POWER) &&
         connPriority != static_cast<int>(GattConnectionPriority::BALANCED) &&
@@ -1101,12 +1101,11 @@ int GattClient::RequestConnectionPriority(int connPriority)
         connPriority != static_cast<int>(GattConnectionPriority::LOW_POWER_ENHANCE) &&
         connPriority != static_cast<int>(GattConnectionPriority::LOW_POWER_ULTRA)) {
         HILOGE("Invalid parameters");
-        return GattStatus::INVALID_PARAMETER;
+        return BT_ERR_INVALID_PARAM;
     }
-    int result = GattStatus::GATT_FAILURE;
     sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
-    result = proxy->RequestConnectionPriority(pimpl->applicationId_, connPriority);
+    int result = proxy->RequestConnectionPriority(pimpl->applicationId_, connPriority);
     HILOGI("result: %{public}d", result);
     return result;
 }
@@ -1163,6 +1162,23 @@ int GattClient::ReadRemoteRssiValue()
         pimpl->requestInformation_.type_ = REQUEST_TYPE_READ_REMOTE_RSSI_VALUE;
     }
     return result;
+}
+
+int GattClient::GetConnectedState(int &state)
+{
+    HILOGD("enter");
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt client proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_SERVICE_DISCONNECTED, "failed: no proxy");
+    const std::string deviceId = pimpl->device_.GetDeviceAddr();
+    return proxy->GetConnectedState(deviceId, state);
 }
 
 }  // namespace Bluetooth

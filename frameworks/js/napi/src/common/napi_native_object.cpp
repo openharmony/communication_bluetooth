@@ -242,7 +242,7 @@ napi_value NapiNativeArrayBuffer::ToNapiValue(napi_env env) const
     if (memset_s(bufferData, sppBuffer_.len_, 0, sppBuffer_.len_) != EOK) {
         HILOGE("memset_s error");
     }
-    if (memcpy_s(bufferData, sppBuffer_.len_, sppBuffer_.data_, sppBuffer_.len_) != EOK) {
+    if (memcpy_s(bufferData, sppBuffer_.len_, sppBuffer_.data_.data(), sppBuffer_.len_) != EOK) {
         HILOGE("memcpy_s error");
     }
     return object;

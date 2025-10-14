@@ -241,9 +241,9 @@ napi_value NapiSppClient::SppCloseClientSocket(napi_env env, napi_callback_info 
         client->client_->Close();
         isOK = true;
     }
+    clientMap.erase(id);
     NAPI_BT_RETURN_IF(napi_release_threadsafe_function(client->sppReadThreadSafeFunc_, napi_tsfn_abort),
         "inner error", nullptr);
-    clientMap.erase(id);
     return NapiGetBooleanRet(env, isOK);
 }
 
@@ -363,7 +363,7 @@ static void NapiThreadSafeFuncCallJs(napi_env, napi_value jsCallback, void *cont
     napi_value result = nullptr;
     uint8_t *bufferData = nullptr;
     napi_create_arraybuffer(callbackInfo->env_, buffer->len_, (void **)&bufferData, &result);
-    if (memcpy_s(bufferData, buffer->len_, buffer->data_, buffer->len_) != EOK) {
+    if (memcpy_s(bufferData, buffer->len_, buffer->data_.data(), buffer->len_) != EOK) {
         HILOGE("memcpy_s failed!");
         return;
     }
@@ -480,87 +480,6 @@ napi_value NapiSppClient::Off(napi_env env, napi_callback_info info)
     return NapiGetUndefinedRet(env);
 }
 
-void NapiSppClient::ProcessRfcommRead(std::shared_ptr<NapiSppClient> client, int id)
-{
-    std::shared_ptr<InputStream> inputStream = client->client_->GetInputStream();
-    uint8_t buf[RFCOMM_SOCKET_BUFFER_SIZE];
-    while (true) {
-        HILOGI("thread start.");
-        (void)memset_s(buf, sizeof(buf), 0, sizeof(buf));
-        int ret = inputStream->Read(buf, sizeof(buf));
-        if (ret <= 0) {
-            HILOGE("inputStream.Read failed, ret = %{public}d", ret);
-            return;
-        } else {
-            ProcessReceivedData(client, buf, RFCOMM_SOCKET_BUFFER_SIZE, ret);
-        }
-    }
-}
-
-void NapiSppClient::ProcessL2capRead(std::shared_ptr<NapiSppClient> client, int id)
-{
-    std::shared_ptr<InputStream> inputStream = client->client_->GetInputStream();
-    while (true) {
-        HILOGI("thread start.");
-        int length = -1;
-        while (length <= 0) {
-            length = inputStream->PollWait();
-        }
-
-        uint8_t buf[length];
-        (void)memset_s(buf, sizeof(buf), 0, sizeof(buf));
-        int ret = inputStream->Read(buf, sizeof(buf));
-        if (ret <= 0) {
-            HILOGE("inputStream.Read failed, ret = %{public}d", ret);
-            return;
-        } else {
-            ProcessReceivedData(client, buf, length, ret);
-        }
-    }
-}
-
-void NapiSppClient::ProcessReceivedData(std::shared_ptr<NapiSppClient> client, uint8_t* buf, int length, int ret)
-{
-    HILOGI("callback read data to jshap begin");
-    if (client == nullptr || !client->sppReadFlag || !client->callbackInfos_[REGISTER_SPP_READ_TYPE]) {
-        HILOGE("failed");
-        return;
-    }
-    std::shared_ptr<BufferCallbackInfo> callbackInfo =
-        std::static_pointer_cast<BufferCallbackInfo>(client->callbackInfos_[REGISTER_SPP_READ_TYPE]);
-    if (callbackInfo == nullptr) {
-        HILOGE("callbackInfo nullptr");
-        return;
-    }
-
-    std::shared_ptr<SppCallbackBuffer> buffer = std::make_shared<SppCallbackBuffer>(length);
-    buffer->len_ = ret;
-    if (memcpy_s(buffer->data_, buffer->len_, buf, ret) != EOK) {
-        HILOGE("memcpy_s failed!");
-        return;
-    }
-    callbackInfo->PushData(buffer);
-
-    auto status = napi_acquire_threadsafe_function(client->sppReadThreadSafeFunc_);
-    if (status != napi_ok) {
-        HILOGE("napi_acquire_threadsafe_function failed, status: %{public}d", status);
-        return;
-    }
-
-    status = napi_call_threadsafe_function(
-        client->sppReadThreadSafeFunc_, static_cast<void *>(callbackInfo.get()), napi_tsfn_blocking);
-    if (status != napi_ok) {
-        HILOGE("napi_call_threadsafe_function failed, status: %{public}d", status);
-        return;
-    }
-
-    status = napi_release_threadsafe_function(client->sppReadThreadSafeFunc_, napi_tsfn_release);
-    if (status != napi_ok) {
-        HILOGE("napi_release_threadsafe_function failed, status: %{public}d", status);
-        return;
-    }
-}
-
 void NapiSppClient::SppRead(int id)
 {
     auto client = clientMap[id];
@@ -568,11 +487,66 @@ void NapiSppClient::SppRead(int id)
         HILOGE("thread start failed.");
         return;
     }
-    if (client->client_->GetType() == TYPE_RFCOMM) {
-        ProcessRfcommRead(client, id);
+    std::shared_ptr<InputStream> inputStream = client->client_->GetInputStream();
+    BtSocketType type = client->client_->GetType();
+    std::vector<uint8_t> buf;
+    if (type == TYPE_RFCOMM) {
+        buf = std::vector<uint8_t>(RFCOMM_SOCKET_BUFFER_SIZE);
     } else {
-        ProcessL2capRead(client, id);
+        uint32_t bufferSize = client->client_->GetMaxReceivePacketSize();
+        buf = std::vector<uint8_t>(bufferSize);
     }
+
+    while (true) {
+        HILOGI("thread start.");
+        std::fill(buf.begin(), buf.end(), 0);
+        HILOGI("inputStream.Read start");
+        int ret = inputStream->Read(buf.data(), buf.size());
+        HILOGI("inputStream.Read end");
+        if (ret <= 0) {
+            HILOGI("inputStream.Read failed, ret = %{public}d", ret);
+            return;
+        } else {
+            HILOGI("callback read data to jshap begin");
+            if (client == nullptr || !client->sppReadFlag || !client->callbackInfos_[REGISTER_SPP_READ_TYPE]) {
+                HILOGE("failed");
+                return;
+            }
+            std::shared_ptr<BufferCallbackInfo> callbackInfo =
+            std::static_pointer_cast<BufferCallbackInfo>(client->callbackInfos_[REGISTER_SPP_READ_TYPE]);
+            if (callbackInfo == nullptr) {
+                HILOGE("callbackInfo nullptr");
+                return;
+            }
+
+            std::shared_ptr<SppCallbackBuffer> buffer = std::make_shared<SppCallbackBuffer>(ret);
+            if (memcpy_s(buffer->data_.data(), buffer->len_, buf.data(), ret) != EOK) {
+                HILOGE("memcpy_s failed!");
+                return;
+            }
+            callbackInfo->PushData(buffer);
+
+            auto status = napi_acquire_threadsafe_function(client->sppReadThreadSafeFunc_);
+            if (status != napi_ok) {
+                HILOGE("napi_acquire_threadsafe_function failed, status: %{public}d", status);
+                return;
+            }
+
+            status = napi_call_threadsafe_function(
+                client->sppReadThreadSafeFunc_, static_cast<void *>(callbackInfo.get()), napi_tsfn_blocking);
+            if (status != napi_ok) {
+                HILOGE("napi_call_threadsafe_function failed, status: %{public}d", status);
+                return;
+            }
+
+            status = napi_release_threadsafe_function(client->sppReadThreadSafeFunc_, napi_tsfn_release);
+            if (status != napi_ok) {
+                HILOGE("napi_release_threadsafe_function failed, status: %{public}d", status);
+                return;
+            }
+        }
+    }
+    return;
 }
 
 static int WriteDataLoop(std::shared_ptr<OutputStream> outputStream, uint8_t* totalBuf, size_t totalSize)
@@ -641,8 +615,8 @@ static napi_status CheckSppReadParams(napi_env env, napi_callback_info info, int
 
 static int ReadData(std::shared_ptr<InputStream> inputStream, int bufSize, SppCallbackBuffer &sppBuffer)
 {
-    (void)memset_s(sppBuffer.data_, bufSize, 0, bufSize);
-    int result = inputStream->Read(reinterpret_cast<uint8_t*>(sppBuffer.data_), bufSize);
+    (void)memset_s(sppBuffer.data_.data(), bufSize, 0, bufSize);
+    int result = inputStream->Read(reinterpret_cast<uint8_t*>(sppBuffer.data_.data()), bufSize);
     if (result <= 0) {
         HILOGE("Read faild");
         return BT_ERR_SPP_IO;
@@ -663,21 +637,16 @@ napi_value NapiSppClient::SppReadAsync(napi_env env, napi_callback_info info)
     client->sppReadFlag = true;
     std::shared_ptr<InputStream> inputStream = client->client_->GetInputStream();
     BtSocketType type = client->client_->GetType();
-    auto func = [inputStream, id, type] {
+    uint32_t bufferSize = client->client_->GetMaxReceivePacketSize();
+    auto func = [inputStream, id, type, bufferSize] {
         int err = 0;
         SppCallbackBuffer buffer;
         if (type == TYPE_RFCOMM) {
             buffer = SppCallbackBuffer(RFCOMM_SOCKET_BUFFER_SIZE);
             err = ReadData(inputStream, RFCOMM_SOCKET_BUFFER_SIZE, buffer);
         } else {
-            int length = -1;
-            while (length <= 0) {
-                length = inputStream->PollWait();
-            }
-            if (length > 0) {
-                buffer = SppCallbackBuffer(length);
-                err = ReadData(inputStream, length, buffer);
-            }
+            buffer = SppCallbackBuffer(bufferSize);
+            err = ReadData(inputStream, bufferSize, buffer);
         }
         auto object = std::make_shared<NapiNativeArrayBuffer>(buffer);
         auto client = clientMap[id];
@@ -718,6 +687,56 @@ napi_value NapiSppClient::GetDeviceId(napi_env env, napi_callback_info info)
     std::string addr = remoteDevice.GetDeviceAddr();
     napi_value result = nullptr;
     napi_create_string_utf8(env, addr.c_str(), addr.size(), &result);
+    return result;
+}
+
+napi_value NapiSppClient::IsConnected(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    bool isConnected = false;
+    int id = -1;
+    auto status = CheckSppFdParams(env, info, id);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    napi_value result = nullptr;
+    if (!clientMap.count(id)) {
+        napi_get_boolean(env, isConnected, &result);
+        return result;
+    }
+    auto client = clientMap[id];
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client != nullptr, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client->client_ != nullptr, BT_ERR_INVALID_PARAM);
+    isConnected = client->client_->IsConnected();
+    napi_get_boolean(env, isConnected, &result);
+    return result;
+}
+
+napi_value NapiSppClient::GetMaxReceiveDataSize(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    int id = -1;
+    auto status = CheckSppFdParams(env, info, id);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    auto client = clientMap[id];
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client != nullptr, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client->client_ != nullptr, BT_ERR_INVALID_PARAM);
+    int32_t maxReceiveDataSize = client->client_->GetMaxReceivePacketSize();
+    napi_value result = nullptr;
+    napi_create_int32(env, maxReceiveDataSize, &result);
+    return result;
+}
+
+napi_value NapiSppClient::GetMaxTransmitDataSize(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    int id = -1;
+    auto status = CheckSppFdParams(env, info, id);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    auto client = clientMap[id];
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client != nullptr, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, client->client_ != nullptr, BT_ERR_INVALID_PARAM);
+    int32_t maxTransmitDataSize = client->client_->GetMaxTransmitPacketSize();
+    napi_value result = nullptr;
+    napi_create_int32(env, maxTransmitDataSize, &result);
     return result;
 }
 } // namespace Bluetooth
