@@ -149,7 +149,7 @@ public:
                     gattcharacter.value().get(),
                     serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_CHARACTERISTICS_READ, device.transport_));
             }
-            
+
             return;
         } else {
             HILOGE("Can not Find Characteristic!");
@@ -191,7 +191,7 @@ public:
                     gattcharacter.value().get(),
                     serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_CHARACTERISTICS_WRITE, device.transport_));
             }
-            
+
             return;
         } else {
             HILOGE("Can not Find Characteristic!");
@@ -229,7 +229,7 @@ public:
                     gattdesc.value().get(),
                     serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_DESCRIPTOR_READ, device.transport_));
             }
-        
+
             return;
         } else {
             HILOGE("Can not Find Descriptor!");
@@ -269,7 +269,7 @@ public:
                     gattdesc.value().get(),
                     serverSptr->pimpl->BuildRequestId(REQUEST_TYPE_DESCRIPTOR_WRITE, device.transport_));
             }
-            
+
             return;
         } else {
             HILOGE("Can not Find Descriptor!");
@@ -328,7 +328,7 @@ public:
                     (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
                 state, disconnectReason);
         }
-        
+
         return;
     }
 
@@ -346,7 +346,7 @@ public:
                     (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
                 mtu);
         }
-        
+
         return;
     }
 
@@ -693,7 +693,7 @@ int GattServer::Connect(const BluetoothRemoteDevice &device, bool isDirect)
 
     int appId = pimpl->applicationId_;
     HILOGI("appId: %{public}d, device: %{public}s, isDirect: %{public}d", appId, GET_ENCRYPT_ADDR(device), isDirect);
-    
+
     bluetooth::GattDevice gattDevice(bluetooth::RawAddress(device.GetDeviceAddr()), GATT_TRANSPORT_TYPE_LE);
     return proxy->Connect(appId, gattDevice, isDirect);
 }
@@ -715,6 +715,7 @@ int GattServer::CancelConnection(const BluetoothRemoteDevice &device)
     HILOGI("appId: %{public}d, device: %{public}s", appId, GET_ENCRYPT_ADDR(device));
     return proxy->CancelConnection(appId, *gattDevice);
 }
+
 std::optional<std::reference_wrapper<GattService>> GattServer::GetService(const UUID &uuid, bool isPrimary)
 {
     HILOGD("enter");
@@ -737,6 +738,28 @@ std::optional<std::reference_wrapper<GattService>> GattServer::GetService(const 
     return std::nullopt;
 }
 
+int GattServer::GetService(const UUID &uuid, bool isPrimary, GattService &outService)
+{
+    // this function returns target service or error code
+    HILOGD("enter");
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    std::unique_lock<std::mutex> lock(pimpl->serviceListMutex_);
+    for (auto &svc : pimpl->gattServices_) {
+        if (svc.GetUuid().Equals(uuid) && svc.IsPrimary() == isPrimary) {
+            HILOGI("Find service, handle: 0x%{public}04X", svc.GetHandle());
+            outService = svc;
+            return BT_NO_ERROR;
+        }
+    }
+
+    HILOGE("The service is not found.");
+    return BT_ERR_GATT_SERVICE_NOT_FOUND;
+}
+
 std::list<GattService> &GattServer::GetServices()
 {
     HILOGD("enter");
@@ -750,6 +773,21 @@ std::list<GattService> &GattServer::GetServices()
     std::unique_lock<std::mutex> lock(pimpl->serviceListMutex_);
     return pimpl->gattServices_;
 }
+
+int GattServer::GetServices(std::list<GattService> &outServices)
+{
+    // this function returns target service or error code
+    HILOGD("enter");
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    std::unique_lock<std::mutex> lock(pimpl->serviceListMutex_);
+    outServices = pimpl->gattServices_;
+    return BT_NO_ERROR;
+}
+
 int GattServer::NotifyCharacteristicChanged(
     const BluetoothRemoteDevice &device, const GattCharacteristic &characteristic, bool confirm)
 {
