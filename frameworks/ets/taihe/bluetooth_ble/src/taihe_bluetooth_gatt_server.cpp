@@ -17,9 +17,9 @@
 #define LOG_TAG "bt_taihe_gatt_server"
 #endif
 
-#include "taihe_bluetooth_gatt_server.h"
-#include "taihe_bluetooth_error.h"
 #include "bluetooth_utils.h"
+#include "taihe_bluetooth_error.h"
+#include "taihe_bluetooth_gatt_server.h"
 #include "taihe_bluetooth_utils.h"
 #include "taihe_parser_utils.h"
 

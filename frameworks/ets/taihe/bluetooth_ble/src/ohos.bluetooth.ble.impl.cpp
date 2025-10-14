@@ -17,34 +17,29 @@
 #define LOG_TAG "bt_taihe_gatt_client"
 #endif
 
-#include "stdexcept"
-
 #include "bluetooth_ble_advertiser.h"
 #include "bluetooth_ble_central_manager.h"
-#include "bluetooth_remote_device.h"
-#include "bluetooth_gatt_client.h"
 #include "bluetooth_errorcode.h"
-#include "bluetooth_utils.h"
-#include "bluetooth_log.h"
+#include "bluetooth_gatt_client.h"
 #include "bluetooth_host.h"
-
-#include "taihe_bluetooth_ble_advertise_callback.h"
-#include "taihe_bluetooth_gatt_client_callback.h"
-#include "taihe_bluetooth_gatt_server_callback.h"
-#include "taihe_bluetooth_gatt_server.h"
-#include "taihe_bluetooth_error.h"
-#include "taihe_bluetooth_ble_utils.h"
-#include "taihe_bluetooth_ble_central_manager_callback.h"
-#include "taihe_bluetooth_utils.h"
-
+#include "bluetooth_log.h"
+#include "bluetooth_remote_device.h"
+#include "bluetooth_utils.h"
 #include "ohos.bluetooth.ble.impl.h"
-#include "taihe/platform/ani.hpp"
-#include "taihe/optional.hpp"
+#include "stdexcept"
+#include "taihe_bluetooth_ble_advertise_callback.h"
+#include "taihe_bluetooth_ble_central_manager_callback.h"
+#include "taihe_bluetooth_ble_utils.h"
+#include "taihe_bluetooth_error.h"
+#include "taihe_bluetooth_gatt_client_callback.h"
+#include "taihe_bluetooth_gatt_server.h"
+#include "taihe_bluetooth_gatt_server_callback.h"
+#include "taihe_bluetooth_utils.h"
+#include "taihe_parser_utils.h"
 #include "taihe/array.hpp"
-#include "ohos.bluetooth.ble.AdvertisingParams.ani.0.hpp"
-#include "ohos.bluetooth.ble.AdvertisingParams.ani.1.hpp"
-#include "ohos.bluetooth.ble.AdvertisingDisableParams.ani.0.hpp"
-#include "ohos.bluetooth.ble.AdvertisingDisableParams.ani.1.hpp"
+#include "taihe/optional.hpp"
+#include "taihe/platform/ani.hpp"
+
 namespace OHOS {
 namespace Bluetooth {
 namespace {
@@ -74,6 +69,11 @@ public:
         callback_->SetDeviceAddr(remoteAddr);
     }
     ~GattClientDeviceImpl() = default;
+
+    std::shared_ptr<BluetoothRemoteDevice> GetDevice()
+    {
+        return device_;
+    }
 
     void SetBLEMtuSize(int mtu)
     {
@@ -119,12 +119,12 @@ public:
     taihe::string GetDeviceNameSync()
     {
         HILOGD("start");
-        std::string deviceName = "";
-        if (device_ == nullptr) {
-            return deviceName;
+        std::string deviceAddr = "";
+        if (GetDevice()) {
+            deviceAddr = device_->GetDeviceAddr();
         }
 
-        std::string deviceAddr = device_->GetDeviceAddr();
+        std::string deviceName = "";
         int32_t err = BluetoothHost::GetDefaultHost().GetRemoteDevice(
             deviceAddr, BT_TRANSPORT_BLE).GetDeviceName(deviceName);
         TAIHE_BT_ASSERT_RETURN(err == BT_NO_ERROR, err, deviceName);
@@ -566,8 +566,7 @@ void StartAdvertising(ohos::bluetooth::ble::AdvertiseSetting setting, ohos::blue
 taihe_status CheckAdvertisingDataWithDuration(ani_env *env, ani_object object, BleAdvertiserSettings &outSettings,
     BleAdvertiserData &outAdvData, BleAdvertiserData &outRspData, uint16_t &outDuration)
 {
-    taihe::from_ani_t<ohos::bluetooth::ble::AdvertisingParams> fromAniInstance;
-    ohos::bluetooth::ble::AdvertisingParams bleAdvertiserParams = fromAniInstance(env, object);
+    ohos::bluetooth::ble::AdvertisingParams bleAdvertiserParams = TaiheParseAdvertisingParams(env, object);
     HILOGI("CheckAdvertisingDataWithDuration parse advertisingParams finish");
 
     if (bleAdvertiserParams.advertisingSettings.interval.has_value()) {
@@ -607,7 +606,7 @@ taihe_status CheckAdvertisingDataWithDuration(ani_env *env, ani_object object, B
 
 ani_object StartAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_object advertisingParams)
 {
-    HILOGI("enter");
+    HILOGI("StartAdvertisingAsyncPromise enter");
     ani_vm *vm = nullptr;
     if (ANI_OK != env->GetVM(&vm)) {
         HILOGE("GetVM failed");
@@ -684,8 +683,8 @@ ani_object StartAdvertisingAsyncCallback([[maybe_unused]] ani_env *env, ani_obje
 taihe_status CheckAdvertisingDisableParams(ani_env *env, ani_object info, uint32_t &outAdvHandle,
     std::shared_ptr<BleAdvertiseCallback> &callback)
 {
-    taihe::from_ani_t<ohos::bluetooth::ble::AdvertisingDisableParams> fromAniInstance;
-    ohos::bluetooth::ble::AdvertisingDisableParams bleAdvertisingDisableParams = fromAniInstance(env, info);
+    ohos::bluetooth::ble::AdvertisingDisableParams bleAdvertisingDisableParams =
+        TaiheParseAdvertisingDisableParams(env, info);
     HILOGI("CheckAdvertisingDisableParams parse advertisingDisableParams finish");
 
     outAdvHandle = static_cast<uint32_t>(bleAdvertisingDisableParams.advertisingId);

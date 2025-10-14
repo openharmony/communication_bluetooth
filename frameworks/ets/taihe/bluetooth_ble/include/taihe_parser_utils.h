@@ -17,9 +17,9 @@
 #define TAIHE_PARSER_UTILS_H
 
 #include "bluetooth_gatt_characteristic.h"
-#include "taihe_bluetooth_utils.h"
-#include "ohos.bluetooth.ble.proj.hpp"
 #include "ohos.bluetooth.ble.impl.hpp"
+#include "ohos.bluetooth.ble.proj.hpp"
+#include "taihe_bluetooth_utils.h"
 #include "taihe/runtime.hpp"
 
 namespace OHOS {
@@ -86,6 +86,8 @@ void TaiheParseObjectGattProperties(ohos::bluetooth::ble::GattProperties object,
 
 struct TaiheAsyncCallback;
 std::shared_ptr<TaiheAsyncCallback> TaiheParseAsyncCallback(ani_vm *vm, ani_env *env, ani_object info);
+::ohos::bluetooth::ble::AdvertisingParams TaiheParseAdvertisingParams(ani_env *env, ani_object ani_obj);
+::ohos::bluetooth::ble::AdvertisingDisableParams TaiheParseAdvertisingDisableParams(ani_env *env, ani_object ani_obj);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // TAIHE_PARSER_UTILS_H
