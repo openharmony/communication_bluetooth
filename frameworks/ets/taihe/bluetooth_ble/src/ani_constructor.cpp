@@ -14,7 +14,6 @@
  */
 
 #include "ohos.bluetooth.ble.ani.hpp"
-#include "bluetooth_log.h"
 #include "ohos.bluetooth.ble.impl.h"
 #include "taihe_bluetooth_gatt_server.h"
 

@@ -16,14 +16,14 @@
 #ifndef TAIHE_BLUETOOTH_BLE_IMPL_H
 #define TAIHE_BLUETOOTH_BLE_IMPL_H
 
-#include "ohos.bluetooth.ble.proj.hpp"
 #include "ohos.bluetooth.ble.impl.hpp"
-#include "taihe/runtime.hpp"
-#include "taihe/string.hpp"
-#include "taihe/common.hpp"
-#include "taihe/common.h"
+#include "ohos.bluetooth.ble.proj.hpp"
 #include "taihe_bluetooth_ble_central_manager_callback.h"
 #include "taihe_bluetooth_gatt_client_callback.h"
+#include "taihe/common.h"
+#include "taihe/common.hpp"
+#include "taihe/runtime.hpp"
+#include "taihe/string.hpp"
 
 namespace OHOS {
 namespace Bluetooth {

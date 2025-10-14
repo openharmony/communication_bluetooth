@@ -289,7 +289,6 @@ function StartAdvertising(setting: AdvertiseSetting, advData: AdvertiseData, adv
 @!sts_inject("""
 native function StartAdvertisingReturnsPromise_inner(advertisingParams: AdvertisingParams): Promise<int>;
 export function startAdvertising(advertisingParams: AdvertisingParams): Promise<int> {
-    console.info("taskpool.execute promise");
     return taskpool.execute((): Promise<int> => {
         console.info("taskpool.execute promise enter");
         return StartAdvertisingReturnsPromise_inner(advertisingParams);
@@ -311,20 +310,17 @@ export function startAdvertising(advertisingParams: AdvertisingParams, callback:
 
 native function DisableAdvertisingReturnsPromise_inner(advertisingDisableParams: AdvertisingDisableParams): Promise<void>;
 export function disableAdvertising(advertisingDisableParams: AdvertisingDisableParams): Promise<void> {
-    console.info("taskpool.execute promise");
     return taskpool.execute((): Promise<void> => {
         console.info("taskpool.execute promise enter");
         return DisableAdvertisingReturnsPromise_inner(advertisingDisableParams);
     })
     .then((ret: Any): void => {
         console.info("taskpool.execute promise then, ret: " + ret);
-        return;
     })
 };
 
 native function DisableAdvertisingWithCallback_inner(advertisingDisableParams: AdvertisingDisableParams, callback: AsyncCallback<void>): void;
 export function disableAdvertising(advertisingDisableParams: AdvertisingDisableParams, callback: AsyncCallback<void>): void {
-    console.info("taskpool.execute callback");
     taskpool.execute((): void => {
         console.info("taskpool.execute callback enter");
         return DisableAdvertisingWithCallback_inner(advertisingDisableParams, callback);
