@@ -348,6 +348,12 @@ enum class GattConnectionPriority : int {
     LOW_POWER_ULTRA /* interval 330ms latency 2 */
 };
 
+enum class NapiGattPriority : int {
+    LOW_POWER = 1,
+    BALANCED = 2,
+    HIGH = 3
+};
+
 enum GattStatus {
     AUTHENTICATION_FAILED = -33,
     GATT_CONGESTION = -32,

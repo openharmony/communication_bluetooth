@@ -391,6 +391,16 @@ public:
     explicit GattClient(const BluetoothRemoteDevice &device);
 
     /**
+     * @brief The function to get connection state.
+     *
+     * @param state connectedstate.
+     * @return result of #GATT_STATUS.
+     * @since 22
+     *
+     */
+    int GetConnectedState(int &state);
+
+    /**
      * @brief A destructor of GattClient.
      *
      * @since 6

@@ -52,6 +52,7 @@ public:
     virtual int RequestFastestConn(const BluetoothRawAddress &addr) = 0;
     virtual int ReadRemoteRssiValue(int32_t appId) = 0;
     virtual int RequestNotification(int32_t appId, uint16_t characterHandle, bool enable) = 0;
+    virtual int GetConnectedState(const std::string &deviceId, int &state) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
