@@ -47,6 +47,7 @@ public:
         const BluetoothGattDevice &device, BluetoothGattDescriptor *descriptor, int32_t ret) = 0;
     virtual int RespondDescriptorWrite(
         const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor, int32_t ret) = 0;
+    virtual int GetConnectedState(const std::string &deviceId, int &state) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

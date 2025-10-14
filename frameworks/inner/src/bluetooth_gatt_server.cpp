@@ -903,6 +903,21 @@ int GattServer::SendResponse(
     return result;
 }
 
+int GattServer::GetConnectedState(const std::string &deviceId, int &state)
+{
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
+        HILOGE("pimpl or gatt server proxy is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_SERVICE_DISCONNECTED, "failed: no proxy");
+    return proxy->GetConnectedState(deviceId, state);
+}
+
 GattServer::~GattServer()
 {
     HILOGD("enter");

@@ -348,6 +348,12 @@ enum class GattConnectionPriority : int {
     LOW_POWER_ULTRA /* interval 330ms latency 2 */
 };
 
+enum class NapiGattPriority : int {
+    LOW_POWER = 1,
+    BALANCED = 2,
+    HIGH = 3
+};
+
 enum GattStatus {
     AUTHENTICATION_FAILED = -33,
     GATT_CONGESTION = -32,
@@ -1744,6 +1750,11 @@ enum ProfileConnectionState {
 enum DialogBoxType {
     BLUETOOTH_SWITCH = 0,
 };
+
+#define DECLARE_WRITABLE_NAPI_FUNCTION(name, func)                                 \
+    {                                                                              \
+        (name), nullptr, (func), nullptr, nullptr, nullptr, napi_writable, nullptr \
+    }
 
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))

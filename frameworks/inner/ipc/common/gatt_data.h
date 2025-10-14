@@ -171,6 +171,11 @@ struct GattDevice {
 
     GattDevice(const RawAddress &addr, uint8_t transport);
 
+    void SetState(int state)
+    {
+        connectState_ = state;
+    }
+
     bool isEncryption_ = false;
     uint8_t role_ = GATT_ROLE_INVALID;
     uint8_t transport_ = 0;

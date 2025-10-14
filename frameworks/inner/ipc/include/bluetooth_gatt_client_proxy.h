@@ -49,6 +49,7 @@ public:
     int RequestFastestConn(const BluetoothRawAddress &addr) override;
     int ReadRemoteRssiValue(int32_t appId) override;
     int RequestNotification(int32_t appId, uint16_t characterHandle, bool enable) override;
+    int GetConnectedState(const std::string &deviceId, int &state) override;
 
 private:
     static inline BrokerDelegator<BluetoothGattClientProxy> delegator_;

@@ -32,6 +32,8 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
+std::vector<std::string> NapiGattServer::deviceList_;
+std::mutex NapiGattServer::deviceListMutex_;
 thread_local napi_ref NapiGattServer::consRef_ = nullptr;
 
 napi_value NapiGattServer::CreateGattServer(napi_env env, napi_callback_info info)
@@ -63,6 +65,7 @@ void NapiGattServer::DefineGattServerJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("sendResponse", SendResponse),
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
+        DECLARE_NAPI_FUNCTION("getConnectedState", GetConnectedState),
     };
 
     napi_value constructor = nullptr;
@@ -326,6 +329,45 @@ napi_value NapiGattServer::SendResponse(napi_env env, napi_callback_info info)
         static_cast<int>(rsp.value.size()));
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
+}
+
+static napi_status ParseGattServerGetConnectState(
+    napi_env env, napi_callback_info info, std::string &deviceId, NapiGattServer **outGattServer)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 argument.", napi_invalid_arg);
+    NapiGattServer *gattServer = NapiGetGattServer(env, thisVar);
+    NAPI_BT_RETURN_IF(gattServer == nullptr || outGattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
+
+    NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], deviceId));
+    if (!IsValidAddress(deviceId)) {
+        HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
+        return napi_invalid_arg;
+    }
+    *outGattServer = gattServer;
+    return napi_ok;
+}
+
+napi_value NapiGattServer::GetConnectedState(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::string deviceId;
+    NapiGattServer *server = nullptr;
+
+    auto status = ParseGattServerGetConnectState(env, info, deviceId, &server);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    std::shared_ptr<GattServer> gattServer = server->GetServer();
+    int state = -1;
+    auto checkStatus = gattServer->GetConnectedState(deviceId, state);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkStatus == BT_NO_ERROR, checkStatus);
+    int profileState = GetProfileConnectionState(state);
+    napi_value result = nullptr;
+    napi_create_int32(env, profileState, &result);
+    return result;
 }
 
 static GattCharacteristic *GetGattCharacteristic(const std::shared_ptr<GattServer> &server, const UUID &serviceUuid,

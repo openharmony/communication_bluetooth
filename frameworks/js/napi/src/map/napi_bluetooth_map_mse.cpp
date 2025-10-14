@@ -41,7 +41,7 @@ void NapiMapMse::DefineMapMseJSClass(napi_env env, napi_value exports)
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
-        DECLARE_NAPI_FUNCTION("getConnectedDevices", GetConnectedDevices),
+        DECLARE_WRITABLE_NAPI_FUNCTION("getConnectedDevices", GetConnectedDevices),
         DECLARE_NAPI_FUNCTION("getConnectionState", GetConnectionState),
         DECLARE_NAPI_FUNCTION("setConnectionStrategy", SetConnectionStrategy),
         DECLARE_NAPI_FUNCTION("getConnectionStrategy", GetConnectionStrategy),
