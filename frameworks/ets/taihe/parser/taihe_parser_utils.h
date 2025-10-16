@@ -77,6 +77,8 @@ taihe_status TaiheParseIncludeService(taihe::array<::ohos::bluetooth::ble::GattS
     std::vector<TaiheGattService> &outIncludeService);
 taihe_status TaiheParseGattCharacteristic(taihe::array<::ohos::bluetooth::ble::BLECharacteristic> object,
     std::vector<TaiheBleCharacteristic> &outCharacteristic);
+taihe_status TaiheParseGattBLECharacteristic(::ohos::bluetooth::ble::BLECharacteristic object,
+    TaiheBleCharacteristic &outCharacteristic);
 taihe_status TaiheParseGattDescriptor(taihe::array<::ohos::bluetooth::ble::BLEDescriptor> object,
     std::vector<TaiheBleDescriptor> &outDescriptor);
 void TaiheParseObjectGattPermissions(ohos::bluetooth::ble::GattPermissions object,
@@ -86,8 +88,6 @@ void TaiheParseObjectGattProperties(ohos::bluetooth::ble::GattProperties object,
 
 struct TaiheAsyncCallback;
 std::shared_ptr<TaiheAsyncCallback> TaiheParseAsyncCallback(ani_vm *vm, ani_env *env, ani_object info);
-::ohos::bluetooth::ble::AdvertisingParams TaiheParseAdvertisingParams(ani_env *env, ani_object ani_obj);
-::ohos::bluetooth::ble::AdvertisingDisableParams TaiheParseAdvertisingDisableParams(ani_env *env, ani_object ani_obj);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // TAIHE_PARSER_UTILS_H

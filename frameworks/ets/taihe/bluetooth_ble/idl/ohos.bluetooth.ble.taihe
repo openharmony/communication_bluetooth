@@ -326,8 +326,23 @@ export function disableAdvertising(advertisingDisableParams: AdvertisingDisableP
         return DisableAdvertisingWithCallback_inner(advertisingDisableParams, callback);
     })
 };
-""")
 
-@gen_async("enableAdvertising")
-@gen_promise("enableAdvertising")
-function EnableAdvertisingSync(advertisingEnableParams: AdvertisingEnableParams): void;
+native function EnableAdvertisingReturnsPromise_inner(advertisingEnableParams: AdvertisingEnableParams): Promise<void>;
+export function enableAdvertising(advertisingEnableParams: AdvertisingEnableParams): Promise<void> {
+    return taskpool.execute((): Promise<void> => {
+        console.info("taskpool.execute promise enter");
+        return EnableAdvertisingReturnsPromise_inner(advertisingEnableParams);
+    })
+    .then((ret: Any): void => {
+        console.info("taskpool.execute promise then, ret: " + ret);
+    })
+};
+
+native function EnableAdvertisingWithCallback_inner(advertisingEnableParams: AdvertisingEnableParams, callback: AsyncCallback<void>): void;
+export function enableAdvertising(advertisingEnableParams: AdvertisingEnableParams, callback: AsyncCallback<void>): void {
+    taskpool.execute((): void => {
+        console.info("taskpool.execute callback enter");
+        return EnableAdvertisingWithCallback_inner(advertisingEnableParams, callback);
+    })
+};
+""")

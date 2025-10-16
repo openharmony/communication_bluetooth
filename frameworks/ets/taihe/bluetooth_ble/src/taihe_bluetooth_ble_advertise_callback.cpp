@@ -38,14 +38,20 @@ void TaiheBluetoothBleAdvertiseCallback::OnStartResultEvent(int result, int advH
     if (advHandle_ == advHandle) {
         HILOGI("OnStartResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
         result = GetSDKAdaptedStatusCode(result); // Adaptation for old sdk
-        auto napiAdvHandle = std::make_shared<TaiheNativeInt>(advHandle);
-        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::GET_ADVERTISING_HANDLE, napiAdvHandle, result);
+        auto taiheAdvHandle = std::make_shared<TaiheNativeInt>(advHandle);
+        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::GET_ADVERTISING_HANDLE, taiheAdvHandle, result);
     }
 }
 
 void TaiheBluetoothBleAdvertiseCallback::OnEnableResultEvent(int result, int advHandle)
 {
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
+    if (advHandle_ == advHandle) {
+        HILOGI("OnEnableResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
+        result = GetSDKAdaptedStatusCode(result); // Adaptation for old sdk
+        auto taiheAdvResult = std::make_shared<TaiheNativeInt>(result);
+        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::BLE_ENABLE_ADVERTISING, taiheAdvResult, result);
+    }
 }
 
 void TaiheBluetoothBleAdvertiseCallback::OnDisableResultEvent(int result, int advHandle)
@@ -54,8 +60,8 @@ void TaiheBluetoothBleAdvertiseCallback::OnDisableResultEvent(int result, int ad
     if (advHandle_ == advHandle) {
         HILOGI("OnDisableResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
         result = GetSDKAdaptedStatusCode(result); // Adaptation for old sdk
-        auto napiAdvResult = std::make_shared<TaiheNativeInt>(result);
-        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::BLE_DISABLE_ADVERTISING, napiAdvResult, result);
+        auto taiheAdvResult = std::make_shared<TaiheNativeInt>(result);
+        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::BLE_DISABLE_ADVERTISING, taiheAdvResult, result);
     }
 }
 

@@ -18,8 +18,9 @@
 
 #include <iostream>
 #include <string>
-#include "safe_map.h"
+
 #include "ani.h"
+#include "safe_map.h"
 
 namespace OHOS {
 namespace Bluetooth {

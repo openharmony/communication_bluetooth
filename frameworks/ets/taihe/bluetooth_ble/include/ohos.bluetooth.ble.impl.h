@@ -34,6 +34,9 @@ ani_object StartAdvertisingAsyncCallback([[maybe_unused]] ani_env *env, ani_obje
 ani_object DisableAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_object advertisingDisableParams);
 ani_object DisableAdvertisingAsyncCallback([[maybe_unused]] ani_env *env, ani_object advertisingDisableParams,
                                            [[maybe_unused]] ani_object object);
+ani_object EnableAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_object advertisingEnableParams);
+ani_object EnableAdvertisingAsyncCallback([[maybe_unused]] ani_env *env, ani_object advertisingEnableParams,
+                                          [[maybe_unused]] ani_object object);
 } // namespace Bluetooth
 } // namespace OHOS
 #endif // TAIHE_BLUETOOTH_BLE_IMPL_H

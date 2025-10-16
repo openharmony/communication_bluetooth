@@ -37,20 +37,6 @@ enum class SensitivityMode {
     SENSITIVITY_MODE_LOW = 2    //  low sensitivity mode
 };
 
-class Util {
-public:
-static void TaiheToBleAdvertiserSettings(BleAdvertiserSettings &advertiserSettings,
-                                         ohos::bluetooth::ble::AdvertiseSetting advertiseSettingsTaihe);
-
-static void TaiheToBleAdvertiserData(BleAdvertiserData &advertiserData,
-                                     ohos::bluetooth::ble::AdvertiseData advertiseDataTaihe);
-
-static void TaiheToBleManufactureData(std::map<uint16_t, std::string> &manufactureData,
-                                      taihe::array<ohos::bluetooth::ble::ManufactureData> manufactureDataTaihe);
-
-static void TaiheToBleServiceData(std::map<ParcelUuid, std::string> &serviceData,
-                                  taihe::array<ohos::bluetooth::ble::ServiceData> serviceDataTaihe);
-};
 int GetCurrentSdkVersion(void);
 int GetSDKAdaptedStatusCode(int status);
 } // namespace Bluetooth

@@ -19,8 +19,8 @@
 
 #include "taihe_timer.h"
 
-#include "bluetooth_log.h"
 #include "bluetooth_errorcode.h"
+#include "bluetooth_log.h"
 #include "common_timer_errors.h"
 
 namespace OHOS {
@@ -77,6 +77,5 @@ void TaiheTimer::Unregister(uint32_t timerId)
 
     timer_->Unregister(timerId);
 }
-
 }  // namespace Bluetooth
 }  // namespace OHOS
