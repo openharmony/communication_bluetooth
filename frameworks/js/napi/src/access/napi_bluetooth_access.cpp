@@ -58,6 +58,7 @@ napi_value NapiAccess::DefineAccessJSFunction(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("enableBluetoothAsync", EnableBluetoothAsync),
         DECLARE_NAPI_FUNCTION("disableBluetoothAsync", DisableBluetoothAsync),
         DECLARE_NAPI_FUNCTION("notifyDialogResult", NotifyDialogResult),
+        DECLARE_NAPI_FUNCTION("convertUuid", ConvertUuid),
 #endif
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "access:napi_define_properties");
@@ -198,6 +199,41 @@ napi_value NapiAccess::GetLocalAddress(napi_env env, napi_callback_info info)
     napi_create_string_utf8(env, localAddr.c_str(), localAddr.size(), &result);
     NAPI_BT_ASSERT_RETURN(env, err == BT_NO_ERROR, err, result);
     return result;
+}
+
+bool CheckConvertUuid(napi_env env, napi_callback_info info, std::string &outUuid)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_RETURN_IF(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr) != napi_ok, "call failed.", false);
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 argument.", false);
+    NAPI_BT_RETURN_IF(NapiParseString(env, argv[0], outUuid) != napi_ok, "invalid param.", false);
+    NAPI_BT_RETURN_IF((outUuid.size() != STR_LEN_OF_2_BYTES_UUID && outUuid.size() != STR_LEN_OF_4_BYTES_UUID &&
+        outUuid.size() != STR_LEN_OF_16_BYTES_UUID), "invalid param.", false);
+    return true;
+}
+
+napi_value NapiAccess::ConvertUuid(napi_env env, napi_callback_info info)
+{
+    std::string inputUuid = "";
+    auto status = CheckConvertUuid(env, info, inputUuid);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status, BT_ERR_INVALID_PARAM);
+    std::string completeUuid = "";
+    if (inputUuid.size() == STR_LEN_OF_2_BYTES_UUID) {
+        completeUuid = "0000" + inputUuid + "-0000-1000-8000-00805f9b34fb";
+    } else if (inputUuid.size() == STR_LEN_OF_4_BYTES_UUID) {
+        completeUuid = inputUuid + "-0000-1000-8000-00805f9b34fb";
+    } else {
+        completeUuid = inputUuid;
+    }
+
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, IsValidUuid(completeUuid), BT_ERR_INVALID_PARAM);
+    std::for_each(completeUuid.begin(), completeUuid.end(), [](char &c) { c = std::tolower(c); });
+
+    napi_value outputUuid = nullptr;
+    napi_create_string_utf8(env, completeUuid.c_str(), NAPI_AUTO_LENGTH, &outputUuid);
+    return outputUuid;
 }
 #endif
 
