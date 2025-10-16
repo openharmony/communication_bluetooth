@@ -17,11 +17,12 @@
 #define LOG_TAG "bt_taihe_error"
 #endif
 
-#include "taihe/runtime.hpp"
+#include <map>
+
 #include "bluetooth_errorcode.h"
 #include "taihe_bluetooth_error.h"
 #include "taihe_bluetooth_utils.h"
-#include <map>
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace Bluetooth {

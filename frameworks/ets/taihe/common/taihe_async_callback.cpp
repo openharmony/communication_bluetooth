@@ -55,22 +55,9 @@ ani_object TaiheAsyncCallback::GetRet(void)
     return reinterpret_cast<ani_object>(TaiheGetUndefinedRet(env));
 }
 
-/*************************** env_cleanup_hook ********************************/
-void TaiheCallbackEnvCleanupHook(void *data)
-{
-    CHECK_AND_RETURN_LOG(data, "data is nullptr");
-
-    TaiheCallback *callback = static_cast<TaiheCallback *>(data);
-    callback->SetTaiheEnvValidity(false);
-}
-/*************************** env_cleanup_hook ********************************/
-
 TaiheCallback::TaiheCallback(ani_vm *vm, ani_env *env, ani_object callback) : vm_(vm), env_(env)
 {
     HILOGI("TaiheCallback::TaiheCallback enter");
-    // Use ID to identify NAPI callback.
-    static int idCount = 0;
-    id_ = idCount++;
 
     auto status = env->GlobalReference_Create(static_cast<ani_ref>(callback), &callbackRef_);
     if (status != ANI_OK) {
@@ -78,14 +65,9 @@ TaiheCallback::TaiheCallback(ani_vm *vm, ani_env *env, ani_object callback) : vm
     }
     HILOGI("TaiheCallback::TaiheCallback leave");
 }
+
 TaiheCallback::~TaiheCallback()
 {
-    HILOGI("TaiheCallback::~TaiheCallback enter");
-    if (!IsValidTaiheEnv()) {
-        HILOGE("TaiheCallback::~TaiheCallback env is exit");
-        return;
-    }
-
     TaiheHandleScope scope(vm_, env_);
     auto status = env_->GlobalReference_Delete(callbackRef_);
     if (status != ANI_OK) {
@@ -105,38 +87,21 @@ void TaiheCallFunction(ani_env *env, ani_ref callbackRef, ani_ref *argv, size_t 
     if (status != ANI_OK) {
         HILOGE("FunctionalObject_Call failed, status: %{public}d", status);
     }
-    if (status == ANI_INVALID_ARGS) {
-        HILOGI("TaiheCallFunction status == ANI_INVALID_ARGS");
-        return;
-    } else {
-        HILOGI("TaiheCallFunction status != ANI_INVALID_ARGS");
+
+    ani_boolean isExist = false;
+    status = env->ExistUnhandledError(&isExist);
+    HILOGD("ExistUnhandledError status: %{public}d, isExist: %{public}d", status, isExist);
+    if (isExist) {
+        HILOGI("Clear application's exception");
+        status = env->ResetError();
+        HILOGD("ResetError status: %{public}d", status);
     }
     HILOGI("TaiheCallFunction leave");
 }
 }  // namespace {}
 
-void TaiheCallback::CallFunction(const std::shared_ptr<TaiheNativeObject> &object)
-{
-    if (!IsValidTaiheEnv()) {
-        HILOGW("taihe env is exit");
-        return;
-    }
-    if (object == nullptr) {
-        HILOGE("taihe native object is nullptr");
-        return;
-    }
-
-    TaiheHandleScope scope(vm_, env_);
-    ani_ref val = object->ToTaiheValue(env_);
-    TaiheCallFunction(env_, callbackRef_, &val, ARGS_SIZE_ONE);
-}
-
 void TaiheCallback::CallFunction(int errCode, const std::shared_ptr<TaiheNativeObject> &object)
 {
-    if (!IsValidTaiheEnv()) {
-        HILOGW("taihe env is exit");
-        return;
-    }
     if (object == nullptr) {
         HILOGE("taihe native object is nullptr");
         return;
@@ -150,41 +115,6 @@ void TaiheCallback::CallFunction(int errCode, const std::shared_ptr<TaiheNativeO
     TaiheCallFunction(env_, callbackRef_, argv, ARGS_SIZE_TWO);
 }
 
-ani_env* TaiheCallback::GetTaiheEnv(void)
-{
-    return env_;
-}
-
-bool TaiheCallback::Equal(ani_env *env, ani_value &callback) const
-{
-    if (!IsValidTaiheEnv()) {
-        HILOGW("napi env is exit");
-        return false;
-    }
-    if (env != env_) {
-        HILOGD("Callback is not in the same thread, not uqual");
-        return false;
-    }
-
-    bool isEqual = false;
-    return isEqual;
-}
-
-std::string TaiheCallback::ToLogString(void) const
-{
-    return "callbackId: " + std::to_string(id_);
-}
-
-/*************************** env_cleanup_hook ********************************/
-void TaihePromiseEnvCleanupHook(void *data)
-{
-    CHECK_AND_RETURN_LOG(data, "data is nullptr");
-
-    TaihePromise *callback = static_cast<TaihePromise *>(data);
-    callback->SetTaiheEnvValidity(false);
-}
-/*************************** env_cleanup_hook ********************************/
-
 TaihePromise::TaihePromise(ani_vm *vm, ani_env *env) : vm_(vm), env_(env)
 {
     auto status = env->Promise_New(&bindDeferred_, &promise_);
@@ -195,18 +125,11 @@ TaihePromise::TaihePromise(ani_vm *vm, ani_env *env) : vm_(vm), env_(env)
 
 TaihePromise::~TaihePromise()
 {
-    if (!IsValidTaiheEnv()) {
-        return;
-    }
 }
 
 void TaihePromise::ResolveOrReject(int errCode, const std::shared_ptr<TaiheNativeObject> &object)
 {
     HILOGI("ResolveOrReject enter");
-    if (!IsValidTaiheEnv()) {
-        HILOGW("napi env is exit");
-        return;
-    }
     if (object == nullptr) {
         HILOGE("napi native object is nullptr");
         return;

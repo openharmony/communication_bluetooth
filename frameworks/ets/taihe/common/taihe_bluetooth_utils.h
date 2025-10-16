@@ -16,12 +16,13 @@
 #ifndef TAIHE_BLUETOOTH_UTILS_H_
 #define TAIHE_BLUETOOTH_UTILS_H_
 
-#include "bluetooth_types.h"
-#include "taihe/runtime.hpp"
-#include "taihe/array.hpp"
 #include <shared_mutex>
 #include <vector>
+
+#include "bluetooth_types.h"
 #include "stdexcept"
+#include "taihe/array.hpp"
+#include "taihe/runtime.hpp"
 #include "taihe_bluetooth_error.h"
 
 namespace OHOS {
@@ -64,8 +65,6 @@ enum taihe_status {
     taihe_create_ark_runtime_only_one_env_per_thread = 23,
     taihe_destroy_ark_runtime_env_not_exist = 24
 };
-
-taihe_status TaiheIsFunction(ani_env *env, ani_object object);
 
 #ifndef TAIHE_BT_CALL_RETURN
 #define TAIHE_BT_CALL_RETURN(func)                                          \

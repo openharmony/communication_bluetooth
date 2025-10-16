@@ -13,30 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef TAIHE_TIMER_H
-#define TAIHE_TIMER_H
+#ifndef TAIHE_TOOL_BLUETOOTH_UTILS_H
+#define TAIHE_TOOL_BLUETOOTH_UTILS_H
 
-#include <memory>
-
-#include "timer.h"
+#include "ohos.bluetooth.ble.impl.hpp"
+#include "ohos.bluetooth.ble.proj.hpp"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace Bluetooth {
-class TaiheTimer {
-public:
-    using TimerCallback = std::function<void ()>;
-    static constexpr uint32_t DEFAULT_TIMEOUT = 10000; // 10s
-
-    static TaiheTimer *GetInstance(void);
-
-    TaiheTimer();
-    ~TaiheTimer();
-
-    int Register(const TimerCallback& callback, uint32_t &outTimerId, uint32_t interval = DEFAULT_TIMEOUT);
-    void Unregister(uint32_t timerId);
-private:
-    std::unique_ptr<OHOS::Utils::Timer> timer_ {nullptr};
-};
+::ohos::bluetooth::ble::AdvertisingParams TaiheParseAdvertisingParams(ani_env *env, ani_object ani_obj);
+::ohos::bluetooth::ble::AdvertisingDisableParams TaiheParseAdvertisingDisableParams(ani_env *env, ani_object ani_obj);
+::ohos::bluetooth::ble::AdvertisingEnableParams TaiheParseAdvertisingEnableParams(ani_env* env, ani_object ani_obj);
 }  // namespace Bluetooth
 }  // namespace OHOS
-#endif // TAIHE_TIMER_H
+#endif  // TAIHE_TOOL_BLUETOOTH_UTILS_H

@@ -49,19 +49,7 @@ public:
     TaiheCallback(ani_vm *vm, ani_env *env, ani_object callback);
     ~TaiheCallback();
 
-    void CallFunction(const std::shared_ptr<TaiheNativeObject> &object);
     void CallFunction(int errCode, const std::shared_ptr<TaiheNativeObject> &object);
-    ani_env* GetTaiheEnv(void);
-    bool Equal(ani_env *env, ani_value &callback) const;
-    std::string ToLogString(void) const;
-    void SetTaiheEnvValidity(bool isValid)
-    {
-        isValid_ = isValid;
-    }
-    bool IsValidTaiheEnv(void) const
-    {
-        return isValid_;
-    }
 
 private:
     TaiheCallback(const TaiheCallback &) = delete;
@@ -72,10 +60,6 @@ private:
     ani_vm *vm_;
     ani_env *env_;
     ani_ref callbackRef_;
-    int id_;
-    /*************************** env_cleanup_hook ********************************/
-    bool isValid_ = true;
-    /*************************** env_cleanup_hook ********************************/
 };
 
 class TaihePromise {
@@ -87,14 +71,6 @@ public:
     void Resolve(ani_ref resolution);
     void Reject(ani_ref rejection);
     ani_object GetPromise(void) const;
-    void SetTaiheEnvValidity(bool isValid)
-    {
-        isValid_ = isValid;
-    }
-    bool IsValidTaiheEnv(void) const
-    {
-        return isValid_;
-    }
 
 private:
     ani_vm *vm_;
@@ -102,7 +78,6 @@ private:
     ani_object promise_;
     ani_resolver bindDeferred_;
     bool isResolvedOrRejected_ = false;
-    bool isValid_ = true;
 };
 
 class TaiheHandleScope {
@@ -113,7 +88,6 @@ public:
 private:
     ani_vm *vm_;
 };
-
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // TAIHE_ASYNC_CALLBACK_H

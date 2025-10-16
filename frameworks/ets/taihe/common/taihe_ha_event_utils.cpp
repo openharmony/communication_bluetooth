@@ -146,6 +146,5 @@ void TaiheHaEventUtils::WriteEndEvent() const
         "ret:%{public}d", transId.c_str(), apiName_.c_str(), SDK_NAME.c_str(), errCode, ret);
 #endif
 }
-
 } // namespace Bluetooth
 } // namespace OHOS

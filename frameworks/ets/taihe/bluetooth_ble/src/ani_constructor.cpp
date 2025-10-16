@@ -32,6 +32,10 @@ static ani_status ANIFuncsRegister(ani_env *env)
             reinterpret_cast<ani_object *>(OHOS::Bluetooth::DisableAdvertisingAsyncPromise)},
         {"DisableAdvertisingWithCallback_inner", nullptr,
             reinterpret_cast<ani_object *>(OHOS::Bluetooth::DisableAdvertisingAsyncCallback)},
+        {"EnableAdvertisingReturnsPromise_inner", nullptr,
+            reinterpret_cast<ani_object *>(OHOS::Bluetooth::EnableAdvertisingAsyncPromise)},
+        {"EnableAdvertisingWithCallback_inner", nullptr,
+            reinterpret_cast<ani_object *>(OHOS::Bluetooth::EnableAdvertisingAsyncCallback)},
     };
     return env->Namespace_BindNativeFunctions(scope, methods, sizeof(methods) / sizeof(ani_native_function));
 }

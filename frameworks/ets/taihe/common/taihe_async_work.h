@@ -16,13 +16,14 @@
 #ifndef TAIHE_ASYNC_WORK_H
 #define TAIHE_ASYNC_WORK_H
 
+#include <map>
 #include <memory>
 #include <mutex>
-#include <map>
+
+#include "ani.h"
 #include "taihe_bluetooth_utils.h"
 #include "taihe_ha_event_utils.h"
 #include "taihe_native_object.h"
-#include "ani.h"
 
 namespace OHOS {
 namespace Bluetooth {
