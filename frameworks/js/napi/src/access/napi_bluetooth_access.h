@@ -21,6 +21,11 @@
 
 namespace OHOS {
 namespace Bluetooth {
+
+constexpr int STR_LEN_OF_2_BYTES_UUID = 4; // e.g. 180f
+constexpr int STR_LEN_OF_4_BYTES_UUID = 8; // e.g. 0000180f
+constexpr int STR_LEN_OF_16_BYTES_UUID = 36; // e.g. 0000180f-0000-1000-8000-00805f9b34fb
+
 #define DECLARE_WRITABLE_NAPI_FUNCTION(name, func)                                 \
     {                                                                              \
         (name), nullptr, (func), nullptr, nullptr, nullptr, napi_writable, nullptr \
@@ -40,6 +45,7 @@ public:
 #ifdef BLUETOOTH_API_SINCE_10
     static napi_value FactoryReset(napi_env env, napi_callback_info info);
     static napi_value GetLocalAddress(napi_env env, napi_callback_info info);
+    static napi_value ConvertUuid(napi_env env, napi_callback_info info);
 #endif
 
     static napi_value AddPersistentDeviceId(napi_env env, napi_callback_info info);
