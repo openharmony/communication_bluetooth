@@ -18,6 +18,7 @@
 
 #include "bluetooth_errorcode.h"
 #include "bluetooth_host.h"
+#include "securec.h"
 #include "datetime_ex.h"
 #include "napi_bluetooth_spp_client.h"
 #include "napi_bluetooth_error.h"
@@ -513,7 +514,7 @@ void NapiSppClient::SppRead(int id)
                 return;
             }
             std::shared_ptr<BufferCallbackInfo> callbackInfo =
-            std::static_pointer_cast<BufferCallbackInfo>(client->callbackInfos_[REGISTER_SPP_READ_TYPE]);
+                std::static_pointer_cast<BufferCallbackInfo>(client->callbackInfos_[REGISTER_SPP_READ_TYPE]);
             if (callbackInfo == nullptr) {
                 HILOGE("callbackInfo nullptr");
                 return;
@@ -719,7 +720,7 @@ napi_value NapiSppClient::GetMaxReceiveDataSize(napi_env env, napi_callback_info
     auto client = clientMap[id];
     NAPI_BT_ASSERT_RETURN_UNDEF(env, client != nullptr, BT_ERR_INVALID_PARAM);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, client->client_ != nullptr, BT_ERR_INVALID_PARAM);
-    int32_t maxReceiveDataSize = client->client_->GetMaxReceivePacketSize();
+    int32_t maxReceiveDataSize = static_cast<int32_t>(client->client_->GetMaxReceivePacketSize());
     napi_value result = nullptr;
     napi_create_int32(env, maxReceiveDataSize, &result);
     return result;
@@ -734,7 +735,7 @@ napi_value NapiSppClient::GetMaxTransmitDataSize(napi_env env, napi_callback_inf
     auto client = clientMap[id];
     NAPI_BT_ASSERT_RETURN_UNDEF(env, client != nullptr, BT_ERR_INVALID_PARAM);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, client->client_ != nullptr, BT_ERR_INVALID_PARAM);
-    int32_t maxTransmitDataSize = client->client_->GetMaxTransmitPacketSize();
+    int32_t maxTransmitDataSize = static_cast<int32_t>(client->client_->GetMaxTransmitPacketSize());
     napi_value result = nullptr;
     napi_create_int32(env, maxTransmitDataSize, &result);
     return result;
