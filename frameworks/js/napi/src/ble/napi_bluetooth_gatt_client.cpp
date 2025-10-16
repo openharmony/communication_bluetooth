@@ -436,7 +436,7 @@ napi_value NapiGattClient::GetConnectedState(napi_env env, napi_callback_info in
 {
     NapiGattClient *client = nullptr;
     auto status = ParseGattClientGetConnectState(env, info, &client);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     std::shared_ptr<GattClient> gattClient = client->GetClient();
     int state = INVALID_STATE;
