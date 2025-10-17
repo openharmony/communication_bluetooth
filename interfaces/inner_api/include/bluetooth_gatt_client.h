@@ -75,6 +75,15 @@ public:
     {}
 
     /**
+     * @brief The function to OnServicesChanged.
+     *
+     * @since 22
+     *
+     */
+    virtual void OnServicesChanged()
+    {}
+
+    /**
      * @brief The function to OnCharacteristicChanged.
      *
      * @param characteristic Characteristic object to changed.
@@ -380,6 +389,16 @@ public:
      *
      */
     explicit GattClient(const BluetoothRemoteDevice &device);
+
+    /**
+     * @brief The function to get connection state.
+     *
+     * @param state connectedstate.
+     * @return result of #GATT_STATUS.
+     * @since 22
+     *
+     */
+    int GetConnectedState(int &state);
 
     /**
      * @brief A destructor of GattClient.
