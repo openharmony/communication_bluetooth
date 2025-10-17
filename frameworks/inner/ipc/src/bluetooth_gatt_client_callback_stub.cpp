@@ -207,20 +207,7 @@ ErrCode BluetoothGattClientCallbackStub::OnServicesChangedInner(
     BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
 {
     HILOGI("BluetoothGattClientCallbackStub::OnServicesChangedInner Triggered!");
-    int32_t num = 0;
-    if (!data.ReadInt32(num) || num > GATT_CLIENT_CALLBACK_READ_DATA_SIZE_MAX_LEN) {
-        HILOGE("read Parcelable size failed.");
-        return TRANSACTION_ERR;
-    }
-    std::vector<BluetoothGattService> service;
-    for (int i = num; i > 0; i--) {
-        std::shared_ptr<BluetoothGattService> dev(data.ReadParcelable<BluetoothGattService>());
-        if (!dev) {
-            return TRANSACTION_ERR;
-        }
-        service.push_back(*dev);
-    }
-    stub->OnServicesChanged(service);
+    stub->OnServicesChanged();
     return NO_ERROR;
 }
 

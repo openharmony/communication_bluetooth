@@ -26,6 +26,7 @@ const int SLEEP_TIME = 50000;
 const int VALUE_1 = 1;
 const int VALUE_2 = 2;
 const int VALUE_3 = 3;
+const int INVALID_STATE = -1;
 
 class NapiGattClient {
 public:
@@ -43,6 +44,9 @@ public:
     static napi_value GetServices(napi_env env, napi_callback_info info);
     static napi_value ReadCharacteristicValue(napi_env env, napi_callback_info info);
     static napi_value ReadDescriptorValue(napi_env env, napi_callback_info info);
+
+    static napi_value GetConnectedState(napi_env env, napi_callback_info info);
+    static napi_value UpdateConnectionParam(napi_env env, napi_callback_info info);
 
 #ifdef BLUETOOTH_API_SINCE_10
     static napi_value WriteCharacteristicValueEx(napi_env env, napi_callback_info info);

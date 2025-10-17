@@ -95,6 +95,8 @@ void NapiGattClient::DefineGattClientJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("setBLEMtuSize", SetBLEMtuSize),
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
+        DECLARE_NAPI_FUNCTION("getConnectedState", GetConnectedState),
+        DECLARE_NAPI_FUNCTION("updateConnectionParam", UpdateConnectionParam),
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("writeCharacteristicValue", WriteCharacteristicValueEx),
         DECLARE_NAPI_FUNCTION("writeDescriptorValue", WriteDescriptorValueEx),
@@ -413,6 +415,99 @@ napi_value NapiGattClient::ReadDescriptorValue(napi_env env, napi_callback_info 
     bool success = client->GetCallback()->asyncWorkMap_.TryPush(NapiAsyncType::GATT_CLIENT_READ_DESCRIPTOR, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+static napi_status ParseGattClientGetConnectState(
+    napi_env env, napi_callback_info info, NapiGattClient **outGattClient)
+{
+    size_t argc = ARGS_SIZE_ZERO;
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ZERO, "Requires 0 argument.", napi_invalid_arg);
+    NapiGattClient *gattClient = NapiGetGattClient(env, thisVar);
+    NAPI_BT_RETURN_IF(gattClient == nullptr || outGattClient == nullptr, "gattClient is nullptr.", napi_invalid_arg);
+    *outGattClient = gattClient;
+    return napi_ok;
+}
+
+napi_value NapiGattClient::GetConnectedState(napi_env env, napi_callback_info info)
+{
+    NapiGattClient *client = nullptr;
+    auto status = ParseGattClientGetConnectState(env, info, &client);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    std::shared_ptr<GattClient> gattClient = client->GetClient();
+    int state = INVALID_STATE;
+    auto checkStatus = gattClient->GetConnectedState(state);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkStatus == BT_NO_ERROR, checkStatus);
+    int profileState = GetProfileConnectionState(state);
+    napi_value result = nullptr;
+    napi_create_int32(env, profileState, &result);
+    return result;
+}
+
+static napi_status ParseGattClientUpdateConnectionState(
+    napi_env env, napi_callback_info info, int &connectionParam, NapiGattClient **outGattClient)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 argument.", napi_invalid_arg);
+    NapiGattClient *gattClient = NapiGetGattClient(env, thisVar);
+    NAPI_BT_RETURN_IF(gattClient == nullptr || outGattClient == nullptr, "gattClient is nullptr.", napi_invalid_arg);
+
+    NAPI_BT_CALL_RETURN(NapiParseInt32(env, argv[PARAM0], connectionParam));
+    if (connectionParam != static_cast<int>(NapiGattPriority::LOW_POWER) &&
+        connectionParam != static_cast<int>(NapiGattPriority::BALANCED) &&
+        connectionParam != static_cast<int>(NapiGattPriority::HIGH)) {
+        return napi_invalid_arg;
+    }
+    *outGattClient = gattClient;
+    return napi_ok;
+}
+
+int ConvertToPrior(int connectionParam)
+{
+    int res = INVALID_STATE;
+    switch (connectionParam) {
+        case static_cast<int>(NapiGattPriority::LOW_POWER):
+            res = static_cast<int>(GattConnectionPriority::LOW_POWER);
+            break;
+        case static_cast<int>(NapiGattPriority::BALANCED):
+            res = static_cast<int>(GattConnectionPriority::BALANCED);
+            break;
+        case static_cast<int>(NapiGattPriority::HIGH):
+            res = static_cast<int>(GattConnectionPriority::HIGH);
+            break;
+        default:
+            break;
+    }
+    return res;
+}
+
+napi_value NapiGattClient::UpdateConnectionParam(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    int connectionParam = -1;
+    NapiGattClient *client = nullptr;
+
+    auto status = ParseGattClientUpdateConnectionState(env, info, connectionParam, &client);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [client, connectionParam]() {
+        std::shared_ptr<GattClient> gattClient = client->GetClient();
+        int ret = gattClient->RequestConnectionPriority(ConvertToPrior(connectionParam));
+        return NapiAsyncWorkRet(ret);
+    };
+
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    bool success = client->GetCallback()->asyncWorkMap_.TryPush(
+        NapiAsyncType::GATT_CLIENT_UPDATE_CONNECTION_PRIORITY, asyncWork);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
 }

@@ -30,7 +30,8 @@ namespace Bluetooth {
 NapiGattClientCallback::NapiGattClientCallback()
     : eventSubscribe_({STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE,
         STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE,
-        STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE},
+        STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE,
+        STR_BT_GATT_CLIENT_CALLBACK_SERVICE_CHANGE},
         BT_MODULE_NAME)
 {}
 
@@ -38,6 +39,12 @@ void NapiGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &c
 {
     auto nativeObject = std::make_shared<NapiNativeBleCharacteristic>(characteristic);
     eventSubscribe_.PublishEvent(STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE, nativeObject);
+}
+
+void NapiGattClientCallback::OnServicesChanged()
+{
+    auto nativeObject = std::make_shared<NapiNativeInt>(BT_NO_ERROR);
+    eventSubscribe_.PublishEvent(STR_BT_GATT_CLIENT_CALLBACK_SERVICE_CHANGE, nativeObject);
 }
 
 void NapiGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
@@ -73,6 +80,17 @@ void NapiGattClientCallback::OnConnectionStateChangedWithReason(int connectionSt
 void NapiGattClientCallback::OnServicesDiscovered(int status)
 {
     HILOGI("status:%{public}d", status);
+}
+
+void NapiGattClientCallback::OnConnectionParameterChanged(int interval, int latency, int timeout, int status)
+{
+    int ret = -1;
+    if (status == static_cast<int>(GattStatus::GATT_SUCCESS)) {
+        ret = static_cast<int>(BT_NO_ERROR);
+    } else {
+        ret = static_cast<int>(BT_ERR_INTERNAL_ERROR);
+    }
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_UPDATE_CONNECTION_PRIORITY, nullptr, ret);
 }
 
 void NapiGattClientCallback::OnReadRemoteRssiValueResult(int rssi, int ret)

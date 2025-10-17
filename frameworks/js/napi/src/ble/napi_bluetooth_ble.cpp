@@ -107,7 +107,7 @@ bool ParseScanParameters(napi_env env, napi_value arg, ScanOptions &info)
         if (value) {
             RegisterBLEObserver(env, value, i, REGISTER_SYS_BLE_SCAN_TYPE);
         } else {
-            UnregisterSysBLEObserver(REGISTER_SYS_BLE_SCAN_TYPE);
+            UnregisterSysBLEObserver(env, REGISTER_SYS_BLE_SCAN_TYPE);
             return false;
         }
     }
@@ -150,7 +150,7 @@ void SysStopBLEScanExec(napi_env env, void *data)
 {
     HILOGI("SysStopBLEScanExec");
     BleCentralManagerGetInstance()->StopScan();
-    UnregisterSysBLEObserver(REGISTER_SYS_BLE_SCAN_TYPE);
+    UnregisterSysBLEObserver(env, REGISTER_SYS_BLE_SCAN_TYPE);
 }
 
 void SysStopBLEScanComplete(napi_env env, napi_status status, void *data)
@@ -229,7 +229,7 @@ bool ParseDeviceFoundParameters(napi_env env, napi_value arg)
         if (value) {
             RegisterBLEObserver(env, value, i, REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
         } else {
-            UnregisterSysBLEObserver(REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
+            UnregisterSysBLEObserver(env, REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
             return false;
         }
     }
@@ -258,7 +258,7 @@ napi_value SysSubscribeBLEFound(napi_env env, napi_callback_info info)
 
 napi_value SysUnsubscribeBLEFound(napi_env env, napi_callback_info info)
 {
-    UnregisterSysBLEObserver(REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
+    UnregisterSysBLEObserver(env, REGISTER_SYS_BLE_FIND_DEVICE_TYPE);
     return NapiGetNull(env);
 }
 } // namespace
@@ -1182,7 +1182,7 @@ napi_value StopAdvertising(napi_env env, napi_callback_info info)
     }
 }
 
-napi_status CheckBleProfileParams(napi_env env, napi_callback_info info, int32_t &outBleProfile)
+napi_status CheckBleProfileParams(napi_env env, napi_callback_info info, int32_t &outBleProfile, bool &hasParam)
 {
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = {nullptr};
@@ -1197,8 +1197,29 @@ napi_status CheckBleProfileParams(napi_env env, napi_callback_info info, int32_t
         if (outBleProfile < minValue || outBleProfile > maxValue) {
             return napi_invalid_arg;
         }
+        hasParam = true;
+    } else {
+        hasParam = false;
     }
     return napi_ok;
+}
+
+int32_t GetConnectedDevicesWithParam(napi_env env, int32_t bleProfile, napi_value &result)
+{
+    std::vector<std::string> connectedDevices;
+    int32_t ret = BluetoothHost::GetDefaultHost().GetConnectedBLEDevices(bleProfile, connectedDevices);
+    NAPI_BT_RETURN_IF(ret != BT_NO_ERROR, "GetConnectedBLEDevices fail", ret);
+    napi_status status = ConvertStringVectorToJS(env, result, connectedDevices);
+    NAPI_BT_RETURN_IF(status != napi_ok, "ConvertStringVectorToJS fail", BT_ERR_INTERNAL_ERROR);
+    return BT_NO_ERROR;
+}
+
+int32_t GetConnectedDevicesWithoutParam(napi_env env, napi_value &result)
+{
+    std::lock_guard<std::mutex> lock(NapiGattServer::deviceListMutex_);
+    napi_status status = ConvertStringVectorToJS(env, result, NapiGattServer::deviceList_);
+    NAPI_BT_RETURN_IF(status != napi_ok, "ConvertStringVectorToJS fail", BT_ERR_INTERNAL_ERROR);
+    return BT_NO_ERROR;
 }
 
 napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info)
@@ -1208,15 +1229,19 @@ napi_value GetConnectedBLEDevices(napi_env env, napi_callback_info info)
     napi_create_array(env, &result);
 
     int32_t bleProfile = static_cast<int32_t>(BleProfile::GATT_SERVER);
-    auto checkStatus = CheckBleProfileParams(env, info, bleProfile);
+    bool hasParam = false;
+    auto checkStatus = CheckBleProfileParams(env, info, bleProfile, hasParam);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkStatus == napi_ok, BT_ERR_INTERNAL_ERROR);
 
-    std::vector<std::string> connectedDevices;
-    int32_t ret = BluetoothHost::GetDefaultHost().GetConnectedBLEDevices(bleProfile, connectedDevices);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
-    
-    auto status = ConvertStringVectorToJS(env, result, connectedDevices);
-    NAPI_BT_ASSERT_RETURN(env, status == napi_ok, BT_ERR_INTERNAL_ERROR, result);
+    int32_t status = static_cast<int32_t>(BT_ERR_INTERNAL_ERROR);
+    // if api version >= 21, the interface need specify bleProfile param.
+    // else the interface do not need any param.
+    if (hasParam) {
+        status = GetConnectedDevicesWithParam(env, bleProfile, result);
+    } else {
+        status = GetConnectedDevicesWithoutParam(env, result);
+    }
+    NAPI_BT_ASSERT_RETURN(env, status == BT_NO_ERROR, status, result);
     return result;
 }
 
@@ -1245,6 +1270,7 @@ napi_value PropertyInit(napi_env env, napi_value exports)
     napi_value scanReportTypeObj = ScanReportTypeInit(env);
     napi_value gattDisconnectReasonObj = GattDisconnectReasonInit(env);
     napi_value bleProfileObj = BleProfileInit(env);
+    napi_value connectionParamObj = ConnectionParamInit(env);
 #endif
 
     napi_property_descriptor exportFuncs[] = {
@@ -1259,6 +1285,7 @@ napi_value PropertyInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("ScanReportType", scanReportTypeObj),
         DECLARE_NAPI_PROPERTY("GattDisconnectReason", gattDisconnectReasonObj),
         DECLARE_NAPI_PROPERTY("BleProfile", bleProfileObj),
+        DECLARE_NAPI_PROPERTY("ConnectionParam", connectionParamObj),
 #endif
     };
 

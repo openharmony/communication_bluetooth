@@ -115,7 +115,7 @@ napi_value NapiA2dpSource::DefineA2dpSourceJSClass(napi_env env, napi_value expo
         DECLARE_NAPI_FUNCTION("setConnectionStrategy", SetConnectionStrategy),
         DECLARE_NAPI_FUNCTION("getConnectionStrategy", GetConnectionStrategy),
         DECLARE_NAPI_FUNCTION("getConnectionState", GetConnectionState),
-        DECLARE_NAPI_FUNCTION("getConnectedDevices", GetConnectedDevices),
+        DECLARE_WRITABLE_NAPI_FUNCTION("getConnectedDevices", GetConnectedDevices),
         DECLARE_NAPI_FUNCTION("isAbsoluteVolumeSupported", IsAbsoluteVolumeSupported),
         DECLARE_NAPI_FUNCTION("isAbsoluteVolumeEnabled", IsAbsoluteVolumeEnabled),
         DECLARE_NAPI_FUNCTION("enableAbsoluteVolume", EnableAbsoluteVolume),

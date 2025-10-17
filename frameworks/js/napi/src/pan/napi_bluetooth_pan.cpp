@@ -57,7 +57,7 @@ void NapiBluetoothPan::DefinePanJSClass(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setTethering", NapiBluetoothPan::SetTethering),
         DECLARE_NAPI_FUNCTION("isTetheringOn", NapiBluetoothPan::IsTetheringOn),
 #ifdef BLUETOOTH_API_SINCE_10
-        DECLARE_NAPI_FUNCTION("getConnectedDevices", NapiBluetoothPan::GetConnectedDevices),
+        DECLARE_WRITABLE_NAPI_FUNCTION("getConnectedDevices", NapiBluetoothPan::GetConnectedDevices),
         DECLARE_NAPI_FUNCTION("getConnectionState", NapiBluetoothPan::GetConnectionState),
         DECLARE_NAPI_FUNCTION("setConnectionStrategy", NapiBluetoothPan::SetConnectionStrategy),
         DECLARE_NAPI_FUNCTION("getConnectionStrategy", NapiBluetoothPan::GetConnectionStrategy),

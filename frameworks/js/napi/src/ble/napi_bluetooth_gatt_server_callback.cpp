@@ -61,11 +61,30 @@ void NapiGattServerCallback::OnConnectionStateUpdateWithReason(
     const BluetoothRemoteDevice &device, int state, int disconnectReason)
 {
     HILOGI("enter, state: %{public}d, remote device address: %{public}s", state, GET_ENCRYPT_ADDR(device));
+    std::lock_guard<std::mutex> lock(NapiGattServer::deviceListMutex_);
     if (state == static_cast<int>(BTConnectState::CONNECTED)) {
+        bool hasAddr = false;
+        for (auto it = NapiGattServer::deviceList_.begin(); it != NapiGattServer::deviceList_.end(); ++it) {
+            if (*it == device.GetDeviceAddr()) {
+                hasAddr = true;
+                break;
+            }
+        }
+        if (!hasAddr) {
+            HILOGI("add device");
+            NapiGattServer::deviceList_.push_back(device.GetDeviceAddr());
+        }
         auto nativeObject = std::make_shared<NapiNativeBleConnectionStateChangeParam>(
             device.GetDeviceAddr(), state);
         eventSubscribe_.PublishEvent(STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE, nativeObject);
     } else if (state == static_cast<int>(BTConnectState::DISCONNECTED)) {
+        for (auto it = NapiGattServer::deviceList_.begin(); it != NapiGattServer::deviceList_.end(); ++it) {
+            if (*it == device.GetDeviceAddr()) {
+                HILOGI("remove device");
+                NapiGattServer::deviceList_.erase(it);
+                break;
+            }
+        }
         auto nativeObject = std::make_shared<NapiNativeBleConnectionStateChangeParam>(
             device.GetDeviceAddr(), state, 0, true, disconnectReason);
         eventSubscribe_.PublishEvent(STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE, nativeObject);
