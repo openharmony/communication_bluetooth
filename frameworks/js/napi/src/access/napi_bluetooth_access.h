@@ -26,10 +26,6 @@ constexpr int STR_LEN_OF_2_BYTES_UUID = 4; // e.g. 180f
 constexpr int STR_LEN_OF_4_BYTES_UUID = 8; // e.g. 0000180f
 constexpr int STR_LEN_OF_16_BYTES_UUID = 36; // e.g. 0000180f-0000-1000-8000-00805f9b34fb
 
-#define DECLARE_WRITABLE_NAPI_FUNCTION(name, func)                                 \
-    {                                                                              \
-        (name), nullptr, (func), nullptr, nullptr, nullptr, napi_writable, nullptr \
-    }
 class NapiAccess {
 public:
     static napi_value DefineAccessJSFunction(napi_env env, napi_value exports);
