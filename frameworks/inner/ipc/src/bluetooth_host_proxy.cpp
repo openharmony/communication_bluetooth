@@ -2093,5 +2093,30 @@ void BluetoothHostProxy::SetCallingPackageName(const std::string &address, const
         return;
     }
 }
+
+bool BluetoothHostProxy::StartRemoteSdpSearch(const std::string &address, const std::string &uuid)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), false, "WriteToken err");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), false, "write address error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(uuid), false, "write uuid error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::START_REMOTE_SDP_SEARCH, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET(error == NO_ERROR, false, "StartRemoteSdpSearch done fail");
+    return reply.ReadBool();
+}
+
+bool BluetoothHostProxy::GetRemoteServices(const std::string &address)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), false, "WriteToken err");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), false, "write address error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_REMOTE_SERVICES, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET(error == NO_ERROR, false, "GetRemoteServices done fail");
+    return reply.ReadBool();
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

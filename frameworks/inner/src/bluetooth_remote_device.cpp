@@ -481,5 +481,23 @@ int32_t BluetoothRemoteDevice::GetDeviceTransport(int32_t &transport) const
     CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     return hostProxy->GetDeviceTransport(address_, transport);
 }
+
+bool BluetoothRemoteDevice::StartRemoteSdpSearch(const std::string &uuid) const
+{
+    HILOGI("enter");
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
+    return hostProxy->StartRemoteSdpSearch(address_, uuid);
+}
+
+bool BluetoothRemoteDevice::GetRemoteServices() const
+{
+    HILOGI("enter");
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
+    return hostProxy->GetRemoteServices(address_);
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
