@@ -24,11 +24,11 @@ namespace OHOS {
 namespace Bluetooth {
 
 #ifndef TAIHE_BT_ASSERT_RETURN
-#define TAIHE_BT_ASSERT_RETURN(cond, errCode, retObj) \
+#define TAIHE_BT_ASSERT_RETURN(cond, errCode, retObj)     \
 do {                                                      \
     if (!(cond)) {                                        \
-        HandleSyncErr((errCode));                  \
-        HILOGE("bluetoothManager taihe assert failed.");                    \
+        HandleSyncErr((errCode));                         \
+        HILOGE("bluetoothManager taihe assert failed.");  \
         return (retObj);                                  \
     }                                                     \
 } while (0)

@@ -20,6 +20,8 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <thread>
+
 #include "taihe_async_work.h"
 
 namespace OHOS {
@@ -45,8 +47,7 @@ struct TaiheAsyncCallback {
 
 class TaiheCallback {
 public:
-    // napi_value 'callback' shall be type of napi_founction, check it use NapiIsFunction().
-    TaiheCallback(ani_vm *vm, ani_env *env, ani_object callback);
+    TaiheCallback(ani_vm *vm, ani_env *env, std::thread::id tid, ani_object callback);
     ~TaiheCallback();
 
     void CallFunction(int errCode, const std::shared_ptr<TaiheNativeObject> &object);
@@ -59,35 +60,32 @@ private:
 
     ani_vm *vm_;
     ani_env *env_;
+    std::thread::id threadId_;
     ani_ref callbackRef_;
 };
 
 class TaihePromise {
 public:
-    explicit TaihePromise(ani_vm *vm, ani_env *env);
+    explicit TaihePromise(ani_vm *vm, ani_env *env, std::thread::id tid);
     ~TaihePromise();
 
     void ResolveOrReject(int errCode, const std::shared_ptr<TaiheNativeObject> &object);
-    void Resolve(ani_ref resolution);
-    void Reject(ani_ref rejection);
+    void Resolve(ani_env *env, ani_ref resolution);
+    void Reject(ani_env *env, ani_ref rejection);
     ani_object GetPromise(void) const;
 
 private:
     ani_vm *vm_;
     ani_env *env_;
+    std::thread::id threadId_;
     ani_object promise_;
     ani_resolver bindDeferred_;
     bool isResolvedOrRejected_ = false;
 };
 
-class TaiheHandleScope {
-public:
-    explicit TaiheHandleScope(ani_vm *vm, ani_env*& env);
-    ~TaiheHandleScope();
-
-private:
-    ani_vm *vm_;
-};
+void TaiheCreateLocalScope(ani_env *env);
+void TaiheDestroyLocalScope(ani_env *env);
+ani_env* GetCurrentEnv(ani_vm *vm);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // TAIHE_ASYNC_CALLBACK_H

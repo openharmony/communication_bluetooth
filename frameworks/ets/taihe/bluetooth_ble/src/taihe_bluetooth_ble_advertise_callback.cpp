@@ -12,13 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef LOG_TAG
 #define LOG_TAG "bt_taihe_ble_advertise_callback"
 #endif
 
 #include "taihe_bluetooth_ble_advertise_callback.h"
-#include "ohos.bluetooth.ble.impl.h"
 #include "bluetooth_log.h"
+#include "ohos.bluetooth.ble.impl.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -75,13 +76,10 @@ void TaiheBluetoothBleAdvertiseCallback::OnSetAdvDataEvent(int result)
 
 void TaiheBluetoothBleAdvertiseCallback::OnGetAdvHandleEvent(int result, int advHandle)
 {
-    HILOGI("OnGetAdvHandleEvent enter, result: %{public}d advHandle: %{public}d", result, advHandle);
     advHandle_ = advHandle;
-    HILOGI("OnGetAdvHandleEvent leave");
 }
 
 void TaiheBluetoothBleAdvertiseCallback::OnChangeAdvResultEvent(int result, int advHandle)
 {}
-
 }  // namespace Bluetooth
 }  // namespace OHOS

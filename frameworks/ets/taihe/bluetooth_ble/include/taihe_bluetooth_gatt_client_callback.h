@@ -17,11 +17,13 @@
 #define TAIHE_BLUETOOTH_GATT_CLIENT_CALLBACK_H_
 
 #include <shared_mutex>
+
 #include "bluetooth_gatt_client.h"
-#include "ohos.bluetooth.ble.proj.hpp"
 #include "ohos.bluetooth.ble.impl.hpp"
-#include "taihe/runtime.hpp"
+#include "ohos.bluetooth.ble.proj.hpp"
 #include "stdexcept"
+#include "taihe_async_callback.h"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -52,6 +54,7 @@ public:
     TaiheGattClientCallback();
     ~TaiheGattClientCallback() override = default;
 
+    TaiheAsyncWorkMap asyncWorkMap_ {};
 private:
     std::string deviceAddr_ = INVALID_MAC_ADDRESS;
 };

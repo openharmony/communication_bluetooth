@@ -17,9 +17,10 @@
 #define LOG_TAG "bt_taihe_gatt_server"
 #endif
 
+#include "taihe_bluetooth_gatt_server.h"
+
 #include "bluetooth_utils.h"
 #include "taihe_bluetooth_error.h"
-#include "taihe_bluetooth_gatt_server.h"
 #include "taihe_bluetooth_utils.h"
 #include "taihe_parser_utils.h"
 
@@ -102,6 +103,104 @@ void GattServerImpl::SendResponse(ohos::bluetooth::ble::ServerResponse serverRes
     int ret = server_->SendResponse(remoteDevice, transId, status, offset,
         serverResponse.value.data(), serverResponse.value.size());
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
+}
+
+static GattCharacteristic *GetGattCharacteristic(const std::shared_ptr<GattServer> &server, const UUID &serviceUuid,
+    const UUID &characterUuid)
+{
+    auto service = server->GetService(serviceUuid, true);
+    if (!service.has_value()) {
+        service = server->GetService(serviceUuid, false);
+    }
+    if (!service.has_value()) {
+        HILOGE("not found service uuid: %{public}s", serviceUuid.ToString().c_str());
+        return nullptr;
+    }
+    GattCharacteristic *character = service.value().get().GetCharacteristic(characterUuid);
+    return character;
+}
+
+static taihe_status CheckNotifyCharacteristicChangedEx(::taihe::string_view id, ::ohos::bluetooth::ble::NotifyCharacteristic const& info,
+    GattServerImpl **outServer, std::string &outDeviceId, TaiheNotifyCharacteristic &outCharacter)
+{
+    std::string deviceId(id.c_str());
+    TaiheNotifyCharacteristic character;
+    TAIHE_BT_RETURN_IF(!IsValidAddress(deviceId), "Invalid bdaddr", taihe_invalid_arg);
+    TAIHE_BT_CALL_RETURN(TaiheParseNotifyCharacteristic(info, character));
+
+    GattServerImpl *gattServer = *outServer;
+    TAIHE_BT_RETURN_IF(gattServer == nullptr || outServer ==nullptr, "gattServer is nullptr.", taihe_invalid_arg);
+    *outServer = gattServer;
+    outDeviceId = std::move(deviceId);
+    outCharacter = std::move(character);
+    return taihe_ok;
+}
+
+uintptr_t GattServerImpl::NotifyCharacteristicChangedPromise(::taihe::string_view deviceId, ::ohos::bluetooth::ble::NotifyCharacteristic const& notifyCharacteristic)
+{
+    HILOGI("enter");
+    GattServerImpl* taiheServer = this;
+    std::string devId {};
+    TaiheNotifyCharacteristic notifyCharacter;
+    auto status = CheckNotifyCharacteristicChangedEx(deviceId, notifyCharacteristic,
+        &taiheServer, devId, notifyCharacter);
+    TAIHE_BT_ASSERT_RETURN((status == taihe_ok && taiheServer && taiheServer->GetServer()),
+        BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
+
+    auto func = [server = taiheServer->GetServer(), notifyCharacter, devId]() {
+        int ret = BT_ERR_INTERNAL_ERROR;
+        auto character = GetGattCharacteristic(server, notifyCharacter.serviceUuid, notifyCharacter.characterUuid);
+        if (character == nullptr) {
+            HILOGI("character is null!");
+            return TaiheAsyncWorkRet(ret);
+        }
+        character->SetValue(notifyCharacter.characterValue.data(), notifyCharacter.characterValue.size());
+        BluetoothRemoteDevice remoteDevice(devId, BTTransport::ADAPTER_BLE);
+        ret = server->NotifyCharacteristicChanged(remoteDevice, *character, notifyCharacter.confirm);
+        return TaiheAsyncWorkRet(ret);
+    };
+    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(taihe::get_env(), nullptr, func);
+    TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+
+    bool success = taiheServer->GetCallback()->asyncWorkMap_.TryPush(TaiheAsyncType::GATT_SERVER_NOTIFY_CHARACTERISTIC,
+        asyncWork);
+    TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+
+    asyncWork->Run();
+    return reinterpret_cast<uintptr_t>(asyncWork->GetRet());
+}
+
+void GattServerImpl::NotifyCharacteristicChangedAsync(::taihe::string_view deviceId, ::ohos::bluetooth::ble::NotifyCharacteristic const& notifyCharacteristic, uintptr_t callback)
+{
+    HILOGI("enter");
+    GattServerImpl* taiheServer = this;
+    std::string devId {};
+    TaiheNotifyCharacteristic notifyCharacter;
+    auto status = CheckNotifyCharacteristicChangedEx(deviceId, notifyCharacteristic,
+        &taiheServer, devId, notifyCharacter);
+    TAIHE_BT_ASSERT_RETURN_VOID((status == taihe_ok && taiheServer && taiheServer->GetServer()), BT_ERR_INVALID_PARAM);
+
+    auto func = [server = taiheServer->GetServer(), notifyCharacter, devId]() {
+        int ret = BT_ERR_INTERNAL_ERROR;
+        auto character = GetGattCharacteristic(server, notifyCharacter.serviceUuid, notifyCharacter.characterUuid);
+        if (character == nullptr) {
+            HILOGI("character is null!");
+            return TaiheAsyncWorkRet(ret);
+        }
+        character->SetValue(notifyCharacter.characterValue.data(), notifyCharacter.characterValue.size());
+        BluetoothRemoteDevice remoteDevice(devId, BTTransport::ADAPTER_BLE);
+        ret = server->NotifyCharacteristicChanged(remoteDevice, *character, notifyCharacter.confirm);
+        return TaiheAsyncWorkRet(ret);
+    };
+    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(
+        taihe::get_env(), reinterpret_cast<ani_object>(callback), func);
+    TAIHE_BT_ASSERT_RETURN_VOID(asyncWork, BT_ERR_INTERNAL_ERROR);
+
+    bool success = taiheServer->GetCallback()->asyncWorkMap_.TryPush(
+        TaiheAsyncType::GATT_SERVER_NOTIFY_CHARACTERISTIC, asyncWork);
+    TAIHE_BT_ASSERT_RETURN_VOID(success, BT_ERR_INTERNAL_ERROR);
+
+    asyncWork->Run();
 }
 } // namespace Bluetooth
 } // namespace OHOS

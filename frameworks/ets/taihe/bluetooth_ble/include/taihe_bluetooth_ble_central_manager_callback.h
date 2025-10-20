@@ -17,6 +17,7 @@
 #define TAIHE_BLUETOOTH_BLE_CENTRAL_MANAGER_H
 
 #include "bluetooth_ble_central_manager.h"
+#include "taihe_async_callback.h"
 #include "taihe_bluetooth_ble_utils.h"
 
 namespace OHOS {
@@ -35,6 +36,7 @@ public:
     void OnNotifyMsgReportFromLpDevice(const UUID &uuid, int msgType, const std::vector<uint8_t> &value) override {};
 
     void ConvertScanReportType(ScanReportType &scanReportType, uint8_t callbackType);
+    TaiheAsyncWorkMap asyncWorkMap_ {};
     bool isLatestNapiBleScannerObj_ = false;
 };
 }  // namespace Bluetooth

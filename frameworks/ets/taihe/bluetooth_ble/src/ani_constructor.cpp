@@ -15,7 +15,6 @@
 
 #include "ohos.bluetooth.ble.ani.hpp"
 #include "ohos.bluetooth.ble.impl.h"
-#include "taihe_bluetooth_gatt_server.h"
 
 static ani_status ANIFuncsRegister(ani_env *env)
 {

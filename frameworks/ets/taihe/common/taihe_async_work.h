@@ -45,9 +45,6 @@ enum TaiheAsyncType : int {
     BLE_DISABLE_ADVERTISING
 };
 
-static constexpr bool ASYNC_WORK_NEED_CALLBACK = true;
-static constexpr bool ASYNC_WORK_NO_NEED_CALLBACK = false;
-
 struct TaiheAsyncWorkRet {
     explicit TaiheAsyncWorkRet(int errCode) : errCode(errCode) {}
     TaiheAsyncWorkRet(int errCode, std::shared_ptr<TaiheNativeObject> object)
@@ -59,10 +56,10 @@ struct TaiheAsyncWorkRet {
 
 class TaiheAsyncWork : public std::enable_shared_from_this<TaiheAsyncWork> {
 public:
-    TaiheAsyncWork(ani_vm *vm, ani_env *env, std::function<TaiheAsyncWorkRet(void)> func,
-        std::shared_ptr<TaiheAsyncCallback> asyncCallback, bool needCallback = false,
+    TaiheAsyncWork(ani_env *env, std::function<TaiheAsyncWorkRet(void)> func,
+        std::shared_ptr<TaiheAsyncCallback> asyncCallback,
         std::shared_ptr<TaiheHaEventUtils> haUtils = nullptr)
-        : env_(env), func_(func), taiheAsyncCallback_(asyncCallback), needCallback_(needCallback), haUtils_(haUtils) {}
+        : env_(env), func_(func), taiheAsyncCallback_(asyncCallback), haUtils_(haUtils) {}
     ~TaiheAsyncWork() = default;
 
     void Run(void);
@@ -75,7 +72,6 @@ public:
         void Complete(void);
 
         int errCode = -1;
-        bool needCallback = false;
         std::shared_ptr<TaiheNativeObject> object;
         std::shared_ptr<TaiheAsyncWork> taiheAsyncWork = nullptr;
     };
@@ -89,16 +85,14 @@ private:
     uint32_t timerId_ = 0;  // Is used to reference a timer.
     std::function<TaiheAsyncWorkRet(void)> func_;
     std::shared_ptr<TaiheAsyncCallback> taiheAsyncCallback_ = nullptr;
-    std::atomic_bool needCallback_ = false; // Indicates whether an asynchronous work needs to wait for callback.
     std::atomic_bool triggered_ = false; // Indicates whether the asynchronous callback is called.
     std::shared_ptr<TaiheHaEventUtils> haUtils_; // HA report tool, which is transferred fron the original API interface
 };
 
 class TaiheAsyncWorkFactory {
 public:
-    static std::shared_ptr<TaiheAsyncWork> CreateAsyncWork(ani_vm *vm, ani_env *env, ani_object info,
-        std::function<TaiheAsyncWorkRet(void)> asyncWork, bool needCallback = ASYNC_WORK_NO_NEED_CALLBACK,
-        std::shared_ptr<TaiheHaEventUtils> haUtils = nullptr);
+    static std::shared_ptr<TaiheAsyncWork> CreateAsyncWork(ani_env *env, ani_object info,
+        std::function<TaiheAsyncWorkRet(void)> asyncWork, std::shared_ptr<TaiheHaEventUtils> haUtils = nullptr);
 };
 
 class TaiheAsyncWorkMap {

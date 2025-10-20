@@ -225,6 +225,24 @@ interface GattClientDevice {
     @gen_async("getDeviceName")
     @gen_promise("getDeviceName")
     GetDeviceNameSync(): String;
+
+    @rename("readCharacteristicValue")
+    ReadCharacteristicValuePromise(characteristic: BLECharacteristic):  @sts_type("Promise<BLECharacteristic>") Opaque;
+
+    @rename("readCharacteristicValue")
+    ReadCharacteristicValueAsync(characteristic: BLECharacteristic, callback: @sts_type("AsyncCallback<BLECharacteristic>") Opaque): void;
+
+    @rename("readDescriptorValue")
+    ReadDescriptorValuePromise(descriptor: BLEDescriptor):  @sts_type("Promise<BLEDescriptor>") Opaque;
+
+    @rename("readDescriptorValue")
+    ReadDescriptorValueAsync(descriptor: BLEDescriptor, callback: @sts_type("AsyncCallback<BLEDescriptor>") Opaque): void;
+
+    @rename("setCharacteristicChangeIndication")
+    SetCharacteristicChangeIndicationPromise(characteristic: BLECharacteristic, enable: bool):  @sts_type("Promise<void>") Opaque;
+
+    @rename("setCharacteristicChangeIndication")
+    SetCharacteristicChangeIndicationAsync(characteristic: BLECharacteristic, enable: bool, callback: @sts_type("AsyncCallback<void>") Opaque): void;
 }
 
 function CreateGattClientDevice(deviceId: String): GattClientDevice;
@@ -234,6 +252,12 @@ interface GattServer {
     AddService(service: GattService): void;
     RemoveService(serviceUuid: String): void;
     SendResponse(serverResponse: ServerResponse): void;
+
+    @rename("notifyCharacteristicChanged")
+    NotifyCharacteristicChangedPromise(deviceId: String, notifyCharacteristic: NotifyCharacteristic):  @sts_type("Promise<void>") Opaque;
+
+    @rename("notifyCharacteristicChanged")
+    NotifyCharacteristicChangedAsync(deviceId: String, notifyCharacteristic: NotifyCharacteristic, callback: @sts_type("AsyncCallback<void>") Opaque): void;
 }
 
 function CreateGattServer(): GattServer;
@@ -279,6 +303,11 @@ struct AdvertisingDisableParams {
 }
 
 interface BleScanner {
+    @rename("startScan")
+    StartScanPromise(filters: ScanFilterNullValue, options: Optional<ScanOptions>):  @sts_type("Promise<void>") Opaque;
+
+    @rename("stopScan")
+    StopScanPromise(): @sts_type("Promise<void>") Opaque;
 }
 
 function CreateBleScanner(): BleScanner;

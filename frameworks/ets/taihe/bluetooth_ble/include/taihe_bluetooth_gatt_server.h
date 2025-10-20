@@ -33,7 +33,19 @@ public:
     void Close();
     void RemoveService(taihe::string_view serviceUuid);
     void SendResponse(ohos::bluetooth::ble::ServerResponse serverResponse);
+    uintptr_t NotifyCharacteristicChangedPromise(::taihe::string_view deviceId,
+        ::ohos::bluetooth::ble::NotifyCharacteristic const& notifyCharacteristic);
+    void NotifyCharacteristicChangedAsync(::taihe::string_view deviceId,
+        ::ohos::bluetooth::ble::NotifyCharacteristic const& notifyCharacteristic, uintptr_t callback);
 
+    std::shared_ptr<GattServer> &GetServer()
+    {
+        return server_;
+    }
+    std::shared_ptr<TaiheGattServerCallback> GetCallback()
+    {
+        return callback_;
+    }
     static std::vector<std::string> deviceList_;
     static std::mutex deviceListMutex_;
 

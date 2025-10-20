@@ -17,6 +17,7 @@
 
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
+#include "taihe_native_object.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -50,6 +51,12 @@ void TaiheBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const s
 void TaiheBluetoothBleCentralManagerCallback::OnStartOrStopScanEvent(int resultCode, bool isStartScan)
 {
     HILOGI("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
+    auto napiIsStartScan = std::make_shared<TaiheNativeBool>(isStartScan);
+    if (isStartScan) {
+        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::BLE_START_SCAN, napiIsStartScan, resultCode);
+    } else {
+        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::BLE_STOP_SCAN, napiIsStartScan, resultCode);
+    }
 }
 
 void TaiheBluetoothBleCentralManagerCallback::ConvertScanReportType(

@@ -55,6 +55,16 @@ public:
 private:
     int value_;
 };
+
+class TaiheNativeBool : public TaiheNativeObject {
+public:
+    explicit TaiheNativeBool(bool value) : value_(value) {}
+    ~TaiheNativeBool() override = default;
+
+    ani_ref ToTaiheValue(ani_env *env) const override;
+private:
+    bool value_;
+};
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // TAIHE_NATIVE_OBJECT_H
