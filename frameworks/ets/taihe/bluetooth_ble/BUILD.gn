@@ -49,7 +49,6 @@ taihe_shared_library("bluetoothBle_taihe_native") {
     "src",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
-    "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/parser"
   ]

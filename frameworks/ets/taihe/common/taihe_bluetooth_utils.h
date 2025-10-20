@@ -38,6 +38,13 @@ ani_ref TaiheGetUndefined(ani_env *env);
 ani_ref TaiheGetUndefinedRet(ani_env *env);
 ani_ref GetCallbackErrorValue(ani_env *env, int errCode);
 
+struct TaiheNotifyCharacteristic {
+    UUID serviceUuid;
+    UUID characterUuid;
+    std::vector<uint8_t> characterValue {};
+    bool confirm;
+};
+
 enum taihe_status {
     taihe_ok = 0,
     taihe_invalid_arg,

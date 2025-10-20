@@ -41,5 +41,26 @@ ani_ref TaiheNativeInt::ToTaiheValue(ani_env *env) const
     }
     return reinterpret_cast<ani_ref>(object);
 }
+
+ani_ref TaiheNativeBool::ToTaiheValue(ani_env *env) const
+{
+    ani_class cls;
+    ani_status status = ANI_ERROR;
+    if ((status = env->FindClass("std.core.boolean", &cls)) != ANI_OK) {
+        HILOGE("FindClass status : %{public}d", status);
+        return nullptr;
+    }
+    ani_method ctor;
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "z:", &ctor)) != ANI_OK) {
+        HILOGE("Class_FindMethod status : %{public}d", status);
+        return nullptr;
+    }
+    ani_object object;
+    if ((status = env->Object_New(cls, ctor, &object, value_)) != ANI_OK) {
+        HILOGE("Object_New status : %{public}d", status);
+        return nullptr;
+    }
+    return reinterpret_cast<ani_ref>(object);
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

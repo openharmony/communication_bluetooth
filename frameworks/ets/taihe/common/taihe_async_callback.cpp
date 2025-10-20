@@ -18,8 +18,10 @@
 #endif
 
 #include "taihe_async_callback.h"
+
 #include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
+#include "taihe_bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -31,7 +33,7 @@ void TaiheAsyncCallback::CallFunction(int errCode, const std::shared_ptr<TaiheNa
         return;
     }
     if (object == nullptr) {
-        HILOGE("napi native object is nullptr");
+        HILOGE("taihe native object is nullptr");
         return;
     }
 
@@ -52,28 +54,37 @@ ani_object TaiheAsyncCallback::GetRet(void)
     if (promise) {
         return promise->GetPromise();
     }
-    return reinterpret_cast<ani_object>(TaiheGetUndefinedRet(env));
+    return reinterpret_cast<ani_object>(TaiheGetUndefined(env));
 }
 
-TaiheCallback::TaiheCallback(ani_vm *vm, ani_env *env, ani_object callback) : vm_(vm), env_(env)
+TaiheCallback::TaiheCallback(ani_vm *vm, ani_env *env, std::thread::id tid, ani_object callback) : vm_(vm), env_(env), threadId_(tid)
 {
-    HILOGI("TaiheCallback::TaiheCallback enter");
-
     auto status = env->GlobalReference_Create(static_cast<ani_ref>(callback), &callbackRef_);
     if (status != ANI_OK) {
         HILOGE("GlobalReference_Create failed, status: %{public}d", status);
     }
-    HILOGI("TaiheCallback::TaiheCallback leave");
 }
 
 TaiheCallback::~TaiheCallback()
 {
-    TaiheHandleScope scope(vm_, env_);
-    auto status = env_->GlobalReference_Delete(callbackRef_);
-    if (status != ANI_OK) {
-        HILOGE("GlobalReference_Delete failed, status: %{public}d", status);
+    bool isSameThread = (threadId_ == std::this_thread::get_id());
+    ani_env* curEnv = isSameThread ? env_ : GetCurrentEnv(vm_);
+    if (curEnv == nullptr) {
+        HILOGE("Failed to GetCurrentEnv");
+        return;
     }
-    HILOGI("TaiheCallback::~TaiheCallback leave");
+
+    if (callbackRef_ != nullptr) {
+        auto status = curEnv->GlobalReference_Delete(callbackRef_);
+        if (status != ANI_OK) {
+            HILOGE("GlobalReference_Delete failed, status: %{public}d", status);
+        }
+        callbackRef_ = nullptr;
+    }
+
+    if (!isSameThread) {
+        vm_->DetachCurrentThread();
+    }
 }
 
 namespace {
@@ -107,15 +118,26 @@ void TaiheCallback::CallFunction(int errCode, const std::shared_ptr<TaiheNativeO
         return;
     }
 
-    TaiheHandleScope scope(vm_, env_);
+    bool isSameThread = (threadId_ == std::this_thread::get_id());
+    ani_env* curEnv = isSameThread ? env_ : GetCurrentEnv(vm_);
+    if (curEnv == nullptr) {
+        HILOGE("taihe get current env is nullptr");
+        return;
+    }
 
-    ani_ref code = GetCallbackErrorValue(env_, errCode);
-    ani_ref val = object->ToTaiheValue(env_);
+    TaiheCreateLocalScope(curEnv);
+    ani_ref code = GetCallbackErrorValue(curEnv, errCode);
+    ani_ref val = object->ToTaiheValue(curEnv);
     ani_ref argv[ARGS_SIZE_TWO] = {code, val};
-    TaiheCallFunction(env_, callbackRef_, argv, ARGS_SIZE_TWO);
+    TaiheCallFunction(curEnv, callbackRef_, argv, ARGS_SIZE_TWO);
+    TaiheDestroyLocalScope(curEnv);
+
+    if (!isSameThread) {
+        vm_->DetachCurrentThread();
+    }
 }
 
-TaihePromise::TaihePromise(ani_vm *vm, ani_env *env) : vm_(vm), env_(env)
+TaihePromise::TaihePromise(ani_vm *vm, ani_env *env, std::thread::id tid) : vm_(vm), env_(env), threadId_(tid)
 {
     auto status = env->Promise_New(&bindDeferred_, &promise_);
     if (status != ANI_OK) {
@@ -131,44 +153,52 @@ void TaihePromise::ResolveOrReject(int errCode, const std::shared_ptr<TaiheNativ
 {
     HILOGI("ResolveOrReject enter");
     if (object == nullptr) {
-        HILOGE("napi native object is nullptr");
+        HILOGE("taihe native object is nullptr");
         return;
     }
 
     if (isResolvedOrRejected_) {
-        HILOGE("napi Resolved Or Rejected");
+        HILOGE("taihe Resolved Or Rejected");
         return;
     }
 
-    TaiheHandleScope scope(vm_, env_);
+    bool isSameThread = (threadId_ == std::this_thread::get_id());
+    ani_env* curEnv = isSameThread ? env_ : GetCurrentEnv(vm_);
+    if (curEnv == nullptr) {
+        HILOGE("taihe get current env is nullptr");
+        return;
+    }
 
+    TaiheCreateLocalScope(curEnv);
     if (errCode == BT_NO_ERROR) {
-        HILOGI("ResolveOrReject Resolve");
-        ani_ref val = object->ToTaiheValue(env_);
-        Resolve(val);
+        ani_ref val = object->ToTaiheValue(curEnv);
+        Resolve(curEnv, val);
     } else {
-        HILOGI("ResolveOrReject Reject");
-        ani_ref code = GetCallbackErrorValue(env_, errCode);
-        Reject(code);
+        ani_ref code = GetCallbackErrorValue(curEnv, errCode);
+        Reject(curEnv, code);
     }
     isResolvedOrRejected_ = true;
-    HILOGI("ResolveOrReject leave");
+    TaiheDestroyLocalScope(curEnv);
+
+    if (!isSameThread) {
+        vm_->DetachCurrentThread();
+    }
 }
 
-void TaihePromise::Resolve(ani_ref resolution)
+void TaihePromise::Resolve(ani_env *env, ani_ref resolution)
 {
     HILOGI("Resolve enter");
-    auto status = env_->PromiseResolver_Resolve(bindDeferred_, resolution);
+    auto status = env->PromiseResolver_Resolve(bindDeferred_, resolution);
     if (status != ANI_OK) {
         HILOGE("PromiseResolver_Resolve failed, status: %{public}d", status);
     }
     HILOGI("Resolve leave");
 }
 
-void TaihePromise::Reject(ani_ref rejection)
+void TaihePromise::Reject(ani_env *env, ani_ref rejection)
 {
     HILOGI("Reject enter");
-    auto status = env_->PromiseResolver_Reject(bindDeferred_, reinterpret_cast<ani_error>(rejection));
+    auto status = env->PromiseResolver_Reject(bindDeferred_, reinterpret_cast<ani_error>(rejection));
     if (status != ANI_OK) {
         HILOGE("PromiseResolver_Reject failed, status: %{public}d", status);
     }
@@ -181,28 +211,37 @@ ani_object TaihePromise::GetPromise(void) const
     return promise_;
 }
 
-TaiheHandleScope::TaiheHandleScope(ani_vm *vm, ani_env*& env) : vm_(vm)
+void TaiheCreateLocalScope(ani_env* env)
 {
-    ani_options aniArgs {0, nullptr};
-    ani_status status = vm->AttachCurrentThread(&aniArgs, ANI_VERSION_1, &env);
-    HILOGI("attach current thread ret: %{public}d", status);
+    ani_size nr_refs = 16;
+    ani_status status = env->CreateLocalScope(nr_refs);
     if (status != ANI_OK) {
-        HILOGE("AttachCurrentThread failed, status(%{public}d)", status);
-        status = vm->GetEnv(ANI_VERSION_1, &env);
-        HILOGI("get new env ret: %{public}d", status);
-        if (status != ANI_OK) {
-            HILOGE("GetEnv failed, status(%{public}d)", status);
-        }
+        HILOGE("CreateLocalScope failed, status(%{public}d)", status);
     }
 }
 
-TaiheHandleScope::~TaiheHandleScope()
+void TaiheDestroyLocalScope(ani_env* env)
 {
-    ani_status status = vm_->DetachCurrentThread();
-    HILOGI("detach current thread ret: %{public}d", status);
+    ani_status status = env->DestroyLocalScope();
     if (status != ANI_OK) {
-        HILOGE("DetachCurrentThread failed, status(%{public}d)", status);
+        HILOGE("DestroyLocalScope failed, status(%{public}d)", status);
     }
+}
+
+ani_env* GetCurrentEnv(ani_vm *vm)
+{
+    if (vm == nullptr) {
+        HILOGE("null vm");
+        return nullptr;
+    }
+    ani_env *threadEnv;
+    ani_options aniArgs {0, nullptr};
+    ani_status status = vm->AttachCurrentThread(&aniArgs, ANI_VERSION_1, &threadEnv);
+    if (status != ANI_OK) {
+        HILOGE("GetCurrentEnv failed, status(%{public}d)", status);
+        return nullptr;
+    }
+    return threadEnv;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

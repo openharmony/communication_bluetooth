@@ -17,6 +17,7 @@
 #define TAIHE_BLUETOOTH_GATT_SERVER_CALLBACK_H_
 
 #include "bluetooth_gatt_server.h"
+#include "taihe_async_callback.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -38,6 +39,7 @@ public:
     void OnConnectionParameterChanged(const BluetoothRemoteDevice &device,
         int interval, int latency, int timeout, int status) override {}
 
+    TaiheAsyncWorkMap asyncWorkMap_ {};
     TaiheGattServerCallback();
     ~TaiheGattServerCallback() override = default;
 };

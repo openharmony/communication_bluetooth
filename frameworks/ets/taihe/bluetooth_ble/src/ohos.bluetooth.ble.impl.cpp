@@ -76,6 +76,16 @@ public:
         return device_;
     }
 
+    std::shared_ptr<GattClient> &GetClient()
+    {
+        return client_;
+    }
+
+    std::shared_ptr<TaiheGattClientCallback> GetCallback()
+    {
+        return callback_;
+    }
+
     void SetBLEMtuSize(int mtu)
     {
         HILOGI("enter");
@@ -134,11 +144,360 @@ public:
 
         return deviceName;
     }
+
+    static GattCharacteristic *GetCharacteristic(const std::shared_ptr<GattClient> &client,
+        const UUID &serviceUuid, const UUID &characterUuid)
+    {
+        GattCharacteristic *character = nullptr;
+        if (client) {
+            auto service = client->GetService(serviceUuid);
+            if (service.has_value()) {
+                character = service->get().GetCharacteristic(characterUuid);
+            }
+        }
+        return character;
+    }
+
+    static GattCharacteristic *FindCharacteristic(std::vector<GattService> &service,
+        const TaiheBleCharacteristic &napiCharacter)
+    {
+        GattCharacteristic *character = nullptr;
+        for (auto &svc : service) {
+            if (svc.GetUuid().Equals(napiCharacter.serviceUuid)) {
+                character = svc.GetCharacteristic(napiCharacter.characteristicValueHandle);
+                if (character && character->GetUuid().Equals(napiCharacter.characteristicUuid)) {
+                    return character;
+                }
+            }
+        }
+        return nullptr;
+    }
+
+    static GattCharacteristic *GetCharacteristic(const std::shared_ptr<GattClient> &client,
+        const TaiheBleCharacteristic &napiCharacter)
+    {
+        if (client) {
+            if (napiCharacter.characteristicValueHandle > 0) {
+                std::vector<GattService> &services = client->GetService();
+                return FindCharacteristic(services, napiCharacter);
+            } else {
+                GattCharacteristic *character = GetCharacteristic(client, napiCharacter.serviceUuid,
+                    napiCharacter.characteristicUuid);
+                return character;
+            }
+        }
+        return nullptr;
+    }
+
+    static GattCharacteristic *GetGattcCharacteristic(const std::shared_ptr<GattClient> &client,
+        const TaiheBleCharacteristic &napiCharacter)
+    {
+        GattCharacteristic *character = GetCharacteristic(client, napiCharacter);
+        if (character) {
+            character->SetValue(napiCharacter.characteristicValue.data(), napiCharacter.characteristicValue.size());
+        }
+        return character;
+    }
+
+    static GattDescriptor *GetGattcDescriptor(const std::shared_ptr<GattClient> &client,
+        const TaiheBleDescriptor &napiDescriptor)
+    {
+        GattDescriptor *descriptor = nullptr;
+        if (client) {
+            auto *character = GetCharacteristic(client, napiDescriptor.serviceUuid, napiDescriptor.characteristicUuid);
+            if (character == nullptr) {
+                HILOGE("character is nullptr");
+                return nullptr;
+            }
+            descriptor = character->GetDescriptor(napiDescriptor.descriptorUuid);
+            if (descriptor) {
+                descriptor->SetValue(napiDescriptor.descriptorValue.data(), napiDescriptor.descriptorValue.size());
+            }
+        }
+        return descriptor;
+    }
+
+    static taihe_status ParseGattClientReadCharacteristicValue(::ohos::bluetooth::ble::BLECharacteristic const &characteristic,
+        GattClientDeviceImpl **outGattClient, GattCharacteristic **outCharacter)
+    {
+        GattClientDeviceImpl *gattClient = *outGattClient; // TaiheGetGattClient();
+        TAIHE_BT_RETURN_IF(gattClient == nullptr || outGattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
+
+        TaiheBleCharacteristic taiheCharacter;
+        TAIHE_BT_CALL_RETURN(TaiheParseGattBLECharacteristic(characteristic, taiheCharacter));
+
+        GattCharacteristic *character = GetGattcCharacteristic(gattClient->GetClient(), taiheCharacter);
+        TAIHE_BT_RETURN_IF(character == nullptr || outCharacter == nullptr, "Not found character", taihe_invalid_arg);
+
+        *outGattClient = gattClient;
+        *outCharacter = character;
+        return taihe_ok;
+    }
+
+    uintptr_t ReadCharacteristicValuePromise(::ohos::bluetooth::ble::BLECharacteristic const& characteristic)
+    {
+        HILOGI("enter");
+        GattClientDeviceImpl *client = this; // nullptr;
+        GattCharacteristic *character = nullptr;
+        auto status = ParseGattClientReadCharacteristicValue(characteristic, &client, &character);
+        TAIHE_BT_ASSERT_RETURN(status == taihe_ok && client && character, BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
+        TAIHE_BT_ASSERT_RETURN(client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+
+        auto func = [gattClient = client->GetClient(), character]() {
+            if (character == nullptr) {
+                HILOGE("character is nullptr");
+                return TaiheAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
+            }
+            int ret = BT_ERR_INTERNAL_ERROR;
+            if (gattClient) {
+                ret = gattClient->ReadCharacteristic(*character);
+                ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret)); // Adaptation for old sdk
+            }
+            return TaiheAsyncWorkRet(ret);
+        };
+        auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(taihe::get_env(), nullptr, func);
+        TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+        bool success = client->GetCallback()->asyncWorkMap_.TryPush(TaiheAsyncType::GATT_CLIENT_READ_CHARACTER, asyncWork);
+        TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+
+        asyncWork->Run();
+
+        return reinterpret_cast<uintptr_t>(asyncWork->GetRet());
+    }
+
+    void ReadCharacteristicValueAsync(::ohos::bluetooth::ble::BLECharacteristic const& characteristic, uintptr_t callback)
+    {
+        HILOGI("enter");
+        GattClientDeviceImpl *client = this; // nullptr;
+        GattCharacteristic *character = nullptr;
+        auto status = ParseGattClientReadCharacteristicValue(characteristic, &client, &character);
+        TAIHE_BT_ASSERT_RETURN_VOID(status == taihe_ok && client && character, BT_ERR_INVALID_PARAM);
+        TAIHE_BT_ASSERT_RETURN_VOID(client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR);
+
+        auto func = [gattClient = client->GetClient(), character]() {
+            if (character == nullptr) {
+                HILOGE("character is nullptr");
+                return TaiheAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
+            }
+            int ret = BT_ERR_INTERNAL_ERROR;
+            if (gattClient) {
+                ret = gattClient->ReadCharacteristic(*character);
+                ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret)); // Adaptation for old sdk
+            }
+            return TaiheAsyncWorkRet(ret);
+        };
+        auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(taihe::get_env(), reinterpret_cast<ani_object>(callback), func);
+        TAIHE_BT_ASSERT_RETURN_VOID(asyncWork, BT_ERR_INTERNAL_ERROR);
+        bool success = client->GetCallback()->asyncWorkMap_.TryPush(TaiheAsyncType::GATT_CLIENT_READ_CHARACTER, asyncWork);
+        TAIHE_BT_ASSERT_RETURN_VOID(success, BT_ERR_INTERNAL_ERROR);
+
+        asyncWork->Run();
+    }
+
+    static taihe_status ParseGattClientReadDescriptorValue(::ohos::bluetooth::ble::BLEDescriptor const &bleDescriptor,
+        GattClientDeviceImpl **outGattClient, GattDescriptor **outDescriptor)
+    {
+        GattClientDeviceImpl *gattClient = *outGattClient; // TaiheGetGattClient();
+        TAIHE_BT_RETURN_IF(outGattClient == nullptr || gattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
+
+        TaiheBleDescriptor taiheDescriptor;
+        TAIHE_BT_CALL_RETURN(TaiheParseGattBLEDescriptor(bleDescriptor, taiheDescriptor));
+        GattDescriptor *descriptor = GetGattcDescriptor(gattClient->GetClient(), taiheDescriptor);
+        TAIHE_BT_RETURN_IF(outDescriptor == nullptr || descriptor == nullptr, "Not found Descriptor", taihe_invalid_arg);
+
+        *outGattClient = gattClient;
+        *outDescriptor = descriptor;
+        return taihe_ok;
+    }
+
+    uintptr_t ReadDescriptorValuePromise(::ohos::bluetooth::ble::BLEDescriptor const& bleDescriptor)
+    {
+        HILOGI("enter");
+        GattClientDeviceImpl *client = this; // nullptr;
+        GattDescriptor *descriptor = nullptr;
+        auto status = ParseGattClientReadDescriptorValue(bleDescriptor, &client, &descriptor);
+        TAIHE_BT_ASSERT_RETURN(status == taihe_ok && client && descriptor, BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
+        TAIHE_BT_ASSERT_RETURN(client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+
+        auto func = [gattClient = client->GetClient(), descriptor]() {
+            if (descriptor == nullptr) {
+                HILOGE("descriptor is nullptr");
+                return TaiheAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
+            }
+            int ret = BT_ERR_INTERNAL_ERROR;
+            if (gattClient) {
+                ret = gattClient->ReadDescriptor(*descriptor);
+                ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret)); // Adaptation for old sdk
+            }
+            return TaiheAsyncWorkRet(ret);
+        };
+        auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(taihe::get_env(), nullptr, func);
+        TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+        bool success = client->GetCallback()->asyncWorkMap_.TryPush(TaiheAsyncType::GATT_CLIENT_READ_DESCRIPTOR, asyncWork);
+        TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+
+        asyncWork->Run();
+        return reinterpret_cast<uintptr_t>(asyncWork->GetRet());
+    }
+
+    void ReadDescriptorValueAsync(::ohos::bluetooth::ble::BLEDescriptor const& bleDescriptor, uintptr_t callback)
+    {
+        HILOGI("enter");
+        GattClientDeviceImpl *client = this; // nullptr;
+        GattDescriptor *descriptor = nullptr;
+        auto status = ParseGattClientReadDescriptorValue(bleDescriptor, &client, &descriptor);
+        TAIHE_BT_ASSERT_RETURN_VOID(status == taihe_ok && client && descriptor, BT_ERR_INVALID_PARAM);
+        TAIHE_BT_ASSERT_RETURN_VOID(client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR);
+
+        auto func = [gattClient = client->GetClient(), descriptor]() {
+            if (descriptor == nullptr) {
+                HILOGE("descriptor is nullptr");
+                return TaiheAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
+            }
+            int ret = BT_ERR_INTERNAL_ERROR;
+            if (gattClient) {
+                ret = gattClient->ReadDescriptor(*descriptor);
+                ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret)); // Adaptation for old sdk
+            }
+            return TaiheAsyncWorkRet(ret);
+        };
+        auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(taihe::get_env(), reinterpret_cast<ani_object>(callback), func);
+        TAIHE_BT_ASSERT_RETURN_VOID(asyncWork, BT_ERR_INTERNAL_ERROR);
+        bool success = client->GetCallback()->asyncWorkMap_.TryPush(TaiheAsyncType::GATT_CLIENT_READ_DESCRIPTOR, asyncWork);
+        TAIHE_BT_ASSERT_RETURN_VOID(success, BT_ERR_INTERNAL_ERROR);
+
+        asyncWork->Run();
+    }
+
+    static taihe_status CheckSetCharacteristicChange(::ohos::bluetooth::ble::BLECharacteristic const& characteristic,
+        GattCharacteristic **outCharacteristic, GattClientDeviceImpl **outGattClient)
+    {
+        GattClientDeviceImpl *gattClient = *outGattClient; // NapiGetGattClient(env, thisVar);
+        TAIHE_BT_RETURN_IF(gattClient == nullptr || outGattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
+
+        TaiheBleCharacteristic taiheCharacter;
+        TAIHE_BT_CALL_RETURN(TaiheParseGattBLECharacteristic(characteristic, taiheCharacter));
+        GattCharacteristic *character = GetGattcCharacteristic(gattClient->GetClient(), taiheCharacter);
+        TAIHE_BT_RETURN_IF(character == nullptr || outCharacteristic == nullptr, "Not found character", taihe_invalid_arg);
+
+        *outGattClient = gattClient;
+        *outCharacteristic = character;
+        return taihe_ok;
+    }
+
+    uintptr_t SetCharacteristicChangeIndicationPromise(::ohos::bluetooth::ble::BLECharacteristic const& characteristic, bool enable)
+    {
+        HILOGI("enter");
+        GattCharacteristic *character = nullptr;
+        GattClientDeviceImpl *client = this; // nullptr;
+
+        auto status = CheckSetCharacteristicChange(characteristic, &character, &client);
+        TAIHE_BT_ASSERT_RETURN(status == taihe_ok && client && character, BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
+        TAIHE_BT_ASSERT_RETURN(client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+
+        bool isNotify = false;
+        auto func = [gattClient = client->GetClient(), character, enable, isNotify]() {
+            if (character == nullptr) {
+                HILOGE("character is nullptr");
+                return TaiheAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
+            }
+            int ret = BT_ERR_INTERNAL_ERROR;
+            if (gattClient) {
+                if (isNotify) {
+                    ret = gattClient->SetNotifyCharacteristic(*character, enable);
+                } else {
+                    ret = gattClient->SetIndicateCharacteristic(*character, enable);
+                }
+                ret = GetSDKAdaptedStatusCode(GattClientDeviceImpl::GattStatusFromService(ret)); // Adaptation for old sdk
+            }
+            return TaiheAsyncWorkRet(ret);
+        };
+        auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(taihe::get_env(), nullptr, func);
+        TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+        bool success = client->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_ENABLE_CHARACTER_CHANGED, asyncWork);
+        TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+
+        asyncWork->Run();
+        return reinterpret_cast<uintptr_t>(asyncWork->GetRet());
+    }
+
+    void SetCharacteristicChangeIndicationAsync(::ohos::bluetooth::ble::BLECharacteristic const& characteristic, bool enable, uintptr_t callback)
+    {
+        HILOGI("enter");
+        GattCharacteristic *character = nullptr;
+        GattClientDeviceImpl *client = this; // nullptr;
+
+        auto status = CheckSetCharacteristicChange(characteristic, &character, &client);
+        TAIHE_BT_ASSERT_RETURN_VOID(status == taihe_ok && client && character, BT_ERR_INVALID_PARAM);
+        TAIHE_BT_ASSERT_RETURN_VOID(client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR);
+
+        bool isNotify = false;
+        auto func = [gattClient = client->GetClient(), character, enable, isNotify]() {
+            if (character == nullptr) {
+                HILOGE("character is nullptr");
+                return TaiheAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
+            }
+            int ret = BT_ERR_INTERNAL_ERROR;
+            if (gattClient) {
+                if (isNotify) {
+                    ret = gattClient->SetNotifyCharacteristic(*character, enable);
+                } else {
+                    ret = gattClient->SetIndicateCharacteristic(*character, enable);
+                }
+                ret = GetSDKAdaptedStatusCode(GattClientDeviceImpl::GattStatusFromService(ret)); // Adaptation for old sdk
+            }
+            return TaiheAsyncWorkRet(ret);
+        };
+        auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(taihe::get_env(), reinterpret_cast<ani_object>(callback), func);
+        TAIHE_BT_ASSERT_RETURN_VOID(asyncWork, BT_ERR_INTERNAL_ERROR);
+        bool success = client->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_ENABLE_CHARACTER_CHANGED, asyncWork);
+        TAIHE_BT_ASSERT_RETURN_VOID(success, BT_ERR_INTERNAL_ERROR);
+
+        asyncWork->Run();
+    }
+
+    static int GattStatusFromService(int status)
+    {
+        // if status is from napi, do not deal with.
+        if (status > 0) {
+            return status;
+        }
+        int ret = BT_ERR_INTERNAL_ERROR;
+        // statusCode srv -> napi
+        auto iter = g_gattStatusSrvToNapi.begin();
+        for (; iter != g_gattStatusSrvToNapi.end(); iter++) {
+            if (iter->second == status) {
+                ret = iter->first; // transfer to napi errorCode.
+                break;
+            }
+        }
+        if (iter == g_gattStatusSrvToNapi.end()) {
+            HILOGW("Unsupported error code conversion, status: %{public}d", status);
+        }
+        return ret;
+    }
+
+    static const std::vector<std::pair<int, int>> g_gattStatusSrvToNapi;
 private:
     std::shared_ptr<GattClient> client_ = nullptr;
     std::shared_ptr<TaiheGattClientCallback> callback_;
     std::shared_ptr<BluetoothRemoteDevice> device_ = nullptr;
 };
+
+const std::vector<std::pair<int, int>> GattClientDeviceImpl::g_gattStatusSrvToNapi = {
+    { Bluetooth::BT_NO_ERROR,                                 GATT_SUCCESS },
+    { Bluetooth::BT_ERR_GATT_WRITE_NOT_PERMITTED,             WRITE_NOT_PERMITTED },
+    { Bluetooth::BT_ERR_GATT_READ_NOT_PERMITTED,              READ_NOT_PERMITTED },
+    { Bluetooth::BT_ERR_GATT_CONNECTION_CONGESTED,            GATT_CONGESTION },
+    { Bluetooth::BT_ERR_GATT_CONNECTION_NOT_ENCRYPTED,        INSUFFICIENT_ENCRYPTION },
+    { Bluetooth::BT_ERR_GATT_CONNECTION_NOT_AUTHENTICATED,    AUTHENTICATION_FAILED },
+    { Bluetooth::BT_ERR_GATT_CONNECTION_NOT_AUTHORIZED,       INSUFFICIENT_AUTHORIZATION },
+};
+
+taihe_status CheckBleScanParams(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
+                                taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options,
+                                std::vector<BleScanFilter> &outScanfilters,
+                                BleScanSettings &outSettinngs);
 
 class BleScannerImpl {
 public:
@@ -149,6 +508,87 @@ public:
     }
     ~BleScannerImpl() = default;
 
+    std::shared_ptr<BleCentralManager> &GetBleCentralManager()
+    {
+        return bleCentralManager_;
+    }
+
+    std::shared_ptr<TaiheBluetoothBleCentralManagerCallback> GetCallback()
+    {
+        return callback_;
+    }
+
+    uintptr_t StartScanPromise(::ohos::bluetooth::ble::ScanFilterNullValue const& filters, ::taihe::optional_view<::ohos::bluetooth::ble::ScanOptions> options)
+    {
+        HILOGI("enter");
+        ani_env *env = taihe::get_env();
+        if (env == nullptr) {
+            HILOGE("StartScanPromise get_env failed");
+            return reinterpret_cast<uintptr_t>(nullptr);
+        }
+        std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.BleScanner.StartScan");
+        std::vector<BleScanFilter> scanFilters;
+        BleScanSettings settings;
+        auto status = CheckBleScanParams(filters, options, scanFilters, settings);
+        TAIHE_BT_ASSERT_RETURN(status == taihe_ok, BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
+
+        TAIHE_BT_ASSERT_RETURN(this->GetBleCentralManager() != nullptr,
+            BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
+        TAIHE_BT_ASSERT_RETURN(this->GetCallback() != nullptr,
+            BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
+
+        auto func = [this, settings, scanFilters]() {
+            this->GetBleCentralManager()->SetNewApiFlag();
+            // When apps like aibase are in frozen state, enabling flight mode and then turning on Bluetooth can cause the
+            // scannerId to become invalid. The C++ interface's scannerId is reset every time scanning is turned off, so
+            // the JS interface should check the scannerId's validity before each scan.
+            this->GetBleCentralManager()->CheckValidScannerId();
+            int ret = this->GetBleCentralManager()->StartScan(settings, scanFilters);
+            return TaiheAsyncWorkRet(ret);
+        };
+
+        auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(env, nullptr, func, haUtils);
+        TAIHE_BT_ASSERT_RETURN(asyncWork != nullptr, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+        bool success = this->GetCallback()->asyncWorkMap_.TryPush(TaiheAsyncType::BLE_START_SCAN, asyncWork);
+        TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+
+        asyncWork->Run();
+        return reinterpret_cast<uintptr_t>(asyncWork->GetRet());
+    }
+
+    uintptr_t StopScanPromise()
+    {
+        HILOGI("enter");
+        ani_env *env = taihe::get_env();
+        if (env == nullptr) {
+            HILOGE("StopScanPromise get_env failed");
+            return reinterpret_cast<uintptr_t>(nullptr);
+        }
+        std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.BleScanner.StopScan");
+
+        TAIHE_BT_ASSERT_RETURN(this->GetBleCentralManager() != nullptr,
+            BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
+        TAIHE_BT_ASSERT_RETURN(this->GetCallback() != nullptr,
+            BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
+
+        auto func = [this]() {
+            // When apps like aibase are in frozen state, enabling flight mode and then turning on Bluetooth can cause the
+            // scannerId to become invalid. The C++ interface's scannerId is reset every time scanning is turned off, so
+            // the JS interface should check the scannerId's validity before each scan.
+            this->GetBleCentralManager()->CheckValidScannerId();
+            int ret = this->GetBleCentralManager()->StopScan();
+            return TaiheAsyncWorkRet(ret);
+        };
+
+        auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(env, nullptr, func, haUtils);
+        TAIHE_BT_ASSERT_RETURN(asyncWork != nullptr, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+        bool success = this->GetCallback()->asyncWorkMap_.TryPush(TaiheAsyncType::BLE_STOP_SCAN, asyncWork);
+        TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
+        HILOGI("StopScanReturnsPromise success: %{public}d", success);
+
+        asyncWork->Run();
+        return reinterpret_cast<uintptr_t>(asyncWork->GetRet());
+    }
 private:
     std::shared_ptr<BleCentralManager> bleCentralManager_ = nullptr;
     std::shared_ptr<TaiheBluetoothBleCentralManagerCallback> callback_ = nullptr;
@@ -577,17 +1017,12 @@ taihe_status CheckAdvertisingDataWithDuration(ani_env *env, ani_object object, B
     return taihe_ok;
 }
 
-ani_object StartAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_object advertisingParams)
+ani_object StartAdvertisingAsyncPromise(ani_env *env, ani_object advertisingParams)
 {
     HILOGI("enter");
-    ani_vm *vm = nullptr;
-    if (ANI_OK != env->GetVM(&vm)) {
-        HILOGE("GetVM failed");
-        return nullptr;
-    }
-
     std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.StartAdvertising");
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
+    TAIHE_BT_ASSERT_RETURN(bleAdvertiser, BT_ERR_INTERNAL_ERROR, nullptr);
 
     BleAdvertiserSettings settings;
     BleAdvertiserData advData;
@@ -603,7 +1038,7 @@ ani_object StartAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_objec
         return TaiheAsyncWorkRet(ret);
     };
 
-    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(vm, env, nullptr, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
+    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(env, nullptr, func, haUtils);
     TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, nullptr);
     bool success = callback->asyncWorkMap_.TryPush(TaiheAsyncType::GET_ADVERTISING_HANDLE, asyncWork);
     TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, nullptr);
@@ -612,25 +1047,19 @@ ani_object StartAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_objec
     return asyncWork->GetRet();
 }
 
-ani_object StartAdvertisingAsyncCallback([[maybe_unused]] ani_env *env, ani_object advertisingParams,
-                                         [[maybe_unused]] ani_object object)
+void StartAdvertisingAsyncCallback(ani_env *env, ani_object advertisingParams, ani_object object)
 {
     HILOGI("enter");
-    ani_vm *vm = nullptr;
-    if (ANI_OK != env->GetVM(&vm)) {
-        HILOGE("GetVM failed");
-        return nullptr;
-    }
-
     std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.StartAdvertising");
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
+    TAIHE_BT_ASSERT_RETURN_VOID(bleAdvertiser, BT_ERR_INTERNAL_ERROR);
 
     BleAdvertiserSettings settings;
     BleAdvertiserData advData;
     BleAdvertiserData rspData;
     uint16_t duration = 0;
     auto status = CheckAdvertisingDataWithDuration(env, advertisingParams, settings, advData, rspData, duration);
-    TAIHE_BT_ASSERT_RETURN(status == taihe_ok, BT_ERR_INVALID_PARAM, nullptr);
+    TAIHE_BT_ASSERT_RETURN_VOID(status == taihe_ok, BT_ERR_INVALID_PARAM);
 
     auto callback = std::make_shared<TaiheBluetoothBleAdvertiseCallback>();
     auto func = [settings, advData, rspData, duration, bleAdvertiser, callback]() {
@@ -639,13 +1068,12 @@ ani_object StartAdvertisingAsyncCallback([[maybe_unused]] ani_env *env, ani_obje
         return TaiheAsyncWorkRet(ret);
     };
 
-    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(vm, env, object, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
-    TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, nullptr);
+    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(env, object, func, haUtils);
+    TAIHE_BT_ASSERT_RETURN_VOID(asyncWork, BT_ERR_INTERNAL_ERROR);
     bool success = callback->asyncWorkMap_.TryPush(TaiheAsyncType::GET_ADVERTISING_HANDLE, asyncWork);
-    TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, nullptr);
+    TAIHE_BT_ASSERT_RETURN_VOID(success, BT_ERR_INTERNAL_ERROR);
 
     asyncWork->Run();
-    return asyncWork->GetRet();
 }
 
 taihe_status CheckAdvertisingDisableParams(ani_env *env, ani_object info, uint32_t &outAdvHandle,
@@ -666,15 +1094,9 @@ taihe_status CheckAdvertisingDisableParams(ani_env *env, ani_object info, uint32
     return taihe_ok;
 }
 
-ani_object DisableAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_object advertisingDisableParams)
+ani_object DisableAdvertisingAsyncPromise(ani_env *env, ani_object advertisingDisableParams)
 {
     HILOGI("enter");
-    ani_vm *vm = nullptr;
-    if (ANI_OK != env->GetVM(&vm)) {
-        HILOGE("GetVM failed");
-        return nullptr;
-    }
-
     std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.DisableAdvertising");
 
     uint32_t advHandle = 0xFF;
@@ -699,7 +1121,7 @@ ani_object DisableAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_obj
         return TaiheAsyncWorkRet(ret);
     };
 
-    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(vm, env, nullptr, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
+    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(env, nullptr, func, haUtils);
     TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, nullptr);
     bool success = callback->asyncWorkMap_.TryPush(TaiheAsyncType::BLE_DISABLE_ADVERTISING, asyncWork);
     TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, nullptr);
@@ -708,25 +1130,18 @@ ani_object DisableAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_obj
     return asyncWork->GetRet();
 }
 
-ani_object DisableAdvertisingAsyncCallback([[maybe_unused]] ani_env *env, ani_object advertisingDisableParams,
-                                           [[maybe_unused]] ani_object object)
+void DisableAdvertisingAsyncCallback(ani_env *env, ani_object advertisingDisableParams, ani_object object)
 {
     HILOGI("enter");
-    ani_vm *vm = nullptr;
-    if (ANI_OK != env->GetVM(&vm)) {
-        HILOGE("GetVM failed");
-        return nullptr;
-    }
-
     std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.DisableAdvertising");
 
     uint32_t advHandle = 0xFF;
     std::shared_ptr<BleAdvertiseCallback> baseCallback;
     auto status = CheckAdvertisingDisableParams(env, advertisingDisableParams, advHandle, baseCallback);
-    TAIHE_BT_ASSERT_RETURN(status == taihe_ok, BT_ERR_INVALID_PARAM, nullptr);
+    TAIHE_BT_ASSERT_RETURN_VOID(status == taihe_ok, BT_ERR_INVALID_PARAM);
     // compatible with XTS
-    TAIHE_BT_ASSERT_RETURN(advHandle != BLE_INVALID_ADVERTISING_HANDLE,
-        GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID), nullptr); // Adaptation for old sdk
+    TAIHE_BT_ASSERT_RETURN_VOID(advHandle != BLE_INVALID_ADVERTISING_HANDLE,
+        GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID)); // Adaptation for old sdk
 
     std::shared_ptr<TaiheBluetoothBleAdvertiseCallback> callback =
         std::static_pointer_cast<TaiheBluetoothBleAdvertiseCallback>(baseCallback);
@@ -742,24 +1157,17 @@ ani_object DisableAdvertisingAsyncCallback([[maybe_unused]] ani_env *env, ani_ob
         return TaiheAsyncWorkRet(ret);
     };
 
-    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(vm, env, object, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
-    TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, nullptr);
+    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(env, object, func, haUtils);
+    TAIHE_BT_ASSERT_RETURN_VOID(asyncWork, BT_ERR_INTERNAL_ERROR);
     bool success = callback->asyncWorkMap_.TryPush(TaiheAsyncType::BLE_DISABLE_ADVERTISING, asyncWork);
-    TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, nullptr);
+    TAIHE_BT_ASSERT_RETURN_VOID(success, BT_ERR_INTERNAL_ERROR);
 
     asyncWork->Run();
-    return asyncWork->GetRet();
 }
 
-ani_object EnableAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_object advertisingEnableParams)
+ani_object EnableAdvertisingAsyncPromise(ani_env *env, ani_object advertisingEnableParams)
 {
     HILOGI("enter");
-    ani_vm *vm = nullptr;
-    if (ANI_OK != env->GetVM(&vm)) {
-        HILOGE("GetVM failed");
-        return nullptr;
-    }
-
     std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.EnableAdvertising");
     uint32_t advHandle = 0xFF;
     uint16_t duration = 0;
@@ -782,7 +1190,7 @@ ani_object EnableAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_obje
         return TaiheAsyncWorkRet(ret);
     };
 
-    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(vm, env, nullptr, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
+    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(env, nullptr, func, haUtils);
     TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, nullptr);
     bool success = callback->asyncWorkMap_.TryPush(TaiheAsyncType::BLE_ENABLE_ADVERTISING, asyncWork);
     TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, nullptr);
@@ -791,25 +1199,18 @@ ani_object EnableAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_obje
     return asyncWork->GetRet();
 }
 
-ani_object EnableAdvertisingAsyncCallback([[maybe_unused]] ani_env *env, ani_object advertisingEnableParams,
-    [[maybe_unused]] ani_object object)
+void EnableAdvertisingAsyncCallback(ani_env *env, ani_object advertisingEnableParams, ani_object object)
 {
     HILOGI("enter");
-    ani_vm *vm = nullptr;
-    if (ANI_OK != env->GetVM(&vm)) {
-        HILOGE("GetVM failed");
-        return nullptr;
-    }
-
     std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.EnableAdvertising");
     uint32_t advHandle = 0xFF;
     uint16_t duration = 0;
     std::shared_ptr<BleAdvertiseCallback> baseCallback;
     auto status = CheckAdvertisingEnableParams(env, advertisingEnableParams, advHandle, duration, baseCallback);
-    TAIHE_BT_ASSERT_RETURN(status == taihe_ok, BT_ERR_INVALID_PARAM, nullptr);
+    TAIHE_BT_ASSERT_RETURN_VOID(status == taihe_ok, BT_ERR_INVALID_PARAM);
     // compatible with XTS
-    TAIHE_BT_ASSERT_RETURN(advHandle != BLE_INVALID_ADVERTISING_HANDLE,
-        GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID), nullptr); // Adaptation for old sdk
+    TAIHE_BT_ASSERT_RETURN_VOID(advHandle != BLE_INVALID_ADVERTISING_HANDLE,
+        GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID)); // Adaptation for old sdk
     std::shared_ptr<TaiheBluetoothBleAdvertiseCallback> callback =
         std::static_pointer_cast<TaiheBluetoothBleAdvertiseCallback>(baseCallback);
     auto func = [advHandle, duration, callback]() {
@@ -823,13 +1224,12 @@ ani_object EnableAdvertisingAsyncCallback([[maybe_unused]] ani_env *env, ani_obj
         return TaiheAsyncWorkRet(ret);
     };
 
-    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(vm, env, object, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
-    TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, nullptr);
+    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(env, object, func, haUtils);
+    TAIHE_BT_ASSERT_RETURN_VOID(asyncWork, BT_ERR_INTERNAL_ERROR);
     bool success = callback->asyncWorkMap_.TryPush(TaiheAsyncType::BLE_ENABLE_ADVERTISING, asyncWork);
-    TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, nullptr);
+    TAIHE_BT_ASSERT_RETURN_VOID(success, BT_ERR_INTERNAL_ERROR);
 
     asyncWork->Run();
-    return asyncWork->GetRet();
 }
 }  // Bluetooth
 }  // OHOS

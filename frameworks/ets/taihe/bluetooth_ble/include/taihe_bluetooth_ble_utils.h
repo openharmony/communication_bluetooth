@@ -18,10 +18,10 @@
 
 #include "bluetooth_ble_advertiser.h"
 
-#include "ohos.bluetooth.ble.proj.hpp"
 #include "ohos.bluetooth.ble.impl.hpp"
-#include "taihe/runtime.hpp"
+#include "ohos.bluetooth.ble.proj.hpp"
 #include "stdexcept"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace Bluetooth {

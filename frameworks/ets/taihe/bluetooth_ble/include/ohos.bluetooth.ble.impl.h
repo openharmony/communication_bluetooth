@@ -28,15 +28,15 @@
 namespace OHOS {
 namespace Bluetooth {
 
-ani_object StartAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_object advertisingParams);
-ani_object StartAdvertisingAsyncCallback([[maybe_unused]] ani_env *env, ani_object advertisingParams,
-                                         [[maybe_unused]] ani_object object);
-ani_object DisableAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_object advertisingDisableParams);
-ani_object DisableAdvertisingAsyncCallback([[maybe_unused]] ani_env *env, ani_object advertisingDisableParams,
-                                           [[maybe_unused]] ani_object object);
-ani_object EnableAdvertisingAsyncPromise([[maybe_unused]] ani_env *env, ani_object advertisingEnableParams);
-ani_object EnableAdvertisingAsyncCallback([[maybe_unused]] ani_env *env, ani_object advertisingEnableParams,
-                                          [[maybe_unused]] ani_object object);
+ani_object StartAdvertisingAsyncPromise(ani_env *env, ani_object advertisingParams);
+void StartAdvertisingAsyncCallback(ani_env *env, ani_object advertisingParams, ani_object object);
+
+ani_object DisableAdvertisingAsyncPromise(ani_env *env, ani_object advertisingDisableParams);
+void DisableAdvertisingAsyncCallback(ani_env *env, ani_object advertisingDisableParams, ani_object object);
+
+ani_object EnableAdvertisingAsyncPromise(ani_env *env, ani_object advertisingEnableParams);
+void EnableAdvertisingAsyncCallback(ani_env *env, ani_object advertisingEnableParams, ani_object object);
+
 } // namespace Bluetooth
 } // namespace OHOS
 #endif // TAIHE_BLUETOOTH_BLE_IMPL_H

@@ -22,37 +22,31 @@
 #include "bluetooth_log.h"
 #include "taihe_async_callback.h"
 #include "taihe_bluetooth_utils.h"
-#include "taihe_timer.h"
 #include "taihe_parser_utils.h"
+#include "taihe_timer.h"
 
 namespace OHOS {
 namespace Bluetooth {
-std::shared_ptr<TaiheAsyncWork> TaiheAsyncWorkFactory::CreateAsyncWork(ani_vm *vm, ani_env *env, ani_object info,
-    std::function<TaiheAsyncWorkRet(void)> asyncWork, bool needCallback, std::shared_ptr<TaiheHaEventUtils> haUtils)
+std::shared_ptr<TaiheAsyncWork> TaiheAsyncWorkFactory::CreateAsyncWork(ani_env *env, ani_object info,
+    std::function<TaiheAsyncWorkRet(void)> asyncWork, std::shared_ptr<TaiheHaEventUtils> haUtils)
 {
-    HILOGI("CreateAsyncWork enter");
-    auto asyncCallback = TaiheParseAsyncCallback(vm, env, info);
+    auto asyncCallback = TaiheParseAsyncCallback(env, info);
     if (!asyncCallback) {
         HILOGE("asyncCallback is nullptr!");
         return nullptr;
     }
-    HILOGI("CreateAsyncWork asyncCallback created");
-    // add custom deleter for destructing in JS thread.
     std::shared_ptr<TaiheAsyncWork> taiheAsyncWork(
-        new TaiheAsyncWork(vm, env, asyncWork, asyncCallback, needCallback, haUtils),
+        new TaiheAsyncWork(env, asyncWork, asyncCallback, haUtils),
         [env](TaiheAsyncWork *ptr) {
             if (ptr) {
-                HILOGI("CreateAsyncWork delete ptr");
                 delete ptr;
             }
         });
-    HILOGI("CreateAsyncWork leave");
     return taiheAsyncWork;
 }
 
 void TaiheAsyncWork::Info::Execute(void)
 {
-    HILOGI("Execute enter");
     if (taiheAsyncWork == nullptr) {
         HILOGE("taiheAsyncWork is nullptr");
         errCode = BT_ERR_INTERNAL_ERROR;
@@ -62,19 +56,18 @@ void TaiheAsyncWork::Info::Execute(void)
     auto ret = taiheAsyncWork->func_();
     errCode = ret.errCode;
     object = ret.object;
-    HILOGI("Execute leave");
 }
 
 void TaiheAsyncWork::Info::Complete(void)
 {
-    HILOGD("needCallback: %{public}d, errCode: %{public}d", needCallback, errCode);
+    HILOGD("errCode: %{public}d", errCode);
     if (taiheAsyncWork == nullptr) {
         HILOGE("taiheAsyncWork is nullptr");
         return;
     }
 
     // need wait callback
-    if (needCallback && (errCode == BT_NO_ERROR)) {
+    if (errCode == BT_NO_ERROR) {
         if (taiheAsyncWork->triggered_) {
             HILOGE("TaiheAsyncWork is triggered, Callback is earlier than Complete in thread scheduling");
             return;
@@ -104,28 +97,18 @@ void TaiheAsyncWork::Info::Complete(void)
         if (haUtils) {
             haUtils->WriteErrCode(errCode);
         }
-
-        auto work = taiheAsyncWork;
-        auto code = errCode;
-        auto obj = object;
-        std::thread workerThread([work, code, obj]() {
-            work->taiheAsyncCallback_->CallFunction(code, obj);
-        });
-        workerThread.join();
+        taiheAsyncWork->taiheAsyncCallback_->CallFunction(errCode, object);
     }
 }
 
 void TaiheAsyncWork::Run(void)
 {
-    HILOGI("Run enter");
     TaiheAsyncWork::Info *info = new TaiheAsyncWork::Info();
-    info->needCallback = needCallback_.load();
     info->taiheAsyncWork = shared_from_this();
 
     info->Execute();
     info->Complete();
     delete info;
-    HILOGI("Run leave");
 }
 
 std::shared_ptr<TaiheHaEventUtils> TaiheAsyncWork::GetHaUtilsPtr(void) const
@@ -141,14 +124,6 @@ void TaiheAsyncWork::TimeoutCallback(void)
 
 void TaiheAsyncWork::CallFunction(int errCode, std::shared_ptr<TaiheNativeObject> object)
 {
-    if (!needCallback_.load()) {
-        HILOGE("Unsupported in no needCallback mode");
-        if (haUtils_) {
-            haUtils_->WriteErrCode(BT_ERR_INTERNAL_ERROR);
-        }
-        return;
-    }
-
     HILOGI("enter");
     auto nativeObj = object;
     if (nativeObj == nullptr) {
@@ -166,7 +141,7 @@ ani_object TaiheAsyncWork::GetRet(void)
 {
     if (!taiheAsyncCallback_) {
         HILOGI("taiheAsyncCallback_ is nullptr");
-        return reinterpret_cast<ani_object>(TaiheGetUndefinedRet(env_));
+        return reinterpret_cast<ani_object>(TaiheGetUndefined(env_));
     }
     return taiheAsyncCallback_->GetRet();
 }
@@ -187,12 +162,10 @@ void AsyncWorkCallFunction(TaiheAsyncWorkMap &map, TaiheAsyncType type, std::sha
 
 bool TaiheAsyncWorkMap::TryPush(TaiheAsyncType type, std::shared_ptr<TaiheAsyncWork> asyncWork)
 {
-    HILOGI("TryPush enter");
     if (!asyncWork) {
         HILOGE("asyncWork is nullptr");
         return false;
     }
-    HILOGI("TryPush asyncWork");
     std::lock_guard<std::mutex> lock(mutex_);
     auto it = map_.find(type);
     if (it != map_.end()) {
@@ -204,9 +177,7 @@ bool TaiheAsyncWorkMap::TryPush(TaiheAsyncType type, std::shared_ptr<TaiheAsyncW
         HILOGI("Async work(%{public}d) hasn't been removed, but triggered, remove it", type);
         map_.erase(it);
     }
-    HILOGI("TryPush map_");
     map_[type] = std::move(asyncWork);
-    HILOGI("TryPush leave");
     return true;
 }
 

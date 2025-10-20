@@ -20,10 +20,11 @@
 #include <algorithm>
 #include <regex>
 
+#include "taihe_bluetooth_utils.h"
+
 #include "bluetooth_def.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
-#include "taihe_bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -57,22 +58,6 @@ ani_ref TaiheGetUndefined(ani_env *env)
         return nullptr;
     }
     return undefinedRef;
-}
-
-ani_ref TaiheGetUndefinedRet(ani_env *env)
-{
-    ani_ref undefRef;
-    ani_status status = ANI_ERROR;
-    if (env == nullptr) {
-        HILOGE("null env");
-        return nullptr;
-    }
-
-    if ((status = env->GetUndefined(&undefRef)) != ANI_OK) {
-        HILOGE("GetUndefined failed, status: %{public}d", status);
-        return nullptr;
-    }
-    return undefRef;
 }
 
 static ani_ref CreateBusinessError(ani_env *env, int code, const std::string &msg)

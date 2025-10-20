@@ -19,8 +19,9 @@
 
 #include <map>
 
-#include "bluetooth_errorcode.h"
 #include "taihe_bluetooth_error.h"
+
+#include "bluetooth_errorcode.h"
 #include "taihe_bluetooth_utils.h"
 #include "taihe/runtime.hpp"
 
