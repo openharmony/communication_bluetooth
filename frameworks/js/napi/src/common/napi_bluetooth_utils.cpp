@@ -268,6 +268,22 @@ void ConvertUuidsVectorToJS(napi_env env, napi_value result, const std::vector<s
     }
 }
 
+napi_status ConvertServiceUuidsToJS(const napi_env env, napi_value &uuidsNapi,
+    const std::vector<UUID> &uuids)
+{
+    size_t idx = 0;
+    if (uuids.empty()) {
+        return napi_ok;
+    }
+    for (const auto &uuid : uuids) {
+        napi_value obj = nullptr;
+        NAPI_BT_CALL_RETURN(napi_create_string_utf8(env, uuid.ToString().c_str(), NAPI_AUTO_LENGTH, &obj));
+        NAPI_BT_CALL_RETURN(napi_set_element(env, uuidsNapi, idx, obj));
+        idx++;
+    }
+    return napi_ok;
+}
+
 void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName, const char *propName)
 {
     napi_value prop = nullptr;
@@ -893,6 +909,36 @@ int GetSDKAdaptedStatusCode(int status)
         return BT_ERR_INTERNAL_ERROR;
     }
     return status;
+}
+
+NapiMap CreateNapiMap(napi_env env)
+{
+    NapiMap res = {nullptr, nullptr};
+    napi_value global = nullptr;
+    if (napi_get_global(env, &global) != napi_ok || !global) {
+        return res;
+    }
+    napi_value constructor = nullptr;
+    if (napi_get_named_property(env, global, "Map", &constructor) != napi_ok || !constructor) {
+        return res;
+    }
+    if (NapiIsFunction(env, constructor) != napi_ok) {
+        return res;
+    }
+    napi_value map_instance = nullptr;
+    if (napi_new_instance(env, constructor, 0, nullptr, &map_instance) != napi_ok || !map_instance) {
+        return res;
+    }
+    napi_value map_set = nullptr;
+    if (napi_get_named_property(env, map_instance, "set", &map_set) != napi_ok || !map_set) {
+        return res;
+    }
+    if (NapiIsFunction(env, map_set) != napi_ok) {
+        return res;
+    }
+    res.instance = map_instance;
+    res.set_function = map_set;
+    return res;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
