@@ -20,7 +20,6 @@
 #include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "event_handler.h"
-#include "ohos.bluetooth.ble.impl.h"
 #include "ohos.bluetooth.ble.impl.hpp"
 #include "ohos.bluetooth.ble.proj.hpp"
 #include "stdexcept"

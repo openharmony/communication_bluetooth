@@ -81,13 +81,17 @@ taihe_status TaiheParseGattBLECharacteristic(::ohos::bluetooth::ble::BLECharacte
     TaiheBleCharacteristic &outCharacteristic);
 taihe_status TaiheParseGattDescriptor(taihe::array<::ohos::bluetooth::ble::BLEDescriptor> object,
     std::vector<TaiheBleDescriptor> &outDescriptor);
+taihe_status TaiheParseGattBLEDescriptor(::ohos::bluetooth::ble::BLEDescriptor object,
+    TaiheBleDescriptor &outDescriptor);
 void TaiheParseObjectGattPermissions(ohos::bluetooth::ble::GattPermissions object,
     TaiheGattPermission &outPermissions);
 void TaiheParseObjectGattProperties(ohos::bluetooth::ble::GattProperties object,
     TaiheGattProperties &outProperties);
+taihe_status TaiheParseNotifyCharacteristic(ohos::bluetooth::ble::NotifyCharacteristic object,
+    TaiheNotifyCharacteristic &outCharacter);
 
 struct TaiheAsyncCallback;
-std::shared_ptr<TaiheAsyncCallback> TaiheParseAsyncCallback(ani_vm *vm, ani_env *env, ani_object info);
+std::shared_ptr<TaiheAsyncCallback> TaiheParseAsyncCallback(ani_env *env, ani_object info);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // TAIHE_PARSER_UTILS_H

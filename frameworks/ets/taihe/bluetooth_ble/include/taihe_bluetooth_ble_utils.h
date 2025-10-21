@@ -18,6 +18,7 @@
 
 #include "bluetooth_ble_advertiser.h"
 
+#include "bluetooth_gatt_client.h"
 #include "ohos.bluetooth.ble.impl.hpp"
 #include "ohos.bluetooth.ble.proj.hpp"
 #include "stdexcept"
@@ -39,6 +40,7 @@ enum class SensitivityMode {
 
 int GetCurrentSdkVersion(void);
 int GetSDKAdaptedStatusCode(int status);
+ani_object ConvertBLEDescriptorToJS(ani_env *env, GattDescriptor& descriptor);
 } // namespace Bluetooth
 } // namespace OHOS
 #endif // TAIHE_BLUETOOTH_BLE_UTILS_H_

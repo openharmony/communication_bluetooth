@@ -315,63 +315,20 @@ function GetConnectedBLEDevices(): Array<String>;
 function StartBLEScan(filters: ScanFilterNullValue, options: Optional<ScanOptions>): void;
 function StartAdvertising(setting: AdvertiseSetting, advData: AdvertiseData, advResponse: Optional<AdvertiseData>): void;
 
-@!sts_inject("""
-native function StartAdvertisingReturnsPromise_inner(advertisingParams: AdvertisingParams): Promise<int>;
-export function startAdvertising(advertisingParams: AdvertisingParams): Promise<int> {
-    return taskpool.execute((): Promise<int> => {
-        console.info("taskpool.execute promise enter");
-        return StartAdvertisingReturnsPromise_inner(advertisingParams);
-    })
-    .then((ret: Any): int => {
-        console.info("taskpool.execute promise then, ret: " + ret);
-        return ret as int;
-    })
-};
+@rename("startAdvertising")
+function StartAdvertisingPromise(advertisingParams: AdvertisingParams): @sts_type("Promise<int>") Opaque;
 
-native function StartAdvertisingWithCallback_inner(advertisingParams: AdvertisingParams, callback: AsyncCallback<int>): void;
-export function startAdvertising(advertisingParams: AdvertisingParams, callback: AsyncCallback<int>): void {
-    console.info("taskpool.execute callback");
-    taskpool.execute((): void => {
-        console.info("taskpool.execute callback enter");
-        return StartAdvertisingWithCallback_inner(advertisingParams, callback);
-    })
-};
+@rename("startAdvertising")
+function StartAdvertisingAsync(advertisingParams: AdvertisingParams, callback: @sts_type("AsyncCallback<int>") Opaque): void;
 
-native function DisableAdvertisingReturnsPromise_inner(advertisingDisableParams: AdvertisingDisableParams): Promise<void>;
-export function disableAdvertising(advertisingDisableParams: AdvertisingDisableParams): Promise<void> {
-    return taskpool.execute((): Promise<void> => {
-        console.info("taskpool.execute promise enter");
-        return DisableAdvertisingReturnsPromise_inner(advertisingDisableParams);
-    })
-    .then((ret: Any): void => {
-        console.info("taskpool.execute promise then, ret: " + ret);
-    })
-};
+@rename("disableAdvertising")
+function DisableAdvertisingPromise(advertisingDisableParams: AdvertisingDisableParams):  @sts_type("Promise<void>") Opaque;
 
-native function DisableAdvertisingWithCallback_inner(advertisingDisableParams: AdvertisingDisableParams, callback: AsyncCallback<void>): void;
-export function disableAdvertising(advertisingDisableParams: AdvertisingDisableParams, callback: AsyncCallback<void>): void {
-    taskpool.execute((): void => {
-        console.info("taskpool.execute callback enter");
-        return DisableAdvertisingWithCallback_inner(advertisingDisableParams, callback);
-    })
-};
+@rename("disableAdvertising")
+function DisableAdvertisingAsync(advertisingDisableParams: AdvertisingDisableParams, callback: @sts_type("AsyncCallback<void>") Opaque): void;
 
-native function EnableAdvertisingReturnsPromise_inner(advertisingEnableParams: AdvertisingEnableParams): Promise<void>;
-export function enableAdvertising(advertisingEnableParams: AdvertisingEnableParams): Promise<void> {
-    return taskpool.execute((): Promise<void> => {
-        console.info("taskpool.execute promise enter");
-        return EnableAdvertisingReturnsPromise_inner(advertisingEnableParams);
-    })
-    .then((ret: Any): void => {
-        console.info("taskpool.execute promise then, ret: " + ret);
-    })
-};
+@rename("enableAdvertising")
+function EnableAdvertisingPromise(advertisingEnableParams: AdvertisingEnableParams): @sts_type("Promise<void>") Opaque;
 
-native function EnableAdvertisingWithCallback_inner(advertisingEnableParams: AdvertisingEnableParams, callback: AsyncCallback<void>): void;
-export function enableAdvertising(advertisingEnableParams: AdvertisingEnableParams, callback: AsyncCallback<void>): void {
-    taskpool.execute((): void => {
-        console.info("taskpool.execute callback enter");
-        return EnableAdvertisingWithCallback_inner(advertisingEnableParams, callback);
-    })
-};
-""")
+@rename("enableAdvertising")
+function EnableAdvertisingAsync(advertisingEnableParams: AdvertisingEnableParams, callback: @sts_type("AsyncCallback<void>") Opaque): void;

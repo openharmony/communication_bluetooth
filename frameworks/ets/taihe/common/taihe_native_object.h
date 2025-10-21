@@ -18,6 +18,8 @@
 
 #include "taihe_bluetooth_utils.h"
 
+#include "bluetooth_gatt_characteristic.h"
+
 namespace OHOS {
 namespace Bluetooth {
 class TaiheNativeObject {
@@ -64,6 +66,26 @@ public:
     ani_ref ToTaiheValue(ani_env *env) const override;
 private:
     bool value_;
+};
+
+class TaiheNativeBleCharacteristic : public TaiheNativeObject {
+public:
+    TaiheNativeBleCharacteristic(const GattCharacteristic &character) : character_(character) {}
+    ~TaiheNativeBleCharacteristic() override = default;
+
+    ani_ref ToTaiheValue(ani_env *env) const override;
+private:
+    GattCharacteristic character_;
+};
+
+class TaiheNativeBleDescriptor : public TaiheNativeObject {
+public:
+    TaiheNativeBleDescriptor(const GattDescriptor &descriptor) : descriptor_(descriptor) {}
+    ~TaiheNativeBleDescriptor() override = default;
+
+    ani_ref ToTaiheValue(ani_env *env) const override;
+private:
+    GattDescriptor descriptor_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

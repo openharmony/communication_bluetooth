@@ -18,8 +18,9 @@
 #endif
 
 #include "taihe_bluetooth_ble_advertise_callback.h"
+
 #include "bluetooth_log.h"
-#include "ohos.bluetooth.ble.impl.h"
+#include "taihe_bluetooth_ble_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
