@@ -2094,7 +2094,7 @@ void BluetoothHostProxy::SetCallingPackageName(const std::string &address, const
     }
 }
 
-int32_t BluetoothHostProxy::StartRemoteSdpSearch(const std::string &address, const std::string &uuid, bool &status)
+int32_t BluetoothHostProxy::StartRemoteSdpSearch(const std::string &address, const std::string &uuid)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
@@ -2104,12 +2104,14 @@ int32_t BluetoothHostProxy::StartRemoteSdpSearch(const std::string &address, con
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::START_REMOTE_SDP_SEARCH, option, data, reply);
-    CHECK_AND_RETURN_LOG_RET(error == BT_NO_ERROR, false, "StartRemoteSdpSearch done fail");
-    status = reply.ReadBool();
-    return BT_NO_ERROR;
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::StartRemoteSdpSearch done fail error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadBool();
 }
 
-int32_t BluetoothHostProxy::GetRemoteServices(const std::string &address, bool &status)
+int32_t BluetoothHostProxy::GetRemoteServices(const std::string &address)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
@@ -2118,9 +2120,11 @@ int32_t BluetoothHostProxy::GetRemoteServices(const std::string &address, bool &
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_REMOTE_SERVICES, option, data, reply);
-    CHECK_AND_RETURN_LOG_RET(error == BT_NO_ERROR, error, "GetRemoteServices done fail");
-    status = reply.ReadBool();
-    return BT_NO_ERROR;
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::GetRemoteServices done fail error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadInt32();
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
