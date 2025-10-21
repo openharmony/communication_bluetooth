@@ -450,7 +450,7 @@ public:
     };
 
     /**
-     * @brief Start sdp search the uuid of remote device.
+     * @brief Start sdp search the uuid information of the remote device.
      *
      * @param uuid The uuid of remote device users want to sdp search.
      * @return Returns <b>true</b> if the operation is successful;

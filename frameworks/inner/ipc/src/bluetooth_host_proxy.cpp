@@ -2094,29 +2094,33 @@ void BluetoothHostProxy::SetCallingPackageName(const std::string &address, const
     }
 }
 
-bool BluetoothHostProxy::StartRemoteSdpSearch(const std::string &address, const std::string &uuid)
+int32_t BluetoothHostProxy::StartRemoteSdpSearch(const std::string &address, const std::string &uuid, bool &status)
 {
     MessageParcel data;
-    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), false, "WriteToken err");
-    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), false, "write address error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteString(uuid), false, "write uuid error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteToken err");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_IPC_TRANS_FAILED, "write address error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(uuid), BT_ERR_IPC_TRANS_FAILED, "write uuid error");
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::START_REMOTE_SDP_SEARCH, option, data, reply);
-    CHECK_AND_RETURN_LOG_RET(error == NO_ERROR, false, "StartRemoteSdpSearch done fail");
-    return reply.ReadBool();
+    CHECK_AND_RETURN_LOG_RET(error == BT_NO_ERROR, false, "StartRemoteSdpSearch done fail");
+    status = reply.ReadBool();
+    return BT_NO_ERROR;
 }
 
-bool BluetoothHostProxy::GetRemoteServices(const std::string &address)
+int32_t BluetoothHostProxy::GetRemoteServices(const std::string &address, bool &status)
 {
     MessageParcel data;
-    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), false, "WriteToken err");
-    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), false, "write address error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteToken err");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_IPC_TRANS_FAILED, "write address error");
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_REMOTE_SERVICES, option, data, reply);
-    CHECK_AND_RETURN_LOG_RET(error == NO_ERROR, false, "GetRemoteServices done fail");
-    return reply.ReadBool();
+    CHECK_AND_RETURN_LOG_RET(error == BT_NO_ERROR, error, "GetRemoteServices done fail");
+    status = reply.ReadBool();
+    return BT_NO_ERROR;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
