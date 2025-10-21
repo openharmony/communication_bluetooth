@@ -2108,7 +2108,7 @@ int32_t BluetoothHostProxy::StartRemoteSdpSearch(const std::string &address, con
         HILOGE("BluetoothHostProxy::StartRemoteSdpSearch done fail error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
     }
-    return reply.ReadBool();
+    return reply.ReadInt32();
 }
 
 int32_t BluetoothHostProxy::GetRemoteServices(const std::string &address)
