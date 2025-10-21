@@ -24,13 +24,13 @@ namespace Bluetooth {
 const int32_t BLE_SCAN_READ_DATA_SIZE_MAX_LEN = 0x400;
 bool BluetoothBleScanResult::Marshalling(Parcel &parcel) const
 {
-    if (!WirteServiceUuidsToParcel(parcel)) {
+    if (!WriteServiceUuidsToParcel(parcel)) {
         return false;
     }
-    if (!WirteManufacturerDataToParcel(parcel)) {
+    if (!WriteManufacturerDataToParcel(parcel)) {
         return false;
     }
-    if (!WirteServiceDataToParcel(parcel)) {
+    if (!WriteServiceDataToParcel(parcel)) {
         return false;
     }
     if (!parcel.WriteString(addr_.GetAddress())) {
@@ -52,6 +52,12 @@ bool BluetoothBleScanResult::Marshalling(Parcel &parcel) const
         return false;
     }
     if (!parcel.WriteUint16(eventType_)) {
+        return false;
+    }
+    if (!parcel.WriteInt8(txPowerLevel_)) {
+        return false;
+    }
+    if (!WriteAdvertisingDataToParcel(parcel)) {
         return false;
     }
     return true;
@@ -107,10 +113,16 @@ bool BluetoothBleScanResult::ReadFromParcel(Parcel &parcel)
     if (!parcel.ReadUint16(eventType_)) {
         return false;
     }
+    if (!parcel.ReadInt8(txPowerLevel_)) {
+        return false;
+    }
+    if (!ReadAdvertisingDataFromParcel(parcel)) {
+        return false;
+    }
     return true;
 }
 
-bool BluetoothBleScanResult::WirteServiceUuidsToParcel(Parcel &parcel) const
+bool BluetoothBleScanResult::WriteServiceUuidsToParcel(Parcel &parcel) const
 {
     if (!parcel.WriteInt32(serviceUuids_.size())) {
         return false;
@@ -141,7 +153,7 @@ bool BluetoothBleScanResult::ReadServiceUuidsFromParcel(Parcel &parcel)
     return true;
 }
 
-bool BluetoothBleScanResult::WirteManufacturerDataToParcel(Parcel &parcel) const
+bool BluetoothBleScanResult::WriteManufacturerDataToParcel(Parcel &parcel) const
 {
     if (!parcel.WriteInt32(manufacturerSpecificData_.size())) {
         return false;
@@ -178,7 +190,7 @@ bool BluetoothBleScanResult::ReadManufacturerDataFromParcel(Parcel &parcel)
     return true;
 }
 
-bool BluetoothBleScanResult::WirteServiceDataToParcel(Parcel &parcel) const
+bool BluetoothBleScanResult::WriteServiceDataToParcel(Parcel &parcel) const
 {
     if (!parcel.WriteInt32(serviceData_.size())) {
         return false;
@@ -211,6 +223,43 @@ bool BluetoothBleScanResult::ReadServiceDataFromParcel(Parcel &parcel)
             return false;
         }
         serviceData_.emplace(bluetooth::Uuid::ConvertFrom32Bits(serviceId), serviceData);
+    }
+    return true;
+}
+
+bool BluetoothBleScanResult::WriteAdvertisingDataToParcel(Parcel &parcel) const
+{
+    if (!parcel.WriteInt32(advertisingData_.size())) {
+        return false;
+    }
+    for (auto iter = advertisingData_.begin(); iter != advertisingData_.end(); ++iter) {
+        if (!parcel.WriteUint8(iter->first)) {
+            return false;
+        }
+        if (!parcel.WriteString(iter->second)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool BluetoothBleScanResult::ReadAdvertisingDataFromParcel(Parcel &parcel)
+{
+    int32_t advSize = 0;
+    if (!parcel.ReadInt32(advSize) || advSize > BLE_SCAN_READ_DATA_SIZE_MAX_LEN) {
+        HILOGE("read Parcelable size failed.");
+        return false;
+    }
+    for (int i = 0; i < advSize; i++) {
+        uint8_t advType = 0;
+        std::string advData {};
+        if (!parcel.ReadUint8(advType)) {
+            return false;
+        }
+        if (!parcel.ReadString(advData)) {
+            return false;
+        }
+        advertisingData_.emplace(advType, advData);
     }
     return true;
 }

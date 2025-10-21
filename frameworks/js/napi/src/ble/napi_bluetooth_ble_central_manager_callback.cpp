@@ -40,7 +40,33 @@ struct SysBLEDeviceFoundCallbackData {
     std::shared_ptr<BleScanResult> result;
 };
 
-void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env &env, napi_value &scanResultArray,
+void GetParsedScanResult(const BleScanResult &bleScanResult, const napi_env env, napi_value &result)
+{
+    napi_value value = nullptr;
+    napi_create_uint32(env, bleScanResult.GetAdvertiseFlag(), &value);
+    napi_set_named_property(env, result, "advertiseFlags", value);
+
+    NapiMap napiMap = CreateNapiMap(env);
+    ConvertDataMapToJS(env, napiMap, bleScanResult.GetManufacturerData());
+    napi_set_named_property(env, result, "manufacturerDataMap", napiMap.instance);
+
+    napiMap = CreateNapiMap(env);
+    ConvertDataMapToJS(env, napiMap, bleScanResult.GetServiceData());
+    napi_set_named_property(env, result, "serviceDataMap", napiMap.instance);
+
+    napi_create_array(env, &value);
+    ConvertServiceUuidsToJS(env, value, bleScanResult.GetServiceUuids());
+    napi_set_named_property(env, result, "serviceUuids", value);
+
+    napi_create_int32(env, bleScanResult.GetTxPowerLevel(), &value);
+    napi_set_named_property(env, result, "txPowerLevel", value);
+
+    napiMap = CreateNapiMap(env);
+    ConvertDataMapToJS(env, napiMap, bleScanResult.GetAdvertisingData());
+    napi_set_named_property(env, result, "advertisingDataMap", napiMap.instance);
+}
+
+void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env env, napi_value &scanResultArray,
     bool isSysInterface = false)
 {
     napi_create_array(env, &scanResultArray);
@@ -79,6 +105,8 @@ void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env
         napi_set_named_property(env, result, "data", value);
         napi_create_string_utf8(env, bleScanResult.GetName().c_str(), NAPI_AUTO_LENGTH, &value);
         napi_set_named_property(env, result, "deviceName", value);
+
+        GetParsedScanResult(bleScanResult, env, result);
         napi_set_element(env, scanResultArray, count, result);
         ++count;
     }

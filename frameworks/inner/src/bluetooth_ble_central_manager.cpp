@@ -67,6 +67,10 @@ struct BleCentralManager::impl {
                 scanResult.AddServiceData(uuid, serviceData.second);
             }
 
+            for (auto &advertisingData : tempResult.GetAdvertisingData()) {
+                scanResult.AddAdvertisingData(advertisingData.first, advertisingData.second);
+            }
+
             scanResult.SetAdvertiseFlag(tempResult.GetAdvertiseFlag());
             scanResult.SetRssi(tempResult.GetRssi());
             scanResult.SetConnectable(tempResult.IsConnectable());
@@ -75,6 +79,7 @@ struct BleCentralManager::impl {
             scanResult.SetPayload(tempResult.GetPayload());
             scanResult.SetName(tempResult.GetName());
             scanResult.SetEventType(tempResult.GetEventType());
+            scanResult.SetTxPowerLevel(tempResult.GetTxPowerLevel());
         }
 
         void OnScanCallback(const BluetoothBleScanResult &result, uint8_t callbackType) override
@@ -600,6 +605,11 @@ std::map<uint16_t, std::string> BleScanResult::GetManufacturerData() const
     return manufacturerSpecificData_;
 }
 
+std::map<uint8_t, std::string> BleScanResult::GetAdvertisingData() const
+{
+    return advertisingData_;
+}
+
 std::map<UUID, std::string> BleScanResult::GetServiceData() const
 {
     return serviceData_;
@@ -613,6 +623,11 @@ BluetoothRemoteDevice BleScanResult::GetPeripheralDevice() const
 int8_t BleScanResult::GetRssi() const
 {
     return rssi_;
+}
+
+int8_t BleScanResult::GetTxPowerLevel() const
+{
+    return txPowerLevel_;
 }
 
 bool BleScanResult::IsConnectable() const
@@ -645,6 +660,12 @@ void BleScanResult::AddServiceUuid(const UUID &serviceUuid)
     serviceUuids_.push_back(serviceUuid);
 }
 
+// std::map<uint8_t, std::string>
+void BleScanResult::AddAdvertisingData(uint8_t advType, const std::string &advData)
+{
+    advertisingData_.insert(std::make_pair(advType, advData));
+}
+
 void BleScanResult::SetPayload(std::string payload)
 {
     payload_.assign(payload.begin(), payload.end());
@@ -658,6 +679,11 @@ void BleScanResult::SetPeripheralDevice(const BluetoothRemoteDevice &device)
 void BleScanResult::SetRssi(int8_t rssi)
 {
     rssi_ = rssi;
+}
+
+void BleScanResult::SetTxPowerLevel(int8_t txPowerLevel)
+{
+    txPowerLevel_ = txPowerLevel;
 }
 
 void BleScanResult::SetConnectable(bool connectable)
