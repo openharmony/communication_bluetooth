@@ -498,7 +498,7 @@ bool BluetoothRemoteDevice::GetRemoteServices() const
     CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device");
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
-    int32_t ret = hostProxy->GetRemoteServices(address_, uuid);
+    int32_t ret = hostProxy->GetRemoteServices(address_);
     return ret == BT_NO_ERROR;
 }
 }  // namespace Bluetooth
