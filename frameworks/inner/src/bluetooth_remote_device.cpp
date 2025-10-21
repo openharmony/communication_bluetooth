@@ -488,9 +488,8 @@ bool BluetoothRemoteDevice::StartRemoteSdpSearch(const std::string &uuid) const
     CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device");
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
-    bool status = false;
-    hostProxy->StartRemoteSdpSearch(address_, uuid, status);
-    return status;
+    int32_t ret = hostProxy->StartRemoteSdpSearch(address_, uuid);
+    return ret == BT_NO_ERROR;
 }
 
 bool BluetoothRemoteDevice::GetRemoteServices() const
@@ -499,9 +498,8 @@ bool BluetoothRemoteDevice::GetRemoteServices() const
     CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), false, "Invalid remote device");
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, false, "proxy is nullptr.");
-    bool status = false;
-    hostProxy->GetRemoteServices(address_, uuid, status);
-    return status;
+    int32_t ret = hostProxy->GetRemoteServices(address_, uuid);
+    return ret == BT_NO_ERROR;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
