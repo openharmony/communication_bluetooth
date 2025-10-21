@@ -12,17 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef LOG_TAG
 #define LOG_TAG "bt_taihe_parser_utils"
 #endif
 
+#include "taihe_parser_utils.h"
+
+#include "bluetooth_log.h"
 #include "taihe_async_callback.h"
 #include "taihe_bluetooth_utils.h"
-#include "taihe_parser_utils.h"
-#include "bluetooth_log.h"
-#include "taihe/platform/ani.hpp"
-#include "taihe/optional.hpp"
 #include "taihe/array.hpp"
+#include "taihe/optional.hpp"
+#include "taihe/platform/ani.hpp"
 
 #include <string>
 #include <vector>
@@ -277,6 +279,41 @@ taihe_status TaiheParseGattDescriptor(taihe::array<::ohos::bluetooth::ble::BLEDe
     return taihe_ok;
 }
 
+taihe_status TaiheParseGattBLEDescriptor(::ohos::bluetooth::ble::BLEDescriptor object,
+    TaiheBleDescriptor &outDescriptor)
+{
+    UUID serviceUuid {};
+    UUID characterUuid {};
+    UUID descriptorUuid {};
+    std::vector<uint8_t> descriptorValue {};
+    uint32_t descriptorHandle = 0;
+    TaiheGattPermission permissions = DEFAULT_GATT_PERMISSIONS;
+
+    TAIHE_BT_CALL_RETURN(ParseUuidParams(std::string(object.serviceUuid), serviceUuid));
+    TAIHE_BT_CALL_RETURN(ParseUuidParams(std::string(object.characteristicUuid), characterUuid));
+    TAIHE_BT_CALL_RETURN(ParseUuidParams(std::string(object.descriptorUuid), descriptorUuid));
+    if (object.descriptorValue.size() > 0) {
+        ParseArrayBufferParams(object.descriptorValue, descriptorValue);
+    }
+    if (object.descriptorHandle.has_value()) {
+        descriptorHandle = object.descriptorHandle.value();
+        TAIHE_BT_RETURN_IF(descriptorHandle > 0xFFFF, "Invalid descriptorHandle", taihe_invalid_arg);
+    }
+    if (object.permissions.has_value()) {
+        ohos::bluetooth::ble::GattPermissions objectPermissions = object.permissions.value();
+        TaiheParseObjectGattPermissions(objectPermissions, permissions);
+    }
+
+    outDescriptor.serviceUuid = serviceUuid;
+    outDescriptor.characteristicUuid = characterUuid;
+    outDescriptor.descriptorUuid = descriptorUuid;
+    outDescriptor.descriptorValue = std::move(descriptorValue);
+    outDescriptor.descriptorHandle = static_cast<uint16_t>(descriptorHandle);
+    outDescriptor.permissions = ConvertGattPermissions(permissions);
+
+    return taihe_ok;
+}
+
 void TaiheParseObjectGattPermissions(ohos::bluetooth::ble::GattPermissions object,
                                      TaiheGattPermission &outPermissions)
 {
@@ -339,16 +376,47 @@ void TaiheParseObjectGattProperties(ohos::bluetooth::ble::GattProperties object,
     outProperties = properties;
 }
 
-std::shared_ptr<TaiheAsyncCallback> TaiheParseAsyncCallback(ani_vm *vm, ani_env *env, ani_object info)
+taihe_status TaiheParseNotifyCharacteristic(ohos::bluetooth::ble::NotifyCharacteristic object,
+    TaiheNotifyCharacteristic &outCharacter)
 {
+    UUID serviceUuid {};
+    UUID characterUuid {};
+    std::vector<uint8_t> characterValue {};
+    bool confirm = false;
+    TAIHE_BT_CALL_RETURN(ParseUuidParams(std::string(object.serviceUuid), serviceUuid));
+    TAIHE_BT_CALL_RETURN(ParseUuidParams(std::string(object.characteristicUuid), characterUuid));
+    ParseArrayBufferParams(object.characteristicValue, characterValue);
+    confirm = object.confirm;
+
+    outCharacter.serviceUuid = serviceUuid;
+    outCharacter.characterUuid = characterUuid;
+    outCharacter.characterValue = std::move(characterValue);
+    outCharacter.confirm = confirm;
+    return taihe_ok;
+}
+
+std::shared_ptr<TaiheAsyncCallback> TaiheParseAsyncCallback(ani_env *env, ani_object info)
+{
+    ani_vm *vm = nullptr;
+    if (env == nullptr) {
+        HILOGE("null env");
+        return nullptr;
+    }
+    if (ANI_OK != env->GetVM(&vm)) {
+        HILOGE("GetVM failed");
+        return nullptr;
+    }
+
+    std::thread::id threadId = std::this_thread::get_id();
+
     auto asyncCallback = std::make_shared<TaiheAsyncCallback>();
     asyncCallback->env = env;
     if (info != nullptr) {
         HILOGD("callback mode");
-        asyncCallback->callback = std::make_shared<TaiheCallback>(vm, env, info);
+        asyncCallback->callback = std::make_shared<TaiheCallback>(vm, env, threadId, info);
     } else {
         HILOGD("promise mode");
-        asyncCallback->promise = std::make_shared<TaihePromise>(vm, env);
+        asyncCallback->promise = std::make_shared<TaihePromise>(vm, env, threadId);
     }
     return asyncCallback;
 }

@@ -14,30 +14,6 @@
  */
 
 #include "ohos.bluetooth.ble.ani.hpp"
-#include "ohos.bluetooth.ble.impl.h"
-
-static ani_status ANIFuncsRegister(ani_env *env)
-{
-    ani_namespace scope;
-    if (ANI_OK != env->FindNamespace("@ohos.bluetooth.ble.ble", &scope)) {
-        return ANI_ERROR;
-    }
-    ani_native_function methods[] = {
-        {"StartAdvertisingReturnsPromise_inner", nullptr,
-            reinterpret_cast<ani_object *>(OHOS::Bluetooth::StartAdvertisingAsyncPromise)},
-        {"StartAdvertisingWithCallback_inner", nullptr,
-            reinterpret_cast<ani_object *>(OHOS::Bluetooth::StartAdvertisingAsyncCallback)},
-        {"DisableAdvertisingReturnsPromise_inner", nullptr,
-            reinterpret_cast<ani_object *>(OHOS::Bluetooth::DisableAdvertisingAsyncPromise)},
-        {"DisableAdvertisingWithCallback_inner", nullptr,
-            reinterpret_cast<ani_object *>(OHOS::Bluetooth::DisableAdvertisingAsyncCallback)},
-        {"EnableAdvertisingReturnsPromise_inner", nullptr,
-            reinterpret_cast<ani_object *>(OHOS::Bluetooth::EnableAdvertisingAsyncPromise)},
-        {"EnableAdvertisingWithCallback_inner", nullptr,
-            reinterpret_cast<ani_object *>(OHOS::Bluetooth::EnableAdvertisingAsyncCallback)},
-    };
-    return env->Namespace_BindNativeFunctions(scope, methods, sizeof(methods) / sizeof(ani_native_function));
-}
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
@@ -48,11 +24,6 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     if (ANI_OK != ohos::bluetooth::ble::ANIRegister(env)) {
         std::cerr << "Error from ohos::bluetooth::ble::ANIRegister" << std::endl;
         return ANI_ERROR;
-    }
-    ani_status status = ANI_OK;
-    if (ani_status ret = ANIFuncsRegister(env); ret != ANI_OK && ret != ANI_ALREADY_BINDED) {
-        std::cerr << "Error from ANIFuncsRegister, code: " << ret << std::endl;
-        status = ANI_ERROR;
     }
     *result = ANI_VERSION_1;
     return ANI_OK;

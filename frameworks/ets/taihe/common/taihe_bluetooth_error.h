@@ -18,6 +18,9 @@
 
 #include <cstdint>
 #include <string>
+#include <optional>
+
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 
 namespace OHOS {
@@ -47,6 +50,22 @@ do {                                                      \
 
 std::string GetTaiheErrMsg(const int32_t errCode);
 void HandleSyncErr(int32_t errCode);
+
+struct TaihePromiseAndCallback {
+    bool success;
+    BtErrCode errorCode;
+    std::optional<uintptr_t> handle;
+
+    static TaihePromiseAndCallback Success(uintptr_t h = 0)
+    {
+        return {true, BtErrCode::BT_NO_ERROR, h};
+    }
+
+    static TaihePromiseAndCallback Failure(BtErrCode code)
+    {
+        return {false, code, std::nullopt};
+    }
+};
 } // namespace Bluetooth
 } // namespace OHOS
 #endif // TAIHE_BLUETOOTH_ERROR_H_
