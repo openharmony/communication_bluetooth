@@ -32,15 +32,15 @@ public:
     void Connect();
     void Disconnect();
     void Close();
-    uintptr_t ReadCharacteristicValuePromise(::ohos::bluetooth::ble::BLECharacteristic const &characteristic);
-    void ReadCharacteristicValueAsync(::ohos::bluetooth::ble::BLECharacteristic const &characteristic,
+    uintptr_t ReadCharacteristicValuePromise(const ohos::bluetooth::ble::BLECharacteristic &characteristic);
+    void ReadCharacteristicValueAsync(const ohos::bluetooth::ble::BLECharacteristic &characteristic,
         uintptr_t callback);
-    uintptr_t ReadDescriptorValuePromise(::ohos::bluetooth::ble::BLEDescriptor const &bleDescriptor);
-    void ReadDescriptorValueAsync(::ohos::bluetooth::ble::BLEDescriptor const &bleDescriptor, uintptr_t callback);
+    uintptr_t ReadDescriptorValuePromise(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor);
+    void ReadDescriptorValueAsync(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor, uintptr_t callback);
 
-    uintptr_t SetCharacteristicChangeIndicationPromise(::ohos::bluetooth::ble::BLECharacteristic const &characteristic,
+    uintptr_t SetCharacteristicChangeIndicationPromise(const ohos::bluetooth::ble::BLECharacteristic &characteristic,
         bool enable);
-    void SetCharacteristicChangeIndicationAsync(::ohos::bluetooth::ble::BLECharacteristic const &characteristic,
+    void SetCharacteristicChangeIndicationAsync(const ohos::bluetooth::ble::BLECharacteristic &characteristic,
         bool enable, uintptr_t callback);
 
     void SetBLEMtuSize(int mtu);

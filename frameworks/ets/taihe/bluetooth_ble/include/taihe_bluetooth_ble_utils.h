@@ -17,12 +17,15 @@
 #define TAIHE_BLUETOOTH_BLE_UTILS_H_
 
 #include "bluetooth_ble_advertiser.h"
-
+#include "bluetooth_ble_central_manager.h"
+#include "bluetooth_gatt_characteristic.h"
 #include "bluetooth_gatt_client.h"
+#include "bluetooth_gatt_server.h"
 #include "ohos.bluetooth.ble.impl.hpp"
 #include "ohos.bluetooth.ble.proj.hpp"
 #include "stdexcept"
 #include "taihe/runtime.hpp"
+#include "taihe_bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -40,7 +43,13 @@ enum class SensitivityMode {
 
 int GetCurrentSdkVersion(void);
 int GetSDKAdaptedStatusCode(int status);
+taihe_status CheckBleScanParams(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
+                                taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options,
+                                std::vector<BleScanFilter> &outScanfilters,
+                                BleScanSettings &outSettinngs);
+ani_object ConvertBLECharacteristicToJS(ani_env *env, GattCharacteristic &characteristic);
 ani_object ConvertBLEDescriptorToJS(ani_env *env, GattDescriptor& descriptor);
+ani_object ConvertBLEDescriptorVectorToJS(ani_env *env, std::vector<GattDescriptor> &descriptors);
 } // namespace Bluetooth
 } // namespace OHOS
 #endif // TAIHE_BLUETOOTH_BLE_UTILS_H_

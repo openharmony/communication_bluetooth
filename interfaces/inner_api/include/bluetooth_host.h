@@ -334,7 +334,6 @@ public:
      * @return Returns <b>true</b> if the operation is accepted;
      *         returns <b>false</b> if the operation is rejected.
      * @since 6
-     * @deprecated since 20
      */
     int EnableBt();
 
@@ -398,7 +397,6 @@ public:
      * @return Returns <b>true</b> if the operation is accepted;
      *         returns <b>false</b> if the operation is rejected.
      * @since 6
-     * @deprecated since 20
      */
     int DisableBle();
 

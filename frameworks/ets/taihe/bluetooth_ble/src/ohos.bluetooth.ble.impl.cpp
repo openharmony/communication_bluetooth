@@ -18,21 +18,18 @@
 #endif
 
 #include "bluetooth_ble_advertiser.h"
-#include "bluetooth_ble_central_manager.h"
 #include "bluetooth_errorcode.h"
-#include "bluetooth_gatt_client.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "bluetooth_remote_device.h"
 #include "bluetooth_utils.h"
 #include "stdexcept"
 #include "taihe_bluetooth_ble_advertise_callback.h"
-#include "taihe_bluetooth_ble_central_manager_callback.h"
+#include "taihe_bluetooth_ble_scanner.h"
 #include "taihe_bluetooth_ble_utils.h"
 #include "taihe_bluetooth_error.h"
 #include "taihe_bluetooth_gatt_client.h"
 #include "taihe_bluetooth_gatt_server.h"
-#include "taihe_bluetooth_gatt_server_callback.h"
 #include "taihe_bluetooth_utils.h"
 #include "taihe_parser_utils.h"
 #include "taihe/array.hpp"
@@ -54,106 +51,6 @@ BleCentralManager *BleCentralManagerGetInstance(void)
     return &instance;
 }
 }  // namespace {}
-
-taihe_status CheckBleScanParams(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
-                                taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options,
-                                std::vector<BleScanFilter> &outScanfilters,
-                                BleScanSettings &outSettinngs);
-
-class BleScannerImpl {
-public:
-    BleScannerImpl()
-    {
-        callback_ = std::make_shared<TaiheBluetoothBleCentralManagerCallback>(true);
-        bleCentralManager_ = std::make_shared<BleCentralManager>(callback_);
-    }
-    ~BleScannerImpl() = default;
-
-    std::shared_ptr<BleCentralManager> &GetBleCentralManager()
-    {
-        return bleCentralManager_;
-    }
-
-    std::shared_ptr<TaiheBluetoothBleCentralManagerCallback> GetCallback()
-    {
-        return callback_;
-    }
-
-    uintptr_t StartScanPromise(::ohos::bluetooth::ble::ScanFilterNullValue const& filters, ::taihe::optional_view<::ohos::bluetooth::ble::ScanOptions> options)
-    {
-        HILOGI("enter");
-        ani_env *env = taihe::get_env();
-        if (env == nullptr) {
-            HILOGE("StartScanPromise get_env failed");
-            return reinterpret_cast<uintptr_t>(nullptr);
-        }
-        std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.BleScanner.StartScan");
-        std::vector<BleScanFilter> scanFilters;
-        BleScanSettings settings;
-        auto status = CheckBleScanParams(filters, options, scanFilters, settings);
-        TAIHE_BT_ASSERT_RETURN(status == taihe_ok, BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
-
-        TAIHE_BT_ASSERT_RETURN(this->GetBleCentralManager() != nullptr,
-            BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
-        TAIHE_BT_ASSERT_RETURN(this->GetCallback() != nullptr,
-            BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
-
-        auto func = [this, settings, scanFilters]() {
-            this->GetBleCentralManager()->SetNewApiFlag();
-            // When apps like aibase are in frozen state, enabling flight mode and then turning on Bluetooth can cause the
-            // scannerId to become invalid. The C++ interface's scannerId is reset every time scanning is turned off, so
-            // the JS interface should check the scannerId's validity before each scan.
-            this->GetBleCentralManager()->CheckValidScannerId();
-            int ret = this->GetBleCentralManager()->StartScan(settings, scanFilters);
-            return TaiheAsyncWorkRet(ret);
-        };
-
-        auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(env, nullptr, func, haUtils);
-        TAIHE_BT_ASSERT_RETURN(asyncWork != nullptr, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
-        bool success = this->GetCallback()->asyncWorkMap_.TryPush(TaiheAsyncType::BLE_START_SCAN, asyncWork);
-        TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
-
-        asyncWork->Run();
-        return reinterpret_cast<uintptr_t>(asyncWork->GetRet());
-    }
-
-    uintptr_t StopScanPromise()
-    {
-        HILOGI("enter");
-        ani_env *env = taihe::get_env();
-        if (env == nullptr) {
-            HILOGE("StopScanPromise get_env failed");
-            return reinterpret_cast<uintptr_t>(nullptr);
-        }
-        std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.BleScanner.StopScan");
-
-        TAIHE_BT_ASSERT_RETURN(this->GetBleCentralManager() != nullptr,
-            BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
-        TAIHE_BT_ASSERT_RETURN(this->GetCallback() != nullptr,
-            BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
-
-        auto func = [this]() {
-            // When apps like aibase are in frozen state, enabling flight mode and then turning on Bluetooth can cause the
-            // scannerId to become invalid. The C++ interface's scannerId is reset every time scanning is turned off, so
-            // the JS interface should check the scannerId's validity before each scan.
-            this->GetBleCentralManager()->CheckValidScannerId();
-            int ret = this->GetBleCentralManager()->StopScan();
-            return TaiheAsyncWorkRet(ret);
-        };
-
-        auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(env, nullptr, func, haUtils);
-        TAIHE_BT_ASSERT_RETURN(asyncWork != nullptr, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
-        bool success = this->GetCallback()->asyncWorkMap_.TryPush(TaiheAsyncType::BLE_STOP_SCAN, asyncWork);
-        TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, reinterpret_cast<uintptr_t>(nullptr));
-        HILOGI("StopScanReturnsPromise success: %{public}d", success);
-
-        asyncWork->Run();
-        return reinterpret_cast<uintptr_t>(asyncWork->GetRet());
-    }
-private:
-    std::shared_ptr<BleCentralManager> bleCentralManager_ = nullptr;
-    std::shared_ptr<TaiheBluetoothBleCentralManagerCallback> callback_ = nullptr;
-};
 
 void StopAdvertising()
 {
@@ -542,8 +439,8 @@ void StartAdvertising(ohos::bluetooth::ble::AdvertiseSetting setting, ohos::blue
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
 }
 
-taihe_status CheckAdvertisingDisableParams(
-    const::ohos::bluetooth::ble::AdvertisingDisableParams &advertisingDisableParams,
+static taihe_status CheckAdvertisingDisableParams(
+    const ohos::bluetooth::ble::AdvertisingDisableParams &advertisingDisableParams,
     uint32_t &outAdvHandle,
     std::shared_ptr<BleAdvertiseCallback> &callback)
 {
@@ -558,7 +455,8 @@ taihe_status CheckAdvertisingDisableParams(
 
     return taihe_ok;
 }
-taihe_status CheckAdvertisingDataWithDuration(::ohos::bluetooth::ble::AdvertisingParams const &advertisingParams,
+
+static taihe_status CheckAdvertisingDataWithDuration(ohos::bluetooth::ble::AdvertisingParams const &advertisingParams,
     BleAdvertiserSettings &outSettings, BleAdvertiserData &outAdvData, BleAdvertiserData &outRspData,
     uint16_t &outDuration)
 {
@@ -590,8 +488,8 @@ taihe_status CheckAdvertisingDataWithDuration(::ohos::bluetooth::ble::Advertisin
     return taihe_ok;
 }
 
-static TaihePromiseAndCallback TaiheStartAdvertising(::ohos::bluetooth::ble::AdvertisingParams const &advertisingParams,
-    uintptr_t cb, bool asPromise = true)
+static TaihePromiseAndCallback TaiheStartAdvertising(ohos::bluetooth::ble::AdvertisingParams const &advertisingParams,
+    uintptr_t cb, bool isPromise = true)
 {
     HILOGI("enter");
     ani_env *env = taihe::get_env();
@@ -632,14 +530,14 @@ static TaihePromiseAndCallback TaiheStartAdvertising(::ohos::bluetooth::ble::Adv
 
     asyncWork->Run();
 
-    if (asPromise) {
+    if (isPromise) {
         return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(asyncWork->GetRet()));
     } else {
         return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(nullptr));
     }
 }
 
-uintptr_t StartAdvertisingPromise(::ohos::bluetooth::ble::AdvertisingParams const &advertisingParams)
+uintptr_t StartAdvertisingPromise(ohos::bluetooth::ble::AdvertisingParams const &advertisingParams)
 {
     TaihePromiseAndCallback result = TaiheStartAdvertising(advertisingParams, reinterpret_cast<uintptr_t>(nullptr));
     if (!result.success || !result.handle.has_value()) {
@@ -648,7 +546,7 @@ uintptr_t StartAdvertisingPromise(::ohos::bluetooth::ble::AdvertisingParams cons
     return result.handle.value();
 }
 
-void StartAdvertisingAsync(::ohos::bluetooth::ble::AdvertisingParams const &advertisingParams, uintptr_t callback)
+void StartAdvertisingAsync(ohos::bluetooth::ble::AdvertisingParams const &advertisingParams, uintptr_t callback)
 {
     TaihePromiseAndCallback result = TaiheStartAdvertising(advertisingParams, callback, false);
     if (!result.success) {
@@ -657,8 +555,8 @@ void StartAdvertisingAsync(::ohos::bluetooth::ble::AdvertisingParams const &adve
 }
 
 static TaihePromiseAndCallback TaiheDisableAdvertising(
-    ::ohos::bluetooth::ble::AdvertisingDisableParams const& advertisingDisableParams,
-    uintptr_t cb, bool asPromise = true)
+    ohos::bluetooth::ble::AdvertisingDisableParams const& advertisingDisableParams,
+    uintptr_t cb, bool isPromise = true)
 {
     HILOGI("enter");
     ani_env *env = taihe::get_env();
@@ -683,7 +581,6 @@ static TaihePromiseAndCallback TaiheDisableAdvertising(
         std::static_pointer_cast<TaiheBluetoothBleAdvertiseCallback>(baseCallback);
     auto func = [advHandle, callback]() {
         std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
-        HILOGI("DisableAdvertisingAsyncPromise BleAdvertiserGetInstance finish");
         if (bleAdvertiser == nullptr) {
             HILOGE("bleAdvertiser is nullptr");
             return TaiheAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
@@ -703,14 +600,14 @@ static TaihePromiseAndCallback TaiheDisableAdvertising(
     }
     asyncWork->Run();
 
-    if (asPromise) {
+    if (isPromise) {
         return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(asyncWork->GetRet()));
     } else {
         return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(nullptr));
     }
 }
 
-uintptr_t DisableAdvertisingPromise(::ohos::bluetooth::ble::AdvertisingDisableParams const& advertisingDisableParams)
+uintptr_t DisableAdvertisingPromise(ohos::bluetooth::ble::AdvertisingDisableParams const& advertisingDisableParams)
 {
     TaihePromiseAndCallback result =
         TaiheDisableAdvertising(advertisingDisableParams, reinterpret_cast<uintptr_t>(nullptr));
@@ -720,7 +617,7 @@ uintptr_t DisableAdvertisingPromise(::ohos::bluetooth::ble::AdvertisingDisablePa
     return result.handle.value();
 }
 
-void DisableAdvertisingAsync(::ohos::bluetooth::ble::AdvertisingDisableParams const& advertisingDisableParams,
+void DisableAdvertisingAsync(ohos::bluetooth::ble::AdvertisingDisableParams const& advertisingDisableParams,
     uintptr_t callback)
 {
     TaihePromiseAndCallback result = TaiheDisableAdvertising(advertisingDisableParams, callback, false);
@@ -730,7 +627,7 @@ void DisableAdvertisingAsync(::ohos::bluetooth::ble::AdvertisingDisableParams co
 }
 
 static TaihePromiseAndCallback TaiheEnableAdvertising(
-    ::ohos::bluetooth::ble::AdvertisingEnableParams const& advertisingEnableParams, uintptr_t cb, bool asPromise = true)
+    ohos::bluetooth::ble::AdvertisingEnableParams const& advertisingEnableParams, uintptr_t cb, bool isPromise = true)
 {
     HILOGI("enter");
     ani_env *env = taihe::get_env();
@@ -775,14 +672,14 @@ static TaihePromiseAndCallback TaiheEnableAdvertising(
     }
     asyncWork->Run();
 
-    if (asPromise) {
+    if (isPromise) {
         return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(asyncWork->GetRet()));
     } else {
         return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(nullptr));
     }
 }
 
-uintptr_t EnableAdvertisingPromise(::ohos::bluetooth::ble::AdvertisingEnableParams const& advertisingEnableParams)
+uintptr_t EnableAdvertisingPromise(ohos::bluetooth::ble::AdvertisingEnableParams const& advertisingEnableParams)
 {
     TaihePromiseAndCallback result = TaiheEnableAdvertising(advertisingEnableParams,
         reinterpret_cast<uintptr_t>(nullptr));
@@ -793,7 +690,7 @@ uintptr_t EnableAdvertisingPromise(::ohos::bluetooth::ble::AdvertisingEnablePara
     return result.handle.value();
 }
 
-void EnableAdvertisingAsync(::ohos::bluetooth::ble::AdvertisingEnableParams const &advertisingEnableParams,
+void EnableAdvertisingAsync(ohos::bluetooth::ble::AdvertisingEnableParams const &advertisingEnableParams,
     uintptr_t callback)
 {
     TaihePromiseAndCallback result = TaiheEnableAdvertising(advertisingEnableParams, callback, false);

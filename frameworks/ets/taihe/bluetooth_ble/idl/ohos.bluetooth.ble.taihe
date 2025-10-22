@@ -155,7 +155,7 @@ enum ScanReportMode: i32 {
     FENCE_SENSITIVITY_HIGH = 11
 }
 
-struct BLECharacteristic {
+@class struct BLECharacteristic {
     serviceUuid: String;
     characteristicUuid: String;
     characteristicValue: @arraybuffer Array<u8>;
@@ -177,7 +177,7 @@ enum AdvertisingState: i32 {
     STOPPED = 4
 }
 
-struct BLEDescriptor {
+@class struct BLEDescriptor {
     serviceUuid: String;
     characteristicUuid: String;
     descriptorUuid: String;
@@ -186,7 +186,7 @@ struct BLEDescriptor {
     permissions: Optional<GattPermissions>;
 }
 
-struct GattProperties {
+@class struct GattProperties {
     write: Optional<bool>;
     writeNoResponse: Optional<bool>;
     read: Optional<bool>;
@@ -202,7 +202,7 @@ enum GattWriteType: i32 {
     WRITE_NO_RESPONSE = 2
 }
 
-struct GattPermissions {
+@class struct GattPermissions {
     read: Optional<bool>;
     readEncrypted: Optional<bool>;
     readEncryptedMitm: Optional<bool>;

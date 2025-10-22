@@ -57,6 +57,7 @@ taihe_shared_library("bluetoothBle_taihe_native") {
     "src/ohos.bluetooth.ble.impl.cpp",
     "src/taihe_bluetooth_ble_advertise_callback.cpp",
     "src/taihe_bluetooth_ble_central_manager_callback.cpp",
+    "src/taihe_bluetooth_ble_scanner.cpp",
     "src/taihe_bluetooth_ble_utils.cpp",
     "src/taihe_bluetooth_gatt_client.cpp",
     "src/taihe_bluetooth_gatt_client_callback.cpp",

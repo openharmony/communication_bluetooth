@@ -121,7 +121,7 @@ static GattCharacteristic *GetGattCharacteristic(const std::shared_ptr<GattServe
 }
 
 static taihe_status CheckNotifyCharacteristicChangedEx(
-    ::taihe::string_view id, ::ohos::bluetooth::ble::NotifyCharacteristic const& info,
+    taihe::string_view id, const ohos::bluetooth::ble::NotifyCharacteristic &info,
     std::string &outDeviceId, TaiheNotifyCharacteristic &outCharacter)
 {
     std::string deviceId(id.c_str());
@@ -134,15 +134,15 @@ static taihe_status CheckNotifyCharacteristicChangedEx(
     return taihe_ok;
 }
 
-static TaihePromiseAndCallback TaiheNotifyCharacteristicChanged(::taihe::string_view deviceId,
-    ::ohos::bluetooth::ble::NotifyCharacteristic const& notifyCharacteristic, uintptr_t cb,
-    GattServerImpl* taiheServer, bool asPromise = true)
+static TaihePromiseAndCallback TaiheNotifyCharacteristicChanged(taihe::string_view deviceId,
+    const ohos::bluetooth::ble::NotifyCharacteristic &notifyCharacteristic, uintptr_t cb,
+    GattServerImpl* taiheServer, bool isPromise = true)
 {
     HILOGI("enter");
     std::string devId {};
     TaiheNotifyCharacteristic notifyCharacter;
     auto status = CheckNotifyCharacteristicChangedEx(deviceId, notifyCharacteristic, devId, notifyCharacter);
-    if ((status != taihe_ok) && (taiheServer == nullptr) && (taiheServer->GetServer() == nullptr)) {
+    if ((status != taihe_ok) || (taiheServer == nullptr) || (taiheServer->GetServer() == nullptr)) {
         return TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM);
     }
     HILOGI("[BTTEST] NotifyCharacteristicChangedAsyncPromise check params status: %{public}d", status);
@@ -171,16 +171,17 @@ static TaihePromiseAndCallback TaiheNotifyCharacteristicChanged(::taihe::string_
 
     asyncWork->Run();
 
-    if (asPromise) {
+    if (isPromise) {
         return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(asyncWork->GetRet()));
     } else {
         return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(nullptr));
     }
 }
 
-uintptr_t GattServerImpl::NotifyCharacteristicChangedPromise(::taihe::string_view deviceId,
-    ::ohos::bluetooth::ble::NotifyCharacteristic const& notifyCharacteristic)
-{    TaihePromiseAndCallback result = TaiheNotifyCharacteristicChanged(deviceId, notifyCharacteristic,
+uintptr_t GattServerImpl::NotifyCharacteristicChangedPromise(taihe::string_view deviceId,
+    const ohos::bluetooth::ble::NotifyCharacteristic &notifyCharacteristic)
+{
+    TaihePromiseAndCallback result = TaiheNotifyCharacteristicChanged(deviceId, notifyCharacteristic,
             reinterpret_cast<uintptr_t>(nullptr), this, false);
     if (!result.success || !result.handle.has_value()) {
         TAIHE_BT_ASSERT_RETURN(false, result.errorCode, reinterpret_cast<uintptr_t>(nullptr));
@@ -188,7 +189,8 @@ uintptr_t GattServerImpl::NotifyCharacteristicChangedPromise(::taihe::string_vie
     return result.handle.value();
 }
 
-void GattServerImpl::NotifyCharacteristicChangedAsync(::taihe::string_view deviceId, ::ohos::bluetooth::ble::NotifyCharacteristic const& notifyCharacteristic, uintptr_t callback)
+void GattServerImpl::NotifyCharacteristicChangedAsync(taihe::string_view deviceId,
+    const ohos::bluetooth::ble::NotifyCharacteristic &notifyCharacteristic, uintptr_t callback)
 {
     TaihePromiseAndCallback result = TaiheNotifyCharacteristicChanged(deviceId, notifyCharacteristic,
         reinterpret_cast<uintptr_t>(callback), this, false);
