@@ -67,22 +67,7 @@ ani_ref TaiheNativeBool::ToTaiheValue(ani_env *env) const
 
 ani_ref TaiheNativeBleCharacteristic::ToTaiheValue(ani_env *env) const
 {
-    // ani_class cls;
-    // ani_status status = ANI_ERROR;
-    // if ((status = env->FindClass("std.core.boolean", &cls)) != ANI_OK) {
-    //     HILOGE("FindClass status : %{public}d", status);
-    //     return nullptr;
-    // }
-    // ani_method ctor;
-    // if ((status = env->Class_FindMethod(cls, "<ctor>", "z:", &ctor)) != ANI_OK) {
-    //     HILOGE("Class_FindMethod status : %{public}d", status);
-    //     return nullptr;
-    // }
-    ani_object object = nullptr;
-    // if ((status = env->Object_New(cls, ctor, &object, character_)) != ANI_OK) {
-    //     HILOGE("Object_New status : %{public}d", status);
-    //     return nullptr;
-    // }
+    ani_object object = ConvertBLECharacteristicToJS(env, const_cast<GattCharacteristic &>(character_));
     return reinterpret_cast<ani_ref>(object);
 }
 

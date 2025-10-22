@@ -97,8 +97,8 @@ void TaiheGattServerCallback::OnMtuUpdate(const BluetoothRemoteDevice &device, i
 void TaiheGattServerCallback::OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device, int ret)
 {
     HILOGI("ret: %{public}d", ret);
-    auto napiRet = std::make_shared<TaiheNativeInt>(ret);
-    AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::GATT_SERVER_NOTIFY_CHARACTERISTIC, napiRet, ret);
+    auto taiheRet = std::make_shared<TaiheNativeInt>(ret);
+    AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::GATT_SERVER_NOTIFY_CHARACTERISTIC, taiheRet, ret);
 }
 } // namespace Bluetooth
 } // namespace OHOS

@@ -109,13 +109,13 @@ static GattCharacteristic *GetCharacteristic(const std::shared_ptr<GattClient> &
 }
 
 static GattCharacteristic *FindCharacteristic(std::vector<GattService> &service,
-    const TaiheBleCharacteristic &napiCharacter)
+    const TaiheBleCharacteristic &taiheCharacter)
 {
     GattCharacteristic *character = nullptr;
     for (auto &svc : service) {
-        if (svc.GetUuid().Equals(napiCharacter.serviceUuid)) {
-            character = svc.GetCharacteristic(napiCharacter.characteristicValueHandle);
-            if (character && character->GetUuid().Equals(napiCharacter.characteristicUuid)) {
+        if (svc.GetUuid().Equals(taiheCharacter.serviceUuid)) {
+            character = svc.GetCharacteristic(taiheCharacter.characteristicValueHandle);
+            if (character && character->GetUuid().Equals(taiheCharacter.characteristicUuid)) {
                 return character;
             }
         }
@@ -124,15 +124,15 @@ static GattCharacteristic *FindCharacteristic(std::vector<GattService> &service,
 }
 
 static GattCharacteristic *GetCharacteristic(const std::shared_ptr<GattClient> &client,
-    const TaiheBleCharacteristic &napiCharacter)
+    const TaiheBleCharacteristic &taiheCharacter)
 {
     if (client) {
-        if (napiCharacter.characteristicValueHandle > 0) {
+        if (taiheCharacter.characteristicValueHandle > 0) {
             std::vector<GattService> &services = client->GetService();
-            return FindCharacteristic(services, napiCharacter);
+            return FindCharacteristic(services, taiheCharacter);
         } else {
-            GattCharacteristic *character = GetCharacteristic(client, napiCharacter.serviceUuid,
-                napiCharacter.characteristicUuid);
+            GattCharacteristic *character = GetCharacteristic(client, taiheCharacter.serviceUuid,
+                taiheCharacter.characteristicUuid);
             return character;
         }
     }
@@ -140,11 +140,11 @@ static GattCharacteristic *GetCharacteristic(const std::shared_ptr<GattClient> &
 }
 
 static GattCharacteristic *GetGattcCharacteristic(const std::shared_ptr<GattClient> &client,
-    const TaiheBleCharacteristic &napiCharacter)
+    const TaiheBleCharacteristic &taiheCharacter)
 {
-    GattCharacteristic *character = GetCharacteristic(client, napiCharacter);
+    GattCharacteristic *character = GetCharacteristic(client, taiheCharacter);
     if (character) {
-        character->SetValue(napiCharacter.characteristicValue.data(), napiCharacter.characteristicValue.size());
+        character->SetValue(taiheCharacter.characteristicValue.data(), taiheCharacter.characteristicValue.size());
     }
     return character;
 }
@@ -167,11 +167,10 @@ static GattDescriptor *GetGattcDescriptor(const std::shared_ptr<GattClient> &cli
     return descriptor;
 }
 
-static taihe_status ParseGattClientReadCharacteristicValue(::ohos::bluetooth::ble::BLECharacteristic const &characteristic,
-    GattClientDeviceImpl **outGattClient, GattCharacteristic **outCharacter)
+static taihe_status ParseGattClientReadCharacteristicValue(const ohos::bluetooth::ble::BLECharacteristic &characteristic,
+    GattClientDeviceImpl *gattClient, GattCharacteristic **outCharacter)
 {
-    GattClientDeviceImpl *gattClient = *outGattClient;
-    TAIHE_BT_RETURN_IF(gattClient == nullptr || outGattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
+    TAIHE_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
 
     TaiheBleCharacteristic taiheCharacter;
     TAIHE_BT_CALL_RETURN(TaiheParseGattBLECharacteristic(characteristic, taiheCharacter));
@@ -179,19 +178,18 @@ static taihe_status ParseGattClientReadCharacteristicValue(::ohos::bluetooth::bl
     GattCharacteristic *character = GetGattcCharacteristic(gattClient->GetClient(), taiheCharacter);
     TAIHE_BT_RETURN_IF(character == nullptr || outCharacter == nullptr, "Not found character", taihe_invalid_arg);
 
-    *outGattClient = gattClient;
     *outCharacter = character;
     return taihe_ok;
 }
 
 static TaihePromiseAndCallback TaiheReadCharacteristicValue(
-    ::ohos::bluetooth::ble::BLECharacteristic const &characteristic, uintptr_t cb,
-    GattClientDeviceImpl* client, bool asPromise = true)
+    const ohos::bluetooth::ble::BLECharacteristic &characteristic, uintptr_t cb,
+    GattClientDeviceImpl* client, bool isPromise = true)
 {
     HILOGI("enter");
     GattCharacteristic *character = nullptr;
-    auto status = ParseGattClientReadCharacteristicValue(characteristic, &client, &character);
-    if ((status != taihe_ok) && (client == nullptr) && (character == nullptr)) {
+    auto status = ParseGattClientReadCharacteristicValue(characteristic, client, &character);
+    if ((status != taihe_ok) || (client == nullptr) || (character == nullptr)) {
         return TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM);
     }
     if (client->GetCallback() == nullptr) {
@@ -221,7 +219,7 @@ static TaihePromiseAndCallback TaiheReadCharacteristicValue(
 
     asyncWork->Run();
 
-    if (asPromise) {
+    if (isPromise) {
         return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(asyncWork->GetRet()));
     } else {
         return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(nullptr));
@@ -229,7 +227,7 @@ static TaihePromiseAndCallback TaiheReadCharacteristicValue(
 }
 
 uintptr_t GattClientDeviceImpl::ReadCharacteristicValuePromise(
-    ::ohos::bluetooth::ble::BLECharacteristic const &characteristic)
+    const ohos::bluetooth::ble::BLECharacteristic &characteristic)
 {
     TaihePromiseAndCallback result = TaiheReadCharacteristicValue(characteristic, reinterpret_cast<uintptr_t>(nullptr),
         this);
@@ -239,7 +237,7 @@ uintptr_t GattClientDeviceImpl::ReadCharacteristicValuePromise(
     return result.handle.value();
 }
 
-void GattClientDeviceImpl::ReadCharacteristicValueAsync(::ohos::bluetooth::ble::BLECharacteristic const &characteristic,
+void GattClientDeviceImpl::ReadCharacteristicValueAsync(const ohos::bluetooth::ble::BLECharacteristic &characteristic,
     uintptr_t callback)
 {
     TaihePromiseAndCallback result = TaiheReadCharacteristicValue(characteristic, callback, this, false);
@@ -248,29 +246,27 @@ void GattClientDeviceImpl::ReadCharacteristicValueAsync(::ohos::bluetooth::ble::
     }
 }
 
-static taihe_status ParseGattClientReadDescriptorValue(::ohos::bluetooth::ble::BLEDescriptor const &bleDescriptor,
-    GattClientDeviceImpl **outGattClient, GattDescriptor **outDescriptor)
+static taihe_status ParseGattClientReadDescriptorValue(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor,
+    GattClientDeviceImpl *gattClient, GattDescriptor **outDescriptor)
 {
-    GattClientDeviceImpl *gattClient = *outGattClient; // TaiheGetGattClient();
-    TAIHE_BT_RETURN_IF(outGattClient == nullptr || gattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
+    TAIHE_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
 
     TaiheBleDescriptor taiheDescriptor;
     TAIHE_BT_CALL_RETURN(TaiheParseGattBLEDescriptor(bleDescriptor, taiheDescriptor));
     GattDescriptor *descriptor = GetGattcDescriptor(gattClient->GetClient(), taiheDescriptor);
     TAIHE_BT_RETURN_IF(outDescriptor == nullptr || descriptor == nullptr, "Not found Descriptor", taihe_invalid_arg);
 
-    *outGattClient = gattClient;
     *outDescriptor = descriptor;
     return taihe_ok;
 }
 
-static TaihePromiseAndCallback TaiheReadDescriptorValue(::ohos::bluetooth::ble::BLEDescriptor const &bleDescriptor,
-    uintptr_t cb, GattClientDeviceImpl* client, bool asPromise = true)
+static TaihePromiseAndCallback TaiheReadDescriptorValue(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor,
+    uintptr_t cb, GattClientDeviceImpl* client, bool isPromise = true)
 {
     HILOGI("enter");
     GattDescriptor *descriptor = nullptr;
-    auto status = ParseGattClientReadDescriptorValue(bleDescriptor, &client, &descriptor);
-    if ((status == taihe_ok) && (client == nullptr) && (descriptor == nullptr)) {
+    auto status = ParseGattClientReadDescriptorValue(bleDescriptor, client, &descriptor);
+    if ((status != taihe_ok) || (client == nullptr) || (descriptor == nullptr)) {
         return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
     }
     if (client->GetCallback() == nullptr) {
@@ -300,14 +296,14 @@ static TaihePromiseAndCallback TaiheReadDescriptorValue(::ohos::bluetooth::ble::
 
     asyncWork->Run();
 
-    if (asPromise) {
+    if (isPromise) {
         return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(asyncWork->GetRet()));
     } else {
         return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(nullptr));
     }
 }
 
-uintptr_t GattClientDeviceImpl::ReadDescriptorValuePromise(::ohos::bluetooth::ble::BLEDescriptor const &bleDescriptor)
+uintptr_t GattClientDeviceImpl::ReadDescriptorValuePromise(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor)
 {
     TaihePromiseAndCallback result = TaiheReadDescriptorValue(bleDescriptor, reinterpret_cast<uintptr_t>(nullptr), this);
     if (!result.success || !result.handle.has_value()) {
@@ -316,7 +312,7 @@ uintptr_t GattClientDeviceImpl::ReadDescriptorValuePromise(::ohos::bluetooth::bl
     return result.handle.value();
 }
 
-void GattClientDeviceImpl::ReadDescriptorValueAsync(::ohos::bluetooth::ble::BLEDescriptor const &bleDescriptor, uintptr_t callback)
+void GattClientDeviceImpl::ReadDescriptorValueAsync(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor, uintptr_t callback)
 {
     TaihePromiseAndCallback result = TaiheReadDescriptorValue(bleDescriptor, callback, this, false);
     if (!result.success) {
@@ -324,31 +320,29 @@ void GattClientDeviceImpl::ReadDescriptorValueAsync(::ohos::bluetooth::ble::BLED
     }
 }
 
-static taihe_status CheckSetCharacteristicChange(::ohos::bluetooth::ble::BLECharacteristic const& characteristic,
-    GattCharacteristic **outCharacteristic, GattClientDeviceImpl **outGattClient)
+static taihe_status CheckSetCharacteristicChange(const ohos::bluetooth::ble::BLECharacteristic &characteristic,
+    GattCharacteristic **outCharacteristic, GattClientDeviceImpl *gattClient)
 {
-    GattClientDeviceImpl *gattClient = *outGattClient; // NapiGetGattClient(env, thisVar);
-    TAIHE_BT_RETURN_IF(gattClient == nullptr || outGattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
+    TAIHE_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
 
     TaiheBleCharacteristic taiheCharacter;
     TAIHE_BT_CALL_RETURN(TaiheParseGattBLECharacteristic(characteristic, taiheCharacter));
     GattCharacteristic *character = GetGattcCharacteristic(gattClient->GetClient(), taiheCharacter);
     TAIHE_BT_RETURN_IF(character == nullptr || outCharacteristic == nullptr, "Not found character", taihe_invalid_arg);
 
-    *outGattClient = gattClient;
     *outCharacteristic = character;
     return taihe_ok;
 }
 
 static TaihePromiseAndCallback TaiheSetCharacteristicChangeIndication(
-    ::ohos::bluetooth::ble::BLECharacteristic const &characteristic, bool enable, uintptr_t cb,
-    GattClientDeviceImpl *client, bool asPromise = true)
+    const ohos::bluetooth::ble::BLECharacteristic &characteristic, bool enable, uintptr_t cb,
+    GattClientDeviceImpl *client, bool isPromise = true)
 {
     HILOGI("enter");
     GattCharacteristic *character = nullptr;
 
-    auto status = CheckSetCharacteristicChange(characteristic, &character, &client);
-    if ((status != taihe_ok) && (client == nullptr) && (character == nullptr)) {
+    auto status = CheckSetCharacteristicChange(characteristic, &character, client);
+    if ((status != taihe_ok) || (client == nullptr) || (character == nullptr)) {
         return TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM);
     }
     if (client->GetCallback() == nullptr) {
@@ -383,7 +377,7 @@ static TaihePromiseAndCallback TaiheSetCharacteristicChangeIndication(
 
     asyncWork->Run();
 
-    if (asPromise) {
+    if (isPromise) {
         return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(asyncWork->GetRet()));
     } else {
         return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(nullptr));
@@ -391,7 +385,7 @@ static TaihePromiseAndCallback TaiheSetCharacteristicChangeIndication(
 }
 
 uintptr_t GattClientDeviceImpl::SetCharacteristicChangeIndicationPromise(
-    ::ohos::bluetooth::ble::BLECharacteristic const &characteristic, bool enable)
+    const ohos::bluetooth::ble::BLECharacteristic &characteristic, bool enable)
 {
     TaihePromiseAndCallback result = TaiheSetCharacteristicChangeIndication(characteristic, enable,
         reinterpret_cast<uintptr_t>(nullptr), this);
@@ -402,7 +396,7 @@ uintptr_t GattClientDeviceImpl::SetCharacteristicChangeIndicationPromise(
 }
 
 void GattClientDeviceImpl::SetCharacteristicChangeIndicationAsync(
-    ::ohos::bluetooth::ble::BLECharacteristic const &characteristic, bool enable, uintptr_t callback)
+    const ohos::bluetooth::ble::BLECharacteristic &characteristic, bool enable, uintptr_t callback)
 {
     TaihePromiseAndCallback result = TaiheSetCharacteristicChangeIndication(characteristic, enable, callback,
         this, false);
