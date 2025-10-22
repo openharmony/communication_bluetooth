@@ -298,6 +298,8 @@ enum BluetoothHostInterfaceCode {
     BT_NOTIFY_DIALOG_RESULT,
     BT_SET_CALLING_PACKAGE_NAME,
     BT_GET_CONNECTED_BLE_DEVICES,
+    START_REMOTE_SDP_SEARCH,
+    GET_REMOTE_SERVICES,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };

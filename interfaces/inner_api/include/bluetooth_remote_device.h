@@ -448,6 +448,25 @@ public:
         VIRTUAL_ADDRESS,
         REAL_ADDRES,
     };
+
+    /**
+     * @brief Start sdp search the uuid information of the remote device.
+     *
+     * @param uuid The uuid of remote device users want to sdp search.
+     * @return Returns <b>true</b> if the operation is successful;
+     *         returns <b>false</b> if the operation fails.
+     * @since 22
+     */
+    bool StartRemoteSdpSearch(const std::string &uuid) const;
+
+    /**
+     * @brief Get all the services remote device suppported with sdp search.
+     *
+     * @return Returns <b>true</b> if the operation is successful;
+     *         returns <b>false</b> if the operation fails.
+     * @since 22
+     */
+    bool GetRemoteServices() const;
 private:
     std::string address_ = "00:00:00:00:00:00";
     int32_t addressType_ = UNSET_ADDRESS; // to support real mac in some pair&connect APIs
