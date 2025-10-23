@@ -19,7 +19,21 @@ static { loadLibrary("bluetoothHfp_taihe_native.z") }
 """)
 
 from ohos.bluetooth.baseProfile use BaseProfile;
+@!sts_inject_into_module("import {baseProfile} from './@ohos.bluetooth.baseProfile';")
 interface HandsFreeAudioGatewayProfile : BaseProfile {
+    @!sts_inject_into_class("""on(type: string, callback: object): void {
+        if (type === "connectionStateChange") {
+            this.onConnectionStateChange(callback as (info: baseProfile.StateChangeParam) => void);
+        }
+    }
+    """)
+
+    @!sts_inject_into_class("""off(type: string, callback?: object): void {
+        if (type === "connectionStateChange") {
+            this.offConnectionStateChange(callback as ((info: baseProfile.StateChangeParam) => void) | undefined);
+        }
+    }
+    """)
     Connect(deviceId: String): void;
     Disconnect(deviceId: String): void;
 }
