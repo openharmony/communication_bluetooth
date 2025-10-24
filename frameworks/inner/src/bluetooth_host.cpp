@@ -191,8 +191,8 @@ public:
 
     void OnPairConfirmed(const int32_t transport, const BluetoothRawAddress &device, int reqType, int number) override
     {
-        HILOGI("enter, transport: %{public}d, device: %{public}s, reqType: %{public}d, number: %{public}d",
-            transport, GET_ENCRYPT_RAW_ADDR(device), reqType, number);
+        HILOGI("enter, transport: %{public}d, device: %{public}s, reqType: %{public}d",
+            transport, GET_ENCRYPT_RAW_ADDR(device), reqType);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), transport);
         host_.observers_.ForEach([remoteDevice, reqType, number](std::shared_ptr<BluetoothHostObserver> observer) {
             observer->OnPairConfirmed(remoteDevice, reqType, number);
