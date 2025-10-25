@@ -24,6 +24,7 @@ using namespace OHOS::bluetooth;
 
 namespace OHOS {
 namespace Bluetooth {
+constexpr int32_t MAX_IPC_SIZE = 0xFFFF;
 void BluetoothHostProxy::RegisterObserver(const sptr<IBluetoothHostObserver> &observer)
 {
     HILOGD("BluetoothHostProxy::RegisterObserver start");
@@ -633,21 +634,19 @@ long BluetoothHostProxy::GetBtDiscoveryEndMillis()
 int32_t BluetoothHostProxy::GetPairedDevices(std::vector<BluetoothRawAddress> &pairedAddr)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
-        HILOGE("BluetoothHostProxy::GetPairedDevices WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "BluetoothHostProxy::GetPairedDevices WriteInterfaceToken error");
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_PAIRED_DEVICES, option, data, reply);
-    if (error != BT_NO_ERROR) {
-        HILOGE("BluetoothHostProxy::GetPairedDevices done fail, error: %{public}d", error);
-        return BT_ERR_IPC_TRANS_FAILED;
-    }
+    CHECK_AND_RETURN_LOG_RET(error == BT_NO_ERROR, BT_ERR_IPC_TRANS_FAILED,
+        "BluetoothHostProxy::GetPairedDevices done fail, error: %{public}d", error);
+    BtErrCode exception = static_cast<BtErrCode>(reply.ReadInt32());
+    CHECK_AND_RETURN_LOG_RET(exception == BT_NO_ERROR, exception, "exception: %{public}d", exception);
     int32_t size = reply.ReadInt32();
-    const int32_t maxSize = 100;
-    if (size > maxSize) {
-        return BT_ERR_INVALID_PARAM;
+    if (size > MAX_IPC_SIZE) {
+        HILOGE("ipc transfer size reach upper limit.");
+        return BT_ERR_INTERNAL_ERROR;
     }
     for (int32_t i = 0; i < size; i++) {
         std::shared_ptr<BluetoothRawAddress> rawAddress(reply.ReadParcelable<BluetoothRawAddress>());
@@ -656,7 +655,7 @@ int32_t BluetoothHostProxy::GetPairedDevices(std::vector<BluetoothRawAddress> &p
         }
         pairedAddr.push_back(*rawAddress);
     }
-    return reply.ReadInt32();
+    return BT_NO_ERROR;
 }
 
 int32_t BluetoothHostProxy::RemovePair(const int32_t transport, const sptr<BluetoothRawAddress> &device)
