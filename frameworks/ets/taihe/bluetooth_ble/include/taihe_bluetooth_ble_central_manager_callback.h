@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Bluetooth {
 class TaiheBluetoothBleCentralManagerCallback : public BleCentralManagerCallback {
 public:
-    TaiheBluetoothBleCentralManagerCallback(bool isLatestNapiBleScannerObj);
+    TaiheBluetoothBleCentralManagerCallback(bool isLatestTaiheBleScannerObj);
     ~TaiheBluetoothBleCentralManagerCallback() override = default;
 
     static TaiheBluetoothBleCentralManagerCallback &GetInstance(void);
@@ -37,7 +37,7 @@ public:
 
     void ConvertScanReportType(ScanReportType &scanReportType, uint8_t callbackType);
     TaiheAsyncWorkMap asyncWorkMap_ {};
-    bool isLatestNapiBleScannerObj_ = false;
+    bool isLatestTaiheBleScannerObj_ = false;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

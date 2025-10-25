@@ -32,7 +32,7 @@ TaiheTimer *TaiheTimer::GetInstance(void)
     return &instance;
 }
 
-TaiheTimer::TaiheTimer() : timer_(std::make_unique<OHOS::Utils::Timer>("NapiBtTimer"))
+TaiheTimer::TaiheTimer() : timer_(std::make_unique<OHOS::Utils::Timer>("TaiheBtTimer"))
 {
     timer_->Setup();
 }

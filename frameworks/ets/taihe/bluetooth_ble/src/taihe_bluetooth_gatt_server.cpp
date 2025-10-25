@@ -159,7 +159,7 @@ static TaihePromiseAndCallback TaiheNotifyCharacteristicChanged(taihe::string_vi
         ret = server->NotifyCharacteristicChanged(remoteDevice, *character, notifyCharacter.confirm);
         return TaiheAsyncWorkRet(ret);
     };
-    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(taihe::get_env(), nullptr, func);
+    auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(taihe::get_env(), reinterpret_cast<ani_object>(cb), func);
     if (asyncWork == nullptr) {
         return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
     }
@@ -182,7 +182,7 @@ uintptr_t GattServerImpl::NotifyCharacteristicChangedPromise(taihe::string_view 
     const ohos::bluetooth::ble::NotifyCharacteristic &notifyCharacteristic)
 {
     TaihePromiseAndCallback result = TaiheNotifyCharacteristicChanged(deviceId, notifyCharacteristic,
-            reinterpret_cast<uintptr_t>(nullptr), this, false);
+        reinterpret_cast<uintptr_t>(nullptr), this);
     if (!result.success || !result.handle.has_value()) {
         TAIHE_BT_ASSERT_RETURN(false, result.errorCode, reinterpret_cast<uintptr_t>(nullptr));
     }

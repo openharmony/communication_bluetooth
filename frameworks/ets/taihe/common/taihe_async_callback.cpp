@@ -57,7 +57,8 @@ ani_object TaiheAsyncCallback::GetRet(void)
     return reinterpret_cast<ani_object>(TaiheGetUndefined(env));
 }
 
-TaiheCallback::TaiheCallback(ani_vm *vm, ani_env *env, std::thread::id tid, ani_object callback) : vm_(vm), env_(env), threadId_(tid)
+TaiheCallback::TaiheCallback(ani_vm *vm, ani_env *env, std::thread::id tid, ani_object callback)
+    : vm_(vm), env_(env), threadId_(tid)
 {
     auto status = env->GlobalReference_Create(static_cast<ani_ref>(callback), &callbackRef_);
     if (status != ANI_OK) {

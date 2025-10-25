@@ -74,7 +74,7 @@ public:
     }
     ~GattClientDeviceImpl() = default;
 
-    static const std::vector<std::pair<int, int>> g_gattStatusSrvToNapi;
+    static const std::vector<std::pair<int, int>> g_gattStatusSrvToTaihe;
 private:
     std::shared_ptr<GattClient> client_ = nullptr;
     std::shared_ptr<TaiheGattClientCallback> callback_;

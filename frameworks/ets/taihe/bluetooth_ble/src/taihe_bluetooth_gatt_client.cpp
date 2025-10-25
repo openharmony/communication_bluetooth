@@ -28,7 +28,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-const std::vector<std::pair<int, int>> GattClientDeviceImpl::g_gattStatusSrvToNapi = {
+const std::vector<std::pair<int, int>> GattClientDeviceImpl::g_gattStatusSrvToTaihe = {
     { Bluetooth::BT_NO_ERROR,                                 GATT_SUCCESS },
     { Bluetooth::BT_ERR_GATT_WRITE_NOT_PERMITTED,             WRITE_NOT_PERMITTED },
     { Bluetooth::BT_ERR_GATT_READ_NOT_PERMITTED,              READ_NOT_PERMITTED },
@@ -150,24 +150,25 @@ static GattCharacteristic *GetGattcCharacteristic(const std::shared_ptr<GattClie
 }
 
 static GattDescriptor *GetGattcDescriptor(const std::shared_ptr<GattClient> &client,
-    const TaiheBleDescriptor &napiDescriptor)
+    const TaiheBleDescriptor &taiheDescriptor)
 {
     GattDescriptor *descriptor = nullptr;
     if (client) {
-        auto *character = GetCharacteristic(client, napiDescriptor.serviceUuid, napiDescriptor.characteristicUuid);
+        auto *character = GetCharacteristic(client, taiheDescriptor.serviceUuid, taiheDescriptor.characteristicUuid);
         if (character == nullptr) {
             HILOGE("character is nullptr");
             return nullptr;
         }
-        descriptor = character->GetDescriptor(napiDescriptor.descriptorUuid);
+        descriptor = character->GetDescriptor(taiheDescriptor.descriptorUuid);
         if (descriptor) {
-            descriptor->SetValue(napiDescriptor.descriptorValue.data(), napiDescriptor.descriptorValue.size());
+            descriptor->SetValue(taiheDescriptor.descriptorValue.data(), taiheDescriptor.descriptorValue.size());
         }
     }
     return descriptor;
 }
 
-static taihe_status ParseGattClientReadCharacteristicValue(const ohos::bluetooth::ble::BLECharacteristic &characteristic,
+static taihe_status ParseGattClientReadCharacteristicValue(
+    const ohos::bluetooth::ble::BLECharacteristic &characteristic,
     GattClientDeviceImpl *gattClient, GattCharacteristic **outCharacter)
 {
     TAIHE_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
@@ -305,14 +306,16 @@ static TaihePromiseAndCallback TaiheReadDescriptorValue(const ohos::bluetooth::b
 
 uintptr_t GattClientDeviceImpl::ReadDescriptorValuePromise(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor)
 {
-    TaihePromiseAndCallback result = TaiheReadDescriptorValue(bleDescriptor, reinterpret_cast<uintptr_t>(nullptr), this);
+    TaihePromiseAndCallback result =
+        TaiheReadDescriptorValue(bleDescriptor, reinterpret_cast<uintptr_t>(nullptr), this);
     if (!result.success || !result.handle.has_value()) {
         TAIHE_BT_ASSERT_RETURN(false, result.errorCode, reinterpret_cast<uintptr_t>(nullptr));
     }
     return result.handle.value();
 }
 
-void GattClientDeviceImpl::ReadDescriptorValueAsync(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor, uintptr_t callback)
+void GattClientDeviceImpl::ReadDescriptorValueAsync(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor,
+    uintptr_t callback)
 {
     TaihePromiseAndCallback result = TaiheReadDescriptorValue(bleDescriptor, callback, this, false);
     if (!result.success) {
@@ -407,20 +410,18 @@ void GattClientDeviceImpl::SetCharacteristicChangeIndicationAsync(
 
 int GattClientDeviceImpl::GattStatusFromService(int status)
 {
-    // if status is from napi, do not deal with.
     if (status > 0) {
         return status;
     }
     int ret = BT_ERR_INTERNAL_ERROR;
-    // statusCode srv -> napi
-    auto iter = g_gattStatusSrvToNapi.begin();
-    for (; iter != g_gattStatusSrvToNapi.end(); iter++) {
+    auto iter = g_gattStatusSrvToTaihe.begin();
+    for (; iter != g_gattStatusSrvToTaihe.end(); iter++) {
         if (iter->second == status) {
-            ret = iter->first; // transfer to napi errorCode.
+            ret = iter->first;
             break;
         }
     }
-    if (iter == g_gattStatusSrvToNapi.end()) {
+    if (iter == g_gattStatusSrvToTaihe.end()) {
         HILOGW("Unsupported error code conversion, status: %{public}d", status);
     }
     return ret;

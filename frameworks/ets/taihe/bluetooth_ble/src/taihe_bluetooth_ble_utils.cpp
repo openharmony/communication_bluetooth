@@ -18,13 +18,14 @@
 #endif
 
 #include "taihe_bluetooth_utils.h"
-#include "taihe_bluetooth_ble_utils.h"
+
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "bundle_mgr_proxy.h"
 #include "iservice_registry.h"
 #include "securec.h"
 #include "system_ability_definition.h"
+#include "taihe_bluetooth_ble_utils.h"
 #include "taihe/array.hpp"
 #include "taihe/optional.hpp"
 #include "taihe/platform/ani.hpp"
@@ -171,8 +172,8 @@ ani_object ConvertGattPropertiesToJs(ani_env *env, int properties)
     ani_field_extendedProperties = ani_field_extendedProperties_ani_temp;
 
     ani_object ani_obj = {};
-    env->Object_New(TH_ANI_FIND_CLASS(env, "@ohos.bluetooth.ble.ble.GattProperties"),
-        TH_ANI_FIND_CLASS_METHOD(env, "@ohos.bluetooth.ble.ble.GattProperties", "<ctor>", nullptr),
+    env->Object_New(TH_ANI_FIND_CLASS(env, "@ohos.bluetooth.ble.ble.GattPropertiesInfo"),
+        TH_ANI_FIND_CLASS_METHOD(env, "@ohos.bluetooth.ble.ble.GattPropertiesInfo", "<ctor>", nullptr),
         &ani_obj, ani_field_write, ani_field_writeNoResponse, ani_field_read, ani_field_notify, ani_field_indicate,
         ani_field_broadcast, ani_field_authenticatedSignedWrite, ani_field_extendedProperties);
     return ani_obj;
@@ -262,8 +263,8 @@ ani_object ConvertGattPermissionsToJs(ani_env *env, int permissions)
     ani_field_writeSignedMitm = ani_field_writeSignedMitm_ani_temp;
 
     ani_object ani_obj = {};
-    env->Object_New(TH_ANI_FIND_CLASS(env, "@ohos.bluetooth.ble.ble.GattPermissions"),
-        TH_ANI_FIND_CLASS_METHOD(env, "@ohos.bluetooth.ble.ble.GattPermissions", "<ctor>", nullptr),
+    env->Object_New(TH_ANI_FIND_CLASS(env, "@ohos.bluetooth.ble.ble.GattPermissionsInfo"),
+        TH_ANI_FIND_CLASS_METHOD(env, "@ohos.bluetooth.ble.ble.GattPermissionsInfo", "<ctor>", nullptr),
         &ani_obj, ani_field_read, ani_field_readEncrypted, ani_field_readEncryptedMitm,
         ani_field_write, ani_field_writeEncrypted, ani_field_writeEncryptedMitm,
         ani_field_writeSigned, ani_field_writeSignedMitm);
@@ -316,8 +317,8 @@ ani_object ConvertBLECharacteristicToJS(ani_env *env, GattCharacteristic &charac
     ani_field_characteristicValueHandle = ani_field_characteristicValueHandle_ani_temp;
 
     ani_object ani_obj = {};
-    env->Object_New(TH_ANI_FIND_CLASS(env, "@ohos.bluetooth.ble.ble.BLECharacteristic"),
-        TH_ANI_FIND_CLASS_METHOD(env, "@ohos.bluetooth.ble.ble.BLECharacteristic", "<ctor>", nullptr),
+    env->Object_New(TH_ANI_FIND_CLASS(env, "@ohos.bluetooth.ble.ble.BLECharacteristicInfo"),
+        TH_ANI_FIND_CLASS_METHOD(env, "@ohos.bluetooth.ble.ble.BLECharacteristicInfo", "<ctor>", nullptr),
         &ani_obj, ani_field_serviceUuid, ani_field_characteristicUuid, ani_field_characteristicValue,
         ani_field_descriptors, ani_field_properties, ani_field_characteristicValueHandle, ani_field_permissions);
     return ani_obj;
@@ -335,12 +336,12 @@ ani_object ConvertBLEDescriptorToJS(ani_env *env, GattDescriptor& descriptor)
     if (descriptor.GetCharacteristic() != nullptr) {
         ani_string ani_field_characteristicUuid = {};
         env->String_NewUTF8(descriptor.GetCharacteristic()->GetUuid().ToString().c_str(),
-        descriptor.GetCharacteristic()->GetUuid().ToString().size(), &ani_field_characteristicUuid);
+            descriptor.GetCharacteristic()->GetUuid().ToString().size(), &ani_field_characteristicUuid);
 
         if (descriptor.GetCharacteristic()->GetService() != nullptr) {
             env->String_NewUTF8(descriptor.GetCharacteristic()->GetService()->GetUuid().ToString().c_str(),
-            descriptor.GetCharacteristic()->GetService()->GetUuid().ToString().size(),
-            &ani_field_serviceUuid);
+                descriptor.GetCharacteristic()->GetService()->GetUuid().ToString().size(),
+                &ani_field_serviceUuid);
         }
     }
 
@@ -369,8 +370,8 @@ ani_object ConvertBLEDescriptorToJS(ani_env *env, GattDescriptor& descriptor)
     ani_field_permissions = ani_field_permissions_ani_temp;
 
     ani_object ani_obj = {};
-    env->Object_New(TH_ANI_FIND_CLASS(env, "@ohos.bluetooth.ble.ble.BLEDescriptor"),
-        TH_ANI_FIND_CLASS_METHOD(env, "@ohos.bluetooth.ble.ble.BLEDescriptor", "<ctor>", nullptr),
+    env->Object_New(TH_ANI_FIND_CLASS(env, "@ohos.bluetooth.ble.ble.BLEDescriptorInfo"),
+        TH_ANI_FIND_CLASS_METHOD(env, "@ohos.bluetooth.ble.ble.BLEDescriptorInfo", "<ctor>", nullptr),
         &ani_obj, ani_field_serviceUuid, ani_field_characteristicUuid, ani_field_descriptorUuid,
         ani_field_descriptorValue, ani_field_descriptorHandle, ani_field_permissions);
     return ani_obj;

@@ -43,7 +43,7 @@ private:
 private:
     static int64_t processorId_;
     static std::mutex processorLock_;
-    static SafeMap<ani_env*, int32_t> envErrCodeMap_; // mapping between napi_env and errCode
+    static SafeMap<ani_env*, int32_t> envErrCodeMap_; // mapping between ani_env and errCode
     ani_env *env_;
     std::string apiName_;
     int64_t beginTime_;
