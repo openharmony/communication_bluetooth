@@ -18,6 +18,7 @@
 #endif
 
 #include "taihe_ha_event_utils.h"
+
 #include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #ifndef CROSS_PLATFORM

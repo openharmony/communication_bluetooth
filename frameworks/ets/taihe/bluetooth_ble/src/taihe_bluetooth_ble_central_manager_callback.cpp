@@ -22,9 +22,9 @@
 namespace OHOS {
 namespace Bluetooth {
 
-TaiheBluetoothBleCentralManagerCallback::TaiheBluetoothBleCentralManagerCallback(bool isLatestNapiBleScannerObj)
+TaiheBluetoothBleCentralManagerCallback::TaiheBluetoothBleCentralManagerCallback(bool isLatestTaiheBleScannerObj)
 {
-    isLatestNapiBleScannerObj_ = isLatestNapiBleScannerObj;
+    isLatestTaiheBleScannerObj_ = isLatestTaiheBleScannerObj;
 }
 
 TaiheBluetoothBleCentralManagerCallback &TaiheBluetoothBleCentralManagerCallback::GetInstance(void)
@@ -51,11 +51,11 @@ void TaiheBluetoothBleCentralManagerCallback::OnBleBatchScanResultsEvent(const s
 void TaiheBluetoothBleCentralManagerCallback::OnStartOrStopScanEvent(int resultCode, bool isStartScan)
 {
     HILOGI("resultCode: %{public}d, isStartScan: %{public}d", resultCode, isStartScan);
-    auto napiIsStartScan = std::make_shared<TaiheNativeBool>(isStartScan);
+    auto taiheIsStartScan = std::make_shared<TaiheNativeBool>(isStartScan);
     if (isStartScan) {
-        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::BLE_START_SCAN, napiIsStartScan, resultCode);
+        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::BLE_START_SCAN, taiheIsStartScan, resultCode);
     } else {
-        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::BLE_STOP_SCAN, napiIsStartScan, resultCode);
+        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::BLE_STOP_SCAN, taiheIsStartScan, resultCode);
     }
 }
 

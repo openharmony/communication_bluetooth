@@ -77,6 +77,8 @@ void TaiheGattClientCallback::OnDescriptorWriteResult(const GattDescriptor &desc
 void TaiheGattClientCallback::OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status)
 {
     HILOGI("UUID: %{public}s, status: %{public}d", characteristic.GetUuid().ToString().c_str(), status);
+    status = GetSDKAdaptedStatusCode(GattClientDeviceImpl::GattStatusFromService(status)); // Adaptation for old sdk
+    AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::GATT_CLIENT_ENABLE_CHARACTER_CHANGED, nullptr, status);
 }
 
 void TaiheGattClientCallback::OnMtuUpdate(int mtu, int ret)

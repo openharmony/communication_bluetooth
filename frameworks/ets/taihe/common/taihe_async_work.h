@@ -20,7 +20,6 @@
 #include <memory>
 #include <mutex>
 
-#include "ani.h"
 #include "taihe_bluetooth_utils.h"
 #include "taihe_ha_event_utils.h"
 #include "taihe_native_object.h"

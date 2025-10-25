@@ -48,7 +48,7 @@ ani_ref TaiheNativeBool::ToTaiheValue(ani_env *env) const
 {
     ani_class cls;
     ani_status status = ANI_ERROR;
-    if ((status = env->FindClass("std.core.boolean", &cls)) != ANI_OK) {
+    if ((status = env->FindClass("std.core.Boolean", &cls)) != ANI_OK) {
         HILOGE("FindClass status : %{public}d", status);
         return nullptr;
     }

@@ -70,7 +70,7 @@ private:
 
 class TaiheNativeBleCharacteristic : public TaiheNativeObject {
 public:
-    TaiheNativeBleCharacteristic(const GattCharacteristic &character) : character_(character) {}
+    explicit TaiheNativeBleCharacteristic(const GattCharacteristic &character) : character_(character) {}
     ~TaiheNativeBleCharacteristic() override = default;
 
     ani_ref ToTaiheValue(ani_env *env) const override;
@@ -80,7 +80,7 @@ private:
 
 class TaiheNativeBleDescriptor : public TaiheNativeObject {
 public:
-    TaiheNativeBleDescriptor(const GattDescriptor &descriptor) : descriptor_(descriptor) {}
+    explicit TaiheNativeBleDescriptor(const GattDescriptor &descriptor) : descriptor_(descriptor) {}
     ~TaiheNativeBleDescriptor() override = default;
 
     ani_ref ToTaiheValue(ani_env *env) const override;

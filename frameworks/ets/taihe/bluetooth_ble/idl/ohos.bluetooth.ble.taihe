@@ -155,7 +155,7 @@ enum ScanReportMode: i32 {
     FENCE_SENSITIVITY_HIGH = 11
 }
 
-@class struct BLECharacteristic {
+struct BLECharacteristic {
     serviceUuid: String;
     characteristicUuid: String;
     characteristicValue: @arraybuffer Array<u8>;
@@ -163,6 +163,10 @@ enum ScanReportMode: i32 {
     properties: Optional<GattProperties>;
     characteristicValueHandle: Optional<i32>;
     permissions: Optional<GattPermissions>;
+}
+
+@class struct BLECharacteristicInfo {
+   @extends characteristic: BLECharacteristic;
 }
 
 struct AdvertisingStateChangeInfo {
@@ -177,7 +181,7 @@ enum AdvertisingState: i32 {
     STOPPED = 4
 }
 
-@class struct BLEDescriptor {
+struct BLEDescriptor {
     serviceUuid: String;
     characteristicUuid: String;
     descriptorUuid: String;
@@ -186,7 +190,11 @@ enum AdvertisingState: i32 {
     permissions: Optional<GattPermissions>;
 }
 
-@class struct GattProperties {
+@class struct BLEDescriptorInfo {
+    @extends descriptor: BLEDescriptor;
+}
+
+struct GattProperties {
     write: Optional<bool>;
     writeNoResponse: Optional<bool>;
     read: Optional<bool>;
@@ -197,12 +205,16 @@ enum AdvertisingState: i32 {
     extendedProperties: Optional<bool>;
 }
 
+@class struct GattPropertiesInfo {
+    @extends gattProperties: GattProperties;
+}
+
 enum GattWriteType: i32 {
     WRITE = 1,
     WRITE_NO_RESPONSE = 2
 }
 
-@class struct GattPermissions {
+struct GattPermissions {
     read: Optional<bool>;
     readEncrypted: Optional<bool>;
     readEncryptedMitm: Optional<bool>;
@@ -211,6 +223,10 @@ enum GattWriteType: i32 {
     writeEncryptedMitm: Optional<bool>;
     writeSigned: Optional<bool>;
     writeSignedMitm: Optional<bool>;
+}
+
+@class struct GattPermissionsInfo {
+    @extends gattPermissions: GattPermissions;
 }
 
 function StopAdvertising(): void;

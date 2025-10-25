@@ -14,7 +14,7 @@
  */
 
 #ifndef LOG_TAG
-#define LOG_TAG "bt_taihe_gatt_client"
+#define LOG_TAG "bt_taihe_ble_impl"
 #endif
 
 #include "bluetooth_ble_advertiser.h"
@@ -104,7 +104,8 @@ static bool IsValidAdvertiserDuration(uint32_t duration)
     return true;
 }
 
-taihe_status CheckAdvertisingEnableParams(const ohos::bluetooth::ble::AdvertisingEnableParams &advertisingEnableParams,
+static taihe_status CheckAdvertisingEnableParams(
+    const ohos::bluetooth::ble::AdvertisingEnableParams &advertisingEnableParams,
     uint32_t &outAdvHandle, uint16_t &outDuration, std::shared_ptr<BleAdvertiseCallback> &callback)
 {
     outAdvHandle = advertisingEnableParams.advertisingId;
@@ -242,7 +243,7 @@ static taihe_status ParseScanFilter(const ohos::bluetooth::ble::ScanFilter &scan
     return taihe_ok;
 }
 
-static taihe_status ParseScanFilterParameters(taihe::array<ohos::bluetooth::ble::ScanFilter> filters,
+static taihe_status ParseScanFilterParameters(const taihe::array<ohos::bluetooth::ble::ScanFilter> &filters,
                                               std::vector<BleScanFilter> &params)
 {
     HILOGD("enter");
@@ -256,7 +257,7 @@ static taihe_status ParseScanFilterParameters(taihe::array<ohos::bluetooth::ble:
     return taihe_ok;
 }
 
-static void SetReportDelay(ohos::bluetooth::ble::ScanOptions &scanOptions, BleScanSettings &outSettinngs)
+static void SetReportDelay(const ohos::bluetooth::ble::ScanOptions &scanOptions, BleScanSettings &outSettinngs)
 {
     long reportDelayFloorValueBatch = 5000;
     if (scanOptions.reportMode.has_value()
@@ -270,7 +271,7 @@ static void SetReportDelay(ohos::bluetooth::ble::ScanOptions &scanOptions, BleSc
     }
 }
 
-static void SetCbTypeSensMode(ohos::bluetooth::ble::ScanOptions &scanOptions, BleScanSettings &outSettinngs)
+static void SetCbTypeSensMode(const ohos::bluetooth::ble::ScanOptions &scanOptions, BleScanSettings &outSettinngs)
 {
     // reportMode -> callbackType + sensitivityMode
     uint8_t callbackType = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
@@ -295,7 +296,7 @@ static void SetCbTypeSensMode(ohos::bluetooth::ble::ScanOptions &scanOptions, Bl
     outSettinngs.SetSensitivityMode(sensitivityMode);
 }
 
-taihe_status CheckBleScanParams(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
+taihe_status CheckBleScanParams(const ohos::bluetooth::ble::ScanFilterNullValue &filters,
                                 taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options,
                                 std::vector<BleScanFilter> &outScanfilters,
                                 BleScanSettings &outSettinngs)
@@ -331,7 +332,7 @@ taihe_status CheckBleScanParams(ohos::bluetooth::ble::ScanFilterNullValue const 
     return taihe_ok;
 }
 
-void StartBLEScan(ohos::bluetooth::ble::ScanFilterNullValue const &filters,
+void StartBLEScan(const ohos::bluetooth::ble::ScanFilterNullValue &filters,
                   taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options)
 {
     HILOGD("enter");
@@ -414,7 +415,8 @@ static taihe_status ParseAdvertisDataParameters(const ohos::bluetooth::ble::Adve
     return taihe_ok;
 }
 
-void StartAdvertising(ohos::bluetooth::ble::AdvertiseSetting setting, ohos::bluetooth::ble::AdvertiseData advData,
+void StartAdvertising(const ohos::bluetooth::ble::AdvertiseSetting &setting,
+                      const ohos::bluetooth::ble::AdvertiseData &advData,
                       taihe::optional_view<ohos::bluetooth::ble::AdvertiseData> advResponse)
 {
     HILOGI("enter");
@@ -456,7 +458,7 @@ static taihe_status CheckAdvertisingDisableParams(
     return taihe_ok;
 }
 
-static taihe_status CheckAdvertisingDataWithDuration(ohos::bluetooth::ble::AdvertisingParams const &advertisingParams,
+static taihe_status CheckAdvertisingDataWithDuration(const ohos::bluetooth::ble::AdvertisingParams &advertisingParams,
     BleAdvertiserSettings &outSettings, BleAdvertiserData &outAdvData, BleAdvertiserData &outRspData,
     uint16_t &outDuration)
 {
@@ -488,7 +490,7 @@ static taihe_status CheckAdvertisingDataWithDuration(ohos::bluetooth::ble::Adver
     return taihe_ok;
 }
 
-static TaihePromiseAndCallback TaiheStartAdvertising(ohos::bluetooth::ble::AdvertisingParams const &advertisingParams,
+static TaihePromiseAndCallback TaiheStartAdvertising(const ohos::bluetooth::ble::AdvertisingParams &advertisingParams,
     uintptr_t cb, bool isPromise = true)
 {
     HILOGI("enter");
@@ -537,7 +539,7 @@ static TaihePromiseAndCallback TaiheStartAdvertising(ohos::bluetooth::ble::Adver
     }
 }
 
-uintptr_t StartAdvertisingPromise(ohos::bluetooth::ble::AdvertisingParams const &advertisingParams)
+uintptr_t StartAdvertisingPromise(const ohos::bluetooth::ble::AdvertisingParams &advertisingParams)
 {
     TaihePromiseAndCallback result = TaiheStartAdvertising(advertisingParams, reinterpret_cast<uintptr_t>(nullptr));
     if (!result.success || !result.handle.has_value()) {
@@ -546,7 +548,7 @@ uintptr_t StartAdvertisingPromise(ohos::bluetooth::ble::AdvertisingParams const 
     return result.handle.value();
 }
 
-void StartAdvertisingAsync(ohos::bluetooth::ble::AdvertisingParams const &advertisingParams, uintptr_t callback)
+void StartAdvertisingAsync(const ohos::bluetooth::ble::AdvertisingParams &advertisingParams, uintptr_t callback)
 {
     TaihePromiseAndCallback result = TaiheStartAdvertising(advertisingParams, callback, false);
     if (!result.success) {
@@ -555,7 +557,7 @@ void StartAdvertisingAsync(ohos::bluetooth::ble::AdvertisingParams const &advert
 }
 
 static TaihePromiseAndCallback TaiheDisableAdvertising(
-    ohos::bluetooth::ble::AdvertisingDisableParams const& advertisingDisableParams,
+    const ohos::bluetooth::ble::AdvertisingDisableParams &advertisingDisableParams,
     uintptr_t cb, bool isPromise = true)
 {
     HILOGI("enter");
@@ -607,7 +609,7 @@ static TaihePromiseAndCallback TaiheDisableAdvertising(
     }
 }
 
-uintptr_t DisableAdvertisingPromise(ohos::bluetooth::ble::AdvertisingDisableParams const& advertisingDisableParams)
+uintptr_t DisableAdvertisingPromise(const ohos::bluetooth::ble::AdvertisingDisableParams &advertisingDisableParams)
 {
     TaihePromiseAndCallback result =
         TaiheDisableAdvertising(advertisingDisableParams, reinterpret_cast<uintptr_t>(nullptr));
@@ -617,7 +619,7 @@ uintptr_t DisableAdvertisingPromise(ohos::bluetooth::ble::AdvertisingDisablePara
     return result.handle.value();
 }
 
-void DisableAdvertisingAsync(ohos::bluetooth::ble::AdvertisingDisableParams const& advertisingDisableParams,
+void DisableAdvertisingAsync(const ohos::bluetooth::ble::AdvertisingDisableParams &advertisingDisableParams,
     uintptr_t callback)
 {
     TaihePromiseAndCallback result = TaiheDisableAdvertising(advertisingDisableParams, callback, false);
@@ -627,7 +629,7 @@ void DisableAdvertisingAsync(ohos::bluetooth::ble::AdvertisingDisableParams cons
 }
 
 static TaihePromiseAndCallback TaiheEnableAdvertising(
-    ohos::bluetooth::ble::AdvertisingEnableParams const& advertisingEnableParams, uintptr_t cb, bool isPromise = true)
+    const ohos::bluetooth::ble::AdvertisingEnableParams &advertisingEnableParams, uintptr_t cb, bool isPromise = true)
 {
     HILOGI("enter");
     ani_env *env = taihe::get_env();
@@ -679,7 +681,7 @@ static TaihePromiseAndCallback TaiheEnableAdvertising(
     }
 }
 
-uintptr_t EnableAdvertisingPromise(ohos::bluetooth::ble::AdvertisingEnableParams const& advertisingEnableParams)
+uintptr_t EnableAdvertisingPromise(const ohos::bluetooth::ble::AdvertisingEnableParams &advertisingEnableParams)
 {
     TaihePromiseAndCallback result = TaiheEnableAdvertising(advertisingEnableParams,
         reinterpret_cast<uintptr_t>(nullptr));
@@ -690,7 +692,7 @@ uintptr_t EnableAdvertisingPromise(ohos::bluetooth::ble::AdvertisingEnableParams
     return result.handle.value();
 }
 
-void EnableAdvertisingAsync(ohos::bluetooth::ble::AdvertisingEnableParams const &advertisingEnableParams,
+void EnableAdvertisingAsync(const ohos::bluetooth::ble::AdvertisingEnableParams &advertisingEnableParams,
     uintptr_t callback)
 {
     TaihePromiseAndCallback result = TaiheEnableAdvertising(advertisingEnableParams, callback, false);
