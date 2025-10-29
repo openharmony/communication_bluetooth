@@ -54,11 +54,11 @@ void HandleSyncErr(int32_t errCode);
 struct TaihePromiseAndCallback {
     bool success;
     BtErrCode errorCode;
-    std::optional<uintptr_t> handle;
+    std::optional<uintptr_t> object;
 
-    static TaihePromiseAndCallback Success(uintptr_t h = 0)
+    static TaihePromiseAndCallback Success(uintptr_t object = 0)
     {
-        return {true, BtErrCode::BT_NO_ERROR, h};
+        return {true, BtErrCode::BT_NO_ERROR, object};
     }
 
     static TaihePromiseAndCallback Failure(BtErrCode code)

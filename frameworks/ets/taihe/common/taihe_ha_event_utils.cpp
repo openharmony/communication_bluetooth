@@ -77,7 +77,7 @@ int64_t TaiheHaEventUtils::GetNowTimeMs() const
 #ifndef CROSS_PLATFORM
     struct timespec ts = {};
     clock_gettime(CLOCK_BOOTTIME, &ts);
-    return (int64_t)ts.tv_sec * TIME_MS_PER_SECOND + (int64_t)ts.tv_nsec / TIME_NS_PER_MS;
+    return static_cast<int64_t>(ts.tv_sec) * TIME_MS_PER_SECOND + static_cast<int64_t>(ts.tv_nsec) / TIME_NS_PER_MS;
 #else
     return -1;
 #endif

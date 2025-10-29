@@ -43,7 +43,7 @@ taihe_status TaiheParseGattService(ohos::bluetooth::ble::GattService object, Tai
 
     taihe::array<ohos::bluetooth::ble::BLECharacteristic> objectCharacteristics = object.characteristics;
     if (objectCharacteristics.size() > 0) {
-        TAIHE_BT_CALL_RETURN(TaiheParseGattCharacteristic(objectCharacteristics, characteristics));
+        TAIHE_BT_CALL_RETURN(TaiheParseGattCharacteristicVec(objectCharacteristics, characteristics));
     }
 
     if (object.includeServices.has_value()) {
@@ -145,18 +145,18 @@ taihe_status TaiheParseIncludeService(taihe::array<ohos::bluetooth::ble::GattSer
     return taihe_ok;
 }
 
-taihe_status TaiheParseGattCharacteristic(taihe::array<ohos::bluetooth::ble::BLECharacteristic> object,
-                                          std::vector<TaiheBleCharacteristic> &outCharacteristic)
+taihe_status TaiheParseGattCharacteristicVec(taihe::array<ohos::bluetooth::ble::BLECharacteristic> object,
+    std::vector<TaiheBleCharacteristic> &outCharacteristic)
 {
     for (size_t i = 0; i < object.size(); i++) {
         TaiheBleCharacteristic characteristic {};
-        TAIHE_BT_CALL_RETURN(TaiheParseGattBLECharacteristic(object[i], characteristic));
+        TAIHE_BT_CALL_RETURN(TaiheParseGattCharacteristic(object[i], characteristic));
         outCharacteristic.push_back(std::move(characteristic));
     }
     return taihe_ok;
 }
 
-taihe_status TaiheParseGattBLECharacteristic(ohos::bluetooth::ble::BLECharacteristic object,
+taihe_status TaiheParseGattCharacteristic(ohos::bluetooth::ble::BLECharacteristic object,
     TaiheBleCharacteristic &outCharacteristic)
 {
     TaiheBleCharacteristic characteristic {};
@@ -174,7 +174,7 @@ taihe_status TaiheParseGattBLECharacteristic(ohos::bluetooth::ble::BLECharacteri
     }
     if (object.descriptors.size() > 0) {
         taihe::array<ohos::bluetooth::ble::BLEDescriptor> objectDescriptors = object.descriptors;
-        TAIHE_BT_CALL_RETURN(TaiheParseGattDescriptor(objectDescriptors, descriptors));
+        TAIHE_BT_CALL_RETURN(TaiheParseGattDescriptorVec(objectDescriptors, descriptors));
     }
     if (object.properties.has_value()) {
         ohos::bluetooth::ble::GattProperties objectProperties = object.properties.value();
@@ -201,18 +201,18 @@ taihe_status TaiheParseGattBLECharacteristic(ohos::bluetooth::ble::BLECharacteri
     return taihe_ok;
 }
 
-taihe_status TaiheParseGattDescriptor(taihe::array<ohos::bluetooth::ble::BLEDescriptor> object,
-                                      std::vector<TaiheBleDescriptor> &outDescriptor)
+taihe_status TaiheParseGattDescriptorVec(taihe::array<ohos::bluetooth::ble::BLEDescriptor> object,
+    std::vector<TaiheBleDescriptor> &outDescriptor)
 {
     for (size_t i = 0; i < object.size(); i++) {
         TaiheBleDescriptor descriptor {};
-        TAIHE_BT_CALL_RETURN(TaiheParseGattBLEDescriptor(object[i], descriptor));
+        TAIHE_BT_CALL_RETURN(TaiheParseGattDescriptor(object[i], descriptor));
         outDescriptor.push_back(std::move(descriptor));
     }
     return taihe_ok;
 }
 
-taihe_status TaiheParseGattBLEDescriptor(ohos::bluetooth::ble::BLEDescriptor object,
+taihe_status TaiheParseGattDescriptor(ohos::bluetooth::ble::BLEDescriptor object,
     TaiheBleDescriptor &outDescriptor)
 {
     UUID serviceUuid {};
@@ -340,6 +340,7 @@ std::shared_ptr<TaiheAsyncCallback> TaiheParseAsyncCallback(ani_env *env, ani_ob
         return nullptr;
     }
 
+    // Get ani main thread id
     std::thread::id threadId = std::this_thread::get_id();
 
     auto asyncCallback = std::make_shared<TaiheAsyncCallback>();

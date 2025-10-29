@@ -35,7 +35,6 @@ constexpr size_t ARGS_SIZE_FOUR = 4;
 
 ani_ref TaiheGetNull(ani_env *env);
 ani_ref TaiheGetUndefined(ani_env *env);
-ani_ref TaiheGetUndefinedRet(ani_env *env);
 ani_ref GetCallbackErrorValue(ani_env *env, int errCode);
 
 struct TaiheNotifyCharacteristic {

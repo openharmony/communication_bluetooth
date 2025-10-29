@@ -99,84 +99,52 @@ bool HasProperty(int properties, int propertyMask)
 
 ani_object ConvertGattPropertiesToJs(ani_env *env, int properties)
 {
-    ani_ref ani_field_write = {};
-    ani_object ani_field_write_ani_temp = {};
-    ani_boolean ani_field_write_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::WRITE));
+    ani_object write = {};
+    ani_boolean value = static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::WRITE));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_write_ani_temp, ani_field_write_ani_temp_ani_after);
-    ani_field_write = ani_field_write_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &write, value);
 
-    ani_ref ani_field_writeNoResponse = {};
-    ani_object ani_field_writeNoResponse_ani_temp = {};
-    ani_boolean ani_field_writeNoResponse_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::WRITE_WITHOUT_RESPONSE));
+    ani_object writeNoResponse = {};
+    value = static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::WRITE_WITHOUT_RESPONSE));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_writeNoResponse_ani_temp, ani_field_writeNoResponse_ani_temp_ani_after);
-    ani_field_writeNoResponse = ani_field_writeNoResponse_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &writeNoResponse, value);
 
-    ani_ref ani_field_read = {};
-    ani_object ani_field_read_ani_temp = {};
-    ani_boolean ani_field_read_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::READ));
+    ani_object read = {};
+    value = static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::READ));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_read_ani_temp, ani_field_read_ani_temp_ani_after);
-    ani_field_read = ani_field_read_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &read, value);
 
-    ani_ref ani_field_notify = {};
-    ani_object ani_field_notify_ani_temp = {};
-    ani_boolean ani_field_notify_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::NOTIFY));
+    ani_object notify = {};
+    value = static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::NOTIFY));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_notify_ani_temp, ani_field_notify_ani_temp_ani_after);
-    ani_field_notify = ani_field_notify_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &notify, value);
 
-    ani_ref ani_field_indicate = {};
-    ani_object ani_field_indicate_ani_temp = {};
-    ani_boolean ani_field_indicate_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::INDICATE));
+    ani_object indicate = {};
+    value = static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::INDICATE));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_indicate_ani_temp, ani_field_indicate_ani_temp_ani_after);
-    ani_field_indicate = ani_field_indicate_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &indicate, value);
 
-    ani_ref ani_field_broadcast = {};
-    ani_object ani_field_broadcast_ani_temp = {};
-    ani_boolean ani_field_broadcast_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::BROADCAST));
+    ani_object broadcast = {};
+    value = static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::BROADCAST));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_broadcast_ani_temp, ani_field_broadcast_ani_temp_ani_after);
-    ani_field_broadcast = ani_field_broadcast_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &broadcast, value);
 
-    ani_ref ani_field_authenticatedSignedWrite = {};
-    ani_object ani_field_authenticatedSignedWrite_ani_temp = {};
-    ani_boolean ani_field_authenticatedSignedWrite_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::AUTHENTICATED_SIGNED_WRITES));
+    ani_object authenticatedSignedWrite = {};
+    value = static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::AUTHENTICATED_SIGNED_WRITES));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_authenticatedSignedWrite_ani_temp, ani_field_authenticatedSignedWrite_ani_temp_ani_after);
-    ani_field_authenticatedSignedWrite = ani_field_authenticatedSignedWrite_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &authenticatedSignedWrite, value);
 
-    ani_ref ani_field_extendedProperties = {};
-    ani_object ani_field_extendedProperties_ani_temp = {};
-    ani_boolean ani_field_extendedProperties_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::EXTENDED_PROPERTIES));
+    ani_object extendedProperties = {};
+    value = static_cast<ani_boolean>(HasProperty(properties, GattCharacteristic::EXTENDED_PROPERTIES));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_extendedProperties_ani_temp, ani_field_extendedProperties_ani_temp_ani_after);
-    ani_field_extendedProperties = ani_field_extendedProperties_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &extendedProperties, value);
 
-    ani_object ani_obj = {};
+    ani_object object = {};
     env->Object_New(TH_ANI_FIND_CLASS(env, "@ohos.bluetooth.ble.ble.GattPropertiesInfo"),
         TH_ANI_FIND_CLASS_METHOD(env, "@ohos.bluetooth.ble.ble.GattPropertiesInfo", "<ctor>", nullptr),
-        &ani_obj, ani_field_write, ani_field_writeNoResponse, ani_field_read, ani_field_notify, ani_field_indicate,
-        ani_field_broadcast, ani_field_authenticatedSignedWrite, ani_field_extendedProperties);
-    return ani_obj;
+        &object, write, writeNoResponse, read, notify, indicate, broadcast,
+        authenticatedSignedWrite, extendedProperties);
+    return object;
 }
 
 bool HasPermission(int permissions, int permissionMask)
@@ -190,191 +158,151 @@ bool HasPermission(int permissions, int permissionMask)
 
 ani_object ConvertGattPermissionsToJs(ani_env *env, int permissions)
 {
-    ani_ref ani_field_read = {};
-    ani_object ani_field_read_ani_temp = {};
-    ani_boolean ani_field_read_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::READABLE));
+    ani_object read = {};
+    ani_boolean value = static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::READABLE));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_read_ani_temp, ani_field_read_ani_temp_ani_after);
-    ani_field_read = ani_field_read_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &read, value);
 
-    ani_ref ani_field_readEncrypted = {};
-    ani_object ani_field_readEncrypted_ani_temp = {};
-    ani_boolean ani_field_readEncrypted_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::READ_ENCRYPTED));
+    ani_object readEncrypted = {};
+    value = static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::READ_ENCRYPTED));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_readEncrypted_ani_temp, ani_field_readEncrypted_ani_temp_ani_after);
-    ani_field_readEncrypted = ani_field_readEncrypted_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &readEncrypted, value);
 
-    ani_ref ani_field_readEncryptedMitm = {};
-    ani_object ani_field_readEncryptedMitm_ani_temp = {};
-    ani_boolean ani_field_readEncryptedMitm_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::READ_ENCRYPTED_MITM));
+    ani_object readEncryptedMitm = {};
+    value = static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::READ_ENCRYPTED_MITM));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_readEncryptedMitm_ani_temp, ani_field_readEncryptedMitm_ani_temp_ani_after);
-    ani_field_readEncryptedMitm = ani_field_readEncryptedMitm_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &readEncryptedMitm, value);
 
-    ani_ref ani_field_write = {};
-    ani_object ani_field_write_ani_temp = {};
-    ani_boolean ani_field_write_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::WRITEABLE));
+    ani_object write = {};
+    value = static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::WRITEABLE));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_write_ani_temp, ani_field_write_ani_temp_ani_after);
-    ani_field_write = ani_field_write_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &write, value);
 
-    ani_ref ani_field_writeEncrypted = {};
-    ani_object ani_field_writeEncrypted_ani_temp = {};
-    ani_boolean ani_field_writeEncrypted_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::WRITE_ENCRYPTED));
+    ani_object writeEncrypted = {};
+    value = static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::WRITE_ENCRYPTED));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_writeEncrypted_ani_temp, ani_field_writeEncrypted_ani_temp_ani_after);
-    ani_field_writeEncrypted = ani_field_writeEncrypted_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &writeEncrypted, value);
 
-    ani_ref ani_field_writeEncryptedMitm = {};
-    ani_object ani_field_writeEncryptedMitm_ani_temp = {};
-    ani_boolean ani_field_writeEncryptedMitm_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::WRITE_ENCRYPTED_MITM));
+    ani_object writeEncryptedMitm = {};
+    value = static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::WRITE_ENCRYPTED_MITM));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_writeEncryptedMitm_ani_temp, ani_field_writeEncryptedMitm_ani_temp_ani_after);
-    ani_field_writeEncryptedMitm = ani_field_writeEncryptedMitm_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &writeEncryptedMitm, value);
 
-    ani_ref ani_field_writeSigned = {};
-    ani_object ani_field_writeSigned_ani_temp = {};
-    ani_boolean ani_field_writeSigned_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::WRITE_SIGNED));
+    ani_object writeSigned = {};
+    value = static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::WRITE_SIGNED));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_writeSigned_ani_temp, ani_field_writeSigned_ani_temp_ani_after);
-    ani_field_writeSigned = ani_field_writeSigned_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &writeSigned, value);
 
-    ani_ref ani_field_writeSignedMitm = {};
-    ani_object ani_field_writeSignedMitm_ani_temp = {};
-    ani_boolean ani_field_writeSignedMitm_ani_temp_ani_after =
-        static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::WRITE_SIGNED_MITM));
+    ani_object writeSignedMitm = {};
+    value = static_cast<ani_boolean>(HasPermission(permissions, GattCharacteristic::WRITE_SIGNED_MITM));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Boolean"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"),
-        &ani_field_writeSignedMitm_ani_temp, ani_field_writeSignedMitm_ani_temp_ani_after);
-    ani_field_writeSignedMitm = ani_field_writeSignedMitm_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Boolean", "<ctor>", "z:"), &writeSignedMitm, value);
 
-    ani_object ani_obj = {};
+    ani_object object = {};
     env->Object_New(TH_ANI_FIND_CLASS(env, "@ohos.bluetooth.ble.ble.GattPermissionsInfo"),
         TH_ANI_FIND_CLASS_METHOD(env, "@ohos.bluetooth.ble.ble.GattPermissionsInfo", "<ctor>", nullptr),
-        &ani_obj, ani_field_read, ani_field_readEncrypted, ani_field_readEncryptedMitm,
-        ani_field_write, ani_field_writeEncrypted, ani_field_writeEncryptedMitm,
-        ani_field_writeSigned, ani_field_writeSignedMitm);
-    return ani_obj;
+        &object, read, readEncrypted, readEncryptedMitm, write, writeEncrypted, writeEncryptedMitm,
+        writeSigned, writeSignedMitm);
+    return object;
 }
 
 ani_object ConvertBLECharacteristicToJS(ani_env *env, GattCharacteristic &characteristic)
 {
-    ani_string ani_field_characteristicUuid = {};
+    ani_string characteristicUuid = {};
+    HILOGI("uuid: %{public}s", characteristic.GetUuid().ToString().c_str());
     env->String_NewUTF8(characteristic.GetUuid().ToString().c_str(),
-        characteristic.GetUuid().ToString().size(), &ani_field_characteristicUuid);
+        characteristic.GetUuid().ToString().size(), &characteristicUuid);
 
-    ani_string ani_field_serviceUuid = {};
+    ani_string serviceUuid = {};
     if (characteristic.GetService() != nullptr) {
         env->String_NewUTF8(characteristic.GetService()->GetUuid().ToString().c_str(),
-            characteristic.GetService()->GetUuid().ToString().size(), &ani_field_serviceUuid);
+            characteristic.GetService()->GetUuid().ToString().size(), &serviceUuid);
     }
 
     size_t valueSize = 0;
     uint8_t* valueData = characteristic.GetValue(&valueSize).get();
-    ani_arraybuffer ani_field_characteristicValue = {};
+    ani_arraybuffer characteristicValue = {};
     {
-        void* ani_field_characteristicValue_ani_data = {};
+        void* characteristicValueData = {};
         env->CreateArrayBuffer(valueSize * (sizeof(uint8_t) / sizeof(char)),
-            &ani_field_characteristicValue_ani_data, &ani_field_characteristicValue);
-        if (memcpy_s(reinterpret_cast<uint8_t*>(ani_field_characteristicValue_ani_data), valueSize,
-            valueData, valueSize) != EOK) {
+            &characteristicValueData, &characteristicValue);
+        if (memcpy_s(reinterpret_cast<uint8_t*>(characteristicValueData), valueSize, valueData, valueSize) != EOK) {
             HILOGE("memcpy_s error");
         }
     }
 
-    ani_ref ani_field_properties = {};
-    ani_object ani_field_properties_ani_temp = ConvertGattPropertiesToJs(env, characteristic.GetProperties());
-    ani_field_properties = ani_field_properties_ani_temp;
+    ani_ref properties = {};
+    ani_object propertiesObject = ConvertGattPropertiesToJs(env, characteristic.GetProperties());
+    properties = propertiesObject;
 
-    ani_ref ani_field_permissions = {};
-    ani_object ani_field_permissions_ani_temp = ConvertGattPermissionsToJs(env, characteristic.GetPermissions());
-    ani_field_permissions = ani_field_permissions_ani_temp;
+    ani_ref permissions = {};
+    ani_object permissionsObject = ConvertGattPermissionsToJs(env, characteristic.GetPermissions());
+    permissions = permissionsObject;
 
-    ani_array ani_field_descriptors {};
-    ani_object ani_field_descriptors_ani_temp = ConvertBLEDescriptorVectorToJS(env, characteristic.GetDescriptors());
-    ani_field_descriptors = reinterpret_cast<ani_array>(ani_field_descriptors_ani_temp);
+    ani_array descriptors {};
+    ani_object descriptorsObject = ConvertBLEDescriptorVectorToJS(env, characteristic.GetDescriptors());
+    descriptors = reinterpret_cast<ani_array>(descriptorsObject);
 
-    ani_ref ani_field_characteristicValueHandle = {};
-    ani_object ani_field_characteristicValueHandle_ani_temp = {};
-    ani_int ani_field_characteristicValueHandle_ani_temp_ani_after = static_cast<ani_int>(characteristic.GetHandle());
+    ani_ref characteristicValueHandle = {};
+    ani_object characteristicValueHandleObject = {};
+    ani_int handle = static_cast<ani_int>(characteristic.GetHandle());
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Int"),
         TH_ANI_FIND_CLASS_METHOD(env, "std.core.Int", "<ctor>", "i:"),
-        &ani_field_characteristicValueHandle_ani_temp, ani_field_characteristicValueHandle_ani_temp_ani_after);
-    ani_field_characteristicValueHandle = ani_field_characteristicValueHandle_ani_temp;
+        &characteristicValueHandleObject, handle);
+    characteristicValueHandle = characteristicValueHandleObject;
 
-    ani_object ani_obj = {};
+    ani_object object = {};
     env->Object_New(TH_ANI_FIND_CLASS(env, "@ohos.bluetooth.ble.ble.BLECharacteristicInfo"),
         TH_ANI_FIND_CLASS_METHOD(env, "@ohos.bluetooth.ble.ble.BLECharacteristicInfo", "<ctor>", nullptr),
-        &ani_obj, ani_field_serviceUuid, ani_field_characteristicUuid, ani_field_characteristicValue,
-        ani_field_descriptors, ani_field_properties, ani_field_characteristicValueHandle, ani_field_permissions);
-    return ani_obj;
+        &object, serviceUuid, characteristicUuid, characteristicValue,
+        descriptors, properties, characteristicValueHandle, permissions);
+    return object;
 }
 
 ani_object ConvertBLEDescriptorToJS(ani_env *env, GattDescriptor& descriptor)
 {
     HILOGI("uuid: %{public}s", descriptor.GetUuid().ToString().c_str());
-    ani_string ani_field_descriptorUuid = {};
+    ani_string descriptorUuid = {};
     env->String_NewUTF8(descriptor.GetUuid().ToString().c_str(),
-        descriptor.GetUuid().ToString().size(), &ani_field_descriptorUuid);
+        descriptor.GetUuid().ToString().size(), &descriptorUuid);
 
-    ani_string ani_field_characteristicUuid = {};
-    ani_string ani_field_serviceUuid = {};
+    ani_string characteristicUuid = {};
+    ani_string serviceUuid = {};
     if (descriptor.GetCharacteristic() != nullptr) {
-        ani_string ani_field_characteristicUuid = {};
         env->String_NewUTF8(descriptor.GetCharacteristic()->GetUuid().ToString().c_str(),
-            descriptor.GetCharacteristic()->GetUuid().ToString().size(), &ani_field_characteristicUuid);
+            descriptor.GetCharacteristic()->GetUuid().ToString().size(), &characteristicUuid);
 
         if (descriptor.GetCharacteristic()->GetService() != nullptr) {
             env->String_NewUTF8(descriptor.GetCharacteristic()->GetService()->GetUuid().ToString().c_str(),
-                descriptor.GetCharacteristic()->GetService()->GetUuid().ToString().size(),
-                &ani_field_serviceUuid);
+                descriptor.GetCharacteristic()->GetService()->GetUuid().ToString().size(), &serviceUuid);
         }
     }
 
     size_t valueSize;
     uint8_t* valueData = descriptor.GetValue(&valueSize).get();
-    void* ani_field_descriptorValue_ani_data = {};
-    ani_arraybuffer ani_field_descriptorValue = {};
-    env->CreateArrayBuffer(valueSize * (sizeof(uint8_t) / sizeof(char)),
-        &ani_field_descriptorValue_ani_data, &ani_field_descriptorValue);
-    if (memcpy_s(reinterpret_cast<uint8_t*>(ani_field_descriptorValue_ani_data), valueSize,
-        valueData, valueSize) != EOK) {
+    void* descriptorValueData = {};
+    ani_arraybuffer descriptorValue = {};
+    env->CreateArrayBuffer(valueSize * (sizeof(uint8_t) / sizeof(char)), &descriptorValueData, &descriptorValue);
+    if (memcpy_s(reinterpret_cast<uint8_t*>(descriptorValueData), valueSize, valueData, valueSize) != EOK) {
         HILOGE("memcpy_s error");
     }
 
-    ani_ref ani_field_descriptorHandle = {};
-    ani_object ani_field_descriptorHandle_ani_temp = {};
-    ani_int ani_field_descriptorHandle_ani_temp_ani_after =
-        static_cast<ani_int>(static_cast<uint32_t>(descriptor.GetHandle()));
+    ani_ref descriptorHandle = {};
+    ani_object descriptorHandleObject = {};
+    ani_int handle = static_cast<ani_int>(static_cast<uint32_t>(descriptor.GetHandle()));
     env->Object_New(TH_ANI_FIND_CLASS(env, "std.core.Int"),
-        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Int", "<ctor>", "i:"),
-        &ani_field_descriptorHandle_ani_temp, ani_field_descriptorHandle_ani_temp_ani_after);
-    ani_field_descriptorHandle = ani_field_descriptorHandle_ani_temp;
+        TH_ANI_FIND_CLASS_METHOD(env, "std.core.Int", "<ctor>", "i:"), &descriptorHandleObject, handle);
+    descriptorHandle = descriptorHandleObject;
 
-    ani_ref ani_field_permissions = {};
-    ani_object ani_field_permissions_ani_temp = ConvertGattPermissionsToJs(env, descriptor.GetPermissions());
-    ani_field_permissions = ani_field_permissions_ani_temp;
+    ani_ref permissions = {};
+    ani_object permissionsObject = ConvertGattPermissionsToJs(env, descriptor.GetPermissions());
+    permissions = permissionsObject;
 
-    ani_object ani_obj = {};
+    ani_object object = {};
     env->Object_New(TH_ANI_FIND_CLASS(env, "@ohos.bluetooth.ble.ble.BLEDescriptorInfo"),
         TH_ANI_FIND_CLASS_METHOD(env, "@ohos.bluetooth.ble.ble.BLEDescriptorInfo", "<ctor>", nullptr),
-        &ani_obj, ani_field_serviceUuid, ani_field_characteristicUuid, ani_field_descriptorUuid,
-        ani_field_descriptorValue, ani_field_descriptorHandle, ani_field_permissions);
-    return ani_obj;
+        &object, serviceUuid, characteristicUuid, descriptorUuid, descriptorValue, descriptorHandle, permissions);
+    return object;
 }
 
 ani_object ConvertBLEDescriptorVectorToJS(ani_env *env, std::vector<GattDescriptor> &descriptors)
@@ -385,17 +313,15 @@ ani_object ConvertBLEDescriptorVectorToJS(ani_env *env, std::vector<GattDescript
         return nullptr;
     }
 
-    ani_array ani_field_descriptors = {};
-    ani_ref ani_field_descriptors_ani_none = {};
-    env->GetUndefined(&ani_field_descriptors_ani_none);
-    env->Array_New(descriptors.size(), ani_field_descriptors_ani_none, &ani_field_descriptors);
-    for (size_t ani_field_descriptors_iterator = 0; ani_field_descriptors_iterator < descriptors.size();
-        ani_field_descriptors_iterator++) {
-        ani_object ani_field_descriptors_ani_item =
-            ConvertBLEDescriptorToJS(env, descriptors[ani_field_descriptors_iterator]);
-        env->Array_Set(ani_field_descriptors, ani_field_descriptors_iterator, ani_field_descriptors_ani_item);
+    ani_array descriptorsObject = {};
+    ani_ref descriptorsNone = {};
+    env->GetUndefined(&descriptorsNone);
+    env->Array_New(descriptors.size(), descriptorsNone, &descriptorsObject);
+    for (size_t iterator = 0; iterator < descriptors.size(); iterator++) {
+        ani_object item = ConvertBLEDescriptorToJS(env, descriptors[iterator]);
+        env->Array_Set(descriptorsObject, iterator, item);
     }
-    return ani_field_descriptors;
+    return descriptorsObject;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
