@@ -27,15 +27,13 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 uintptr_t BleScannerImpl::StartScanPromise(const ohos::bluetooth::ble::ScanFilterNullValue &filters,
     taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options)
 {
     HILOGI("enter");
     ani_env *env = taihe::get_env();
-    if (env == nullptr) {
-        TAIHE_BT_ASSERT_RETURN(env != nullptr, BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
-    }
+    TAIHE_BT_ASSERT_RETURN(env != nullptr, BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
+
     std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.BleScanner.StartScan");
     std::vector<BleScanFilter> scanFilters;
     BleScanSettings settings;
@@ -70,9 +68,8 @@ uintptr_t BleScannerImpl::StopScanPromise()
 {
     HILOGI("enter");
     ani_env *env = taihe::get_env();
-    if (env == nullptr) {
-        TAIHE_BT_ASSERT_RETURN(env != nullptr, BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
-    }
+    TAIHE_BT_ASSERT_RETURN(env != nullptr, BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
+
     std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.BleScanner.StopScan");
 
     TAIHE_BT_ASSERT_RETURN(this->GetBleCentralManager() != nullptr,

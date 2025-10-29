@@ -121,31 +121,29 @@ static GattCharacteristic *GetGattCharacteristic(const std::shared_ptr<GattServe
 }
 
 static taihe_status CheckNotifyCharacteristicChangedEx(
-    taihe::string_view id, const ohos::bluetooth::ble::NotifyCharacteristic &info,
+    taihe::string_view deviceId, const ohos::bluetooth::ble::NotifyCharacteristic &info,
     std::string &outDeviceId, TaiheNotifyCharacteristic &outCharacter)
 {
-    std::string deviceId(id.c_str());
+    std::string bdaddr = static_cast<std::string>(deviceId);
     TaiheNotifyCharacteristic character;
-    TAIHE_BT_RETURN_IF(!IsValidAddress(deviceId), "Invalid bdaddr", taihe_invalid_arg);
+    TAIHE_BT_RETURN_IF(!IsValidAddress(bdaddr), "Invalid bdaddr", taihe_invalid_arg);
     TAIHE_BT_CALL_RETURN(TaiheParseNotifyCharacteristic(info, character));
 
-    outDeviceId = std::move(deviceId);
+    outDeviceId = std::move(bdaddr);
     outCharacter = std::move(character);
     return taihe_ok;
 }
 
 static TaihePromiseAndCallback TaiheNotifyCharacteristicChanged(taihe::string_view deviceId,
     const ohos::bluetooth::ble::NotifyCharacteristic &notifyCharacteristic, uintptr_t cb,
-    GattServerImpl* taiheServer, bool isPromise = true)
+    GattServerImpl *taiheServer, bool isPromise = true)
 {
     HILOGI("enter");
     std::string devId {};
     TaiheNotifyCharacteristic notifyCharacter;
     auto status = CheckNotifyCharacteristicChangedEx(deviceId, notifyCharacteristic, devId, notifyCharacter);
-    if ((status != taihe_ok) || (taiheServer == nullptr) || (taiheServer->GetServer() == nullptr)) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM);
-    }
-    HILOGI("[BTTEST] NotifyCharacteristicChangedAsyncPromise check params status: %{public}d", status);
+    TAIHE_BT_ASSERT_RETURN((status == taihe_ok && taiheServer && taiheServer->GetServer()),
+        BT_ERR_INVALID_PARAM, TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM));
 
     auto func = [server = taiheServer->GetServer(), notifyCharacter, devId]() {
         int ret = BT_ERR_INTERNAL_ERROR;
@@ -160,22 +158,14 @@ static TaihePromiseAndCallback TaiheNotifyCharacteristicChanged(taihe::string_vi
         return TaiheAsyncWorkRet(ret);
     };
     auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(taihe::get_env(), reinterpret_cast<ani_object>(cb), func);
-    if (asyncWork == nullptr) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
     bool success = taiheServer->GetCallback()->asyncWorkMap_.TryPush(TaiheAsyncType::GATT_SERVER_NOTIFY_CHARACTERISTIC,
         asyncWork);
-    if (!success) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
 
     asyncWork->Run();
 
-    if (isPromise) {
-        return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(asyncWork->GetRet()));
-    } else {
-        return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(nullptr));
-    }
+    return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(isPromise ? asyncWork->GetRet() : nullptr));
 }
 
 uintptr_t GattServerImpl::NotifyCharacteristicChangedPromise(taihe::string_view deviceId,
@@ -183,10 +173,10 @@ uintptr_t GattServerImpl::NotifyCharacteristicChangedPromise(taihe::string_view 
 {
     TaihePromiseAndCallback result = TaiheNotifyCharacteristicChanged(deviceId, notifyCharacteristic,
         reinterpret_cast<uintptr_t>(nullptr), this);
-    if (!result.success || !result.handle.has_value()) {
+    if (!result.success || !result.object.has_value()) {
         TAIHE_BT_ASSERT_RETURN(false, result.errorCode, reinterpret_cast<uintptr_t>(nullptr));
     }
-    return result.handle.value();
+    return result.object.value();
 }
 
 void GattServerImpl::NotifyCharacteristicChangedAsync(taihe::string_view deviceId,

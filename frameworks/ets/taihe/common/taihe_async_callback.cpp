@@ -27,7 +27,6 @@ namespace OHOS {
 namespace Bluetooth {
 void TaiheAsyncCallback::CallFunction(int errCode, const std::shared_ptr<TaiheNativeObject> &object)
 {
-    HILOGI("CallFunction enter");
     if (callback == nullptr && promise == nullptr) {
         HILOGE("callback & promise is nullptr");
         return;
@@ -38,15 +37,12 @@ void TaiheAsyncCallback::CallFunction(int errCode, const std::shared_ptr<TaiheNa
     }
 
     if (callback) {
-        HILOGI("CallFunction callback");
         callback->CallFunction(errCode, object);
         return;
     }
     if (promise) {
-        HILOGI("CallFunction promise");
         promise->ResolveOrReject(errCode, object);
     }
-    HILOGI("CallFunction leave");
 }
 
 ani_object TaiheAsyncCallback::GetRet(void)
@@ -71,7 +67,7 @@ TaiheCallback::~TaiheCallback()
     bool isSameThread = (threadId_ == std::this_thread::get_id());
     ani_env* curEnv = isSameThread ? env_ : GetCurrentEnv(vm_);
     if (curEnv == nullptr) {
-        HILOGE("Failed to GetCurrentEnv");
+        HILOGE("taihe get current env is nullptr");
         return;
     }
 
@@ -91,7 +87,6 @@ TaiheCallback::~TaiheCallback()
 namespace {
 void TaiheCallFunction(ani_env *env, ani_ref callbackRef, ani_ref *argv, size_t argc)
 {
-    HILOGI("TaiheCallFunction enter");
     ani_ref callRet = nullptr;
     ani_fn_object callback = reinterpret_cast<ani_fn_object>(callbackRef);
 
@@ -108,7 +103,6 @@ void TaiheCallFunction(ani_env *env, ani_ref callbackRef, ani_ref *argv, size_t 
         status = env->ResetError();
         HILOGD("ResetError status: %{public}d", status);
     }
-    HILOGI("TaiheCallFunction leave");
 }
 }  // namespace {}
 
@@ -119,6 +113,7 @@ void TaiheCallback::CallFunction(int errCode, const std::shared_ptr<TaiheNativeO
         return;
     }
 
+    // Get the current thread id and compare it with the ani main thread id
     bool isSameThread = (threadId_ == std::this_thread::get_id());
     ani_env* curEnv = isSameThread ? env_ : GetCurrentEnv(vm_);
     if (curEnv == nullptr) {
@@ -126,6 +121,7 @@ void TaiheCallback::CallFunction(int errCode, const std::shared_ptr<TaiheNativeO
         return;
     }
 
+    // Create a temporary scope to manage the life cycle of BusinessError objects
     TaiheCreateLocalScope(curEnv);
     ani_ref code = GetCallbackErrorValue(curEnv, errCode);
     ani_ref val = object->ToTaiheValue(curEnv);
@@ -152,7 +148,6 @@ TaihePromise::~TaihePromise()
 
 void TaihePromise::ResolveOrReject(int errCode, const std::shared_ptr<TaiheNativeObject> &object)
 {
-    HILOGI("ResolveOrReject enter");
     if (object == nullptr) {
         HILOGE("taihe native object is nullptr");
         return;
@@ -188,27 +183,22 @@ void TaihePromise::ResolveOrReject(int errCode, const std::shared_ptr<TaiheNativ
 
 void TaihePromise::Resolve(ani_env *env, ani_ref resolution)
 {
-    HILOGI("Resolve enter");
     auto status = env->PromiseResolver_Resolve(bindDeferred_, resolution);
     if (status != ANI_OK) {
         HILOGE("PromiseResolver_Resolve failed, status: %{public}d", status);
     }
-    HILOGI("Resolve leave");
 }
 
 void TaihePromise::Reject(ani_env *env, ani_ref rejection)
 {
-    HILOGI("Reject enter");
     auto status = env->PromiseResolver_Reject(bindDeferred_, reinterpret_cast<ani_error>(rejection));
     if (status != ANI_OK) {
         HILOGE("PromiseResolver_Reject failed, status: %{public}d", status);
     }
-    HILOGI("Reject leave");
 }
 
 ani_object TaihePromise::GetPromise(void) const
 {
-    HILOGI("GetPromise enter");
     return promise_;
 }
 

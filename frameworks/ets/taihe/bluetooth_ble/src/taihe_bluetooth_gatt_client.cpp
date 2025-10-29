@@ -88,9 +88,8 @@ taihe::string GattClientDeviceImpl::GetDeviceNameSync()
     std::string deviceName = "";
     int32_t err = BluetoothHost::GetDefaultHost().GetRemoteDevice(
         deviceAddr, BT_TRANSPORT_BLE).GetDeviceName(deviceName);
+    HILOGI("err: %{public}d, deviceName: %{private}s", err, deviceName.c_str());
     TAIHE_BT_ASSERT_RETURN(err == BT_NO_ERROR, err, deviceName);
-
-    HILOGI("err: %{public}d, deviceName: %{public}s", err, deviceName.c_str());
 
     return deviceName;
 }
@@ -174,7 +173,7 @@ static taihe_status ParseGattClientReadCharacteristicValue(
     TAIHE_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
 
     TaiheBleCharacteristic taiheCharacter;
-    TAIHE_BT_CALL_RETURN(TaiheParseGattBLECharacteristic(characteristic, taiheCharacter));
+    TAIHE_BT_CALL_RETURN(TaiheParseGattCharacteristic(characteristic, taiheCharacter));
 
     GattCharacteristic *character = GetGattcCharacteristic(gattClient->GetClient(), taiheCharacter);
     TAIHE_BT_RETURN_IF(character == nullptr || outCharacter == nullptr, "Not found character", taihe_invalid_arg);
@@ -185,17 +184,15 @@ static taihe_status ParseGattClientReadCharacteristicValue(
 
 static TaihePromiseAndCallback TaiheReadCharacteristicValue(
     const ohos::bluetooth::ble::BLECharacteristic &characteristic, uintptr_t cb,
-    GattClientDeviceImpl* client, bool isPromise = true)
+    GattClientDeviceImpl *client, bool isPromise = true)
 {
     HILOGI("enter");
     GattCharacteristic *character = nullptr;
     auto status = ParseGattClientReadCharacteristicValue(characteristic, client, &character);
-    if ((status != taihe_ok) || (client == nullptr) || (character == nullptr)) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM);
-    }
-    if (client->GetCallback() == nullptr) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(status == taihe_ok && client && character, BT_ERR_INVALID_PARAM,
+        TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM));
+    TAIHE_BT_ASSERT_RETURN(client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR,
+        TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
 
     auto func = [gattClient = client->GetClient(), character]() {
         if (character == nullptr) {
@@ -210,21 +207,13 @@ static TaihePromiseAndCallback TaiheReadCharacteristicValue(
         return TaiheAsyncWorkRet(ret);
     };
     auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(taihe::get_env(), reinterpret_cast<ani_object>(cb), func);
-    if (asyncWork == nullptr) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
     bool success = client->GetCallback()->asyncWorkMap_.TryPush(TaiheAsyncType::GATT_CLIENT_READ_CHARACTER, asyncWork);
-    if (!success) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
 
     asyncWork->Run();
 
-    if (isPromise) {
-        return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(asyncWork->GetRet()));
-    } else {
-        return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(nullptr));
-    }
+    return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(isPromise ? asyncWork->GetRet() : nullptr));
 }
 
 uintptr_t GattClientDeviceImpl::ReadCharacteristicValuePromise(
@@ -232,10 +221,10 @@ uintptr_t GattClientDeviceImpl::ReadCharacteristicValuePromise(
 {
     TaihePromiseAndCallback result = TaiheReadCharacteristicValue(characteristic, reinterpret_cast<uintptr_t>(nullptr),
         this);
-    if (!result.success || !result.handle.has_value()) {
+    if (!result.success || !result.object.has_value()) {
         TAIHE_BT_ASSERT_RETURN(false, result.errorCode, reinterpret_cast<uintptr_t>(nullptr));
     }
-    return result.handle.value();
+    return result.object.value();
 }
 
 void GattClientDeviceImpl::ReadCharacteristicValueAsync(const ohos::bluetooth::ble::BLECharacteristic &characteristic,
@@ -253,7 +242,7 @@ static taihe_status ParseGattClientReadDescriptorValue(const ohos::bluetooth::bl
     TAIHE_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
 
     TaiheBleDescriptor taiheDescriptor;
-    TAIHE_BT_CALL_RETURN(TaiheParseGattBLEDescriptor(bleDescriptor, taiheDescriptor));
+    TAIHE_BT_CALL_RETURN(TaiheParseGattDescriptor(bleDescriptor, taiheDescriptor));
     GattDescriptor *descriptor = GetGattcDescriptor(gattClient->GetClient(), taiheDescriptor);
     TAIHE_BT_RETURN_IF(outDescriptor == nullptr || descriptor == nullptr, "Not found Descriptor", taihe_invalid_arg);
 
@@ -262,17 +251,15 @@ static taihe_status ParseGattClientReadDescriptorValue(const ohos::bluetooth::bl
 }
 
 static TaihePromiseAndCallback TaiheReadDescriptorValue(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor,
-    uintptr_t cb, GattClientDeviceImpl* client, bool isPromise = true)
+    uintptr_t cb, GattClientDeviceImpl *client, bool isPromise = true)
 {
     HILOGI("enter");
     GattDescriptor *descriptor = nullptr;
     auto status = ParseGattClientReadDescriptorValue(bleDescriptor, client, &descriptor);
-    if ((status != taihe_ok) || (client == nullptr) || (descriptor == nullptr)) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
-    if (client->GetCallback() == nullptr) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(status == taihe_ok && client && descriptor, BT_ERR_INVALID_PARAM,
+        TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM));
+    TAIHE_BT_ASSERT_RETURN(client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR,
+        TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
 
     auto func = [gattClient = client->GetClient(), descriptor]() {
         if (descriptor == nullptr) {
@@ -287,31 +274,23 @@ static TaihePromiseAndCallback TaiheReadDescriptorValue(const ohos::bluetooth::b
         return TaiheAsyncWorkRet(ret);
     };
     auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(taihe::get_env(), reinterpret_cast<ani_object>(cb), func);
-    if (asyncWork == nullptr) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
     bool success = client->GetCallback()->asyncWorkMap_.TryPush(TaiheAsyncType::GATT_CLIENT_READ_DESCRIPTOR, asyncWork);
-    if (!success) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
 
     asyncWork->Run();
 
-    if (isPromise) {
-        return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(asyncWork->GetRet()));
-    } else {
-        return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(nullptr));
-    }
+    return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(isPromise ? asyncWork->GetRet() : nullptr));
 }
 
 uintptr_t GattClientDeviceImpl::ReadDescriptorValuePromise(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor)
 {
     TaihePromiseAndCallback result =
         TaiheReadDescriptorValue(bleDescriptor, reinterpret_cast<uintptr_t>(nullptr), this);
-    if (!result.success || !result.handle.has_value()) {
+    if (!result.success || !result.object.has_value()) {
         TAIHE_BT_ASSERT_RETURN(false, result.errorCode, reinterpret_cast<uintptr_t>(nullptr));
     }
-    return result.handle.value();
+    return result.object.value();
 }
 
 void GattClientDeviceImpl::ReadDescriptorValueAsync(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor,
@@ -329,7 +308,7 @@ static taihe_status CheckSetCharacteristicChange(const ohos::bluetooth::ble::BLE
     TAIHE_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
 
     TaiheBleCharacteristic taiheCharacter;
-    TAIHE_BT_CALL_RETURN(TaiheParseGattBLECharacteristic(characteristic, taiheCharacter));
+    TAIHE_BT_CALL_RETURN(TaiheParseGattCharacteristic(characteristic, taiheCharacter));
     GattCharacteristic *character = GetGattcCharacteristic(gattClient->GetClient(), taiheCharacter);
     TAIHE_BT_RETURN_IF(character == nullptr || outCharacteristic == nullptr, "Not found character", taihe_invalid_arg);
 
@@ -345,12 +324,10 @@ static TaihePromiseAndCallback TaiheSetCharacteristicChangeIndication(
     GattCharacteristic *character = nullptr;
 
     auto status = CheckSetCharacteristicChange(characteristic, &character, client);
-    if ((status != taihe_ok) || (client == nullptr) || (character == nullptr)) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM);
-    }
-    if (client->GetCallback() == nullptr) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(status == taihe_ok && client && character, BT_ERR_INVALID_PARAM,
+        TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM));
+    TAIHE_BT_ASSERT_RETURN(client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR,
+        TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
 
     bool isNotify = false;
     auto func = [gattClient = client->GetClient(), character, enable, isNotify]() {
@@ -370,21 +347,13 @@ static TaihePromiseAndCallback TaiheSetCharacteristicChangeIndication(
         return TaiheAsyncWorkRet(ret);
     };
     auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(taihe::get_env(), reinterpret_cast<ani_object>(cb), func);
-    if (asyncWork == nullptr) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
     bool success = client->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_ENABLE_CHARACTER_CHANGED, asyncWork);
-    if (!success) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
 
     asyncWork->Run();
 
-    if (isPromise) {
-        return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(asyncWork->GetRet()));
-    } else {
-        return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(nullptr));
-    }
+    return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(isPromise ? asyncWork->GetRet() : nullptr));
 }
 
 uintptr_t GattClientDeviceImpl::SetCharacteristicChangeIndicationPromise(
@@ -392,10 +361,10 @@ uintptr_t GattClientDeviceImpl::SetCharacteristicChangeIndicationPromise(
 {
     TaihePromiseAndCallback result = TaiheSetCharacteristicChangeIndication(characteristic, enable,
         reinterpret_cast<uintptr_t>(nullptr), this);
-    if (!result.success || !result.handle.has_value()) {
+    if (!result.success || !result.object.has_value()) {
         TAIHE_BT_ASSERT_RETURN(false, result.errorCode, reinterpret_cast<uintptr_t>(nullptr));
     }
-    return result.handle.value();
+    return result.object.value();
 }
 
 void GattClientDeviceImpl::SetCharacteristicChangeIndicationAsync(

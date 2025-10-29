@@ -96,9 +96,9 @@ ohos::bluetooth::ble::BleScanner CreateBleScanner()
 
 static bool IsValidAdvertiserDuration(uint32_t duration)
 {
-    const uint32_t MIN_DURATION = 0;
-    const uint32_t MAX_DURATION = 65535;
-    if (duration < MIN_DURATION || duration > MAX_DURATION) {
+    const uint32_t minDuration = 0;
+    const uint32_t maxDuration = 65535;
+    if (duration < minDuration || duration > maxDuration) {
         return false;
     }
     return true;
@@ -441,12 +441,23 @@ void StartAdvertising(const ohos::bluetooth::ble::AdvertiseSetting &setting,
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
 }
 
+static bool IsValidAdvertisingId(int32_t advertisingId)
+{
+    const int32_t minAdvertisingId = 0;
+    const int32_t maxAdvertisingId = 65535;
+    if (advertisingId < minAdvertisingId || advertisingId > maxAdvertisingId) {
+        return false;
+    }
+    return true;
+}
+
 static taihe_status CheckAdvertisingDisableParams(
     const ohos::bluetooth::ble::AdvertisingDisableParams &advertisingDisableParams,
     uint32_t &outAdvHandle,
     std::shared_ptr<BleAdvertiseCallback> &callback)
 {
-    outAdvHandle = static_cast<uint32_t>(advertisingDisableParams.advertisingId);
+    outAdvHandle = IsValidAdvertisingId(advertisingDisableParams.advertisingId)
+        ? static_cast<uint32_t>(advertisingDisableParams.advertisingId) : 0;
 
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
     TAIHE_BT_RETURN_IF(bleAdvertiser == nullptr, "bleAdvertiser is nullptr", taihe_invalid_arg);
@@ -495,24 +506,20 @@ static TaihePromiseAndCallback TaiheStartAdvertising(const ohos::bluetooth::ble:
 {
     HILOGI("enter");
     ani_env *env = taihe::get_env();
-    if (env == nullptr) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(env, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
 
     std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.StartAdvertising");
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
-    if (bleAdvertiser == nullptr) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(bleAdvertiser, BT_ERR_INTERNAL_ERROR,
+        TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
 
     BleAdvertiserSettings settings;
     BleAdvertiserData advData;
     BleAdvertiserData rspData;
     uint16_t duration = 0;
     auto status = CheckAdvertisingDataWithDuration(advertisingParams, settings, advData, rspData, duration);
-    if (status != taihe_ok) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM);
-    }
+    TAIHE_BT_ASSERT_RETURN(status == taihe_ok, BT_ERR_INVALID_PARAM,
+        TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM));
 
     auto callback = std::make_shared<TaiheBluetoothBleAdvertiseCallback>();
     auto func = [settings, advData, rspData, duration, bleAdvertiser, callback]() {
@@ -522,30 +529,22 @@ static TaihePromiseAndCallback TaiheStartAdvertising(const ohos::bluetooth::ble:
     };
 
     auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(env, reinterpret_cast<ani_object>(cb), func, haUtils);
-    if (asyncWork == nullptr) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
     bool success = callback->asyncWorkMap_.TryPush(TaiheAsyncType::GET_ADVERTISING_HANDLE, asyncWork);
-    if (!success) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
 
     asyncWork->Run();
 
-    if (isPromise) {
-        return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(asyncWork->GetRet()));
-    } else {
-        return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(nullptr));
-    }
+    return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(isPromise ? asyncWork->GetRet() : nullptr));
 }
 
 uintptr_t StartAdvertisingPromise(const ohos::bluetooth::ble::AdvertisingParams &advertisingParams)
 {
     TaihePromiseAndCallback result = TaiheStartAdvertising(advertisingParams, reinterpret_cast<uintptr_t>(nullptr));
-    if (!result.success || !result.handle.has_value()) {
+    if (!result.success || !result.object.has_value()) {
         TAIHE_BT_ASSERT_RETURN(false, result.errorCode, reinterpret_cast<uintptr_t>(nullptr));
     }
-    return result.handle.value();
+    return result.object.value();
 }
 
 void StartAdvertisingAsync(const ohos::bluetooth::ble::AdvertisingParams &advertisingParams, uintptr_t callback)
@@ -562,22 +561,19 @@ static TaihePromiseAndCallback TaiheDisableAdvertising(
 {
     HILOGI("enter");
     ani_env *env = taihe::get_env();
-    if (env == nullptr) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(env, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
 
     std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.DisableAdvertising");
     uint32_t advHandle = 0xFF;
     std::shared_ptr<BleAdvertiseCallback> baseCallback;
     auto status = CheckAdvertisingDisableParams(advertisingDisableParams, advHandle, baseCallback);
-    if (status != taihe_ok) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM);
-    }
+    TAIHE_BT_ASSERT_RETURN(status == taihe_ok, BT_ERR_INVALID_PARAM,
+        TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM));
     // compatible with XTS
-    if (advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
-        return TaihePromiseAndCallback::Failure(
-            static_cast<BtErrCode>(GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID))); // Adaptation for old sdk
-    }
+    TAIHE_BT_ASSERT_RETURN(advHandle != BLE_INVALID_ADVERTISING_HANDLE,
+        GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID),
+        TaihePromiseAndCallback::Failure(
+            static_cast<BtErrCode>(GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID)))); // Adaptation for old sdk
 
     std::shared_ptr<TaiheBluetoothBleAdvertiseCallback> callback =
         std::static_pointer_cast<TaiheBluetoothBleAdvertiseCallback>(baseCallback);
@@ -593,30 +589,23 @@ static TaihePromiseAndCallback TaiheDisableAdvertising(
     };
 
     auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(env, reinterpret_cast<ani_object>(cb), func, haUtils);
-    if (asyncWork == nullptr) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
     bool success = callback->asyncWorkMap_.TryPush(TaiheAsyncType::BLE_DISABLE_ADVERTISING, asyncWork);
-    if (!success) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
+
     asyncWork->Run();
 
-    if (isPromise) {
-        return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(asyncWork->GetRet()));
-    } else {
-        return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(nullptr));
-    }
+    return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(isPromise ? asyncWork->GetRet() : nullptr));
 }
 
 uintptr_t DisableAdvertisingPromise(const ohos::bluetooth::ble::AdvertisingDisableParams &advertisingDisableParams)
 {
     TaihePromiseAndCallback result =
         TaiheDisableAdvertising(advertisingDisableParams, reinterpret_cast<uintptr_t>(nullptr));
-    if (!result.success || !result.handle.has_value()) {
+    if (!result.success || !result.object.has_value()) {
         TAIHE_BT_ASSERT_RETURN(false, result.errorCode, reinterpret_cast<uintptr_t>(nullptr));
     }
-    return result.handle.value();
+    return result.object.value();
 }
 
 void DisableAdvertisingAsync(const ohos::bluetooth::ble::AdvertisingDisableParams &advertisingDisableParams,
@@ -633,24 +622,20 @@ static TaihePromiseAndCallback TaiheEnableAdvertising(
 {
     HILOGI("enter");
     ani_env *env = taihe::get_env();
-    if (env == nullptr) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(env, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
 
     std::shared_ptr<TaiheHaEventUtils> haUtils = std::make_shared<TaiheHaEventUtils>(env, "ble.EnableAdvertising");
     uint32_t advHandle = 0xFF;
     uint16_t duration = 0;
     std::shared_ptr<BleAdvertiseCallback> baseCallback;
     auto status = CheckAdvertisingEnableParams(advertisingEnableParams, advHandle, duration, baseCallback);
-    if (status != taihe_ok) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM);
-    }
+    TAIHE_BT_ASSERT_RETURN(status == taihe_ok, BT_ERR_INVALID_PARAM,
+        TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM));
     // compatible with XTS
-    if (advHandle == BLE_INVALID_ADVERTISING_HANDLE) {
-        return TaihePromiseAndCallback::Failure(
-            static_cast<BtErrCode>(GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID))); // Adaptation for old sdk
-    }
-
+    TAIHE_BT_ASSERT_RETURN(advHandle != BLE_INVALID_ADVERTISING_HANDLE,
+        GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID),
+        TaihePromiseAndCallback::Failure(
+            static_cast<BtErrCode>(GetSDKAdaptedStatusCode(BT_ERR_BLE_INVALID_ADV_ID)))); // Adaptation for old sdk
     std::shared_ptr<TaiheBluetoothBleAdvertiseCallback> callback =
         std::static_pointer_cast<TaiheBluetoothBleAdvertiseCallback>(baseCallback);
     auto func = [advHandle, duration, callback]() {
@@ -665,31 +650,24 @@ static TaihePromiseAndCallback TaiheEnableAdvertising(
     };
 
     auto asyncWork = TaiheAsyncWorkFactory::CreateAsyncWork(env, reinterpret_cast<ani_object>(cb), func, haUtils);
-    if (asyncWork == nullptr) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(asyncWork, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
     bool success = callback->asyncWorkMap_.TryPush(TaiheAsyncType::BLE_ENABLE_ADVERTISING, asyncWork);
-    if (!success) {
-        return TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR);
-    }
+    TAIHE_BT_ASSERT_RETURN(success, BT_ERR_INTERNAL_ERROR, TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
+
     asyncWork->Run();
 
-    if (isPromise) {
-        return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(asyncWork->GetRet()));
-    } else {
-        return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(nullptr));
-    }
+    return TaihePromiseAndCallback::Success(reinterpret_cast<uintptr_t>(isPromise ? asyncWork->GetRet() : nullptr));
 }
 
 uintptr_t EnableAdvertisingPromise(const ohos::bluetooth::ble::AdvertisingEnableParams &advertisingEnableParams)
 {
     TaihePromiseAndCallback result = TaiheEnableAdvertising(advertisingEnableParams,
         reinterpret_cast<uintptr_t>(nullptr));
-    if (!result.success || !result.handle.has_value()) {
+    if (!result.success || !result.object.has_value()) {
         TAIHE_BT_ASSERT_RETURN(false, result.errorCode, reinterpret_cast<uintptr_t>(nullptr));
     }
 
-    return result.handle.value();
+    return result.object.value();
 }
 
 void EnableAdvertisingAsync(const ohos::bluetooth::ble::AdvertisingEnableParams &advertisingEnableParams,
