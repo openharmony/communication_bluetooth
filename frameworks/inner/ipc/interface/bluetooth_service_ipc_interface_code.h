@@ -78,6 +78,7 @@ enum BluetoothBleCentralManagerInterfaceCode {
     BLE_SET_LPDEVICE_PARAM,
     BLE_REMOVE_LPDEVICE_PARAM,
     BLE_CHANGE_SCAN_PARAM,
+    BLE_IS_VALID_SCANNERID,
     // The last code, if you want to add a new code, please add it before this
     BLE_CENTRAL_MANAGER_BUTT
 };

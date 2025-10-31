@@ -18,17 +18,20 @@
 
 #include <cstdint>
 #include <string>
+#include <optional>
+
+#include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 
 namespace OHOS {
 namespace Bluetooth {
 
 #ifndef TAIHE_BT_ASSERT_RETURN
-#define TAIHE_BT_ASSERT_RETURN(cond, errCode, retObj) \
+#define TAIHE_BT_ASSERT_RETURN(cond, errCode, retObj)     \
 do {                                                      \
     if (!(cond)) {                                        \
-        HandleSyncErr((errCode));                  \
-        HILOGE("bluetoothManager taihe assert failed.");                    \
+        HandleSyncErr((errCode));                         \
+        HILOGE("bluetoothManager taihe assert failed.");  \
         return (retObj);                                  \
     }                                                     \
 } while (0)
@@ -47,6 +50,22 @@ do {                                                      \
 
 std::string GetTaiheErrMsg(const int32_t errCode);
 void HandleSyncErr(int32_t errCode);
+
+struct TaihePromiseAndCallback {
+    bool success;
+    BtErrCode errorCode;
+    std::optional<uintptr_t> object;
+
+    static TaihePromiseAndCallback Success(uintptr_t object = 0)
+    {
+        return {true, BtErrCode::BT_NO_ERROR, object};
+    }
+
+    static TaihePromiseAndCallback Failure(BtErrCode code)
+    {
+        return {false, code, std::nullopt};
+    }
+};
 } // namespace Bluetooth
 } // namespace OHOS
 #endif // TAIHE_BLUETOOTH_ERROR_H_

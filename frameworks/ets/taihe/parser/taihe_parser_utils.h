@@ -17,9 +17,9 @@
 #define TAIHE_PARSER_UTILS_H
 
 #include "bluetooth_gatt_characteristic.h"
-#include "taihe_bluetooth_utils.h"
-#include "ohos.bluetooth.ble.proj.hpp"
 #include "ohos.bluetooth.ble.impl.hpp"
+#include "ohos.bluetooth.ble.proj.hpp"
+#include "taihe_bluetooth_utils.h"
 #include "taihe/runtime.hpp"
 
 namespace OHOS {
@@ -73,16 +73,25 @@ struct TaiheGattProperties {
 };
 
 taihe_status TaiheParseGattService(ohos::bluetooth::ble::GattService object, TaiheGattService &outService);
-taihe_status TaiheParseIncludeService(taihe::array<::ohos::bluetooth::ble::GattService> object,
+taihe_status TaiheParseIncludeService(taihe::array<ohos::bluetooth::ble::GattService> object,
     std::vector<TaiheGattService> &outIncludeService);
-taihe_status TaiheParseGattCharacteristic(taihe::array<::ohos::bluetooth::ble::BLECharacteristic> object,
+taihe_status TaiheParseGattCharacteristicVec(taihe::array<ohos::bluetooth::ble::BLECharacteristic> object,
     std::vector<TaiheBleCharacteristic> &outCharacteristic);
-taihe_status TaiheParseGattDescriptor(taihe::array<::ohos::bluetooth::ble::BLEDescriptor> object,
+taihe_status TaiheParseGattCharacteristic(ohos::bluetooth::ble::BLECharacteristic object,
+    TaiheBleCharacteristic &outCharacteristic);
+taihe_status TaiheParseGattDescriptorVec(taihe::array<ohos::bluetooth::ble::BLEDescriptor> object,
     std::vector<TaiheBleDescriptor> &outDescriptor);
+taihe_status TaiheParseGattDescriptor(ohos::bluetooth::ble::BLEDescriptor object,
+    TaiheBleDescriptor &outDescriptor);
 void TaiheParseObjectGattPermissions(ohos::bluetooth::ble::GattPermissions object,
     TaiheGattPermission &outPermissions);
 void TaiheParseObjectGattProperties(ohos::bluetooth::ble::GattProperties object,
     TaiheGattProperties &outProperties);
+taihe_status TaiheParseNotifyCharacteristic(ohos::bluetooth::ble::NotifyCharacteristic object,
+    TaiheNotifyCharacteristic &outCharacter);
+
+struct TaiheAsyncCallback;
+std::shared_ptr<TaiheAsyncCallback> TaiheParseAsyncCallback(ani_env *env, ani_object info);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // TAIHE_PARSER_UTILS_H
