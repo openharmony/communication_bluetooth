@@ -12,15 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef LOG_TAG
+#define LOG_TAG "bt_taihe_ble_advertise_callback"
+#endif
+
 #include "taihe_bluetooth_ble_advertise_callback.h"
 
 #include "bluetooth_log.h"
+#include "taihe_bluetooth_ble_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
 TaiheBluetoothBleAdvertiseCallback::TaiheBluetoothBleAdvertiseCallback()
 {}
-    
+
 std::shared_ptr<TaiheBluetoothBleAdvertiseCallback> TaiheBluetoothBleAdvertiseCallback::GetInstance(void)
 {
     static std::shared_ptr<TaiheBluetoothBleAdvertiseCallback> instance =
@@ -31,16 +37,34 @@ std::shared_ptr<TaiheBluetoothBleAdvertiseCallback> TaiheBluetoothBleAdvertiseCa
 void TaiheBluetoothBleAdvertiseCallback::OnStartResultEvent(int result, int advHandle)
 {
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
+    if (advHandle_ == advHandle) {
+        HILOGI("OnStartResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
+        result = GetSDKAdaptedStatusCode(result); // Adaptation for old sdk
+        auto taiheAdvHandle = std::make_shared<TaiheNativeInt>(advHandle);
+        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::GET_ADVERTISING_HANDLE, taiheAdvHandle, result);
+    }
 }
 
 void TaiheBluetoothBleAdvertiseCallback::OnEnableResultEvent(int result, int advHandle)
 {
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
+    if (advHandle_ == advHandle) {
+        HILOGI("OnEnableResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
+        result = GetSDKAdaptedStatusCode(result); // Adaptation for old sdk
+        auto taiheAdvResult = std::make_shared<TaiheNativeInt>(result);
+        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::BLE_ENABLE_ADVERTISING, taiheAdvResult, result);
+    }
 }
 
 void TaiheBluetoothBleAdvertiseCallback::OnDisableResultEvent(int result, int advHandle)
 {
     HILOGI("enter, result: %{public}d advHandle: %{public}d", result, advHandle);
+    if (advHandle_ == advHandle) {
+        HILOGI("OnDisableResultEvent, advHandle is same, advHandle: %{public}d", advHandle_);
+        result = GetSDKAdaptedStatusCode(result); // Adaptation for old sdk
+        auto taiheAdvResult = std::make_shared<TaiheNativeInt>(result);
+        AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::BLE_DISABLE_ADVERTISING, taiheAdvResult, result);
+    }
 }
 
 void TaiheBluetoothBleAdvertiseCallback::OnStopResultEvent(int result, int advHandle)

@@ -12,6 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef LOG_TAG
+#define LOG_TAG "bt_taihe_gatt_server_callback"
+#endif
+
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "taihe_bluetooth_gatt_server.h"
@@ -92,6 +97,8 @@ void TaiheGattServerCallback::OnMtuUpdate(const BluetoothRemoteDevice &device, i
 void TaiheGattServerCallback::OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device, int ret)
 {
     HILOGI("ret: %{public}d", ret);
+    auto taiheRet = std::make_shared<TaiheNativeInt>(ret);
+    AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::GATT_SERVER_NOTIFY_CHARACTERISTIC, taiheRet, ret);
 }
 } // namespace Bluetooth
 } // namespace OHOS

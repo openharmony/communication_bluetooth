@@ -17,11 +17,12 @@
 #define TAIHE_BLUETOOTH_GATT_SERVER_H_
 
 #include <vector>
+
 #include "bluetooth_gatt_server.h"
 #include "bluetooth_log.h"
-#include "taihe_bluetooth_gatt_server_callback.h"
-#include "ohos.bluetooth.ble.proj.hpp"
 #include "ohos.bluetooth.ble.impl.hpp"
+#include "ohos.bluetooth.ble.proj.hpp"
+#include "taihe_bluetooth_gatt_server_callback.h"
 #include "taihe/runtime.hpp"
 
 namespace OHOS {
@@ -32,7 +33,19 @@ public:
     void Close();
     void RemoveService(taihe::string_view serviceUuid);
     void SendResponse(ohos::bluetooth::ble::ServerResponse serverResponse);
+    uintptr_t NotifyCharacteristicChangedPromise(taihe::string_view deviceId,
+        const ohos::bluetooth::ble::NotifyCharacteristic &notifyCharacteristic);
+    void NotifyCharacteristicChangedAsync(taihe::string_view deviceId,
+        const ohos::bluetooth::ble::NotifyCharacteristic &notifyCharacteristic, uintptr_t callback);
 
+    std::shared_ptr<GattServer> &GetServer()
+    {
+        return server_;
+    }
+    std::shared_ptr<TaiheGattServerCallback> GetCallback()
+    {
+        return callback_;
+    }
     static std::vector<std::string> deviceList_;
     static std::mutex deviceListMutex_;
 

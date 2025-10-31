@@ -16,17 +16,40 @@
 #ifndef TAIHE_BLUETOOTH_BLE_UTILS_H_
 #define TAIHE_BLUETOOTH_BLE_UTILS_H_
 
+#include "bluetooth_ble_advertiser.h"
+#include "bluetooth_ble_central_manager.h"
+#include "bluetooth_gatt_characteristic.h"
+#include "bluetooth_gatt_client.h"
+#include "bluetooth_gatt_server.h"
+#include "ohos.bluetooth.ble.impl.hpp"
+#include "ohos.bluetooth.ble.proj.hpp"
+#include "stdexcept"
+#include "taihe/runtime.hpp"
+#include "taihe_bluetooth_utils.h"
+
 namespace OHOS {
 namespace Bluetooth {
+constexpr int SDK_VERSION_20 = 20;
+
 enum class ScanReportType {
     ON_FOUND = 1, // the found of advertisement packet
-    ON_LOST = 2 // the lost of advertisement packet
+    ON_LOST = 2   // the lost of advertisement packet
 };
 
 enum class SensitivityMode {
     SENSITIVITY_MODE_HIGH = 1,  //  high sensitivity mode
     SENSITIVITY_MODE_LOW = 2    //  low sensitivity mode
 };
+
+int GetCurrentSdkVersion(void);
+int GetSDKAdaptedStatusCode(int status);
+taihe_status CheckBleScanParams(const ohos::bluetooth::ble::ScanFilterNullValue &filters,
+                                taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options,
+                                std::vector<BleScanFilter> &outScanfilters,
+                                BleScanSettings &outSettinngs);
+ani_object ConvertBLECharacteristicToJS(ani_env *env, GattCharacteristic &characteristic);
+ani_object ConvertBLEDescriptorToJS(ani_env *env, GattDescriptor& descriptor);
+ani_object ConvertBLEDescriptorVectorToJS(ani_env *env, std::vector<GattDescriptor> &descriptors);
 } // namespace Bluetooth
 } // namespace OHOS
 #endif // TAIHE_BLUETOOTH_BLE_UTILS_H_

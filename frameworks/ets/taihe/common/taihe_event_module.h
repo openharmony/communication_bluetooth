@@ -18,10 +18,11 @@
 
 #include <shared_mutex>
 #include <vector>
-#include <taihe/optional.hpp>
-#include <taihe/callback.hpp>
-#include "taihe/runtime.hpp"
+
 #include "stdexcept"
+#include "taihe/callback.hpp"
+#include "taihe/optional.hpp"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace Bluetooth {
