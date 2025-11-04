@@ -318,6 +318,17 @@ public:
         HILOGD("srvUuid: %{public}s, charcUuid: %{public}s", srvUuid.c_str(), charcUuid.c_str());
         appCallback_->notificationCb(clientId_, &notificationData, OHOS_BT_STATUS_SUCCESS);
     }
+
+    void OnServicesChanged() override
+    {
+        if (appCallback_ == nullptr || appCallback_->serviceChangeCb == nullptr) {
+            HILOGE("callback is null.");
+            return;
+        }
+
+        HILOGI("clientId: %{public}d", clientId_);
+        appCallback_->serviceChangeCb(clientId_);
+    }
 private:
     void GattcBuildUuid(BtUuid *desUuid, const std::string &srcUuid)
     {
