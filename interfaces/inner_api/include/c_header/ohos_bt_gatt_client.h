@@ -144,6 +144,13 @@ typedef void (*RegisterNotificationCallback)(int clientId, int status);
  */
 typedef void (*NotificationCallback)(int clientId, BtGattReadData *notifyData, int status);
 
+/**
+ * @brief Callback invoked when a remote device add or remove its service.
+ *
+ * @param clientId Indicates the ID of the GATT client.
+ */
+typedef void (*ServiceChangeCallback)(int clientId);
+
 typedef struct {
     ConnectionStateChangedCallback ConnectionStateCb;
     ConnectParaUpdateCallback connectParaUpdateCb;
@@ -155,6 +162,7 @@ typedef struct {
     ConfigureMtuSizeCallback configureMtuSizeCb;
     RegisterNotificationCallback registerNotificationCb;
     NotificationCallback notificationCb;
+    ServiceChangeCallback serviceChangeCb;
 } BtGattClientCallbacks;
 
 /**
