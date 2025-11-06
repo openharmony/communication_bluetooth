@@ -153,6 +153,8 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
             if (callbackInfo->errorCode_ == BtStatus::BT_SUCCESS) {
                 HILOGI("SppConnect successfully");
                 callbackInfo->errorCode_ = CODE_SUCCESS;
+            } else if (callbackInfo->errorCode_ == BT_ERR_SPP_CONNECT_FAILED) {
+                callbackInfo->errorCode_ = BT_ERR_INTERNAL_ERROR;
             } else {
                 HILOGE("SppConnect failed");
             }
