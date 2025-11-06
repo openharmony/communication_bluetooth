@@ -703,6 +703,10 @@ public:
     {
         HILOGI("enter, device: %{public}s, res: %{public}d, detail: %{public}d",
             GET_ENCRYPT_ADDR(device), result, detail);
+        if (attributes.size() > values.size()) {
+            HILOGE("attributes size is bigger than values size");
+            return;
+        }
         std::vector<AvrcpCtResponse::ItemAttributes::ItemAttribute> itemAttrs;
         for (int i = 0; i < static_cast<int>(attributes.size()); i++) {
             AvrcpCtResponse::ItemAttributes::ItemAttribute itemAttr;
