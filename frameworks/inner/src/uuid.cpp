@@ -55,7 +55,7 @@ UUID::UUID(const long mostSigBits, const long leastSigBits)
 UUID UUID::FromString(const std::string &name)
 {
     UUID ret;
-    if (name.empty()) {
+    if (name.empty() || !IsValidUuid(name)) {
         return ret;
     }
     std::string tmp = name;
