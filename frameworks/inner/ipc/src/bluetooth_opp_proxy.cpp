@@ -40,7 +40,9 @@ int32_t BluetoothOppProxy::SendFile(const std::string &device,
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG_RET((remote != nullptr), BT_ERR_INTERNAL_ERROR, "get remote fail");
+    int error = remote->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_SEND_FILE), data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     int32_t ret = reply.ReadInt32();
@@ -63,7 +65,9 @@ int32_t BluetoothOppProxy::SetIncomingFileConfirmation(bool accept, int fd)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG_RET((remote != nullptr), BT_ERR_INTERNAL_ERROR, "get remote fail");
+    int error = remote->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_SET_INCOMING_FILE_CONFIRMATION), data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     return reply.ReadInt32();
@@ -77,7 +81,9 @@ int32_t BluetoothOppProxy::GetCurrentTransferInformation(BluetoothIOppTransferIn
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int error = Remote()->SendRequest(static_cast<uint32_t>(
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG_RET((remote != nullptr), BT_ERR_INTERNAL_ERROR, "get remote fail");
+    int error = remote->SendRequest(static_cast<uint32_t>(
         BluetoothOppInterfaceCode::COMMAND_GET_CURRENT_TRANSFER_INFORMATION), data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     int32_t ret = reply.ReadInt32();
@@ -99,7 +105,9 @@ int32_t BluetoothOppProxy::CancelTransfer()
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG_RET((remote != nullptr), BT_ERR_INTERNAL_ERROR, "get remote fail");
+    int error = remote->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_CANCEL_TRANSFER), data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
 
@@ -118,7 +126,9 @@ int32_t BluetoothOppProxy::SetLastReceivedFileUri(const std::string &uri)
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG_RET((remote != nullptr), BT_ERR_INTERNAL_ERROR, "get remote fail");
+    int error = remote->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_SET_LAST_RECEIVED_URI), data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     int32_t ret = reply.ReadInt32();
@@ -137,7 +147,9 @@ void BluetoothOppProxy::RegisterObserver(const sptr<IBluetoothOppObserver> &obse
         MessageOption::TF_ASYNC
     };
 
-    int error = Remote()->SendRequest(
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG((remote != nullptr), "get remote fail");
+    int error = remote->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_REGISTER_OBSERVER), data, reply, option);
     CHECK_AND_RETURN_LOG((error == BT_NO_ERROR), "error: %{public}d", error);
 }
@@ -153,7 +165,9 @@ void BluetoothOppProxy::DeregisterObserver(const sptr<IBluetoothOppObserver> &ob
         MessageOption::TF_ASYNC
     };
 
-    int error = Remote()->SendRequest(
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG((remote != nullptr), "get remote fail");
+    int error = remote->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_DEREGISTER_OBSERVER), data, reply, option);
     CHECK_AND_RETURN_LOG((error == BT_NO_ERROR), "error: %{public}d", error);
 }
@@ -173,7 +187,9 @@ int32_t BluetoothOppProxy::GetDeviceState(const BluetoothRawAddress &device, int
         MessageOption::TF_SYNC
     };
 
-    int error = Remote()->SendRequest(
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG_RET((remote != nullptr), BT_ERR_INTERNAL_ERROR, "get remote fail");
+    int error = remote->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_GET_DEVICE_STATE), data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
 
@@ -197,7 +213,9 @@ int32_t BluetoothOppProxy::GetDevicesByStates(
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int error = Remote()->SendRequest(
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG_RET((remote != nullptr), BT_ERR_INTERNAL_ERROR, "get remote fail");
+    int error = remote->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_GET_DEVICES_BY_STATES), data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     int32_t ret = reply.ReadInt32();
