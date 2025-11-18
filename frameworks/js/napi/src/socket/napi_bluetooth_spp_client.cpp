@@ -123,6 +123,66 @@ std::shared_ptr<SppOption> GetSppOptionFromJS(napi_env env, napi_value object)
     return sppOption;
 }
 
+void ExecuteSppConnect(napi_env env, SppConnectCallbackInfo* callbackInfo)
+{
+    callbackInfo->device_ = std::make_shared<BluetoothRemoteDevice>(callbackInfo->deviceId_, 0);
+    callbackInfo->client_ = std::make_shared<ClientSocket>(*callbackInfo->device_,
+        UUID::FromString(callbackInfo->sppOption_->uuid_),
+        callbackInfo->sppOption_->type_, callbackInfo->sppOption_->secure_);
+
+    callbackInfo->errorCode_ = callbackInfo->client_->Connect(callbackInfo->sppOption_->psm_);
+    if (callbackInfo->errorCode_ == BtStatus::BT_SUCCESS) {
+        HILOGI("SppConnect successfully");
+        callbackInfo->errorCode_ = CODE_SUCCESS;
+    } else if (callbackInfo->errorCode_ == BT_ERR_SPP_CONNECT_FAILED) {
+        callbackInfo->errorCode_ = BT_ERR_INTERNAL_ERROR;
+    } else {
+        HILOGE("SppConnect failed");
+    }
+}
+
+void HandleSppConnectResult(napi_env env, SppConnectCallbackInfo* callbackInfo)
+{
+    napi_value result[ARGS_SIZE_TWO] = {0};
+    napi_value callback = 0;
+    napi_value undefined = 0;
+    napi_value callResult = 0;
+    napi_get_undefined(env, &undefined);
+    if (callbackInfo->errorCode_ == CODE_SUCCESS) {
+        HILOGI("SppConnect execute back success");
+        std::shared_ptr<NapiSppClient> client =  std::make_shared<NapiSppClient>();
+        client->device_ = callbackInfo->device_;
+        client->id_ = NapiSppClient::count++;
+        napi_create_int32(env, client->id_, &result[PARAM1]);
+        client->client_ = callbackInfo->client_;
+        NapiSppClient::clientMap.insert(std::make_pair(client->id_, client));
+        HILOGI("SppConnect execute back successfully");
+    } else {
+        napi_get_undefined(env, &result[PARAM1]);
+        HILOGI("SppConnect execute back failed");
+    }
+
+    if (callbackInfo->callback_) {
+        // Callback mode
+        HILOGI("SppConnect execute Callback mode");
+        result[PARAM0] = GetCallbackErrorValue(callbackInfo->env_, callbackInfo->errorCode_);
+        napi_get_reference_value(env, callbackInfo->callback_, &callback);
+        napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, result, &callResult);
+        napi_delete_reference(env, callbackInfo->callback_);
+    } else {
+        if (callbackInfo->errorCode_ == CODE_SUCCESS) {
+            // Promise mode
+            napi_resolve_deferred(env, callbackInfo->deferred_, result[PARAM1]);
+        } else {
+            HILOGI("SppConnect execute Promise mode failed");
+            napi_reject_deferred(env, callbackInfo->deferred_, result[PARAM1]);
+        }
+    }
+    napi_delete_async_work(env, callbackInfo->asyncWork_);
+    delete callbackInfo;
+    callbackInfo = nullptr;
+}
+
 napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
@@ -142,65 +202,11 @@ napi_value NapiSppClient::SppConnect(napi_env env, napi_callback_info info)
         env, nullptr, resource,
         [](napi_env env, void* data) {
             HILOGI("SppConnect execute");
-            SppConnectCallbackInfo* callbackInfo = static_cast<SppConnectCallbackInfo*>(data);
-            callbackInfo->device_ = std::make_shared<BluetoothRemoteDevice>(callbackInfo->deviceId_, 0);
-            callbackInfo->client_ = std::make_shared<ClientSocket>(*callbackInfo->device_,
-                UUID::FromString(callbackInfo->sppOption_->uuid_),
-                callbackInfo->sppOption_->type_, callbackInfo->sppOption_->secure_);
-            HILOGI("SppConnect client_ constructed");
-            callbackInfo->errorCode_ = callbackInfo->client_->Connect(callbackInfo->sppOption_->psm_);
-            if (callbackInfo->errorCode_ == BtStatus::BT_SUCCESS) {
-                HILOGI("SppConnect successfully");
-                callbackInfo->errorCode_ = CODE_SUCCESS;
-            } else if (callbackInfo->errorCode_ == BT_ERR_SPP_CONNECT_FAILED) {
-                callbackInfo->errorCode_ = BT_ERR_INTERNAL_ERROR;
-            } else {
-                HILOGE("SppConnect failed");
-            }
+            ExecuteSppConnect(env, static_cast<SppConnectCallbackInfo*>(data));
         },
         [](napi_env env, napi_status status, void* data) {
             HILOGI("SppConnect execute back");
-            SppConnectCallbackInfo* callbackInfo = static_cast<SppConnectCallbackInfo*>(data);
-            napi_value result[ARGS_SIZE_TWO] = {0};
-            napi_value callback = 0;
-            napi_value undefined = 0;
-            napi_value callResult = 0;
-            napi_get_undefined(env, &undefined);
-
-            if (callbackInfo->errorCode_ == CODE_SUCCESS) {
-                HILOGI("SppConnect execute back success");
-                std::shared_ptr<NapiSppClient> client =  std::make_shared<NapiSppClient>();
-                client->device_ = callbackInfo->device_;
-                client->id_ = NapiSppClient::count++;
-                napi_create_int32(env, client->id_, &result[PARAM1]);
-                client->client_ = callbackInfo->client_;
-                clientMap.insert(std::make_pair(client->id_, client));
-                HILOGI("SppConnect execute back successfully");
-            } else {
-                napi_get_undefined(env, &result[PARAM1]);
-                HILOGI("SppConnect execute back failed");
-            }
-
-            if (callbackInfo->callback_) {
-                // Callback mode
-                HILOGI("SppConnect execute Callback mode");
-                result[PARAM0] = GetCallbackErrorValue(callbackInfo->env_, callbackInfo->errorCode_);
-                napi_get_reference_value(env, callbackInfo->callback_, &callback);
-                napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, result, &callResult);
-                napi_delete_reference(env, callbackInfo->callback_);
-            } else {
-                if (callbackInfo->errorCode_ == CODE_SUCCESS) {
-                // Promise mode
-                    HILOGI("SppConnect execute Promise mode successfully");
-                    napi_resolve_deferred(env, callbackInfo->deferred_, result[PARAM1]);
-                } else {
-                    HILOGI("SppConnect execute Promise mode failed");
-                    napi_reject_deferred(env, callbackInfo->deferred_, result[PARAM1]);
-                }
-            }
-            napi_delete_async_work(env, callbackInfo->asyncWork_);
-            delete callbackInfo;
-            callbackInfo = nullptr;
+            HandleSppConnectResult(env, static_cast<SppConnectCallbackInfo*>(data));
         },
         static_cast<void*>(callbackInfo), &callbackInfo->asyncWork_);
     if (napi_queue_async_work(env, callbackInfo->asyncWork_) != napi_ok) {
