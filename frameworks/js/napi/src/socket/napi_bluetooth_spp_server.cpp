@@ -335,7 +335,7 @@ napi_value NapiSppServer::SppCloseServerSocket(napi_env env, napi_callback_info 
     std::shared_ptr<NapiSppServer> server = nullptr;
     std::shared_ptr<NapiSppClient> client = nullptr;
 
-    if (NapiSppClient::clientMap[id] != nullptr) {
+    if (NapiSppClient::clientMap.count(id) == KEY_FOUND && NapiSppClient::clientMap[id] != nullptr) {
         client = NapiSppClient::clientMap[id];
         if (client->client_) {
             client->client_->Close();
