@@ -17,13 +17,11 @@
 #define TAIHE_BLUETOOTH_HFP_AG_OBSERVER_H_
 
 #include <shared_mutex>
-#include "stdexcept"
-
+#include "bluetooth_hfp_ag.h"
 #include "ohos.bluetooth.hfp.proj.hpp"
 #include "ohos.bluetooth.hfp.impl.hpp"
 #include "taihe/runtime.hpp"
-
-#include "bluetooth_hfp_ag.h"
+#include "stdexcept"
 #include "taihe_event_module.h"
 
 namespace OHOS {

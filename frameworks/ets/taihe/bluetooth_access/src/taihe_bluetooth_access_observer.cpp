@@ -19,9 +19,8 @@
  
 #include "ohos.bluetooth.access.proj.hpp"
 #include "ohos.bluetooth.access.impl.hpp"
-
-#include "bluetooth_log.h"
 #include "taihe_bluetooth_access_observer.h"
+#include "bluetooth_log.h"
 
 namespace OHOS {
 namespace Bluetooth {

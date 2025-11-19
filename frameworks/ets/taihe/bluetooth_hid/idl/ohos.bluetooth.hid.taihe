@@ -15,10 +15,12 @@
 
 @!namespace("@ohos.bluetooth.hid", "hid")
 @!sts_inject("""
-static { loadLibraryWithPermissionCheck("bluetoothHid_taihe_native.z", "@ohos.bluetooth.hid") }
+static { loadLibrary("bluetoothHid_taihe_native.z") }
 """)
 
-from ohos.bluetooth.baseProfile use BaseProfile; 
+from ohos.bluetooth.baseProfile use BaseProfile;
 interface HidHostProfile : BaseProfile {
+    Connect(deviceId: String): void;
+    Disconnect(deviceId: String): void;
 }
 function CreateHidHostProfile(): HidHostProfile;
