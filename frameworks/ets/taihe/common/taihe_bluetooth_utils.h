@@ -44,39 +44,39 @@ struct TaiheNotifyCharacteristic {
     bool confirm;
 };
 
-enum taihe_status {
-    taihe_ok = 0,
-    taihe_invalid_arg,
-    taihe_object_expected,
-    taihe_string_expected,
-    taihe_name_expected,
-    taihe_function_expected,
-    taihe_number_expected,
-    taihe_boolean_expected,
-    taihe_array_expected,
-    taihe_generic_failure,
-    taihe_pending_exception,
-    taihe_cancelled,
-    taihe_escape_called_twice,
-    taihe_handle_scope_mismatch,
-    taihe_callback_scope_mismatch,
-    taihe_queue_full,
-    taihe_closing,
-    taihe_bigint_expected,
-    taihe_date_expected,
-    taihe_arraybuffer_expected,
-    taihe_detachable_arraybuffer_expected,
-    taihe_would_deadlock,  // unused
-    taihe_create_ark_runtime_too_many_envs = 22,
-    taihe_create_ark_runtime_only_one_env_per_thread = 23,
-    taihe_destroy_ark_runtime_env_not_exist = 24
+enum TaiheStatus {
+    TAIHE_OK = 0,
+    TAIHE_INVALID_ARG,
+    TAIHE_OBJECT_EXPECTED,
+    TAIHE_STRING_EXPECTED,
+    TAIHE_NAME_EXPECTED,
+    TAIHE_FUNCTION_EXPECTED,
+    TAIHE_NUMBER_EXPECTED,
+    TAIHE_BOOLEAN_EXPECTED,
+    TAIHE_ARRAY_EXPECTED,
+    TAIHE_GENERIC_FAILURE,
+    TAIHE_PENDING_EXCEPTION,
+    TAIHE_CANCELLED,
+    TAIHE_ESCAPE_CALLED_TWICE,
+    TAIHE_HANDLE_SCOPE_MISMATCH,
+    TAIHE_CALLBACK_SCOPE_MISMATCH,
+    TAIHE_QUEUE_FULL,
+    TAIHE_CLOSING,
+    TAIHE_BIGINT_EXPECTED,
+    TAIHE_DATE_EXPECTED,
+    TAIHE_ARRAYBUFFER_EXPECTED,
+    TAIHE_DETACHABLE_ARRAYBUFFER_EXPECTED,
+    TAIHE_WOULD_DEADLOCK,  // unused
+    TAIHE_CREATE_ARK_RUNTIME_TOO_MANY_ENVS = 22,
+    TAIHE_CREATE_ARK_RUNTIME_ONLY_ONE_ENV_PER_THREAD = 23,
+    TAIHE_DESTROY_ARK_RUNTIME_ENV_NOT_EXIST = 24
 };
 
 #ifndef TAIHE_BT_CALL_RETURN
 #define TAIHE_BT_CALL_RETURN(func)                                          \
     do {                                                                   \
-        taihe_status ret = (func);                                          \
-        if (ret != taihe_ok) {                                              \
+        TaiheStatus ret = (func);                                          \
+        if (ret != TAIHE_OK) {                                              \
             HILOGE("api call function failed. ret:%{public}d", ret);      \
             return ret;                                                    \
         }                                                                  \
@@ -97,7 +97,7 @@ bool IsValidTransport(int transport);
 bool CheckDeviceIdParam(std::string &addr);
 bool CheckSetConnectStrategyParam(std::string &addr, int32_t &strategy);
 bool CheckPairCredibleDeviceParam(std::string &addr, int &transport);
-taihe_status ParseUuidParams(const std::string &uuid, UUID &outUuid);
+TaiheStatus ParseUuidParams(const std::string &uuid, UUID &outUuid);
 template<typename T>
 void ParseArrayBufferParams(const taihe::array<T>& data, std::vector<T> &outParam)
 {

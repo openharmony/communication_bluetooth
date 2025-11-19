@@ -158,15 +158,15 @@ bool CheckPairCredibleDeviceParam(std::string &addr, int &transport)
     return true;
 }
 
-taihe_status ParseUuidParams(const std::string &uuid, UUID &outUuid)
+TaiheStatus ParseUuidParams(const std::string &uuid, UUID &outUuid)
 {
     if (!IsValidUuid(uuid)) {
         HILOGE("match the UUID faild.");
-        return taihe_invalid_arg;
+        return TAIHE_INVALID_ARG;
     }
     outUuid = ParcelUuid::FromString(uuid);
 
-    return taihe_ok;
+    return TAIHE_OK;
 }
 } // namespace Bluetooth
 } // namespace OHOS

@@ -38,7 +38,7 @@ uintptr_t BleScannerImpl::StartScanPromise(const ohos::bluetooth::ble::ScanFilte
     std::vector<BleScanFilter> scanFilters;
     BleScanSettings settings;
     auto status = CheckBleScanParams(filters, options, scanFilters, settings);
-    TAIHE_BT_ASSERT_RETURN(status == taihe_ok, BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
+    TAIHE_BT_ASSERT_RETURN(status == TAIHE_OK, BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
 
     TAIHE_BT_ASSERT_RETURN(this->GetBleCentralManager() != nullptr,
         BT_ERR_INVALID_PARAM, reinterpret_cast<uintptr_t>(nullptr));
