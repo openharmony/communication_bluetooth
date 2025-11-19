@@ -166,20 +166,20 @@ static GattDescriptor *GetGattcDescriptor(const std::shared_ptr<GattClient> &cli
     return descriptor;
 }
 
-static taihe_status ParseGattClientReadCharacteristicValue(
+static TaiheStatus ParseGattClientReadCharacteristicValue(
     const ohos::bluetooth::ble::BLECharacteristic &characteristic,
     GattClientDeviceImpl *gattClient, GattCharacteristic **outCharacter)
 {
-    TAIHE_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
+    TAIHE_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", TAIHE_INVALID_ARG);
 
     TaiheBleCharacteristic taiheCharacter;
     TAIHE_BT_CALL_RETURN(TaiheParseGattCharacteristic(characteristic, taiheCharacter));
 
     GattCharacteristic *character = GetGattcCharacteristic(gattClient->GetClient(), taiheCharacter);
-    TAIHE_BT_RETURN_IF(character == nullptr || outCharacter == nullptr, "Not found character", taihe_invalid_arg);
+    TAIHE_BT_RETURN_IF(character == nullptr || outCharacter == nullptr, "Not found character", TAIHE_INVALID_ARG);
 
     *outCharacter = character;
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
 static TaihePromiseAndCallback TaiheReadCharacteristicValue(
@@ -189,7 +189,7 @@ static TaihePromiseAndCallback TaiheReadCharacteristicValue(
     HILOGI("enter");
     GattCharacteristic *character = nullptr;
     auto status = ParseGattClientReadCharacteristicValue(characteristic, client, &character);
-    TAIHE_BT_ASSERT_RETURN(status == taihe_ok && client && character, BT_ERR_INVALID_PARAM,
+    TAIHE_BT_ASSERT_RETURN(status == TAIHE_OK && client && character, BT_ERR_INVALID_PARAM,
         TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM));
     TAIHE_BT_ASSERT_RETURN(client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR,
         TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
@@ -236,18 +236,18 @@ void GattClientDeviceImpl::ReadCharacteristicValueAsync(const ohos::bluetooth::b
     }
 }
 
-static taihe_status ParseGattClientReadDescriptorValue(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor,
+static TaiheStatus ParseGattClientReadDescriptorValue(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor,
     GattClientDeviceImpl *gattClient, GattDescriptor **outDescriptor)
 {
-    TAIHE_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
+    TAIHE_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", TAIHE_INVALID_ARG);
 
     TaiheBleDescriptor taiheDescriptor;
     TAIHE_BT_CALL_RETURN(TaiheParseGattDescriptor(bleDescriptor, taiheDescriptor));
     GattDescriptor *descriptor = GetGattcDescriptor(gattClient->GetClient(), taiheDescriptor);
-    TAIHE_BT_RETURN_IF(outDescriptor == nullptr || descriptor == nullptr, "Not found Descriptor", taihe_invalid_arg);
+    TAIHE_BT_RETURN_IF(outDescriptor == nullptr || descriptor == nullptr, "Not found Descriptor", TAIHE_INVALID_ARG);
 
     *outDescriptor = descriptor;
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
 static TaihePromiseAndCallback TaiheReadDescriptorValue(const ohos::bluetooth::ble::BLEDescriptor &bleDescriptor,
@@ -256,7 +256,7 @@ static TaihePromiseAndCallback TaiheReadDescriptorValue(const ohos::bluetooth::b
     HILOGI("enter");
     GattDescriptor *descriptor = nullptr;
     auto status = ParseGattClientReadDescriptorValue(bleDescriptor, client, &descriptor);
-    TAIHE_BT_ASSERT_RETURN(status == taihe_ok && client && descriptor, BT_ERR_INVALID_PARAM,
+    TAIHE_BT_ASSERT_RETURN(status == TAIHE_OK && client && descriptor, BT_ERR_INVALID_PARAM,
         TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM));
     TAIHE_BT_ASSERT_RETURN(client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR,
         TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
@@ -302,18 +302,18 @@ void GattClientDeviceImpl::ReadDescriptorValueAsync(const ohos::bluetooth::ble::
     }
 }
 
-static taihe_status CheckSetCharacteristicChange(const ohos::bluetooth::ble::BLECharacteristic &characteristic,
+static TaiheStatus CheckSetCharacteristicChange(const ohos::bluetooth::ble::BLECharacteristic &characteristic,
     GattCharacteristic **outCharacteristic, GattClientDeviceImpl *gattClient)
 {
-    TAIHE_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", taihe_invalid_arg);
+    TAIHE_BT_RETURN_IF(gattClient == nullptr, "gattClient is nullptr.", TAIHE_INVALID_ARG);
 
     TaiheBleCharacteristic taiheCharacter;
     TAIHE_BT_CALL_RETURN(TaiheParseGattCharacteristic(characteristic, taiheCharacter));
     GattCharacteristic *character = GetGattcCharacteristic(gattClient->GetClient(), taiheCharacter);
-    TAIHE_BT_RETURN_IF(character == nullptr || outCharacteristic == nullptr, "Not found character", taihe_invalid_arg);
+    TAIHE_BT_RETURN_IF(character == nullptr || outCharacteristic == nullptr, "Not found character", TAIHE_INVALID_ARG);
 
     *outCharacteristic = character;
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
 static TaihePromiseAndCallback TaiheSetCharacteristicChangeIndication(
@@ -324,7 +324,7 @@ static TaihePromiseAndCallback TaiheSetCharacteristicChangeIndication(
     GattCharacteristic *character = nullptr;
 
     auto status = CheckSetCharacteristicChange(characteristic, &character, client);
-    TAIHE_BT_ASSERT_RETURN(status == taihe_ok && client && character, BT_ERR_INVALID_PARAM,
+    TAIHE_BT_ASSERT_RETURN(status == TAIHE_OK && client && character, BT_ERR_INVALID_PARAM,
         TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM));
     TAIHE_BT_ASSERT_RETURN(client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR,
         TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));

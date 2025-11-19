@@ -31,7 +31,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-taihe_status TaiheParseGattService(ohos::bluetooth::ble::GattService object, TaiheGattService &outService)
+TaiheStatus TaiheParseGattService(ohos::bluetooth::ble::GattService object, TaiheGattService &outService)
 {
     UUID uuid {};
     bool isPrimary = true;
@@ -59,7 +59,7 @@ taihe_status TaiheParseGattService(ohos::bluetooth::ble::GattService object, Tai
     outService.isPrimary = isPrimary;
     outService.characteristics = std::move(characteristics);
 
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
 namespace {
@@ -133,7 +133,7 @@ uint16_t ConvertGattProperties(const TaiheGattProperties &taiheProperties)
 }
 }  // namespace {}
 
-taihe_status TaiheParseIncludeService(taihe::array<ohos::bluetooth::ble::GattService> object,
+TaiheStatus TaiheParseIncludeService(taihe::array<ohos::bluetooth::ble::GattService> object,
                                       std::vector<TaiheGattService> &outIncludeService)
 {
     for (size_t i = 0; i < object.size(); i++) {
@@ -142,10 +142,10 @@ taihe_status TaiheParseIncludeService(taihe::array<ohos::bluetooth::ble::GattSer
         TAIHE_BT_CALL_RETURN(TaiheParseGattService(element, includeService));
         outIncludeService.push_back(std::move(includeService));
     }
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
-taihe_status TaiheParseGattCharacteristicVec(taihe::array<ohos::bluetooth::ble::BLECharacteristic> object,
+TaiheStatus TaiheParseGattCharacteristicVec(taihe::array<ohos::bluetooth::ble::BLECharacteristic> object,
     std::vector<TaiheBleCharacteristic> &outCharacteristic)
 {
     for (size_t i = 0; i < object.size(); i++) {
@@ -153,10 +153,10 @@ taihe_status TaiheParseGattCharacteristicVec(taihe::array<ohos::bluetooth::ble::
         TAIHE_BT_CALL_RETURN(TaiheParseGattCharacteristic(object[i], characteristic));
         outCharacteristic.push_back(std::move(characteristic));
     }
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
-taihe_status TaiheParseGattCharacteristic(ohos::bluetooth::ble::BLECharacteristic object,
+TaiheStatus TaiheParseGattCharacteristic(ohos::bluetooth::ble::BLECharacteristic object,
     TaiheBleCharacteristic &outCharacteristic)
 {
     TaiheBleCharacteristic characteristic {};
@@ -183,7 +183,7 @@ taihe_status TaiheParseGattCharacteristic(ohos::bluetooth::ble::BLECharacteristi
     if (object.characteristicValueHandle.has_value()) {
         characteristicValueHandle = object.characteristicValueHandle.value();
         TAIHE_BT_RETURN_IF(characteristicValueHandle > 0xFFFF, "Invalid characteristicValueHandle",
-            taihe_invalid_arg);
+            TAIHE_INVALID_ARG);
     }
     if (object.permissions.has_value()) {
         ohos::bluetooth::ble::GattPermissions objectPermissions = object.permissions.value();
@@ -198,10 +198,10 @@ taihe_status TaiheParseGattCharacteristic(ohos::bluetooth::ble::BLECharacteristi
     outCharacteristic.characteristicValueHandle = static_cast<uint16_t>(characteristicValueHandle);
     outCharacteristic.permissions = ConvertGattPermissions(permissions);
 
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
-taihe_status TaiheParseGattDescriptorVec(taihe::array<ohos::bluetooth::ble::BLEDescriptor> object,
+TaiheStatus TaiheParseGattDescriptorVec(taihe::array<ohos::bluetooth::ble::BLEDescriptor> object,
     std::vector<TaiheBleDescriptor> &outDescriptor)
 {
     for (size_t i = 0; i < object.size(); i++) {
@@ -209,10 +209,10 @@ taihe_status TaiheParseGattDescriptorVec(taihe::array<ohos::bluetooth::ble::BLED
         TAIHE_BT_CALL_RETURN(TaiheParseGattDescriptor(object[i], descriptor));
         outDescriptor.push_back(std::move(descriptor));
     }
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
-taihe_status TaiheParseGattDescriptor(ohos::bluetooth::ble::BLEDescriptor object,
+TaiheStatus TaiheParseGattDescriptor(ohos::bluetooth::ble::BLEDescriptor object,
     TaiheBleDescriptor &outDescriptor)
 {
     UUID serviceUuid {};
@@ -230,7 +230,7 @@ taihe_status TaiheParseGattDescriptor(ohos::bluetooth::ble::BLEDescriptor object
     }
     if (object.descriptorHandle.has_value()) {
         descriptorHandle = object.descriptorHandle.value();
-        TAIHE_BT_RETURN_IF(descriptorHandle > 0xFFFF, "Invalid descriptorHandle", taihe_invalid_arg);
+        TAIHE_BT_RETURN_IF(descriptorHandle > 0xFFFF, "Invalid descriptorHandle", TAIHE_INVALID_ARG);
     }
     if (object.permissions.has_value()) {
         ohos::bluetooth::ble::GattPermissions objectPermissions = object.permissions.value();
@@ -244,7 +244,7 @@ taihe_status TaiheParseGattDescriptor(ohos::bluetooth::ble::BLEDescriptor object
     outDescriptor.descriptorHandle = static_cast<uint16_t>(descriptorHandle);
     outDescriptor.permissions = ConvertGattPermissions(permissions);
 
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
 void TaiheParseObjectGattPermissions(ohos::bluetooth::ble::GattPermissions object,
@@ -309,7 +309,7 @@ void TaiheParseObjectGattProperties(ohos::bluetooth::ble::GattProperties object,
     outProperties = properties;
 }
 
-taihe_status TaiheParseNotifyCharacteristic(ohos::bluetooth::ble::NotifyCharacteristic object,
+TaiheStatus TaiheParseNotifyCharacteristic(ohos::bluetooth::ble::NotifyCharacteristic object,
     TaiheNotifyCharacteristic &outCharacter)
 {
     UUID serviceUuid {};
@@ -325,7 +325,7 @@ taihe_status TaiheParseNotifyCharacteristic(ohos::bluetooth::ble::NotifyCharacte
     outCharacter.characterUuid = characterUuid;
     outCharacter.characterValue = std::move(characterValue);
     outCharacter.confirm = confirm;
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
 std::shared_ptr<TaiheAsyncCallback> TaiheParseAsyncCallback(ani_env *env, ani_object info)

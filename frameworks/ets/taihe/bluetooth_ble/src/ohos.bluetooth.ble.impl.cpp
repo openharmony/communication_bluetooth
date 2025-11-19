@@ -104,16 +104,16 @@ static bool IsValidAdvertiserDuration(uint32_t duration)
     return true;
 }
 
-static taihe_status CheckAdvertisingEnableParams(
+static TaiheStatus CheckAdvertisingEnableParams(
     const ohos::bluetooth::ble::AdvertisingEnableParams &advertisingEnableParams,
     uint32_t &outAdvHandle, uint16_t &outDuration, std::shared_ptr<BleAdvertiseCallback> &callback)
 {
     outAdvHandle = advertisingEnableParams.advertisingId;
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
-    TAIHE_BT_RETURN_IF(bleAdvertiser == nullptr, "bleAdvertiser is nullptr", taihe_invalid_arg);
+    TAIHE_BT_RETURN_IF(bleAdvertiser == nullptr, "bleAdvertiser is nullptr", TAIHE_INVALID_ARG);
     if (outAdvHandle != BLE_INVALID_ADVERTISING_HANDLE) {
         callback = bleAdvertiser->GetAdvObserver(outAdvHandle);
-        TAIHE_BT_RETURN_IF(callback == nullptr, "callback is nullptr", taihe_invalid_arg);
+        TAIHE_BT_RETURN_IF(callback == nullptr, "callback is nullptr", TAIHE_INVALID_ARG);
     }
 
     uint32_t duration = 0;
@@ -121,46 +121,46 @@ static taihe_status CheckAdvertisingEnableParams(
         duration = advertisingEnableParams.duration.value();
         if (!IsValidAdvertiserDuration(duration)) {
             HILOGE("Invalid duration: %{public}d", duration);
-            return taihe_invalid_arg;
+            return TAIHE_INVALID_ARG;
         }
         HILOGI("duration: %{public}u", duration);
     }
     outDuration = duration;
 
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
-static taihe_status ParseScanFilterDeviceIdParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
+static TaiheStatus ParseScanFilterDeviceIdParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
                                                       BleScanFilter &bleScanFilter)
 {
     if (scanFilter.deviceId.has_value()) {
         std::string deviceId = std::string(scanFilter.deviceId.value());
         if (!IsValidAddress(deviceId)) {
             HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
-            return taihe_invalid_arg;
+            return TAIHE_INVALID_ARG;
         }
         HILOGI("Scan filter device id is %{public}s", GetEncryptAddr(deviceId).c_str());
         bleScanFilter.SetDeviceId(deviceId);
     }
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
-static taihe_status ParseScanFilterLocalNameParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
+static TaiheStatus ParseScanFilterLocalNameParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
                                                        BleScanFilter &bleScanFilter)
 {
     if (scanFilter.name.has_value()) {
         std::string name = std::string(scanFilter.name.value());
         if (name.empty()) {
             HILOGE("name is empty");
-            return taihe_invalid_arg;
+            return TAIHE_INVALID_ARG;
         }
         HILOGI("Scan filter name is %{public}s", name.c_str());
         bleScanFilter.SetName(name);
     }
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
-static taihe_status ParseScanFilterServiceUuidParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
+static TaiheStatus ParseScanFilterServiceUuidParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
                                                          BleScanFilter &bleScanFilter)
 {
     if (scanFilter.serviceUuid.has_value()) {
@@ -174,10 +174,10 @@ static taihe_status ParseScanFilterServiceUuidParameters(const ohos::bluetooth::
         TAIHE_BT_CALL_RETURN(ParseUuidParams(std::string(scanFilter.serviceUuidMask.value()), uuidMask));
         bleScanFilter.SetServiceUuidMask(uuidMask);
     }
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
-static taihe_status ParseScanFilterSolicitationUuidParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
+static TaiheStatus ParseScanFilterSolicitationUuidParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
                                                               BleScanFilter &bleScanFilter)
 {
     if (scanFilter.serviceSolicitationUuid.has_value()) {
@@ -191,10 +191,10 @@ static taihe_status ParseScanFilterSolicitationUuidParameters(const ohos::blueto
         TAIHE_BT_CALL_RETURN(ParseUuidParams(std::string(scanFilter.serviceSolicitationUuidMask.value()), uuidMask));
         bleScanFilter.SetServiceSolicitationUuidMask(uuidMask);
     }
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
-static taihe_status ParseScanFilterServiceDataParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
+static TaiheStatus ParseScanFilterServiceDataParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
                                                          BleScanFilter &bleScanFilter)
 {
     if (scanFilter.serviceData.has_value()) {
@@ -207,10 +207,10 @@ static taihe_status ParseScanFilterServiceDataParameters(const ohos::bluetooth::
         ParseArrayBufferParams(scanFilter.serviceDataMask.value(), dataMask);
         bleScanFilter.SetServiceDataMask(std::move(dataMask));
     }
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
-static taihe_status ParseScanFilterManufactureDataParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
+static TaiheStatus ParseScanFilterManufactureDataParameters(const ohos::bluetooth::ble::ScanFilter &scanFilter,
                                                              BleScanFilter &bleScanFilter)
 {
     if (scanFilter.manufactureId.has_value()) {
@@ -228,10 +228,10 @@ static taihe_status ParseScanFilterManufactureDataParameters(const ohos::bluetoo
         ParseArrayBufferParams(scanFilter.manufactureDataMask.value(), dataMask);
         bleScanFilter.SetManufactureDataMask(std::move(dataMask));
     }
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
-static taihe_status ParseScanFilter(const ohos::bluetooth::ble::ScanFilter &scanFilter, BleScanFilter &bleScanFilter)
+static TaiheStatus ParseScanFilter(const ohos::bluetooth::ble::ScanFilter &scanFilter, BleScanFilter &bleScanFilter)
 {
     HILOGD("enter");
     TAIHE_BT_CALL_RETURN(ParseScanFilterDeviceIdParameters(scanFilter, bleScanFilter));
@@ -240,21 +240,21 @@ static taihe_status ParseScanFilter(const ohos::bluetooth::ble::ScanFilter &scan
     TAIHE_BT_CALL_RETURN(ParseScanFilterSolicitationUuidParameters(scanFilter, bleScanFilter));
     TAIHE_BT_CALL_RETURN(ParseScanFilterServiceDataParameters(scanFilter, bleScanFilter));
     TAIHE_BT_CALL_RETURN(ParseScanFilterManufactureDataParameters(scanFilter, bleScanFilter));
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
-static taihe_status ParseScanFilterParameters(const taihe::array<ohos::bluetooth::ble::ScanFilter> &filters,
+static TaiheStatus ParseScanFilterParameters(const taihe::array<ohos::bluetooth::ble::ScanFilter> &filters,
                                               std::vector<BleScanFilter> &params)
 {
     HILOGD("enter");
-    TAIHE_BT_RETURN_IF(filters.empty(), "Requires array length > 0", taihe_invalid_arg);
+    TAIHE_BT_RETURN_IF(filters.empty(), "Requires array length > 0", TAIHE_INVALID_ARG);
 
     for (const auto& scanFilter : filters) {
         BleScanFilter bleScanFilter;
         TAIHE_BT_CALL_RETURN(ParseScanFilter(scanFilter, bleScanFilter));
         params.push_back(bleScanFilter);
     }
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
 static void SetReportDelay(const ohos::bluetooth::ble::ScanOptions &scanOptions, BleScanSettings &outSettinngs)
@@ -296,7 +296,7 @@ static void SetCbTypeSensMode(const ohos::bluetooth::ble::ScanOptions &scanOptio
     outSettinngs.SetSensitivityMode(sensitivityMode);
 }
 
-taihe_status CheckBleScanParams(const ohos::bluetooth::ble::ScanFilterNullValue &filters,
+TaiheStatus CheckBleScanParams(const ohos::bluetooth::ble::ScanFilterNullValue &filters,
                                 taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options,
                                 std::vector<BleScanFilter> &outScanfilters,
                                 BleScanSettings &outSettinngs)
@@ -329,7 +329,7 @@ taihe_status CheckBleScanParams(const ohos::bluetooth::ble::ScanFilterNullValue 
         }
     }
     outScanfilters = std::move(scanfilters);
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
 void StartBLEScan(const ohos::bluetooth::ble::ScanFilterNullValue &filters,
@@ -339,7 +339,7 @@ void StartBLEScan(const ohos::bluetooth::ble::ScanFilterNullValue &filters,
     std::vector<BleScanFilter> scanfilters;
     BleScanSettings settings;
     auto status = CheckBleScanParams(filters, options, scanfilters, settings);
-    TAIHE_BT_ASSERT_RETURN_VOID(status == taihe_ok, BT_ERR_INVALID_PARAM);
+    TAIHE_BT_ASSERT_RETURN_VOID(status == TAIHE_OK, BT_ERR_INVALID_PARAM);
 
     int ret = BleCentralManagerGetInstance()->StartScan(settings, scanfilters);
     TAIHE_BT_ASSERT_RETURN_VOID(ret == NO_ERROR || ret == BT_ERR_BLE_SCAN_ALREADY_STARTED, ret);
@@ -354,7 +354,7 @@ taihe::array<taihe::string> GetConnectedBLEDevices()
     return result;
 }
 
-static taihe_status ParseAdvertisingSettingsParameters(const ohos::bluetooth::ble::AdvertiseSetting &inSettings,
+static TaiheStatus ParseAdvertisingSettingsParameters(const ohos::bluetooth::ble::AdvertiseSetting &inSettings,
                                                        BleAdvertiserSettings &outSettings)
 {
     HILOGD("enter");
@@ -364,7 +364,7 @@ static taihe_status ParseAdvertisingSettingsParameters(const ohos::bluetooth::bl
         const uint32_t maxInterval = 16384;
         if (interval < minInterval || interval > maxInterval) {
             HILOGE("Invalid interval: %{public}d", interval);
-            return taihe_invalid_arg;
+            return TAIHE_INVALID_ARG;
         }
         HILOGI("interval: %{public}u", interval);
         outSettings.SetInterval(interval);
@@ -375,7 +375,7 @@ static taihe_status ParseAdvertisingSettingsParameters(const ohos::bluetooth::bl
         const int32_t maxTxPower = 1;
         if (txPower < minTxPower || txPower > maxTxPower) {
             HILOGE("Invalid tx power: %{public}d", txPower);
-            return taihe_invalid_arg;
+            return TAIHE_INVALID_ARG;
         }
         HILOGI("txPower is %{public}d", txPower);
         outSettings.SetTxPower(txPower);
@@ -385,10 +385,10 @@ static taihe_status ParseAdvertisingSettingsParameters(const ohos::bluetooth::bl
         HILOGI("connectable: %{public}d", connectable);
         outSettings.SetConnectable(connectable);
     }
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
-static taihe_status ParseAdvertisDataParameters(const ohos::bluetooth::ble::AdvertiseData &advDataIn,
+static TaiheStatus ParseAdvertisDataParameters(const ohos::bluetooth::ble::AdvertiseData &advDataIn,
                                                 BleAdvertiserData &advDataOut)
 {
     for (auto &serviceUuid: advDataIn.serviceUuids) {
@@ -396,7 +396,7 @@ static taihe_status ParseAdvertisDataParameters(const ohos::bluetooth::ble::Adve
         HILOGI("Service Uuid = %{public}s", std::string(serviceUuid).c_str());
     }
     for (auto &manufacture: advDataIn.manufactureData) {
-        TAIHE_BT_RETURN_IF(manufacture.manufactureId > 0xFFFF, "Invalid manufactureId", taihe_invalid_arg);
+        TAIHE_BT_RETURN_IF(manufacture.manufactureId > 0xFFFF, "Invalid manufactureId", TAIHE_INVALID_ARG);
         advDataOut.AddManufacturerData(manufacture.manufactureId,
             std::string(manufacture.manufactureValue.begin(), manufacture.manufactureValue.end()));
     }
@@ -412,7 +412,7 @@ static taihe_status ParseAdvertisDataParameters(const ohos::bluetooth::ble::Adve
         HILOGI("includeTxPower: %{public}d", advDataIn.includeTxPower.value());
         advDataOut.SetIncludeTxPower(advDataIn.includeTxPower.value());
     }
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
 void StartAdvertising(const ohos::bluetooth::ble::AdvertiseSetting &setting,
@@ -426,14 +426,14 @@ void StartAdvertising(const ohos::bluetooth::ble::AdvertiseSetting &setting,
     BleAdvertiserSettings nativeSettings;
     BleAdvertiserData nativeAdvData;
     BleAdvertiserData nativeRspData;
-    taihe_status status = ParseAdvertisingSettingsParameters(setting, nativeSettings);
-    TAIHE_BT_ASSERT_RETURN_VOID(status == taihe_ok, BT_ERR_INVALID_PARAM);
+    TaiheStatus status = ParseAdvertisingSettingsParameters(setting, nativeSettings);
+    TAIHE_BT_ASSERT_RETURN_VOID(status == TAIHE_OK, BT_ERR_INVALID_PARAM);
     status = ParseAdvertisDataParameters(advData, nativeAdvData);
-    TAIHE_BT_ASSERT_RETURN_VOID(status == taihe_ok, BT_ERR_INVALID_PARAM);
+    TAIHE_BT_ASSERT_RETURN_VOID(status == TAIHE_OK, BT_ERR_INVALID_PARAM);
     if (advResponse.has_value()) {
         ohos::bluetooth::ble::AdvertiseData response = advResponse.value();
         status = ParseAdvertisDataParameters(response, nativeRspData);
-        TAIHE_BT_ASSERT_RETURN_VOID(status == taihe_ok, BT_ERR_INVALID_PARAM);
+        TAIHE_BT_ASSERT_RETURN_VOID(status == TAIHE_OK, BT_ERR_INVALID_PARAM);
     }
 
     int ret = bleAdvertiser->StartAdvertising(nativeSettings, nativeAdvData, nativeRspData, 0,
@@ -451,7 +451,7 @@ static bool IsValidAdvertisingId(int32_t advertisingId)
     return true;
 }
 
-static taihe_status CheckAdvertisingDisableParams(
+static TaiheStatus CheckAdvertisingDisableParams(
     const ohos::bluetooth::ble::AdvertisingDisableParams &advertisingDisableParams,
     uint32_t &outAdvHandle,
     std::shared_ptr<BleAdvertiseCallback> &callback)
@@ -460,16 +460,16 @@ static taihe_status CheckAdvertisingDisableParams(
         ? static_cast<uint32_t>(advertisingDisableParams.advertisingId) : 0;
 
     std::shared_ptr<BleAdvertiser> bleAdvertiser = BleAdvertiserGetInstance();
-    TAIHE_BT_RETURN_IF(bleAdvertiser == nullptr, "bleAdvertiser is nullptr", taihe_invalid_arg);
+    TAIHE_BT_RETURN_IF(bleAdvertiser == nullptr, "bleAdvertiser is nullptr", TAIHE_INVALID_ARG);
     if (outAdvHandle != BLE_INVALID_ADVERTISING_HANDLE) {
         callback = bleAdvertiser->GetAdvObserver(outAdvHandle);
-        TAIHE_BT_RETURN_IF(callback == nullptr, "callback is nullptr", taihe_invalid_arg);
+        TAIHE_BT_RETURN_IF(callback == nullptr, "callback is nullptr", TAIHE_INVALID_ARG);
     }
 
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
-static taihe_status CheckAdvertisingDataWithDuration(const ohos::bluetooth::ble::AdvertisingParams &advertisingParams,
+static TaiheStatus CheckAdvertisingDataWithDuration(const ohos::bluetooth::ble::AdvertisingParams &advertisingParams,
     BleAdvertiserSettings &outSettings, BleAdvertiserData &outAdvData, BleAdvertiserData &outRspData,
     uint16_t &outDuration)
 {
@@ -490,7 +490,7 @@ static taihe_status CheckAdvertisingDataWithDuration(const ohos::bluetooth::ble:
         duration = advertisingParams.duration.value();
         if (!IsValidAdvertiserDuration(duration)) {
             HILOGE("Invalid duration: %{public}d", duration);
-            return taihe_invalid_arg;
+            return TAIHE_INVALID_ARG;
         }
         HILOGI("duration: %{public}u", duration);
     }
@@ -498,7 +498,7 @@ static taihe_status CheckAdvertisingDataWithDuration(const ohos::bluetooth::ble:
     outSettings = std::move(settings);
     outAdvData = std::move(advData);
     outRspData = std::move(advRsp);
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
 static TaihePromiseAndCallback TaiheStartAdvertising(const ohos::bluetooth::ble::AdvertisingParams &advertisingParams,
@@ -518,7 +518,7 @@ static TaihePromiseAndCallback TaiheStartAdvertising(const ohos::bluetooth::ble:
     BleAdvertiserData rspData;
     uint16_t duration = 0;
     auto status = CheckAdvertisingDataWithDuration(advertisingParams, settings, advData, rspData, duration);
-    TAIHE_BT_ASSERT_RETURN(status == taihe_ok, BT_ERR_INVALID_PARAM,
+    TAIHE_BT_ASSERT_RETURN(status == TAIHE_OK, BT_ERR_INVALID_PARAM,
         TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM));
 
     auto callback = std::make_shared<TaiheBluetoothBleAdvertiseCallback>();
@@ -567,7 +567,7 @@ static TaihePromiseAndCallback TaiheDisableAdvertising(
     uint32_t advHandle = 0xFF;
     std::shared_ptr<BleAdvertiseCallback> baseCallback;
     auto status = CheckAdvertisingDisableParams(advertisingDisableParams, advHandle, baseCallback);
-    TAIHE_BT_ASSERT_RETURN(status == taihe_ok, BT_ERR_INVALID_PARAM,
+    TAIHE_BT_ASSERT_RETURN(status == TAIHE_OK, BT_ERR_INVALID_PARAM,
         TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM));
     // compatible with XTS
     TAIHE_BT_ASSERT_RETURN(advHandle != BLE_INVALID_ADVERTISING_HANDLE,
@@ -629,7 +629,7 @@ static TaihePromiseAndCallback TaiheEnableAdvertising(
     uint16_t duration = 0;
     std::shared_ptr<BleAdvertiseCallback> baseCallback;
     auto status = CheckAdvertisingEnableParams(advertisingEnableParams, advHandle, duration, baseCallback);
-    TAIHE_BT_ASSERT_RETURN(status == taihe_ok, BT_ERR_INVALID_PARAM,
+    TAIHE_BT_ASSERT_RETURN(status == TAIHE_OK, BT_ERR_INVALID_PARAM,
         TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM));
     // compatible with XTS
     TAIHE_BT_ASSERT_RETURN(advHandle != BLE_INVALID_ADVERTISING_HANDLE,

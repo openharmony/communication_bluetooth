@@ -73,7 +73,7 @@ void GattServerImpl::RemoveService(taihe::string_view serviceUuid)
     HILOGI("enter");
     UUID uuid;
     auto status = ParseUuidParams(std::string(serviceUuid), uuid);
-    TAIHE_BT_ASSERT_RETURN_VOID((status == taihe_ok && server_ != nullptr), BT_ERR_INVALID_PARAM);
+    TAIHE_BT_ASSERT_RETURN_VOID((status == TAIHE_OK && server_ != nullptr), BT_ERR_INVALID_PARAM);
 
     int ret = BT_NO_ERROR;
     auto primaryService = server_->GetService(uuid, true);
@@ -120,18 +120,18 @@ static GattCharacteristic *GetGattCharacteristic(const std::shared_ptr<GattServe
     return character;
 }
 
-static taihe_status CheckNotifyCharacteristicChangedEx(
+static TaiheStatus CheckNotifyCharacteristicChangedEx(
     taihe::string_view deviceId, const ohos::bluetooth::ble::NotifyCharacteristic &info,
     std::string &outDeviceId, TaiheNotifyCharacteristic &outCharacter)
 {
     std::string bdaddr = static_cast<std::string>(deviceId);
     TaiheNotifyCharacteristic character;
-    TAIHE_BT_RETURN_IF(!IsValidAddress(bdaddr), "Invalid bdaddr", taihe_invalid_arg);
+    TAIHE_BT_RETURN_IF(!IsValidAddress(bdaddr), "Invalid bdaddr", TAIHE_INVALID_ARG);
     TAIHE_BT_CALL_RETURN(TaiheParseNotifyCharacteristic(info, character));
 
     outDeviceId = std::move(bdaddr);
     outCharacter = std::move(character);
-    return taihe_ok;
+    return TAIHE_OK;
 }
 
 static TaihePromiseAndCallback TaiheNotifyCharacteristicChanged(taihe::string_view deviceId,
@@ -142,7 +142,7 @@ static TaihePromiseAndCallback TaiheNotifyCharacteristicChanged(taihe::string_vi
     std::string devId {};
     TaiheNotifyCharacteristic notifyCharacter;
     auto status = CheckNotifyCharacteristicChangedEx(deviceId, notifyCharacteristic, devId, notifyCharacter);
-    TAIHE_BT_ASSERT_RETURN((status == taihe_ok && taiheServer && taiheServer->GetServer()),
+    TAIHE_BT_ASSERT_RETURN((status == TAIHE_OK && taiheServer && taiheServer->GetServer()),
         BT_ERR_INVALID_PARAM, TaihePromiseAndCallback::Failure(BT_ERR_INVALID_PARAM));
 
     auto func = [server = taiheServer->GetServer(), notifyCharacter, devId]() {

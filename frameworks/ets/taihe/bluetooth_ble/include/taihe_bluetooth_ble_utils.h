@@ -43,7 +43,7 @@ enum class SensitivityMode {
 
 int GetCurrentSdkVersion(void);
 int GetSDKAdaptedStatusCode(int status);
-taihe_status CheckBleScanParams(const ohos::bluetooth::ble::ScanFilterNullValue &filters,
+TaiheStatus CheckBleScanParams(const ohos::bluetooth::ble::ScanFilterNullValue &filters,
                                 taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options,
                                 std::vector<BleScanFilter> &outScanfilters,
                                 BleScanSettings &outSettinngs);
