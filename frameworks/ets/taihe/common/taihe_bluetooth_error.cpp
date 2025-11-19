@@ -50,7 +50,7 @@ static std::map<int32_t, std::string> taiheErrMsgMap {
     { BtErrCode::BT_ERR_SPP_DEVICE_NOT_FOUND, "Device is not inquired." },
     { BtErrCode::BT_ERR_SPP_IO, "SPP IO error." },
     { BtErrCode::BT_ERR_NO_ACTIVE_HFP_DEVICE, "Active hfp device is not exist." },
-    { BtErrCode::BT_ERR_NULL_HFP_STATE_MACHINE, "Hfp state machine is not null." },
+    { BtErrCode::BT_ERR_NULL_HFP_STATE_MACHINE, "Hfp state machine is null." },
     { BtErrCode::BT_ERR_HFP_NOT_CONNECT, "Hfp is not connected." },
     { BtErrCode::BT_ERR_SCO_HAS_BEEN_CONNECTED, "Sco has been connected." },
     { BtErrCode::BT_ERR_VR_HAS_BEEN_STARTED, "Voice recognition has been started." },

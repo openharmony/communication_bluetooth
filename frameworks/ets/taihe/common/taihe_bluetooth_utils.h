@@ -101,7 +101,7 @@ TaiheStatus ParseUuidParams(const std::string &uuid, UUID &outUuid);
 template<typename T>
 void ParseArrayBufferParams(const taihe::array<T>& data, std::vector<T> &outParam)
 {
-    for (const auto item : data) {
+    for (const auto& item : data) {
         outParam.push_back(item);
     }
 }

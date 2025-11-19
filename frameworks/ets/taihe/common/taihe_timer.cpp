@@ -69,7 +69,7 @@ void TaiheTimer::Unregister(uint32_t timerId)
         return;
     }
 
-    HILOGI("timerId: %{public}d", timerId);
+    HILOGI("timerId: %{public}u", timerId);
     if (timer_ == nullptr) {
         HILOGE("timer_ is nulptr");
         return;

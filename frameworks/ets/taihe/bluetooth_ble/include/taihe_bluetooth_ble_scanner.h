@@ -31,7 +31,7 @@ public:
         taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options);
     uintptr_t StopScanPromise();
 
-    std::shared_ptr<BleCentralManager> &GetBleCentralManager()
+    const std::shared_ptr<BleCentralManager> &GetBleCentralManager()
     {
         return bleCentralManager_;
     }

@@ -186,7 +186,10 @@ void AddPersistentDeviceId(::taihe::string_view deviceId)
 void NotifyDialogResult(::ohos::bluetooth::access::NotifyDialogResultParams notifyDialogResultParams)
 {
     HILOGI("enter");
-    uint32_t dialogType = notifyDialogResultParams.dialogType.get_value();
+    uint32_t dialogType = 0;
+    if(notifyDialogResultParams.dialogType.is_valid()) {
+        dialogType = notifyDialogResultParams.dialogType.get_value();
+    }
     bool dialogResult = notifyDialogResultParams.dialogResult;
     int32_t ret = BluetoothHost::GetDefaultHost().NotifyDialogResult(dialogType, dialogResult);
     HILOGI("NotifyDialogResult err: %{public}d", ret);

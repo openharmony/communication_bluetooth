@@ -46,7 +46,7 @@ int GetSDKAdaptedStatusCode(int status);
 TaiheStatus CheckBleScanParams(const ohos::bluetooth::ble::ScanFilterNullValue &filters,
                                taihe::optional_view<ohos::bluetooth::ble::ScanOptions> options,
                                std::vector<BleScanFilter> &outScanfilters,
-                               BleScanSettings &outSettinngs);
+                               BleScanSettings &outSettings);
 ani_object ConvertBLECharacteristicToJS(ani_env *env, GattCharacteristic &characteristic);
 ani_object ConvertBLEDescriptorToJS(ani_env *env, GattDescriptor& descriptor);
 ani_object ConvertBLEDescriptorVectorToJS(ani_env *env, std::vector<GattDescriptor> &descriptors);

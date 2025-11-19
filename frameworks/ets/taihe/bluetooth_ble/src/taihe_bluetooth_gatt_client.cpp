@@ -329,19 +329,14 @@ static TaihePromiseAndCallback TaiheSetCharacteristicChangeIndication(
     TAIHE_BT_ASSERT_RETURN(client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR,
         TaihePromiseAndCallback::Failure(BT_ERR_INTERNAL_ERROR));
 
-    bool isNotify = false;
-    auto func = [gattClient = client->GetClient(), character, enable, isNotify]() {
+    auto func = [gattClient = client->GetClient(), character, enable]() {
         if (character == nullptr) {
             HILOGE("character is nullptr");
             return TaiheAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
         }
         int ret = BT_ERR_INTERNAL_ERROR;
         if (gattClient) {
-            if (isNotify) {
-                ret = gattClient->SetNotifyCharacteristic(*character, enable);
-            } else {
-                ret = gattClient->SetIndicateCharacteristic(*character, enable);
-            }
+            ret = gattClient->SetIndicateCharacteristic(*character, enable);
             ret = GetSDKAdaptedStatusCode(GattClientDeviceImpl::GattStatusFromService(ret)); // Adaptation for old sdk
         }
         return TaiheAsyncWorkRet(ret);

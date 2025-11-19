@@ -85,7 +85,7 @@ private:
     std::function<TaiheAsyncWorkRet(void)> func_;
     std::shared_ptr<TaiheAsyncCallback> taiheAsyncCallback_ = nullptr;
     std::atomic_bool triggered_ = false; // Indicates whether the asynchronous callback is called.
-    std::shared_ptr<TaiheHaEventUtils> haUtils_; // HA report tool, which is transferred fron the original API interface
+    std::shared_ptr<TaiheHaEventUtils> haUtils_; // HA report tool, which is transferred from the original API interface
 };
 
 class TaiheAsyncWorkFactory {
