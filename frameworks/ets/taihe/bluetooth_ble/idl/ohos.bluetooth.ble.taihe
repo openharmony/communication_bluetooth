@@ -17,7 +17,7 @@
 
 @!sts_inject_into_module("import { BusinessError, AsyncCallback } from '@ohos.base';")
 @!sts_inject("""
-static { loadLibrary("bluetoothBle_taihe_native.z") }
+static { loadLibraryWithPermissionCheck("bluetoothBle_taihe_native.z", "@ohos.bluetooth.ble") }
 """)
 from ohos.bluetooth.constant use ProfileConnectionState;
 

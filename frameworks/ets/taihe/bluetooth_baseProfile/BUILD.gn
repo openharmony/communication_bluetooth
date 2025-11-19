@@ -60,8 +60,9 @@ taihe_shared_library("bluetoothBaseProfile_taihe_native") {
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
   ]
   external_deps = [
+    "c_utils:utils",
     "hilog:libhilog",
-    "c_utils:utils"
+    "ipc:ipc_single",
   ]
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection

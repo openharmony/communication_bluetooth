@@ -15,7 +15,7 @@
 
 @!namespace("@ohos.bluetooth.baseProfile", "baseProfile")
 @!sts_inject("""
-static { loadLibrary("bluetoothBaseProfile_taihe_native.z") }
+static { loadLibraryWithPermissionCheck("bluetoothBaseProfile_taihe_native.z", "@ohos.bluetooth.baseProfile") }
 """)
 
 from ohos.bluetooth.constant use ProfileConnectionState;

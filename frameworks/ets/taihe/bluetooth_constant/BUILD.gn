@@ -54,6 +54,7 @@ taihe_shared_library("bluetoothConstant_taihe_native") {
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
   ]
   external_deps = [
+    "c_utils:utils",
     "hilog:libhilog",
   ]
   sanitize = {
