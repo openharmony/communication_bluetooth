@@ -134,7 +134,7 @@ uint16_t ConvertGattProperties(const TaiheGattProperties &taiheProperties)
 }  // namespace {}
 
 TaiheStatus TaiheParseIncludeService(taihe::array<ohos::bluetooth::ble::GattService> object,
-                                      std::vector<TaiheGattService> &outIncludeService)
+                                     std::vector<TaiheGattService> &outIncludeService)
 {
     for (size_t i = 0; i < object.size(); i++) {
         ohos::bluetooth::ble::GattService element = object[i];
