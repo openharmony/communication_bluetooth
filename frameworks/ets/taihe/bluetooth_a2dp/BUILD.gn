@@ -10,7 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
- 
+
 import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 import("//build/ohos/taihe_idl/taihe.gni")
@@ -25,11 +25,11 @@ copy_taihe_idl("bluetooth_a2dp_taihe") {
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/bluetooth_baseProfile:bluetooth_baseProfile_taihe"
   ]
 }
- 
+
 subsystem_name = "communication"
 part_name = "bluetooth"
 taihe_generated_file_path_a2dp = "$taihe_file_path/out/$subsystem_name/$part_name/a2dp"
- 
+
 ohos_taihe("run_taihe") {
   taihe_generated_file_path = "${taihe_generated_file_path_a2dp}"
   deps = [ ":bluetooth_a2dp_taihe" ]
@@ -38,7 +38,7 @@ ohos_taihe("run_taihe") {
     "$taihe_generated_file_path/src/ohos.bluetooth.a2dp.abi.c",
   ]
 }
- 
+
 taihe_shared_library("bluetoothA2dp_taihe_native") {
   taihe_generated_file_path = "${taihe_generated_file_path_a2dp}"
   part_name = "$part_name"
@@ -55,6 +55,8 @@ taihe_shared_library("bluetoothA2dp_taihe_native") {
     "src/ani_constructor.cpp",
     "src/ohos.bluetooth.a2dp.impl.cpp",
     "src/taihe_bluetooth_a2dp_src_observer.cpp",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_bluetooth_error.cpp",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_bluetooth_utils.cpp",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_event_module.cpp"
   ]
   deps = [
@@ -63,9 +65,7 @@ taihe_shared_library("bluetoothA2dp_taihe_native") {
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/bluetooth_baseProfile:bluetoothBaseProfile_taihe_native"
   ]
   external_deps = [
-    "c_utils:utils",
     "hilog:libhilog",
-    "ipc:ipc_single",
   ]
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
@@ -76,7 +76,7 @@ taihe_shared_library("bluetoothA2dp_taihe_native") {
     debug = false
   }
 }
- 
+
 generate_static_abc("bluetoothA2dp_abc") {
   base_url = "${taihe_generated_file_path_a2dp}"
   files = [ "${taihe_generated_file_path_a2dp}/@ohos.bluetooth.a2dp.ets" ]
@@ -86,7 +86,7 @@ generate_static_abc("bluetoothA2dp_abc") {
 }
 
 ohos_prebuilt_etc("bluetoothA2dp_etc") {
-  source = "$target_out_dir/bluetoothA2dp_abc.abc"           
+  source = "$target_out_dir/bluetoothA2dp_abc.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"

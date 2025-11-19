@@ -14,8 +14,10 @@
  */
 
 @!namespace("@ohos.bluetooth.ble", "ble")
+
+@!sts_inject_into_module("import { BusinessError, AsyncCallback } from '@ohos.base';")
 @!sts_inject("""
-static { loadLibraryWithPermissionCheck("bluetoothBle_taihe_native.z", "@ohos.bluetooth.ble") }
+static { loadLibrary("bluetoothBle_taihe_native.z") }
 """)
 from ohos.bluetooth.constant use ProfileConnectionState;
 
@@ -42,9 +44,8 @@ enum MatchMode: i32 {
 
 struct AdvertisingEnableParams {
     advertisingId: i32;
-    duration: Optional<i16>;
+    duration: Optional<i32>;
 }
-
 
 struct DescriptorWriteRequest {
     deviceId: String;
@@ -68,8 +69,8 @@ struct DescriptorReadRequest {
 }
 
 struct AdvertiseSetting {
-    interval: Optional<i16>;
-    txPower: Optional<i8>;
+    interval: Optional<i32>;
+    txPower: Optional<i32>;
     connectable: Optional<bool>;
 }
 
@@ -89,9 +90,14 @@ struct ScanFilter {
     serviceSolicitationUuidMask: Optional<String>;
     serviceData: Optional<@arraybuffer Array<u8>>;
     serviceDataMask: Optional<@arraybuffer Array<u8>>;
-    manufactureId: Optional<i16>;
+    manufactureId: Optional<i32>;
     manufactureData: Optional<@arraybuffer Array<u8>>;
     manufactureDataMask: Optional<@arraybuffer Array<u8>>;
+}
+
+union ScanFilterNullValue {
+    filters: Array<ScanFilter>;
+    @null nValue;
 }
 
 struct CharacteristicReadRequest {
@@ -144,6 +150,7 @@ enum PhyType: i32 {
 
 enum ScanReportMode: i32 {
     NORMAL = 1,
+    BATCH = 2,
     FENCE_SENSITIVITY_LOW = 10,
     FENCE_SENSITIVITY_HIGH = 11
 }
@@ -154,7 +161,12 @@ struct BLECharacteristic {
     characteristicValue: @arraybuffer Array<u8>;
     descriptors: Array<BLEDescriptor>;
     properties: Optional<GattProperties>;
-    characteristicValueHandle: Optional<i16>;
+    characteristicValueHandle: Optional<i32>;
+    permissions: Optional<GattPermissions>;
+}
+
+@class struct BLECharacteristicInfo {
+   @extends characteristic: BLECharacteristic;
 }
 
 struct AdvertisingStateChangeInfo {
@@ -174,7 +186,12 @@ struct BLEDescriptor {
     characteristicUuid: String;
     descriptorUuid: String;
     descriptorValue: @arraybuffer Array<u8>;
-    descriptorHandle: Optional<i16>;
+    descriptorHandle: Optional<i32>;
+    permissions: Optional<GattPermissions>;
+}
+
+@class struct BLEDescriptorInfo {
+    @extends descriptor: BLEDescriptor;
 }
 
 struct GattProperties {
@@ -183,11 +200,33 @@ struct GattProperties {
     read: Optional<bool>;
     notify: Optional<bool>;
     indicate: Optional<bool>;
+    broadcast: Optional<bool>;
+    authenticatedSignedWrite: Optional<bool>;
+    extendedProperties: Optional<bool>;
+}
+
+@class struct GattPropertiesInfo {
+    @extends gattProperties: GattProperties;
 }
 
 enum GattWriteType: i32 {
     WRITE = 1,
     WRITE_NO_RESPONSE = 2
+}
+
+struct GattPermissions {
+    read: Optional<bool>;
+    readEncrypted: Optional<bool>;
+    readEncryptedMitm: Optional<bool>;
+    write: Optional<bool>;
+    writeEncrypted: Optional<bool>;
+    writeEncryptedMitm: Optional<bool>;
+    writeSigned: Optional<bool>;
+    writeSignedMitm: Optional<bool>;
+}
+
+@class struct GattPermissionsInfo {
+    @extends gattPermissions: GattPermissions;
 }
 
 function StopAdvertising(): void;
@@ -198,12 +237,43 @@ interface GattClientDevice {
     Disconnect(): void;
 
     Close(): void;
+
+    @gen_async("getDeviceName")
+    @gen_promise("getDeviceName")
+    GetDeviceNameSync(): String;
+
+    @rename("readCharacteristicValue")
+    ReadCharacteristicValuePromise(characteristic: BLECharacteristic):  @sts_type("Promise<BLECharacteristic>") Opaque;
+
+    @rename("readCharacteristicValue")
+    ReadCharacteristicValueAsync(characteristic: BLECharacteristic, callback: @sts_type("AsyncCallback<BLECharacteristic>") Opaque): void;
+
+    @rename("readDescriptorValue")
+    ReadDescriptorValuePromise(descriptor: BLEDescriptor):  @sts_type("Promise<BLEDescriptor>") Opaque;
+
+    @rename("readDescriptorValue")
+    ReadDescriptorValueAsync(descriptor: BLEDescriptor, callback: @sts_type("AsyncCallback<BLEDescriptor>") Opaque): void;
+
+    @rename("setCharacteristicChangeIndication")
+    SetCharacteristicChangeIndicationPromise(characteristic: BLECharacteristic, enable: bool):  @sts_type("Promise<void>") Opaque;
+
+    @rename("setCharacteristicChangeIndication")
+    SetCharacteristicChangeIndicationAsync(characteristic: BLECharacteristic, enable: bool, callback: @sts_type("AsyncCallback<void>") Opaque): void;
 }
 
 function CreateGattClientDevice(deviceId: String): GattClientDevice;
 
 interface GattServer {
     Close(): void;
+    AddService(service: GattService): void;
+    RemoveService(serviceUuid: String): void;
+    SendResponse(serverResponse: ServerResponse): void;
+
+    @rename("notifyCharacteristicChanged")
+    NotifyCharacteristicChangedPromise(deviceId: String, notifyCharacteristic: NotifyCharacteristic):  @sts_type("Promise<void>") Opaque;
+
+    @rename("notifyCharacteristicChanged")
+    NotifyCharacteristicChangedAsync(deviceId: String, notifyCharacteristic: NotifyCharacteristic, callback: @sts_type("AsyncCallback<void>") Opaque): void;
 }
 
 function CreateGattServer(): GattServer;
@@ -220,10 +290,10 @@ struct AdvertisingParams {
     advertisingSettings: AdvertiseSetting;
     advertisingData: AdvertiseData;
     advertisingResponse: Optional<AdvertiseData>;
-    duration: Optional<i16>;
+    duration: Optional<i32>;
 }
 struct ManufactureData {
-    manufactureId: i16;
+    manufactureId: i32;
     manufactureValue: @arraybuffer Array<u8>;
 }
 
@@ -244,8 +314,37 @@ struct BLEConnectionChangeState {
     state: ProfileConnectionState;
 }
 
+struct AdvertisingDisableParams {
+    advertisingId: i32;
+}
+
 interface BleScanner {
+    @rename("startScan")
+    StartScanPromise(filters: ScanFilterNullValue, options: Optional<ScanOptions>):  @sts_type("Promise<void>") Opaque;
+
+    @rename("stopScan")
+    StopScanPromise(): @sts_type("Promise<void>") Opaque;
 }
 
 function CreateBleScanner(): BleScanner;
+function GetConnectedBLEDevices(): Array<String>;
+function StartBLEScan(filters: ScanFilterNullValue, options: Optional<ScanOptions>): void;
+function StartAdvertising(setting: AdvertiseSetting, advData: AdvertiseData, advResponse: Optional<AdvertiseData>): void;
 
+@rename("startAdvertising")
+function StartAdvertisingPromise(advertisingParams: AdvertisingParams): @sts_type("Promise<int>") Opaque;
+
+@rename("startAdvertising")
+function StartAdvertisingAsync(advertisingParams: AdvertisingParams, callback: @sts_type("AsyncCallback<int>") Opaque): void;
+
+@rename("disableAdvertising")
+function DisableAdvertisingPromise(advertisingDisableParams: AdvertisingDisableParams):  @sts_type("Promise<void>") Opaque;
+
+@rename("disableAdvertising")
+function DisableAdvertisingAsync(advertisingDisableParams: AdvertisingDisableParams, callback: @sts_type("AsyncCallback<void>") Opaque): void;
+
+@rename("enableAdvertising")
+function EnableAdvertisingPromise(advertisingEnableParams: AdvertisingEnableParams): @sts_type("Promise<void>") Opaque;
+
+@rename("enableAdvertising")
+function EnableAdvertisingAsync(advertisingEnableParams: AdvertisingEnableParams, callback: @sts_type("AsyncCallback<void>") Opaque): void;

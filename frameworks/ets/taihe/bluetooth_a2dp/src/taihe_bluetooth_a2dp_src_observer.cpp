@@ -19,10 +19,9 @@
 
 #include "ohos.bluetooth.a2dp.proj.hpp"
 #include "ohos.bluetooth.a2dp.impl.hpp"
-
-#include "bluetooth_log.h"
 #include "bluetooth_utils.h"
 #include "taihe_bluetooth_a2dp_src_observer.h"
+#include "bluetooth_log.h"
 
 namespace OHOS {
 namespace Bluetooth {

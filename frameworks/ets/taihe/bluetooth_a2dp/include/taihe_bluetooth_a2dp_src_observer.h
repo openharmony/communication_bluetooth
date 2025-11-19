@@ -17,13 +17,11 @@
 #define TAIHE_BLUETOOTH_A2DP_SRC_OBSERVER_H_
 
 #include <shared_mutex>
-#include "stdexcept"
-
+#include "bluetooth_a2dp_src.h"
 #include "ohos.bluetooth.a2dp.proj.hpp"
 #include "ohos.bluetooth.a2dp.impl.hpp"
 #include "taihe/runtime.hpp"
-
-#include "bluetooth_a2dp_src.h"
+#include "stdexcept"
 #include "taihe_event_module.h"
 
 namespace OHOS {

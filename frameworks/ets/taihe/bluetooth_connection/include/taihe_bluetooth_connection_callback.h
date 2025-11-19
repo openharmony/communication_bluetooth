@@ -17,14 +17,11 @@
 #define TAIHE_BLUETOOTH_CONNECTION_CALLBACK_H
 
 #include <shared_mutex>
-#include "stdexcept"
-
+#include "bluetooth_host.h"
 #include "ohos.bluetooth.connection.proj.hpp"
 #include "ohos.bluetooth.connection.impl.hpp"
 #include "taihe/runtime.hpp"
-
-#include "bluetooth_host.h"
-
+#include "stdexcept"
 
 namespace OHOS {
 namespace Bluetooth {

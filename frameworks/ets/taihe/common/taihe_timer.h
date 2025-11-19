@@ -13,16 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef TAIHE_BLUETOOTH_UTILS_H_
-#define TAIHE_BLUETOOTH_UTILS_H_
+#ifndef TAIHE_TIMER_H
+#define TAIHE_TIMER_H
+
+#include <memory>
+
+#include "timer.h"
 
 namespace OHOS {
 namespace Bluetooth {
+class TaiheTimer {
+public:
+    using TimerCallback = std::function<void ()>;
+    static constexpr uint32_t DEFAULT_TIMEOUT = 10000; // 10s
 
-enum class ScanReportType {
-    ON_FOUND = 1, // the found of advertisement packet
-    ON_LOST = 2 // the lost of advertisement packet
+    static TaiheTimer *GetInstance(void);
+
+    TaiheTimer();
+    ~TaiheTimer();
+
+    int Register(const TimerCallback& callback, uint32_t &outTimerId, uint32_t interval = DEFAULT_TIMEOUT);
+    void Unregister(uint32_t timerId);
+private:
+    std::unique_ptr<OHOS::Utils::Timer> timer_ {nullptr};
 };
-}
-}
-#endif // TAIHE_BLUETOOTH_UTILS_H_
+}  // namespace Bluetooth
+}  // namespace OHOS
+#endif // TAIHE_TIMER_H

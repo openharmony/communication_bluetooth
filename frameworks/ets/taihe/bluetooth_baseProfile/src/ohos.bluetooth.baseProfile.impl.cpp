@@ -13,18 +13,13 @@
  * limitations under the License.
  */
 
-#include "stdexcept"
-
 #include "ohos.bluetooth.baseProfile.proj.hpp"
 #include "ohos.bluetooth.baseProfile.impl.hpp"
 #include "taihe/runtime.hpp"
+#include "stdexcept"
 
-using namespace taihe;
-using namespace ohos::bluetooth::baseProfile;
-
-namespace {
-// To be implemented.
-
+namespace OHOS {
+namespace Bluetooth {
 class BaseProfileImpl {
 public:
     BaseProfileImpl()
@@ -35,12 +30,33 @@ public:
     void On(::taihe::string_view type, ::taihe::callback_view<void(
         ::ohos::bluetooth::baseProfile::StateChangeParam const& data)> callback)
     {}
-    
+
     void Off(::taihe::string_view type, ::taihe::optional_view<::taihe::callback_view<void(
         ::ohos::bluetooth::baseProfile::StateChangeParam const& data)>> callback)
     {}
+
+    ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(taihe::string_view deviceId)
+    {
+        return ohos::bluetooth::constant::ProfileConnectionState(
+            ohos::bluetooth::constant::ProfileConnectionState::key_t::STATE_DISCONNECTED);
+    }
+
+    taihe::array<taihe::string> GetConnectedDevices()
+    {
+        return {};
+    }
+
+    ohos::bluetooth::baseProfile::ConnectionStrategy GetConnectionStrategySync(taihe::string_view deviceId)
+    {
+        return ohos::bluetooth::baseProfile::ConnectionStrategy(
+            ohos::bluetooth::baseProfile::ConnectionStrategy::key_t::CONNECTION_STRATEGY_UNSUPPORTED);
+    }
+
+    void SetConnectionStrategySync(taihe::string_view deviceId,
+                                   ohos::bluetooth::baseProfile::ConnectionStrategy strategy) {}
 };
-}  // namespace
+}  // namespace Bluetooth
+}  // namespace OHOS
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
