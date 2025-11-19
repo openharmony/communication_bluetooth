@@ -577,7 +577,7 @@ bool IsBluetoothDiscovering()
     bool isDiscovering = false;
     int32_t err = host->IsBtDiscovering(isDiscovering);
     TAIHE_BT_ASSERT_RETURN(err == BT_NO_ERROR, err, isDiscovering);
-    HILOGE("isBluetoothDiscovering :%{public}d", isDiscovering);
+    HILOGI("isBluetoothDiscovering :%{public}d", isDiscovering);
 
     return isDiscovering;
 }

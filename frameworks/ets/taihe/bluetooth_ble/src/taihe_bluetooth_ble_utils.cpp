@@ -224,10 +224,11 @@ ani_object ConvertBLECharacteristicToJS(ani_env *env, GattCharacteristic &charac
     ani_arraybuffer characteristicValue = {};
     {
         void* characteristicValueData = {};
-        env->CreateArrayBuffer(valueSize * (sizeof(uint8_t) / sizeof(char)),
+        env->CreateArrayBuffer(valueSize,
             &characteristicValueData, &characteristicValue);
         if (memcpy_s(reinterpret_cast<uint8_t*>(characteristicValueData), valueSize, valueData, valueSize) != EOK) {
             HILOGE("memcpy_s error");
+            return {};
         }
     }
 
