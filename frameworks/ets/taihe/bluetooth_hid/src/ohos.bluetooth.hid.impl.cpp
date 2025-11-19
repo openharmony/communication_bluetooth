@@ -38,7 +38,7 @@ public:
         profile->RegisterObserver(observer_);
     }
 
-    void On(::taihe::string_view type, ::taihe::callback_view<void(
+    void OnConnectionStateChange(::taihe::callback_view<void(
         ::ohos::bluetooth::baseProfile::StateChangeParam const& data)> callback)
     {
         if (observer_) {
@@ -46,7 +46,7 @@ public:
         }
     }
 
-    void Off(::taihe::string_view type, ::taihe::optional_view<::taihe::callback<void(
+    void OffConnectionStateChange(::taihe::optional_view<::taihe::callback<void(
         ::ohos::bluetooth::baseProfile::StateChangeParam const& data)>> callback)
     {
         if (observer_) {
