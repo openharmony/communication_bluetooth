@@ -659,7 +659,6 @@ int32_t HandsFreeAudioGateway::IsAudioConnected(bool &isAudioOn)
 
 bool HandsFreeAudioGateway::SetActiveDevice(const BluetoothRemoteDevice &device)
 {
-    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return false;
@@ -667,7 +666,16 @@ bool HandsFreeAudioGateway::SetActiveDevice(const BluetoothRemoteDevice &device)
 
     sptr<IBluetoothHfpAg> proxy = GetRemoteProxy<IBluetoothHfpAg>(PROFILE_HFP_AG);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
-
+    std::string currentAddress = pimpl->GetActiveDevice().GetDeviceAddr();
+    std::string address = device.GetDeviceAddr();
+    if (currentAddress.empty() && (address == NULL_ADDRESS || address == EMPTY_ADDRESS)) {
+        HILOGD("targetDevice is nullptr");
+        return true;
+    }
+    if (currentAddress == address) {
+        HILOGD("same device: %{public}s", GET_ENCRYPT_ADDR(device));
+        return true;
+    }
     return pimpl->SetActiveDevice(device);
 }
 
