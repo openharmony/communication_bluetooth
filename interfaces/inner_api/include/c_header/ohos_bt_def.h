@@ -394,5 +394,14 @@ typedef struct {
     /** UUID field */
     char *uuid;
 } BtUuid;
+
+typedef enum {
+    /** Default priority */
+    OHOS_SOCKET_PRIORITY_DEFAULT = 0x00,
+    /** Priority won't be preempted in limited resource condition */
+    OHOS_SOCKET_PRIORITY_NON_PREEMPTIBLE = 0x01,
+    /** Priority won't be refused by frequent connect limit */
+    OHOS_SOCKET_PRIORITY_NO_REFUSE_FREQUENT_CONNECT = 0x10,
+} BtSocketPriority;
 #endif
 /** @} */

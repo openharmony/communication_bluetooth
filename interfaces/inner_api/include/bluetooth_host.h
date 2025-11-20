@@ -906,6 +906,16 @@ public:
      * @since 21
      */
     int32_t SetCallingPackageName(const std::string &address, const std::string &packageName);
+
+    /**
+      * @brief Set connection priority for incoming or existed socket connection.
+      *
+      * @param address The remote device address.
+      * @param priority Connection priority {@link BtLinkPriority}.
+      * @return Returns the operation result status {@link BtStatus}.
+      * @since 21
+     */
+    int SetConnectionPriority(const std::string &address, int priority);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
