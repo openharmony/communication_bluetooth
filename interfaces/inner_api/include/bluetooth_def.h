@@ -1751,6 +1751,15 @@ enum DialogBoxType {
     BLUETOOTH_SWITCH = 0,
 };
 
+enum BtLinkPriority {
+    /** Default priority */
+    BT_LINK_PRIORITY_DEFAULT = 0x00,
+    /** Priority won't be preempted in limited resource condition */
+    BT_LINK_PRIORITY_NON_PREEMPTIBLE = 0x01,
+    /** Priority won't be refused by frequent connect limit */
+    BT_LINK_PRIORITY_NO_REFUSE_FREQUENT_CONNECT = 0x10,
+};
+
 #define DECLARE_WRITABLE_NAPI_FUNCTION(name, func)                                 \
     {                                                                              \
         (name), nullptr, (func), nullptr, nullptr, nullptr, napi_writable, nullptr \

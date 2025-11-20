@@ -232,6 +232,15 @@ int SocketUpdateCocConnectionParams(BluetoothCocUpdateSocketParam* param, const 
  */
 int GetRandomAddress(const BdAddr *realAddr, BdAddr *randomAddr, uint64_t tokenId);
 
+/**
+ * @brief Set connection priority for incoming or existed socket connection.
+ *
+ * @param bdAddr The remote device address.
+ * @param priority Connection priority {@link BtSocketPriority}.
+ * @return Returns the operation result status {@link BtStatus}.
+ */
+int SetConnectionPriority(const BdAddr *bdAddr, BtSocketPriority priority);
+
 #ifdef __cplusplus
 }
 #endif
