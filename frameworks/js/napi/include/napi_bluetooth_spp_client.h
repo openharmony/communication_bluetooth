@@ -26,6 +26,8 @@ namespace OHOS {
 namespace Bluetooth {
 const int RFCOMM_SOCKET_BUFFER_SIZE = 1024;
 const int L2CAP_SOCKET_BUFFER_SIZE = 65535;
+const size_t KEY_NOT_FOUND = 0;
+const size_t KEY_FOUND = 1;
 
 struct SppConnectCallbackInfo : public AsyncCallbackInfo {
     std::shared_ptr<ClientSocket> client_ = nullptr;

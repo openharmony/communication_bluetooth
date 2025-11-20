@@ -239,7 +239,7 @@ napi_value NapiSppClient::SppCloseClientSocket(napi_env env, napi_callback_info 
     auto status = CheckSppCloseClientSocketParams(env, info, id);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
-    if (clientMap[id]) {
+    if (clientMap.count(id) == KEY_FOUND && clientMap[id] != nullptr) {
         client = clientMap[id];
     } else {
         HILOGE("no such key in map.");
@@ -340,7 +340,8 @@ napi_value NapiSppClient::SppWrite(napi_env env, napi_callback_info info)
 
     auto status = CheckSppWriteParams(env, info, id, &totalBuf, totalSize);
     NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok, BT_ERR_INVALID_PARAM);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, clientMap[id] > 0, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, clientMap.count(id) == KEY_FOUND, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_RETURN_FALSE(env, clientMap[id] != nullptr, BT_ERR_INTERNAL_ERROR);
     std::shared_ptr<OutputStream> outputStream = clientMap[id]->client_->GetOutputStream();
     while (totalSize) {
         int result = outputStream->Write(totalBuf, totalSize);
@@ -432,8 +433,9 @@ napi_status CheckSppClientOn(napi_env env, napi_callback_info info)
 
     NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM1]), "Wrong argument type. Int expected.", napi_invalid_arg);
 
+    NAPI_BT_RETURN_IF(NapiSppClient::clientMap.count(id) == KEY_NOT_FOUND, "client is nullptr.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(NapiSppClient::clientMap[id] == nullptr, "client is nullptr.", napi_invalid_arg);
     std::shared_ptr<NapiSppClient> client = NapiSppClient::clientMap[id];
-    NAPI_BT_RETURN_IF(!client, "client is nullptr.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(client->sppReadFlag, "client is reading... please off first", napi_invalid_arg);
     client->sppReadFlag = true;
     client->callbackInfos_[type] = callbackInfo;
@@ -469,9 +471,10 @@ napi_status CheckSppClientOff(napi_env env, napi_callback_info info)
     NAPI_BT_RETURN_IF(type != REGISTER_SPP_READ_TYPE, "Invalid type.", napi_invalid_arg);
 
     NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM1]), "Wrong argument type. Int expected.", napi_invalid_arg);
-
+ 
+    NAPI_BT_RETURN_IF(NapiSppClient::clientMap.count(id) == KEY_NOT_FOUND, "client is nullptr.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(NapiSppClient::clientMap[id] == nullptr, "client is nullptr.", napi_invalid_arg);
     std::shared_ptr<NapiSppClient> client = NapiSppClient::clientMap[id];
-    NAPI_BT_RETURN_IF(!client, "client is nullptr.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(napi_release_threadsafe_function(client->sppReadThreadSafeFunc_, napi_tsfn_abort),
         "innner error",
         napi_invalid_arg);
@@ -491,6 +494,10 @@ napi_value NapiSppClient::Off(napi_env env, napi_callback_info info)
 
 void NapiSppClient::SppRead(int id)
 {
+    if (clientMap.count(id) == KEY_NOT_FOUND) {
+        HILOGE("thread start failed.");
+        return;
+    }
     auto client = clientMap[id];
     if (client == nullptr || !client->sppReadFlag || client->callbackInfos_[REGISTER_SPP_READ_TYPE] == nullptr) {
         HILOGE("thread start failed.");
@@ -588,7 +595,8 @@ napi_value NapiSppClient::SppWriteAsync(napi_env env, napi_callback_info info)
 
     auto status = CheckSppWriteParams(env, info, id, &totalBuf, totalSize);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, clientMap[id] > 0, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, clientMap.count(id) == KEY_FOUND, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, clientMap[id] != nullptr, BT_ERR_INTERNAL_ERROR);
     auto client = clientMap[id];
     NAPI_BT_ASSERT_RETURN_UNDEF(env, client != nullptr, BT_ERR_INVALID_PARAM);
     std::shared_ptr<OutputStream> outputStream = client->client_->GetOutputStream();
@@ -640,8 +648,9 @@ napi_value NapiSppClient::SppReadAsync(napi_env env, napi_callback_info info)
     int id = -1;
     auto status = CheckSppReadParams(env, info, id);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, clientMap.count(id) == KEY_FOUND, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, clientMap[id] != nullptr, BT_ERR_INVALID_PARAM);
     auto client = clientMap[id];
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, client != nullptr, BT_ERR_INVALID_PARAM);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, !client->sppReadFlag, BT_ERR_INVALID_PARAM);
     client->sppReadFlag = true;
     std::shared_ptr<InputStream> inputStream = client->client_->GetInputStream();
@@ -658,11 +667,11 @@ napi_value NapiSppClient::SppReadAsync(napi_env env, napi_callback_info info)
             err = ReadData(inputStream, bufferSize, buffer);
         }
         auto object = std::make_shared<NapiNativeArrayBuffer>(buffer);
-        auto client = clientMap[id];
-        if (client == nullptr) {
+        if (clientMap.count(id) == KEY_NOT_FOUND || clientMap[id] == nullptr) {
             HILOGI("client is nullptr");
             return NapiAsyncWorkRet(BT_ERR_SPP_IO, object);
         }
+        auto client = clientMap[id];
         client->sppReadFlag = false;
         return NapiAsyncWorkRet(err, object);
     };
@@ -689,8 +698,9 @@ napi_value NapiSppClient::GetDeviceId(napi_env env, napi_callback_info info)
     int id = -1;
     auto status = CheckSppFdParams(env, info, id);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, clientMap.count(id) == KEY_FOUND, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, clientMap[id] != nullptr, BT_ERR_INVALID_PARAM);
     auto client = clientMap[id];
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, client != nullptr, BT_ERR_INVALID_PARAM);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, client->client_ != nullptr, BT_ERR_INVALID_PARAM);
     BluetoothRemoteDevice remoteDevice = client->client_->GetRemoteDevice();
     std::string addr = remoteDevice.GetDeviceAddr();
@@ -707,7 +717,7 @@ napi_value NapiSppClient::IsConnected(napi_env env, napi_callback_info info)
     auto status = CheckSppFdParams(env, info, id);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     napi_value result = nullptr;
-    if (!clientMap.count(id)) {
+    if (clientMap.count(id) == KEY_NOT_FOUND) {
         napi_get_boolean(env, isConnected, &result);
         return result;
     }
@@ -725,8 +735,9 @@ napi_value NapiSppClient::GetMaxReceiveDataSize(napi_env env, napi_callback_info
     int id = -1;
     auto status = CheckSppFdParams(env, info, id);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, clientMap.count(id) == KEY_FOUND, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, clientMap[id] != nullptr, BT_ERR_INVALID_PARAM);
     auto client = clientMap[id];
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, client != nullptr, BT_ERR_INVALID_PARAM);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, client->client_ != nullptr, BT_ERR_INVALID_PARAM);
     int32_t maxReceiveDataSize = static_cast<int32_t>(client->client_->GetMaxReceivePacketSize());
     napi_value result = nullptr;
@@ -740,8 +751,9 @@ napi_value NapiSppClient::GetMaxTransmitDataSize(napi_env env, napi_callback_inf
     int id = -1;
     auto status = CheckSppFdParams(env, info, id);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, clientMap.count(id) == KEY_FOUND, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, clientMap[id] != nullptr, BT_ERR_INVALID_PARAM);
     auto client = clientMap[id];
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, client != nullptr, BT_ERR_INVALID_PARAM);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, client->client_ != nullptr, BT_ERR_INVALID_PARAM);
     int32_t maxTransmitDataSize = static_cast<int32_t>(client->client_->GetMaxTransmitPacketSize());
     napi_value result = nullptr;
