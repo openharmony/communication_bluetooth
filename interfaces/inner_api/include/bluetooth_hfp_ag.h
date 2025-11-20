@@ -438,6 +438,10 @@ private:
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(HandsFreeAudioGateway);
     BLUETOOTH_DECLARE_IMPL();
 
+    // The empty address
+    inline static const std::string NULL_ADDRESS {""};
+    inline static const std::string EMPTY_ADDRESS {"00:00:00:00:00:00"};
+
 #ifdef DTFUZZ_TEST
     friend class BluetoothNoDestructor<HandsFreeAudioGateway>;
 #endif
