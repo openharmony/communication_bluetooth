@@ -38,64 +38,68 @@ struct SensingInfo {
     SensingInfo()
         : addr_(INVALID_MAC_ADDRESS), uuid_(INVALID_UUID_STRING), resourceId_(0), pkgName_(INVALID_PKGNAME),
         isServer_(false), interval_(0), connectable_(false), payloadLen_(0), bussinessType_(INVALID_BUSSINESS_TYPE),
-        scanMode_(0)
+        scanMode_(0), sensingArray_({})
     {}
     ~SensingInfo() {}
 
     // used by ble fastest conn decision
     explicit SensingInfo(const std::string &addr)
         : addr_(addr), uuid_(INVALID_UUID_STRING), resourceId_(0), pkgName_(INVALID_PKGNAME), isServer_(false),
-        interval_(0), connectable_(false), payloadLen_(0), bussinessType_(INVALID_BUSSINESS_TYPE), scanMode_(0)
+        interval_(0), connectable_(false), payloadLen_(0), bussinessType_(INVALID_BUSSINESS_TYPE), scanMode_(0),
+        sensingArray_({})
     {}
     // used by gatt connect SensingInfo construct
     explicit SensingInfo(uint32_t resourceId)
         : addr_(INVALID_MAC_ADDRESS), uuid_(INVALID_UUID_STRING), resourceId_(resourceId), pkgName_(INVALID_PKGNAME),
         isServer_(false), interval_(0), connectable_(false), payloadLen_(0), bussinessType_(INVALID_BUSSINESS_TYPE),
-        scanMode_(0)
+        scanMode_(0), sensingArray_({})
     {}
     SensingInfo(const std::string &addr, uint32_t resourceId)
         : addr_(addr), uuid_(INVALID_UUID_STRING), resourceId_(resourceId), pkgName_(INVALID_PKGNAME),
         isServer_(false), interval_(0), connectable_(false), payloadLen_(0), bussinessType_(INVALID_BUSSINESS_TYPE),
-        scanMode_(0)
+        scanMode_(0), sensingArray_({})
     {}
     // used by gatt pkgName SensingInfo construct
     SensingInfo(const std::string &pkgName, bool isServer)
         : addr_(INVALID_MAC_ADDRESS), uuid_(INVALID_UUID_STRING), resourceId_(0), pkgName_(pkgName),
         isServer_(isServer), interval_(0), connectable_(false), payloadLen_(0), bussinessType_(INVALID_BUSSINESS_TYPE),
-        scanMode_(0)
+        scanMode_(0), sensingArray_({})
     {}
     SensingInfo(const std::string &addr, const std::string &pkgName, bool isServer)
         : addr_(addr), uuid_(INVALID_UUID_STRING), resourceId_(0), pkgName_(pkgName), isServer_(isServer),
-        interval_(0), connectable_(false), payloadLen_(0), bussinessType_(INVALID_BUSSINESS_TYPE), scanMode_(0)
+        interval_(0), connectable_(false), payloadLen_(0), bussinessType_(INVALID_BUSSINESS_TYPE), scanMode_(0),
+        sensingArray_({})
     {}
     // used by socket pkgName SensingInfo construct
     SensingInfo(const std::string uuid, const std::string pkgName)
         : addr_(INVALID_MAC_ADDRESS), uuid_(uuid), resourceId_(0), pkgName_(pkgName), isServer_(false), interval_(0),
-        connectable_(false), payloadLen_(0), bussinessType_(INVALID_BUSSINESS_TYPE), scanMode_(0)
+        connectable_(false), payloadLen_(0), bussinessType_(INVALID_BUSSINESS_TYPE), scanMode_(0),
+        sensingArray_({})
     {}
     // used by ble conn interval update
     SensingInfo(const std::string &addr, uint16_t interval)
         : addr_(addr), uuid_(INVALID_UUID_STRING), resourceId_(0), pkgName_(INVALID_PKGNAME), isServer_(false),
         interval_(interval), connectable_(false), payloadLen_(0), bussinessType_(INVALID_BUSSINESS_TYPE),
-        scanMode_(0)
+        scanMode_(0), sensingArray_({})
     {}
     // used by stack sensing info transfer
     SensingInfo(const std::string &addr, const std::string &uuid, uint32_t resourceId, uint16_t interval)
         : addr_(addr), uuid_(uuid), resourceId_(resourceId), pkgName_(INVALID_PKGNAME), isServer_(false),
         interval_(interval), connectable_(false), payloadLen_(0), bussinessType_(INVALID_BUSSINESS_TYPE),
-        scanMode_(0)
+        scanMode_(0), sensingArray_({})
     {}
     // used by ble adv sensing info transfer
     SensingInfo(const BleAdvData &bleAdvData, uint32_t resourceId, uint16_t interval)
         : addr_(INVALID_MAC_ADDRESS), uuid_(bleAdvData.uuid_), resourceId_(resourceId), pkgName_(INVALID_PKGNAME),
         isServer_(false), interval_(interval), connectable_(bleAdvData.connectable_),
-        payloadLen_(bleAdvData.payloadLen_), bussinessType_(bleAdvData.bussinessType_), scanMode_(0)
+        payloadLen_(bleAdvData.payloadLen_), bussinessType_(bleAdvData.bussinessType_), scanMode_(0),
+        sensingArray_({})
     {}
     // used by ble scan sensing info transfer
     SensingInfo(int scanMode, int scanStatus)
         : addr_(INVALID_MAC_ADDRESS), uuid_(INVALID_UUID_STRING), resourceId_(0), pkgName_(INVALID_PKGNAME),
         isServer_(false), interval_(0), connectable_(false), payloadLen_(0), bussinessType_(INVALID_BUSSINESS_TYPE),
-        scanMode_(scanMode)
+        scanMode_(scanMode), sensingArray_({})
     {}
 
     std::string addr_;
@@ -108,6 +112,7 @@ struct SensingInfo {
     int payloadLen_;
     std::string bussinessType_;
     int scanMode_;
+    std::vector<std::string> sensingArray_;
 };
 }
 }

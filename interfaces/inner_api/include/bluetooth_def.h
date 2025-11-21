@@ -1706,6 +1706,7 @@ struct SensingInfo {
     int payloadLen_;
     std::string bussinessType_;
     int scanMode_;
+    std::vector<std::string> sensingArray_;
 };
 
 enum class SATELLITE_CONTROL_MODE {
