@@ -38,31 +38,31 @@ namespace Bluetooth {
  */
 struct A2dpCodecInfo {
     // Codec priority
-    uint32_t codecPriority;
+    uint32_t codecPriority = 0;
 
     // Codec type
-    uint8_t codecType;
+    uint8_t codecType = 0;
 
     // Codec sample
-    uint32_t sampleRate;
+    uint32_t sampleRate = 0;
 
     // Codec bits per sample
-    uint8_t bitsPerSample;
+    uint8_t bitsPerSample = 0;
 
     // Codec channel mode
-    uint8_t channelMode;
+    uint8_t channelMode = 0;
 
     // Codec specific value1
-    uint64_t codecSpecific1;
+    uint64_t codecSpecific1 = 0;
 
     // Codec specific value2
-    uint64_t codecSpecific2;
+    uint64_t codecSpecific2 = 0;
 
     // Codec specific value3
-    uint64_t codecSpecific3;
+    uint64_t codecSpecific3 = 0;
 
     // Codec specific value4
-    uint64_t codecSpecific4;
+    uint64_t codecSpecific4 = 0;
 };
 
 /**
