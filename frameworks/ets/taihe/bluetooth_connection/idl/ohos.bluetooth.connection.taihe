@@ -17,7 +17,7 @@
 @!sts_inject("""
 static { loadLibraryWithPermissionCheck("bluetoothConnection_taihe_native.z", "@ohos.bluetooth.connection") }
 """)
-from ohos.bluetooth.constant use MajorClass, MajorMinorClass;
+from ohos.bluetooth.constant use MajorClass, MajorMinorClass, ProfileConnectionState, ProfileId, ProfileUuids;
 
 @!sts_inject("""
 export function on(type: string, cb: (arg_0: Object) => void) {
@@ -114,6 +114,17 @@ enum DeviceChargeState: i32 {
     DEVICE_SUPER_CHARGE_IN_CHARGING = 3
 }
 
+enum DeviceType: i32 {
+    DEVICE_TYPE_DEFAULT = 0,
+    DEVICE_TYPE_CAR = 1,
+    DEVICE_TYPE_HEADSET = 2,
+    DEVICE_TYPE_HEARING = 3,
+    DEVICE_TYPE_GLASSES = 4,
+    DEVICE_TYPE_WATCH = 5,
+    DEVICE_TYPE_SPEAKER = 6,
+    DEVICE_TYPE_OTHERS = 7
+}
+
 struct BondStateParam {
     deviceId: String;
     state: BondState;
@@ -161,15 +172,101 @@ enum ControlObject: i32 {
     LEFT_RIGHT_EAR = 2
 }
 
+struct TrustedPairedDevices {
+    trustedPairedDevices: Array<TrustedPairedDevice>;
+}
+
+struct TrustedPairedDevice {
+    sn: String;
+    deviceType: String;
+    modelId: String;
+    manufactory: String;
+    productId: String;
+    hiLinkVersion: String;
+    macAddress: String;
+    serviceType: String;
+    serviceId: String;
+    deviceName: String;
+    uuids: String;
+    bluetoothClass: i32;
+    token: @arraybuffer Array<u8>;
+    deviceNameTime: i64;
+    secureAdvertisingInfo: @arraybuffer Array<u8>;
+    pairState: i32;
+}
+
 function GetRemoteProductId(deviceId: String): String;
 
-@overload("getRemoteDeviceName")
-function GetRemoteDeviceNameWithAlias(deviceId: String, alias: Optional<bool>): String;
-@overload("getRemoteDeviceName")
-function GetRemoteDeviceName(deviceId: String): String;
+function GetRemoteDeviceName(deviceId: String, @optional alias: Optional<bool>): String;
 
 function GetPairedDevices(): Array<String>;
 
 function SetBluetoothScanMode(mode: ScanMode, duration: i32): void;
 
 function GetRemoteDeviceClass(deviceId: String): DeviceClass;
+
+@promise function ControlDeviceAction(controlDeviceActionParams: ControlDeviceActionParams): void;
+
+@promise function GetLastConnectionTime(deviceId: String): i64;
+
+@promise function GetRemoteDeviceType(deviceId: String): DeviceType;
+
+@promise function UpdateCloudBluetoothDevice(trustedPairedDevices: TrustedPairedDevices): void;
+
+@promise function GetRemoteDeviceBatteryInfo(deviceId: String): BatteryInfo;
+
+@promise function SetRemoteDeviceName(deviceId: String, name: String): void;
+
+@promise function SetRemoteDeviceType(deviceId: String, type: DeviceType): void;
+
+function GetBluetoothScanMode(): ScanMode;
+
+function GetProfileConnectionState(profileId: Optional<ProfileId>): ProfileConnectionState;
+
+function GetLocalName(): String;
+
+function GetPairState(deviceId: String): BondState;
+
+function StartBluetoothDiscovery(): void;
+
+function IsBluetoothDiscovering(): bool;
+
+function StopBluetoothDiscovery(): void;
+
+function SetDevicePairingConfirmation(deviceId: String, accept: bool): void;
+
+@gen_async("connectAllowedProfiles")
+@gen_promise("connectAllowedProfiles")
+function ConnectAllowedProfilesSync(deviceId: String): void;
+
+@gen_async("getRemoteProfileUuids")
+@gen_promise("getRemoteProfileUuids")
+function GetRemoteProfileUuidsSync(deviceId: String): Array<ProfileUuids>;
+
+@gen_async("pairDevice")
+@gen_promise("pairDevice")
+function PairDeviceSync(deviceId: String): void;
+
+@gen_async("disconnectAllowedProfiles")
+@gen_promise("disconnectAllowedProfiles")
+function DisconnectAllowedProfilesSync(deviceId: String): void;
+
+@gen_async("getLocalProfileUuids")
+@gen_promise("getLocalProfileUuids")
+function GetLocalProfileUuidsSync(): Array<ProfileUuids>;
+
+@gen_async("setDevicePinCode")
+@gen_promise("setDevicePinCode")
+function SetDevicePinCodeSync(deviceId: String, code: String): void;
+
+@gen_async("cancelPairingDevice")
+@gen_promise("cancelPairingDevice")
+function CancelPairingDeviceSync(deviceId: String): void;
+
+@gen_async("cancelPairedDevice")
+@gen_promise("cancelPairedDevice")
+function CancelPairedDeviceSync(deviceId: String): void;
+
+@gen_async("pairCredibleDevice")
+@gen_promise("pairCredibleDevice")
+function PairCredibleDeviceSync(deviceId: String, transport: BluetoothTransport): void;

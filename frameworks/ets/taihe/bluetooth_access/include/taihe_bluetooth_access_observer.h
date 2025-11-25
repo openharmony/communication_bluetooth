@@ -17,12 +17,10 @@
 #define TAIHE_BLUETOOTH_ACCESS_OBSERVER_H
 
 #include <shared_mutex>
-#include "stdexcept"
-
 #include "ohos.bluetooth.access.proj.hpp"
 #include "ohos.bluetooth.access.impl.hpp"
 #include "taihe/runtime.hpp"
-
+#include "stdexcept"
 #include "bluetooth_host.h"
 
 #ifndef BT_MODULE_NAME

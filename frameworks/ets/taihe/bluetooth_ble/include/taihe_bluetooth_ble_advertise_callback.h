@@ -16,13 +16,15 @@
 #ifndef TAIHE_BLUETOOTH_BLE_ADVERTISE_CALLBACK_H
 #define TAIHE_BLUETOOTH_BLE_ADVERTISE_CALLBACK_H
 
-#include "stdexcept"
-
-#include "ohos.bluetooth.ble.proj.hpp"
-#include "ohos.bluetooth.ble.impl.hpp"
-#include "taihe/runtime.hpp"
-
 #include "bluetooth_ble_advertiser.h"
+#include "bluetooth_errorcode.h"
+#include "bluetooth_log.h"
+#include "event_handler.h"
+#include "ohos.bluetooth.ble.impl.hpp"
+#include "ohos.bluetooth.ble.proj.hpp"
+#include "stdexcept"
+#include "taihe_async_callback.h"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -40,6 +42,8 @@ public:
     void OnSetAdvDataEvent(int result) override;
     void OnGetAdvHandleEvent(int result, int advHandle) override;
     void OnChangeAdvResultEvent(int result, int advHandle) override;
+
+    TaiheAsyncWorkMap asyncWorkMap_ {};
 
     int advHandle_ = -1;
 };

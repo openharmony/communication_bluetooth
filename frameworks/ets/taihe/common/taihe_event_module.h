@@ -17,11 +17,11 @@
 #define TAIHE_EVENT_MODULE_H
 
 #include <shared_mutex>
-#include "stdexcept"
 #include <vector>
 
-#include <taihe/callback.hpp>
-#include <taihe/optional.hpp>
+#include "stdexcept"
+#include "taihe/callback.hpp"
+#include "taihe/optional.hpp"
 #include "taihe/runtime.hpp"
 
 namespace OHOS {

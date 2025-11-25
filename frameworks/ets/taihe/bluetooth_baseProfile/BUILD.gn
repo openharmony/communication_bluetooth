@@ -10,7 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
- 
+
 import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 import("//build/ohos/taihe_idl/taihe.gni")
@@ -25,11 +25,11 @@ copy_taihe_idl("bluetooth_baseProfile_taihe") {
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/bluetooth_constant:bluetooth_constant_taihe"
   ]
 }
- 
+
 subsystem_name = "communication"
 part_name = "bluetooth"
 taihe_generated_file_path_baseProfile = "$taihe_file_path/out/$subsystem_name/$part_name/baseProfile"
- 
+
 ohos_taihe("run_taihe") {
   taihe_generated_file_path = "${taihe_generated_file_path_baseProfile}"
   deps = [ ":bluetooth_baseProfile_taihe" ]
@@ -38,7 +38,7 @@ ohos_taihe("run_taihe") {
     "$taihe_generated_file_path/src/ohos.bluetooth.baseProfile.abi.c",
   ]
 }
- 
+
 taihe_shared_library("bluetoothBaseProfile_taihe_native") {
   shlib_type = "ani"
   taihe_generated_file_path = "${taihe_generated_file_path_baseProfile}"
@@ -62,7 +62,7 @@ taihe_shared_library("bluetoothBaseProfile_taihe_native") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "c_utils:utils"
+    "ipc:ipc_single",
   ]
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
@@ -73,7 +73,7 @@ taihe_shared_library("bluetoothBaseProfile_taihe_native") {
     debug = false
   }
 }
- 
+
 generate_static_abc("bluetoothBaseProfile_abc") {
   base_url = "${taihe_generated_file_path_baseProfile}"
   files = [ "${taihe_generated_file_path_baseProfile}/@ohos.bluetooth.baseProfile.ets" ]
@@ -83,7 +83,7 @@ generate_static_abc("bluetoothBaseProfile_abc") {
 }
 
 ohos_prebuilt_etc("bluetoothBaseProfile_etc") {
-  source = "$target_out_dir/bluetoothBaseProfile_abc.abc"   
+  source = "$target_out_dir/bluetoothBaseProfile_abc.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"

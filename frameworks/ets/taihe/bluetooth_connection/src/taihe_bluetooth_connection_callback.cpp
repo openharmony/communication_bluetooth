@@ -17,16 +17,14 @@
 #define LOG_TAG "bt_taihe_connection_observer"
 #endif
 
+#include <string>
 #include <memory>
 #include <map>
-#include <string>
-
 #include "ohos.bluetooth.connection.proj.hpp"
 #include "ohos.bluetooth.connection.impl.hpp"
-
+#include "taihe_bluetooth_connection_callback.h"
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
-#include "taihe_bluetooth_connection_callback.h"
 
 namespace OHOS {
 namespace Bluetooth {

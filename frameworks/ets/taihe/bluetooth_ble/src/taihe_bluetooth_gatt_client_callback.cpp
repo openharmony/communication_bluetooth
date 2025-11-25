@@ -13,9 +13,12 @@
  * limitations under the License.
  */
 
+#include "taihe_bluetooth_gatt_client_callback.h"
+
 #include "bluetooth_log.h"
 #include "bluetooth_errorcode.h"
-#include "taihe_bluetooth_gatt_client_callback.h"
+#include "taihe_bluetooth_ble_utils.h"
+#include "taihe_bluetooth_gatt_client.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -30,11 +33,17 @@ void TaiheGattClientCallback::OnCharacteristicChanged(const GattCharacteristic &
 void TaiheGattClientCallback::OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)
 {
     HILOGI("UUID: %{public}s, ret: %{public}d", characteristic.GetUuid().ToString().c_str(), ret);
+    ret = GetSDKAdaptedStatusCode(GattClientDeviceImpl::GattStatusFromService(ret)); // Adaptation for old sdk
+    auto taiheCharacter = std::make_shared<TaiheNativeBleCharacteristic>(characteristic);
+    AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::GATT_CLIENT_READ_CHARACTER, taiheCharacter, ret);
 }
 
 void TaiheGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descriptor, int ret)
 {
     HILOGI("UUID: %{public}s, ret: %{public}d", descriptor.GetUuid().ToString().c_str(), ret);
+    ret = GetSDKAdaptedStatusCode(GattClientDeviceImpl::GattStatusFromService(ret)); // Adaptation for old sdk
+    auto taiheDescriptor = std::make_shared<TaiheNativeBleDescriptor>(descriptor);
+    AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::GATT_CLIENT_READ_DESCRIPTOR, taiheDescriptor, ret);
 }
 
 void TaiheGattClientCallback::OnConnectionStateChanged(int connectionState, int ret)
@@ -55,6 +64,9 @@ void TaiheGattClientCallback::OnReadRemoteRssiValueResult(int rssi, int ret)
 void TaiheGattClientCallback::OnCharacteristicWriteResult(const GattCharacteristic &characteristic, int ret)
 {
     HILOGI("UUID: %{public}s, ret: %{public}d", characteristic.GetUuid().ToString().c_str(), ret);
+    ret = GetSDKAdaptedStatusCode(GattClientDeviceImpl::GattStatusFromService(ret)); // Adaptation for old sdk
+    auto taiheCharacter = std::make_shared<TaiheNativeBleCharacteristic>(characteristic);
+    AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::GATT_CLIENT_WRITE_CHARACTER, taiheCharacter, ret);
 }
 
 void TaiheGattClientCallback::OnDescriptorWriteResult(const GattDescriptor &descriptor, int ret)
@@ -65,6 +77,8 @@ void TaiheGattClientCallback::OnDescriptorWriteResult(const GattDescriptor &desc
 void TaiheGattClientCallback::OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status)
 {
     HILOGI("UUID: %{public}s, status: %{public}d", characteristic.GetUuid().ToString().c_str(), status);
+    status = GetSDKAdaptedStatusCode(GattClientDeviceImpl::GattStatusFromService(status)); // Adaptation for old sdk
+    AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::GATT_CLIENT_ENABLE_CHARACTER_CHANGED, nullptr, status);
 }
 
 void TaiheGattClientCallback::OnMtuUpdate(int mtu, int ret)
