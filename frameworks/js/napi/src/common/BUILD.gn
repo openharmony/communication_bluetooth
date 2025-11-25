@@ -20,6 +20,7 @@ config("btcommon_config") {
   include_dirs = [
     "$BT_NAPI_DIR/src",
     "$BT_PART_DIR/frameworks/inner/include",
+    "$BT_PART_DIR/frameworks/inner/ipc/parcel",
     "$BT_PART_DIR/interfaces/inner_api/include",
     "$BT_PART_DIR/interfaces/inner_api/include/c_header",
   ]
@@ -95,6 +96,7 @@ ohos_shared_library("common") {
     "$BT_NAPI_DIR/include",
     "$BT_NAPI_DIR/src/common",
     "$BT_PART_DIR/frameworks/inner/include",
+    "$BT_PART_DIR/frameworks/inner/ipc/parcel",
   ]
 
   defines = [

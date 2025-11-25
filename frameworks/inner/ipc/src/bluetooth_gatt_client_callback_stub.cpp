@@ -135,7 +135,11 @@ ErrCode BluetoothGattClientCallbackStub::OnCharacteristicWriteInner(
     if (!characteristic) {
         return TRANSACTION_ERR;
     }
-    stub->OnCharacteristicWrite(ret, *characteristic);
+    std::shared_ptr<BluetoothGattRspContext> rspContext(data.ReadParcelable<BluetoothGattRspContext>());
+    if (!rspContext) {
+        return TRANSACTION_ERR;
+    }
+    stub->OnCharacteristicWrite(ret, *characteristic, *rspContext);
     return NO_ERROR;
 }
 

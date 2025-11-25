@@ -443,6 +443,13 @@ void ConvertDescriptorWriteReqToJS(napi_env env, napi_value result, const std::s
     }
 }
 
+void ConvertGattResponseContextToJS(napi_env env, napi_value result, BluetoothGattRspContext &rspContext)
+{
+    napi_value timeStamp;
+    napi_create_int64(env, rspContext.GetTimeStamp(), &timeStamp);
+    napi_set_named_property(env, result, "timestamp", timeStamp);
+}
+
 napi_value ScanReportTypeInit(napi_env env)
 {
     HILOGD("enter");
@@ -575,6 +582,14 @@ napi_value NapiNativeBleDescriptor::ToNapiValue(napi_env env) const
     napi_value object;
     napi_create_object(env, &object);
     ConvertBLEDescriptorToJS(env, object, const_cast<GattDescriptor &>(descriptor_));
+    return object;
+}
+
+napi_value NapiNativeGattResponseContext::ToNapiValue(napi_env env) const
+{
+    napi_value object;
+    napi_create_object(env, &object);
+    ConvertGattResponseContextToJS(env, object, const_cast<BluetoothGattRspContext &>(rspContext_));
     return object;
 }
 

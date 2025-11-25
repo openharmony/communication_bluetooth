@@ -66,6 +66,7 @@ void ConvertDescriptorReadReqToJS(
     napi_env env, napi_value result, const std::string &device, GattDescriptor &descriptor, int requestId);
 void ConvertDescriptorWriteReqToJS(
     napi_env env, napi_value result, const std::string &device, GattDescriptor &descriptor, int requestId);
+void ConvertGattResponseContextToJS(napi_env env, napi_value result, BluetoothGattRspContext &rspContext);
 
 napi_value ScanReportTypeInit(napi_env env);
 napi_value ScanDutyInit(napi_env env);
@@ -107,6 +108,16 @@ public:
     napi_value ToNapiValue(napi_env env) const override;
 private:
     GattDescriptor descriptor_;
+};
+
+class NapiNativeGattResponseContext : public NapiNativeObject {
+public:
+    NapiNativeGattResponseContext(const BluetoothGattRspContext &rspContext) : rspContext_(rspContext) {}
+    ~NapiNativeGattResponseContext() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    BluetoothGattRspContext rspContext_;
 };
 
 class NapiNativeBleScanResult : public NapiNativeObject {

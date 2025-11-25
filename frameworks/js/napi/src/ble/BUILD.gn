@@ -23,6 +23,7 @@ ohos_shared_library("ble") {
     "$BT_NAPI_DIR/include",
     "$BT_NAPI_DIR/src",
     "$BT_PART_DIR/frameworks/inner/include",
+    "$BT_PART_DIR/frameworks/inner/ipc/parcel",
   ]
 
   defines = [
@@ -57,6 +58,7 @@ ohos_shared_library("ble") {
 
   deps = [
     "$BT_PART_DIR/frameworks/inner:btframework",
+    "$BT_PART_DIR/frameworks/inner:btcommon",
     "$BT_PART_DIR/frameworks/js/napi/src/common:bt_napi_common",
   ]
 

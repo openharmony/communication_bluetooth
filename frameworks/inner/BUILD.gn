@@ -136,6 +136,7 @@ config("btframework_public_config") {
   include_dirs = [
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/parcel",
   ]
 }
 
@@ -232,6 +233,7 @@ ohos_shared_library("btcommon") {
     "ipc/parcel/bluetooth_device_battery_info.cpp",
     "ipc/parcel/bluetooth_gatt_characteristic_parcel.cpp",
     "ipc/parcel/bluetooth_gatt_descriptor_parcel.cpp",
+    "ipc/parcel/bluetooth_gatt_rsp_context_parcel.cpp",
     "ipc/parcel/bluetooth_gatt_device.cpp",
     "ipc/parcel/bluetooth_gatt_service_parcel.cpp",
     "ipc/parcel/bluetooth_hfp_hf_call.cpp",

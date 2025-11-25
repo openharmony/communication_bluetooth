@@ -23,6 +23,7 @@ ohos_shared_library("hid") {
   include_dirs = [
     "$BT_NAPI_DIR/include",
     "$BT_PART_DIR/frameworks/inner/include",
+    "$BT_PART_DIR/frameworks/inner/ipc/parcel",
   ]
 
   defines = [
