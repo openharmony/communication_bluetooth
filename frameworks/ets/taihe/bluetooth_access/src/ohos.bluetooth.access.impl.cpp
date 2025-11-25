@@ -187,7 +187,7 @@ void NotifyDialogResult(::ohos::bluetooth::access::NotifyDialogResultParams noti
 {
     HILOGI("enter");
     uint32_t dialogType = 0;
-    if(notifyDialogResultParams.dialogType.is_valid()) {
+    if (notifyDialogResultParams.dialogType.is_valid()) {
         dialogType = notifyDialogResultParams.dialogType.get_value();
     }
     bool dialogResult = notifyDialogResultParams.dialogResult;
