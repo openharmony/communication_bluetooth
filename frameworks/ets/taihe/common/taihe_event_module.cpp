@@ -17,9 +17,9 @@
 #define LOG_TAG "bt_taihe_event_module"
 #endif
 
+#include "taihe_event_module.h"
 #include "bluetooth_def.h"
 #include "bluetooth_log.h"
-#include "taihe_event_module.h"
 
 namespace OHOS {
 namespace Bluetooth {

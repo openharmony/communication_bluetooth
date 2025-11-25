@@ -17,15 +17,13 @@
 #define LOG_TAG "bt_taihe_hfp_ag_observer"
 #endif
 
-#include "stdexcept"
-
 #include "ohos.bluetooth.hfp.proj.hpp"
 #include "ohos.bluetooth.hfp.impl.hpp"
-#include "taihe/runtime.hpp"
-
-#include "bluetooth_log.h"
 #include "bluetooth_utils.h"
+#include "bluetooth_log.h"
 #include "taihe_bluetooth_hfp_ag_observer.h"
+#include "taihe/runtime.hpp"
+#include "stdexcept"
 
 namespace OHOS {
 namespace Bluetooth {

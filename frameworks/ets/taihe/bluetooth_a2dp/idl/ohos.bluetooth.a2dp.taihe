@@ -18,8 +18,98 @@
 static { loadLibraryWithPermissionCheck("bluetoothA2dp_taihe_native.z", "@ohos.bluetooth.a2dp") }
 """)
 
-from ohos.bluetooth.baseProfile use BaseProfile; 
+from ohos.bluetooth.baseProfile use BaseProfile;
+@!sts_inject_into_module("import {baseProfile} from './@ohos.bluetooth.baseProfile';")
 interface A2dpSourceProfile : BaseProfile {
+    @!sts_inject_into_class("""on(type: string, callback: object): void {
+        if (type === "connectionStateChange") {
+            this.onConnectionStateChange(callback as (info: baseProfile.StateChangeParam) => void);
+        }
+    }
+    """)
+
+    @!sts_inject_into_class("""off(type: string, callback?: object): void {
+        if (type === "connectionStateChange") {
+            this.offConnectionStateChange(callback as ((info: baseProfile.StateChangeParam) => void) | undefined);
+        }
+    }
+    """)
+
+    SetCurrentCodecInfo(deviceId: String, codecInfo: CodecInfo): void;
+
+    GetCurrentCodecInfo(deviceId: String): CodecInfo;
+
+    GetPlayingState(deviceId: String): PlayingState;
+
+    Connect(deviceId: String): void;
+
+    Disconnect(deviceId: String): void;
+
+    @promise GetAutoPlayDisabledDuration(deviceId: String): i32;
+
+    @promise DisableAutoPlay(deviceId: String, duration: i32): void;
+
+    @promise EnableAutoPlay(deviceId: String): void;
+
+    @gen_async("disableAbsoluteVolume")
+    @gen_promise("disableAbsoluteVolume")
+    DisableAbsoluteVolumeSync(deviceId: String): void;
+
+    @gen_async("enableAbsoluteVolume")
+    @gen_promise("enableAbsoluteVolume")
+    EnableAbsoluteVolumeSync(deviceId: String): void;
+
+    @gen_async("isAbsoluteVolumeEnabled")
+    @gen_promise("isAbsoluteVolumeEnabled")
+    IsAbsoluteVolumeEnabledSync(deviceId: String): bool;
+
+    @gen_async("isAbsoluteVolumeSupported")
+    @gen_promise("isAbsoluteVolumeSupported")
+    IsAbsoluteVolumeSupportedSync(deviceId: String): bool;
+}
+
+enum CodecType: i32 {
+    CODEC_TYPE_INVALID = -1,
+    CODEC_TYPE_SBC = 0,
+    CODEC_TYPE_AAC = 1,
+    CODEC_TYPE_L2HC = 2,
+    CODEC_TYPE_L2HCST = 3,
+    CODEC_TYPE_LDAC = 4
+}
+
+enum CodecChannelMode: i32 {
+    CODEC_CHANNEL_MODE_NONE = 0,
+    CODEC_CHANNEL_MODE_MONO = 1,
+    CODEC_CHANNEL_MODE_STEREO = 2
+}
+
+enum CodecSampleRate: i32 {
+    CODEC_SAMPLE_RATE_NONE = 0,
+    CODEC_SAMPLE_RATE_44100 = 1,
+    CODEC_SAMPLE_RATE_48000 = 2,
+    CODEC_SAMPLE_RATE_88200 = 3,
+    CODEC_SAMPLE_RATE_96000 = 4,
+    CODEC_SAMPLE_RATE_176400 = 5,
+    CODEC_SAMPLE_RATE_192000 = 6
+}
+
+enum CodecBitsPerSample: i32 {
+    CODEC_BITS_PER_SAMPLE_NONE = 0,
+    CODEC_BITS_PER_SAMPLE_16 = 1,
+    CODEC_BITS_PER_SAMPLE_24 = 2,
+    CODEC_BITS_PER_SAMPLE_32 = 3
+}
+
+enum PlayingState: i32 {
+    STATE_NOT_PLAYING,
+    STATE_PLAYING
+}
+
+struct CodecInfo {
+    codecType: CodecType;
+    codecBitsPerSample: CodecBitsPerSample;
+    codecChannelMode: CodecChannelMode;
+    codecSampleRate: CodecSampleRate;
 }
 
 function CreateA2dpSrcProfile(): A2dpSourceProfile;

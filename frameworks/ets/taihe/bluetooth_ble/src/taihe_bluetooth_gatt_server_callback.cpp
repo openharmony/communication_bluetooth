@@ -12,8 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef LOG_TAG
+#define LOG_TAG "bt_taihe_gatt_server_callback"
+#endif
+
 #include "bluetooth_log.h"
 #include "bluetooth_utils.h"
+#include "taihe_bluetooth_gatt_server.h"
 #include "taihe_bluetooth_gatt_server_callback.h"
 
 namespace OHOS {
@@ -40,6 +46,32 @@ void TaiheGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemote
 void TaiheGattServerCallback::OnConnectionStateUpdate(const BluetoothRemoteDevice &device, int state)
 {
     HILOGI("enter, state: %{public}d, remote device address: %{public}s", state, GET_ENCRYPT_ADDR(device));
+    std::lock_guard<std::mutex> lock(GattServerImpl::deviceListMutex_);
+    if (state == static_cast<int>(BTConnectState::CONNECTED)) {
+        HILOGI("connected");
+        bool hasAddr = false;
+        for (auto it = GattServerImpl::deviceList_.begin();
+                it != GattServerImpl::deviceList_.end(); ++it) {
+            if (*it == device.GetDeviceAddr()) {
+                hasAddr = true;
+                break;
+            }
+        }
+        if (!hasAddr) {
+            HILOGI("add devices");
+            GattServerImpl::deviceList_.push_back(device.GetDeviceAddr());
+        }
+    } else if (state == static_cast<int>(BTConnectState::DISCONNECTED)) {
+        HILOGI("disconnected");
+        for (auto it = GattServerImpl::deviceList_.begin();
+                it != GattServerImpl::deviceList_.end(); ++it) {
+            if (*it == device.GetDeviceAddr()) {
+                HILOGI("remove device");
+                GattServerImpl::deviceList_.erase(it);
+                break;
+            }
+        }
+    }
 }
 
 void TaiheGattServerCallback::OnDescriptorWriteRequest(const BluetoothRemoteDevice &device,
@@ -65,6 +97,8 @@ void TaiheGattServerCallback::OnMtuUpdate(const BluetoothRemoteDevice &device, i
 void TaiheGattServerCallback::OnNotificationCharacteristicChanged(const BluetoothRemoteDevice &device, int ret)
 {
     HILOGI("ret: %{public}d", ret);
+    auto taiheRet = std::make_shared<TaiheNativeInt>(ret);
+    AsyncWorkCallFunction(asyncWorkMap_, TaiheAsyncType::GATT_SERVER_NOTIFY_CHARACTERISTIC, taiheRet, ret);
 }
 } // namespace Bluetooth
 } // namespace OHOS

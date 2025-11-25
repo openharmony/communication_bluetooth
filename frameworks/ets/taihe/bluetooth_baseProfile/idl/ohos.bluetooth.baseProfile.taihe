@@ -20,6 +20,12 @@ static { loadLibraryWithPermissionCheck("bluetoothBaseProfile_taihe_native.z", "
 
 from ohos.bluetooth.constant use ProfileConnectionState;
 
+enum ConnectionStrategy: i32 {
+    CONNECTION_STRATEGY_UNSUPPORTED = 0,
+    CONNECTION_STRATEGY_ALLOWED = 1,
+    CONNECTION_STRATEGY_FORBIDDEN = 2
+}
+
 struct StateChangeParam {
     deviceId: String;
     state: ProfileConnectionState;
@@ -36,6 +42,33 @@ enum DisconnectCause: i32 {
 }
 
 interface BaseProfile {
-    On(type: String, callback: (data: StateChangeParam) => void): void;
-    Off(type: String, callback: Optional<(data: StateChangeParam) => void>): void;
+    GetConnectionState(deviceId: String): ProfileConnectionState;
+
+    GetConnectedDevices(): Array<String>;
+
+    @gen_async("getConnectionStrategy")
+    @gen_promise("getConnectionStrategy")
+    GetConnectionStrategySync(deviceId: String): ConnectionStrategy;
+
+    @gen_async("setConnectionStrategy")
+    @gen_promise("setConnectionStrategy")
+    SetConnectionStrategySync(deviceId: String, strategy: ConnectionStrategy): void;
+
+    @!sts_inject_into_interface("on(type: string, callback: (info: object) => void): void;")
+    @!sts_inject_into_class("""on(type: string, callback: object): void {
+        if (type === "connectionStateChange") {
+            this.onConnectionStateChange(callback as (info: StateChangeParam) => void);
+        }
+    }
+    """)
+    OnConnectionStateChange(callback: (info: StateChangeParam) => void);
+
+    @!sts_inject_into_interface("off(type: string, callback?: (info: object) => void): void;")
+    @!sts_inject_into_class("""off(type: string, callback?: object): void {
+        if (type === "connectionStateChange") {
+            this.offConnectionStateChange(callback as ((info: StateChangeParam) => void) | undefined);
+        }
+    }
+    """)
+    OffConnectionStateChange(callback: Optional<(info: StateChangeParam) => void>);
 }

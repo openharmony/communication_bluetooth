@@ -18,7 +18,7 @@
 static { loadLibraryWithPermissionCheck("bluetoothAccess_taihe_native.z", "@ohos.bluetooth.access") }
 """)
 
-from ohos.bluetooth.baseProfile use BaseProfile; 
+from ohos.bluetooth.baseProfile use BaseProfile;
 
 @!sts_inject("""
 export function on(type: string, cb: (arg_0: Object) => void) {
@@ -47,10 +47,38 @@ enum BluetoothState: i32 {
     STATE_BLE_TURNING_OFF = 6
 }
 
-@gen_promise("restrictBluetooth")
-function RestrictBluetoothSync(): void;
+enum DialogType: i32 {
+    BLUETOOTH_SWITCH = 0
+}
+
+struct NotifyDialogResultParams {
+    dialogType: DialogType;
+    dialogResult: bool;
+}
+
+@promise function RestrictBluetooth(): void;
 
 function GetState(): BluetoothState;
 
 function EnableBluetooth(): void;
 function DisableBluetooth(): void;
+
+@promise function EnableBluetoothAsync(): void;
+
+@promise function DisableBluetoothAsync(): void;
+
+function IsValidRandomDeviceId(deviceId: String): bool;
+
+function GetPersistentDeviceIds(): Array<String>;
+
+@promise function DeletePersistentDeviceId(deviceId: String): void;
+
+@promise function AddPersistentDeviceId(deviceId: String): void;
+
+function GetLocalAddress(): String;
+
+@promise function NotifyDialogResult(notifyDialogResultParams: NotifyDialogResultParams): void;
+
+@gen_async("factoryReset")
+@gen_promise("factoryReset")
+function FactoryResetSync(): void;
