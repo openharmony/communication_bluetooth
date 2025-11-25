@@ -197,6 +197,7 @@
               "parcel/bluetooth_bt_uuid.h",
               "parcel/bluetooth_gatt_characteristic_parcel.h",
               "parcel/bluetooth_gatt_descriptor_parcel.h",
+              "parcel/bluetooth_gatt_rsp_context_parcel.h",
               "parcel/bluetooth_gatt_device.h",
               "parcel/bluetooth_gatt_service_parcel.h",
               "parcel/bluetooth_hfp_hf_call.h",

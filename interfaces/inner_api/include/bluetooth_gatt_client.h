@@ -39,6 +39,7 @@
 #include "bluetooth_def.h"
 #include "bluetooth_gatt_service.h"
 #include "bluetooth_remote_device.h"
+#include "bluetooth_gatt_rsp_context_parcel.h"
 #include <memory>
 
 namespace OHOS {
@@ -115,6 +116,19 @@ public:
      *
      */
     virtual void OnCharacteristicWriteResult(const GattCharacteristic &characteristic, int ret)
+    {}
+
+    /**
+     * @brief The function to OnCharacteristicWriteResultWithContext.
+     *
+     * @param characteristic Characteristic object. The value attribute is the initial value 0.
+     * @param rspContext BluetoothGattRspContext object. Including timeStamp since API23.
+     * @param ret ret of GattClientCallback.
+     * @since 23
+     *
+     */
+    virtual void OnCharacteristicWriteResultWithContext(const GattCharacteristic &characteristic,
+        const BluetoothGattRspContext &rspContext, int ret)
     {}
 
     /**
@@ -357,7 +371,16 @@ public:
      * @since 6
      *
      */
-    int WriteCharacteristic(GattCharacteristic &characteristic);
+    /**
+     * @brief The function to write characteristic.
+     *
+     * @param characteristic characteristic object.
+     * @param isWithContext bool flag to identify WriteCharacteristic and WriteCharacteristicWithContext.
+     * @return int write characteristic.
+     * @since 23
+     *
+     */
+    int WriteCharacteristic(GattCharacteristic &characteristic, bool isWithContext = false);
 
     /**
      * @brief The function to write characteristic.
@@ -368,7 +391,17 @@ public:
      * @since 6
      *
      */
-    int WriteCharacteristic(GattCharacteristic &characteristic, std::vector<uint8_t> value);
+    /**
+     * @brief The function to write characteristic.
+     *
+     * @param characteristic characteristic object.
+     * @param value characteristic value.
+     * @param isWithContext bool flag to identify WriteCharacteristic and WriteCharacteristicWithContext.
+     * @return int write characteristic.
+     * @since 23
+     *
+     */
+    int WriteCharacteristic(GattCharacteristic &characteristic, std::vector<uint8_t> value, bool isWithContext = false);
 
     /**
      * @brief The function to write characteristic.
@@ -416,6 +449,8 @@ private:
     int SetNotifyCharacteristicInner(GattCharacteristic &characteristic, bool enable,
         const std::vector<uint8_t> &descriptorValue);
 };
+
+std::vector<uint8_t> GetCharacteristicValue(const GattCharacteristic &characteristic);
 } // namespace Bluetooth
 } // namespace OHOS
 #endif  // BLUETOOTH_GATT_CLIENT_H

@@ -150,7 +150,7 @@ int BluetoothGattClientProxy::ReadCharacteristic(int32_t appId, const BluetoothG
 }
 
 int BluetoothGattClientProxy::WriteCharacteristic(
-    int32_t appId, BluetoothGattCharacteristic *characteristic, bool withoutRespond)
+    int32_t appId, BluetoothGattCharacteristic *characteristic, bool withoutRespond, bool isWithContext)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattClientProxy::GetDescriptor()),
@@ -160,6 +160,8 @@ int BluetoothGattClientProxy::WriteCharacteristic(
         BT_ERR_IPC_TRANS_FAILED, "write characteristic error");
     CHECK_AND_RETURN_LOG_RET(data.WriteBool(withoutRespond),
         BT_ERR_IPC_TRANS_FAILED, "write withoutRespond error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteBool(isWithContext),
+        BT_ERR_IPC_TRANS_FAILED, "write isWithContext error");
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
@@ -249,7 +251,7 @@ void BluetoothGattClientProxy::GetAllDevice(std::vector<BluetoothGattDevice> &de
     MessageOption option(MessageOption::TF_SYNC);
 
     SEND_IPC_REQUEST_RETURN(BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_GET_ALL_DEVICE, data, reply, option);
-    
+
     int devNum = 0;
     if (!reply.ReadInt32(devNum) || devNum > GATT_CLIENT_READ_DATA_SIZE_MAX_LEN) {
         HILOGE("read Parcelable size failed.");
@@ -293,7 +295,7 @@ int BluetoothGattClientProxy::GetServices(int32_t appId, std::vector<BluetoothGa
 
     SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_GET_SERVICES,
         data, reply, option, BT_ERR_IPC_TRANS_FAILED);
-    
+
     int ret = reply.ReadInt32();
     int devNum = 0;
     if (!reply.ReadInt32(devNum) || devNum > GATT_CLIENT_READ_DATA_SIZE_MAX_LEN) {

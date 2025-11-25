@@ -99,6 +99,7 @@ void NapiGattClient::DefineGattClientJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("updateConnectionParam", UpdateConnectionParam),
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("writeCharacteristicValue", WriteCharacteristicValueEx),
+        DECLARE_NAPI_FUNCTION("writeCharacteristicValueWithContext", WriteCharacteristicValueWithContext),
         DECLARE_NAPI_FUNCTION("writeDescriptorValue", WriteDescriptorValueEx),
         DECLARE_NAPI_FUNCTION("setCharacteristicChangeNotification", setCharacteristicChangeNotification),
         DECLARE_NAPI_FUNCTION("setCharacteristicChangeIndication", setCharacteristicChangeIndication),
@@ -731,25 +732,31 @@ static napi_status CheckWriteCharacteristicValueEx(napi_env env, napi_callback_i
     return napi_ok;
 }
 
-napi_value NapiGattClient::WriteCharacteristicValueEx(napi_env env, napi_callback_info info)
+napi_value NapiGattClient::WriteCharacteristicValueCommon(napi_env env, napi_callback_info info,
+    bool isWithContext, std::shared_ptr<NapiHaEventUtils> haUtils)
 {
-    HILOGI("enter");
     GattCharacteristic* character = nullptr;
     NapiGattClient* client = nullptr;
+    NapiAsyncType asyncType = GATT_CLIENT_WRITE_CHARACTER;
 
     std::vector<uint8_t> value {};
     auto status = CheckWriteCharacteristicValueEx(env, info, &character, &client, value);
     NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok && character && client, BT_ERR_INVALID_PARAM);
+    if (isWithContext) {
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, character->GetWriteType() == GattCharacteristic::WriteType::DEFAULT,
+            BT_ERR_INVALID_PARAM);
+        asyncType = GATT_CLIENT_WRITE_CHARACTER_WITH_CONTEXT;
+    }
     NAPI_BT_ASSERT_RETURN_UNDEF(env, client->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR);
 
-    auto func = [gattClient = client->GetClient(), character]() {
+    auto func = [gattClient = client->GetClient(), character, isWithContext]() {
         if (character == nullptr) {
             HILOGE("character is nullptr");
             return NapiAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
         }
         int ret = BT_ERR_INTERNAL_ERROR;
         if (gattClient) {
-            ret = gattClient->WriteCharacteristic(*character);
+            ret = gattClient->WriteCharacteristic(*character, isWithContext);
             ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret)); // Adaptation for old sdk
         }
         return NapiAsyncWorkRet(ret);
@@ -757,16 +764,32 @@ napi_value NapiGattClient::WriteCharacteristicValueEx(napi_env env, napi_callbac
 
     bool isNeedCallback = character->GetWriteType() == GattCharacteristic::WriteType::DEFAULT;
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(
-        env, info, func, isNeedCallback ? ASYNC_WORK_NEED_CALLBACK : ASYNC_WORK_NO_NEED_CALLBACK);
+        env, info, func, isNeedCallback ? ASYNC_WORK_NEED_CALLBACK : ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     // GattCharacteristic write need callback, write no response is not needed.
     if (isNeedCallback) {
-        bool success = client->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_WRITE_CHARACTER, asyncWork);
+        bool success = client->GetCallback()->asyncWorkMap_.TryPush(asyncType, asyncWork);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
     }
 
     asyncWork->Run();
     return asyncWork->GetRet();
+}
+
+napi_value NapiGattClient::WriteCharacteristicValueEx(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::shared_ptr<NapiHaEventUtils> haUtils =
+        std::make_shared<NapiHaEventUtils>(env, "ble.GattClientDevice.WriteCharacteristicValueEx");
+    return WriteCharacteristicValueCommon(env, info, false, haUtils);
+}
+
+napi_value NapiGattClient::WriteCharacteristicValueWithContext(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::shared_ptr<NapiHaEventUtils> haUtils =
+        std::make_shared<NapiHaEventUtils>(env, "ble.GattClientDevice.WriteCharacteristicValueWithContext");
+    return WriteCharacteristicValueCommon(env, info, true, haUtils);
 }
 
 static napi_status CheckWriteDescriptorValueEx(napi_env env, napi_callback_info info,
