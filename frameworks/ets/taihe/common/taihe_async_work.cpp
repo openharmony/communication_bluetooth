@@ -24,7 +24,7 @@
 #include "taihe_async_callback.h"
 #include "taihe_bluetooth_utils.h"
 #include "taihe_parser_utils.h"
-#include "taihe_timer.h"
+#include "bluetooth_timer.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -83,7 +83,7 @@ void TaiheAsyncWork::Info::Complete(void)
             }
             asyncWorkSptr->TimeoutCallback();
         };
-        TaiheTimer::GetInstance()->Register(func, taiheAsyncWork->timerId_);
+        BluetoothTimer::GetInstance()->Register(func, taiheAsyncWork->timerId_);
         return;
     }
 
@@ -133,7 +133,7 @@ void TaiheAsyncWork::CallFunction(int errCode, std::shared_ptr<TaiheNativeObject
         nativeObj = std::make_shared<TaiheNativeUndefined>();
     }
     // Check timer triggered & remove timer if supported
-    TaiheTimer::GetInstance()->Unregister(timerId_);
+    BluetoothTimer::GetInstance()->UnRegister(timerId_);
 
     triggered_ = true;
     taiheAsyncCallback_->CallFunction(errCode, nativeObj);
