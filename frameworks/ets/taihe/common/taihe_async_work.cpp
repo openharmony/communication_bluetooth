@@ -104,11 +104,13 @@ void TaiheAsyncWork::Info::Complete(void)
 
 void TaiheAsyncWork::Run(void)
 {
-    auto info = std::make_shared<TaiheAsyncWork::Info>();
+    auto info = std::make_unique<TaiheAsyncWork::Info>();
     info->taiheAsyncWork = shared_from_this();
 
-    info->Execute();
-    info->Complete();
+    std::thread([info = std::move(info)]() mutable {
+        info->Execute();
+        info->Complete();
+    }).detach();
 }
 
 std::shared_ptr<TaiheHaEventUtils> TaiheAsyncWork::GetHaUtilsPtr(void) const

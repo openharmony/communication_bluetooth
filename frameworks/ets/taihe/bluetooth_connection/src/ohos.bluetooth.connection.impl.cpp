@@ -427,14 +427,6 @@ ohos::bluetooth::connection::BatteryInfo GetRemoteDeviceBatteryInfo(taihe::strin
     HILOGI("err: %{public}d", err);
     TAIHE_BT_ASSERT_RETURN(err == BT_NO_ERROR, err, batterys);
 
-    int tmpCod = ohos::bluetooth::constant::MajorClass(
-        ohos::bluetooth::constant::MajorClass::key_t::MAJOR_UNCATEGORIZED).get_value();
-    int tmpMajorClass = ohos::bluetooth::constant::MajorClass(
-        ohos::bluetooth::constant::MajorClass::key_t::MAJOR_UNCATEGORIZED).get_value();
-    int tmpMajorMinorClass = ohos::bluetooth::constant::MajorMinorClass(
-        ohos::bluetooth::constant::MajorMinorClass::key_t::COMPUTER_UNCATEGORIZED).get_value();
-    remoteDevice.GetDeviceProductType(tmpCod, tmpMajorClass, tmpMajorMinorClass);
-
     batterys.deviceId = batteryInfo.deviceId_;
     batterys.batteryLevel = batteryInfo.batteryLevel_;
     batterys.leftEarBatteryLevel = batteryInfo.leftEarBatteryLevel_;
