@@ -52,10 +52,11 @@ BluetoothProfileManager &BluetoothProfileManager::GetInstance()
     return *instance;
 }
 
-extern "C" __attribute__((destructor)) void BluetoothProfileManager::ClearSystemAbility()
+void BluetoothProfileManager::ClearSystemAbility()
 {
     sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHECK_AND_RETURN_LOG(samgrProxy != nullptr, "[BLUETOOTH_PROFILE_MANAGER] failed to get samgrProxy");
+    CHECK_AND_RETURN_LOG(bluetoothSystemAbility_ != nullptr, "bluetoothSystemAbility_ is null");
     int32_t ret = samgrProxy->UnSubscribeSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID, bluetoothSystemAbility_);
     CHECK_AND_RETURN_LOG(ret == ERR_OK,
         "[BLUETOOTH_PROFILE_MANAGER] Unsubscribe systemAbilityId: bluetooth service failed!");
