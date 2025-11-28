@@ -50,6 +50,9 @@ bool BluetoothSensingInfo::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(scanMode_)) {
         return false;
     }
+    if (!parcel.WriteStringVector(sensingArray_)) {
+        return false;
+    }
     return true;
 }
 
@@ -98,6 +101,9 @@ bool BluetoothSensingInfo::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!parcel.ReadInt32(scanMode_)) {
+        return false;
+    }
+    if (!parcel.ReadStringVector(&sensingArray_)) {
         return false;
     }
     return true;
