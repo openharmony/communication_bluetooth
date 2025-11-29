@@ -69,7 +69,6 @@ taihe_shared_library("bluetoothBle_taihe_native") {
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_async_work.cpp",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_ha_event_utils.cpp",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_native_object.cpp",
-    "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_timer.cpp",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/parser/taihe_parser_utils.cpp",
   ]
   deps = [
