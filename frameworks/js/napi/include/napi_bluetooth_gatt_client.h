@@ -50,6 +50,9 @@ public:
 
 #ifdef BLUETOOTH_API_SINCE_10
     static napi_value WriteCharacteristicValueEx(napi_env env, napi_callback_info info);
+    static napi_value WriteCharacteristicValueWithContext(napi_env env, napi_callback_info info);
+    static napi_value WriteCharacteristicValueCommon(napi_env env, napi_callback_info info, bool isWithContext,
+        std::shared_ptr<NapiHaEventUtils> haUtils);
     static napi_value WriteDescriptorValueEx(napi_env env, napi_callback_info info);
     static napi_value setCharacteristicChangeNotification(napi_env env, napi_callback_info info);
     static napi_value setCharacteristicChangeIndication(napi_env env, napi_callback_info info);

@@ -30,6 +30,7 @@ config("module_private_config") {
     include_dirs = [
         ".",
         "$FRAMWORK_DIR/frameworks/inner/include",
+        "$FRAMWORK_DIR/frameworks/inner/ipc/parcel",
         "$FRAMWORK_DIR/frameworks/js/napi/include",
         "$FRAMWORK_DIR/frameworks/js/napi/src/parser",
         "$FRAMWORK_DIR/interfaces/inner_api/include",

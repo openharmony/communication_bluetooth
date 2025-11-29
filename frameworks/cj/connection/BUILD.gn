@@ -32,6 +32,7 @@ ohos_shared_library("cj_bluetooth_connection_ffi") {
     "$BT_CJ_DIR/src",
     "$BT_NAPI_DIR/include",
     "$BT_PART_DIR/frameworks/inner/include",
+    "$BT_PART_DIR/frameworks/inner/ipc/parcel",
   ]
 
   sources = [

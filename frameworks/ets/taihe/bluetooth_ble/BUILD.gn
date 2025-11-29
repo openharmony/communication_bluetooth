@@ -18,8 +18,8 @@ import("//build/ohos/taihe_idl/taihe.gni")
 SUBSYSTEM_DIR = "//foundation/communication"
 
 copy_taihe_idl("bluetooth_ble_taihe") {
-  sources = [ 
-    "idl/ohos.bluetooth.ble.taihe", 
+  sources = [
+    "idl/ohos.bluetooth.ble.taihe",
   ]
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/bluetooth_constant:bluetooth_constant_taihe"
@@ -48,6 +48,7 @@ taihe_shared_library("bluetoothBle_taihe_native") {
     "include",
     "src",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/parcel",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/parser"

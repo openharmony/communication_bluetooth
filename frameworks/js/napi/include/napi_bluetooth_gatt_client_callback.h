@@ -38,6 +38,8 @@ public:
     void OnServicesChanged() override;
     void OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)  override;
     void OnCharacteristicWriteResult(const GattCharacteristic &characteristic, int ret) override;
+    void OnCharacteristicWriteResultWithContext(const GattCharacteristic &characteristic,
+        const BluetoothGattRspContext &context, int ret) override;
     void OnDescriptorReadResult(const GattDescriptor &descriptor, int ret) override;
     void OnDescriptorWriteResult(const GattDescriptor &descriptor, int ret) override;
     void OnMtuUpdate(int mtu, int ret) override;
