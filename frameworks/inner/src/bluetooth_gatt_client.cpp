@@ -213,7 +213,8 @@ public:
         WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnCharacteristicReadResult, charac, ret);
     }
 
-    void OnCharacteristicWrite(int32_t ret, const BluetoothGattCharacteristic &characteristic) override
+    void OnCharacteristicWrite(int32_t ret, const BluetoothGattCharacteristic &characteristic,
+        const BluetoothGattRspContext &rspContext) override
     {
         HILOGI("ret:%{public}d, length:%{public}zu", ret, characteristic.length_);
         std::shared_ptr<GattClient> clientSptr = (client_).lock();
@@ -239,6 +240,7 @@ public:
             return;
         }
         WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnCharacteristicWriteResult, charac, ret);
+        WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnCharacteristicWriteResultWithContext, charac, rspContext, ret);
     }
 
     void OnDescriptorRead(int32_t ret, const BluetoothGattDescriptor &descriptor) override
@@ -964,15 +966,15 @@ int GattClient::SetIndicateCharacteristic(GattCharacteristic &characteristic, bo
     return SetNotifyCharacteristicInner(characteristic, enable, (enable ? enableIndicateValue : disableValue));
 }
 
-int GattClient::WriteCharacteristic(GattCharacteristic &characteristic)
+int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, bool isWithContext)
 {
     size_t length = 0;
     const uint8_t *pData = characteristic.GetValue(&length).get();
     std::vector<uint8_t> value(pData, pData + length);
-    return WriteCharacteristic(characteristic, std::move(value));
+    return WriteCharacteristic(characteristic, std::move(value), isWithContext);
 }
 
-int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vector<uint8_t> value)
+int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vector<uint8_t> value, bool isWithContext)
 {
     HILOGD("enter");
     if (!IS_BLE_ENABLED()) {
@@ -1017,7 +1019,7 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vec
         pimpl->requestInformation_.type_ = REQUEST_TYPE_CHARACTERISTICS_WRITE;
         // if withoutRespond is true, no need wait for callback
         pimpl->requestInformation_.doing_ = (!withoutRespond);
-        result = proxy->WriteCharacteristic(pimpl->applicationId_, &character, withoutRespond);
+        result = proxy->WriteCharacteristic(pimpl->applicationId_, &character, withoutRespond, isWithContext);
     }
     if (result != GattStatus::GATT_SUCCESS) {
         HILOGE("Write failed, ret: %{public}d", result);

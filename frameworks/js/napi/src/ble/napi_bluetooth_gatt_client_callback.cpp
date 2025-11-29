@@ -111,6 +111,18 @@ void NapiGattClientCallback::OnCharacteristicWriteResult(const GattCharacteristi
 #endif
 }
 
+void NapiGattClientCallback::OnCharacteristicWriteResultWithContext(const GattCharacteristic &characteristic,
+    const BluetoothGattRspContext &rspContext, int ret)
+{
+#ifdef BLUETOOTH_API_SINCE_10
+    HILOGI("UUID: %{public}s, timeStamp:%{public}lld, ret: %{public}d", characteristic.GetUuid().ToString().c_str(),
+        static_cast<long long>(rspContext.GetTimeStamp()), ret);
+    ret = GetSDKAdaptedStatusCode(NapiGattClient::GattStatusFromService(ret)); // Adaptation for old sdk
+    auto napiRspContext = std::make_shared<NapiNativeGattResponseContext>(rspContext);
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_WRITE_CHARACTER_WITH_CONTEXT, napiRspContext, ret);
+#endif
+}
+
 void NapiGattClientCallback::OnDescriptorWriteResult(const GattDescriptor &descriptor, int ret)
 {
 #ifdef BLUETOOTH_API_SINCE_10

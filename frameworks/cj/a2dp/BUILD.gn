@@ -30,6 +30,7 @@ ohos_shared_library("cj_bluetooth_a2dp_ffi") {
     "include",
     "../../js/napi/include",
     "../../../frameworks/inner/include",
+    "../../../frameworks/inner/ipc/parcel",
   ]
 
   deps = [

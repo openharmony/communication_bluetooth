@@ -41,7 +41,7 @@ public:
     virtual int DiscoveryServices(int32_t appId) = 0;
     virtual int ReadCharacteristic(int32_t appId, const BluetoothGattCharacteristic &characteristic) = 0;
     virtual int WriteCharacteristic(
-        int32_t appId, BluetoothGattCharacteristic *characteristic, bool withoutRespond) = 0;
+        int32_t appId, BluetoothGattCharacteristic *characteristic, bool withoutRespond, bool isWithContext) = 0;
     virtual int SignedWriteCharacteristic(int32_t appId, BluetoothGattCharacteristic *characteristic) = 0;
     virtual int ReadDescriptor(int32_t appId, const BluetoothGattDescriptor &descriptor) = 0;
     virtual int WriteDescriptor(int32_t appId, BluetoothGattDescriptor *descriptor) = 0;

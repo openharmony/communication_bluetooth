@@ -19,6 +19,7 @@
 #include "iremote_broker.h"
 #include "bluetooth_gatt_characteristic_parcel.h"
 #include "bluetooth_gatt_descriptor_parcel.h"
+#include "bluetooth_gatt_rsp_context_parcel.h"
 #include "bluetooth_gatt_service_parcel.h"
 #include "bluetooth_service_ipc_interface_code.h"
 #include "raw_address.h"
@@ -32,7 +33,8 @@ public:
     virtual void OnConnectionStateChanged(int32_t state, int32_t newState, int32_t disconnectReason) = 0;
     virtual void OnCharacteristicChanged(const BluetoothGattCharacteristic &characteristic) = 0;
     virtual void OnCharacteristicRead(int32_t ret, const BluetoothGattCharacteristic &characteristic) = 0;
-    virtual void OnCharacteristicWrite(int32_t ret, const BluetoothGattCharacteristic &characteristic) = 0;
+    virtual void OnCharacteristicWrite(int32_t ret, const BluetoothGattCharacteristic &characteristic,
+        const BluetoothGattRspContext &rspContext) = 0;
     virtual void OnDescriptorRead(int32_t ret, const BluetoothGattDescriptor &descriptor) = 0;
     virtual void OnDescriptorWrite(int32_t ret, const BluetoothGattDescriptor &descriptor) = 0;
     virtual void OnMtuChanged(int32_t state, int32_t mtu) = 0;
