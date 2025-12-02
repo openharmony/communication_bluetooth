@@ -340,17 +340,14 @@ std::shared_ptr<TaiheAsyncCallback> TaiheParseAsyncCallback(ani_env *env, ani_ob
         return nullptr;
     }
 
-    // Get ani main thread id
-    std::thread::id threadId = std::this_thread::get_id();
-
     auto asyncCallback = std::make_shared<TaiheAsyncCallback>();
     asyncCallback->env = env;
     if (info != nullptr) {
         HILOGD("callback mode");
-        asyncCallback->callback = std::make_shared<TaiheCallback>(vm, env, threadId, info);
+        asyncCallback->callback = std::make_shared<TaiheCallback>(vm, info);
     } else {
         HILOGD("promise mode");
-        asyncCallback->promise = std::make_shared<TaihePromise>(vm, env, threadId);
+        asyncCallback->promise = std::make_shared<TaihePromise>(vm);
     }
     return asyncCallback;
 }
