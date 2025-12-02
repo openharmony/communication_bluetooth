@@ -47,7 +47,7 @@ struct TaiheAsyncCallback {
 
 class TaiheCallback {
 public:
-    TaiheCallback(ani_vm *vm, ani_env *env, std::thread::id tid, ani_object callback);
+    TaiheCallback(ani_vm *vm, ani_object callback);
     ~TaiheCallback();
 
     void CallFunction(int errCode, const std::shared_ptr<TaiheNativeObject> &object);
@@ -59,14 +59,13 @@ private:
     TaiheCallback &operator=(TaiheCallback &&) noexcept = delete;
 
     ani_vm *vm_;
-    ani_env *env_;
-    std::thread::id threadId_;
     ani_ref callbackRef_;
+    bool isAttach_ = false;
 };
 
 class TaihePromise {
 public:
-    explicit TaihePromise(ani_vm *vm, ani_env *env, std::thread::id tid);
+    explicit TaihePromise(ani_vm *vm);
     ~TaihePromise();
 
     void ResolveOrReject(int errCode, const std::shared_ptr<TaiheNativeObject> &object);
@@ -76,16 +75,15 @@ public:
 
 private:
     ani_vm *vm_;
-    ani_env *env_;
-    std::thread::id threadId_;
     ani_object promise_;
     ani_resolver bindDeferred_;
     bool isResolvedOrRejected_ = false;
+    bool isAttach_ = false;
 };
 
 void TaiheCreateLocalScope(ani_env *env);
 void TaiheDestroyLocalScope(ani_env *env);
-ani_env* GetCurrentEnv(ani_vm *vm);
+ani_env* GetCurrentEnv(ani_vm *vm, bool &isAttach);
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // TAIHE_ASYNC_CALLBACK_H
