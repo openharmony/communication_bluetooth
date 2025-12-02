@@ -53,9 +53,13 @@ ani_object TaiheAsyncCallback::GetRet(void)
     return reinterpret_cast<ani_object>(TaiheGetUndefined(env));
 }
 
-TaiheCallback::TaiheCallback(ani_vm *vm, ani_env *env, std::thread::id tid, ani_object callback)
-    : vm_(vm), env_(env), threadId_(tid)
+TaiheCallback::TaiheCallback(ani_vm *vm, ani_object callback)
+    : vm_(vm)
 {
+    ani_env* env = GetCurrentEnv(vm_, isAttach_);
+    if (env == nullptr) {
+        HILOGE("taihe get current env is nullptr");
+    }
     auto status = env->GlobalReference_Create(static_cast<ani_ref>(callback), &callbackRef_);
     if (status != ANI_OK) {
         HILOGE("GlobalReference_Create failed, status: %{public}d", status);
@@ -64,8 +68,7 @@ TaiheCallback::TaiheCallback(ani_vm *vm, ani_env *env, std::thread::id tid, ani_
 
 TaiheCallback::~TaiheCallback()
 {
-    bool isSameThread = (threadId_ == std::this_thread::get_id());
-    ani_env* curEnv = isSameThread ? env_ : GetCurrentEnv(vm_);
+    ani_env* curEnv = GetCurrentEnv(vm_, isAttach_);
     if (curEnv == nullptr) {
         HILOGE("taihe get current env is nullptr");
         return;
@@ -79,7 +82,7 @@ TaiheCallback::~TaiheCallback()
         callbackRef_ = nullptr;
     }
 
-    if (!isSameThread) {
+    if (isAttach_) {
         vm_->DetachCurrentThread();
     }
 }
@@ -113,9 +116,7 @@ void TaiheCallback::CallFunction(int errCode, const std::shared_ptr<TaiheNativeO
         return;
     }
 
-    // Get the current thread id and compare it with the ani main thread id
-    bool isSameThread = (threadId_ == std::this_thread::get_id());
-    ani_env* curEnv = isSameThread ? env_ : GetCurrentEnv(vm_);
+    ani_env* curEnv = GetCurrentEnv(vm_, isAttach_);
     if (curEnv == nullptr) {
         HILOGE("taihe get current env is nullptr");
         return;
@@ -128,14 +129,14 @@ void TaiheCallback::CallFunction(int errCode, const std::shared_ptr<TaiheNativeO
     ani_ref argv[ARGS_SIZE_TWO] = {code, val};
     TaiheCallFunction(curEnv, callbackRef_, argv, ARGS_SIZE_TWO);
     TaiheDestroyLocalScope(curEnv);
-
-    if (!isSameThread) {
-        vm_->DetachCurrentThread();
-    }
 }
 
-TaihePromise::TaihePromise(ani_vm *vm, ani_env *env, std::thread::id tid) : vm_(vm), env_(env), threadId_(tid)
+TaihePromise::TaihePromise(ani_vm *vm) : vm_(vm)
 {
+    ani_env* env = GetCurrentEnv(vm_, isAttach_);
+    if (env == nullptr) {
+        HILOGE("taihe get current env is nullptr");
+    }
     auto status = env->Promise_New(&bindDeferred_, &promise_);
     if (status != ANI_OK) {
         HILOGE("Promise_New failed, status: %{public}d", status);
@@ -144,6 +145,9 @@ TaihePromise::TaihePromise(ani_vm *vm, ani_env *env, std::thread::id tid) : vm_(
 
 TaihePromise::~TaihePromise()
 {
+    if (isAttach_) {
+        vm_->DetachCurrentThread();
+    }
 }
 
 void TaihePromise::ResolveOrReject(int errCode, const std::shared_ptr<TaiheNativeObject> &object)
@@ -158,8 +162,7 @@ void TaihePromise::ResolveOrReject(int errCode, const std::shared_ptr<TaiheNativ
         return;
     }
 
-    bool isSameThread = (threadId_ == std::this_thread::get_id());
-    ani_env* curEnv = isSameThread ? env_ : GetCurrentEnv(vm_);
+    ani_env* curEnv = GetCurrentEnv(vm_, isAttach_);
     if (curEnv == nullptr) {
         HILOGE("taihe get current env is nullptr");
         return;
@@ -175,10 +178,6 @@ void TaihePromise::ResolveOrReject(int errCode, const std::shared_ptr<TaiheNativ
     }
     isResolvedOrRejected_ = true;
     TaiheDestroyLocalScope(curEnv);
-
-    if (!isSameThread) {
-        vm_->DetachCurrentThread();
-    }
 }
 
 void TaihePromise::Resolve(ani_env *env, ani_ref resolution)
@@ -219,19 +218,25 @@ void TaiheDestroyLocalScope(ani_env* env)
     }
 }
 
-ani_env* GetCurrentEnv(ani_vm *vm)
+ani_env* GetCurrentEnv(ani_vm *vm, bool &isAttach)
 {
     if (vm == nullptr) {
         HILOGE("null vm");
         return nullptr;
     }
+
     ani_env *threadEnv;
-    ani_options aniArgs {0, nullptr};
-    ani_status status = vm->AttachCurrentThread(&aniArgs, ANI_VERSION_1, &threadEnv);
-    if (status != ANI_OK) {
-        HILOGE("GetCurrentEnv failed, status(%{public}d)", status);
-        return nullptr;
+    if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &threadEnv)) {
+        HILOGE("GetEnv failed, AttachCurrentThread");
+        ani_options aniArgs {0, nullptr};
+        ani_status status = vm->AttachCurrentThread(&aniArgs, ANI_VERSION_1, &threadEnv);
+        if (status != ANI_OK) {
+            HILOGE("GetCurrentEnv failed, status(%{public}d)", status);
+            return nullptr;
+        }
+        isAttach = true;
     }
+
     return threadEnv;
 }
 }  // namespace Bluetooth
