@@ -59,6 +59,7 @@ TaiheCallback::TaiheCallback(ani_vm *vm, ani_object callback)
     ani_env* env = GetCurrentEnv(vm_, isAttach_);
     if (env == nullptr) {
         HILOGE("taihe get current env is nullptr");
+        return;
     }
     auto status = env->GlobalReference_Create(static_cast<ani_ref>(callback), &callbackRef_);
     if (status != ANI_OK) {
@@ -136,6 +137,7 @@ TaihePromise::TaihePromise(ani_vm *vm) : vm_(vm)
     ani_env* env = GetCurrentEnv(vm_, isAttach_);
     if (env == nullptr) {
         HILOGE("taihe get current env is nullptr");
+        return;
     }
     auto status = env->Promise_New(&bindDeferred_, &promise_);
     if (status != ANI_OK) {
