@@ -570,6 +570,24 @@ int SocketUpdateCocConnectionParams(BluetoothCocUpdateSocketParam* param, const 
     return client->UpdateCocConnectionParams(params);
 }
 
+/**
+ * @brief Set priority for incoming or existed socket connection.
+ *
+ * @param addr The remote device address.
+ * @param priority Connection priority {@link BtSocketPriority}.
+ * @return Returns the operation result status {@link BtStatus}.
+ */
+int SetConnectionPriority(const BdAddr *bdAddr, BtSocketPriority priority)
+{
+    CHECK_AND_RETURN_LOG_RET(bdAddr, OHOS_BT_STATUS_FAIL, "bdAddr is null");
+    std::string address;
+    ConvertAddr(bdAddr->addr, address);
+    HILOGI("set socket connection priority, addr: %{public}s, priority: %{public}d",
+        GetEncryptAddr(address).c_str(), priority);
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    return host->SetConnectionPriority(address, priority);
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS
 #ifdef __cplusplus

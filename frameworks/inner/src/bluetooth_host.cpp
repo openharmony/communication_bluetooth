@@ -1384,5 +1384,14 @@ int32_t BluetoothHost::SetCallingPackageName(const std::string &address, const s
     proxy->SetCallingPackageName(address, packageName);
     return BT_NO_ERROR;
 }
+
+int BluetoothHost::SetConnectionPriority(const std::string &address, int priority)
+{
+    HILOGI("Set connection priority, address: %{public}s, priority: %{public}d",
+        GetEncryptAddr(address).c_str(), priority);
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
+    return proxy->SetConnectionPriority(address, priority);
+}
 } // namespace Bluetooth
 } // namespace OHOS
