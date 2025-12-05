@@ -2125,5 +2125,22 @@ int32_t BluetoothHostProxy::GetRemoteServices(const std::string &address)
     }
     return reply.ReadInt32();
 }
+
+int32_t BluetoothHostProxy::SetConnectionPriority(const std::string &address, int32_t priority)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteToken err");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_IPC_TRANS_FAILED, "write address error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(priority), BT_ERR_IPC_TRANS_FAILED, "write priority error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SET_CONNECTION_PRIORITY, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::SetConnectionPriority done fail error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadInt32();
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
