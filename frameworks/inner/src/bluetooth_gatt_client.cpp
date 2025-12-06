@@ -20,6 +20,7 @@
 #include <memory>
 #include <set>
 #include <thread>
+#include <atomic>
 #include "bluetooth_def.h"
 #include "bluetooth_gatt_client.h"
 #include "bluetooth_gatt_client_proxy.h"
@@ -96,7 +97,9 @@ struct RequestInformation {
 struct GattClient::impl {
     class BluetoothGattClientCallbackStubImpl;
 
-    bool isGetServiceYet_;
+    // Indicates that the current service content is the latest.
+    // Multiple threads may operate this value at the same time, use atomic_bool.
+    std::atomic_bool isGetServiceYet_;
     bool isRegisterSucceeded_;
     std::weak_ptr<GattClientCallback> callback_;
     int applicationId_;
@@ -136,6 +139,7 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
+        clientSptr->pimpl->isGetServiceYet_ = false;
         WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnServicesChanged);
     }
 
@@ -149,6 +153,7 @@ public:
             return;
         }
         if (newState == static_cast<int>(BTConnectState::DISCONNECTED)) {
+            clientSptr->pimpl->isGetServiceYet_ = false;
             clientSptr->pimpl->CleanConnectionInfo();
         }
 
@@ -441,7 +446,6 @@ void GattClient::impl::DiscoverComplete(int state)
         std::unique_lock<std::mutex> lock(discoverInformation_.mutex_);
         if (discoverInformation_.isDiscovering_) {
             discoverInformation_.isDiscovering_ = false;
-            isGetServiceYet_ = false;
             discoverInformation_.condition_.notify_all();
             ret = true;
         }
@@ -520,7 +524,7 @@ void GattClient::impl::GetServices()
         HILOGE("timeout");
         return;
     }
-    if (isGetServiceYet_) {
+    if (isGetServiceYet_.load()) {
         HILOGD("isGetServiceYet_ is true");
         return;
     }
