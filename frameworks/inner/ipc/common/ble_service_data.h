@@ -528,6 +528,12 @@ public:
 
     bool GetAdvIndReportFlag() const;
 
+    void SetRssiThreshold(int32_t rssiThreshold);
+
+    bool HasRssiThreshold() const;
+
+    int32_t GetRssiThreshold() const;
+
 private:
     std::string deviceId_;
     std::string name_;
@@ -540,6 +546,7 @@ private:
     bool hasServiceUuidMask_ = false;
     bool hasSolicitationUuid_ = false;
     bool hasSolicitationUuidMask_ = false;
+    bool hasRssiThreshold_ = false;
 
     std::vector<uint8_t> serviceData_;
     std::vector<uint8_t> serviceDataMask_;
@@ -552,6 +559,7 @@ private:
     int clientId_ = 0;
     uint8_t filtIndex_ = 0;
     uint8_t action_ = -1;
+    int32_t rssiThreshold_ = BLE_SCAN_MIN_RSSI_THRESHOLD;
 };
 
 /**

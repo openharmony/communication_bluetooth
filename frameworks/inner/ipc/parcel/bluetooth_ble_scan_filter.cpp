@@ -38,6 +38,9 @@ bool BluetoothBleScanFilter::Marshalling(Parcel &parcel) const
     if (!parcel.WriteBool(hasSolicitationUuidMask_)) {
         return false;
     }
+    if (!parcel.WriteBool(hasRssiThreshold_)) {
+        return false;
+    }
     BluetoothUuid serviceUuid = BluetoothUuid(serviceUuid_);
     if (!parcel.WriteParcelable(&serviceUuid)) {
         return false;
@@ -73,6 +76,9 @@ bool BluetoothBleScanFilter::Marshalling(Parcel &parcel) const
         return false;
     }
     if (!parcel.WriteUint8(filterIndex_)) {
+        return false;
+    }
+    if (!parcel.WriteInt32(rssiThreshold_)) {
         return false;
     }
     return true;
@@ -113,6 +119,9 @@ bool BluetoothBleScanFilter::ReadFromParcel(Parcel &parcel)
     if (!parcel.ReadBool(hasSolicitationUuidMask_)) {
         return false;
     }
+    if (!parcel.ReadBool(hasRssiThreshold_)) {
+        return false;
+    }
     if (!ReadUuidFromParcel(parcel)) {
         return false;
     }
@@ -134,6 +143,9 @@ bool BluetoothBleScanFilter::ReadFromParcel(Parcel &parcel)
     if (!parcel.ReadUint8(filterIndex_)) {
         return false;
     }
+    if (!parcel.ReadInt32(rssiThreshold_)) {
+        return false;
+    }
     return true;
 }
 
@@ -149,13 +161,15 @@ bool BluetoothBleScanFilter::operator==(const BluetoothBleScanFilter& other) con
         (hasServiceUuidMask_ == other.hasServiceUuidMask_) &&
         (hasSolicitationUuid_ == other.hasSolicitationUuid_) &&
         (hasSolicitationUuidMask_ == other.hasSolicitationUuidMask_) &&
+        (hasRssiThreshold_ == other.hasRssiThreshold_) &&
         (serviceData_ == other.serviceData_) &&
         (serviceDataMask_ == other.serviceDataMask_) &&
         (manufacturerId_ == other.manufacturerId_) &&
         (manufactureData_ == other.manufactureData_) &&
         (manufactureDataMask_ == other.manufactureDataMask_) &&
         (advIndReport_ == other.advIndReport_) &&
-        (filterIndex_ == other.filterIndex_);
+        (filterIndex_ == other.filterIndex_) &&
+        (rssiThreshold_ == other.rssiThreshold_);
 }
 
 bool BluetoothBleScanFilter::ReadUuidFromParcel(Parcel &parcel)

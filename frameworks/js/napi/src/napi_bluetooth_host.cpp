@@ -56,7 +56,7 @@ napi_value RegisterHostObserver(napi_env env, napi_callback_info info)
     if (type == REGISTER_STATE_CHANGE_TYPE) {
         return NapiAccess::RegisterAccessObserver(env, info);
     } else if (type == REGISTER_DEVICE_FIND_TYPE || type == REGISTER_PIN_REQUEST_TYPE ||
-               type == REGISTER_BOND_STATE_TYPE) {
+               type == REGISTER_BOND_STATE_TYPE || type == REGISTER_SCAN_MODE_CHANGE_TYPE) {
         return RegisterConnectionObserver(env, info);
     } else if (type == REGISTER_SPP_READ_TYPE) {
         return NapiSppServer::RegisterSocketObserver(env, info);
@@ -78,7 +78,7 @@ napi_value DeregisterHostObserver(napi_env env, napi_callback_info info)
     if (type == REGISTER_STATE_CHANGE_TYPE) {
         return NapiAccess::DeregisterAccessObserver(env, info);
     } else if (type == REGISTER_DEVICE_FIND_TYPE || type == REGISTER_PIN_REQUEST_TYPE ||
-               type == REGISTER_BOND_STATE_TYPE) {
+               type == REGISTER_BOND_STATE_TYPE || type == REGISTER_SCAN_MODE_CHANGE_TYPE) {
         return DeRegisterConnectionObserver(env, info);
     } else if (type == REGISTER_SPP_READ_TYPE) {
         return NapiSppServer::DeRegisterSocketObserver(env, info);

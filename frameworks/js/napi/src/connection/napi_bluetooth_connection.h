@@ -45,6 +45,7 @@ const char * const REGISTER_DISCOVERY_RESULT_TYPE = "discoveryResult";
 const char * const REGISTER_PIN_REQUEST_TYPE = "pinRequired";
 const char * const REGISTER_BOND_STATE_TYPE = "bondStateChange";
 const char * const REGISTER_BATTERY_CHANGE_TYPE = "batteryChange";
+const char * const REGISTER_SCAN_MODE_CHANGE_TYPE = "scanModeChange";
 const char * const INVALID_PIN_CODE = "000000";
 
 napi_value DefineConnectionFunctions(napi_env env, napi_value exports);
@@ -82,6 +83,10 @@ napi_value ConnectAllowedProfiles(napi_env env, napi_callback_info info);
 napi_value DisconnectAllowedProfiles(napi_env env, napi_callback_info info);
 napi_value GetRemoteProductId(napi_env env, napi_callback_info info);
 napi_value GetRemoteDeviceTransport(napi_env env, napi_callback_info info);
+napi_value OnScanModeChange(napi_env env, napi_callback_info info);
+napi_value OffScanModeChange(napi_env env, napi_callback_info info);
+napi_value RegisterConnectionObserverWithName(napi_env env, napi_callback_info info, std::string typeName);
+napi_value DeRegisterConnectionObserverWithName(napi_env env, napi_callback_info info, std::string typeName);
 #endif
 napi_value SetRemoteDeviceName(napi_env env, napi_callback_info info);
 napi_value SetRemoteDeviceType(napi_env env, napi_callback_info info);
