@@ -37,10 +37,14 @@ public:
     ~NapiEventSubscribeModule() = default;
 
     napi_status Register(napi_env env, napi_callback_info info);
+    napi_status RegisterWithName(napi_env env, napi_callback_info info, std::string name);
     napi_status Deregister(napi_env env, napi_callback_info info);
+    napi_status DeregisterWithName(napi_env env, napi_callback_info info, std::string name);
     void PublishEvent(std::string eventName, const std::shared_ptr<NapiNativeObject> &nativeObject);
 
 private:
+    void RegisterCallback(napi_env env, std::string name, napi_value callback);
+    void DeregisterCallback(napi_env env, std::string name, napi_value callback);
     bool IsValidEventName(const std::string &eventName) const;
     bool IsNapiCallbackExist(
         const std::vector<std::shared_ptr<NapiCallback>> &napiCallbackVec, napi_env env, napi_value &callback) const;

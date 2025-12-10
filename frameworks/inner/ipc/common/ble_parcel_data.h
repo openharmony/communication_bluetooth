@@ -1085,6 +1085,22 @@ public:
         return filterIndex_;
     }
 
+    void SetRssiThreshold(const int32_t &rssiThreshold)
+    {
+        rssiThreshold_ = rssiThreshold;
+        hasRssiThreshold_ = true;
+    }
+
+    bool HasRssiThreshold() const
+    {
+        return hasRssiThreshold_;
+    }
+
+    int32_t GetRssiThreshold() const
+    {
+        return rssiThreshold_;
+    }
+
 public:
     std::string deviceId_;
     std::string name_;
@@ -1097,6 +1113,7 @@ public:
     bool hasServiceUuidMask_ = false;
     bool hasSolicitationUuid_ = false;
     bool hasSolicitationUuidMask_ = false;
+    bool hasRssiThreshold_ = false;
 
     std::vector<uint8_t> serviceData_;
     std::vector<uint8_t> serviceDataMask_;
@@ -1106,6 +1123,7 @@ public:
     std::vector<uint8_t> manufactureDataMask_;
     bool advIndReport_ = false;
     uint8_t filterIndex_ = 0;
+    int32_t rssiThreshold_ = BLE_SCAN_MIN_RSSI_THRESHOLD;
 };
 }  // namespace bluetooth
 }  // namespace OHOS

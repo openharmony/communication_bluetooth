@@ -200,6 +200,7 @@ struct ScanFilter {
     uint16_t manufacturerId = 0;
     std::vector<uint8_t> manufactureData;
     std::vector<uint8_t> manufactureDataMask;
+    int32_t rssiThreshold = BLE_SCAN_MIN_RSSI_THRESHOLD;
 };
 
 enum class MatchMode {

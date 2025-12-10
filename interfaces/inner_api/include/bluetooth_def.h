@@ -499,6 +499,11 @@ constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_FIRST_MATCH = 2;
 constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_LOST_MATCH = 4;
 constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_FIRST_AND_LOST_MATCH = 6;
 
+// max rssi threshold
+constexpr int32_t BLE_SCAN_MAX_RSSI_THRESHOLD = 127;
+// min rssi threshold
+constexpr int32_t BLE_SCAN_MIN_RSSI_THRESHOLD = -128;
+
 // Sensitivity mode for Bluetooth LE scan
 typedef enum { SENSITIVITY_MODE_HIGH = 1, SENSITIVITY_MODE_LOW = 2 } SENSITIVITY_MODE;
 

@@ -542,6 +542,12 @@ public:
     void SetFilterIndex(uint8_t index);
 
     uint8_t GetFilterIndex() const;
+
+    void SetRssiThreshold(int32_t rssiThreshold);
+
+    bool HasRssiThreshold();
+
+    int32_t GetRssiThreshold() const;
     /**
      * @brief Compare two BleScanFilter whether are same or not.
      *
@@ -561,13 +567,15 @@ public:
             (hasServiceUuidMask_ == rhs.hasServiceUuidMask_) &&
             (hasSolicitationUuid_ == rhs.hasSolicitationUuid_) &&
             (hasSolicitationUuidMask_ == rhs.hasSolicitationUuidMask_) &&
+            (hasRssiThreshold_ == rhs.hasRssiThreshold_) &&
             (serviceData_ == rhs.serviceData_) &&
             (serviceDataMask_ == rhs.serviceDataMask_) &&
             (manufacturerId_ == rhs.manufacturerId_) &&
             (manufactureData_ == rhs.manufactureData_) &&
             (manufactureDataMask_ == rhs.manufactureDataMask_) &&
             (advIndReprot_ == rhs.advIndReprot_) &&
-            (filterIndex_ == rhs.filterIndex_);
+            (filterIndex_ == rhs.filterIndex_) &&
+            (rssiThreshold_ == rhs.rssiThreshold_);
     }
 
     private:
@@ -582,6 +590,7 @@ public:
         bool hasServiceUuidMask_ = false;
         bool hasSolicitationUuid_ = false;
         bool hasSolicitationUuidMask_ = false;
+        bool hasRssiThreshold_ = false;
 
         std::vector<uint8_t> serviceData_;
         std::vector<uint8_t> serviceDataMask_;
@@ -591,6 +600,7 @@ public:
         std::vector<uint8_t> manufactureDataMask_;
         bool advIndReprot_ = false;
         uint8_t filterIndex_ = 0;
+        int32_t rssiThreshold_ = BLE_SCAN_MIN_RSSI_THRESHOLD;
 };
 
 struct BleActiveDeviceInfo {

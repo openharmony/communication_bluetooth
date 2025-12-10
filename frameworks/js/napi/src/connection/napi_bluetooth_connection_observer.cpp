@@ -34,7 +34,8 @@ namespace Bluetooth {
 NapiBluetoothConnectionObserver::NapiBluetoothConnectionObserver()
     : eventSubscribe_({REGISTER_DEVICE_FIND_TYPE,
         REGISTER_DISCOVERY_RESULT_TYPE,
-        REGISTER_PIN_REQUEST_TYPE},
+        REGISTER_PIN_REQUEST_TYPE,
+        REGISTER_SCAN_MODE_CHANGE_TYPE},
         BT_MODULE_NAME)
 {}
 
@@ -85,7 +86,9 @@ void NapiBluetoothConnectionObserver::OnPairConfirmed(const BluetoothRemoteDevic
 
 void NapiBluetoothConnectionObserver::OnScanModeChanged(int mode)
 {
-    HILOGI("mode is %{public}d", mode);
+    HILOGD("mode is %{public}d", mode);
+    auto nativeObject = std::make_shared<NapiNativeInt>(mode);
+    eventSubscribe_.PublishEvent(REGISTER_SCAN_MODE_CHANGE_TYPE, nativeObject);
 }
 
 void NapiBluetoothConnectionObserver::OnDeviceNameChanged(const std::string &deviceName)
