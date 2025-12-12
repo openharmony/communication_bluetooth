@@ -449,8 +449,6 @@ private:
     int SetNotifyCharacteristicInner(GattCharacteristic &characteristic, bool enable,
         const std::vector<uint8_t> &descriptorValue);
 };
-
-std::vector<uint8_t> GetCharacteristicValue(const GattCharacteristic &characteristic);
 } // namespace Bluetooth
 } // namespace OHOS
 #endif  // BLUETOOTH_GATT_CLIENT_H
