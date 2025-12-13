@@ -62,7 +62,7 @@ public:
     ~TaiheAsyncWork() = default;
 
     void Run(void);
-    void CallFunction(int errorCode, std::shared_ptr<TaiheNativeObject> object);
+    void CallFunction(int errCode, std::shared_ptr<TaiheNativeObject> object);
     ani_object GetRet(void);
     std::shared_ptr<TaiheHaEventUtils> GetHaUtilsPtr(void) const;
 
