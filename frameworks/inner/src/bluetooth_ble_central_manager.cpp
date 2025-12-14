@@ -80,6 +80,9 @@ struct BleCentralManager::impl {
             scanResult.SetName(tempResult.GetName());
             scanResult.SetEventType(tempResult.GetEventType());
             scanResult.SetTxPowerLevel(tempResult.GetTxPowerLevel());
+            BluetoothAddress address(tempResult.GetPeripheralDevice().GetAddress(), tempResult.GetAddressType(),
+                tempResult.GetRawAddressType());
+            scanResult.SetAddress(address);
         }
 
         void OnScanCallback(const BluetoothBleScanResult &result, uint8_t callbackType) override
@@ -205,6 +208,9 @@ void BleCentralManager::impl::ConvertBleScanFilter(const std::vector<BleScanFilt
     for (auto filter : filters) {
         BluetoothBleScanFilter scanFilter;
         scanFilter.SetDeviceId(filter.GetDeviceId());
+        scanFilter.SetAddressType(filter.GetAddressType());
+        scanFilter.SetRawAddressType(filter.GetRawAddressType());
+        scanFilter.SetIrk(filter.GetIrk());
         scanFilter.SetName(filter.GetName());
         if (filter.HasServiceUuid()) {
             scanFilter.SetServiceUuid(bluetooth::Uuid::ConvertFromString(
@@ -722,6 +728,16 @@ uint16_t BleScanResult::GetEventType(void) const
     return eventType_;
 }
 
+void BleScanResult::SetAddress(const BluetoothAddress &address)
+{
+    address_ = address;
+}
+
+BluetoothAddress BleScanResult::GetAddress(void) const
+{
+    return address_;
+}
+
 BleScanSettings::BleScanSettings()
 {}
 
@@ -827,6 +843,36 @@ void BleScanFilter::SetDeviceId(std::string deviceId)
 std::string BleScanFilter::GetDeviceId() const
 {
     return deviceId_;
+}
+
+void BleScanFilter::SetAddressType(uint8_t addressType)
+{
+    addressType_ = addressType;
+}
+
+uint8_t BleScanFilter::GetAddressType() const
+{
+    return addressType_;
+}
+
+void BleScanFilter::SetRawAddressType(uint8_t rawAddressType)
+{
+    rawAddressType_ = rawAddressType;
+}
+
+uint8_t BleScanFilter::GetRawAddressType() const
+{
+    return rawAddressType_;
+}
+
+void BleScanFilter::SetIrk(const std::vector<uint8_t> &irk)
+{
+    irk_ = irk;
+}
+
+std::vector<uint8_t> BleScanFilter::GetIrk() const
+{
+    return irk_;
 }
 
 void BleScanFilter::SetName(std::string name)

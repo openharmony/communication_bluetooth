@@ -82,6 +82,16 @@ void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env
             propertyName = "addr";
         }
         napi_set_named_property(env, result, propertyName.c_str(), value);
+
+        napi_value bluetoothAddress = nullptr;
+        napi_create_object(env, &bluetoothAddress);
+        napi_set_named_property(env, bluetoothAddress, "address", value);
+        napi_create_int32(env, bleScanResult.GetAddress().addressType, &value);
+        napi_set_named_property(env, bluetoothAddress, "addressType", value);
+        napi_create_int32(env, bleScanResult.GetAddress().rawAddressType, &value);
+        napi_set_named_property(env, bluetoothAddress, "rawAddressType", value);
+        napi_set_named_property(env, result, "address", bluetoothAddress);
+
         napi_create_int32(env, bleScanResult.GetRssi(), &value);
         napi_set_named_property(env, result, "rssi", value);
         if (isSysInterface) {

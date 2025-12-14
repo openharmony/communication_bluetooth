@@ -36,6 +36,12 @@ bool BluetoothBleScanResult::Marshalling(Parcel &parcel) const
     if (!parcel.WriteString(addr_.GetAddress())) {
         return false;
     }
+    if (!parcel.WriteUint8(addressType_)) {
+        return false;
+    }
+    if (!parcel.WriteUint8(rawAddressType_)) {
+        return false;
+    }
     if (!parcel.WriteInt8(rssi_)) {
         return false;
     }
@@ -93,6 +99,12 @@ bool BluetoothBleScanResult::ReadFromParcel(Parcel &parcel)
     if (parcel.ReadString(address)) {
         addr_ = bluetooth::RawAddress(address);
     } else {
+        return false;
+    }
+    if (!parcel.ReadUint8(addressType_)) {
+        return false;
+    }
+    if (!parcel.ReadUint8(rawAddressType_)) {
         return false;
     }
     if (!parcel.ReadInt8(rssi_)) {

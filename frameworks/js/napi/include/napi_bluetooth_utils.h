@@ -458,12 +458,6 @@ enum AccessAuthorization {
     REJECTED = 2,
 };
 
-enum AddressType {
-    UNSET_ADDRESS = 0,
-    VIRTUAL_ADDRESS,
-    REAL_ADDRESS,
-};
-
 template<typename T1, typename T2, typename T3>
 struct AfterWorkCallbackData {
     T1* object;
@@ -512,6 +506,7 @@ void AfterWorkCallback(uv_work_t *work, int status)
 int DoInJsMainThread(napi_env env, std::function<void(void)> func);
 
 bool IsValidAddress(std::string bdaddr);
+bool IsRandomStaticAddress(std::string address);
 bool IsValidTransport(int transport);
 bool IsValidConnectStrategy(int strategy);
 napi_status NapiIsBoolean(napi_env env, napi_value value);
@@ -528,6 +523,9 @@ napi_status ParseBooleanParams(napi_env env, napi_value object, const char *name
 napi_status ParseStringParams(napi_env env, napi_value object, const char *name, bool &outExist,
     std::string &outParam);
 napi_status ParseArrayBufferParams(napi_env env, napi_value object, const char *name, bool &outExist,
+    std::vector<uint8_t> &outParam);
+napi_status ParseUint8ArrayParam(napi_env env, napi_value array, std::vector<uint8_t> &outParam);
+napi_status NapiParseObjectUint8Array(napi_env env, napi_value object, const char *name, bool &outExist,
     std::vector<uint8_t> &outParam);
 napi_status ParseUuidParams(napi_env env, napi_value object, const char *name, bool &outExist, UUID &outUuid);
 
@@ -555,7 +553,7 @@ napi_status ConvertDataMapToJS(const napi_env env, NapiMap &dataMapNapi,
 {
     for (const auto &[key, value] : dataMap) {
         napi_value napiKey;
-        
+
         napi_value napiBuffer;
         napi_value napiValue;
         size_t valueSize = value.size();
