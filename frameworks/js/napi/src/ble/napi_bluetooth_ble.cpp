@@ -495,6 +495,68 @@ static napi_status ParseScanFilterDeviceIdParameters(
     return napi_ok;
 }
 
+static napi_status ParseScanFilterAddrInfoParameters(const napi_env &env, napi_value &scanFilter,
+    BleScanFilter &bleScanFilter)
+{
+    bool hasProperty = false;
+    NAPI_BT_CALL_RETURN(napi_has_named_property(env, scanFilter, "address", &hasProperty)); // address is optional
+    if (hasProperty) {
+        bool exist = false;
+        napi_value bluetoothAddress;
+        NAPI_BT_CALL_RETURN(napi_get_named_property(env, scanFilter, "address", &bluetoothAddress));
+
+        // address in bluetoothAddress is not optional
+        std::string deviceId {};
+        NAPI_BT_CALL_RETURN(ParseStringParams(env, bluetoothAddress, "address", exist, deviceId));
+        if (!IsValidAddress(deviceId)) {
+            HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
+            return napi_invalid_arg;
+        }
+        HILOGI("Scan filter device id is %{public}s", GetEncryptAddr(deviceId).c_str());
+        bleScanFilter.SetDeviceId(deviceId); // override the value of deviceId if both was given
+
+        // addressType in bluetoothAddress is not optional
+        int32_t addressType = AddressType::UNSET_ADDRESS;
+        NAPI_BT_CALL_RETURN(ParseInt32Params(env, bluetoothAddress, "addressType", exist, addressType));
+        // use virtual address for ble scan is not supported yet
+        NAPI_BT_RETURN_IF(addressType == AddressType::VIRTUAL_ADDRESS, "Invalid addressType",
+            napi_invalid_arg);
+        HILOGI("Scan filter addressType is %{public}d", addressType);
+        bleScanFilter.SetAddressType(addressType);
+
+        // rawAddressType in bluetoothAddress is optional
+        int32_t rawAddressType = RawAddressType::UNSET_RAW_ADDRESS;
+        NAPI_BT_CALL_RETURN(ParseInt32Params(env, bluetoothAddress, "rawAddressType", exist, rawAddressType));
+        NAPI_BT_RETURN_IF(rawAddressType < RawAddressType::PUBLIC_ADDRESS ||
+            rawAddressType > RawAddressType::UNSET_RAW_ADDRESS, "Invalid rawAddressType", napi_invalid_arg);
+        HILOGI("Scan filter rawAddressType is %{public}d", rawAddressType);
+        bleScanFilter.SetRawAddressType(rawAddressType);
+    }
+    return napi_ok;
+}
+
+static napi_status ParseScanFilterIrkParameters(const napi_env &env, napi_value &scanFilter,
+    BleScanFilter &bleScanFilter)
+{
+    bool exist = false;
+    std::vector<uint8_t> irk {};
+    NAPI_BT_CALL_RETURN(NapiParseObjectUint8Array(env, scanFilter, "irk", exist, irk));
+    if (exist) {
+        NAPI_BT_RETURN_IF(irk.size() != LEN_OF_IRK, "length of irk should be 16 octets", napi_invalid_arg);
+        // IRK can only be used with a REAL address
+        NAPI_BT_RETURN_IF(bleScanFilter.GetAddressType() != AddressType::REAL_ADDRESS,
+            "addressType must be REAL when IRK is used", napi_invalid_arg);
+        // IRK can only be used with a PUBLIC or RANDOM (STATIC) address
+        bool isPublicAddress = (bleScanFilter.GetRawAddressType() == RawAddressType::PUBLIC_ADDRESS);
+        bool isRandomAddress = (bleScanFilter.GetRawAddressType() == RawAddressType::RANDOM_ADDRESS);
+        bool isRandomStaticAddress = IsRandomStaticAddress(bleScanFilter.GetDeviceId());
+        NAPI_BT_RETURN_IF(!(isPublicAddress || (isRandomAddress && isRandomStaticAddress)),
+            "rawAddressType must be PUBLIC or RANDOM (STATIC) when IRK is used", napi_invalid_arg);
+        bleScanFilter.SetIrk(irk);
+    }
+    return napi_ok;
+}
+
 static napi_status ParseScanFilterLocalNameParameters(
     const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
 {
@@ -601,12 +663,14 @@ static napi_status ParseScanFilterManufactureDataParameters(
 static napi_status ParseScanFilter(const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
 {
     HILOGD("enter");
-    std::vector<std::string> expectedNames {"deviceId", "name", "serviceUuid", "serviceUuidMask",
+    std::vector<std::string> expectedNames {"deviceId", "address", "irk", "name", "serviceUuid", "serviceUuidMask",
         "serviceSolicitationUuid", "serviceSolicitationUuidMask", "serviceData", "serviceDataMask", "manufactureId",
         "manufactureData", "manufactureDataMask"};
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, scanFilter, expectedNames));
 
     NAPI_BT_CALL_RETURN(ParseScanFilterDeviceIdParameters(env, scanFilter, bleScanFilter));
+    NAPI_BT_CALL_RETURN(ParseScanFilterAddrInfoParameters(env, scanFilter, bleScanFilter));
+    NAPI_BT_CALL_RETURN(ParseScanFilterIrkParameters(env, scanFilter, bleScanFilter));
     NAPI_BT_CALL_RETURN(ParseScanFilterLocalNameParameters(env, scanFilter, bleScanFilter));
     NAPI_BT_CALL_RETURN(ParseScanFilterServiceUuidParameters(env, scanFilter, bleScanFilter));
     NAPI_BT_CALL_RETURN(ParseScanFilterSolicitationUuidParameters(env, scanFilter, bleScanFilter));

@@ -49,6 +49,9 @@
 
 namespace OHOS {
 namespace bluetooth {
+
+constexpr int LEN_OF_IRK = 16; // in octets
+
 /**
  * @brief Represents scan settings.
  *
@@ -464,6 +467,20 @@ public:
      */
     std::string GetDeviceId() const;
 
+    void SetAddressType(uint8_t addressType);
+
+    uint8_t GetAddressType() const;
+
+    void SetRawAddressType(uint8_t rawAddressType);
+
+    uint8_t GetRawAddressType() const;
+
+    void SetIrk(std::vector<uint8_t> irk);
+
+    std::vector<uint8_t> GetIrk() const;
+
+    std::array<uint8_t, LEN_OF_IRK> GetIrkArray() const;
+
     void SetName(const std::string &name);
 
     std::string GetName() const;
@@ -530,6 +547,9 @@ public:
 
 private:
     std::string deviceId_;
+    uint8_t addressType_ = AddressType::UNSET_ADDRESS; // real or virtual
+    uint8_t rawAddressType_ = RawAddressType::UNSET_RAW_ADDRESS; // public or random
+    std::vector<uint8_t> irk_ = {};
     std::string name_;
 
     Uuid serviceUuid_;

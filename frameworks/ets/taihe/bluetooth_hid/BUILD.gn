@@ -18,7 +18,7 @@ import("//build/ohos/taihe_idl/taihe.gni")
 SUBSYSTEM_DIR = "//foundation/communication"
 
 copy_taihe_idl("bluetooth_hid_taihe") {
-  sources = [ 
+  sources = [
     "idl/ohos.bluetooth.hid.taihe"
   ]
   deps = [

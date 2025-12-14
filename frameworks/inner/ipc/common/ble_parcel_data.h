@@ -678,11 +678,33 @@ public:
         return eventType_;
     }
 
+    void SetAddressType(uint8_t addressType)
+    {
+        addressType_ = addressType;
+    }
+
+    uint8_t GetAddressType() const
+    {
+        return addressType_;
+    }
+
+    void SetRawAddressType(uint8_t rawAddressType)
+    {
+        rawAddressType_ = rawAddressType;
+    }
+
+    uint8_t GetRawAddressType() const
+    {
+        return rawAddressType_;
+    }
+
 public:
     std::vector<Uuid> serviceUuids_ {};
     std::map<uint16_t, std::string> manufacturerSpecificData_ {};
     std::map<Uuid, std::string> serviceData_ {};
     RawAddress addr_ {};
+    uint8_t addressType_ = AddressType::UNSET_ADDRESS;
+    uint8_t rawAddressType_ = RawAddressType::UNSET_RAW_ADDRESS;
     int8_t rssi_ {};
     bool connectable_ {};
     uint8_t advertiseFlag_ {};
@@ -941,6 +963,36 @@ public:
         return deviceId_;
     }
 
+    void SetAddressType(uint8_t addressType)
+    {
+        addressType_ = addressType;
+    }
+
+    uint8_t GetAddressType() const
+    {
+        return addressType_;
+    }
+
+    void SetRawAddressType(uint8_t rawAddressType)
+    {
+        rawAddressType_ = rawAddressType;
+    }
+
+    uint8_t GetRawAddressType() const
+    {
+        return rawAddressType_;
+    }
+
+    void SetIrk(std::vector<uint8_t> irk)
+    {
+        irk_ = irk;
+    }
+
+    std::vector<uint8_t> GetIrk() const
+    {
+        return irk_;
+    }
+
     void SetName(const std::string &name)
     {
         name_ = name;
@@ -1087,6 +1139,9 @@ public:
 
 public:
     std::string deviceId_;
+    uint8_t addressType_ = AddressType::UNSET_ADDRESS; // real or virtual
+    uint8_t rawAddressType_ = RawAddressType::UNSET_RAW_ADDRESS; // public or random
+    std::vector<uint8_t> irk_ = {};
     std::string name_;
 
     Uuid serviceUuid_;

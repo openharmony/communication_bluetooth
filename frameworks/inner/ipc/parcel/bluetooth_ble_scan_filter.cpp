@@ -20,7 +20,10 @@ namespace OHOS {
 namespace Bluetooth {
 bool BluetoothBleScanFilter::Marshalling(Parcel &parcel) const
 {
-    if (!parcel.WriteString(deviceId_)) {
+    if (!WriteAddrInfoToParcel(parcel)) {
+        return false;
+    }
+    if (!parcel.WriteUInt8Vector(irk_)) {
         return false;
     }
     if (!parcel.WriteString(name_)) {
@@ -95,7 +98,10 @@ bool BluetoothBleScanFilter::WriteToParcel(Parcel &parcel)
 
 bool BluetoothBleScanFilter::ReadFromParcel(Parcel &parcel)
 {
-    if (!parcel.ReadString(deviceId_)) {
+    if (!ReadAddrInfoFromParcel(parcel)) {
+        return false;
+    }
+    if (!parcel.ReadUInt8Vector(&irk_)) {
         return false;
     }
     if (!parcel.ReadString(name_)) {
@@ -140,6 +146,9 @@ bool BluetoothBleScanFilter::ReadFromParcel(Parcel &parcel)
 bool BluetoothBleScanFilter::operator==(const BluetoothBleScanFilter& other) const
 {
     return (deviceId_ == other.deviceId_) &&
+        (addressType_ == other.addressType_) &&
+        (rawAddressType_ == other.rawAddressType_) &&
+        (irk_ == other.irk_) &&
         (name_ == other.name_) &&
         (serviceUuid_ == other.serviceUuid_) &&
         (serviceUuidMask_ == other.serviceUuidMask_) &&
@@ -156,6 +165,34 @@ bool BluetoothBleScanFilter::operator==(const BluetoothBleScanFilter& other) con
         (manufactureDataMask_ == other.manufactureDataMask_) &&
         (advIndReport_ == other.advIndReport_) &&
         (filterIndex_ == other.filterIndex_);
+}
+
+bool BluetoothBleScanFilter::ReadAddrInfoFromParcel(Parcel &parcel)
+{
+    if (!parcel.ReadString(deviceId_)) {
+        return false;
+    }
+    if (!parcel.ReadUint8(addressType_)) {
+        return false;
+    }
+    if (!parcel.ReadUint8(rawAddressType_)) {
+        return false;
+    }
+    return true;
+}
+
+bool BluetoothBleScanFilter::WriteAddrInfoToParcel(Parcel &parcel) const
+{
+    if (!parcel.WriteString(deviceId_)) {
+        return false;
+    }
+    if (!parcel.WriteUint8(addressType_)) {
+        return false;
+    }
+    if (!parcel.WriteUint8(rawAddressType_)) {
+        return false;
+    }
+    return true;
 }
 
 bool BluetoothBleScanFilter::ReadUuidFromParcel(Parcel &parcel)
