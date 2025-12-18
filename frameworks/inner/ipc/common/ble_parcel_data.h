@@ -209,6 +209,28 @@ public:
         includeTxPower_ = flag;
     }
 
+    /**
+     * @brief Get the advertise name included in the advertise packet.
+     *
+     * @return Returns advertiseName.
+     * @since 23
+     */
+    std::string GetAdvertiseName() const
+    {
+        return advertiseName_;
+    }
+
+    /**
+     * @brief Set the advertise name to be included in the advertise packet.
+     *
+     * @param advName advertiseName.
+     * @since 23
+     */
+    void SetAdvertiseName(std::string advName)
+    {
+        advertiseName_ = advName;
+    }
+
 public:
     std::vector<Uuid> serviceUuids_ {};
     std::map<uint16_t, std::string> manufacturerSpecificData_ {};
@@ -216,6 +238,7 @@ public:
     uint8_t advFlag_ {};
     std::string payload_ = "";
     bool includeDeviceName_ = false;
+    std::string advertiseName_ = "";
     bool includeTxPower_ = false;
 };
 

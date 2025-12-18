@@ -244,6 +244,7 @@ void BleAdvertiser::impl::ConvertBleAdvertiserData(const BleAdvertiserData &data
     }
     outData.SetIncludeDeviceName(data.GetIncludeDeviceName());
     outData.SetIncludeTxPower(data.GetIncludeTxPower());
+    outData.SetAdvertiseName(data.GetAdvertiseName());
 }
 
 uint32_t BleAdvertiser::impl::GetAdvertiserTotalBytes(const BluetoothBleAdvertiserData &data, bool isFlagsIncluded)
@@ -283,10 +284,15 @@ uint32_t BleAdvertiser::impl::GetAdvertiserTotalBytes(const BluetoothBleAdvertis
         size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + static_cast<uint32_t>(num128BitUuids * Uuid::UUID128_BYTES_TYPE);
     }
     if (data.GetIncludeDeviceName()) {
-        uint32_t deviceNameLen = BluetoothHost::GetDefaultHost().GetLocalName().length();
-        deviceNameLen = (deviceNameLen > DEVICE_NAME_MAX_LEN) ?  DEVICE_NAME_MAX_LEN : deviceNameLen;
-        size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + deviceNameLen;
+        uint32_t advNameLen = 0;
+        if (data.GetAdvertiseName().empty()) {
+            advNameLen = BluetoothHost::GetDefaultHost().GetLocalName().length();
+        } else {
+            advNameLen = data.GetAdvertiseName().length();
+        }
+        size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + advNameLen;
     }
+
     if (data.GetIncludeTxPower()) {
         uint32_t txPowerLen = 3;
         size += BLE_ADV_PER_FIELD_OVERHEAD_LENGTH + txPowerLen;
@@ -671,6 +677,16 @@ bool BleAdvertiserData::GetIncludeDeviceName() const
 void BleAdvertiserData::SetIncludeDeviceName(bool flag)
 {
     includeDeviceName_ = flag;
+}
+
+std::string BleAdvertiserData::GetAdvertiseName() const
+{
+    return advertiseName_;
+}
+
+void BleAdvertiserData::SetAdvertiseName(std::string advName)
+{
+    advertiseName_ = advName;
 }
 
 bool BleAdvertiserData::GetIncludeTxPower() const
