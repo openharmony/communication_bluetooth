@@ -61,24 +61,28 @@ napi_status NapiEventSubscribeModule::Register(napi_env env, napi_callback_info 
     napi_value callback = argv[PARAM1];
     NAPI_BT_CALL_RETURN(NapiIsFunction(env, callback));
 
-    eventSubscribeMap_.ChangeValueByLambda(name, [this, &env, &name, &callback](auto &callbackVec) {
-        if (IsNapiCallbackExist(callbackVec, env, callback)) {
-            HILOGW("The %{public}s callback is registered, no need to re-registered", name.c_str());
-            return;
-        }
-        // Attempt clear invalid napi env
-        callbackVec.erase(
-            std::remove_if(callbackVec.begin(), callbackVec.end(),
-                [](std::shared_ptr<NapiCallback> &callback) {
-                    return callback == nullptr || !callback->IsValidNapiEnv();
-                }),
-            callbackVec.end());
+    RegisterCallback(env, name, callback);
+    return napi_ok;
+}
 
-        auto napiCallback = std::make_shared<NapiCallback>(env, callback);
-        callbackVec.push_back(napiCallback);
-        HILOGI("Register one %{public}s callback in %{public}s module, %{public}s, %{public}zu callback left",
-            name.c_str(), moduleName_.c_str(), napiCallback->ToLogString().c_str(), callbackVec.size());
-    });
+napi_status NapiEventSubscribeModule::RegisterWithName(napi_env env, napi_callback_info info, std::string name)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 arguments", napi_invalid_arg);
+
+    if (!IsValidEventName(name)) {
+        HILOGE("Invalid name %{public}s, valid name is %{public}s",
+            name.c_str(), ToLogString(validEventNameVec_).c_str());
+        return napi_invalid_arg;
+    }
+
+    napi_value callback = argv[PARAM0];
+    NAPI_BT_CALL_RETURN(NapiIsFunction(env, callback));
+
+    RegisterCallback(env, name, callback);
     return napi_ok;
 }
 
@@ -107,6 +111,63 @@ napi_status NapiEventSubscribeModule::Deregister(napi_env env, napi_callback_inf
     // The argc is ARGS_SIZE_TWO
     napi_value callback = argv[PARAM1];
     NAPI_BT_CALL_RETURN(NapiIsFunction(env, callback));
+    
+    DeregisterCallback(env, name, callback);
+    return napi_ok;
+}
+
+napi_status NapiEventSubscribeModule::DeregisterWithName(napi_env env, napi_callback_info info, std::string name)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF(
+        argc != ARGS_SIZE_ZERO && argc != ARGS_SIZE_ONE, "Requires 0 or 1 arguments", napi_invalid_arg);
+
+    if (!IsValidEventName(name)) {
+        HILOGE("Invalid name %{public}s, valid name is %{public}s",
+            name.c_str(), ToLogString(validEventNameVec_).c_str());
+        return napi_invalid_arg;
+    }
+
+    if (argc == ARGS_SIZE_ZERO) {
+        HILOGI("Deregister all %{public}s callback in %{public}s module", name.c_str(), moduleName_.c_str());
+        eventSubscribeMap_.Erase(name);
+        return napi_ok;
+    }
+    // The argc is ARGS_SIZE_ONE
+    napi_value callback = argv[PARAM0];
+    NAPI_BT_CALL_RETURN(NapiIsFunction(env, callback));
+
+    DeregisterCallback(env, name, callback);
+    return napi_ok;
+}
+
+void NapiEventSubscribeModule::RegisterCallback(napi_env env, std::string name, napi_value callback)
+{
+    eventSubscribeMap_.ChangeValueByLambda(name, [this, &env, &name, &callback](auto &callbackVec) {
+        if (IsNapiCallbackExist(callbackVec, env, callback)) {
+            HILOGW("The %{public}s callback is registered, no need to re-registered", name.c_str());
+            return;
+        }
+        // Attempt clear invalid napi env
+        callbackVec.erase(
+            std::remove_if(callbackVec.begin(), callbackVec.end(),
+                [](std::shared_ptr<NapiCallback> &callback) {
+                    return callback == nullptr || !callback->IsValidNapiEnv();
+                }),
+            callbackVec.end());
+
+        auto napiCallback = std::make_shared<NapiCallback>(env, callback);
+        callbackVec.push_back(napiCallback);
+        HILOGI("Register one %{public}s callback in %{public}s module, %{public}s, %{public}zu callback left",
+            name.c_str(), moduleName_.c_str(), napiCallback->ToLogString().c_str(), callbackVec.size());
+    });
+}
+
+void NapiEventSubscribeModule::DeregisterCallback(napi_env env, std::string name, napi_value callback)
+{
     eventSubscribeMap_.ChangeValueByLambda(name, [this, &name, &env, &callback](auto &callbackVec) {
         auto it = std::find_if(callbackVec.begin(), callbackVec.end(),
             [&env, &callback](auto &napiCallback) { return napiCallback->Equal(env, callback); });
@@ -120,7 +181,6 @@ napi_status NapiEventSubscribeModule::Deregister(napi_env env, napi_callback_inf
         HILOGI("Deregister one %{public}s callback in %{public}s module, %{public}s, %{public}zu callback left",
             name.c_str(), moduleName_.c_str(), callbackIdLog.c_str(), callbackVec.size());
     });
-    return napi_ok;
 }
 
 bool NapiEventSubscribeModule::IsValidEventName(const std::string &eventName) const

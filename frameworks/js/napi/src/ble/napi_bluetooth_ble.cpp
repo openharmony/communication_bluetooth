@@ -598,12 +598,27 @@ static napi_status ParseScanFilterManufactureDataParameters(
     return napi_ok;
 }
 
+static napi_status ParseScanFilterRssiThresholdParameters(
+    const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
+{
+    bool exist = false;
+    int32_t rssiThreshold = BLE_SCAN_MIN_RSSI_THRESHOLD;
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, scanFilter, "rssiThreshold", exist, rssiThreshold));
+    NAPI_BT_RETURN_IF(rssiThreshold > BLE_SCAN_MAX_RSSI_THRESHOLD || rssiThreshold < BLE_SCAN_MIN_RSSI_THRESHOLD,
+        "Invalid rssiThreshold", napi_invalid_arg);
+    if (exist) {
+        HILOGI("Scan rssiThreshold is %{public}d", rssiThreshold);
+        bleScanFilter.SetRssiThreshold(rssiThreshold);
+    }
+    return napi_ok;
+}
+
 static napi_status ParseScanFilter(const napi_env &env, napi_value &scanFilter, BleScanFilter &bleScanFilter)
 {
     HILOGD("enter");
     std::vector<std::string> expectedNames {"deviceId", "name", "serviceUuid", "serviceUuidMask",
         "serviceSolicitationUuid", "serviceSolicitationUuidMask", "serviceData", "serviceDataMask", "manufactureId",
-        "manufactureData", "manufactureDataMask"};
+        "manufactureData", "manufactureDataMask", "rssiThreshold"};
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, scanFilter, expectedNames));
 
     NAPI_BT_CALL_RETURN(ParseScanFilterDeviceIdParameters(env, scanFilter, bleScanFilter));
@@ -612,6 +627,7 @@ static napi_status ParseScanFilter(const napi_env &env, napi_value &scanFilter, 
     NAPI_BT_CALL_RETURN(ParseScanFilterSolicitationUuidParameters(env, scanFilter, bleScanFilter));
     NAPI_BT_CALL_RETURN(ParseScanFilterServiceDataParameters(env, scanFilter, bleScanFilter));
     NAPI_BT_CALL_RETURN(ParseScanFilterManufactureDataParameters(env, scanFilter, bleScanFilter));
+    NAPI_BT_CALL_RETURN(ParseScanFilterRssiThresholdParameters(env, scanFilter, bleScanFilter));
     return napi_ok;
 }
 

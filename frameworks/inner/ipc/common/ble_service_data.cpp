@@ -321,6 +321,22 @@ uint8_t BleScanFilterImpl::GetFilterAction() const
     return action_;
 }
 
+void BleScanFilterImpl::SetRssiThreshold(int32_t rssiThreshold)
+{
+    rssiThreshold_ = rssiThreshold;
+    hasRssiThreshold_ = true;
+}
+
+bool BleScanFilterImpl::HasRssiThreshold() const
+{
+    return hasRssiThreshold_;
+}
+
+int32_t BleScanFilterImpl::GetRssiThreshold() const
+{
+    return rssiThreshold_;
+}
+
 /**
  * @brief Check if the device service is connectable.
  *

@@ -222,6 +222,9 @@ void BleCentralManager::impl::ConvertBleScanFilter(const std::vector<BleScanFilt
             scanFilter.SetServiceSolicitationUuidMask(bluetooth::Uuid::ConvertFromString(
                 filter.GetServiceSolicitationUuidMask().ToString()));
         }
+        if (filter.HasRssiThreshold()) {
+            scanFilter.SetRssiThreshold(filter.GetRssiThreshold());
+        }
         scanFilter.SetServiceData(filter.GetServiceData());
         scanFilter.SetServiceDataMask(filter.GetServiceDataMask());
         scanFilter.SetManufacturerId(filter.GetManufacturerId());
@@ -972,6 +975,22 @@ void BleScanFilter::SetFilterIndex(uint8_t index)
 uint8_t BleScanFilter::GetFilterIndex() const
 {
     return filterIndex_;
+}
+
+void BleScanFilter::SetRssiThreshold(int32_t rssiThreshold)
+{
+    rssiThreshold_ = rssiThreshold;
+    hasRssiThreshold_ = true;
+}
+
+bool BleScanFilter::HasRssiThreshold()
+{
+    return hasRssiThreshold_;
+}
+
+int32_t BleScanFilter::GetRssiThreshold() const
+{
+    return rssiThreshold_;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
