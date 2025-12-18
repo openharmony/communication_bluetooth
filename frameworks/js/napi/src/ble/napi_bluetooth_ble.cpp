@@ -822,16 +822,24 @@ static napi_status ParseAdvertisDataParameters(const napi_env &env,
     const napi_value &object, BleAdvertiserData &outData)
 {
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(
-        env, object, {"serviceUuids", "manufactureData", "serviceData", "includeDeviceName", "includeTxPower"}));
+        env, object, {"serviceUuids", "manufactureData", "serviceData", "includeDeviceName", "includeTxPower",
+            "advertiseName"}));
 
     NAPI_BT_CALL_RETURN(ParseServiceUuidParameters(env, object, outData));
     NAPI_BT_CALL_RETURN(ParseManufactureDataParameters(env, object, outData));
     NAPI_BT_CALL_RETURN(ParseServiceDataParameters(env, object, outData));
+
     bool exist = false;
     bool includeDeviceName = false;
     NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(env, object, "includeDeviceName", includeDeviceName, exist));
     HILOGI("includeDeviceName: %{public}d", includeDeviceName);
     outData.SetIncludeDeviceName(includeDeviceName);
+
+    std::string advName = "";
+    NAPI_BT_CALL_RETURN(NapiParseObjectStringOptional(env, object, "advertiseName", advName, exist));
+    NAPI_BT_RETURN_IF(!advName.empty() && !includeDeviceName, "includeDeviceName must be true if advertiseName is set",
+        napi_invalid_arg);
+    outData.SetAdvertiseName(advName);
 
     bool includeTxPower = false;
     NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(env, object, "includeTxPower", includeTxPower, exist));

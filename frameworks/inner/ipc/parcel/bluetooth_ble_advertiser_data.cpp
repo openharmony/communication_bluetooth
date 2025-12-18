@@ -47,6 +47,9 @@ bool BluetoothBleAdvertiserData::Marshalling(Parcel &parcel) const
     if (!parcel.WriteBool(includeTxPower_)) {
         return false;
     }
+    if (!parcel.WriteString(advertiseName_)) {
+        return false;
+    }
     return true;
 }
 
@@ -86,6 +89,9 @@ bool BluetoothBleAdvertiserData::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!parcel.ReadBool(includeTxPower_)) {
+        return false;
+    }
+    if (!parcel.ReadString(advertiseName_)) {
         return false;
     }
     return true;

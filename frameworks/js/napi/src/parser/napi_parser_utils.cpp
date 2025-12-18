@@ -684,6 +684,22 @@ napi_status NapiParseObjectBooleanOptional(napi_env env, napi_value object, cons
     outExist = exist;
     return napi_ok;
 }
+
+napi_status NapiParseObjectStringOptional(napi_env env, napi_value object, const char *name, std::string &outString,
+    bool &outExist)
+{
+    napi_value property;
+    bool exist = false;
+    NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
+    NAPI_BT_CALL_RETURN(NapiGetObjectPropertyOptional(env, object, name, property, exist));
+    if (exist) {
+        std::string str = "";
+        NAPI_BT_CALL_RETURN(NapiParseString(env, property, str));
+        outString = str;
+    }
+    outExist = exist;
+    return napi_ok;
+}
 napi_status NapiParseObjectInt32Optional(napi_env env, napi_value object, const char *name, int32_t &outNum,
     bool &outExist)
 {
