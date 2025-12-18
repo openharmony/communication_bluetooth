@@ -58,6 +58,8 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getRemoteProfileUuids", GetRemoteProfileUuids),
         DECLARE_NAPI_FUNCTION("on", RegisterConnectionObserver),
         DECLARE_NAPI_FUNCTION("off", DeRegisterConnectionObserver),
+        DECLARE_NAPI_FUNCTION("onScanModeChange", OnScanModeChange),
+        DECLARE_NAPI_FUNCTION("offScanModeChange", OffScanModeChange),
         DECLARE_NAPI_FUNCTION("isBluetoothDiscovering", IsBluetoothDiscovering),
         DECLARE_NAPI_FUNCTION("getPairState", GetPairState),
         DECLARE_NAPI_FUNCTION("connectAllowedProfiles", ConnectAllowedProfiles),
@@ -128,22 +130,44 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
 #endif
 
 using NapiBluetoothOnOffFunc = std::function<napi_status(napi_env env, napi_callback_info info)>;
+using NapiBluetoothOnOffFuncWithName =
+    std::function<napi_status(napi_env env, napi_callback_info info, std::string typeName)>;
 
 static napi_status NapiConnectionOnOffExecute(napi_env env, napi_callback_info info,
     NapiBluetoothOnOffFunc connectionObserverFunc, NapiBluetoothOnOffFunc remoteDeviceObserverFunc)
 {
-    std::string type = "";
-    NAPI_BT_CALL_RETURN(NapiGetOnOffCallbackName(env, info, type));
-
+    std::string typeName = "";
+    NAPI_BT_CALL_RETURN(NapiGetOnOffCallbackName(env, info, typeName));
     napi_status status = napi_ok;
-    if (type == REGISTER_DEVICE_FIND_TYPE ||
-        type == REGISTER_DISCOVERY_RESULT_TYPE ||
-        type == REGISTER_PIN_REQUEST_TYPE) {
+    if (typeName == REGISTER_DEVICE_FIND_TYPE ||
+        typeName == REGISTER_DISCOVERY_RESULT_TYPE ||
+        typeName == REGISTER_PIN_REQUEST_TYPE ||
+        typeName == REGISTER_SCAN_MODE_CHANGE_TYPE) {
         status = connectionObserverFunc(env, info);
-    } else if (type == REGISTER_BOND_STATE_TYPE || type == REGISTER_BATTERY_CHANGE_TYPE) {
+    } else if (typeName == REGISTER_BOND_STATE_TYPE || typeName == REGISTER_BATTERY_CHANGE_TYPE) {
         status = remoteDeviceObserverFunc(env, info);
     } else {
-        HILOGE("Unsupported callback: %{public}s", type.c_str());
+        HILOGE("Unsupported callback: %{public}s", typeName.c_str());
+        status = napi_invalid_arg;
+    }
+    return status;
+}
+
+static napi_status NapiConnectionOnOffExecuteWithName(napi_env env, napi_callback_info info,
+    NapiBluetoothOnOffFuncWithName connectionObserverFuncWithName,
+    NapiBluetoothOnOffFuncWithName remoteDeviceObserverFuncWithName,
+    std::string typeName)
+{
+    napi_status status = napi_ok;
+    if (typeName == REGISTER_DEVICE_FIND_TYPE ||
+        typeName == REGISTER_DISCOVERY_RESULT_TYPE ||
+        typeName == REGISTER_PIN_REQUEST_TYPE ||
+        typeName == REGISTER_SCAN_MODE_CHANGE_TYPE) {
+        status = connectionObserverFuncWithName(env, info, typeName);
+    } else if (typeName == REGISTER_BOND_STATE_TYPE || typeName == REGISTER_BATTERY_CHANGE_TYPE) {
+        status = remoteDeviceObserverFuncWithName(env, info, typeName);
+    } else {
+        HILOGE("Unsupported callback: %{public}s", typeName.c_str());
         status = napi_invalid_arg;
     }
     return status;
@@ -175,6 +199,48 @@ napi_value DeRegisterConnectionObserver(napi_env env, napi_callback_info info)
     auto status = NapiConnectionOnOffExecute(env, info, connectionObserverFunc, remoteDeviceObserverFunc);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     return NapiGetUndefinedRet(env);
+}
+
+napi_value RegisterConnectionObserverWithName(
+    napi_env env, napi_callback_info info, std::string typeName)
+{
+    auto connectionObserverFuncWithName = [](napi_env env, napi_callback_info info, std::string typeName) {
+        return g_connectionObserver->eventSubscribe_.RegisterWithName(env, info, typeName);
+    };
+    auto remoteDeviceObserverFuncWithName =  [](napi_env env, napi_callback_info info, std::string typeName) {
+        return g_remoteDeviceObserver->eventSubscribe_.RegisterWithName(env, info, typeName);
+    };
+
+    auto status = NapiConnectionOnOffExecuteWithName(
+        env, info, connectionObserverFuncWithName, remoteDeviceObserverFuncWithName, typeName);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    return NapiGetUndefinedRet(env);
+}
+
+napi_value DeRegisterConnectionObserverWithName(
+    napi_env env, napi_callback_info info, std::string typeName)
+{
+    auto connectionObserverFuncWithName = [](napi_env env, napi_callback_info info, std::string typeName) {
+        return g_connectionObserver->eventSubscribe_.DeregisterWithName(env, info, typeName);
+    };
+    auto remoteDeviceObserverFuncWithName =  [](napi_env env, napi_callback_info info, std::string typeName) {
+        return g_remoteDeviceObserver->eventSubscribe_.DeregisterWithName(env, info, typeName);
+    };
+
+    auto status = NapiConnectionOnOffExecuteWithName(
+        env, info, connectionObserverFuncWithName, remoteDeviceObserverFuncWithName, typeName);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    return NapiGetUndefinedRet(env);
+}
+
+napi_value OnScanModeChange(napi_env env, napi_callback_info info)
+{
+    return RegisterConnectionObserverWithName(env, info, REGISTER_SCAN_MODE_CHANGE_TYPE);
+}
+
+napi_value OffScanModeChange(napi_env env, napi_callback_info info)
+{
+    return DeRegisterConnectionObserverWithName(env, info, REGISTER_SCAN_MODE_CHANGE_TYPE);
 }
 
 napi_value GetBtConnectionState(napi_env env, napi_callback_info info)
