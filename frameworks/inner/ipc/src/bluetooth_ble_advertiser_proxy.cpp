@@ -113,7 +113,11 @@ int BluetoothBleAdvertiserProxy::StartAdvertising(const BluetoothBleAdvertiserSe
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_START_ADVERTISING, option, data, reply);
+    BluetoothBleAdvertiserInterfaceCode interfaceCode = BLE_START_ADVERTISING;
+    if (!(advData.GetAdvertiseName().empty() && scanResponse.GetAdvertiseName().empty())) {
+        interfaceCode = BLE_START_ADVERTISING_WITH_CUSTOM_ADV_NAME;
+    }
+    ErrCode result = InnerTransact(interfaceCode, option, data, reply);
     if (result != NO_ERROR) {
         HILOGE("[StartAdvertising] fail: transact ErrCode=%{public}d", result);
         return BT_ERR_IPC_TRANS_FAILED;
