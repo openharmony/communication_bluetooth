@@ -132,6 +132,8 @@ napi_status NapiParseObjectInt32Optional(napi_env env, napi_value object, const 
     bool &outExist);
 napi_status NapiParseObjectUint32Optional(napi_env env, napi_value object, const char *name, uint32_t &outNum,
     bool &outExist);
+napi_status NapiParseObjectStringOptional(napi_env env, napi_value object, const char *name, std::string &outString,
+    bool &outExist);
 
 // Parse type Array<XXX>, must implete NapiParseObject<XXX> in napi_parser_utils.cpp.
 template <typename T>
