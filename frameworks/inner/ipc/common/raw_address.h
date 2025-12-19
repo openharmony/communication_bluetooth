@@ -23,6 +23,31 @@
 
 namespace OHOS {
 namespace bluetooth {
+
+enum AddressType : uint8_t {
+    VIRTUAL_ADDRESS = 0x01,
+    REAL_ADDRESS = 0x02,
+    UNSET_ADDRESS = 0xFF,
+};
+
+enum RawAddressType {
+    PUBLIC_ADDRESS = 0x00,
+    RANDOM_ADDRESS = 0x01,
+    UNSET_RAW_ADDRESS = 0xFF,
+};
+
+struct BluetoothAddress {
+    std::string address = {};
+    int32_t addressType = AddressType::UNSET_ADDRESS;
+    int32_t rawAddressType = RawAddressType::UNSET_RAW_ADDRESS;
+
+    BluetoothAddress() : address{}, addressType(AddressType::UNSET_ADDRESS),
+        rawAddressType(RawAddressType::UNSET_RAW_ADDRESS) {}
+
+    BluetoothAddress(std::string addr, uint8_t addrType, uint8_t rawAddrType)
+        : address(addr), addressType(addrType), rawAddressType(rawAddrType) {}
+};
+
 class RawAddress {
 public:
     // address length
@@ -36,12 +61,6 @@ public:
     const static int BT_UAP_BYTE = 2;
     const static int BT_NAP_HIGH_BYTE = 1;
     const static int BT_NAP_LOW_BYTE = 0;
-
-    enum AddressType {
-        UNSET_ADDRESS = 0,
-        VIRTUAL_ADDRESS,
-        REAL_ADDRESS,
-    };
 
     /**
      * @brief A constructor used to create an <b>RawAddress</b> instance.
@@ -108,7 +127,7 @@ public:
      * @return Returns address type.
      * @since 21
      */
-    const int32_t &GetAddressType() const
+    const uint8_t &GetAddressType() const
     {
         return addressType_;
     };
@@ -118,7 +137,7 @@ public:
      *
      * @since 21
      */
-    void SetAddressType(int32_t addressType)
+    void SetAddressType(uint8_t addressType)
     {
         addressType_ = addressType;
     };
@@ -161,7 +180,7 @@ public:
     bool operator==(const RawAddress &rhs) const;
 
 protected:
-    int32_t addressType_ = UNSET_ADDRESS; // to support real mac in some pair&connect APIs
+    uint8_t addressType_ = AddressType::UNSET_ADDRESS; // to support real mac in some pair&connect APIs
     std::string address_ = "";
 };
 }  // namespace bluetooth

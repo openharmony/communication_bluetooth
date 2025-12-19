@@ -32,10 +32,14 @@
 #include "system_ability_definition.h"
 #include "bundle_mgr_proxy.h"
 #include <set>
+#include <charconv>
 
 namespace OHOS {
 namespace Bluetooth {
 using namespace std;
+
+static const int DEX_STRING_TO_INT = 10;
+static const int HEX_STRING_TO_INT = 16;
 
 napi_value GetCallbackErrorValue(napi_env env, int errCode)
 {
@@ -498,6 +502,36 @@ bool IsValidAddress(std::string bdaddr)
 #endif
 }
 
+template <typename T>
+bool ConvertStrToDigit(const std::string &str, T &ret, int base = DEX_STRING_TO_INT)
+{
+    std::from_chars_result res = std::from_chars(str.data(), str.data() + str.size(), ret, base);
+    if (res.ec != std::errc{} || res.ptr != str.data() +str.size()) {
+        HILOGE("FromString failed, error string is %{public}s", str.c_str());
+        return false;
+    }
+    return true;
+}
+
+bool IsRandomStaticAddress(std::string address)
+{
+    // RANDOM STATIC: (addr & 0xC0) == 0xC0
+    // RANDOM RESOLVABLE: (addr & 0xC0) == 0x40
+    // RANDOM non-RESOLVABLE: (addr & 0xC0) == 0x00
+    if (!IsValidAddress(address)) {
+        return false;
+    }
+    // 获取第一个字节
+    std::string firstByteStr = address.substr(0, 2);
+    uint8_t firstByteUint = 0;
+    // 将第一个字节从十六进制转换为整数
+    if (!ConvertStrToDigit(firstByteStr, firstByteUint, HEX_STRING_TO_INT)) {
+        return false;
+    }
+    // 检查第一个字符的高两位是否为11(即0xC0)
+    return (firstByteUint & 0xC0) == 0xC0;
+}
+
 bool IsValidTransport(int transport)
 {
     return transport == BT_TRANSPORT_BREDR || transport == BT_TRANSPORT_BLE;
@@ -679,6 +713,38 @@ napi_status ParseArrayBufferParams(napi_env env, napi_value object, const char *
             return napi_invalid_arg;
         }
         outParam = std::vector<uint8_t>(data, data + size);
+    }
+    outExist = hasProperty;
+    return napi_ok;
+}
+
+napi_status ParseUint8ArrayParam(napi_env env, napi_value array, std::vector<uint8_t> &outParam)
+{
+    void *data = nullptr;
+    size_t dataLen;
+    size_t offset;
+    napi_value arrayBuffer = nullptr;
+    napi_typedarray_type type;
+    NAPI_BT_CALL_RETURN(napi_get_typedarray_info(env, array, &type, &dataLen, &data, &arrayBuffer, &offset));
+    NAPI_BT_RETURN_IF(type != napi_typedarray_type::napi_uint8_array, "Wrong argument type, uint8array expected",
+        napi_invalid_arg);
+    uint8_t *dataPtr = reinterpret_cast<uint8_t *>(data) + offset;
+    std::vector<uint8_t> initDataStr(dataPtr, dataPtr + dataLen);
+    outParam.assign(initDataStr.begin(), initDataStr.end());
+    return napi_ok;
+}
+
+napi_status NapiParseObjectUint8Array(napi_env env, napi_value object, const char *name, bool &outExist,
+    std::vector<uint8_t> &outParam)
+{
+    bool hasProperty = false;
+    NAPI_BT_CALL_RETURN(napi_has_named_property(env, object, name, &hasProperty));
+    if (hasProperty) {
+        napi_value property;
+        NAPI_BT_CALL_RETURN(napi_get_named_property(env, object, name, &property));
+        std::vector<uint8_t> vec {};
+        NAPI_BT_CALL_RETURN(ParseUint8ArrayParam(env, property, vec));
+        outParam = std::move(vec);
     }
     outExist = hasProperty;
     return napi_ok;

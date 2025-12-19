@@ -37,8 +37,10 @@ napi_value NapiCommon::CommonPropertyValueInit(napi_env env, napi_value exports)
 {
     HILOGD("enter");
     napi_value bluetoothAddressTypeObj = BluetoothAddressTypeInit(env);
+    napi_value bluetoothRawAddressTypeObj = BluetoothRawAddressTypeInit(env);
     napi_property_descriptor exporProperties[] = {
         DECLARE_NAPI_PROPERTY("BluetoothAddressType", bluetoothAddressTypeObj),
+        DECLARE_NAPI_PROPERTY("BluetoothRawAddressType", bluetoothRawAddressTypeObj),
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "common:napi_define_properties");
     napi_define_properties(env, exports, sizeof(exporProperties) / sizeof(*exporProperties), exporProperties);
@@ -53,6 +55,16 @@ napi_value NapiCommon::BluetoothAddressTypeInit(napi_env env)
     SetNamedPropertyByInteger(env, bluetoothAddressType, AddressType::VIRTUAL_ADDRESS, "VIRTUAL");
     SetNamedPropertyByInteger(env, bluetoothAddressType, AddressType::REAL_ADDRESS, "REAL");
     return bluetoothAddressType;
+}
+
+napi_value NapiCommon::BluetoothRawAddressTypeInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value bluetoothRawAddressType = nullptr;
+    napi_create_object(env, &bluetoothRawAddressType);
+    SetNamedPropertyByInteger(env, bluetoothRawAddressType, RawAddressType::PUBLIC_ADDRESS, "PUBLIC");
+    SetNamedPropertyByInteger(env, bluetoothRawAddressType, RawAddressType::RANDOM_ADDRESS, "RANDOM");
+    return bluetoothRawAddressType;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

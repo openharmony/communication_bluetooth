@@ -157,6 +157,43 @@ std::string BleScanFilterImpl::GetDeviceId() const
     return deviceId_;
 }
 
+void BleScanFilterImpl::SetAddressType(uint8_t addressType)
+{
+    addressType_ = addressType;
+}
+
+uint8_t BleScanFilterImpl::GetAddressType() const
+{
+    return addressType_;
+}
+
+void BleScanFilterImpl::SetRawAddressType(uint8_t rawAddressType)
+{
+    rawAddressType_ = rawAddressType;
+}
+
+uint8_t BleScanFilterImpl::GetRawAddressType() const
+{
+    return rawAddressType_;
+}
+
+void BleScanFilterImpl::SetIrk(std::vector<uint8_t> irk)
+{
+    irk_ = irk;
+}
+
+std::vector<uint8_t> BleScanFilterImpl::GetIrk() const
+{
+    return irk_;
+}
+
+std::array<uint8_t, LEN_OF_IRK> BleScanFilterImpl::GetIrkArray() const
+{
+    std::array<uint8_t, LEN_OF_IRK> irkArray;
+    std::copy(irk_.begin(), irk_.end(), irkArray.begin());
+    return irkArray;
+}
+
 void BleScanFilterImpl::SetName(const std::string &name)
 {
     name_ = name;

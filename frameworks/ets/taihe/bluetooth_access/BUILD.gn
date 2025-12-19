@@ -18,8 +18,8 @@ import("//build/ohos/taihe_idl/taihe.gni")
 SUBSYSTEM_DIR = "//foundation/communication"
 
 copy_taihe_idl("bluetooth_access_taihe") {
-  sources = [ 
-    "idl/ohos.bluetooth.access.taihe" 
+  sources = [
+    "idl/ohos.bluetooth.access.taihe"
   ]
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/bluetooth_baseProfile:bluetooth_baseProfile_taihe"
