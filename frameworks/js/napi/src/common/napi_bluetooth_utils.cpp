@@ -38,8 +38,6 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
-static const int DEX_STRING_TO_INT = 10;
-static const int HEX_STRING_TO_INT = 16;
 
 napi_value GetCallbackErrorValue(napi_env env, int errCode)
 {
@@ -503,7 +501,7 @@ bool IsValidAddress(std::string bdaddr)
 }
 
 template <typename T>
-bool ConvertStrToDigit(const std::string &str, T &ret, int base = DEX_STRING_TO_INT)
+bool ConvertStrToDigit(const std::string &str, T &ret, int base = 10) // 10 means input string is decimal
 {
     std::from_chars_result res = std::from_chars(str.data(), str.data() + str.size(), ret, base);
     if (res.ec != std::errc{} || res.ptr != str.data() +str.size()) {
@@ -525,7 +523,7 @@ bool IsRandomStaticAddress(std::string address)
     std::string firstByteStr = address.substr(0, 2);
     uint8_t firstByteUint = 0;
     // 将第一个字节从十六进制转换为整数
-    if (!ConvertStrToDigit(firstByteStr, firstByteUint, HEX_STRING_TO_INT)) {
+    if (!ConvertStrToDigit(firstByteStr, firstByteUint, 16)) { // 16 means input string is hexadecimal
         return false;
     }
     // 检查第一个字符的高两位是否为11(即0xC0)
