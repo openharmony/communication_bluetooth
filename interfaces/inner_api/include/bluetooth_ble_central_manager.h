@@ -231,11 +231,15 @@ public:
     void SetEventType(uint16_t eventType);
     uint16_t GetEventType(void) const;
 
+    void SetAddress(const BluetoothAddress &address);
+    BluetoothAddress GetAddress(void) const;
+
 private:
     std::vector<UUID> serviceUuids_ {};
     std::map<uint16_t, std::string> manufacturerSpecificData_ {};
     std::map<UUID, std::string> serviceData_ {};
     BluetoothRemoteDevice peripheralDevice_ {};
+    BluetoothAddress address_;
     int8_t rssi_ {};
     bool connectable_ {};
     uint8_t advertiseFlag_ {};
@@ -487,6 +491,18 @@ public:
 
     std::string GetDeviceId() const;
 
+    void SetAddressType(uint8_t addressType);
+
+    uint8_t GetAddressType() const;
+
+    void SetRawAddressType(uint8_t rawAddressType);
+
+    uint8_t GetRawAddressType() const;
+
+    void SetIrk(const std::vector<uint8_t> &irk);
+
+    std::vector<uint8_t> GetIrk() const;
+
     void SetName(std::string name);
 
     std::string GetName() const;
@@ -558,6 +574,9 @@ public:
     bool operator==(const BleScanFilter &rhs) const
     {
         return (deviceId_ == rhs.deviceId_) &&
+            (addressType_ == rhs.addressType_) &&
+            (rawAddressType_ == rhs.rawAddressType_) &&
+            (irk_ == rhs.irk_) &&
             (name_ == rhs.name_) &&
             (serviceUuid_ == rhs.serviceUuid_) &&
             (serviceUuidMask_ == rhs.serviceUuidMask_) &&
@@ -580,6 +599,9 @@ public:
 
     private:
         std::string deviceId_;
+        uint8_t addressType_ = AddressType::UNSET_ADDRESS; // real or virtual
+        uint8_t rawAddressType_ = RawAddressType::UNSET_RAW_ADDRESS; // public or random
+        std::vector<uint8_t> irk_ = {};
         std::string name_;
 
         UUID serviceUuid_;

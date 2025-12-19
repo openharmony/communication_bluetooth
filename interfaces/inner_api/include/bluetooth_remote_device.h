@@ -440,16 +440,6 @@ public:
     int32_t GetDeviceTransport(int32_t &transport) const;
 
     /**
-    * @brief bluetooth address type
-    * @since 21
-    */
-    enum AddressType {
-        UNSET_ADDRESS = 0,
-        VIRTUAL_ADDRESS,
-        REAL_ADDRES,
-    };
-
-    /**
      * @brief Start sdp search the uuid information of the remote device.
      *
      * @param uuid The uuid of remote device users want to sdp search.
@@ -469,7 +459,7 @@ public:
     bool GetRemoteServices() const;
 private:
     std::string address_ = "00:00:00:00:00:00";
-    int32_t addressType_ = UNSET_ADDRESS; // to support real mac in some pair&connect APIs
+    uint8_t addressType_ = AddressType::UNSET_ADDRESS; // to support real mac in some pair&connect APIs
     int transport_ = BT_TRANSPORT_NONE;
 };
 }  // namespace Bluetooth

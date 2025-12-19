@@ -37,6 +37,8 @@ public:
 
 private:
     bool ReadUuidFromParcel(Parcel &parcel);
+    bool ReadAddrInfoFromParcel(Parcel &parcel);
+    bool WriteAddrInfoToParcel(Parcel &parcel) const;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

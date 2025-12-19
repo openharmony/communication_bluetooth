@@ -28,6 +28,7 @@ public:
 private:
     static napi_value CommonPropertyValueInit(napi_env env, napi_value exports);
     static napi_value BluetoothAddressTypeInit(napi_env env);
+    static napi_value BluetoothRawAddressTypeInit(napi_env env);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

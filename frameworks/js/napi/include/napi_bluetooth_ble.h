@@ -21,6 +21,9 @@
 
 namespace OHOS {
 namespace Bluetooth {
+
+constexpr int LEN_OF_IRK = 16; // in octets
+
 void DefineBLEJSObject(napi_env env, napi_value exports);
 void DefineSystemBLEInterface(napi_env env, napi_value exports);
 napi_value StartBLEScan(napi_env env, napi_callback_info info);

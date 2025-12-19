@@ -598,10 +598,12 @@ napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::st
             return napi_invalid_arg;
         }
         addr = address;
-        int32_t addressType = 0;
+        int32_t addressType = AddressType::UNSET_ADDRESS;
         NAPI_BT_CALL_RETURN(ParseInt32Params(env, argv[PARAM0], "addressType", exist, addressType));
-        if (!(addressType == VIRTUAL_ADDRESS || addressType == REAL_ADDRESS)) {
-            HILOGE("invalid addressType, should be 1 or 2");
+        bool isVirtualAddr = (addressType == AddressType::VIRTUAL_ADDRESS);
+        bool isRealAddr = (addressType == AddressType::REAL_ADDRESS);
+        if (!(isVirtualAddr || isRealAddr)) {
+            HILOGE("invalid addressType, should be VIRTUAL or REAL");
             return napi_invalid_arg;
         }
         addrType = addressType;
@@ -618,7 +620,7 @@ napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
     HILOGD("enter");
     std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "connection.PairDeviceAsync");
     std::string remoteAddr = INVALID_MAC_ADDRESS;
-    int32_t addressType = UNSET_ADDRESS;
+    int32_t addressType = AddressType::UNSET_ADDRESS;
     auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr, addressType);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
     auto func = [remoteAddr, addressType]() {

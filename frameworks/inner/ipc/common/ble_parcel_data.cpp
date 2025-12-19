@@ -21,6 +21,7 @@ namespace bluetooth {
 ScanResult::ScanResult(const BleScanResultImpl &other)
 {
     const auto &device = other.GetPeripheralDevice();
+    this->SetRawAddressType(device.GetAddressType());
     if (device.IsRSSI()) {
         this->SetRssi(device.GetRSSI());
     }
