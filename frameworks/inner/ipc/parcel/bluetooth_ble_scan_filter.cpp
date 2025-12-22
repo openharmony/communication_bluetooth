@@ -29,35 +29,7 @@ bool BluetoothBleScanFilter::Marshalling(Parcel &parcel) const
     if (!parcel.WriteString(name_)) {
         return false;
     }
-    if (!parcel.WriteBool(hasServiceUuid_)) {
-        return false;
-    }
-    if (!parcel.WriteBool(hasServiceUuidMask_)) {
-        return false;
-    }
-    if (!parcel.WriteBool(hasSolicitationUuid_)) {
-        return false;
-    }
-    if (!parcel.WriteBool(hasSolicitationUuidMask_)) {
-        return false;
-    }
-    if (!parcel.WriteBool(hasRssiThreshold_)) {
-        return false;
-    }
-    BluetoothUuid serviceUuid = BluetoothUuid(serviceUuid_);
-    if (!parcel.WriteParcelable(&serviceUuid)) {
-        return false;
-    }
-    BluetoothUuid serviceUuidMask = BluetoothUuid(serviceUuidMask_);
-    if (!parcel.WriteParcelable(&serviceUuidMask)) {
-        return false;
-    }
-    BluetoothUuid serviceSolicitationUuid = BluetoothUuid(serviceSolicitationUuid_);
-    if (!parcel.WriteParcelable(&serviceSolicitationUuid)) {
-        return false;
-    }
-    BluetoothUuid serviceSolicitationUuidMask = BluetoothUuid(serviceSolicitationUuidMask_);
-    if (!parcel.WriteParcelable(&serviceSolicitationUuidMask)) {
+    if (!WriteUuidInfoToParcel(parcel)) {
         return false;
     }
     if (!parcel.WriteUInt8Vector(serviceData_)) {
@@ -79,6 +51,9 @@ bool BluetoothBleScanFilter::Marshalling(Parcel &parcel) const
         return false;
     }
     if (!parcel.WriteUint8(filterIndex_)) {
+        return false;
+    }
+    if (!parcel.WriteBool(hasRssiThreshold_)) {
         return false;
     }
     if (!parcel.WriteInt32(rssiThreshold_)) {
@@ -113,22 +88,10 @@ bool BluetoothBleScanFilter::ReadFromParcel(Parcel &parcel)
     if (!parcel.ReadString(name_)) {
         return false;
     }
-    if (!parcel.ReadBool(hasServiceUuid_)) {
+    if (!ReadUuidInfoFromParcel(parcel)) {
         return false;
     }
-    if (!parcel.ReadBool(hasServiceUuidMask_)) {
-        return false;
-    }
-    if (!parcel.ReadBool(hasSolicitationUuid_)) {
-        return false;
-    }
-    if (!parcel.ReadBool(hasSolicitationUuidMask_)) {
-        return false;
-    }
-    if (!parcel.ReadBool(hasRssiThreshold_)) {
-        return false;
-    }
-    if (!ReadUuidFromParcel(parcel)) {
+    if (!parcel.ReadUInt8Vector(&serviceData_)) {
         return false;
     }
     if (!parcel.ReadUInt8Vector(&serviceDataMask_)) {
@@ -147,6 +110,9 @@ bool BluetoothBleScanFilter::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!parcel.ReadUint8(filterIndex_)) {
+        return false;
+    }
+    if (!parcel.ReadBool(hasRssiThreshold_)) {
         return false;
     }
     if (!parcel.ReadInt32(rssiThreshold_)) {
@@ -209,8 +175,20 @@ bool BluetoothBleScanFilter::WriteAddrInfoToParcel(Parcel &parcel) const
     return true;
 }
 
-bool BluetoothBleScanFilter::ReadUuidFromParcel(Parcel &parcel)
+bool BluetoothBleScanFilter::ReadUuidInfoFromParcel(Parcel &parcel)
 {
+    if (!parcel.ReadBool(hasServiceUuid_)) {
+        return false;
+    }
+    if (!parcel.ReadBool(hasServiceUuidMask_)) {
+        return false;
+    }
+    if (!parcel.ReadBool(hasSolicitationUuid_)) {
+        return false;
+    }
+    if (!parcel.ReadBool(hasSolicitationUuidMask_)) {
+        return false;
+    }
     std::shared_ptr<BluetoothUuid> serviceUuid(parcel.ReadParcelable<BluetoothUuid>());
     if (!serviceUuid) {
         return false;
@@ -231,7 +209,37 @@ bool BluetoothBleScanFilter::ReadUuidFromParcel(Parcel &parcel)
         return false;
     }
     serviceSolicitationUuidMask_ = BluetoothUuid(*serviceSolicitationUuidMask);
-    if (!parcel.ReadUInt8Vector(&serviceData_)) {
+    return true;
+}
+
+bool BluetoothBleScanFilter::WriteUuidInfoToParcel(Parcel &parcel) const
+{
+    if (!parcel.WriteBool(hasServiceUuid_)) {
+        return false;
+    }
+    if (!parcel.WriteBool(hasServiceUuidMask_)) {
+        return false;
+    }
+    if (!parcel.WriteBool(hasSolicitationUuid_)) {
+        return false;
+    }
+    if (!parcel.WriteBool(hasSolicitationUuidMask_)) {
+        return false;
+    }
+    BluetoothUuid serviceUuid = BluetoothUuid(serviceUuid_);
+    if (!parcel.WriteParcelable(&serviceUuid)) {
+        return false;
+    }
+    BluetoothUuid serviceUuidMask = BluetoothUuid(serviceUuidMask_);
+    if (!parcel.WriteParcelable(&serviceUuidMask)) {
+        return false;
+    }
+    BluetoothUuid serviceSolicitationUuid = BluetoothUuid(serviceSolicitationUuid_);
+    if (!parcel.WriteParcelable(&serviceSolicitationUuid)) {
+        return false;
+    }
+    BluetoothUuid serviceSolicitationUuidMask = BluetoothUuid(serviceSolicitationUuidMask_);
+    if (!parcel.WriteParcelable(&serviceSolicitationUuidMask)) {
         return false;
     }
     return true;
