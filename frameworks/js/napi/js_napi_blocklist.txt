@@ -41,6 +41,8 @@ type:*OHOS::Bluetooth::HandsFreeUnit
 type:*OHOS::Bluetooth::HidHostObserver
 type:*OHOS::Bluetooth::HidHost
 type:*OHOS::Bluetooth::BluetoothHostObserver
+type:*OHOS::Bluetooth::HidDevice
+type:*OHOS::Bluetooth::BluetoothDeviceObserver
 type:*OHOS::Bluetooth::BluetoothRemoteDeviceObserver
 type:*OHOS::Bluetooth::BluetoothHost
 type:*OHOS::Bluetooth::MapClientObserver

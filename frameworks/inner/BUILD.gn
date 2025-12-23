@@ -45,6 +45,7 @@ FwkSrc = [
   "src/bluetooth_hfp_ag.cpp",
   "src/bluetooth_hfp_hf.cpp",
   "src/bluetooth_hid_host.cpp",
+  "src/bluetooth_hid_device.cpp",
   "src/bluetooth_host.cpp",
   "src/bluetooth_map_mse.cpp",
   "src/bluetooth_opp.cpp",
@@ -89,6 +90,8 @@ FwkIpcSrc = [
   "$BT_IPCSRC_DIR/bluetooth_hfp_hf_proxy.cpp",
   "$BT_IPCSRC_DIR/bluetooth_hid_host_observer_stub.cpp",
   "$BT_IPCSRC_DIR/bluetooth_hid_host_proxy.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_hid_device_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_hid_device_proxy.cpp",
   "$BT_IPCSRC_DIR/bluetooth_opp_observer_stub.cpp",
   "$BT_IPCSRC_DIR/bluetooth_opp_proxy.cpp",
   "$BT_IPCSRC_DIR/bluetooth_host_observer_stub.cpp",
@@ -119,6 +122,7 @@ config("btframework_config") {
     "ipc",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
   ]
 
@@ -136,6 +140,7 @@ config("btframework_public_config") {
   include_dirs = [
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/include",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/parcel",
   ]
 }
@@ -245,6 +250,8 @@ ohos_shared_library("btcommon") {
     "ipc/parcel/bluetooth_socket_coc.cpp",
     "ipc/parcel/bluetooth_trust_pair_device.cpp",
     "ipc/parcel/parcel_bt_uuid.cpp",
+    "ipc/parcel/bluetooth_hid_device_qos_parcel.cpp",
+    "ipc/parcel/bluetooth_hid_device_sdp_parcel.cpp",
   ]
 
   deps = []
