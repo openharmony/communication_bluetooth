@@ -88,6 +88,7 @@ napi_value NapiConstant::ProfileIdInit(napi_env env)
 #endif
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_HANDS_FREE_UNIT, "PROFILE_HANDS_FREE_UNIT");
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_HID_HOST, "PROFILE_HID_HOST");
+    SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_HID_DEVICE, "PROFILE_HID_DEVICE");
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PAN_NETWORK, "PROFILE_PAN_NETWORK");
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PBAP_CLIENT, "PROFILE_PBAP_PCE");
     SetNamedPropertyByInteger(env, profileId, ProfileId::PROFILE_PBAP_SERVER, "PROFILE_PBAP_PSE");

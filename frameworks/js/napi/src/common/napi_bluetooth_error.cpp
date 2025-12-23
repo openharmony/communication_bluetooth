@@ -69,6 +69,10 @@ static std::map<int32_t, std::string> napiErrMsgMap {
     { BtErrCode::BT_ERR_BLE_SCAN_ALREADY_STARTED, "Failed to start scan as Ble scan is already started by the app."},
     { BtErrCode::BT_ERR_DIALOG_FOR_USER_NOT_RESPOND, "The user does not respond."},
     { BtErrCode::BT_ERR_DIALOG_FOR_USER_REFUSE, "User refuse the action."},
+    { BtErrCode::BT_ERR_HID_APPLICATION_NOT_IN_FOREGROUND, "HID application is not in the foreground."},
+    { BtErrCode::BT_ERR_HID_APP_HAS_BEEN_REGISTERED, "Any HID application has been registered."},
+    { BtErrCode::BT_ERR_HID_APP_NOT_REGISTER, "HID application does not register."},
+    { BtErrCode::BT_ERR_HID_DEVICE_NOT_CONNECTED, "HID device not connected."},
 };
 
 std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode)
@@ -92,6 +96,32 @@ void HandleSyncErr(const napi_env &env, int32_t errCode)
     if (errMsg != "") {
         napi_throw_error(env, std::to_string(errCode).c_str(), errMsg.c_str());
     }
+}
+
+static napi_value GenerateBusinessError(napi_env env, int32_t errCode, const std::string &errMsg)
+{
+    napi_value businessError = nullptr;
+    napi_value code = nullptr;
+    napi_create_int32(env, errCode, &code);
+
+    napi_value message = nullptr;
+    napi_create_string_utf8(env, errMsg.c_str(), NAPI_AUTO_LENGTH, &message);
+
+    napi_create_error(env, nullptr, message, &businessError);
+    napi_set_named_property(env, businessError, "code", code);
+    return businessError;
+}
+
+void HandleSyncErrNum(const napi_env &env, int32_t errCode)
+{
+    if (errCode == BtErrCode::BT_NO_ERROR) {
+        return;
+    }
+
+    int ret = -1;
+    std::string errMsg = GetNapiErrMsg(env, errCode);
+    ret = napi_throw(env, GenerateBusinessError(env, errCode, errMsg));
+    CHECK_AND_RETURN_LOG(ret == napi_ok, "napi_throw failed, ret: %{public}d", ret);
 }
 }
 }
