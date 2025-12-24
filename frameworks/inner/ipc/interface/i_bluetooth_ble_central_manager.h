@@ -57,7 +57,7 @@ public:
         const std::vector<BluetoothBleScanFilter> &filters, bool isNewApi) = 0;
     virtual int StopScan(int32_t scannerId) = 0;
     virtual void RemoveScanFilter(int32_t scannerId) = 0;
-    virtual bool FreezeByRss(std::set<int> pidSet, bool isProxy) = 0;
+    virtual bool FreezeByRss(std::set<int> pidSet, bool isProxy, uint8_t freezeType) = 0;
     virtual bool ResetAllProxy() = 0;
     virtual int SetLpDeviceAdvParam(int duration, int maxExtAdvEvents, int window, int interval, int advHandle) = 0;
     virtual int SetScanReportChannelToLpDevice(int32_t scannerId, bool enable) = 0;
