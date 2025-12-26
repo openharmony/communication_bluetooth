@@ -196,6 +196,30 @@ public:
      */
     virtual void OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status)
     {}
+    
+    /**
+     * @brief The function to OnBlePhyUpdate.
+     *
+     * @param txPhy transmitter phy to update.
+     * @param rxPhy receiver phy to update.
+     * @param status result of setphy.
+     * @since 23
+     *
+     */
+    virtual void OnBlePhyUpdate(int32_t txPhy, int32_t rxPhy, int32_t status)
+    {}
+    
+    /**
+     * @brief The function to OnBlePhyRead.
+     *
+     * @param txPhy transmitter phy to update.
+     * @param rxPhy receiver phy to update.
+     * @param status result of readphy.
+     * @since 23
+     *
+     */
+    virtual void OnBlePhyRead(int32_t txPhy, int32_t rxPhy, int32_t status)
+    {}
 
     /**
      * @brief A destructor of GattClientCallback.
@@ -432,6 +456,27 @@ public:
      *
      */
     int GetConnectedState(int &state);
+
+    /**
+     * @brief The function to set phy.
+     *
+     * @param txPhy transmitter phy of GattClient.
+     * @param rxPhy receiver phy of GattClient.
+     * @param phyOptions preferred coded phy mode of GattClient.
+     * @return result of #GATT_STATUS.
+     * @since 23
+     *
+     */
+    int SetPhy(int32_t txPhy, int32_t rxPhy, int32_t phyOptions);
+
+    /**
+     * @brief The function to read phy.
+     *
+     * @return result of #GATT_STATUS.
+     * @since 23
+     *
+     */
+    int ReadPhy();
 
     /**
      * @brief A destructor of GattClient.

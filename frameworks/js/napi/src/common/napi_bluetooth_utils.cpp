@@ -920,6 +920,29 @@ napi_status NapiGetOnOffCallbackName(napi_env env, napi_callback_info info, std:
     return napi_ok;
 }
 
+napi_status NapiParseSetPhyValue(napi_env env, napi_value object, BlePhyInfo &phyInfo)
+{
+    NAPI_BT_CALL_RETURN(NapiIsObject(env, object));
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"txPhy", "rxPhy", "phyMode"}));
+    if (NapiIsObjectPropertyExist(env, object, "phyMode")) {
+        NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, object, "phyMode", phyInfo.phyOptions));
+        if (phyInfo.phyOptions < static_cast<int32_t>(BLE_PHY_CODED_NO_PREFERRED) ||
+            phyInfo.phyOptions > static_cast<int32_t>(BLE_PHY_CODED_S8)) {
+            return napi_invalid_arg;
+        }
+    }
+    NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, object, "txPhy", phyInfo.txPhy));
+    if (phyInfo.txPhy < static_cast<int32_t>(BLE_PHY_1M) || phyInfo.txPhy > static_cast<int32_t>(BLE_PHY_CODED)) {
+        return napi_invalid_arg;
+    }
+
+    NAPI_BT_CALL_RETURN(NapiParseObjectInt32(env, object, "rxPhy", phyInfo.rxPhy));
+    if (phyInfo.rxPhy < static_cast<int32_t>(BLE_PHY_1M) || phyInfo.rxPhy > static_cast<int32_t>(BLE_PHY_CODED)) {
+        return napi_invalid_arg;
+    }
+    return napi_ok;
+}
+
 int GetCurrentSdkVersion(void)
 {
     int version = SDK_VERSION_20;  // default sdk version is api 20

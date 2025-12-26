@@ -104,6 +104,13 @@ struct NapiMap {
     napi_value set_function;
 };
 
+struct BlePhyInfo {
+    int txPhy;
+    int rxPhy;
+    int phyOptions;
+    BlePhyInfo(int txPhy, int rxPhy, int phyOptions): txPhy(txPhy), rxPhy(rxPhy), phyOptions(phyOptions) {}
+};
+
 const char * const REGISTER_STATE_CHANGE_TYPE = "stateChange";
 
 const char * const INVALID_DEVICE_ID = "00:00:00:00:00:00";
@@ -543,6 +550,7 @@ napi_status CheckDeviceAddressParam(napi_env env, napi_callback_info info, std::
 napi_status CheckAccessAuthorizationParam(napi_env env, napi_callback_info info, std::string &addr,
     int32_t &accessAuthorization);
 napi_status NapiGetOnOffCallbackName(napi_env env, napi_callback_info info, std::string &name);
+napi_status NapiParseSetPhyValue(napi_env env, napi_value object, BlePhyInfo &phyInfo);
 
 int GetCurrentSdkVersion(void);
 int GetSDKAdaptedStatusCode(int status);

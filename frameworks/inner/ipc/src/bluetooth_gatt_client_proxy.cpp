@@ -381,5 +381,39 @@ int BluetoothGattClientProxy::GetConnectedState(const std::string &deviceId, int
     state = reply.ReadInt32();
     return BT_NO_ERROR;
 }
+
+int BluetoothGattClientProxy::SetPhy(int32_t appId, int32_t txPhy, int32_t rxPhy, int32_t phyOptions)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattClientProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_IPC_TRANS_FAILED, "write appId error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(txPhy), BT_ERR_IPC_TRANS_FAILED, "write txPhy error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(rxPhy), BT_ERR_IPC_TRANS_FAILED, "write rxPhy error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(phyOptions), BT_ERR_IPC_TRANS_FAILED, "write phyOptions error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_SET_PHY,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+    return reply.ReadInt32();
+}
+
+int BluetoothGattClientProxy::ReadPhy(int32_t appId)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattClientProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_IPC_TRANS_FAILED, "write appId error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattClientInterfaceCode::BT_GATT_CLIENT_READ_PHY,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+    return reply.ReadInt32();
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -45,6 +45,9 @@ public:
         const BluetoothGattDevice &device, const BluetoothGattCharacteristic &characteristic, int result) = 0;
     virtual void OnConnectionParameterChanged(
         const BluetoothGattDevice &device, int32_t interval, int32_t latency, int32_t timeout, int32_t status) = 0;
+    virtual void OnBlePhyUpdate(
+        const BluetoothGattDevice &device, int32_t txPhy, int32_t rxPhy, int32_t status) = 0;
+    virtual void OnBlePhyRead(int32_t txPhy, int32_t rxPhy, int32_t status) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

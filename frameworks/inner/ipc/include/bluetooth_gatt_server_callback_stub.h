@@ -51,6 +51,10 @@ private:
         BluetoothGattServerCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
     static ErrCode OnConnectionParameterChangedInner(
         BluetoothGattServerCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnBlePhyUpdateInner(
+        BluetoothGattServerCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnBlePhyReadInner(
+        BluetoothGattServerCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
 
     using BluetoothGattServerCallbackFunc = ErrCode (*)(
         BluetoothGattServerCallbackStub *stub, MessageParcel &data, MessageParcel &reply);

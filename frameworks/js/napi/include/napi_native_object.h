@@ -257,6 +257,17 @@ public:
 private:
     SppCallbackBuffer sppBuffer_;
 };
+
+class NapiNativeBlePhyInfo : public NapiNativeObject {
+public:
+    NapiNativeBlePhyInfo(int txPhy, int rxPhy) : txPhy_(txPhy), rxPhy_(rxPhy) {}
+    ~NapiNativeBlePhyInfo() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    int txPhy_;
+    int rxPhy_;
+};
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_NATIVE_OBJECT_H
