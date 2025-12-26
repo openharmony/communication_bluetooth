@@ -32,12 +32,14 @@
 #include "system_ability_definition.h"
 #include "bundle_mgr_proxy.h"
 #include <set>
-#include <charconv>
 
 namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
+constexpr int OOB_C_SIZE = 16; // size of confirmationHash of OobData
+constexpr int OOB_R_SIZE = 16; // size of randomizerHash of OobData
+constexpr int OOB_NAME_MAX_SIZE = 256; // size limit of deviceName of OobData
 
 napi_value GetCallbackErrorValue(napi_env env, int errCode)
 {
@@ -500,17 +502,6 @@ bool IsValidAddress(std::string bdaddr)
 #endif
 }
 
-template <typename T>
-bool ConvertStrToDigit(const std::string &str, T &ret, int base = 10) // 10 means input string is decimal
-{
-    std::from_chars_result res = std::from_chars(str.data(), str.data() + str.size(), ret, base);
-    if (res.ec != std::errc{} || res.ptr != str.data() +str.size()) {
-        HILOGE("FromString failed, error string is %{public}s", str.c_str());
-        return false;
-    }
-    return true;
-}
-
 bool IsRandomStaticAddress(std::string address)
 {
     // RANDOM STATIC: (addr & 0xC0) == 0xC0
@@ -598,6 +589,14 @@ napi_status NapiIsObject(napi_env env, napi_value value)
     napi_valuetype valuetype = napi_undefined;
     NAPI_BT_CALL_RETURN(napi_typeof(env, value, &valuetype));
     NAPI_BT_RETURN_IF(valuetype != napi_object, "Wrong argument type. Object expected.", napi_object_expected);
+    return napi_ok;
+}
+
+napi_status NapiIsNull(napi_env env, napi_value value)
+{
+    napi_valuetype valuetype = napi_undefined;
+    NAPI_BT_CALL_RETURN(napi_typeof(env, value, &valuetype));
+    NAPI_BT_RETURN_IF(valuetype != napi_null, "Wrong argument type. Null expected.", napi_invalid_arg);
     return napi_ok;
 }
 
@@ -745,6 +744,95 @@ napi_status NapiParseObjectUint8Array(napi_env env, napi_value object, const cha
         outParam = std::move(vec);
     }
     outExist = hasProperty;
+    return napi_ok;
+}
+
+napi_status ParseAddressInfoParam(napi_env env, napi_value object, AddressInfo &addressInfo)
+{
+    HILOGD("enter");
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"address", "addressType", "rawAddressType"}));
+    bool exist = false;
+
+    // address is not optional
+    std::string address {};
+    NAPI_BT_CALL_RETURN(ParseStringParams(env, object, "address", exist, address));
+    if (!IsValidAddress(address)) {
+        HILOGE("Invalid address: %{public}s", address.c_str());
+        return napi_invalid_arg;
+    }
+    addressInfo.SetAddress(address);
+
+    // addressType is not optional
+    int addressType = 0;
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, object, "addressType", exist, addressType));
+    bool isRealAddr = (addressType == AddressType::REAL_ADDRESS);
+    bool isVirtualAddr = (addressType == AddressType::VIRTUAL_ADDRESS);
+    NAPI_BT_RETURN_IF(!isRealAddr && !isVirtualAddr, "Invalid addressType", napi_invalid_arg);
+    addressInfo.SetAddressType(static_cast<uint8_t>(addressType));
+
+    // rawAddressType is optional
+    int rawAddressType = 0;
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, object, "rawAddressType", exist, rawAddressType));
+    if (exist) {
+        bool isPublicAddr = (rawAddressType == RawAddressType::PUBLIC_ADDRESS);
+        bool isRandomAddr = (rawAddressType == RawAddressType::RANDOM_ADDRESS);
+        NAPI_BT_RETURN_IF(!isPublicAddr && !isRandomAddr, "Invalid rawAddressType", napi_invalid_arg);
+        addressInfo.SetRawAddressType(static_cast<uint8_t>(rawAddressType));
+    }
+    return napi_ok;
+}
+
+void GetAddressWithType(const std::string &address, const uint8_t rawAddressType, std::vector<uint8_t> &addressWithType)
+{
+    std::string hexAddrStr = std::regex_replace(address, std::regex(":"), "");
+    for (size_t i = 0; i < hexAddrStr.length(); i += 2) { // 2 char is one byte
+        std::string byteStr = hexAddrStr.substr(i, 2);  // 2 char is one byte
+        uint8_t byte;
+        ConvertStrToDigit(byteStr, byte, 16); // 16 means input string is hexadecimal
+        addressWithType.push_back(byte);
+    }
+    addressWithType.push_back(rawAddressType);
+    return;
+}
+
+napi_status ParseOobDataParam(napi_env env, napi_value object, const int32_t transport,
+    const AddressInfo &addressInfo, OobData &oobData)
+{
+    HILOGD("enter");
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"confirmationHash", "randomizerHash",
+        "deviceName"}));
+    bool exist = false;
+
+    // addressWithType is not optional
+    bool isBRTransport = (transport == BT_TRANSPORT_BREDR);
+    bool isPublicAddr = (addressInfo.GetRawAddressType() == RawAddressType::PUBLIC_ADDRESS);
+    NAPI_BT_RETURN_IF(isBRTransport && !isPublicAddr, "Invalid transport and rawAddressType", napi_invalid_arg);
+    std::vector<uint8_t> addressWithType {};
+    GetAddressWithType(addressInfo.GetAddress(), addressInfo.GetRawAddressType(), addressWithType);
+    oobData.SetAddressWithType(addressWithType);
+
+    // confirmationHash is not optional
+    std::vector<uint8_t> confirmHash {};
+    NAPI_BT_CALL_RETURN(NapiParseObjectUint8Array(env, object, "confirmationHash", exist, confirmHash));
+    NAPI_BT_RETURN_IF(confirmHash.size() != OOB_C_SIZE, "size of confirmationHash should be 16", napi_invalid_arg);
+    oobData.SetConfirmationHash(confirmHash);
+
+    // randomizerHash is optional
+    std::vector<uint8_t> randomHash {};
+    NAPI_BT_CALL_RETURN(NapiParseObjectUint8Array(env, object, "randomizerHash", exist, randomHash));
+    if (exist) {
+        NAPI_BT_RETURN_IF(randomHash.size() != OOB_R_SIZE, "size of randomizerHash should be 16", napi_invalid_arg);
+        oobData.SetRandomizerHash(randomHash);
+    }
+
+    // deviceName is optional
+    std::string deviceName {};
+    NAPI_BT_CALL_RETURN(ParseStringParams(env, object, "deviceName", exist, deviceName));
+    if (exist) {
+        NAPI_BT_RETURN_IF(deviceName.empty() || deviceName.length() > OOB_NAME_MAX_SIZE,
+            "size of deviceName should between 0 and 256", napi_invalid_arg);
+        oobData.SetDeviceName(deviceName);
+    }
     return napi_ok;
 }
 
