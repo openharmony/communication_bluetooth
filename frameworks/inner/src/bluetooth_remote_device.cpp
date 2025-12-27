@@ -30,6 +30,7 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "bluetooth_audio_manager.h"
+#include "bluetooth_oob_data_parcel.h"
 
 using namespace OHOS::bluetooth;
 
@@ -200,7 +201,42 @@ int BluetoothRemoteDevice::StartPair()
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
     BluetoothRawAddress bluetoothRawAddress(addressType_, address_);
-    return hostProxy->StartPair(transport_, bluetoothRawAddress);
+    BluetoothOobData dummyOobdata;
+    return hostProxy->StartPair(transport_, bluetoothRawAddress, dummyOobdata);
+}
+
+void ConvertOobData(const OobData &inOobData, BluetoothOobData &outOobData)
+{
+    if (!inOobData.HasOobData()) {
+        return;
+    }
+
+    outOobData.SetAddressWithType(inOobData.GetAddressWithType());
+    outOobData.SetConfirmationHash(inOobData.GetConfirmationHash());
+    outOobData.SetOobDataType(inOobData.GetOobDataType());
+
+    if (inOobData.HasRandomHash()) {
+        outOobData.SetRandomizerHash(inOobData.GetRandomizerHash());
+    }
+
+    if (inOobData.HasDeviceName()) {
+        outOobData.SetDeviceName(inOobData.GetDeviceName());
+    }
+    return;
+}
+
+int BluetoothRemoteDevice::StartPairOutOfBand(const OobData &oobData)
+{
+    HILOGI("enter");
+    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
+    CHECK_AND_RETURN_LOG_RET(oobData.HasOobData(), BT_ERR_INTERNAL_ERROR, "Invalid oob data");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
+    BluetoothRawAddress bluetoothRawAddress(addressType_, address_);
+    BluetoothOobData outOobData;
+    ConvertOobData(oobData, outOobData);
+    return hostProxy->StartPair(transport_, bluetoothRawAddress, outOobData);
 }
 
 int BluetoothRemoteDevice::StartCrediblePair()
