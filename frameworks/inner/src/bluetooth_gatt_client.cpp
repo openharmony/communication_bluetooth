@@ -543,7 +543,9 @@ void GattClient::impl::GetServices()
     } else {
         proxy->GetServices(applicationId_, result);
         BuildServiceList(result);
-        isGetServiceYet_ = true;
+        if (!gattServices_.empty()) {
+            isGetServiceYet_ = true;
+        }
     }
 }
 
