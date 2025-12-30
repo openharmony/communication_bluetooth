@@ -29,6 +29,7 @@
 #include "bluetooth_errorcode.h"
 #include "bluetooth_utils.h"
 #include "napi_bluetooth_hid_device.h"
+#include "hid_device_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -38,7 +39,6 @@ thread_local napi_ref NapiBluetoothHidDevice::consRef_ = nullptr;
 
 napi_value SubclassInit(napi_env env)
 {
-    HILOGD("enter");
     napi_value subclass = nullptr;
     napi_create_object(env, &subclass);
     SetNamedPropertyByInteger(env, subclass, Subclass::SUBCLASS_UNCATEGORIZED, "SUBCLASS_UNCATEGORIZED");
@@ -56,7 +56,6 @@ napi_value SubclassInit(napi_env env)
 
 napi_value ReportTypeInit(napi_env env)
 {
-    HILOGD("enter");
     napi_value reportType = nullptr;
     napi_create_object(env, &reportType);
     SetNamedPropertyByInteger(env, reportType, ReportType::REPORT_TYPE_INPUT, "REPORT_TYPE_INPUT");
@@ -65,24 +64,8 @@ napi_value ReportTypeInit(napi_env env)
     return reportType;
 }
 
-bool IsValidServiceType(int type)
-{
-    bool isValidServiceType = false;
-    switch (type) {
-        case static_cast<int>(ServiceType::SERVICE_NO_TRAFFIC):
-        case static_cast<int>(ServiceType::SERVICE_BEST_EFFORT):
-        case static_cast<int>(ServiceType::SERVICE_GUARANTEED):
-            isValidServiceType = true;
-            break;
-        default:
-            break;
-    }
-    return isValidServiceType;
-}
-
 napi_value ServiceTypeInit(napi_env env)
 {
-    HILOGD("enter");
     napi_value serviceType = nullptr;
     napi_create_object(env, &serviceType);
     SetNamedPropertyByInteger(env, serviceType, ServiceType::SERVICE_NO_TRAFFIC, "SERVICE_NO_TRAFFIC");
@@ -93,7 +76,6 @@ napi_value ServiceTypeInit(napi_env env)
 
 napi_value ErrorReasonInit(napi_env env)
 {
-    HILOGD("enter");
     napi_value errorReason = nullptr;
     napi_create_object(env, &errorReason);
     SetNamedPropertyByInteger(env, errorReason, ErrorReason::RSP_SUCCESS, "RSP_SUCCESS");
@@ -105,23 +87,8 @@ napi_value ErrorReasonInit(napi_env env)
     return errorReason;
 }
 
-bool IsValidProtocolType(int type)
-{
-    bool isValidProtocolType = false;
-    switch (type) {
-        case static_cast<int>(ProtocolType::PROTOCOL_BOOT_MODE):
-        case static_cast<int>(ProtocolType::PROTOCOL_REPORT_MODE):
-            isValidProtocolType = true;
-            break;
-        default:
-            break;
-    }
-    return isValidProtocolType;
-}
-
 napi_value ProtocolTypeInit(napi_env env)
 {
-    HILOGD("enter");
     napi_value protocolType = nullptr;
     napi_create_object(env, &protocolType);
     SetNamedPropertyByInteger(env, protocolType, ProtocolType::PROTOCOL_BOOT_MODE, "PROTOCOL_BOOT_MODE");
@@ -370,7 +337,6 @@ napi_value NapiBluetoothHidDevice::GetConnectedDevices(napi_env env, napi_callba
     HidDevice *profile = HidDevice::GetProfile();
     std::vector<BluetoothRemoteDevice> devices;
     int errorCode = profile->GetConnectedDevices(devices);
-    HILOGI("errorCode:%{public}s, devices size:%{public}zu", GetErrorCode(errorCode).c_str(), devices.size());
     NAPI_BT_ASSERT_NUM_RETURN(env, errorCode == BT_NO_ERROR, errorCode, ret);
 
     std::vector<std::string> deviceVector;
@@ -406,34 +372,6 @@ napi_value NapiBluetoothHidDevice::GetConnectionState(napi_env env, napi_callbac
     return result;
 }
 
-bool IsValidSubclass(int type)
-{
-    bool isValidSubclass = false;
-    switch (type) {
-        case static_cast<int>(Subclass::SUBCLASS_UNCATEGORIZED):
-        case static_cast<int>(Subclass::SUBCLASS_JOYSTICK):
-        case static_cast<int>(Subclass::SUBCLASS_GAMEPAD):
-        case static_cast<int>(Subclass::SUBCLASS_REMOTE_CONTROL):
-        case static_cast<int>(Subclass::SUBCLASS_SENSING_DEVICE):
-        case static_cast<int>(Subclass::SUBCLASS_DIGITIZER_TABLET):
-        case static_cast<int>(Subclass::SUBCLASS_CARD_READER):
-        case static_cast<int>(Subclass::SUBCLASS_KEYBOARD):
-        case static_cast<int>(Subclass::SUBCLASS_MOUSE):
-        case static_cast<int>(Subclass::SUBCLASS_COMBO):
-            isValidSubclass = true;
-            break;
-        default:
-            break;
-    }
-    return isValidSubclass;
-}
-
-bool isValidSDPSettingParam(const std::string &param, size_t maxSdpParamSize)
-{
-    size_t nameLength = param.size();
-    return nameLength > 0 && nameLength <= maxSdpParamSize;
-}
-
 napi_status NapiParseHidDeviceSDPSetting(napi_env env, napi_value object, BluetoothHidDeviceSdp &sdpSetting)
 {
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"name", "description", "provider", "subclass",
@@ -441,20 +379,20 @@ napi_status NapiParseHidDeviceSDPSetting(napi_env env, napi_value object, Blueto
     std::string name {};
     std::string description {};
     std::string provider {};
-    int subclass = 0;
+    int subclass {};
     std::vector<uint8_t> descriptors {};
     NAPI_BT_CALL_RETURN(NapiParseObjectString(env, object, "name", name));
-    if (!isValidSDPSettingParam(name, MAX_NAME_SIZE)) {
+    if (!IsValidSDPSettingParam(name, MAX_NAME_SIZE)) {
         HILOGE("invalid SDPSetting name size");
         return napi_invalid_arg;
     }
     NAPI_BT_CALL_RETURN(NapiParseObjectString(env, object, "description", description));
-    if (!isValidSDPSettingParam(description, MAX_DESCRIPTION_SIZE)) {
+    if (!IsValidSDPSettingParam(description, MAX_DESCRIPTION_SIZE)) {
         HILOGE("invalid SDPSetting description size");
         return napi_invalid_arg;
     }
     NAPI_BT_CALL_RETURN(NapiParseObjectString(env, object, "provider", provider));
-    if (!isValidSDPSettingParam(provider, MAX_PROVIDER_SIZE)) {
+    if (!IsValidSDPSettingParam(provider, MAX_PROVIDER_SIZE)) {
         HILOGE("invalid SDPSetting provider size");
         return napi_invalid_arg;
     }
@@ -567,7 +505,7 @@ napi_value NapiBluetoothHidDevice::UnregisterHidDevice(napi_env env, napi_callba
     NAPI_BT_ASSERT_ERR_NUM_RETURN(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     HidDevice *profile = HidDevice::GetProfile();
     if (observer_) {
-        observer_->eventSubscribe_.DeregisterWithNoCallback(
+        observer_->eventSubscribe_.DeregisterAllCallback(
             STR_BT_HID_DEVICE_OBSERVER_APP_STATUS_CHANGE);
     }
     int32_t errorCode = profile->UnregisterHidDevice();
@@ -629,21 +567,6 @@ napi_value NapiBluetoothHidDevice::SendReport(napi_env env, napi_callback_info i
     return NapiGetUndefinedRet(env);
 }
 
-bool IsValidReportType(int type)
-{
-    bool isValidType = false;
-    switch (type) {
-        case static_cast<int>(ReportType::REPORT_TYPE_INPUT):
-        case static_cast<int>(ReportType::REPORT_TYPE_OUTPUT):
-        case static_cast<int>(ReportType::REPORT_TYPE_FEATURE):
-            isValidType = true;
-            break;
-        default:
-            break;
-    }
-    return isValidType;
-}
-
 static napi_status CheckReplyReport(napi_env env, napi_callback_info info,
     ReportType &outtype, int &outid, std::vector<uint8_t> &outdata)
 {
@@ -678,24 +601,6 @@ napi_value NapiBluetoothHidDevice::ReplyReport(napi_env env, napi_callback_info 
     HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
     NAPI_BT_ASSERT_ERR_NUM_RETURN(env, errorCode == BT_NO_ERROR, errorCode);
     return NapiGetUndefinedRet(env);
-}
-
-bool IsValidErrorReason(int errorReason)
-{
-    bool isValidReason = false;
-    switch (errorReason) {
-        case static_cast<int>(ErrorReason::RSP_SUCCESS):
-        case static_cast<int>(ErrorReason::RSP_NOT_READY):
-        case static_cast<int>(ErrorReason::RSP_INVALID_REP_ID):
-        case static_cast<int>(ErrorReason::RSP_UNSUPPORTED_REQ):
-        case static_cast<int>(ErrorReason::INVALID_PARAM):
-        case static_cast<int>(ErrorReason::RSP_UNKNOWN):
-            isValidReason = true;
-            break;
-        default:
-            break;
-    }
-    return isValidReason;
 }
 
 static napi_status CheckReportError(napi_env env, napi_callback_info info, ErrorReason &outtype)

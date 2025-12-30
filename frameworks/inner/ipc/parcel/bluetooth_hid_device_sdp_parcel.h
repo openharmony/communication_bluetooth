@@ -18,6 +18,8 @@
 
 #include "hid_device_data.h"
 #include "parcel.h"
+#include "bluetooth_hid_device_info.h"
+#include "hid_device_utils.h"
 namespace OHOS {
 namespace Bluetooth {
 class BluetoothHidDeviceSdp : public Parcelable, public bluetooth::SdpSetting {

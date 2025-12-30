@@ -20,15 +20,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-const size_t MAX_DESCRIPTOR_SIZE = 2048;
-const size_t MAX_NAME_SIZE = 50;
-const size_t MAX_DESCRIPTION_SIZE = 50;
-const size_t MAX_PROVIDER_SIZE = 50;
-const int DEFAULT_TOKEN_RATE = 0;
-const int DEFAULT_TOKEN_BUCKET_SIZE = 0;
-const int DEFAULT_PEAK_BANDWIDTH = 0;
-const int DEFAULT_LATENCY = -1;
-const int DEFAULT_DELAY_VARIATION = -1;
 
 class NapiBluetoothHidDevice {
 public:

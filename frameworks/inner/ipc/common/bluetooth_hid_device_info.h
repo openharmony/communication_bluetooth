@@ -19,6 +19,9 @@
 namespace OHOS {
 namespace Bluetooth {
 
+const int HID_DEVICE_UNREGISTERED = 0;
+const int HID_DEVICE_REGISTERED = 1;
+
 enum Subclass {
     SUBCLASS_UNCATEGORIZED = 0,
     SUBCLASS_JOYSTICK = 1,

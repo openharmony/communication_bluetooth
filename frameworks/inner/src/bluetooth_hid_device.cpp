@@ -36,15 +36,16 @@ class HidDeviceInnerObserver : public BluetoothHidDeviceObserverStub {
 public:
     explicit HidDeviceInnerObserver(BluetoothObserverList<HidDeviceObserver> &observers) : observers_(observers)
     {
-        HILOGD("Enter!");
+        HILOGD("enter!");
     }
     ~HidDeviceInnerObserver() override
     {
-        HILOGD("Enter!");
+        HILOGD("enter!");
     }
 
     ErrCode OnAppStatusChanged(int state) override
     {
+        HILOGI("hid device app status changed, state: %{public}d", state);
         observers_.ForEach([state](std::shared_ptr<HidDeviceObserver> observer) {
             observer->OnAppStatusChanged(state);
         });
@@ -53,6 +54,8 @@ public:
 
     ErrCode OnConnectionStateChanged(const BluetoothRawAddress &device, int state) override
     {
+        HILOGD("hid device conn state, device: %{public}s, state: %{public}s",
+            GET_ENCRYPT_RAW_ADDR(device), GetProfileConnStateName(state).c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BT_TRANSPORT_BREDR);
         observers_.ForEach([remoteDevice, state](std::shared_ptr<HidDeviceObserver> observer) {
             observer->OnConnectionStateChanged(remoteDevice, state);
@@ -62,6 +65,7 @@ public:
 
     ErrCode OnGetReport(int type, int id, uint16_t bufferSize) override
     {
+        HILOGD("enter");
         observers_.ForEach([type, id, bufferSize](std::shared_ptr<HidDeviceObserver> observer) {
             observer->OnGetReport(type, id, bufferSize);
         });
@@ -70,6 +74,7 @@ public:
 
     ErrCode OnInterruptDataReceived(int id, std::vector<uint8_t> data) override
     {
+        HILOGD("enter");
         observers_.ForEach([id, data](std::shared_ptr<HidDeviceObserver> observer) {
             observer->OnInterruptDataReceived(id, data);
         });
@@ -78,6 +83,7 @@ public:
 
     ErrCode OnSetProtocol(int protocol) override
     {
+        HILOGD("enter");
         observers_.ForEach([protocol](std::shared_ptr<HidDeviceObserver> observer) {
             observer->OnSetProtocol(protocol);
         });
@@ -86,6 +92,7 @@ public:
 
     ErrCode OnSetReport(int type, int id, std::vector<uint8_t> data) override
     {
+        HILOGD("enter");
         observers_.ForEach([type, id, data](std::shared_ptr<HidDeviceObserver> observer) {
             observer->OnSetReport(type, id, data);
         });
@@ -94,6 +101,7 @@ public:
 
     ErrCode OnVirtualCableUnplug() override
     {
+        HILOGD("enter");
         observers_.ForEach([](std::shared_ptr<HidDeviceObserver> observer) {
             observer->OnVirtualCableUnplug();
         });
@@ -111,7 +119,7 @@ struct HidDevice::impl {
 
     int32_t GetConnectedDevices(std::vector<BluetoothRemoteDevice>& result)
     {
-        HILOGI("Enter!");
+        HILOGI("enter!");
         std::vector<BluetoothRawAddress> rawDevices;
         sptr<IBluetoothHidDevice> proxy = GetRemoteProxy<IBluetoothHidDevice>(PROFILE_HID_DEVICE_SERVER);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
@@ -141,13 +149,13 @@ struct HidDevice::impl {
 
     void RegisterObserver(std::shared_ptr<HidDeviceObserver> observer)
     {
-        HILOGD("Enter!");
+        HILOGD("enter!");
         observers_.Register(observer);
     }
 
     void DeregisterObserver(std::shared_ptr<HidDeviceObserver> observer)
     {
-        HILOGD("Enter!");
+        HILOGD("enter!");
         observers_.Deregister(observer);
     }
 
@@ -155,6 +163,7 @@ struct HidDevice::impl {
         const BluetoothHidDeviceQos &inQos,
         const BluetoothHidDeviceQos &outQos)
     {
+        HILOGI("enter!");
         sptr<IBluetoothHidDevice> proxy = GetRemoteProxy<IBluetoothHidDevice>(PROFILE_HID_DEVICE_SERVER);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
         return proxy->RegisterHidDevice(sdpSetting, inQos, outQos);
@@ -162,6 +171,7 @@ struct HidDevice::impl {
 
     int UnregisterHidDevice()
     {
+        HILOGI("enter!");
         sptr<IBluetoothHidDevice> proxy = GetRemoteProxy<IBluetoothHidDevice>(PROFILE_HID_DEVICE_SERVER);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
         return proxy->UnregisterHidDevice();
@@ -180,6 +190,7 @@ struct HidDevice::impl {
 
     int32_t Disconnect()
     {
+        HILOGI("hid disconnect remote device");
         sptr<IBluetoothHidDevice> proxy = GetRemoteProxy<IBluetoothHidDevice>(PROFILE_HID_DEVICE_SERVER);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
         return proxy->Disconnect();
@@ -208,6 +219,7 @@ struct HidDevice::impl {
 
     int SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy)
     {
+        HILOGI("enter");
         sptr<IBluetoothHidDevice> proxy = GetRemoteProxy<IBluetoothHidDevice>(PROFILE_HID_DEVICE_SERVER);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
         return proxy->SetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
@@ -215,6 +227,7 @@ struct HidDevice::impl {
 
     int GetConnectStrategy(const BluetoothRemoteDevice &device, int &strategy) const
     {
+        HILOGI("enter");
         sptr<IBluetoothHidDevice> proxy = GetRemoteProxy<IBluetoothHidDevice>(PROFILE_HID_DEVICE_SERVER);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
         return proxy->GetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);

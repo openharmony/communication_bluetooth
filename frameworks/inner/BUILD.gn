@@ -222,6 +222,7 @@ ohos_shared_library("btcommon") {
     "ipc/common/bt_trust_pair_device.cpp",
     "ipc/common/bt_uuid.cpp",
     "ipc/common/gatt_data.cpp",
+    "ipc/common/hid_device_utils.cpp",
     "ipc/common/hands_free_unit_calls.cpp",
     "ipc/common/opp_transfer_information.cpp",
     "ipc/common/raw_address.cpp",

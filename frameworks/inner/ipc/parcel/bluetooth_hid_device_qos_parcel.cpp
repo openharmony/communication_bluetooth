@@ -69,7 +69,7 @@ bool BluetoothHidDeviceQos::WriteToParcel(Parcel &parcel)
 
 bool BluetoothHidDeviceQos::ReadFromParcel(Parcel &parcel)
 {
-    if (!parcel.ReadInt32(serviceType_)) {
+    if (!parcel.ReadInt32(serviceType_) || !IsValidServiceType(serviceType_)) {
         return false;
     }
     if (!parcel.ReadInt32(tokenRate_)) {

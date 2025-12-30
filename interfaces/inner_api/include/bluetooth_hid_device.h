@@ -204,7 +204,6 @@ public:
      * @param type Report type fpr reply.
      * @param id Report Id, as is defined in descriptor.
      * @param data Report data send to host.
-     * @param 
      */
     int32_t ReplyReport(ReportType type, int id, const std::vector<uint8_t> &data);
 
