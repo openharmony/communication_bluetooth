@@ -61,8 +61,25 @@ do {                                                     \
     NAPI_BT_ASSERT_RETURN((env), (cond), (errCode), res); \
 } while (0)
 
+#define NAPI_BT_ASSERT_NUM_RETURN(env, cond, errCode, retObj) \
+do {                                                          \
+    if (!(cond)) {                                            \
+        HandleSyncErrNum((env), (errCode));                   \
+        HILOGE("bluetoothManager napi assert failed.");       \
+        return (retObj);                                      \
+    }                                                         \
+} while (0)
+
+#define NAPI_BT_ASSERT_ERR_NUM_RETURN(env, cond, errCode)     \
+do {                                                          \
+    napi_value res = nullptr;                                 \
+    napi_get_undefined((env), &res);                          \
+    NAPI_BT_ASSERT_NUM_RETURN((env), (cond), (errCode), res); \
+} while (0)
+
 std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode);
 void HandleSyncErr(const napi_env &env, int32_t errCode);
+void HandleSyncErrNum(const napi_env &env, int32_t errCode);
 }
 }
 #endif

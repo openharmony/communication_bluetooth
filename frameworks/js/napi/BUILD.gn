@@ -28,6 +28,7 @@ ohos_shared_library("bluetooth") {
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/access",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/base_profile",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/constant",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
   ]
 
   defines = [
@@ -69,7 +70,9 @@ ohos_shared_library("bluetooth") {
     "src/hfp/napi_bluetooth_hfp_hf.cpp",
     "src/hfp/napi_bluetooth_hfp_hf_observer.cpp",
     "src/hid/napi_bluetooth_hid_host.cpp",
+    "src/hid/napi_bluetooth_hid_device.cpp",
     "src/hid/napi_bluetooth_hid_host_observer.cpp",
+    "src/hid/napi_bluetooth_hid_device_observer.cpp",
     "src/napi_bluetooth_a2dp_snk.cpp",
     "src/napi_bluetooth_a2dp_snk_observer.cpp",
     "src/napi_bluetooth_avrcp_ct.cpp",
@@ -87,6 +90,7 @@ ohos_shared_library("bluetooth") {
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/common:bt_napi_common",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btcommon",
   ]
 
   external_deps = [
@@ -128,6 +132,7 @@ ohos_shared_library("bluetoothmanager") {
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/access",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/base_profile",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/constant",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
   ]
 
   defines = [
@@ -171,6 +176,8 @@ ohos_shared_library("bluetoothmanager") {
     "src/hfp/napi_bluetooth_hfp_hf_observer.cpp",
     "src/hid/napi_bluetooth_hid_host.cpp",
     "src/hid/napi_bluetooth_hid_host_observer.cpp",
+    "src/hid/napi_bluetooth_hid_device.cpp",
+    "src/hid/napi_bluetooth_hid_device_observer.cpp",
     "src/napi_bluetooth_a2dp_snk.cpp",
     "src/napi_bluetooth_a2dp_snk_observer.cpp",
     "src/napi_bluetooth_avrcp_ct.cpp",
@@ -188,6 +195,7 @@ ohos_shared_library("bluetoothmanager") {
   deps = [
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btframework",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/common:bt_napi_common",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner:btcommon",
   ]
 
   external_deps = [

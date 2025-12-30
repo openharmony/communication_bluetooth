@@ -49,6 +49,7 @@ constexpr int32_t DEFAULT_INT32 = 0;
 constexpr int32_t PARAM0 = 0;
 constexpr int32_t PARAM1 = 1;
 constexpr int32_t PARAM2 = 2;
+constexpr int32_t PARAM3 = 3;
 constexpr int32_t CODE_SUCCESS = 0;
 constexpr int32_t CODE_FAILED = -1;
 constexpr int ASYNC_IDLE = 0;
@@ -450,7 +451,8 @@ enum ProfileId {
     PROFILE_PAN_NETWORK = 7,
     PROFILE_PBAP_CLIENT = 8,
     PROFILE_PBAP_SERVER = 9,
-    PROFILE_OPP = 10
+    PROFILE_OPP = 10,
+    PROFILE_HID_DEVICE = 11
 };
 
 enum AccessAuthorization {

@@ -172,6 +172,8 @@
               "interface/i_bluetooth_hfp_hf_observer.h",
               "interface/i_bluetooth_hid_host.h",
               "interface/i_bluetooth_hid_host_observer.h",
+              "interface/i_bluetooth_hid_device.h",
+              "interface/i_bluetooth_hid_device_observer.h",
               "interface/i_bluetooth_host.h",
               "interface/i_bluetooth_host_observer.h",
               "interface/i_bluetooth_map_mse.h",
@@ -205,7 +207,9 @@
               "parcel/bluetooth_phone_state.h",
               "parcel/bluetooth_raw_address.h",
               "parcel/bluetooth_socket_coc.h",
-              "parcel/parcel_bt_uuid.h"
+              "parcel/parcel_bt_uuid.h",
+              "parcel/bluetooth_hid_device_sdp_parcel.h",
+              "parcel/bluetooth_hid_device_qos_parcel.h"
             ]
           },
           "name": "//foundation/communication/bluetooth/frameworks/inner:btcommon"
