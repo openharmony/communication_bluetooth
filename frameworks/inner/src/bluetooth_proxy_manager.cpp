@@ -19,7 +19,6 @@
 #include "bluetooth_proxy_manager.h"
 
 #include "bluetooth_ble_central_manager.h"
-#include "bluetooth_def.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "bluetooth_profile_manager.h"
@@ -38,7 +37,7 @@ BluetoothProxyManager& BluetoothProxyManager::GetInstance()
 #endif
 }
 
-bool BluetoothProxyManager::FreezeByRss(std::set<int> pidSet, bool isProxy)
+bool BluetoothProxyManager::FreezeByRss(std::set<int> pidSet, bool isProxy, uint8_t freezeType)
 {
     if (!IS_BLE_ENABLED()) {
         HILOGD("bluetooth is off.");
@@ -47,7 +46,7 @@ bool BluetoothProxyManager::FreezeByRss(std::set<int> pidSet, bool isProxy)
     sptr<IBluetoothBleCentralManager> proxy =
         GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy, false, "failed: no proxy");
-    return proxy->FreezeByRss(pidSet, isProxy);
+    return proxy->FreezeByRss(pidSet, isProxy, freezeType);
 }
 
 bool BluetoothProxyManager::ResetAllProxy()
