@@ -1778,6 +1778,12 @@ enum RawAddressType {
     UNSET_RAW_ADDRESS = 0xFF,
 };
 
+enum FreezeType : uint8_t {
+    DEFAULT_TYPE = 0x00,
+    LOW_POWER_TYPE = 0x01,
+    UNSET_TYPE = 0xFF,
+};
+
 struct BluetoothAddress {
     std::string address = {};
     int32_t addressType = AddressType::UNSET_ADDRESS;

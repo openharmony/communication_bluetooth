@@ -170,7 +170,7 @@ void BluetoothBleCentralManagerProxy::RemoveScanFilter(int32_t scannerId)
     }
 }
 
-bool BluetoothBleCentralManagerProxy::FreezeByRss(std::set<int> pidSet, bool isProxy)
+bool BluetoothBleCentralManagerProxy::FreezeByRss(std::set<int> pidSet, bool isProxy, uint8_t freezeType)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
@@ -179,7 +179,7 @@ bool BluetoothBleCentralManagerProxy::FreezeByRss(std::set<int> pidSet, bool isP
     }
 
     std::vector<int> pidVec(pidSet.begin(), pidSet.end());
-    if (!data.WriteInt32Vector(pidVec) || !data.WriteBool(isProxy)) {
+    if (!data.WriteInt32Vector(pidVec) || !data.WriteBool(isProxy) || !data.WriteUint8(freezeType)) {
         HILOGE("[FreezeByRss] fail: write data failed");
         return false;
     }
