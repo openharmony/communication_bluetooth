@@ -73,16 +73,16 @@ bool BluetoothHidDeviceSdp::WriteToParcel(Parcel &parcel)
 
 bool BluetoothHidDeviceSdp::ReadFromParcel(Parcel &parcel)
 {
-    if (!parcel.ReadString(name_)) {
+    if (!parcel.ReadString(name_) || !IsValidSDPSettingParam(name_, MAX_NAME_SIZE)) {
         return false;
     }
-    if (!parcel.ReadString(description_)) {
+    if (!parcel.ReadString(description_) || !IsValidSDPSettingParam(description_, MAX_DESCRIPTION_SIZE)) {
         return false;
     }
-    if (!parcel.ReadString(provider_)) {
+    if (!parcel.ReadString(provider_) || !IsValidSDPSettingParam(provider_, MAX_PROVIDER_SIZE)) {
         return false;
     }
-    if (!parcel.ReadInt32(subclass_)) {
+    if (!parcel.ReadInt32(subclass_) || !IsValidSubclass(subclass_)) {
         return false;
     }
 

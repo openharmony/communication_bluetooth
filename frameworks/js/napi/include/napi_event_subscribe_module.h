@@ -43,7 +43,7 @@ public:
     void PublishEvent(std::string eventName, const std::shared_ptr<NapiNativeObject> &nativeObject);
     void RegisterCallback(napi_env env, std::string name, napi_value callback);
     void DeregisterCallback(napi_env env, std::string name, napi_value callback);
-    void DeregisterWithNoCallback(std::string name);
+    void DeregisterAllCallback(std::string name);
 private:
     bool IsValidEventName(const std::string &eventName) const;
     bool IsNapiCallbackExist(

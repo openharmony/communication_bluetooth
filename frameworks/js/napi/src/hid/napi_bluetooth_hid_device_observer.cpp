@@ -41,6 +41,9 @@ void NapiBluetoothHidDeviceObserver::OnAppStatusChanged(int state)
 {
     auto nativeObject = std::make_shared<NapiNativeBool>(state);
     eventSubscribe_.PublishEvent(STR_BT_HID_DEVICE_OBSERVER_APP_STATUS_CHANGE, nativeObject);
+    if (state == HID_DEVICE_UNREGISTERED) {
+        eventSubscribe_.DeregisterAllCallback(STR_BT_HID_DEVICE_OBSERVER_APP_STATUS_CHANGE);
+    }
 }
 
 void NapiBluetoothHidDeviceObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state)

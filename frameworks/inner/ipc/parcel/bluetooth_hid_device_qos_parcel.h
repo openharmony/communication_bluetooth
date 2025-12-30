@@ -17,6 +17,8 @@
 #define BLUETOOTH_PARCEL_HID_DEVICE_QOS_H
 
 #include "hid_device_data.h"
+#include "bluetooth_hid_device_info.h"
+#include "hid_device_utils.h"
 #include "parcel.h"
 namespace OHOS {
 namespace Bluetooth {

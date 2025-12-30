@@ -183,7 +183,7 @@ void NapiEventSubscribeModule::DeregisterCallback(napi_env env, std::string name
     });
 }
 
-void NapiEventSubscribeModule::DeregisterWithNoCallback(std::string name)
+void NapiEventSubscribeModule::DeregisterAllCallback(std::string name)
 {
     HILOGI("Deregister all %{public}s callback in %{public}s module", name.c_str(), moduleName_.c_str());
     eventSubscribeMap_.Erase(name);
