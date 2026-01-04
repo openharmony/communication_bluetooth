@@ -917,8 +917,8 @@ static napi_status ParseAdvertisDataParameters(const napi_env &env,
 
     std::string advName = "";
     NAPI_BT_CALL_RETURN(NapiParseObjectStringOptional(env, object, "advertiseName", advName, exist));
-    NAPI_BT_RETURN_IF(!advName.empty() && !includeDeviceName, "includeDeviceName must be true if advertiseName is set",
-        napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!advName.empty() && includeDeviceName, "includeDeviceName should be false if advertiseName is"
+        "given", napi_invalid_arg);
     outData.SetAdvertiseName(advName);
 
     bool includeTxPower = false;
