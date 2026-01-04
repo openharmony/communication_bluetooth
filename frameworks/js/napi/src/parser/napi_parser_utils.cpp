@@ -700,6 +700,7 @@ napi_status NapiParseObjectStringOptional(napi_env env, napi_value object, const
     outExist = exist;
     return napi_ok;
 }
+
 napi_status NapiParseObjectInt32Optional(napi_env env, napi_value object, const char *name, int32_t &outNum,
     bool &outExist)
 {
