@@ -396,6 +396,18 @@ enum BtStatus {
     BT_FAILURE = -1,
 };
 
+enum BlePhy {
+    BLE_PHY_1M = 1,
+    BLE_PHY_2M,
+    BLE_PHY_CODED
+};
+
+enum CodedPhyMode {
+    BLE_PHY_CODED_NO_PREFERRED,
+    BLE_PHY_CODED_S2,
+    BLE_PHY_CODED_S8
+};
+
 /*********************************************
  *
  * BLE Macro Define

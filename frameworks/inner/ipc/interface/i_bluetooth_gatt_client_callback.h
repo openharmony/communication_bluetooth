@@ -42,6 +42,8 @@ public:
     virtual void OnConnectionParameterChanged(int32_t interval, int32_t latency, int32_t timeout, int32_t status) = 0;
     virtual void OnServicesChanged() = 0;
     virtual void OnReadRemoteRssiValue(const bluetooth::RawAddress &addr, int rssi, int status) = 0;
+    virtual void OnBlePhyUpdate(int32_t txPhy, int32_t rxPhy, int32_t status) = 0;
+    virtual void OnBlePhyRead(int32_t txPhy, int32_t rxPhy, int32_t status) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
