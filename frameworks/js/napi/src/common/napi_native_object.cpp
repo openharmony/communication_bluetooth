@@ -255,5 +255,20 @@ napi_value NapiNativeStringArray::ToNapiValue(napi_env env) const
     ConvertStringVectorToJS(env, object, value_);
     return object;
 }
+
+napi_value NapiNativeBlePhyInfo::ToNapiValue(napi_env env) const
+{
+    //协议栈的回调不返phyMode，因此不构造phyMode返回
+    napi_value object = nullptr;
+    napi_create_object(env, &object);
+
+    napi_value value;
+    napi_create_int32(env, txPhy_, &value);
+    napi_set_named_property(env, object, "txPhy", value);
+
+    napi_create_int32(env, rxPhy_, &value);
+    napi_set_named_property(env, object, "rxPhy", value);
+    return object;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

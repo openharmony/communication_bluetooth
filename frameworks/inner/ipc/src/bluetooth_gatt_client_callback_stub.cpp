@@ -59,6 +59,12 @@ BluetoothGattClientCallbackStub::BluetoothGattClientCallbackStub()
     memberFuncMap_[static_cast<uint32_t>(
         BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_READ_REMOTE_RSSI_VALUE)] =
         BluetoothGattClientCallbackStub::OnReadRemoteRssiValueInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_BLE_PHY_UPDATE)] =
+        BluetoothGattClientCallbackStub::OnBlePhyUpdateInner;
+    memberFuncMap_[static_cast<uint32_t>(
+        BluetoothGattClientCallbackInterfaceCode::BT_GATT_CLIENT_CALLBACK_BLE_PHY_READ)] =
+        BluetoothGattClientCallbackStub::OnBlePhyReadInner;
 }
 
 BluetoothGattClientCallbackStub::~BluetoothGattClientCallbackStub()
@@ -224,6 +230,30 @@ ErrCode BluetoothGattClientCallbackStub::OnReadRemoteRssiValueInner(
     int32_t rssi = data.ReadInt32();
     int32_t state = data.ReadInt32();
     stub->OnReadRemoteRssiValue(address, rssi, state);
+    return NO_ERROR;
+}
+
+__attribute__((no_sanitize("cfi")))
+ErrCode BluetoothGattClientCallbackStub::OnBlePhyUpdateInner(
+    BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
+{
+    HILOGI("BluetoothGattClientCallbackStub::OnBlePhyUpdateInner Triggered!");
+    int32_t txPhy = data.ReadInt32();
+    int32_t rxPhy = data.ReadInt32();
+    int32_t status = data.ReadInt32();
+    stub->OnBlePhyUpdate(txPhy, rxPhy, status);
+    return NO_ERROR;
+}
+
+__attribute__((no_sanitize("cfi")))
+ErrCode BluetoothGattClientCallbackStub::OnBlePhyReadInner(
+    BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply)
+{
+    HILOGI("BluetoothGattClientCallbackStub::OnBlePhyReadInner Triggered!");
+    int32_t txPhy = data.ReadInt32();
+    int32_t rxPhy = data.ReadInt32();
+    int32_t status = data.ReadInt32();
+    stub->OnBlePhyRead(txPhy, rxPhy, status);
     return NO_ERROR;
 }
 

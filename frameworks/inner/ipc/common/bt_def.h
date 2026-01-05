@@ -411,6 +411,38 @@ enum GattStatus {
     GATT_SUCCESS
 };
 
+enum BlePhy {
+    BLE_PHY_1M = 1,
+    BLE_PHY_2M,
+    BLE_PHY_CODED
+};
+
+enum CodedPhyMode {
+    BLE_PHY_CODED_NO_PREFERRED,
+    BLE_PHY_CODED_S2,
+    BLE_PHY_CODED_S8
+};
+
+enum BlePhyMask {
+    BLE_PHY_1M_MASK = 1,
+    BLE_PHY_2M_MASK = 2,
+    BLE_PHY_CODED_MASK = 4
+};
+
+inline int ConvertToBlePhyMask (int phy)
+{
+    int outPhy = BLE_PHY_1M_MASK;
+    switch (phy) {
+        case BLE_PHY_CODED:
+            outPhy = BLE_PHY_CODED_MASK;
+            break;
+        default:
+            outPhy = phy;
+            break;
+    }
+    return outPhy;
+}
+
 /*********************************************
  *
  * BLE Macro Define

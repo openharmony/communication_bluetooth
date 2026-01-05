@@ -34,6 +34,7 @@ const char * const STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE = "connectio
 const char * const STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE = "connectStateChange";
 #endif
 const char * const STR_BT_GATT_SERVER_CALLBACK_MTU_CHANGE = "BLEMtuChange";
+const char * const STR_BT_GATT_SERVER_CALLBACK_BLE_PHY_UPDATE = "BlePhyUpdate";
 
 class NapiGattServerCallback : public GattServerCallback {
 public:
@@ -53,6 +54,9 @@ public:
         int result) override;
     void OnConnectionParameterChanged(const BluetoothRemoteDevice &device,
         int interval, int latency, int timeout, int status) override {}
+    void OnBlePhyUpdate(const BluetoothRemoteDevice &device,
+        int32_t txPhy, int32_t rxPhy, int32_t status) override;
+    void OnBlePhyRead(int32_t txPhy, int32_t rxPhy, int32_t status) override;
 
     NapiAsyncWorkMap asyncWorkMap_ {};
     NapiEventSubscribeModule eventSubscribe_;
