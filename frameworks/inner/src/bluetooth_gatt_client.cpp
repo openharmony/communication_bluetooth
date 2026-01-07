@@ -350,15 +350,6 @@ public:
             HILOGE("callback client is nullptr");
             return;
         }
-        uint8_t requestType;
-        {
-            std::lock_guard<std::mutex> lock(clientSptr->pimpl->requestInformation_.mutex_);
-            clientSptr->pimpl->requestInformation_.doing_ = false;
-            requestType = clientSptr->pimpl->requestInformation_.type_;
-        }
-        if (requestType != REQUEST_TYPE_READ_REMOTE_RSSI_VALUE) {
-            HILOGE("Unexpected call!");
-        }
         WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnReadRemoteRssiValueResult, rssi, status);
     }
 
@@ -1141,16 +1132,12 @@ int GattClient::ReadRemoteRssiValue()
         HILOGE("pimpl or gatt client proxy is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
-
-    std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
-    if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
-        HILOGE("Request not supported");
-        return BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED;
-    }
-    std::lock_guard<std::mutex> lck(pimpl->requestInformation_.mutex_);
-    if (pimpl->requestInformation_.doing_) {
-        HILOGE("Remote device busy");
-        return BT_ERR_OPERATION_BUSY;
+    {
+        std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
+        if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
+            HILOGE("Request not supported");
+            return BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED;
+        }
     }
     int result = GattStatus::GATT_FAILURE;
     HILOGI("applicationId: %{public}d", pimpl->applicationId_);
@@ -1158,10 +1145,6 @@ int GattClient::ReadRemoteRssiValue()
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
     result = proxy->ReadRemoteRssiValue(pimpl->applicationId_);
     HILOGI("result: %{public}d", result);
-    if (result == BT_NO_ERROR) {
-        pimpl->requestInformation_.doing_ = true;
-        pimpl->requestInformation_.type_ = REQUEST_TYPE_READ_REMOTE_RSSI_VALUE;
-    }
     return result;
 }
 
