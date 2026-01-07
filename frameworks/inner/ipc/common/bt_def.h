@@ -375,8 +375,8 @@ enum class GattConnectionPriority : int {
 };
 
 enum GattStatus {
-    GATT_CANCEL = -57,
-    GATT_MORE = -56,
+    GATT_DIS_CANCEL = -57,
+    GATT_MORE_REASON = -56,
     OUT_OF_RANGE = -55,
     PRC_IN_PROGRESS = -54,
     CCC_CFG_ERR = -53,
