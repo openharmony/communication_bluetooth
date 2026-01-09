@@ -515,15 +515,15 @@ napi_value NapiBluetoothHidDevice::UnregisterHidDevice(napi_env env, napi_callba
 
 napi_value NapiBluetoothHidDevice::Connect(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");	 
-     std::string remoteAddr {};	 
-     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);	 
-     NAPI_BT_ASSERT_ERR_NUM_RETURN(env, checkRet, BT_ERR_INVALID_PARAM);	 
-     HidDevice *profile = HidDevice::GetProfile();	 
-     BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);	 
-     int32_t errorCode = profile->Connect(device);	 
-     NAPI_BT_ASSERT_ERR_NUM_RETURN(env, errorCode == BT_NO_ERROR, errorCode);	 
-     return NapiGetUndefinedRet(env);
+    HILOGI("enter");
+    std::string remoteAddr {};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, checkRet, BT_ERR_INVALID_PARAM);
+    HidDevice *profile = HidDevice::GetProfile();
+    BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
+    int32_t errorCode = profile->Connect(device);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, errorCode == BT_NO_ERROR, errorCode);
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiBluetoothHidDevice::Disconnect(napi_env env, napi_callback_info info)
