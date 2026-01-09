@@ -185,7 +185,7 @@ struct HidDevice::impl {
             return BT_ERR_INVALID_PARAM;
         }
         HILOGI("hid connect remote device: %{public}s", GET_ENCRYPT_ADDR(device));
-        return proxy->Connect(BluetoothRawAddress(device.GetAddressType(), device.GetDeviceAddr()));
+        return proxy->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
     }
 
     int32_t Disconnect()

@@ -77,11 +77,6 @@ int BluetoothRemoteDevice::GetTransportType() const
     return transport_;
 }
 
-int BluetoothRemoteDevice::GetAddressType() const
-{
-    return addressType_;
-}
-
 int BluetoothRemoteDevice::GetPhonebookPermission() const
 {
     HILOGI("enter");
