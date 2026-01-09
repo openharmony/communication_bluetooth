@@ -397,6 +397,18 @@ enum BtStatus {
     BT_FAILURE = -1,
 };
 
+enum BlePhy {
+    BLE_PHY_1M = 1,
+    BLE_PHY_2M,
+    BLE_PHY_CODED
+};
+
+enum CodedPhyMode {
+    BLE_PHY_CODED_NO_PREFERRED,
+    BLE_PHY_CODED_S2,
+    BLE_PHY_CODED_S8
+};
+
 /*********************************************
  *
  * BLE Macro Define
@@ -1777,6 +1789,12 @@ enum RawAddressType {
     PUBLIC_ADDRESS = 0x00,
     RANDOM_ADDRESS = 0x01,
     UNSET_RAW_ADDRESS = 0xFF,
+};
+
+enum FreezeType : uint8_t {
+    DEFAULT_TYPE = 0x00,
+    LOW_POWER_TYPE = 0x01,
+    UNSET_TYPE = 0xFF,
 };
 
 struct BluetoothAddress {

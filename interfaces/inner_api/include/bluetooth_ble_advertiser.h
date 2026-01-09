@@ -144,6 +144,24 @@ public:
     void SetIncludeDeviceName(bool flag);
 
     /**
+     * @brief Get advertise name.
+     *
+     * @return Returns advertiseName.
+     * @since 23
+     */
+    std::string GetAdvertiseName() const;
+
+    /**
+     * @brief Set advertise name.
+     *
+     * @param advName advertiseName.
+     * @since 23
+     */
+    void SetAdvertiseName(std::string advName);
+
+    bool HasAdvertiseName() const;
+
+    /**
      * @brief Get whether the txpower will be included in the advertisement packet.
      *
      * @return Returns includeTxPower flag.
@@ -158,22 +176,6 @@ public:
      * @since 10
      */
     void SetIncludeTxPower(bool flag);
-
-    /**
-     * @brief Get the advertise name included in the advertise packet.
-     *
-     * @return Returns advertiseName.
-     * @since 23
-     */
-    std::string GetAdvertiseName() const;
-
-    /**
-     * @brief Set the advertise name to be included in the advertise packet.
-     *
-     * @param advName advertiseName.
-     * @since 23
-     */
-    void SetAdvertiseName(std::string advName);
 
 private:
     std::vector<ParcelUuid> serviceUuids_{};

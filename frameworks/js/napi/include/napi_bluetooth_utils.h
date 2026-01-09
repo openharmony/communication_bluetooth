@@ -19,6 +19,8 @@
 #include "bluetooth_gatt_descriptor.h"
 #include "bluetooth_gatt_server.h"
 #include "bluetooth_gatt_service.h"
+#include "bluetooth_address_info.h"
+#include "bluetooth_oob_data.h"
 #include "bluetooth_log.h"
 #include "bluetooth_opp.h"
 #include "bluetooth_remote_device.h"
@@ -36,6 +38,7 @@
 
 #include "bluetooth_socket.h"
 #include "securec.h"
+#include <charconv>
 
 namespace OHOS {
 namespace Bluetooth {
@@ -103,6 +106,13 @@ struct ConnStateChangeParam {
 struct NapiMap {
     napi_value instance;
     napi_value set_function;
+};
+
+struct BlePhyInfo {
+    int txPhy;
+    int rxPhy;
+    int phyOptions;
+    BlePhyInfo(int txPhy, int rxPhy, int phyOptions): txPhy(txPhy), rxPhy(rxPhy), phyOptions(phyOptions) {}
 };
 
 const char * const REGISTER_STATE_CHANGE_TYPE = "stateChange";
@@ -506,8 +516,18 @@ void AfterWorkCallback(uv_work_t *work, int status)
         }                                                   \
     } while (0)
 
-int DoInJsMainThread(napi_env env, std::function<void(void)> func);
+template <typename T>
+bool ConvertStrToDigit(const std::string &str, T &ret, int base = 10) // 10 means input string is decimal
+{
+    std::from_chars_result res = std::from_chars(str.data(), str.data() + str.size(), ret, base);
+    if (res.ec != std::errc{} || res.ptr != str.data() +str.size()) {
+        HILOGE("FromString failed, error string is %{public}s", str.c_str());
+        return false;
+    }
+    return true;
+}
 
+int DoInJsMainThread(napi_env env, std::function<void(void)> func);
 bool IsValidAddress(std::string bdaddr);
 bool IsRandomStaticAddress(std::string address);
 bool IsValidTransport(int transport);
@@ -519,6 +539,7 @@ napi_status NapiIsFunction(napi_env env, napi_value value);
 napi_status NapiIsArray(napi_env env, napi_value value);
 napi_status NapiIsArrayBuffer(napi_env env, napi_value value);
 napi_status NapiIsObject(napi_env env, napi_value value);
+napi_status NapiIsNull(napi_env env, napi_value value);
 napi_status ParseNumberParams(napi_env env, napi_value object, const char *name, bool &outExist, napi_value &outParam);
 napi_status ParseInt32Params(napi_env env, napi_value object, const char *name, bool &outExist, int32_t &outParam);
 napi_status ParseUint32Params(napi_env env, napi_value object, const char *name, bool &outExist, uint32_t &outParam);
@@ -530,6 +551,9 @@ napi_status ParseArrayBufferParams(napi_env env, napi_value object, const char *
 napi_status ParseUint8ArrayParam(napi_env env, napi_value array, std::vector<uint8_t> &outParam);
 napi_status NapiParseObjectUint8Array(napi_env env, napi_value object, const char *name, bool &outExist,
     std::vector<uint8_t> &outParam);
+napi_status ParseAddressInfoParam(napi_env env, napi_value object, AddressInfo &addressInfo);
+napi_status ParseOobDataParam(napi_env env, napi_value object, const int32_t transport,
+    const AddressInfo &addressInfo, OobData &oobData);
 napi_status ParseUuidParams(napi_env env, napi_value object, const char *name, bool &outExist, UUID &outUuid);
 
 bool CheckDeivceIdParam(napi_env env, napi_callback_info info, std::string &addr);
@@ -545,6 +569,7 @@ napi_status CheckDeviceAddressParam(napi_env env, napi_callback_info info, std::
 napi_status CheckAccessAuthorizationParam(napi_env env, napi_callback_info info, std::string &addr,
     int32_t &accessAuthorization);
 napi_status NapiGetOnOffCallbackName(napi_env env, napi_callback_info info, std::string &name);
+napi_status NapiParseSetPhyValue(napi_env env, napi_value object, BlePhyInfo &phyInfo);
 
 int GetCurrentSdkVersion(void);
 int GetSDKAdaptedStatusCode(int status);

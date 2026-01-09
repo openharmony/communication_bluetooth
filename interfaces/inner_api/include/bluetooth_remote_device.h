@@ -23,6 +23,7 @@
 #include "bluetooth_types.h"
 #include "bluetooth_device_class.h"
 #include "bluetooth_battery_info.h"
+#include "bluetooth_oob_data.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -196,6 +197,16 @@ public:
      * @since 6
      */
     int StartPair();
+
+    /**
+     * @brief Device start pair.
+     *
+     * @param oobData oobData.
+     * @return Returns <b>true</b> if the operation is successful;
+     *         returns <b>false</b> if the operation fails.
+     * @since 23
+     */
+    int StartPairOutOfBand(const OobData &oobData);
 
     /**
      * @brief Credible Device start pair.

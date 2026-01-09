@@ -139,8 +139,12 @@ bool BluetoothBleScanResult::WriteServiceUuidsToParcel(Parcel &parcel) const
     if (!parcel.WriteInt32(serviceUuids_.size())) {
         return false;
     }
-    for (auto iter : serviceUuids_) {
-        if (!parcel.WriteUint32(iter.ConvertTo32Bits())) {
+    for (auto &serviceUuid : serviceUuids_) {
+        uint8_t buffer[bluetooth::Uuid::UUID128_BYTES_TYPE] = {0};
+        if (!serviceUuid.ConvertToBytesLE(buffer, bluetooth::Uuid::UUID128_BYTES_TYPE)) {
+            return false;
+        }
+        if (!parcel.WriteBuffer(static_cast<void *>(buffer), bluetooth::Uuid::UUID128_BYTES_TYPE)) {
             return false;
         }
     }
@@ -155,12 +159,14 @@ bool BluetoothBleScanResult::ReadServiceUuidsFromParcel(Parcel &parcel)
         return false;
     }
     for (int i = 0; i < uuidSize; ++i) {
-        uint32_t uuid;
-        if (parcel.ReadUint32(uuid)) {
-            serviceUuids_.push_back(bluetooth::Uuid::ConvertFrom32Bits(uuid));
-        } else {
+        const uint8_t *buffer = parcel.ReadBuffer(static_cast<size_t>(bluetooth::Uuid::UUID128_BYTES_TYPE));
+        if (buffer == nullptr) {
+            HILOGE("ReadBuffer failed");
             return false;
         }
+        bluetooth::Uuid uuid = bluetooth::Uuid::ConvertFromBytesLE(
+            buffer, static_cast<size_t>(bluetooth::Uuid::UUID128_BYTES_TYPE));
+        serviceUuids_.push_back(uuid);
     }
     return true;
 }

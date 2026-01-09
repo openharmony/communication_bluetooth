@@ -31,7 +31,8 @@ NapiGattClientCallback::NapiGattClientCallback()
     : eventSubscribe_({STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE,
         STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE,
         STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE,
-        STR_BT_GATT_CLIENT_CALLBACK_SERVICE_CHANGE},
+        STR_BT_GATT_CLIENT_CALLBACK_SERVICE_CHANGE,
+        STR_BT_GATT_CLIENT_CALLBACK_BLE_PHY_UPDATE},
         BT_MODULE_NAME)
 {}
 
@@ -149,6 +150,21 @@ void NapiGattClientCallback::OnMtuUpdate(int mtu, int ret)
     auto nativeObject = std::make_shared<NapiNativeInt>(mtu);
     eventSubscribe_.PublishEvent(STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE, nativeObject);
 #endif
+}
+
+void NapiGattClientCallback::OnBlePhyUpdate(int32_t txPhy, int32_t rxPhy, int32_t status)
+{
+    HILOGI("txPhy: %{public}d, rxPhy: %{public}d, status: %{public}d", txPhy, rxPhy, status);
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_SET_PHY, nullptr, status);
+    auto napiBlePhy = std::make_shared<NapiNativeBlePhyInfo>(txPhy, rxPhy);
+    eventSubscribe_.PublishEvent(STR_BT_GATT_CLIENT_CALLBACK_BLE_PHY_UPDATE, napiBlePhy);
+}
+
+void NapiGattClientCallback::OnBlePhyRead(int32_t txPhy, int32_t rxPhy, int32_t status)
+{
+    HILOGI("txPhy: %{public}d, rxPhy: %{public}d, status: %{public}d", txPhy, rxPhy, status);
+    auto napiBlePhy = std::make_shared<NapiNativeBlePhyInfo>(txPhy, rxPhy);
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_READ_PHY, napiBlePhy, status);
 }
 
 } // namespace Bluetooth

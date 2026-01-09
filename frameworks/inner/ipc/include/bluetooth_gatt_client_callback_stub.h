@@ -54,6 +54,10 @@ private:
         BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
     static ErrCode OnReadRemoteRssiValueInner(
         BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnBlePhyUpdateInner(
+        BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
+    static ErrCode OnBlePhyReadInner(
+        BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
     using BluetoothHostFunc = ErrCode (*)(
         BluetoothGattClientCallbackStub *stub, MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothHostFunc> memberFuncMap_;
