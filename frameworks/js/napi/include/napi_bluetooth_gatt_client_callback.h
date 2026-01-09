@@ -29,6 +29,7 @@ const char * const STR_BT_GATT_CLIENT_CALLBACK_BLE_CHARACTERISTIC_CHANGE = "BLEC
 const char * const STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE = "BLEConnectionStateChange";
 const char * const STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE = "BLEMtuChange";
 const char * const STR_BT_GATT_CLIENT_CALLBACK_SERVICE_CHANGE = "serviceChange";
+const char * const STR_BT_GATT_CLIENT_CALLBACK_BLE_PHY_UPDATE = "BlePhyUpdate";
 class NapiGattClient;
 
 class NapiGattClientCallback : public GattClientCallback {
@@ -47,6 +48,8 @@ public:
     void OnConnectionParameterChanged(int interval, int latency, int timeout, int status) override;
     void OnSetNotifyCharacteristic(const GattCharacteristic &characteristic, int status) override;
     void OnReadRemoteRssiValueResult(int rssi, int status)  override;
+    void OnBlePhyUpdate(int32_t txPhy, int32_t rxPhy, int32_t status) override;
+    void OnBlePhyRead(int32_t txPhy, int32_t rxPhy, int32_t status) override;
 
     NapiGattClientCallback();
     ~NapiGattClientCallback() override = default;

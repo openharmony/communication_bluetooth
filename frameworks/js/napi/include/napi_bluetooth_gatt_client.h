@@ -37,6 +37,8 @@ public:
 
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
+    static napi_value OnBlePhyUpdate(napi_env env, napi_callback_info info);
+    static napi_value OffBlePhyUpdate(napi_env env, napi_callback_info info);
 
     static napi_value Connect(napi_env env, napi_callback_info info);
     static napi_value Disconnect(napi_env env, napi_callback_info info);
@@ -56,6 +58,8 @@ public:
     static napi_value WriteDescriptorValueEx(napi_env env, napi_callback_info info);
     static napi_value setCharacteristicChangeNotification(napi_env env, napi_callback_info info);
     static napi_value setCharacteristicChangeIndication(napi_env env, napi_callback_info info);
+    static napi_value SetPhy(napi_env env, napi_callback_info info);
+    static napi_value ReadPhy(napi_env env, napi_callback_info info);
 #else
     static napi_value WriteCharacteristicValue(napi_env env, napi_callback_info info);
     static napi_value WriteDescriptorValue(napi_env env, napi_callback_info info);

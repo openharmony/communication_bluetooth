@@ -38,7 +38,6 @@ enum BluetoothBleAdvertiserInterfaceCode {
     BLE_REGISTER_BLE_ADVERTISER_CALLBACK = 0,
     BLE_DE_REGISTER_BLE_ADVERTISER_CALLBACK,
     BLE_START_ADVERTISING,
-    BLE_START_ADVERTISING_WITH_CUSTOM_ADV_NAME,
     BLE_START_ADVERTISING_WITH_RAWDATA,
     BLE_STOP_ADVERTISING,
     BLE_CLOSE,
@@ -104,6 +103,8 @@ enum BluetoothGattClientCallbackInterfaceCode {
     BT_GATT_CLIENT_CALLBACK_CONNECTION_PARA_CHANGE,
     BT_GATT_CLIENT_CALLBACK_SERVICES_CHANGED,
     BT_GATT_CLIENT_CALLBACK_READ_REMOTE_RSSI_VALUE,
+    BT_GATT_CLIENT_CALLBACK_BLE_PHY_UPDATE,
+    BT_GATT_CLIENT_CALLBACK_BLE_PHY_READ,
     // The last code, if you want to add a new code, please add it before this
     BT_GATT_CLIENT_CALLBACK_BUTT
 };
@@ -127,6 +128,8 @@ enum BluetoothGattClientInterfaceCode {
     BT_GATT_CLIENT_READ_REMOTE_RSSI_VALUE,
     BT_GATT_CLIENT_REQUEST_NOTIFICATION,
     BT_GATT_CLIENT_GET_CONNECTED_STATE,
+    BT_GATT_CLIENT_SET_PHY,
+    BT_GATT_CLIENT_READ_PHY,
     // The last code, if you want to add a new code, please add it before this
     BT_GATT_CLIENT_BUTT
 };
@@ -142,6 +145,8 @@ enum BluetoothGattServerCallbackInterfaceCode {
     GATT_SERVER_CALLBACK_MTU_CHANGED,
     GATT_SERVER_CALLBACK_NOTIFY_CONFIRM,
     GATT_SERVER_CALLBACK_CONNECTION_PARAMETER_CHANGED,
+    GATT_SERVER_CALLBACK_BLE_PHY_UPDATE,
+    GATT_SERVER_CALLBACK_BLE_PHY_READ,
     // The last code, if you want to add a new code, please add it before this
     GATT_SERVER_CALLBACK_BUTT
 };
@@ -160,6 +165,8 @@ enum BluetoothGattServerInterfaceCode {
     GATT_SERVER_RESPOND_DESCRIPTOR_WRITE,
     GATT_SERVER_CONNECT,
     GATT_SERVER_GET_CONNECTED_STATE,
+    GATT_SERVER_SET_PHY,
+    GATT_SERVER_READ_PHY,
     // The last code, if you want to add a new code, please add it before this
     GATT_SERVER_BUTT
 };

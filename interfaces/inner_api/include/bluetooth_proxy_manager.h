@@ -21,6 +21,7 @@
 
 #include "iremote_broker.h"
 #include "refbase.h"
+#include "bluetooth_def.h"
 #include "bluetooth_no_destructor.h"
 
 namespace OHOS {
@@ -28,7 +29,7 @@ namespace Bluetooth {
 class IBluetoothBleCentralManager;
 class BluetoothProxyManager {
 public:
-    bool FreezeByRss(std::set<int> pidSet, bool isProxy);
+    bool FreezeByRss(std::set<int> pidSet, bool isProxy, uint8_t freezeType = FreezeType::DEFAULT_TYPE);
     bool ResetAllProxy();
 
     static BluetoothProxyManager& GetInstance();

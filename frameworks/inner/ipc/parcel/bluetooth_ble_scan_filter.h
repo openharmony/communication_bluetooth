@@ -36,7 +36,8 @@ public:
     bool operator==(const BluetoothBleScanFilter& other) const;
 
 private:
-    bool ReadUuidFromParcel(Parcel &parcel);
+    bool ReadUuidInfoFromParcel(Parcel &parcel);
+    bool WriteUuidInfoToParcel(Parcel &parcel) const;
     bool ReadAddrInfoFromParcel(Parcel &parcel);
     bool WriteAddrInfoToParcel(Parcel &parcel) const;
 };
