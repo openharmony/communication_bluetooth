@@ -304,7 +304,7 @@ private:
     int type_;
     int id_;
     std::vector<uint8_t> data_;
-}
+};
 
 class NapiNativeBlePhyInfo : public NapiNativeObject {
 public:

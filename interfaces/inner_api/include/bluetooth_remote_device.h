@@ -468,14 +468,6 @@ public:
      * @since 22
      */
     bool GetRemoteServices() const;
-
-    /**
-     * @brief Get device address type.
-     *
-     * @return Returns device address type;
-     * @since 23
-     */
-    int32_t GetAddressType() const;
 private:
     std::string address_ = "00:00:00:00:00:00";
     uint8_t addressType_ = AddressType::UNSET_ADDRESS; // to support real mac in some pair&connect APIs
