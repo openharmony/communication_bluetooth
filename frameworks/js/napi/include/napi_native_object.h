@@ -304,6 +304,17 @@ private:
     int type_;
     int id_;
     std::vector<uint8_t> data_;
+}
+
+class NapiNativeBlePhyInfo : public NapiNativeObject {
+public:
+    NapiNativeBlePhyInfo(int txPhy, int rxPhy) : txPhy_(txPhy), rxPhy_(rxPhy) {}
+    ~NapiNativeBlePhyInfo() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    int txPhy_;
+    int rxPhy_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -48,6 +48,9 @@ public:
     virtual int RespondDescriptorWrite(
         const BluetoothGattDevice &device, const BluetoothGattDescriptor &descriptor, int32_t ret) = 0;
     virtual int GetConnectedState(const std::string &deviceId, int &state) = 0;
+    virtual int SetPhy(int32_t appId,
+        const std::string &deviceId, int32_t txPhy, int32_t rxPhy, int32_t phyOptions) = 0;
+    virtual int ReadPhy(int32_t appId, const std::string &deviceId) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

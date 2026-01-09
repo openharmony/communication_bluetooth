@@ -397,6 +397,39 @@ public:
         return;
     }
 
+    void OnBlePhyUpdate(const BluetoothGattDevice &device, int32_t txPhy, int32_t rxPhy, int32_t status) override
+    {
+        HILOGD("remote device: %{public}s, txPhy: %{public}d, rxPhy: %{public}d, status: %{public}d",
+            GET_ENCRYPT_GATT_ADDR(device), txPhy, rxPhy, status);
+        auto serverSptr = GetServerSptr();
+        if (!serverSptr) {
+            return;
+        }
+
+        if (serverSptr->pimpl->callback_) {
+            serverSptr->pimpl->callback_->OnBlePhyUpdate(BluetoothRemoteDevice(device.addr_.GetAddress(),
+                (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+                txPhy, rxPhy, status);
+        }
+
+        return;
+    }
+
+    void OnBlePhyRead(int32_t txPhy, int32_t rxPhy, int32_t status) override
+    {
+        HILOGD("txPhy: %{public}d, rxPhy: %{public}d, status: %{public}d", txPhy, rxPhy, status);
+        auto serverSptr = GetServerSptr();
+        if (!serverSptr) {
+            return;
+        }
+
+        if (serverSptr->pimpl->callback_) {
+            serverSptr->pimpl->callback_->OnBlePhyRead(txPhy, rxPhy, status);
+        }
+
+        return;
+    }
+
     explicit BluetoothGattServerCallbackStubImpl(std::weak_ptr<GattServer> server) : server_(server)
     {
         HILOGD("enter");
@@ -909,13 +942,35 @@ int GattServer::GetConnectedState(const std::string &deviceId, int &state)
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
-    if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
-        HILOGE("pimpl or gatt server proxy is nullptr");
-        return BT_ERR_INTERNAL_ERROR;
-    }
     sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_SERVICE_DISCONNECTED, "failed: no proxy");
     return proxy->GetConnectedState(deviceId, state);
+}
+
+int GattServer::SetPhy(const std::string &deviceId, int32_t txPhy, int32_t rxPhy, int32_t phyOptions)
+{
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    HILOGI("applicationId: %{public}d", pimpl->applicationId_);
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    return proxy->SetPhy(pimpl->applicationId_, deviceId, txPhy, rxPhy, phyOptions);
+}
+
+int GattServer::ReadPhy(const std::string &deviceId)
+{
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    HILOGI("applicationId: %{public}d", pimpl->applicationId_);
+    sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_SERVICE_DISCONNECTED, "failed: no proxy");
+    return proxy->ReadPhy(pimpl->applicationId_, deviceId);
 }
 
 GattServer::~GattServer()

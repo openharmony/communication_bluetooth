@@ -1063,7 +1063,8 @@ int32_t BluetoothHostProxy::GetPairState(int32_t transport, const std::string &a
     return exception;
 }
 
-int32_t BluetoothHostProxy::StartPair(int32_t transport, const BluetoothRawAddress &bluetoothRawAddress)
+int32_t BluetoothHostProxy::StartPair(int32_t transport, const BluetoothRawAddress &bluetoothRawAddress,
+    const BluetoothOobData &oobData)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
@@ -1076,6 +1077,10 @@ int32_t BluetoothHostProxy::StartPair(int32_t transport, const BluetoothRawAddre
     }
     if (!data.WriteParcelable(&bluetoothRawAddress)) {
         HILOGE("BluetoothHostProxy::StartPair bluetoothRawAddress error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteParcelable(&oobData)) {
+        HILOGE("BluetoothHostProxy::StartPair oobData error");
         return BT_ERR_IPC_TRANS_FAILED;
     }
     MessageParcel reply;

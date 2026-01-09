@@ -32,7 +32,7 @@ ani_ref TaiheNativeInt::ToTaiheValue(ani_env *env) const
         return nullptr;
     }
     ani_method ctor;
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) != ANI_OK) {
         HILOGE("Class_FindMethod status : %{public}d", status);
         return nullptr;
     }

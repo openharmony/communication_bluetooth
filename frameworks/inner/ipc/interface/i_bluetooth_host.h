@@ -27,6 +27,7 @@
 #include "bluetooth_device_battery_info.h"
 #include "bluetooth_remote_device_info.h"
 #include "bluetooth_trust_pair_device.h"
+#include "bluetooth_oob_data_parcel.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -105,7 +106,8 @@ public:
     virtual int32_t SetDeviceAlias(const std::string &address, const std::string &aliasName) = 0;
     virtual int32_t GetRemoteDeviceBatteryInfo(const std::string &address, BluetoothBatteryInfo &batteryInfo) = 0;
     virtual int32_t GetPairState(int32_t transport, const std::string &address, int32_t &pairState) = 0;
-    virtual int32_t StartPair(int32_t transport, const BluetoothRawAddress &bluetoothRawAddress) = 0;
+    virtual int32_t StartPair(int32_t transport, const BluetoothRawAddress &bluetoothRawAddress,
+        const BluetoothOobData &oobData) = 0;
     virtual int32_t StartCrediblePair(int32_t transport, const std::string &address) = 0;
     virtual bool CancelPairing(int32_t transport, const std::string &address) = 0;
     virtual bool IsBondedFromLocal(int32_t transport, const std::string &address) = 0;

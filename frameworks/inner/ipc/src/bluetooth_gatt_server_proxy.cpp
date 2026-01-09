@@ -248,5 +248,43 @@ int BluetoothGattServerProxy::GetConnectedState(const std::string &deviceId, int
     state = reply.ReadInt32();
     return BT_NO_ERROR;
 }
+
+int BluetoothGattServerProxy::SetPhy(int32_t appId, const std::string &deviceId,
+    int32_t txPhy, int32_t rxPhy, int32_t phyOptions)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_IPC_TRANS_FAILED, "write appId error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(deviceId), BT_ERR_IPC_TRANS_FAILED, "write deviceId error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(txPhy), BT_ERR_IPC_TRANS_FAILED, "write txPhy error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(rxPhy), BT_ERR_IPC_TRANS_FAILED, "write rxPhy error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(phyOptions), BT_ERR_IPC_TRANS_FAILED, "write phyOptions error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattServerInterfaceCode::GATT_SERVER_SET_PHY,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
+    return reply.ReadInt32();
+}
+
+int BluetoothGattServerProxy::ReadPhy(int32_t appId, const std::string &deviceId)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_IPC_TRANS_FAILED, "write appId error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(deviceId), BT_ERR_IPC_TRANS_FAILED, "write deviceId error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattServerInterfaceCode::GATT_SERVER_READ_PHY,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
+    return reply.ReadInt32();
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

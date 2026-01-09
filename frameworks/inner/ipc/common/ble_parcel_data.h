@@ -210,7 +210,7 @@ public:
     }
 
     /**
-     * @brief Get the advertise name included in the advertise packet.
+     * @brief Get the advertise name.
      *
      * @return Returns advertiseName.
      * @since 23
@@ -221,7 +221,7 @@ public:
     }
 
     /**
-     * @brief Set the advertise name to be included in the advertise packet.
+     * @brief Set the advertise name.
      *
      * @param advName advertiseName.
      * @since 23
@@ -229,6 +229,11 @@ public:
     void SetAdvertiseName(std::string advName)
     {
         advertiseName_ = advName;
+    }
+
+    bool HasAdvertiseName() const
+    {
+        return !advertiseName_.empty();
     }
 
 public:
