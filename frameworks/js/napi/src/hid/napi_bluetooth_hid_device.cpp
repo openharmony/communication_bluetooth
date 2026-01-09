@@ -96,6 +96,15 @@ napi_value ProtocolTypeInit(napi_env env)
     return protocolType;
 }
 
+napi_value BluetoothAddressTypeInit(napi_env env)
+{
+    napi_value bluetoothAddressType = nullptr;
+    napi_create_object(env, &bluetoothAddressType);
+    SetNamedPropertyByInteger(env, bluetoothAddressType, AddressType::VIRTUAL_ADDRESS, "VIRTUAL");
+    SetNamedPropertyByInteger(env, bluetoothAddressType, AddressType::REAL_ADDRESS, "REAL");
+    return bluetoothAddressType;
+}
+
 void HidDevicePropertyInit(napi_env env, napi_value exports)
 {
     napi_value subclassObj = SubclassInit(env);
@@ -103,12 +112,14 @@ void HidDevicePropertyInit(napi_env env, napi_value exports)
     napi_value errorReasonObj = ErrorReasonInit(env);
     napi_value serviceTypeObj = ServiceTypeInit(env);
     napi_value protocolTypeObj = ProtocolTypeInit(env);
+    napi_value bluetoothAddressTypeObj = BluetoothAddressTypeInit(env);
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("Subclass", subclassObj),
         DECLARE_NAPI_PROPERTY("ReportType", reportTypeObj),
         DECLARE_NAPI_PROPERTY("ErrorReason", errorReasonObj),
         DECLARE_NAPI_PROPERTY("ServiceType", serviceTypeObj),
         DECLARE_NAPI_PROPERTY("ProtocolType", protocolTypeObj),
+        DECLARE_NAPI_PROPERTY("BluetoothAddressType", bluetoothAddressTypeObj),
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "hid_device:napi_define_properties");
     napi_define_properties(env, exports, sizeof(exportFuncs)/sizeof(*exportFuncs), exportFuncs);
@@ -468,6 +479,35 @@ static napi_status CheckRegisterParam(napi_env env, napi_callback_info info,
     return napi_ok;
 }
 
+static napi_status CheckDeviceParam(napi_env env, napi_callback_info info, std::string &addr, int32_t &addrType)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 argument", napi_invalid_arg);
+    bool isObject = NapiIsObject(env, argv[PARAM0]) == napi_ok;
+    NAPI_BT_RETURN_IF(!(isObject), "1st argument should be Object", napi_invalid_arg);
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, argv[PARAM0], {"address", "addressType"}));
+    std::string address {};
+    bool exist = false;
+    NAPI_BT_CALL_RETURN(ParseStringParams(env, argv[PARAM0], "address", exist, address));
+    if (!IsValidAddress(address)) {
+        HILOGE("invalid address");
+        return napi_invalid_arg;
+    }
+    addr = address;
+    int32_t addressType = AddressType::UNSET_ADDRESS;
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, argv[PARAM0], "addressType", exist, addressType));
+    bool isVirtualAddr = (addressType == AddressType::VIRTUAL_ADDRESS);
+    bool isRealAddr = (addressType == AddressType::REAL_ADDRESS);
+    if (!(isVirtualAddr || isRealAddr)) {
+        HILOGE("invalid addressType, should be VIRTUAL or REAL");
+        return napi_invalid_arg;
+    }
+    addrType = addressType;
+    return napi_ok;
+}
+
 static napi_status GetHidDeviceCallback(napi_env env, napi_callback_info info, napi_value &callback)
 {
     size_t argc = ARGS_SIZE_FOUR;
@@ -517,10 +557,11 @@ napi_value NapiBluetoothHidDevice::Connect(napi_env env, napi_callback_info info
 {
     HILOGI("enter");
     std::string remoteAddr {};
-    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
-    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, checkRet, BT_ERR_INVALID_PARAM);
+    int32_t addressType = AddressType::UNSET_ADDRESS;
+    auto checkRet = CheckDeviceParam(env, info, remoteAddr, addressType);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
     HidDevice *profile = HidDevice::GetProfile();
-    BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
+    BluetoothRemoteDevice device(addressType, remoteAddr, BT_TRANSPORT_BREDR);
     int32_t errorCode = profile->Connect(device);
     NAPI_BT_ASSERT_ERR_NUM_RETURN(env, errorCode == BT_NO_ERROR, errorCode);
     return NapiGetUndefinedRet(env);
