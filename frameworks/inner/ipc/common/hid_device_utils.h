@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-
 const size_t MAX_DESCRIPTOR_SIZE = 2048;
 const size_t MAX_NAME_SIZE = 50;
 const size_t MAX_DESCRIPTION_SIZE = 50;
