@@ -52,6 +52,8 @@ void NapiGattServer::DefineGattServerJSClass(napi_env env)
     napi_property_descriptor gattserverDesc[] = {
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("notifyCharacteristicChanged", NotifyCharacteristicChangedEx),
+        DECLARE_NAPI_FUNCTION("setPhy", SetPhy),
+        DECLARE_NAPI_FUNCTION("readPhy", ReadPhy),
 #else
         DECLARE_NAPI_FUNCTION("startAdvertising", StartAdvertising),
         DECLARE_NAPI_FUNCTION("stopAdvertising", StopAdvertising),
@@ -65,6 +67,8 @@ void NapiGattServer::DefineGattServerJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("sendResponse", SendResponse),
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
+        DECLARE_NAPI_FUNCTION("onBlePhyUpdate", OnBlePhyUpdate),
+        DECLARE_NAPI_FUNCTION("offBlePhyUpdate", OffBlePhyUpdate),
         DECLARE_NAPI_FUNCTION("getConnectedState", GetConnectedState),
     };
 
@@ -135,6 +139,28 @@ napi_value NapiGattServer::Off(napi_env env, napi_callback_info info)
     NapiGattServer *napiGattServer = NapiGetGattServer(env, info);
     if (napiGattServer && napiGattServer->GetCallback()) {
         auto status = napiGattServer->GetCallback()->eventSubscribe_.Deregister(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
+    return NapiGetUndefinedRet(env);
+}
+
+napi_value NapiGattServer::OnBlePhyUpdate(napi_env env, napi_callback_info info)
+{
+    NapiGattServer *napiGattServer = NapiGetGattServer(env, info);
+    if (napiGattServer && napiGattServer->GetCallback()) {
+        auto status = napiGattServer->GetCallback()->eventSubscribe_.RegisterWithName(env, info,
+            STR_BT_GATT_SERVER_CALLBACK_BLE_PHY_UPDATE);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
+    return NapiGetUndefinedRet(env);
+}
+
+napi_value NapiGattServer::OffBlePhyUpdate(napi_env env, napi_callback_info info)
+{
+    NapiGattServer *napiGattServer = NapiGetGattServer(env, info);
+    if (napiGattServer && napiGattServer->GetCallback()) {
+        auto status = napiGattServer->GetCallback()->eventSubscribe_.DeregisterWithName(env, info,
+            STR_BT_GATT_SERVER_CALLBACK_BLE_PHY_UPDATE);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     }
     return NapiGetUndefinedRet(env);
@@ -437,6 +463,106 @@ napi_value NapiGattServer::NotifyCharacteristicChangedEx(napi_env env, napi_call
         asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+static napi_status ParseSetPhyValue(napi_env env, napi_callback_info info, std::string &outDeviceId,
+    BlePhyInfo &outPhyValue, NapiGattServer **outGattServer)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
+    NapiGattServer *gattServer = NapiGetGattServer(env, thisVar);
+    NAPI_BT_RETURN_IF(gattServer == nullptr || outGattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
+
+    std::string deviceId {};
+    NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], deviceId));
+    if (!IsValidAddress(deviceId)) {
+        HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
+        return napi_invalid_arg;
+    }
+    NAPI_BT_CALL_RETURN(NapiParseSetPhyValue(env, argv[PARAM1], outPhyValue));
+
+    *outGattServer = gattServer;
+    outDeviceId = std::move(deviceId);
+    return napi_ok;
+}
+
+
+napi_value NapiGattServer::SetPhy(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::string deviceId;
+    BlePhyInfo phyValue(static_cast<int32_t>(BLE_PHY_1M), static_cast<int32_t>(BLE_PHY_1M),
+        BLE_PHY_CODED_NO_PREFERRED);
+    NapiGattServer *server = nullptr;
+
+    auto status = ParseSetPhyValue(env, info, deviceId, phyValue, &server);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [gattServer = server->GetServer(), deviceId, phyValue]() {
+        int ret = BT_ERR_INTERNAL_ERROR;
+        if (gattServer) {
+            ret = gattServer->SetPhy(deviceId, phyValue.txPhy, phyValue.rxPhy, phyValue.phyOptions);
+        }
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    bool success = server->GetCallback()->asyncWorkMap_.TryPush(
+        NapiAsyncType::GATT_SERVER_SET_PHY, asyncWork);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+static napi_status ParseReadPhyValue(napi_env env, napi_callback_info info,
+    std::string &outDeviceId, NapiGattServer **outGattServer)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 argument.", napi_invalid_arg);
+    NapiGattServer *gattServer = NapiGetGattServer(env, thisVar);
+    NAPI_BT_RETURN_IF(gattServer == nullptr || outGattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
+
+    std::string deviceId {};
+    NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], deviceId));
+    if (!IsValidAddress(deviceId)) {
+        HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
+        return napi_invalid_arg;
+    }
+    *outGattServer = gattServer;
+    outDeviceId = std::move(deviceId);
+    return napi_ok;
+}
+
+napi_value NapiGattServer::ReadPhy(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::string deviceId;
+    NapiGattServer *server = nullptr;
+
+    auto status = ParseReadPhyValue(env, info, deviceId, &server);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [gattServer = server->GetServer(), deviceId]() {
+        int ret = BT_ERR_INTERNAL_ERROR;
+        if (gattServer) {
+            ret = gattServer->ReadPhy(deviceId);
+        }
+        return NapiAsyncWorkRet(ret);
+    };
+
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    bool success = server->GetCallback()->asyncWorkMap_.TryPush(
+        NapiAsyncType::GATT_SERVER_READ_PHY, asyncWork);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
 }

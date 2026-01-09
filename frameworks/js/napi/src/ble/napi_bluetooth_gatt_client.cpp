@@ -95,6 +95,8 @@ void NapiGattClient::DefineGattClientJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("setBLEMtuSize", SetBLEMtuSize),
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
+        DECLARE_NAPI_FUNCTION("onBlePhyUpdate", OnBlePhyUpdate),
+        DECLARE_NAPI_FUNCTION("offBlePhyUpdate", OffBlePhyUpdate),
         DECLARE_NAPI_FUNCTION("getConnectedState", GetConnectedState),
         DECLARE_NAPI_FUNCTION("updateConnectionParam", UpdateConnectionParam),
 #ifdef BLUETOOTH_API_SINCE_10
@@ -103,6 +105,8 @@ void NapiGattClient::DefineGattClientJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("writeDescriptorValue", WriteDescriptorValueEx),
         DECLARE_NAPI_FUNCTION("setCharacteristicChangeNotification", setCharacteristicChangeNotification),
         DECLARE_NAPI_FUNCTION("setCharacteristicChangeIndication", setCharacteristicChangeIndication),
+        DECLARE_NAPI_FUNCTION("setPhy", SetPhy),
+        DECLARE_NAPI_FUNCTION("readPhy", ReadPhy),
 #else
         DECLARE_NAPI_FUNCTION("writeCharacteristicValue", WriteCharacteristicValue),
         DECLARE_NAPI_FUNCTION("writeDescriptorValue", WriteDescriptorValue),
@@ -260,6 +264,28 @@ napi_value NapiGattClient::Off(napi_env env, napi_callback_info info)
     NapiGattClient *napiGattClient = NapiGetGattClient(env, info);
     if (napiGattClient && napiGattClient->GetCallback()) {
         auto status = napiGattClient->GetCallback()->eventSubscribe_.Deregister(env, info);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
+    return NapiGetUndefinedRet(env);
+}
+
+napi_value NapiGattClient::OnBlePhyUpdate(napi_env env, napi_callback_info info)
+{
+    NapiGattClient *napiGattClient = NapiGetGattClient(env, info);
+    if (napiGattClient && napiGattClient->GetCallback()) {
+        auto status = napiGattClient->GetCallback()->eventSubscribe_.RegisterWithName(env, info,
+            STR_BT_GATT_CLIENT_CALLBACK_BLE_PHY_UPDATE);
+        NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
+    return NapiGetUndefinedRet(env);
+}
+
+napi_value NapiGattClient::OffBlePhyUpdate(napi_env env, napi_callback_info info)
+{
+    NapiGattClient *napiGattClient = NapiGetGattClient(env, info);
+    if (napiGattClient && napiGattClient->GetCallback()) {
+        auto status = napiGattClient->GetCallback()->eventSubscribe_.DeregisterWithName(env, info,
+            STR_BT_GATT_CLIENT_CALLBACK_BLE_PHY_UPDATE);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     }
     return NapiGetUndefinedRet(env);
@@ -910,6 +936,75 @@ napi_value NapiGattClient::setCharacteristicChangeIndication(napi_env env, napi_
 {
     HILOGI("enter");
     return setCharacteristicChangeInner(env, info, false);
+}
+
+static napi_status ParseSetPhyValue(napi_env env, napi_callback_info info,
+    BlePhyInfo &outPhyValue, NapiGattClient **outGattClient)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 argument.", napi_invalid_arg);
+    NapiGattClient *gattClient = NapiGetGattClient(env, thisVar);
+    NAPI_BT_RETURN_IF(gattClient == nullptr || outGattClient == nullptr, "gattClient is nullptr.", napi_invalid_arg);
+
+    NAPI_BT_CALL_RETURN(NapiParseSetPhyValue(env, argv[PARAM0], outPhyValue));
+
+    *outGattClient = gattClient;
+    return napi_ok;
+}
+
+
+napi_value NapiGattClient::SetPhy(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    BlePhyInfo phyValue(static_cast<int32_t>(BLE_PHY_1M), static_cast<int32_t>(BLE_PHY_1M),
+        BLE_PHY_CODED_NO_PREFERRED);
+    NapiGattClient *client = nullptr;
+
+    auto status = ParseSetPhyValue(env, info, phyValue, &client);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [gattClient = client->GetClient(), phyValue]() {
+        int ret = BT_ERR_INTERNAL_ERROR;
+        if (gattClient) {
+            ret = gattClient->SetPhy(phyValue.txPhy, phyValue.rxPhy, phyValue.phyOptions);
+        }
+        return NapiAsyncWorkRet(ret);
+    };
+
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    bool success = client->GetCallback()->asyncWorkMap_.TryPush(
+        NapiAsyncType::GATT_CLIENT_SET_PHY, asyncWork);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_value NapiGattClient::ReadPhy(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    NapiGattClient *client = nullptr;
+    auto status = CheckGattClientNoArgc(env, info, &client);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [gattClient = client->GetClient()]() {
+        int ret = BT_ERR_INTERNAL_ERROR;
+        if (gattClient) {
+            ret = gattClient->ReadPhy();
+        }
+        return NapiAsyncWorkRet(ret);
+    };
+
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    bool success = client->GetCallback()->asyncWorkMap_.TryPush(
+        NapiAsyncType::GATT_CLIENT_READ_PHY, asyncWork);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 
 #else  // ! BLUETOOTH_API_SINCE_10

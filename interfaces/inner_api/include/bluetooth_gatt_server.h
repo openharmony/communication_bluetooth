@@ -170,6 +170,31 @@ public:
     {}
 
     /**
+     * @brief The callback function to notify ble phy changed
+     *
+     * @param device Remote device object.
+     * @param txPhy transmitter phy to update.
+     * @param rxPhy receiver phy to update.
+     * @param status result of setphy.
+     * @since 23
+     *
+     */
+    virtual void OnBlePhyUpdate(
+        const BluetoothRemoteDevice &device, int32_t txPhy, int32_t rxPhy, int32_t status)
+    {}
+
+    /**
+     * @brief The callback function to notify ble phy changed
+     *
+     * @param txPhy transmitter phy to update.
+     * @param rxPhy receiver phy to update.
+     * @param status result of setphy.
+     * @since 23
+     *
+     */
+    virtual void OnBlePhyRead(int32_t txPhy, int32_t rxPhy, int32_t status) {}
+
+    /**
      * @brief A destructor of GattServerCallback.
      *
      * @since 6
@@ -332,6 +357,29 @@ public:
     GattServer() = delete;
 
     int GetConnectedState(const std::string &deviceId, int &state);
+
+    /**
+     * @brief The function to set ble phy.
+     *
+     * @param deviceId Remote device object.
+     * @param txPhy transmitter phy of GattServer.
+     * @param rxPhy receiver phy of GattServer.
+     * @param phyOptions preferred coded phy mode of GattServer.
+     * @return int   api accept status.
+     * @since 23
+     *
+     */
+    int SetPhy(const std::string &deviceId, int32_t txPhy, int32_t rxPhy, int32_t phyOptions);
+
+    /**
+     * @brief The function to read ble phy.
+     *
+     * @param deviceId Remote device object.
+     * @return int   api accept status.
+     * @since 23
+     *
+     */
+    int ReadPhy(const std::string &deviceId);
 
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(GattServer);
 
