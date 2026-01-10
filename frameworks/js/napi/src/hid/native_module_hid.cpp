@@ -22,6 +22,7 @@
 
 #include "bluetooth_log.h"
 #include "napi_bluetooth_hid_host.h"
+#include "napi_bluetooth_hid_device.h"
 #include "hitrace_meter.h"
 
 namespace OHOS {
@@ -39,6 +40,7 @@ static napi_value Init(napi_env env, napi_value exports)
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 
     NapiBluetoothHidHost::DefineHidHostJSClass(env, exports);
+    NapiBluetoothHidDevice::DefineHidDeviceJSClass(env, exports);
 
     HILOGI("-----Init end------");
     return exports;

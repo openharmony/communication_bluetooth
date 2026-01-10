@@ -258,6 +258,54 @@ private:
     SppCallbackBuffer sppBuffer_;
 };
 
+class NapiNativeHIDGetReportData : public NapiNativeObject {
+public:
+    explicit NapiNativeHIDGetReportData(int type, int id, uint16_t bufferSize)
+        : type_(type), id_(id), bufferSize_(static_cast<int>(bufferSize)) {}
+    ~NapiNativeHIDGetReportData() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    int type_;
+    int id_;
+    int bufferSize_;
+};
+
+class NapiNativeHIDProtocolData : public NapiNativeObject {
+public:
+    explicit NapiNativeHIDProtocolData(int protocol) : protocol_(protocol) {}
+    ~NapiNativeHIDProtocolData() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    int protocol_;
+};
+
+class NapiNativeHIDInterruptData : public NapiNativeObject {
+public:
+    explicit NapiNativeHIDInterruptData(int id, std::vector<uint8_t> data)
+        : id_(id), data_(data) {}
+    ~NapiNativeHIDInterruptData() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    int id_;
+    std::vector<uint8_t> data_;
+};
+
+class NapiNativeHIDSetReportData : public NapiNativeObject {
+public:
+    explicit NapiNativeHIDSetReportData(int type, int id, std::vector<uint8_t> data)
+        : type_(type), id_(id), data_(data) {}
+    ~NapiNativeHIDSetReportData() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    int type_;
+    int id_;
+    std::vector<uint8_t> data_;
+};
+
 class NapiNativeBlePhyInfo : public NapiNativeObject {
 public:
     NapiNativeBlePhyInfo(int txPhy, int rxPhy) : txPhy_(txPhy), rxPhy_(rxPhy) {}
