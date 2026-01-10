@@ -177,15 +177,12 @@ struct HidDevice::impl {
         return proxy->UnregisterHidDevice();
     }
 
-    int32_t Connect(const BluetoothRemoteDevice &device)
+    int32_t Connect(const AddressInfo &device)
     {
         sptr<IBluetoothHidDevice> proxy = GetRemoteProxy<IBluetoothHidDevice>(PROFILE_HID_DEVICE_SERVER);
-        if (proxy == nullptr || !device.IsValidBluetoothRemoteDevice()) {
-            HILOGE("invalid param.");
-            return BT_ERR_INVALID_PARAM;
-        }
-        HILOGI("hid connect remote device: %{public}s", GET_ENCRYPT_ADDR(device));
-        return proxy->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+        HILOGI("hid connect remote device: %{public}s", GET_ENCRYPT_RAW_ADDR(device));
+        return proxy->Connect(BluetoothRawAddress(device.GetAddressType(), device.GetAddress()));
     }
 
     int32_t Disconnect()
@@ -330,7 +327,7 @@ int HidDevice::UnregisterHidDevice()
     return pimpl->UnregisterHidDevice();
 }
 
-int32_t HidDevice::Connect(const BluetoothRemoteDevice &device)
+int32_t HidDevice::Connect(const AddressInfo &device)
 {
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
