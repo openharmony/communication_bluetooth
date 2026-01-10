@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 
 BT_PART_DIR = "../../../../.."
 BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
+SUBSYSTEM_DIR = "//foundation/communication"
 
 ohos_shared_library("hid") {
   branch_protector_ret = "pac_ret"  # Enable PAC CFI
@@ -23,6 +24,7 @@ ohos_shared_library("hid") {
   include_dirs = [
     "$BT_NAPI_DIR/include",
     "$BT_PART_DIR/frameworks/inner/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
     "$BT_PART_DIR/frameworks/inner/ipc/parcel",
   ]
 
@@ -47,12 +49,15 @@ ohos_shared_library("hid") {
     "$BT_NAPI_DIR/src/common/napi_bluetooth_profile.cpp",
     "napi_bluetooth_hid_host.cpp",
     "napi_bluetooth_hid_host_observer.cpp",
+    "napi_bluetooth_hid_device.cpp",
+    "napi_bluetooth_hid_device_observer.cpp",
     "native_module_hid.cpp",
   ]
 
   deps = [
     "$BT_PART_DIR/frameworks/inner:btframework",
     "$BT_PART_DIR/frameworks/js/napi/src/common:bt_napi_common",
+    "$BT_PART_DIR/frameworks/inner:btcommon",
   ]
 
   external_deps = [

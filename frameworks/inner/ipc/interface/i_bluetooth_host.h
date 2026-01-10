@@ -49,6 +49,7 @@ constexpr const char *PROFILE_DI = "DIServer";
 constexpr const char *BLE_ADVERTISER_SERVER = "BleAdvertiserServer";
 constexpr const char *BLE_CENTRAL_MANAGER_SERVER = "BleCentralMangerServer";
 constexpr const char *PROFILE_HID_HOST_SERVER = "BluetoothHidHostServer";
+constexpr const char *PROFILE_HID_DEVICE_SERVER = "BluetoothHidDeviceServer";
 constexpr const char *PROFILE_PAN_SERVER = "BluetoothPanServer";
 constexpr const char *PROFILE_OPP_SERVER = "BluetoothOppServer";
 constexpr const char *PROFILE_AUDIO_MANAGER = "BluetoothAudioManagerServer";

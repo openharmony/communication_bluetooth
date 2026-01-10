@@ -422,6 +422,10 @@ uint32_t GetProfileId(int profile)
             HILOGD("PROFILE_HID_HOST");
             profileId = PROFILE_ID_HID_HOST;
             break;
+        case static_cast<int32_t>(ProfileId::PROFILE_HID_DEVICE):
+            HILOGD("PROFILE_HID_DEVICE");
+            profileId = PROFILE_ID_HID_DEVICE;
+            break;
         default:
             break;
     }

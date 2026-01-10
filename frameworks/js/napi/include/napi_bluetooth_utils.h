@@ -461,7 +461,8 @@ enum ProfileId {
     PROFILE_PAN_NETWORK = 7,
     PROFILE_PBAP_CLIENT = 8,
     PROFILE_PBAP_SERVER = 9,
-    PROFILE_OPP = 10
+    PROFILE_OPP = 10,
+    PROFILE_HID_DEVICE = 11
 };
 
 enum AccessAuthorization {

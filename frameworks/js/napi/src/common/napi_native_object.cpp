@@ -256,6 +256,81 @@ napi_value NapiNativeStringArray::ToNapiValue(napi_env env) const
     return object;
 }
 
+napi_value NapiNativeHIDGetReportData::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    napi_value type = nullptr;
+    napi_create_int32(env, type_, &type);
+    napi_set_named_property(env, result, "type", type);
+    napi_value id = nullptr;
+    napi_create_int32(env, id_, &id);
+    napi_set_named_property(env, result, "id", id);
+    napi_value bufferSize = nullptr;
+    napi_create_int32(env, bufferSize_, &bufferSize);
+    napi_set_named_property(env, result, "bufferSize", bufferSize);
+    return result;
+}
+
+napi_value NapiNativeHIDProtocolData::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    napi_value protocol = nullptr;
+    napi_create_int32(env, protocol_, &protocol);
+    napi_set_named_property(env, result, "protocol", protocol);
+    return result;
+}
+
+napi_value NapiNativeHIDInterruptData::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    napi_value id = nullptr;
+    napi_create_int32(env, id_, &id);
+    napi_set_named_property(env, result, "id", id);
+    size_t valueSize = data_.size();
+    const uint8_t *valueData = data_.data();
+    napi_value buffer = nullptr;
+    uint8_t *bufferData = nullptr;
+    napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &buffer);
+    if (valueSize > 0 && memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
+        HILOGE("memcpy_s error");
+    }
+    napi_value data = nullptr;
+    napi_create_typedarray(env, napi_uint8_array, valueSize, buffer, 0, &data);
+    napi_set_named_property(env, result, "data", data);
+    return result;
+}
+
+napi_value NapiNativeHIDSetReportData::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+    napi_value type = nullptr;
+    napi_create_int32(env, type_, &type);
+    napi_set_named_property(env, result, "type", type);
+    napi_value id = nullptr;
+    napi_create_int32(env, id_, &id);
+    napi_set_named_property(env, result, "id", id);
+
+    size_t valueSize = data_.size();
+    const uint8_t *valueData = data_.data();
+    napi_value buffer = nullptr;
+    uint8_t *bufferData = nullptr;
+    napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &buffer);
+    if (valueSize > 0 && memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
+        HILOGE("memcpy_s error");
+    }
+    napi_value data = nullptr;
+    napi_create_typedarray(env, napi_uint8_array, valueSize, buffer, 0, &data);
+    napi_set_named_property(env, result, "data", data);
+    return result;
+}
+
 napi_value NapiNativeBlePhyInfo::ToNapiValue(napi_env env) const
 {
     //协议栈的回调不返phyMode，因此不构造phyMode返回
