@@ -37,6 +37,7 @@
 #include "bluetooth_remote_device.h"
 #include "bluetooth_no_destructor.h"
 #include "bluetooth_hid_device_info.h"
+#include "bluetooth_address_info.h"
 #include "bluetooth_hid_device_sdp_parcel.h"
 #include "bluetooth_hid_device_qos_parcel.h"
 
@@ -181,7 +182,7 @@ public:
      *
      * @param device Remote device object.
      */
-    int32_t Connect(const BluetoothRemoteDevice &device);
+    int32_t Connect(const AddressInfo &device);
 
     /**
      * @brief Release the connection from remote Hid host.

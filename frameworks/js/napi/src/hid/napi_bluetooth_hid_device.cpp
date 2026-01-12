@@ -468,6 +468,16 @@ static napi_status CheckRegisterParam(napi_env env, napi_callback_info info,
     return napi_ok;
 }
 
+static napi_status CheckDeviceParam(napi_env env, napi_callback_info info, AddressInfo &addressInfo)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 argument", napi_invalid_arg);
+    NAPI_BT_CALL_RETURN(ParseAddressInfoParam(env, argv[PARAM0], addressInfo));
+    return napi_ok;
+}
+
 static napi_status GetHidDeviceCallback(napi_env env, napi_callback_info info, napi_value &callback)
 {
     size_t argc = ARGS_SIZE_FOUR;
@@ -516,12 +526,11 @@ napi_value NapiBluetoothHidDevice::UnregisterHidDevice(napi_env env, napi_callba
 napi_value NapiBluetoothHidDevice::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::string remoteAddr {};
-    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
-    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, checkRet, BT_ERR_INVALID_PARAM);
+    AddressInfo addressInfo;
+    auto checkRet = CheckDeviceParam(env, info, addressInfo);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
     HidDevice *profile = HidDevice::GetProfile();
-    BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
-    int32_t errorCode = profile->Connect(device);
+    int32_t errorCode = profile->Connect(addressInfo);
     NAPI_BT_ASSERT_ERR_NUM_RETURN(env, errorCode == BT_NO_ERROR, errorCode);
     return NapiGetUndefinedRet(env);
 }
