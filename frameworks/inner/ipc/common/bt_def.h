@@ -454,7 +454,7 @@ enum BlePhyMask {
     BLE_PHY_CODED_MASK = 4
 };
 
-inline int ConvertToBlePhyMask (int phy)
+inline int ConvertToBlePhyMask(int phy)
 {
     int outPhy = BLE_PHY_1M_MASK;
     switch (phy) {
