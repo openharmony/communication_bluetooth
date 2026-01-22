@@ -52,6 +52,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getBtConnectionState", GetBtConnectionState),
         DECLARE_NAPI_FUNCTION("pairDevice", PairDeviceAsync),
         DECLARE_NAPI_FUNCTION("pairDeviceOutOfBand", PairDeviceOutOfBand),
+        DECLARE_NAPI_FUNCTION("generateLocalOobData", GenerateLocalOobData),
         DECLARE_NAPI_FUNCTION("cancelPairedDevice", CancelPairedDeviceAsync),
         DECLARE_NAPI_FUNCTION("getProfileConnectionState", GetProfileConnectionStateEx),
         DECLARE_NAPI_FUNCTION("setDevicePinCode", SetDevicePinCode),
@@ -90,7 +91,6 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setCarKeyDfxData", SetCarKeyCardData),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceTransport", GetRemoteDeviceTransport),
     };
-
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     return exports;
@@ -641,43 +641,38 @@ napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
 napi_status CheckPairDeviceOobParam(napi_env env, napi_callback_info info, AddressInfo &addressInfo,
     int32_t &transport, OobData &oobData)
 {
-    HILOGD("enter");
-    size_t argc = ARGS_SIZE_FOUR;
-    napi_value argv[ARGS_SIZE_FOUR] = {nullptr};
+    size_t argc = ARGS_SIZE_THREE;
+    napi_value argv[ARGS_SIZE_THREE] = {nullptr};
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
-    // deviceId and transport are not optional, p192Data and p256Data should have at least one.
-    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_FOUR, "Requires 4 arguments", napi_invalid_arg);
+    // transport is not optional, p192Data and p256Data should have at least one.
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_THREE, "Requires 3 arguments", napi_invalid_arg);
 
-    NAPI_BT_CALL_RETURN(ParseAddressInfoParam(env, argv[PARAM0], addressInfo));
-    NAPI_BT_RETURN_IF(!addressInfo.HasRawAddressType(), "rawAddressType must be given for OOB", napi_invalid_arg);
-
-    NAPI_BT_RETURN_IF(!ParseInt32(env, transport, argv[PARAM1]), "Parse transport failed", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseInt32(env, transport, argv[PARAM0]), "Parse transport failed", napi_invalid_arg);
     NAPI_BT_RETURN_IF(!IsValidTransport(transport), "invalid transport", napi_invalid_arg);
 
     bool hasP192 = false;
     bool hasP256 = false;
-    if (NapiIsNull(env, argv[PARAM2]) != napi_ok) {
+    if (NapiIsNull(env, argv[PARAM1]) != napi_ok) {
         hasP192 = true;
     }
-    if (NapiIsNull(env, argv[PARAM3]) != napi_ok) {
+    if (NapiIsNull(env, argv[PARAM2]) != napi_ok) {
         hasP256 = true;
     }
     NAPI_BT_RETURN_IF(!hasP192 && !hasP256, "At least one oobData should be given", napi_invalid_arg);
 
     if (hasP256) { // prefer p256Data
-        NAPI_BT_CALL_RETURN(ParseOobDataParam(env, argv[PARAM3], transport, addressInfo, oobData));
+        NAPI_BT_CALL_RETURN(ParseOobDataParam(env, argv[PARAM2], transport, addressInfo, oobData));
         oobData.SetOobDataType(OobDataType::P256);
         return napi_ok;
     }
 
-    NAPI_BT_CALL_RETURN(ParseOobDataParam(env, argv[PARAM2], transport, addressInfo, oobData));
+    NAPI_BT_CALL_RETURN(ParseOobDataParam(env, argv[PARAM1], transport, addressInfo, oobData));
     oobData.SetOobDataType(OobDataType::P192);
     return napi_ok;
 }
 
 napi_value PairDeviceOutOfBand(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
     std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
         "connection.PairDeviceOutofBand");
     AddressInfo addressInfo;
@@ -685,16 +680,47 @@ napi_value PairDeviceOutOfBand(napi_env env, napi_callback_info info)
     int32_t transport = BT_TRANSPORT_NONE;
     auto checkRet = CheckPairDeviceOobParam(env, info, addressInfo, transport, oobData);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
-    uint8_t addressType = addressInfo.GetAddressType();
-    std::string remoteAddr = addressInfo.GetAddress();
-    auto func = [addressType, remoteAddr, transport, oobData]() {
-        BluetoothRemoteDevice remoteDevice(addressType, remoteAddr, transport);
+    auto func = [addressInfo, transport, oobData]() {
+        BluetoothRemoteDevice remoteDevice(addressInfo, transport);
         int32_t err = remoteDevice.StartPairOutOfBand(oobData);
         HILOGI("pairDeviceOutOfBand err: %{public}d", err);
         return NapiAsyncWorkRet(err);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_status CheckGenLocalOobDataParam(napi_env env, napi_callback_info info, int32_t &transport)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 argument", napi_invalid_arg);
+
+    NAPI_BT_RETURN_IF(!ParseInt32(env, transport, argv[PARAM0]), "Parse transport failed", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!IsValidTransport(transport), "invalid transport", napi_invalid_arg);
+    return napi_ok;
+}
+
+napi_value GenerateLocalOobData(napi_env env, napi_callback_info info)
+{
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "connection.GenerateLocalOobData");
+    int32_t transport = BT_TRANSPORT_NONE;
+    auto checkRet = CheckGenLocalOobDataParam(env, info, transport);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
+    auto callback = std::make_shared<NapiBluetoothOobCallback>();
+    auto func = [transport, callback]() {
+        int32_t ret = BluetoothHost::GetDefaultHost().GenerateLocalOobData(transport, callback);
+        HILOGI("GenerateLocalOobData ret: %{public}d", ret);
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    bool success = callback->asyncWorkMap_.TryPush(NapiAsyncType::GENERATE_LOCAL_OOB_DATA, asyncWork);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
 }

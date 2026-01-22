@@ -74,6 +74,7 @@ napi_value DeRegisterConnectionObserver(napi_env env, napi_callback_info info);
 napi_value SetDevicePinCode(napi_env env, napi_callback_info info);
 napi_value CancelPairingDevice(napi_env env, napi_callback_info info);
 napi_value PairCredibleDevice(napi_env env, napi_callback_info info);
+napi_value GenerateLocalOobData(napi_env env, napi_callback_info info);
 napi_value PairDeviceOutOfBand(napi_env env, napi_callback_info info);
 napi_value GetLocalProfileUuids(napi_env env, napi_callback_info info);
 napi_value GetRemoteProfileUuids(napi_env env, napi_callback_info info);

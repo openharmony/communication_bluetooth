@@ -263,6 +263,7 @@ enum BluetoothHostInterfaceCode {
     BT_GET_LOCAL_ADDRESS,
     BT_GET_LOCAL_NAME,
     BT_SET_LOCAL_NAME,
+    BT_GENERATE_LOCAL_OOB_DATA,
     BT_GET_BT_SCAN_MODE,
     BT_SET_BT_SCAN_MODE,
     BT_GET_BONDABLE_MODE,
@@ -343,6 +344,12 @@ enum BluetoothHostInterfaceCode {
     IS_PROFILE_EXIST,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
+};
+
+enum BluetoothOobObserverInterfaceCode {
+    BT_OOB_OBSERVER_GENERATE_LOCAL_OOB_DATA = 0,
+    // The last code, if you want to add a new code, please add it before this
+    BT_OOB_OBSERVER_BUTT
 };
 
 enum BluetoothMapMceObserverInterfaceCode {

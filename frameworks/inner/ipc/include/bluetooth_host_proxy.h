@@ -41,6 +41,7 @@ public:
     int32_t BluetoothFactoryReset() override;
     int32_t GetBtState(int &state) override;
     int32_t GetLocalAddress(std::string &addr) override;
+    int32_t GenerateLocalOobData(int transport, const sptr<IBluetoothOobObserver> &observer) override;
     int32_t DisableBle() override;
     int32_t EnableBle(bool noAutoConnect, bool isAsync, const std::string &callingName) override;
     std::vector<uint32_t> GetProfileList() override;

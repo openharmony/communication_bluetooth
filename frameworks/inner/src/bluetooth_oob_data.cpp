@@ -75,9 +75,19 @@ void OobData::SetOobDataType(const uint8_t OobDataType)
     oobDataType_ = OobDataType;
 }
 
+uint8_t OobData::GetDeviceRole() const
+{
+    return deviceRole_;
+}
+
+void OobData::SetDeviceRole(const uint8_t deviceRole)
+{
+    deviceRole_ = deviceRole;
+}
+
 bool OobData::HasOobData() const
 {
-    return hasConfirmHash_ && hasAddressWithType_;
+    return hasConfirmHash_ && hasAddressWithType_; // 必选参数
 }
 
 bool OobData::HasConfirmHash() const

@@ -21,6 +21,10 @@
 
 namespace OHOS {
 namespace Bluetooth {
+
+constexpr int ADDRESS_BYTE_LEN = 6;
+constexpr int ADDRESS_WITH_TYPE_BYTE_LEN = 7; // 6字节地址+1字节地址类型
+
 napi_value NapiNativeInt::ToNapiValue(napi_env env) const
 {
     napi_value value = nullptr;
@@ -87,6 +91,92 @@ void ConvertDeviceClassToJS(napi_env env, napi_value result, int deviceClass)
     napi_value cod = 0;
     napi_create_int32(env, deviceClass, &cod);
     napi_set_named_property(env, result, "classOfDevice", cod);
+}
+
+void ConvertAddressInfoToJs(napi_env env, napi_value result, const AddressInfo &addressInfo)
+{
+    napi_value address = nullptr;
+    std::string addr = addressInfo.GetAddress();
+    napi_create_string_utf8(env, addr.c_str(), addr.size(), &address);
+    napi_set_named_property(env, result, "address", address);
+
+    napi_value addressType = nullptr;
+    if (addressInfo.HasAddressType()) {
+        napi_create_int32(env, static_cast<int32_t>(addressInfo.GetAddressType()), &addressType);
+    } else {
+        napi_create_int32(env, static_cast<int32_t>(AddressType::VIRTUAL_ADDRESS), &addressType);
+    }
+    napi_set_named_property(env, result, "addressType", addressType);
+
+    napi_value rawAddressType = nullptr;
+    if (addressInfo.HasRawAddressType()) {
+        napi_create_int32(env, static_cast<int32_t>(addressInfo.GetRawAddressType()), &rawAddressType);
+    } else {
+        napi_create_int32(env, static_cast<int32_t>(RawAddressType::PUBLIC_ADDRESS), &rawAddressType);
+    }
+    napi_set_named_property(env, result, "rawAddressType", rawAddressType);
+}
+
+void ConvertUint8VectorToJsUint8Array(napi_env env, napi_value &result, const std::vector<uint8_t> &data)
+{
+    size_t valueSize = data.size();
+    const uint8_t *valueData = data.data();
+    napi_value buffer = nullptr;
+    uint8_t *bufferData = nullptr;
+    napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &buffer);
+    if (valueSize > 0 && memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
+        HILOGE("memcpy_s error");
+    }
+    napi_create_typedarray(env, napi_uint8_array, valueSize, buffer, 0, &result);
+}
+
+napi_value NapiNativeOobData::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    napi_value deviceId = nullptr;
+    napi_create_object(env, &deviceId);
+
+    std::string address = "";
+    uint8_t addressType = AddressType::REAL_ADDRESS; // OOB数据中的地址一定是真实地址
+    uint8_t rawAddressType = RawAddressType::RANDOM_ADDRESS;
+    if (data_.HasAddressWithType() && (data_.GetAddressWithType().size() == ADDRESS_WITH_TYPE_BYTE_LEN)) {
+        std::vector<uint8_t> addressWithType = data_.GetAddressWithType();
+        // addressWithType中前6位为地址，第7位为地址类型
+        std::vector<uint8_t> addressVec(addressWithType.begin(), addressWithType.begin() + ADDRESS_BYTE_LEN);
+        address = BuildAddressString(addressVec);
+        rawAddressType = addressWithType[ADDRESS_BYTE_LEN];
+    }
+    AddressInfo addressInfo;
+    addressInfo.SetAddress(address);
+    addressInfo.SetAddressType(addressType);
+    addressInfo.SetRawAddressType(rawAddressType);
+    ConvertAddressInfoToJs(env, deviceId, addressInfo);
+    napi_set_named_property(env, result, "deviceId", deviceId);
+
+    napi_value confirmationHash = nullptr;
+    std::vector<uint8_t> confirmHash = data_.HasConfirmHash() ? data_.GetConfirmationHash() : std::vector<uint8_t> {};
+    ConvertUint8VectorToJsUint8Array(env, confirmationHash, confirmHash);
+    napi_set_named_property(env, result, "confirmationHash", confirmationHash);
+
+    napi_value randomizerHash = nullptr;
+    std::vector<uint8_t> randomHash = data_.HasRandomHash() ? data_.GetRandomizerHash() : std::vector<uint8_t> {};
+    ConvertUint8VectorToJsUint8Array(env, randomizerHash, randomHash);
+    napi_set_named_property(env, result, "randomizerHash", randomizerHash);
+
+    napi_value deviceName = nullptr;
+    std::string deviceNameStr = "";
+    if (data_.HasDeviceName()) {
+        deviceNameStr = data_.GetDeviceName();
+    }
+    napi_create_string_utf8(env, deviceNameStr.c_str(), deviceNameStr.size(), &deviceName);
+    napi_set_named_property(env, result, "deviceName", deviceName);
+
+    napi_value deviceRole = nullptr;
+    napi_create_int32(env, static_cast<int32_t>(data_.GetDeviceRole()), &deviceRole);
+    napi_set_named_property(env, result, "deviceRole", deviceRole);
+    return result;
 }
 
 napi_value NapiNativeDiscoveryInfoResultArray::ToNapiValue(napi_env env) const

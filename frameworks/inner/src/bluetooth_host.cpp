@@ -32,6 +32,7 @@
 #include "bluetooth_observer_list.h"
 #include "bluetooth_remote_device_observer_stub.h"
 #include "bluetooth_resource_manager_observer_stub.h"
+#include "bluetooth_oob_observer_stub.h"
 #include "iservice_registry.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
@@ -74,6 +75,10 @@ struct BluetoothHost::impl {
     // bluetooth resource manager observer
     class BluetoothResourceManagerObserverImp;
     sptr<BluetoothResourceManagerObserverImp> resourceManagerObserverImp_ = nullptr;
+
+    // bluetooth oob observer
+    class BluetoothOobObserverImp;
+    sptr<BluetoothOobObserverImp> oobObserverImp_ = nullptr;
 
     // user regist observers
     BluetoothObserverList<BluetoothHostObserver> observers_;
@@ -226,6 +231,7 @@ public:
         HILOGI("OnRefusePolicyChanged, pid: %{public}d time %{public}" PRId64"", pid, prohibitedSecondsTime);
         host_.refusePolicyProhibitedTime_ = prohibitedSecondsTime;
     }
+
 private:
     bool isNeedInterceptSwitchStatus(int32_t transport, int32_t status)
     {
@@ -252,6 +258,67 @@ private:
     int32_t preBrState_ = INVALID_STATE;
     int32_t preBleState_ = INVALID_STATE;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothHostObserverImp);
+};
+
+void ConvertToOobData(const BluetoothOobData &inOobData, OobData &outOobData)
+{
+    if (!inOobData.HasOobData()) {
+        HILOGE("invalid oob Data");
+        return;
+    }
+
+    outOobData.SetAddressWithType(inOobData.GetAddressWithType());
+    outOobData.SetConfirmationHash(inOobData.GetConfirmationHash());
+    outOobData.SetOobDataType(inOobData.GetOobDataType());
+
+    if (inOobData.HasRandomHash()) {
+        outOobData.SetRandomizerHash(inOobData.GetRandomizerHash());
+    }
+
+    if (inOobData.HasDeviceName()) {
+        outOobData.SetDeviceName(inOobData.GetDeviceName());
+    }
+
+    outOobData.SetDeviceRole(inOobData.GetDeviceRole());
+}
+
+class BluetoothHost::impl::BluetoothOobObserverImp : public BluetoothOobObserverStub {
+public:
+    explicit BluetoothOobObserverImp(BluetoothHost::impl &host) : host_(host){};
+    ~BluetoothOobObserverImp() override = default;
+
+    void SetOobCallback(std::shared_ptr<BluetoothOobCallback> callback)
+    {
+        if (callback == nullptr) {
+            HILOGE("callback is null");
+            return;
+        }
+        std::lock_guard<std::mutex> lock(callbackMutex_);
+        oobCallback_ = callback;
+    }
+
+    void OnGenerateLocalOobData(int32_t ret, const BluetoothOobData &oobData) override
+    {
+        HILOGI("enter OnGenerateLocalOobData, ret: %{public}d", ret);
+        OobData data;
+        ConvertToOobData(oobData, data);
+        {
+            std::lock_guard<std::mutex> lock(callbackMutex_);
+            if (oobCallback_ != nullptr) {
+                oobCallback_->OnGenerateLocalOobData(ret, data);
+                oobCallback_ = nullptr;
+            } else {
+                HILOGE("oobCallback_ is null");
+            }
+        }
+    }
+
+private:
+    BluetoothHost::impl &host_;
+    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BluetoothOobObserverImp);
+    // user regist bluetooth oob callbacks
+    std::mutex callbackMutex_;
+    std::shared_ptr<BluetoothOobCallback> oobCallback_ = nullptr;
 };
 
 class BluetoothHost::impl::BluetoothRemoteDeviceObserverImp : public BluetoothRemoteDeviceObserverstub {
@@ -496,6 +563,7 @@ BluetoothHost::impl::impl()
     bleRemoteObserverImp_ = new BluetoothBlePeripheralCallbackImp(*this);
     bleObserverImp_ = new BluetoothHostObserverImp(*this);
     resourceManagerObserverImp_ = new BluetoothResourceManagerObserverImp(*this);
+    oobObserverImp_ = new BluetoothOobObserverImp(*this);
 
     auto switchActionPtr = std::make_unique<BluetoothSwitchAction>();
     switchModule_ = std::make_shared<BluetoothSwitchModule>(std::move(switchActionPtr));
@@ -866,6 +934,16 @@ int BluetoothHost::GetLocalAddress(std::string &addr) const
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
 
     return proxy->GetLocalAddress(addr);
+}
+
+int BluetoothHost::GenerateLocalOobData(int transport, std::shared_ptr<BluetoothOobCallback> callback) const
+{
+    HILOGI("GenerateLocalOobData, transport: %{public}d", transport);
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(callback != nullptr, BT_ERR_INTERNAL_ERROR, "callback is nullptr");
+    pimpl->oobObserverImp_->SetOobCallback(callback);
+    return proxy->GenerateLocalOobData(transport, pimpl->oobObserverImp_);
 }
 
 std::vector<uint32_t> BluetoothHost::GetProfileList() const

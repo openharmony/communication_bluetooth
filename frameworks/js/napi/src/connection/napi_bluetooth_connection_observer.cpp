@@ -126,5 +126,15 @@ void NapiBluetoothConnectionObserver::OnDiscoveryResultCallBack(
         std::make_shared<NapiNativeDiscoveryInfoResultArray>(remoteDevice, rssi, deviceName, deviceClass);
     eventSubscribe_.PublishEvent(REGISTER_DISCOVERY_RESULT_TYPE, nativeObject);
 }
+
+NapiBluetoothOobCallback::NapiBluetoothOobCallback()
+{}
+
+void NapiBluetoothOobCallback::OnGenerateLocalOobData(int32_t ret, const OobData &oobData)
+{
+    HILOGI("NapiBluetoothOobCallback OnGenerateLocalOobData, ret: %{public}d", ret);
+    auto napiOobData = std::make_shared<NapiNativeOobData>(oobData);
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GENERATE_LOCAL_OOB_DATA, napiOobData, ret);
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
