@@ -230,6 +230,32 @@ int32_t BluetoothHostProxy::GetLocalAddress(std::string &addr)
     return exception;
 }
 
+int32_t BluetoothHostProxy::GenerateLocalOobData(int32_t transport, const sptr<IBluetoothOobObserver> &observer)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::GenerateLocalOobData WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteInt32(transport)) {
+        HILOGE("BluetoothHostProxy::GenerateLocalOobData write transport error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteRemoteObject(observer->AsObject())) {
+        HILOGE("BluetoothHostProxy::GenerateLocalOobData write observer error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t err = InnerTransact(BluetoothHostInterfaceCode::BT_GENERATE_LOCAL_OOB_DATA, option, data, reply);
+    if (err != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::GenerateLocalOobData done fail, error: %{public}d", err);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadInt32();
+}
+
 int32_t BluetoothHostProxy::DisableBle()
 {
     MessageParcel data;

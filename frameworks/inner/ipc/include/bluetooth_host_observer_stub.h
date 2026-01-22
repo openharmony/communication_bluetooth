@@ -55,6 +55,8 @@ private:
         MessageParcel &data, MessageParcel &reply);
     static int32_t OnBluetoothRefusePolicyChangedInner(BluetoothHostObserverStub *stub,
         MessageParcel &data, MessageParcel &reply);
+    static int32_t OnGenerateLocalOobDataInner(BluetoothHostObserverStub *stub,
+        MessageParcel &data, MessageParcel &reply);
 
     using BluetoothObserverHostFunc = int32_t (*)(BluetoothHostObserverStub *stub,
         MessageParcel &data, MessageParcel &reply);

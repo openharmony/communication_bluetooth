@@ -49,6 +49,14 @@ BluetoothRemoteDevice::BluetoothRemoteDevice(int32_t addressType, const std::str
     transport_ = transport;
 }
 
+BluetoothRemoteDevice::BluetoothRemoteDevice(const AddressInfo &addressInfo, const int transport)
+{
+    address_ = addressInfo.GetAddress();
+    addressType_ = addressInfo.GetAddressType();
+    rawAddressType_ = addressInfo.GetRawAddressType();
+    transport_ = transport;
+}
+
 int BluetoothRemoteDevice::GetDeviceType() const
 {
     HILOGI("enter");
@@ -205,9 +213,10 @@ int BluetoothRemoteDevice::StartPair()
     return hostProxy->StartPair(transport_, bluetoothRawAddress, dummyOobdata);
 }
 
-void ConvertOobData(const OobData &inOobData, BluetoothOobData &outOobData)
+void ConvertToBluetoothOobData(const OobData &inOobData, BluetoothOobData &outOobData)
 {
     if (!inOobData.HasOobData()) {
+        HILOGE("invalid oob Data");
         return;
     }
 
@@ -222,7 +231,8 @@ void ConvertOobData(const OobData &inOobData, BluetoothOobData &outOobData)
     if (inOobData.HasDeviceName()) {
         outOobData.SetDeviceName(inOobData.GetDeviceName());
     }
-    return;
+
+    outOobData.SetDeviceRole(inOobData.GetDeviceRole());
 }
 
 int BluetoothRemoteDevice::StartPairOutOfBand(const OobData &oobData)
@@ -235,7 +245,7 @@ int BluetoothRemoteDevice::StartPairOutOfBand(const OobData &oobData)
     CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
     BluetoothRawAddress bluetoothRawAddress(addressType_, address_);
     BluetoothOobData outOobData;
-    ConvertOobData(oobData, outOobData);
+    ConvertToBluetoothOobData(oobData, outOobData);
     return hostProxy->StartPair(transport_, bluetoothRawAddress, outOobData);
 }
 

@@ -23,6 +23,7 @@
 #include "i_bluetooth_host_observer.h"
 #include "i_bluetooth_remote_device_observer.h"
 #include "i_bluetooth_resource_manager_observer.h"
+#include "i_bluetooth_oob_observer.h"
 #include "iremote_broker.h"
 #include "bluetooth_device_battery_info.h"
 #include "bluetooth_remote_device_info.h"
@@ -69,6 +70,7 @@ public:
     virtual int32_t BluetoothFactoryReset() = 0;
     virtual int32_t GetBtState(int &state) = 0;
     virtual int32_t GetLocalAddress(std::string &addr) = 0;
+    virtual int32_t GenerateLocalOobData(int transport, const sptr<IBluetoothOobObserver> &observer) = 0;
     virtual int32_t DisableBle() = 0;
     virtual int32_t EnableBle(bool noAutoConnect, bool isAsync, const std::string &callingName) = 0;
     virtual std::vector<uint32_t> GetProfileList() = 0;

@@ -45,9 +45,9 @@ public:
 private:
     std::string address_ = {};
     bool hasAddressType_ = false;
-    uint8_t addressType_ = {}; // real or virtual
+    uint8_t addressType_ = AddressType::UNSET_ADDRESS; // real or virtual
     bool hasRawAddressType_ = false;
-    uint8_t rawAddressType_ = {}; // public or random
+    uint8_t rawAddressType_ = RawAddressType::UNSET_RAW_ADDRESS; // public or random
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

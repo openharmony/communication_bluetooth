@@ -46,6 +46,16 @@ private:
     void OnDiscoveryResultCallBack(
         const BluetoothRemoteDevice &device, int rssi, const std::string &deviceName, int deviceClass);
 };
+
+class NapiBluetoothOobCallback : public BluetoothOobCallback {
+public:
+    NapiBluetoothOobCallback();
+    ~NapiBluetoothOobCallback() override = default;
+
+    void OnGenerateLocalOobData(int32_t ret, const OobData &oobData) override;
+
+    NapiAsyncWorkMap asyncWorkMap_ {};
+};
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_BLUETOOTH_HOST_OBSERVER_H

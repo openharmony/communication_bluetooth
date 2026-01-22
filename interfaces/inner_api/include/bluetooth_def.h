@@ -1809,7 +1809,7 @@ enum AddressType : uint8_t {
     UNSET_ADDRESS = 0xFF,
 };
 
-enum RawAddressType {
+enum RawAddressType : uint8_t {
     PUBLIC_ADDRESS = 0x00,
     RANDOM_ADDRESS = 0x01,
     UNSET_RAW_ADDRESS = 0xFF,
@@ -1823,8 +1823,8 @@ enum FreezeType : uint8_t {
 
 struct BluetoothAddress {
     std::string address = {};
-    int32_t addressType = AddressType::UNSET_ADDRESS;
-    int32_t rawAddressType = RawAddressType::UNSET_RAW_ADDRESS;
+    uint8_t addressType = AddressType::UNSET_ADDRESS;
+    uint8_t rawAddressType = RawAddressType::UNSET_RAW_ADDRESS;
 
     BluetoothAddress() : address{}, addressType(AddressType::UNSET_ADDRESS),
         rawAddressType(RawAddressType::UNSET_RAW_ADDRESS) {}

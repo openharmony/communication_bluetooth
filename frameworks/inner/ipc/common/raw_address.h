@@ -30,22 +30,10 @@ enum AddressType : uint8_t {
     UNSET_ADDRESS = 0xFF,
 };
 
-enum RawAddressType {
+enum RawAddressType : uint8_t {
     PUBLIC_ADDRESS = 0x00,
     RANDOM_ADDRESS = 0x01,
     UNSET_RAW_ADDRESS = 0xFF,
-};
-
-struct BluetoothAddress {
-    std::string address = {};
-    int32_t addressType = AddressType::UNSET_ADDRESS;
-    int32_t rawAddressType = RawAddressType::UNSET_RAW_ADDRESS;
-
-    BluetoothAddress() : address{}, addressType(AddressType::UNSET_ADDRESS),
-        rawAddressType(RawAddressType::UNSET_RAW_ADDRESS) {}
-
-    BluetoothAddress(std::string addr, uint8_t addrType, uint8_t rawAddrType)
-        : address(addr), addressType(addrType), rawAddressType(rawAddrType) {}
 };
 
 class RawAddress {

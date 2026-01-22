@@ -26,6 +26,13 @@ enum OobDataType : uint8_t {
     P256 = 0x02,
 };
 
+enum LeDeviceRole : uint8_t {
+    DEVICE_ROLE_PERIPHERAL_ONLY = 0x00,
+    DEVICE_ROLE_CENTRAL_ONLY = 0x01,
+    DEVICE_ROLE_BOTH_PREFER_PERIPHERAL = 0x02,
+    DEVICE_ROLE_BOTH_PREFER_CENTRAL = 0x03,
+};
+
 class BLUETOOTH_API OobData {
 public:
     OobData() = default;
@@ -52,6 +59,10 @@ public:
 
     void SetOobDataType(const uint8_t OobDataType);
 
+    uint8_t GetDeviceRole() const;
+
+    void SetDeviceRole(const uint8_t deviceRole);
+
     bool HasOobData() const;
 
     bool HasConfirmHash() const;
@@ -72,6 +83,7 @@ private:
     bool hasDeviceName_ = false;
     std::string deviceName_ = {};
     uint8_t oobDataType_ = P256;
+    uint8_t deviceRole_ = DEVICE_ROLE_PERIPHERAL_ONLY;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
