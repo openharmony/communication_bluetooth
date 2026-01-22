@@ -25,7 +25,12 @@ namespace OHOS {
 namespace Bluetooth {
 void BluetoothHidHostObserverImpl::RegisterStateChangeFunc(std::function<void(StateChangeParam)> cjCallback)
 {
-    stateChangeFunc = cjCallback;
+    [[maybe_unused]] std::function<void(StateChangeParam)> stateChangeFuncCopy;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        stateChangeFuncCopy = stateChangeFunc;
+        stateChangeFunc = cjCallback;
+    }
 }
 
 void BluetoothHidHostObserverImpl::OnConnectionStateChanged(const BluetoothRemoteDevice& device, int state, int cause)
@@ -44,7 +49,12 @@ void BluetoothHidHostObserverImpl::OnConnectionStateChanged(const BluetoothRemot
     StateChangeParam param = StateChangeParam {
         .deviceId = deviceId, .state = static_cast<int32_t>(state), .cause = static_cast<int32_t>(cause)
     };
-    stateChangeFunc(param);
+    std::function<void(StateChangeParam)> stateChangeFuncCopy;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        stateChangeFuncCopy = stateChangeFunc;
+    }
+    stateChangeFuncCopy(param);
     free(deviceId);
     return;
 }

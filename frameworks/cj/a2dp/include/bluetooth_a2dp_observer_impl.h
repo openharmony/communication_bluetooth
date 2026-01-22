@@ -21,6 +21,7 @@
 #include "bluetooth_a2dp_src.h"
 #include "bluetooth_a2dp_utils.h"
 #include "ffi_remote_data.h"
+#include <mutex>
 
 namespace OHOS {
 namespace Bluetooth {
@@ -39,8 +40,9 @@ public:
 private:
     friend class A2dpSourceProfileImpl;
     std::function<void(StateChangeParam)> stateChangeFunc { nullptr };
+    std::mutex mtx_;
 };
 
 } // namespace Bluetooth
 } // namespace OHOS
-#endif /* NAPI_BLUETOOTH_A2DP_SRC_OBSERVER_H_ */
+#endif /* BLUETOOTH_A2DP_OBSERVER_IMPL_H */

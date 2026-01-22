@@ -21,6 +21,7 @@
 #include "bluetooth_hfp_ag.h"
 #include "bluetooth_hfp_utils.h"
 #include "ffi_remote_data.h"
+#include <mutex>
 
 namespace OHOS {
 namespace Bluetooth {
@@ -42,6 +43,7 @@ public:
 
 private:
     std::function<void(StateChangeParam)> stateChangeFunc { nullptr };
+    std::mutex mtx_;
 };
 
 } // namespace Bluetooth
