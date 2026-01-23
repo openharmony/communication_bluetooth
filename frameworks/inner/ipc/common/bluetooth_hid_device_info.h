@@ -62,9 +62,9 @@ enum ProtocolType {
 };
 
 struct HidDeviceAppInfo {
-    uint32_t tokenId;
-    std::string appId;
-    std::string name;
+    uint32_t tokenId = {};
+    std::string appId = {};
+    std::string name = {};
     bool operator!=(const HidDeviceAppInfo& other) const
     {
         return (tokenId != other.tokenId) || (appId != other.appId) || (name != other.name);

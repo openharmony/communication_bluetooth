@@ -86,7 +86,7 @@ public:
      * @param id id of Interrupt data.
      * @param data data of Interrupt data.
      */
-    virtual void OnInterruptDataReceived(int id, std::vector<uint8_t> data) {}
+    virtual void OnInterruptDataReceived(int id, const std::vector<uint8_t> &data) {}
 
     /**
      * @brief The observer function to notify message when SET_REMOTE message is received from remote.
@@ -95,7 +95,7 @@ public:
      * @param id id of SET_REPORT data.
      * @param data data of SET_REPORT data.
      */
-    virtual void OnSetReport(int type, int id, std::vector<uint8_t> data) {}
+    virtual void OnSetReport(int type, int id, const std::vector<uint8_t> &data) {}
 
     /**
      * @brief The observer function to notify when virtual cable is removed.

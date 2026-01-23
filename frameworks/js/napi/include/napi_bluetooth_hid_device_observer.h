@@ -39,8 +39,8 @@ public:
     void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state) override;
     void OnGetReport(int type, int id, uint16_t bufferSize) override;
     void OnSetProtocol(int protocol) override;
-    void OnInterruptDataReceived(int id, std::vector<uint8_t> data) override;
-    void OnSetReport(int type, int id, std::vector<uint8_t> data) override;
+    void OnInterruptDataReceived(int id, const std::vector<uint8_t> &data) override;
+    void OnSetReport(int type, int id, const std::vector<uint8_t> &data) override;
     void OnVirtualCableUnplug() override;
 
     NapiEventSubscribeModule eventSubscribe_;
