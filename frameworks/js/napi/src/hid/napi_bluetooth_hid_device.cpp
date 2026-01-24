@@ -80,9 +80,9 @@ napi_value ErrorReasonInit(napi_env env)
     napi_create_object(env, &errorReason);
     SetNamedPropertyByInteger(env, errorReason, ErrorReason::RSP_SUCCESS, "RSP_SUCCESS");
     SetNamedPropertyByInteger(env, errorReason, ErrorReason::RSP_NOT_READY, "RSP_NOT_READY");
-    SetNamedPropertyByInteger(env, errorReason, ErrorReason::RSP_INVALID_REP_ID, "RSP_INVALID_REP_ID");
+    SetNamedPropertyByInteger(env, errorReason, ErrorReason::RSP_INVALID_REP_ID, "RSP_INVALID_REPORT_ID");
     SetNamedPropertyByInteger(env, errorReason, ErrorReason::RSP_UNSUPPORTED_REQ, "RSP_UNSUPPORTED_REQ");
-    SetNamedPropertyByInteger(env, errorReason, ErrorReason::INVALID_PARAM, "INVALID_PARAM");
+    SetNamedPropertyByInteger(env, errorReason, ErrorReason::INVALID_PARAM, "RSP_INVALID_PARAM");
     SetNamedPropertyByInteger(env, errorReason, ErrorReason::RSP_UNKNOWN, "RSP_UNKNOWN");
     return errorReason;
 }

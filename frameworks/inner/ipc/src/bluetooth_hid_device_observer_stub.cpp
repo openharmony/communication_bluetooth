@@ -61,8 +61,7 @@ int BluetoothHidDeviceObserverStub::OnRemoteRequest(
     MessageParcel &reply,
     MessageOption &option)
 {
-    HILOGD("BluetoothHidDeviceObserverStub::OnRemoteRequest, cmd = %{public}d, flags = %{public}d",
-        code, option.GetFlags());
+    HILOGD("cmd = %{public}d, flags = %{public}d", code, option.GetFlags());
     if (BluetoothHidDeviceObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGI("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
@@ -75,7 +74,7 @@ int BluetoothHidDeviceObserverStub::OnRemoteRequest(
             return (this->*memberFunc)(data, reply);
         }
     }
-    HILOGW("BluetoothHidDeviceObserverStub::OnRemoteRequest, default case, need check.");
+    HILOGI("default case, need check.");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 

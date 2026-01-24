@@ -64,13 +64,13 @@ void NapiBluetoothHidDeviceObserver::OnSetProtocol(int protocol)
     eventSubscribe_.PublishEvent(STR_BT_HID_DEVICE_OBSERVER_SET_PROTOCOL, nativeObject);
 }
 
-void NapiBluetoothHidDeviceObserver::OnInterruptDataReceived(int id, std::vector<uint8_t> data)
+void NapiBluetoothHidDeviceObserver::OnInterruptDataReceived(int id, const std::vector<uint8_t> &data)
 {
     auto nativeObject = std::make_shared<NapiNativeHIDInterruptData>(id, data);
     eventSubscribe_.PublishEvent(STR_BT_HID_DEVICE_OBSERVER_INTERRUPT_DATA_RECEIVED, nativeObject);
 }
 
-void NapiBluetoothHidDeviceObserver::OnSetReport(int type, int id, std::vector<uint8_t> data)
+void NapiBluetoothHidDeviceObserver::OnSetReport(int type, int id, const std::vector<uint8_t> &data)
 {
     auto nativeObject = std::make_shared<NapiNativeHIDSetReportData>(type, id, data);
     eventSubscribe_.PublishEvent(STR_BT_HID_DEVICE_OBSERVER_APP_SET_REPORT, nativeObject);
