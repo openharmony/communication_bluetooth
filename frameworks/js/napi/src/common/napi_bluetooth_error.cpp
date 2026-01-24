@@ -98,6 +98,17 @@ void HandleSyncErr(const napi_env &env, int32_t errCode)
     }
 }
 
+void HandleSyncErrWithMsg(const napi_env &env, int32_t errCode, std::string errMsg)
+{
+    if (errCode == BtErrCode::BT_NO_ERROR) {
+        return;
+    }
+    NapiHaEventUtils::WriteErrCode(env, errCode);
+    if (errMsg != "") {
+        napi_throw_error(env, std::to_string(errCode).c_str(), errMsg.c_str());
+    }
+}
+
 static napi_value GenerateBusinessError(napi_env env, int32_t errCode, const std::string &errMsg)
 {
     napi_value businessError = nullptr;

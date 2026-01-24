@@ -38,6 +38,9 @@ using namespace std;
 
 thread_local napi_ref NapiGattClient::consRef_ = nullptr;
 
+constexpr int32_t DEFAULT_MTU_SIZE = 23;
+constexpr int32_t MAX_MTU_SIZE = 517;
+
 const std::vector<std::pair<int, int>> NapiGattClient::g_gattStatusSrvToNapi = {
     { Bluetooth::BT_NO_ERROR,                                 GATT_SUCCESS },
     { Bluetooth::BT_ERR_GATT_WRITE_NOT_PERMITTED,             WRITE_NOT_PERMITTED },
@@ -623,6 +626,9 @@ napi_value NapiGattClient::SetBLEMtuSize(napi_env env, napi_callback_info info)
 
     auto status = CheckSetBLEMtuSize(env, info, mtuSize, &gattClient);
     NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    NAPI_BT_ASSERT_RETURN_FALSE_WITH_MSG(env, mtuSize >= DEFAULT_MTU_SIZE && mtuSize <= MAX_MTU_SIZE,
+        BT_ERR_INTERNAL_ERROR, "The mtu size is not in the valid range.");
 
     std::shared_ptr<GattClient> client = gattClient->GetClient();
     NAPI_BT_ASSERT_RETURN_FALSE(env, client != nullptr, BT_ERR_INTERNAL_ERROR);
