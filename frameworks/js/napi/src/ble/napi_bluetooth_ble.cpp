@@ -1359,6 +1359,8 @@ napi_value PropertyInit(napi_env env, napi_value exports)
     napi_value gattDisconnectReasonObj = GattDisconnectReasonInit(env);
     napi_value bleProfileObj = BleProfileInit(env);
     napi_value connectionParamObj = ConnectionParamInit(env);
+    napi_value blePhyObj = BlePhyInit(env);
+    napi_value codedPhyModeObj = CodedPhyModeInit(env);
 #endif
 
     napi_property_descriptor exportFuncs[] = {
@@ -1374,6 +1376,8 @@ napi_value PropertyInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("GattDisconnectReason", gattDisconnectReasonObj),
         DECLARE_NAPI_PROPERTY("BleProfile", bleProfileObj),
         DECLARE_NAPI_PROPERTY("ConnectionParam", connectionParamObj),
+        DECLARE_NAPI_PROPERTY("BlePhy", blePhyObj),
+        DECLARE_NAPI_PROPERTY("CodedPhyMode", codedPhyModeObj),
 #endif
     };
 

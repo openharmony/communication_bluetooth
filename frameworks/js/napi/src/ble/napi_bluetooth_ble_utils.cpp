@@ -559,6 +559,30 @@ napi_value ConnectionParamInit(napi_env env)
     return connectionParamObj;
 }
 
+napi_value BlePhyInit(napi_env env)
+{
+    napi_value blePhyObj = nullptr;
+    napi_create_object(env, &blePhyObj);
+    SetNamedPropertyByInteger(
+        env, blePhyObj, static_cast<int32_t>(BLE_PHY_1M), "BLE_PHY_1M");
+    SetNamedPropertyByInteger(
+        env, blePhyObj, static_cast<int32_t>(BLE_PHY_2M), "BLE_PHY_2M");
+    SetNamedPropertyByInteger(
+        env, blePhyObj, static_cast<int32_t>(BLE_PHY_CODED), "BLE_PHY_CODED");
+    return blePhyObj;
+}
+
+napi_value CodedPhyModeInit(napi_env env)
+{
+    napi_value codedPhyModeObj = nullptr;
+    napi_create_object(env, &codedPhyModeObj);
+    SetNamedPropertyByInteger(
+        env, codedPhyModeObj, static_cast<int32_t>(BLE_PHY_CODED_S2), "BLE_PHY_CODED_S2");
+    SetNamedPropertyByInteger(
+        env, codedPhyModeObj, static_cast<int32_t>(BLE_PHY_CODED_S8), "BLE_PHY_CODED_S8");
+    return codedPhyModeObj;
+}
+
 void SetGattClientDeviceId(const std::string &deviceId)
 {
     deviceAddr = deviceId;
