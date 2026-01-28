@@ -50,7 +50,9 @@ int BluetoothAudioManagerProxy::SetWearDetection(const std::string &deviceId, bo
     MessageOption option{MessageOption::TF_SYNC};
     int opcode = enable ? BluetoothAudioManagerInterfaceCode::WEAR_DETECTION_ENABLE
                         : BluetoothAudioManagerInterfaceCode::WEAR_DETECTION_DISABLE;
-    int error = Remote()->SendRequest(opcode, data, reply, option);
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG_RET(remote, BT_ERR_IPC_TRANS_FAILED, "remote nullptr");
+    int error = remote->SendRequest(opcode, data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("SetWearDetection done fail, error: %{public}d", error);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -72,7 +74,9 @@ int BluetoothAudioManagerProxy::GetWearDetectionState(const std::string &deviceI
 
     MessageParcel reply;
     MessageOption option{MessageOption::TF_SYNC};
-    int error = Remote()->SendRequest(
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG_RET(remote, BT_ERR_IPC_TRANS_FAILED, "remote nullptr");
+    int error = remote->SendRequest(
         static_cast<uint32_t>(BluetoothAudioManagerInterfaceCode::IS_WEAR_DETECTION_ENABLED), data, reply, option);
     if (error != BT_NO_ERROR) {
         HILOGE("BluetoothWearDetectionProxy::EnableWearDetections done fail, error: %{public}d", error);
@@ -96,7 +100,9 @@ int32_t BluetoothAudioManagerProxy::IsDeviceWearing(const BluetoothRawAddress &d
         "BluetoothAudioManagerProxy::IsDeviceWearing Write device error");
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int error = Remote()->SendRequest(
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG_RET(remote, BT_ERR_IPC_TRANS_FAILED, "remote nullptr");
+    int error = remote->SendRequest(
         BluetoothAudioManagerInterfaceCode::IS_DEVICE_WEARING, data, reply, option);
 
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR,
@@ -113,7 +119,9 @@ int32_t BluetoothAudioManagerProxy::IsWearDetectionSupported(const BluetoothRawA
         "BluetoothAudioManagerProxy::IsWearDetectionSupported Write device error");
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int error = Remote()->SendRequest(
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG_RET(remote, BT_ERR_IPC_TRANS_FAILED, "remote nullptr");
+    int error = remote->SendRequest(
         BluetoothAudioManagerInterfaceCode::BT_IS_WEAR_DETECTION_SUPPORTED, data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR,
         "BluetoothAudioManagerProxy::IsWearDetectionSupported fail, error: %{public}d", error);
@@ -138,7 +146,9 @@ int32_t BluetoothAudioManagerProxy::SendDeviceSelection(const BluetoothRawAddres
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int error = Remote()->SendRequest(
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG_RET(remote, BT_ERR_IPC_TRANS_FAILED, "remote nullptr");
+    int error = remote->SendRequest(
         BluetoothAudioManagerInterfaceCode::BT_SEND_DEVICE_SELECTION, data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR,
         "BluetoothAudioManagerProxy::SendDeviceSelection fail, error: %{public}d", error);

@@ -136,7 +136,7 @@ static TaiheStatus ParseScanFilterDeviceIdParameters(const ohos::bluetooth::ble:
     if (scanFilter.deviceId.has_value()) {
         std::string deviceId = std::string(scanFilter.deviceId.value());
         if (!IsValidAddress(deviceId)) {
-            HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
+            HILOGE("Invalid deviceId");
             return TAIHE_INVALID_ARG;
         }
         HILOGI("Scan filter device id is %{public}s", GetEncryptAddr(deviceId).c_str());

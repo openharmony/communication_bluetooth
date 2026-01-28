@@ -485,7 +485,7 @@ static napi_status ParseScanFilterDeviceIdParameters(
     NAPI_BT_CALL_RETURN(ParseStringParams(env, scanFilter, "deviceId", exist, deviceId));
     if (exist) {
         if (!IsValidAddress(deviceId)) {
-            HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
+            HILOGE("Invalid deviceId");
             return napi_invalid_arg;
         }
 
@@ -509,7 +509,7 @@ static napi_status ParseScanFilterAddrInfoParameters(const napi_env &env, napi_v
         std::string deviceId {};
         NAPI_BT_CALL_RETURN(ParseStringParams(env, bluetoothAddress, "address", exist, deviceId));
         if (!IsValidAddress(deviceId)) {
-            HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
+            HILOGE("Invalid deviceId");
             return napi_invalid_arg;
         }
         HILOGI("Scan filter device id is %{public}s", GetEncryptAddr(deviceId).c_str());

@@ -101,8 +101,6 @@ static GattCharacteristic *GattcFindCharacteristic(int clientId, std::shared_ptr
 
     string strUuidSvc(characteristic.serviceUuid.uuid);
     string strUuidChar(characteristic.characteristicUuid.uuid);
-    HILOGD("execute, strUuidSvc: %{public}s, strUuidChar: %{public}s",
-        strUuidSvc.c_str(), strUuidChar.c_str());
     if (!IsValidUuid(strUuidSvc) || !IsValidUuid(strUuidChar)) {
         HILOGE("match the UUID faild.");
         return nullptr;
