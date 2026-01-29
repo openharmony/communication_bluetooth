@@ -294,6 +294,10 @@ int32_t HidDevice::GetConnectedDevices(std::vector<BluetoothRemoteDevice> &resul
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
+    int error = CheckProfileState();
+    if (error != BT_NO_ERROR) {
+        return error;
+    }
     return pimpl->GetConnectedDevices(result);
 }
 
@@ -302,6 +306,10 @@ int32_t HidDevice::GetConnectionState(const BluetoothRemoteDevice &device, int32
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
+    }
+    int error = CheckProfileState();
+    if (error != BT_NO_ERROR) {
+        return error;
     }
     return pimpl->GetConnectionState(device, state);
 }
@@ -315,6 +323,10 @@ int HidDevice::RegisterHidDevice(const BluetoothHidDeviceSdp &sdpSetting,
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
+    int error = CheckProfileState();
+    if (error != BT_NO_ERROR) {
+        return error;
+    }
     return pimpl->RegisterHidDevice(sdpSetting, inQos, outQos);
 }
 
@@ -323,6 +335,10 @@ int HidDevice::UnregisterHidDevice()
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
+    }
+    int error = CheckProfileState();
+    if (error != BT_NO_ERROR) {
+        return error;
     }
     return pimpl->UnregisterHidDevice();
 }
@@ -333,6 +349,10 @@ int32_t HidDevice::Connect(const AddressInfo &device)
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
+    int error = CheckProfileState();
+    if (error != BT_NO_ERROR) {
+        return error;
+    }
     return pimpl->Connect(device);
 }
 
@@ -341,6 +361,10 @@ int32_t HidDevice::Disconnect()
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
+    }
+    int error = CheckProfileState();
+    if (error != BT_NO_ERROR) {
+        return error;
     }
     return pimpl->Disconnect();
 }
@@ -351,6 +375,10 @@ int32_t HidDevice::SendReport(int id, const std::vector<uint8_t> &data)
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
+    int error = CheckProfileState();
+    if (error != BT_NO_ERROR) {
+        return error;
+    }
     return pimpl->SendReport(id, data);
 }
 
@@ -359,6 +387,10 @@ int32_t HidDevice::ReplyReport(ReportType type, int id, const std::vector<uint8_
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
+    }
+    int error = CheckProfileState();
+    if (error != BT_NO_ERROR) {
+        return error;
     }
     return pimpl->ReplyReport(type, id, data);
 }
@@ -369,6 +401,10 @@ int32_t HidDevice::ReportError(ErrorReason type)
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
+    int error = CheckProfileState();
+    if (error != BT_NO_ERROR) {
+        return error;
+    }
     return pimpl->ReportError(type);
 }
 
@@ -378,6 +414,10 @@ int HidDevice::SetConnectStrategy(const BluetoothRemoteDevice &device, int strat
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
+    }
+    int error = CheckProfileState();
+    if (error != BT_NO_ERROR) {
+        return error;
     }
 
     if ((!device.IsValidBluetoothRemoteDevice()) || (
@@ -396,12 +436,27 @@ int HidDevice::GetConnectStrategy(const BluetoothRemoteDevice &device, int &stra
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
+    int error = CheckProfileState();
+    if (error != BT_NO_ERROR) {
+        return error;
+    }
 
     if (!device.IsValidBluetoothRemoteDevice()) {
         HILOGI("input parameter error.");
         return BT_ERR_INVALID_PARAM;
     }
     return pimpl->GetConnectStrategy(device, strategy);
+}
+
+int32_t HidDevice::CheckProfileState() const
+{
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    bool isProfileExist = false;
+    int32_t ret = proxy->IsProfileExist(PROFILE_HID_DEVICE_SERVER, isProfileExist);
+    CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, BT_ERR_INTERNAL_ERROR, "IPC fail");
+    CHECK_AND_RETURN_LOG_RET(isProfileExist, BT_ERR_API_NOT_SUPPORT, "failed: api not support");
+    return BT_NO_ERROR;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS
