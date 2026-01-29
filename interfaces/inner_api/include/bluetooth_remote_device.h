@@ -182,6 +182,15 @@ public:
     int GetRemoteDeviceBatteryInfo(DeviceBatteryInfo &batteryInfo) const;
 
     /**
+     * @brief A private solution for Audio Server to set device battery levele.
+     *
+     * @param batteryInfo the device battery info.
+     * @return Returns operation code
+     * @since 23
+     */
+    int SetRemoteDeviceBatteryInfo(const DeviceBatteryInfo &batteryInfo) const;
+
+    /**
      * @brief Get device pair state.
      *
      * @return Returns device pair state.
