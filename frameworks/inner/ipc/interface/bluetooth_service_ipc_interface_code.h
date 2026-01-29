@@ -339,6 +339,7 @@ enum BluetoothHostInterfaceCode {
     START_REMOTE_SDP_SEARCH,
     GET_REMOTE_SERVICES,
     SET_CONNECTION_PRIORITY,
+    IS_PROFILE_EXIST,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };

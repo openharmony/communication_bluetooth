@@ -158,6 +158,7 @@ public:
     virtual int32_t StartRemoteSdpSearch(const std::string &address, const std::string &uuid) = 0;
     virtual int32_t GetRemoteServices(const std::string &address) = 0;
     virtual int32_t SetConnectionPriority(const std::string &address, int32_t priority) = 0;
+    virtual int32_t IsProfileExist(const std::string &profileName, bool &isProfileExist) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

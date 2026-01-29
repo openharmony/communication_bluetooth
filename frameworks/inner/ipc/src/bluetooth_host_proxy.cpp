@@ -2147,5 +2147,26 @@ int32_t BluetoothHostProxy::SetConnectionPriority(const std::string &address, in
     }
     return reply.ReadInt32();
 }
+
+int32_t BluetoothHostProxy::IsProfileExist(const std::string &profileName, bool &isProfileExist)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "WriteToken err");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(profileName), BT_ERR_INTERNAL_ERROR, "write profileName error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::IS_PROFILE_EXIST, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("fail error: %{public}d", error);
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    int errCode = reply.ReadInt32();
+    if (errCode != BT_NO_ERROR) {
+        return errCode;
+    }
+    isProfileExist = reply.ReadBool();
+    return BT_NO_ERROR;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

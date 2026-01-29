@@ -247,6 +247,7 @@ public:
 private:
     HidDevice();
     ~HidDevice();
+    int32_t CheckProfileState() const;
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(HidDevice);
     BLUETOOTH_DECLARE_IMPL();
 #ifdef DTFUZZ_TEST
