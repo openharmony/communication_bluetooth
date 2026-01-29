@@ -65,7 +65,7 @@ static napi_status CheckCreateGattClientDeviceParams(napi_env env, napi_callback
         return napi_string_expected;
     }
     if (!IsValidAddress(deviceId)) {
-        HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
+        HILOGE("Invalid deviceId");
         return napi_invalid_arg;
     }
 

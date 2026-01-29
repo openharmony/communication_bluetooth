@@ -1294,7 +1294,6 @@ bool ConvertBtUuid(const BtUuid &inUuid, UUID &outUuid)
         return false;
     }
     string strUuid(inUuid.uuid);
-    HILOGD("UUID: %{public}s", strUuid.c_str());
     if (!IsValidUuid(strUuid)) {
         HILOGE("match the UUID faild.");
         return false;

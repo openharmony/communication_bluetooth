@@ -370,7 +370,7 @@ static napi_status ParseGattServerGetConnectState(
 
     NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], deviceId));
     if (!IsValidAddress(deviceId)) {
-        HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
+        HILOGE("Invalid deviceId");
         return napi_invalid_arg;
     }
     *outGattServer = gattServer;
@@ -481,7 +481,7 @@ static napi_status ParseSetPhyValue(napi_env env, napi_callback_info info, std::
     std::string deviceId {};
     NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], deviceId));
     if (!IsValidAddress(deviceId)) {
-        HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
+        HILOGE("Invalid deviceId");
         return napi_invalid_arg;
     }
     NAPI_BT_CALL_RETURN(NapiParseSetPhyValue(env, argv[PARAM1], outPhyValue));
@@ -533,7 +533,7 @@ static napi_status ParseReadPhyValue(napi_env env, napi_callback_info info,
     std::string deviceId {};
     NAPI_BT_CALL_RETURN(NapiParseBdAddr(env, argv[PARAM0], deviceId));
     if (!IsValidAddress(deviceId)) {
-        HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
+        HILOGE("Invalid deviceId");
         return napi_invalid_arg;
     }
     *outGattServer = gattServer;
