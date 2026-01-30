@@ -1034,6 +1034,24 @@ int32_t BluetoothHostProxy::GetRemoteDeviceBatteryInfo(const std::string &addres
     return ret;
 }
 
+int32_t BluetoothHostProxy::SetRemoteDeviceBatteryInfo(const std::string &address,
+    const BluetoothBatteryInfo &batteryInfo)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "write InterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(address), BT_ERR_INTERNAL_ERROR, "write address error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&batteryInfo), BT_ERR_INTERNAL_ERROR, "write batteryInfo error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SET_DEVICE_BATTERY_INFO, option, data, reply);
+    if (error != NO_ERROR) {
+        HILOGE("BluetoothHostProxy::SetRemoteDeviceBatteryInfo done fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadInt32();
+}
+
 int32_t BluetoothHostProxy::GetPairState(int32_t transport, const std::string &address, int32_t &pairState)
 {
     MessageParcel data;

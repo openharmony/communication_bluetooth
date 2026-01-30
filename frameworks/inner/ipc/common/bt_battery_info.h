@@ -62,7 +62,7 @@ public:
         batteryInfo_.ResetInfo();
     }
 public:
-    uint8_t batteryObtainType_ = 0; // 0 not exist,1 AT,2 ECHO,3 ALL
+    uint8_t batteryObtainType_ = 0; // 0 not exist,1 AT,2 ECHO,3 SYSTEM HAP
     BatteryInfo batteryInfo_;
 };
 }
