@@ -490,6 +490,8 @@ static napi_status GetHidDeviceCallback(napi_env env, napi_callback_info info, n
 
 napi_value NapiBluetoothHidDevice::RegisterHidDevice(napi_env env, napi_callback_info info)
 {
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "hid.registerHidDevice");
     BluetoothHidDeviceSdp sdpSetting;
     BluetoothHidDeviceQos inQos;
     BluetoothHidDeviceQos outQos;
@@ -511,6 +513,8 @@ napi_value NapiBluetoothHidDevice::RegisterHidDevice(napi_env env, napi_callback
 
 napi_value NapiBluetoothHidDevice::UnregisterHidDevice(napi_env env, napi_callback_info info)
 {
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "hid.unregisterHidDevice");
     napi_status status = CheckEmptyParam(env, info);
     NAPI_BT_ASSERT_ERR_NUM_RETURN(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     HidDevice *profile = HidDevice::GetProfile();
@@ -526,6 +530,8 @@ napi_value NapiBluetoothHidDevice::UnregisterHidDevice(napi_env env, napi_callba
 napi_value NapiBluetoothHidDevice::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "hid.connect");
     AddressInfo addressInfo;
     auto checkRet = CheckDeviceParam(env, info, addressInfo);
     NAPI_BT_ASSERT_ERR_NUM_RETURN(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
@@ -538,6 +544,8 @@ napi_value NapiBluetoothHidDevice::Connect(napi_env env, napi_callback_info info
 napi_value NapiBluetoothHidDevice::Disconnect(napi_env env, napi_callback_info info)
 {
     HILOGI("Disconnect called");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "hid.disconnect");
     napi_status status = CheckEmptyParam(env, info);
     NAPI_BT_ASSERT_ERR_NUM_RETURN(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
@@ -564,6 +572,8 @@ static napi_status CheckSendReport(napi_env env, napi_callback_info info,
 napi_value NapiBluetoothHidDevice::SendReport(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "hid.sendReport");
     int id {};
     std::vector<uint8_t> data {};
     auto status = CheckSendReport(env, info, id, data);
@@ -599,6 +609,8 @@ static napi_status CheckReplyReport(napi_env env, napi_callback_info info,
 napi_value NapiBluetoothHidDevice::ReplyReport(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "hid.replyReport");
     ReportType type = ReportType::REPORT_TYPE_INPUT;
     int id {};
     std::vector<uint8_t> data {};
@@ -633,6 +645,8 @@ static napi_status CheckReportError(napi_env env, napi_callback_info info, Error
 napi_value NapiBluetoothHidDevice::ReportError(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "hid.ReportError");
     ErrorReason errorReason = ErrorReason::RSP_UNKNOWN;
     auto status = CheckReportError(env, info, errorReason);
     NAPI_BT_ASSERT_ERR_NUM_RETURN(env, status == napi_ok, BT_ERR_INVALID_PARAM);
