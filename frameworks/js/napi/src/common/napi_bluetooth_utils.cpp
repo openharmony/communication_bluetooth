@@ -32,6 +32,7 @@
 #include "system_ability_definition.h"
 #include "bundle_mgr_proxy.h"
 #include <set>
+#include <sstream>
 
 namespace OHOS {
 namespace Bluetooth {
@@ -40,6 +41,7 @@ using namespace std;
 constexpr int OOB_C_SIZE = 16; // size of confirmationHash of OobData
 constexpr int OOB_R_SIZE = 16; // size of randomizerHash of OobData
 constexpr int OOB_NAME_MAX_SIZE = 256; // size limit of deviceName of OobData
+constexpr int ADDRESS_BYTE_LEN = 6;
 
 napi_value GetCallbackErrorValue(napi_env env, int errCode)
 {
@@ -767,7 +769,7 @@ napi_status ParseAddressInfoParam(napi_env env, napi_value object, AddressInfo &
     addressInfo.SetAddress(address);
 
     // addressType is not optional
-    int addressType = 0;
+    int32_t addressType = AddressType::UNSET_ADDRESS;
     NAPI_BT_CALL_RETURN(ParseInt32Params(env, object, "addressType", exist, addressType));
     bool isRealAddr = (addressType == AddressType::REAL_ADDRESS);
     bool isVirtualAddr = (addressType == AddressType::VIRTUAL_ADDRESS);
@@ -775,7 +777,7 @@ napi_status ParseAddressInfoParam(napi_env env, napi_value object, AddressInfo &
     addressInfo.SetAddressType(static_cast<uint8_t>(addressType));
 
     // rawAddressType is optional
-    int rawAddressType = 0;
+    int32_t rawAddressType = RawAddressType::UNSET_RAW_ADDRESS;
     NAPI_BT_CALL_RETURN(ParseInt32Params(env, object, "rawAddressType", exist, rawAddressType));
     if (exist) {
         bool isPublicAddr = (rawAddressType == RawAddressType::PUBLIC_ADDRESS);
@@ -799,13 +801,18 @@ void GetAddressWithType(const std::string &address, const uint8_t rawAddressType
     return;
 }
 
-napi_status ParseOobDataParam(napi_env env, napi_value object, const int32_t transport,
-    const AddressInfo &addressInfo, OobData &oobData)
+napi_status ParseOobDataParam(napi_env env, napi_value object, const int32_t transport, AddressInfo &addressInfo,
+    OobData &oobData)
 {
-    HILOGD("enter");
-    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"confirmationHash", "randomizerHash",
-        "deviceName"}));
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"deviceId", "confirmationHash", "randomizerHash",
+        "deviceName", "deviceRole"}));
     bool exist = false;
+
+    napi_value property;
+    NAPI_BT_CALL_RETURN(napi_get_named_property(env, object, "deviceId", &property));
+    NAPI_BT_CALL_RETURN(NapiIsObject(env, property));
+    NAPI_BT_CALL_RETURN(ParseAddressInfoParam(env, property, addressInfo));
+    NAPI_BT_RETURN_IF(!addressInfo.HasRawAddressType(), "rawAddressType must be given for OOB", napi_invalid_arg);
 
     // addressWithType is not optional
     bool isBRTransport = (transport == BT_TRANSPORT_BREDR);
@@ -836,6 +843,15 @@ napi_status ParseOobDataParam(napi_env env, napi_value object, const int32_t tra
         NAPI_BT_RETURN_IF(deviceName.empty() || deviceName.length() > OOB_NAME_MAX_SIZE,
             "size of deviceName should between 0 and 256", napi_invalid_arg);
         oobData.SetDeviceName(deviceName);
+    }
+
+    // deviceRole is optional
+    int32_t deviceRole = DEVICE_ROLE_PERIPHERAL_ONLY;
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, object, "deviceRole", exist, deviceRole));
+    if (exist) {
+        NAPI_BT_RETURN_IF((deviceRole < DEVICE_ROLE_PERIPHERAL_ONLY) || (deviceRole > DEVICE_ROLE_BOTH_PREFER_CENTRAL),
+            "invalid deviceRole", napi_invalid_arg);
+        oobData.SetDeviceRole(static_cast<uint8_t>(deviceRole));
     }
     return napi_ok;
 }
@@ -1118,6 +1134,38 @@ NapiMap CreateNapiMap(napi_env env)
     res.instance = map_instance;
     res.set_function = map_set;
     return res;
+}
+
+std::string UpperStr(const string &str)
+{
+    std::string upperString = str;
+    std::transform(upperString.begin(), upperString.end(), upperString.begin(), ::toupper);
+    return upperString;
+}
+
+std::string HexToString(uint8_t value)
+{
+    std::stringstream strStream;
+    // 用0补齐，避免单字节
+    strStream << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(value); // 2 表示强制两位十六进制
+    return strStream.str();
+}
+
+std::string BuildAddressString(const std::vector<uint8_t> &data)
+{
+    std::string addr = "";
+    if (data.size() != ADDRESS_BYTE_LEN) {
+        HILOGE("Invalid address length");
+        return addr;
+    }
+    for (size_t i = 0; i < ADDRESS_BYTE_LEN; i++) {
+        uint8_t temp = data[i];
+        addr += HexToString(temp);
+        if (i < ADDRESS_BYTE_LEN - 1) { // 判断是否为地址的最后一个字节
+            addr += ":";
+        }
+    }
+    return UpperStr(addr);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

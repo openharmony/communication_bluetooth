@@ -176,6 +176,7 @@
               "interface/i_bluetooth_hid_device_observer.h",
               "interface/i_bluetooth_host.h",
               "interface/i_bluetooth_host_observer.h",
+              "interface/i_bluetooth_oob_observer.h",
               "interface/i_bluetooth_map_mse.h",
               "interface/i_bluetooth_map_mse_observer.h",
               "interface/i_bluetooth_opp.h",

@@ -24,6 +24,7 @@
 #include "bluetooth_device_class.h"
 #include "bluetooth_battery_info.h"
 #include "bluetooth_oob_data.h"
+#include "bluetooth_address_info.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -48,6 +49,12 @@ public:
      * @since 21
      */
     BluetoothRemoteDevice(int32_t addressType, const std::string &addr, const int transport = BT_TRANSPORT_NONE);
+    /**
+     * @brief A structor used to create the <b>BluetoothRemoteDevice</b> instance.
+     *
+     * @since 23
+     */
+    BluetoothRemoteDevice(const AddressInfo &addressInfo, const int transport = BT_TRANSPORT_NONE);
     /**
      * @brief A destructor used to delete the <b>BluetoothRemoteDevice</b> instance.
      *
@@ -480,6 +487,7 @@ public:
 private:
     std::string address_ = "00:00:00:00:00:00";
     uint8_t addressType_ = AddressType::UNSET_ADDRESS; // to support real mac in some pair&connect APIs
+    uint8_t rawAddressType_ = RawAddressType::UNSET_RAW_ADDRESS;
     int transport_ = BT_TRANSPORT_NONE;
 };
 }  // namespace Bluetooth

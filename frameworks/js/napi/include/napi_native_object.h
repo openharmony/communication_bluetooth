@@ -113,6 +113,16 @@ private:
     int deviceClass_ = MajorClass::MAJOR_UNCATEGORIZED;
 };
 
+class NapiNativeOobData : public NapiNativeObject {
+public:
+    NapiNativeOobData(const OobData &data) : data_(data) {}
+    ~NapiNativeOobData() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    OobData data_;
+};
+
 class NapiNativePinRequiredParam : public NapiNativeObject {
 public:
     explicit NapiNativePinRequiredParam(const std::shared_ptr<PairConfirmedCallBackInfo> &pairConfirmInfo)

@@ -72,6 +72,16 @@ void BtOobData::SetOobDataType(const uint8_t oobDataType)
     oobDataType_ = oobDataType;
 }
 
+uint8_t BtOobData::GetDeviceRole() const
+{
+    return deviceRole_;
+}
+
+void BtOobData::SetDeviceRole(const uint8_t deviceRole)
+{
+    deviceRole_ = deviceRole;
+}
+
 bool BtOobData::HasOobData() const
 {
     return hasConfirmHash_ && hasAddressWithType_;
