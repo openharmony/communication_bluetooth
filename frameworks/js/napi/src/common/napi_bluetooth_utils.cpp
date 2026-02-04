@@ -31,6 +31,7 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "bundle_mgr_proxy.h"
+#include <iomanip>
 #include <set>
 #include <sstream>
 
