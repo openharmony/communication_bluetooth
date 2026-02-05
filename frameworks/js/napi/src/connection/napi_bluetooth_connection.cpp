@@ -1072,6 +1072,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
 #ifdef BLUETOOTH_API_SINCE_10
     napi_value bluetoothTransportObject = BluetoothTransportInit(env);
     napi_value pinTypeObject = PinTypeInit(env);
+    napi_value deviceRoleObject = DeviceRoleInit(env);
 #endif
     napi_value deviceTypeObject = DeviceTypeInit(env);
     napi_value deviceChargeStateObject = DeviceChargeStateInit(env);
@@ -1082,6 +1083,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_PROPERTY("BluetoothTransport", bluetoothTransportObject),
         DECLARE_NAPI_PROPERTY("PinType", pinTypeObject),
+        DECLARE_NAPI_PROPERTY("DeviceRole", deviceRoleObject),
 #endif
         DECLARE_NAPI_PROPERTY("DeviceType", deviceTypeObject),
         DECLARE_NAPI_PROPERTY("DeviceChargeState", deviceChargeStateObject),
@@ -1176,6 +1178,21 @@ napi_value PinTypeInit(napi_env env)
     SetNamedPropertyByInteger(
         env, pinType, static_cast<int>(PinType::PIN_TYPE_PIN_16_DIGITS), "PIN_TYPE_PIN_16_DIGITS");
     return pinType;
+}
+
+napi_value DeviceRoleInit(napi_env env)
+{
+    napi_value deviceRole = nullptr;
+    napi_create_object(env, &deviceRole);
+    SetNamedPropertyByInteger(
+        env, deviceRole, static_cast<int>(LeDeviceRole::DEVICE_ROLE_PERIPHERAL_ONLY), "DEVICE_ROLE_PERIPHERAL_ONLY");
+    SetNamedPropertyByInteger(
+        env, deviceRole, static_cast<int>(LeDeviceRole::DEVICE_ROLE_CENTRAL_ONLY), "DEVICE_ROLE_CENTRAL_ONLY");
+    SetNamedPropertyByInteger(env, deviceRole, static_cast<int>(LeDeviceRole::DEVICE_ROLE_BOTH_PREFER_PERIPHERAL),
+        "DEVICE_ROLE_BOTH_PREFER_PERIPHERAL");
+    SetNamedPropertyByInteger(env, deviceRole, static_cast<int>(LeDeviceRole::DEVICE_ROLE_BOTH_PREFER_CENTRAL),
+        "DEVICE_ROLE_BOTH_PREFER_CENTRAL");
+    return deviceRole;
 }
 #endif
 
