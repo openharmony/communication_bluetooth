@@ -747,9 +747,9 @@ struct ServerSocket::impl {
         host->GetRandomAddress(rawAddr.GetAddress(), randomAddr);
         acceptAddress_ = randomAddr;
 
-        CHECK_AND_RETURN_LOG_RET(rv >= TX_OFFSET, clientFd, "getTxPacketSize fail, invalid recvBufLen");
+        CHECK_AND_RETURN_LOG_RET(rv > TX_OFFSET, clientFd, "getTxPacketSize fail, invalid recvBufLen");
         maxTxPacketSize_ = GetPacketSizeFromBuf(recvBuf + TX_OFFSET, rv - TX_OFFSET);
-        CHECK_AND_RETURN_LOG_RET(rv >= RX_OFFSET, clientFd, "getRxPacketSize fail, invalid recvBufLen");
+        CHECK_AND_RETURN_LOG_RET(rv > RX_OFFSET, clientFd, "getRxPacketSize fail, invalid recvBufLen");
         maxRxPacketSize_ = GetPacketSizeFromBuf(recvBuf + RX_OFFSET, rv - RX_OFFSET);
         return clientFd;
     }
