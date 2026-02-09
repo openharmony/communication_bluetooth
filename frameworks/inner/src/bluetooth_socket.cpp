@@ -717,7 +717,7 @@ struct ServerSocket::impl {
         int rv = TEMP_FAILURE_RETRY(recvmsg(fd_, &msg, MSG_NOSIGNAL));
 #endif
         if (rv == -1) {
-            HILOGE("[sock] recvmsg error  %{public}d, fd: %{public}d", errno, fd_);
+            HILOGE("[sock] recvmsg error %{public}d, fd: %{public}d", errno, fd_);
             return BtStatus::BT_FAILURE;
         }
         struct cmsghdr *cmptr = CMSG_FIRSTHDR(&msg);
@@ -727,6 +727,16 @@ struct ServerSocket::impl {
             "recvmsg error, len:%{public}d level:%{public}d type:%{public}d",
             cmptr->cmsg_len, cmptr->cmsg_level, cmptr->cmsg_type);
         int clientFd = *(reinterpret_cast<int *>(CMSG_DATA(cmptr)));
+
+        if (rv != SOCKET_RECV_FD_SIGNAL) {
+            if (clientFd > 0) {
+                shutdown(clientFd, SHUT_RD);
+                shutdown(clientFd, SHUT_WR);
+                close(clientFd);
+            }
+            HILOGE("recv signal error, fd closed, fd: %{public}d", clientFd);
+            return INVALID_FD;
+        }
 
         uint8_t recvBuf[rv];
         (void)memset_s(&recvBuf, sizeof(recvBuf), 0, sizeof(recvBuf));
@@ -747,9 +757,7 @@ struct ServerSocket::impl {
         host->GetRandomAddress(rawAddr.GetAddress(), randomAddr);
         acceptAddress_ = randomAddr;
 
-        CHECK_AND_RETURN_LOG_RET(rv > TX_OFFSET, clientFd, "getTxPacketSize fail, invalid recvBufLen");
         maxTxPacketSize_ = GetPacketSizeFromBuf(recvBuf + TX_OFFSET, rv - TX_OFFSET);
-        CHECK_AND_RETURN_LOG_RET(rv > RX_OFFSET, clientFd, "getRxPacketSize fail, invalid recvBufLen");
         maxRxPacketSize_ = GetPacketSizeFromBuf(recvBuf + RX_OFFSET, rv - RX_OFFSET);
         return clientFd;
     }
