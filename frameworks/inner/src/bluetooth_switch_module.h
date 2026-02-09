@@ -21,6 +21,7 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <string>
 #include "ffrt_inner.h"
 
 namespace OHOS {
@@ -45,6 +46,11 @@ enum class BluetoothSwitchEvent : int {
     BLUETOOTH_HALF,
 };
 
+struct BluetoothSwitchCacheEvent {
+    BluetoothSwitchEvent event = BluetoothSwitchEvent::NONE;
+    std::string callingName = "";
+};
+
 class BluetoothSwitchModule : public std::enable_shared_from_this<BluetoothSwitchModule> {
 public:
     explicit BluetoothSwitchModule(std::unique_ptr<IBluetoothSwitchAction> switchAction)
@@ -61,12 +67,12 @@ private:
     int ProcessBluetoothOnEvent(void);
     int ProcessBluetoothOffEvent(void);
     int ProcessBluetoothHalfEvent(void);
-    int ProcessBluetoothSwitchAction(std::function<int(void)> action, BluetoothSwitchEvent cachedEvent);
-    int ProcessBluetoothSwitchCachedEvent(BluetoothSwitchEvent event);
+    int ProcessBluetoothSwitchAction(std::function<int(void)> action, BluetoothSwitchCacheEvent cachedEvent);
+    int ProcessBluetoothSwitchCachedEvent(BluetoothSwitchEvent event, const std::string &callingName);
     int ProcessBluetoothSwitchActionEnd(
         BluetoothSwitchEvent curSwitchActionEvent, std::vector<BluetoothSwitchEvent> expectedEventVec);
     void DeduplicateCacheEvent(BluetoothSwitchEvent curEvent);
-    void LogCacheEventIgnored(std::vector<BluetoothSwitchEvent> eventVec);
+    void LogCacheEventIgnored(std::vector<BluetoothSwitchCacheEvent> eventVec);
     void LogBluetoothSwitchEvent(BluetoothSwitchEvent event);
     void OnTaskTimeout(void);
 
@@ -77,7 +83,7 @@ private:
 
     std::unique_ptr<IBluetoothSwitchAction> switchAction_ { nullptr };
     std::atomic_bool isBtSwitchProcessing_ { false };
-    std::vector<BluetoothSwitchEvent> cachedEventVec_ {};
+    std::vector<BluetoothSwitchCacheEvent> cachedEventVec_ {};
     std::mutex bluetoothSwitchEventMutex_ {};  // Used for ProcessBluetoothSwitchEvent function
     std::atomic_bool noAutoConnect_ { false };
 };
