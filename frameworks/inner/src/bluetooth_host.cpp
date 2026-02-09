@@ -818,11 +818,11 @@ int BluetoothHost::EnableBle(std::string name, bool isAsync)
     return pimpl->switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::ENABLE_BLUETOOTH, name, isAsync);
 }
 
-int BluetoothHost::EnableBluetoothNoAutoConnect()
+int BluetoothHost::EnableBluetoothNoAutoConnect(std::string name)
 {
     HILOGI("enter");
     pimpl->switchModule_->SetNoAutoConnect(true);
-    return EnableBle();
+    return EnableBle(name);
 }
 
 int BluetoothHost::DisableBle()
