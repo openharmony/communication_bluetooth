@@ -729,12 +729,8 @@ struct ServerSocket::impl {
         int clientFd = *(reinterpret_cast<int *>(CMSG_DATA(cmptr)));
 
         if (rv != SOCKET_RECV_FD_SIGNAL) {
-            if (clientFd > 0) {
-                shutdown(clientFd, SHUT_RD);
-                shutdown(clientFd, SHUT_WR);
-                close(clientFd);
-            }
-            HILOGE("recv signal error, fd closed, fd: %{public}d", clientFd);
+            CloseFd(clientFd);
+            HILOGE("recv signal error, service closed");
             return INVALID_FD;
         }
 
@@ -760,6 +756,16 @@ struct ServerSocket::impl {
         maxTxPacketSize_ = GetPacketSizeFromBuf(recvBuf + TX_OFFSET, rv - TX_OFFSET);
         maxRxPacketSize_ = GetPacketSizeFromBuf(recvBuf + RX_OFFSET, rv - RX_OFFSET);
         return clientFd;
+    }
+
+    void CloseFd(int fd)
+    {
+        if (fd > 0) {
+            shutdown(fd, SHUT_RD);
+            shutdown(fd, SHUT_WR);
+            close(fd);
+            HILOGI("fd closed, fd: %{public}d", fd);
+        }
     }
 
     uint16_t GetPacketSizeFromBuf(uint8_t recvBuf[], int recvBufLen)
