@@ -45,7 +45,8 @@ struct BleAdvertiser::impl {
     int32_t CheckAdvertiserSettings(const BleAdvertiserSettings &settings);
     int32_t CheckAdvertiserData(const BluetoothBleAdvertiserSettings &setting,
         const BluetoothBleAdvertiserData &advData, const BluetoothBleAdvertiserData &scanResponse);
-    void WaitForAdvCallbackRegister();
+    void NotifyAdvCallbackRegistered();
+    void WaitForAdvCallbackRegistering();
 
     class BluetoothBleAdvertiserCallbackImp : public BluetoothBleAdvertiseCallbackStub {
     public:
@@ -222,10 +223,7 @@ void BleAdvertiser::impl::Init(std::weak_ptr<BleAdvertiser> advertiser)
         if (deathRecipient_ != nullptr) {
             proxy->AsObject()->AddDeathRecipient(deathRecipient_);
         }
-        std::unique_lock<std::mutex> lock(advInitLock);
-        CHECK_AND_RETURN_LOG(callbackImp_ != nullptr, "failed: null callbackImp_");
-        callbackImp_->isRegistered_ = true;
-        advInitCV.notify_all();
+        NotifyAdvCallbackRegistered();
     });
 }
 
@@ -355,7 +353,15 @@ int32_t BleAdvertiser::impl::CheckAdvertiserData(const BluetoothBleAdvertiserSet
     return BT_NO_ERROR;
 }
 
-void BleAdvertiser::impl::WaitForAdvCallbackRegister()
+void BleAdvertiser::impl::NotifyAdvCallbackRegistered()
+{
+    std::unique_lock<std::mutex> lock(advInitLock);
+    CHECK_AND_RETURN_LOG(callbackImp_ != nullptr, "failed: null callbackImp_");
+    callbackImp_->isRegistered_ = true;
+    advInitCV.notify_all();
+}
+
+void BleAdvertiser::impl::WaitForAdvCallbackRegistering()
 {
     std::unique_lock<std::mutex> lock(advInitLock);
     if (callbackImp_ == nullptr) {
@@ -406,7 +412,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     }
 
     HILOGD("duration=%{public}d", duration);
-    pimpl->WaitForAdvCallbackRegister();
+    pimpl->WaitForAdvCallbackRegistering();
     int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
     if (pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
         ret = proxy->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, false);
@@ -457,7 +463,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     bleScanResponse.SetPayload(std::string(scanResponse.begin(), scanResponse.end()));
 
     HILOGD("duration=%{public}d", duration);
-    pimpl->WaitForAdvCallbackRegister();
+    pimpl->WaitForAdvCallbackRegistering();
     int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
     if (pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
         ret = proxy->StartAdvertising(setting, bleAdvertiserData, bleScanResponse, advHandle, duration, true);
