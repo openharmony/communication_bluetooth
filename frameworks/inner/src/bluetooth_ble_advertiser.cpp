@@ -147,6 +147,7 @@ struct BleAdvertiser::impl {
             }
         }
 
+        // Callback register flag set true when BleAdvertiser init finished, set false when BleAdvertiser destructed
         bool isRegistered_ = false;
 
     private:
