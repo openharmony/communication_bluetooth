@@ -130,6 +130,7 @@ public:
     int32_t StartRemoteSdpSearch(const std::string &address, const std::string &uuid) override;
     int32_t GetRemoteServices(const std::string &address) override;
     int32_t SetConnectionPriority(const std::string &address, int32_t priority) override;
+    int32_t IsProfileExist(const std::string &profileName, bool &isProfileExist) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;
