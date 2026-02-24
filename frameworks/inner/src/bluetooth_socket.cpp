@@ -105,7 +105,7 @@ struct ClientSocket::impl {
             ReportDataToRss("close", fd_, "empty", IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
             HILOGI("fd closed, fd_: %{public}d", fd_);
             close(fd_);
-            fd_ = -1;
+            fd_ = INVALID_FD;
         }
     }
 
@@ -130,7 +130,7 @@ struct ClientSocket::impl {
                 ReportDataToRss("close", fd_, "empty", IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
                 HILOGI("fd closed, fd_: %{public}d", fd_);
                 close(fd_);
-                fd_ = -1;
+                fd_ = INVALID_FD;
             } else {
                 HILOGE("socket not created");
             }
@@ -478,7 +478,7 @@ int ClientSocket::Connect(int psm)
     CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "Connect error %{public}d", ret);
 
     HILOGI("fd_: %{public}d", pimpl->fd_);
-    CHECK_AND_RETURN_LOG_RET(pimpl->fd_ != -1, BtStatus::BT_FAILURE, "connect failed!");
+    CHECK_AND_RETURN_LOG_RET(pimpl->fd_ != INVALID_FD, BtStatus::BT_FAILURE, "connect failed!");
     CHECK_AND_RETURN_LOG_RET(pimpl->RecvSocketPsmOrScn(), BT_ERR_SPP_CONNECT_FAILED, "recv psm or scn failed");
 
     bool recvret = pimpl->RecvSocketSignal();
@@ -595,7 +595,7 @@ struct ServerSocket::impl {
             shutdown(fd_, SHUT_WR);
             close(fd_);
             HILOGI("fd closed, fd_: %{public}d", fd_);
-            fd_ = -1;
+            fd_ = INVALID_FD;
         }
     }
 
@@ -700,7 +700,6 @@ struct ServerSocket::impl {
 
     int RecvSocketFd()
     {
-        HILOGD("enter");
         char ccmsg[CMSG_SPACE(sizeof(int))];
         char buffer[SOCKET_RECV_FD_SIZE];
         struct iovec io = {.iov_base = buffer, .iov_len = sizeof(buffer)};
@@ -717,7 +716,7 @@ struct ServerSocket::impl {
         int rv = TEMP_FAILURE_RETRY(recvmsg(fd_, &msg, MSG_NOSIGNAL));
 #endif
         if (rv == -1) {
-            HILOGE("[sock] recvmsg error  %{public}d, fd: %{public}d", errno, fd_);
+            HILOGE("[sock] recvmsg error %{public}d, fd: %{public}d", errno, fd_);
             return BtStatus::BT_FAILURE;
         }
         struct cmsghdr *cmptr = CMSG_FIRSTHDR(&msg);
@@ -727,6 +726,12 @@ struct ServerSocket::impl {
             "recvmsg error, len:%{public}d level:%{public}d type:%{public}d",
             cmptr->cmsg_len, cmptr->cmsg_level, cmptr->cmsg_type);
         int clientFd = *(reinterpret_cast<int *>(CMSG_DATA(cmptr)));
+
+        if (rv != SOCKET_RECV_FD_SIGNAL) {
+            CloseFd(clientFd);
+            HILOGE("recv signal error, service closed");
+            return INVALID_FD;
+        }
 
         uint8_t recvBuf[rv];
         (void)memset_s(&recvBuf, sizeof(recvBuf), 0, sizeof(recvBuf));
@@ -750,6 +755,17 @@ struct ServerSocket::impl {
         maxTxPacketSize_ = GetPacketSizeFromBuf(recvBuf + TX_OFFSET, rv - TX_OFFSET);
         maxRxPacketSize_ = GetPacketSizeFromBuf(recvBuf + RX_OFFSET, rv - RX_OFFSET);
         return clientFd;
+    }
+
+    void CloseFd(int fd)
+    {
+        if (fd > 0) {
+            HILOGI("fd closed, fd: %{public}d", fd);
+            shutdown(fd, SHUT_RD);
+            shutdown(fd, SHUT_WR);
+            close(fd);
+            fd = INVALID_FD;
+        }
     }
 
     uint16_t GetPacketSizeFromBuf(uint8_t recvBuf[], int recvBufLen)
@@ -792,7 +808,7 @@ struct ServerSocket::impl {
                 shutdown(fd_, SHUT_WR);
                 HILOGI("fd closed, fd_: %{public}d", fd_);
                 close(fd_);
-                fd_ = -1;
+                fd_ = INVALID_FD;
                 sptr<IBluetoothSocket> proxy = GetRemoteProxy<IBluetoothSocket>(PROFILE_SOCKET);
                 CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
                 proxy->DeregisterServerObserver(observer_);
