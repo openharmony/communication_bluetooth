@@ -1240,13 +1240,13 @@ bool ConvertScanFilterParam(const BtLpDeviceParam *param, std::vector<BleScanFil
     }
     for (unsigned int i = 0; i < param->filterSize; i++) {
         BleScanNativeFilter nativeScanFilter = param->filter[i];
-        BleScanNativeFilterLog(nativeScanFilter);
         BleScanFilter scanFilter;
         int result = SetOneScanFilter(scanFilter, &nativeScanFilter);
         if (result != OHOS_BT_STATUS_SUCCESS) {
             HILOGE("SetOneScanFilter faild, result: %{public}d", result);
             return false;
         }
+        BleScanNativeFilterLog(nativeScanFilter);
         filter.push_back(scanFilter);
     }
     return true;
