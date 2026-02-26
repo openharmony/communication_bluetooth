@@ -36,7 +36,6 @@
 
 #include "bluetooth_def.h"
 #include "bluetooth_types.h"
-#include <sys/ioctl.h>
 
 namespace OHOS {
 namespace Bluetooth {
@@ -74,18 +73,8 @@ public:
      */
     ssize_t Read(uint8_t *buf, size_t length);
 
-    /**
-     * @brief poll() for sockets: efficiently manage socket connections for data reception.
-     *
-     * @return Returns the length greater than <b>0</b> as read the actual length.
-     *         Returns <b>-1</b> if the operation fails.
-     * @since 20
-     */
-    int PollWait();
-
 private:
     int socketFd_;
-    const int POLL_SIZE = 1;
     InputStream() = delete;
 };
 } // namespace Bluetooth
