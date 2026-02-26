@@ -102,6 +102,7 @@ napi_value UnbondCauseInit(napi_env env);
 #ifdef BLUETOOTH_API_SINCE_10
 napi_value BluetoothTransportInit(napi_env env);
 napi_value PinTypeInit(napi_env env);
+napi_value DeviceRoleInit(napi_env env);
 #endif
 
 napi_value DeviceTypeInit(napi_env env);
