@@ -22,7 +22,6 @@
 #include "bluetooth_socket_inputstream.h"
 #include <cerrno>
 #include "sys/socket.h"
-#include <poll.h>
 
 namespace OHOS {
 namespace Bluetooth {
@@ -31,20 +30,6 @@ InputStream::InputStream(int socketFd) : socketFd_(socketFd)
 
 InputStream::~InputStream()
 {}
-
-int InputStream::PollWait()
-{
-    struct pollfd fd[POLL_SIZE];
-    int availableBytes = 0;
-    fd[0].fd = socketFd_;
-    fd[0].events = POLLIN;
-    if ((poll(fd, 1, -1) > 0) && (fd[0].revents & POLLIN)) {
-        if (ioctl(socketFd_, FIONREAD, &availableBytes) == 0) {
-            return availableBytes;
-        }
-    }
-    return -1;
-}
 
 ssize_t InputStream::Read(uint8_t *buf, size_t length)
 {
