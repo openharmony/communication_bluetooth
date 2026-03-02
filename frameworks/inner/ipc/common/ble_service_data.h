@@ -551,6 +551,10 @@ public:
 
     int32_t GetRssiThreshold() const;
 
+    void SetLpDeviceFlag(bool enable);
+
+    bool GetLpDeviceFlag() const;
+
 private:
     std::string deviceId_;
     uint8_t addressType_ = AddressType::UNSET_ADDRESS; // real or virtual
@@ -580,6 +584,7 @@ private:
     uint8_t filtIndex_ = 0;
     uint8_t action_ = -1;
     int32_t rssiThreshold_ = BLE_SCAN_MIN_RSSI_THRESHOLD;
+    bool isLpDevice_ = false;
 };
 
 /**
