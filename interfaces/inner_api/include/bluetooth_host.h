@@ -441,11 +441,12 @@ public:
     /**
      * @brief Enable bluetooth without AutoConnect.
      *
+     * @param name Indicate the calling application to enable bluetooth. The default value is current application.
      * @return Returns <b>true</b> if the operation is accepted;
      *         returns <b>false</b> if the operation is rejected.
      * @since 16
      */
-    int EnableBluetoothNoAutoConnect();
+    int EnableBluetoothNoAutoConnect(std::string name = "");
 
     /**
      * @brief Enable bluetooth to restrict mode.

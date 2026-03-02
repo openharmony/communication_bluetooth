@@ -83,11 +83,11 @@ void BluetoothSwitchModule::OnTaskTimeout(void)
 }
 
 int BluetoothSwitchModule::ProcessBluetoothSwitchAction(
-    std::function<int(void)> action, BluetoothSwitchEvent cachedEvent)
+    std::function<int(void)> action, BluetoothSwitchCacheEvent cachedEvent)
 {
     if (isBtSwitchProcessing_.load()) {
         cachedEventVec_.push_back(cachedEvent);
-        HILOGW("BtSwich action is processing, cache the %{public}s event", ToString(cachedEvent));
+        HILOGW("BtSwich action is processing, cache the %{public}s event", ToString(cachedEvent.event));
         return BT_NO_ERROR;
     }
 
@@ -121,6 +121,11 @@ int BluetoothSwitchModule::ProcessBluetoothSwitchAction(
 
 int BluetoothSwitchModule::ProcessEnableBluetoothEvent(const std::string &callingName, bool isAsync)
 {
+    BluetoothSwitchCacheEvent cachedEvent = {
+        .event = BluetoothSwitchEvent::ENABLE_BLUETOOTH,
+        .callingName = callingName,
+    };
+
     return ProcessBluetoothSwitchAction(
         [this, callingName, isAsync]() {
             bool noAutoConnect = noAutoConnect_.load();
@@ -129,21 +134,31 @@ int BluetoothSwitchModule::ProcessEnableBluetoothEvent(const std::string &callin
             }
             return switchAction_->EnableBluetooth(noAutoConnect, callingName, isAsync);
         },
-        BluetoothSwitchEvent::ENABLE_BLUETOOTH);
+        cachedEvent);
 }
 
 int BluetoothSwitchModule::ProcessDisableBluetoothEvent(const std::string &callingName, bool isAsync)
 {
+    BluetoothSwitchCacheEvent cachedEvent = {
+        .event = BluetoothSwitchEvent::DISABLE_BLUETOOTH,
+        .callingName = callingName,
+    };
+
     return ProcessBluetoothSwitchAction(
         [this, callingName, isAsync]() { return switchAction_->DisableBluetooth(callingName, isAsync); },
-        BluetoothSwitchEvent::DISABLE_BLUETOOTH);
+        cachedEvent);
 }
 
 int BluetoothSwitchModule::ProcessEnableBluetoothToRestrictModeEvent(const std::string &callingName)
 {
+    BluetoothSwitchCacheEvent cachedEvent = {
+        .event = BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_RESTRICE_MODE,
+        .callingName = callingName,
+    };
+
     return ProcessBluetoothSwitchAction(
         [this, callingName]() { return switchAction_->EnableBluetoothToRestrictMode(callingName); },
-        BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_RESTRICE_MODE);
+        cachedEvent);
 }
 
 int BluetoothSwitchModule::ProcessBluetoothOnEvent(void)
@@ -175,33 +190,34 @@ int BluetoothSwitchModule::ProcessBluetoothSwitchActionEnd(
     DeduplicateCacheEvent(curSwitchActionEvent);
 
     // Expect process the next event is in 'expectedProcessEventVec'
-    auto it = std::find_if(cachedEventVec_.begin(), cachedEventVec_.end(), [&expectedEventVec](auto event) {
-        return std::find(expectedEventVec.begin(), expectedEventVec.end(), event) != expectedEventVec.end();
+    auto it = std::find_if(cachedEventVec_.begin(), cachedEventVec_.end(), [&expectedEventVec](auto cacheEvent) {
+        return std::find(expectedEventVec.begin(), expectedEventVec.end(), cacheEvent.event) != expectedEventVec.end();
     });
     if (it != cachedEventVec_.end()) {
         if (it != cachedEventVec_.begin()) {
-            LogCacheEventIgnored(std::vector<BluetoothSwitchEvent>(cachedEventVec_.begin(), it));
+            LogCacheEventIgnored(std::vector<BluetoothSwitchCacheEvent>(cachedEventVec_.begin(), it));
         }
         // Ignore the cached event before 'expectedEventVec'
-        BluetoothSwitchEvent event = *it;
+        BluetoothSwitchEvent event = (*it).event;
+        std::string callingName = (*it).callingName;
         cachedEventVec_.erase(cachedEventVec_.begin(), it + 1);
-        return ProcessBluetoothSwitchCachedEvent(event);
+        return ProcessBluetoothSwitchCachedEvent(event, callingName);
     }
 
     cachedEventVec_.clear();
     return BT_NO_ERROR;
 }
 
-int BluetoothSwitchModule::ProcessBluetoothSwitchCachedEvent(BluetoothSwitchEvent event)
+int BluetoothSwitchModule::ProcessBluetoothSwitchCachedEvent(BluetoothSwitchEvent event, const std::string &callingName)
 {
     HILOGI("Auto process cached %{public}s event", ToString(event));
-    ffrtQueue_.submit([switchWptr = weak_from_this(), event]() {
+    ffrtQueue_.submit([switchWptr = weak_from_this(), event, callingName]() {
         auto switchSptr = switchWptr.lock();
         if (switchSptr == nullptr) {
             HILOGE("switchSptr is nullptr");
             return;
         }
-        switchSptr->ProcessBluetoothSwitchEvent(event);
+        switchSptr->ProcessBluetoothSwitchEvent(event, callingName);
     });
     return BT_NO_ERROR;
 }
@@ -209,23 +225,24 @@ int BluetoothSwitchModule::ProcessBluetoothSwitchCachedEvent(BluetoothSwitchEven
 void BluetoothSwitchModule::DeduplicateCacheEvent(BluetoothSwitchEvent curEvent)
 {
     // 从缓存事件列表里，找到最后一个 curEvent，保留该事件之后的缓存事件
-    auto it = std::find(cachedEventVec_.rbegin(), cachedEventVec_.rend(), curEvent);
+    auto it = std::find_if(cachedEventVec_.rbegin(), cachedEventVec_.rend(),
+        [&curEvent](const BluetoothSwitchCacheEvent &cachedEvent) { return cachedEvent.event == curEvent; });
     if (it != cachedEventVec_.rend()) {
         // The it.base() is greater than cachedEventVec_.begin(), so std::distance > 0.
         size_t pos = static_cast<size_t>(std::distance(cachedEventVec_.begin(), it.base())) - 1;
 
         LogCacheEventIgnored(
-            std::vector<BluetoothSwitchEvent>(cachedEventVec_.begin(), cachedEventVec_.begin() + pos + 1));
+            std::vector<BluetoothSwitchCacheEvent>(cachedEventVec_.begin(), cachedEventVec_.begin() + pos + 1));
         cachedEventVec_.erase(cachedEventVec_.begin(), cachedEventVec_.begin() + pos + 1);
     }
 }
 
-void BluetoothSwitchModule::LogCacheEventIgnored(std::vector<BluetoothSwitchEvent> eventVec)
+void BluetoothSwitchModule::LogCacheEventIgnored(std::vector<BluetoothSwitchCacheEvent> eventVec)
 {
     std::string log = "";
     for (size_t i = 0; i < eventVec.size(); i++) {
         // The last event current process event, not ignored
-        log += ToString(eventVec[i]);
+        log += ToString(eventVec[i].event);
         log += " ";
     }
     if (!log.empty()) {
