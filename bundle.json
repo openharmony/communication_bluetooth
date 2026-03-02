@@ -39,8 +39,7 @@
     "subsystem": "communication",
     "syscap": [
       "SystemCapability.Communication.Bluetooth.Core",
-      "SystemCapability.Communication.Bluetooth.Lite",
-      "SystemCapability.Communication.FusionConnectivity.Core"
+      "SystemCapability.Communication.Bluetooth.Lite"
     ],
     "features": [
       "bluetooth_kia_enable"
