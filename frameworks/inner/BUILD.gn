@@ -109,6 +109,7 @@ FwkIpcSrc = [
   "$BT_IPCSRC_DIR/bluetooth_socket_observer_stub.cpp",
   "$BT_IPCSRC_DIR/bluetooth_audio_manager_proxy.cpp",
   "$BT_IPCSRC_DIR/bluetooth_resource_manager_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_oob_observer_stub.cpp",
 ]
 
 config("btframework_config") {

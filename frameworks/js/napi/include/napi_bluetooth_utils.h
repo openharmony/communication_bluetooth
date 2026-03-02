@@ -552,8 +552,8 @@ napi_status ParseUint8ArrayParam(napi_env env, napi_value array, std::vector<uin
 napi_status NapiParseObjectUint8Array(napi_env env, napi_value object, const char *name, bool &outExist,
     std::vector<uint8_t> &outParam);
 napi_status ParseAddressInfoParam(napi_env env, napi_value object, AddressInfo &addressInfo);
-napi_status ParseOobDataParam(napi_env env, napi_value object, const int32_t transport,
-    const AddressInfo &addressInfo, OobData &oobData);
+napi_status ParseOobDataParam(napi_env env, napi_value object, const int32_t transport, AddressInfo &addressInfo,
+    OobData &oobData);
 napi_status ParseUuidParams(napi_env env, napi_value object, const char *name, bool &outExist, UUID &outUuid);
 
 bool CheckDeivceIdParam(napi_env env, napi_callback_info info, std::string &addr);
@@ -573,6 +573,10 @@ napi_status NapiParseSetPhyValue(napi_env env, napi_value object, BlePhyInfo &ph
 
 int GetCurrentSdkVersion(void);
 int GetSDKAdaptedStatusCode(int status);
+void GetAddressWithType(const std::string &address, const uint8_t rawAddressType,
+    std::vector<uint8_t> &addressWithType);
+std::string HexToString(uint8_t value);
+std::string BuildAddressString(const std::vector<uint8_t> &data);
 
 NapiMap CreateNapiMap(napi_env env);
 template <typename KeyType>

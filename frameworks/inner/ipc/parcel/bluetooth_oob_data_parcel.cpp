@@ -46,6 +46,9 @@ bool BluetoothOobData::Marshalling(Parcel &parcel) const
     if (!parcel.WriteUint8(oobDataType_)) {
         return false;
     }
+    if (!parcel.WriteUint8(deviceRole_)) {
+        return false;
+    }
     return true;
 }
 
@@ -91,6 +94,9 @@ bool BluetoothOobData::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!parcel.ReadUint8(oobDataType_)) {
+        return false;
+    }
+    if (!parcel.ReadUint8(deviceRole_)) {
         return false;
     }
     return true;

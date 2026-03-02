@@ -74,6 +74,7 @@ napi_value DeRegisterConnectionObserver(napi_env env, napi_callback_info info);
 napi_value SetDevicePinCode(napi_env env, napi_callback_info info);
 napi_value CancelPairingDevice(napi_env env, napi_callback_info info);
 napi_value PairCredibleDevice(napi_env env, napi_callback_info info);
+napi_value GenerateLocalOobData(napi_env env, napi_callback_info info);
 napi_value PairDeviceOutOfBand(napi_env env, napi_callback_info info);
 napi_value GetLocalProfileUuids(napi_env env, napi_callback_info info);
 napi_value GetRemoteProfileUuids(napi_env env, napi_callback_info info);
@@ -101,6 +102,7 @@ napi_value UnbondCauseInit(napi_env env);
 #ifdef BLUETOOTH_API_SINCE_10
 napi_value BluetoothTransportInit(napi_env env);
 napi_value PinTypeInit(napi_env env);
+napi_value DeviceRoleInit(napi_env env);
 #endif
 
 napi_value DeviceTypeInit(napi_env env);

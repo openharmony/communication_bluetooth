@@ -287,6 +287,31 @@ public:
 };
 
 /**
+ * @brief Represents bluetooth oob callback.
+ *
+ * @since 23
+ */
+class BluetoothOobCallback {
+public:
+    /**
+     * @brief A destructor used to delete the <b>BluetoothOobCallback</b> instance.
+     *
+     * @since 23
+     */
+    virtual ~BluetoothOobCallback() = default;
+
+    /**
+     * @brief Bluetooth generate local oob data callback.
+     *
+     * @param ret Return of generate local oob data callback.
+     * @param oobData Local oob data.
+     * @since 23
+     */
+    virtual void OnGenerateLocalOobData(int32_t ret, const OobData &oobData)
+    {};
+};
+
+/**
  * @brief Represents framework host device.
  *
  * @since 6
@@ -580,6 +605,17 @@ public:
      * @since 6
      */
     int GetLocalName(std::string &name) const;
+
+    /**
+     * @brief Get local oob data.
+     *
+     * @param transport Adapter transport.
+     * @param callback Bluetooth connect callback.
+     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+     *         returns an error code defined in {@link BtErrCode} otherwise.
+     * @since 23
+     */
+    int GenerateLocalOobData(int transport, std::shared_ptr<BluetoothOobCallback> callback) const;
 
     /**
      * @brief Set local device name.
