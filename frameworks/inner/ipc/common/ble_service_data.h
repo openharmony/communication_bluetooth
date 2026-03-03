@@ -1364,7 +1364,7 @@ private:
     /// tx power
     int8_t txPower_ {};
     /// Timestamp when the scan result was observed.
- 	uint16_t timestamp_ = 0;
+    uint16_t timestamp_ = 0;
     /// service data
     std::vector<std::string> serviceData_ {};
     /// service data uuid
