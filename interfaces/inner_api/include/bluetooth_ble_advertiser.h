@@ -539,6 +539,15 @@ public:
      */
     std::vector<std::shared_ptr<BleAdvertiseCallback>> GetAdvObservers();
 
+    /**
+    * @brief Set Advertisement Data or Scan Response Data
+    *
+    * @param advHandle Advertising handle.
+    * @since 22
+    */
+    void SetAdvOrRspData(const std::vector<uint8_t> &data, bool isAdv,
+        std::shared_ptr<BleAdvertiseCallback> callback);
+
 private:
     BleAdvertiser();
     BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(BleAdvertiser);

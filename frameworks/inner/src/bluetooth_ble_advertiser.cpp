@@ -476,6 +476,29 @@ void BleAdvertiser::SetAdvertisingData(const std::vector<uint8_t> &advData, cons
     proxy->SetAdvertisingData(bleAdvertiserData, bleScanResponse, advHandle);
 }
 
+void BleAdvertiser::SetAdvOrRspData(const std::vector<uint8_t> &data, bool isAdvData,
+    std::shared_ptr<BleAdvertiseCallback> callback)
+{
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return;
+    }
+    sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+
+    CHECK_AND_RETURN_LOG(callback != nullptr, "callback is nullptr");
+
+    int advHandle = BLE_INVALID_ADVERTISING_HANDLE;
+    if (!pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
+        HILOGE("Advertising is not started");
+        return;
+    }
+
+    BluetoothBleAdvertiserData bleAdvData;
+    bleAdvData.SetPayload(std::string(data.begin(), data.end()));
+    proxy->SetAdvOrRspData(bleAdvData, isAdvData, advHandle);
+}
+
 int BleAdvertiser::ChangeAdvertisingParams(uint8_t advHandle, const BleAdvertiserSettings &settings)
 {
     CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");

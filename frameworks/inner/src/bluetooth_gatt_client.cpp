@@ -843,6 +843,29 @@ int GattClient::ReadCharacteristic(GattCharacteristic &characteristic)
     return result;
 }
 
+int GattClient::ReadUsingCharacteristicUuid(const std::string& uuid, int startHandle, int endHandle)
+{
+    CHECK_AND_RETURN_LOG_RET(IsValidUuid(uuid), BT_ERR_INTERNAL_ERROR, "failed: invalid uuid");
+    CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    CHECK_AND_RETURN_LOG_RET(pimpl != nullptr && pimpl->Init(weak_from_this()),
+        BT_ERR_INTERNAL_ERROR, "pimpl or gatt client proxy is nullptr");
+    
+    std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
+    CHECK_AND_RETURN_LOG_RET(!pimpl->requestInformation_.doing_, BT_ERR_OPERATION_BUSY, "Remote device busy");
+    int result = GattStatus::GATT_FAILURE;
+    HILOGI("applicationId: %{public}d, startHandle: 0x%{public}04X, endHandle: 0x%{public}04X",
+        pimpl->applicationId_, startHandle, endHandle);
+    sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    result = proxy->ReadUsingCharacteristicUuid(pimpl->applicationId_, uuid, startHandle, endHandle);
+    HILOGI("result: %{public}d", result);
+    if (result == BT_NO_ERROR) {
+        pimpl->requestInformation_.doing_ = true;
+        pimpl->requestInformation_.type_ = REQUEST_TYPE_CHARACTERISTICS_READ;
+    }
+    return result;
+}
+
 int GattClient::ReadDescriptor(GattDescriptor &descriptor)
 {
     HILOGI("enter");

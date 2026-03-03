@@ -676,6 +676,16 @@ public:
         advertiseFlag_ = flag;
     }
 
+    void SetTimestamp(uint16_t timestamp)
+    {
+        timestamp_ = timestamp;
+    }
+
+    uint16_t GetTimestamp()
+    {
+        return timestamp_;
+    }
+
     void SetPayload(const std::string &payload)
     {
         payload_ = payload;

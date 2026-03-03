@@ -828,6 +828,14 @@ public:
     int8_t GetTXPower() const;
 
     /**
+    * @brief Get Timestamp data.
+    *
+    * @return Returns device timestamp.
+    * @since 22
+    */
+    uint16_t GetTimestamp() const;
+
+    /**
      * @brief Get advertising data.
      *
      * @return Returns advertising data.
@@ -943,6 +951,15 @@ public:
     * @since 22
     */
     bool IsTXPower() const;
+
+    /**
+    * @brief Check if the device timestamp is included.
+    *
+    * @return Returns <b>true</b> if include device timeStamp;
+    *         Returns <b>false</b> otherwise.
+    * @since 22
+    */
+    bool IsTimestamp() const;
 
     /**
     * @brief Check if advertising data is included.
@@ -1227,6 +1244,14 @@ public:
     void SetManufacturerData(std::string manufacturerData);
 
     /**
+    * @brief Set Timestamp data.
+    *
+    * @param timestamp Timestamp at which the scan result was observed.
+    * @since 22
+    */
+    void SetTimestamp(uint16_t timestamp);
+
+    /**
      * @brief Add advertising data.
      *
      * @param advType Type of advertising data.
@@ -1306,6 +1331,8 @@ private:
     bool isManufacturerData_ = false;
     /// include device name?
     bool isName_ = false;
+    /// include timestamp?
+    bool isTimestamp_ = false;
     /// include rssi value?
     bool isRSSI_ = false;
     /// include advertising data value?
@@ -1336,6 +1363,8 @@ private:
     std::vector<Uuid> serviceUUIDs_ {};
     /// tx power
     int8_t txPower_ {};
+    /// Timestamp when the scan result was observed.
+ 	uint16_t timestamp_ = 0;
     /// service data
     std::vector<std::string> serviceData_ {};
     /// service data uuid

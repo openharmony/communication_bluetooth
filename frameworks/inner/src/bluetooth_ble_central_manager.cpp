@@ -80,6 +80,7 @@ struct BleCentralManager::impl {
             scanResult.SetName(tempResult.GetName());
             scanResult.SetEventType(tempResult.GetEventType());
             scanResult.SetTxPowerLevel(tempResult.GetTxPowerLevel());
+            scanResult.SetTimestamp(tempResult.GetTimestamp());
             BluetoothAddress address(tempResult.GetPeripheralDevice().GetAddress(), tempResult.GetAddressType(),
                 tempResult.GetRawAddressType());
             scanResult.SetAddress(address);
@@ -586,6 +587,23 @@ int BleCentralManager::ChangeScanParams(const BleScanSettings &settings, const s
     return proxy->ChangeScanParams(pimpl->scannerId_, parcelSetting, parcelFilters, filterAction);
 }
 
+int BleCentralManager::FlushBatchScanResults()
+{
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    std::lock_guard<std::mutex> lock(pimpl->scannerIdMutex_);
+    CHECK_AND_RETURN_LOG_RET((pimpl->scannerId_ != BLE_SCAN_INVALID_ID), BT_ERR_INVALID_PARAM, "scannerId invalid");
+    HILOGI("scannerId:%{public}d", pimpl->scannerId_);
+
+    sptr<IBluetoothBleCentralManager> proxy =
+        GetRemoteProxy<IBluetoothBleCentralManager>(BLE_CENTRAL_MANAGER_SERVER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    return proxy->FlushBatchScanResults(pimpl->scannerId_);
+}
+
 void BleCentralManager::SetNewApiFlag()
 {
     isNewApi_ = true;
@@ -729,6 +747,16 @@ void BleScanResult::SetEventType(uint16_t eventType)
 uint16_t BleScanResult::GetEventType(void) const
 {
     return eventType_;
+}
+
+void BleScanResult::SetTimestamp(uint16_t timestamp)
+{
+    timestamp_ = timestamp;
+}
+
+uint16_t BleScanResult::GetTimestamp(void) const
+{
+    return timestamp_;
 }
 
 void BleScanResult::SetAddress(const BluetoothAddress &address)

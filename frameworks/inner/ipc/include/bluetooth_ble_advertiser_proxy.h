@@ -40,6 +40,8 @@ public:
     void SetAdvertisingData(const BluetoothBleAdvertiserData &advData,
         const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle) override;
     int ChangeAdvertisingParams(uint8_t advHandle, const BluetoothBleAdvertiserSettings &settings) override;
+    void SetAdvOrRspData(const BluetoothBleAdvertiserData &bleAdvData,
+ 	    bool isAdv, int32_t advHandle) override;
 
 private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);

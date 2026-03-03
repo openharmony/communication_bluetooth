@@ -70,6 +70,10 @@ ScanResult::ScanResult(const BleScanResultImpl &other)
         }
     }
 
+    if (device.IsTimestamp()) {
+ 	    this->SetTimestamp(device.GetTimestamp());
+ 	}
+    
     this->SetPeripheralDevice(device.GetRawAddress());
     this->SetPayload(std::string(device.GetPayload(), device.GetPayload() + device.GetPayloadLen()));
 }

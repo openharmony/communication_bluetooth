@@ -38,6 +38,8 @@ public:
     int Disconnect(int32_t appId) override;
     int DiscoveryServices(int32_t appId) override;
     int ReadCharacteristic(int32_t appId, const BluetoothGattCharacteristic &characteristic) override;
+    int ReadUsingCharacteristicUuid(int32_t appId, const std::string& uuid,
+ 	    int startHandle, int endHandle) override;
     int WriteCharacteristic(int32_t appId, BluetoothGattCharacteristic *characteristic, bool withoutRespond,
         bool isWithContext) override;
     int SignedWriteCharacteristic(int32_t appId, BluetoothGattCharacteristic *characteristic) override;
