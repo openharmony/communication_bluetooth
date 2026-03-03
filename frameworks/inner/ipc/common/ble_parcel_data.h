@@ -751,6 +751,7 @@ public:
     uint16_t eventType_{};
     int8_t txPowerLevel_ {};
     std::map<uint8_t, std::string> advertisingData_ {};
+    uint16_t timestamp_{};
 };
 
 /**
