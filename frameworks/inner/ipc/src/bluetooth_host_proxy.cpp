@@ -1662,6 +1662,31 @@ int32_t BluetoothHostProxy::GetRandomAddress(const std::string &realAddr, std::s
     return exception;
 }
 
+int32_t BluetoothHostProxy::GetRealAddress(const std::string &randomAddr, std::string &realAddr)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::GetRealAddress WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteString(randomAddr)) {
+        HILOGE("BluetoothHostProxy::GetRealAddress Write randomAddr error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_REAL_ADDRESS, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::GetRealAddress fail, error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    int32_t exception = reply.ReadInt32();
+    if (exception == BT_NO_ERROR) {
+        realAddr = reply.ReadString();
+    }
+    return exception;
+}
+
 int32_t BluetoothHostProxy::SyncRandomAddress(const std::string &realAddr, const std::string &randomAddr)
 {
     MessageParcel data;
