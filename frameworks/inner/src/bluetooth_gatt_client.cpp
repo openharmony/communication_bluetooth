@@ -846,6 +846,7 @@ int GattClient::ReadCharacteristic(GattCharacteristic &characteristic)
 int GattClient::ReadUsingCharacteristicUuid(const std::string& uuid, int startHandle, int endHandle)
 {
     CHECK_AND_RETURN_LOG_RET(IsValidUuid(uuid), BT_ERR_INTERNAL_ERROR, "failed: invalid uuid");
+    CHECK_AND_RETURN_LOG_RET(startHandle <= endHandle, BT_ERR_INTERNAL_ERROR, "invalid handle range");
     CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     CHECK_AND_RETURN_LOG_RET(pimpl != nullptr && pimpl->Init(weak_from_this()),
         BT_ERR_INTERNAL_ERROR, "pimpl or gatt client proxy is nullptr");
