@@ -54,6 +54,7 @@ void NapiGattServer::DefineGattServerJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("notifyCharacteristicChanged", NotifyCharacteristicChangedEx),
         DECLARE_NAPI_FUNCTION("setPhy", SetPhy),
         DECLARE_NAPI_FUNCTION("readPhy", ReadPhy),
+        DECLARE_NAPI_FUNCTION("removeAllServices", RemoveAllServices),
 #else
         DECLARE_NAPI_FUNCTION("startAdvertising", StartAdvertising),
         DECLARE_NAPI_FUNCTION("stopAdvertising", StopAdvertising),
@@ -565,6 +566,18 @@ napi_value NapiGattServer::ReadPhy(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
+}
+
+napi_value NapiGattServer::RemoveAllServices(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::shared_ptr<GattServer> server {nullptr};
+    auto status = CheckGattsEmptyParam(env, info, server);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
+
+    int ret = server->ClearServices();
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+    return NapiGetUndefinedRet(env);
 }
 #else
 static napi_status CheckGattsNotify(napi_env env, napi_callback_info info, std::shared_ptr<GattServer> &outServer,

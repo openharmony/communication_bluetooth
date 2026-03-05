@@ -27,7 +27,7 @@ public:
     ~BluetoothGattServerProxy(){};
 
     int AddService(int32_t appId, BluetoothGattService *services) override;
-    void ClearServices(int appId) override;
+    int ClearServices(int appId) override;
     int Connect(int appId, const BluetoothGattDevice &device, bool isDirect) override;
     int CancelConnection(int appId, const BluetoothGattDevice &device) override;
     int RegisterApplication(const sptr<IBluetoothGattServerCallback> &callback) override;

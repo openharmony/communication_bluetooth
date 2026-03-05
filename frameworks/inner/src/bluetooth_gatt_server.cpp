@@ -683,20 +683,21 @@ int GattServer::AddService(GattService &service)
     return ret;
 }
 
-void GattServer::ClearServices()
+int GattServer::ClearServices()
 {
     HILOGD("enter");
     if (!IS_BLE_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return;
+        return BT_ERR_INVALID_STATE;
     }
 
     sptr<IBluetoothGattServer> proxy = GetRemoteProxy<IBluetoothGattServer>(PROFILE_GATT_SERVER);
-    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "failed: no proxy");
 
     int appId = pimpl->applicationId_;
-    proxy->ClearServices(int(appId));
+    int ret = proxy->ClearServices(int(appId));
     pimpl->gattServices_.clear();
+    return ret;
 }
 
 int GattServer::Close()

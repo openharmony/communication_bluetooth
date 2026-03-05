@@ -47,6 +47,7 @@ public:
     static napi_value NotifyCharacteristicChangedEx(napi_env env, napi_callback_info info);
     static napi_value SetPhy(napi_env env, napi_callback_info info);
     static napi_value ReadPhy(napi_env env, napi_callback_info info);
+    static napi_value RemoveAllServices(napi_env env, napi_callback_info info);
 #else
     static napi_value NotifyCharacteristicChanged(napi_env env, napi_callback_info info);
 #endif

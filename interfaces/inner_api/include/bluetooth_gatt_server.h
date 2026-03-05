@@ -241,10 +241,11 @@ public:
     /**
      * @brief The function to clear all services.
      *
+     * @return int
      * @since 6
      *
      */
-    void ClearServices();
+    int ClearServices();
     /**
      * @brief The function to clear all services.
      *

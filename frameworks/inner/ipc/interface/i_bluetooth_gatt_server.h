@@ -31,7 +31,7 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothGattServer");
 
     virtual int AddService(int32_t appId, BluetoothGattService *services) = 0;
-    virtual void ClearServices(int appId) = 0;
+    virtual int ClearServices(int appId) = 0;
     virtual int RegisterApplication(const sptr<IBluetoothGattServerCallback> &callback) = 0;
     virtual int DeregisterApplication(int appId) = 0;
     virtual int Connect(int appId, const BluetoothGattDevice &device, bool isDirect) = 0;
