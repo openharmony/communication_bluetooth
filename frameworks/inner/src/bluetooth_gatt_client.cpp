@@ -852,6 +852,11 @@ int GattClient::ReadUsingCharacteristicUuid(const std::string& uuid, int startHa
         BT_ERR_INTERNAL_ERROR, "pimpl or gatt client proxy is nullptr");
     
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
+    if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED) || !pimpl->isRegisterSucceeded_) {
+        HILOGE("Request not supported");
+        return BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED;
+    }
+    std::lock_guard<std::mutex> lck(pimpl->requestInformation_.mutex_);
     CHECK_AND_RETURN_LOG_RET(!pimpl->requestInformation_.doing_, BT_ERR_OPERATION_BUSY, "Remote device busy");
     int result = GattStatus::GATT_FAILURE;
     HILOGI("applicationId: %{public}d, startHandle: 0x%{public}04X, endHandle: 0x%{public}04X",
