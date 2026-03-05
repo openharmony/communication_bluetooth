@@ -814,6 +814,15 @@ public:
     int GetRandomAddress(const std::string &realAddr, std::string &randomAddr, uint64_t tokenId = 0) const;
 
     /**
+    * @brief Get the real address of a device.
+    * @param randomAddr random address.
+    * @param[out] realAddr real address.
+    * @return Returns {@link BT_NO_ERROR} if get real address success;
+    * returns an error code defined in {@link BtErrCode} otherwise.
+    */
+    int GetRealAddress(const std::string &randomAddr, std::string &realAddr) const;
+
+    /**
     * @brief Connects all allowed bluetooth profiles between the local and remote device.
     *
     * @param remoteAddr remote device addr.
