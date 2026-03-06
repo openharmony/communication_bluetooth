@@ -413,6 +413,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     }
 
     HILOGD("duration=%{public}d", duration);
+    // make sure advCallback has been registered before StartAdvertising, if not then wait for advCallback registering
     pimpl->WaitForAdvCallbackRegistering();
     int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
     if (pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
@@ -464,6 +465,7 @@ int BleAdvertiser::StartAdvertising(const BleAdvertiserSettings &settings, const
     bleScanResponse.SetPayload(std::string(scanResponse.begin(), scanResponse.end()));
 
     HILOGD("duration=%{public}d", duration);
+    // make sure advCallback has been registered before StartAdvertising, if not then wait for advCallback registering
     pimpl->WaitForAdvCallbackRegistering();
     int32_t advHandle = BLE_INVALID_ADVERTISING_HANDLE;
     if (pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
