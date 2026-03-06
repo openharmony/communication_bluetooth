@@ -35,6 +35,7 @@ struct BluetoothAudioManager::impl {
     int IsDeviceWearing(const BluetoothRemoteDevice &device);
     int IsWearDetectionSupported(const BluetoothRemoteDevice &device, bool &isSupported);
     int SendDeviceSelection(const BluetoothRemoteDevice &device, int useA2dp, int useHfp, int userSelection);
+    int GetProfileStatus(const BluetoothRemoteDevice &device, uint8_t &a2dpState, uint8_t &hfpState);
 };
 
 BluetoothAudioManager::impl::impl()
@@ -84,6 +85,14 @@ int BluetoothAudioManager::impl::SendDeviceSelection(const BluetoothRemoteDevice
     sptr<IBluetoothAudioManager> proxy = GetRemoteProxy<IBluetoothAudioManager>(PROFILE_AUDIO_MANAGER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "failed: no proxy");
     return proxy->SendDeviceSelection(BluetoothRawAddress(device.GetDeviceAddr()), useA2dp, useHfp, userSelection);
+}
+
+int BluetoothAudioManager::impl::GetProfileStatus(const BluetoothRemoteDevice &device,
+    uint8_t &a2dpState, uint8_t &hfpState)
+{
+    sptr<IBluetoothAudioManager> proxy = GetRemoteProxy<IBluetoothAudioManager>(PROFILE_AUDIO_MANAGER);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INVALID_STATE, "failed: no proxy");
+    return proxy->GetProfileStatus(BluetoothRawAddress(device.GetDeviceAddr()), a2dpState, hfpState);
 }
 
 int BluetoothAudioManager::EnableWearDetection(const std::string &deviceId)
@@ -157,6 +166,26 @@ int BluetoothAudioManager::SendDeviceSelection(const BluetoothRemoteDevice &devi
         return BT_ERR_INVALID_STATE;
     }
     return pimpl->SendDeviceSelection(device, useA2dp, useHfp, userSelection);
+}
+
+int BluetoothAudioManager::GetProfileStatus(const BluetoothRemoteDevice &device, uint8_t &a2dpState, uint8_t &hfpState)
+{
+    HILOGI("GetProfileStatus enter, a2dpState: %{public}d, hfpState: %{public}d", a2dpState, hfpState);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+
+    if (!device.IsValidBluetoothRemoteDevice()) {
+        HILOGE("input parameter error.");
+        return BT_ERR_INVALID_PARAM;
+    }
+    
+    if (pimpl == nullptr) {
+        HILOGE("pimpl is null");
+        return BT_ERR_INVALID_STATE;
+    }
+    return pimpl->GetProfileStatus(device, a2dpState, hfpState);
 }
 
 BluetoothAudioManager &BluetoothAudioManager::GetInstance()
