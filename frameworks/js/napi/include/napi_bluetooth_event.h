@@ -54,27 +54,6 @@ public:
         std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> &callbackInfos);
     static napi_value OffEvent(napi_env env, napi_callback_info cbinfo,
         std::map<std::string, std::shared_ptr<BluetoothCallbackInfo>> &callbackInfos);
-    static void EventNotify(AsyncEventData *asyncEvent);
-
-    template<typename T>
-    static void CheckAndNotify(const std::shared_ptr<BluetoothCallbackInfo> &cb, const T& obj)
-    {
-        if (cb == nullptr) {
-            HILOGI("checkAndNotify event cb is nullptr!");
-            return;
-        }
-        auto func = std::bind(
-            [](const std::shared_ptr<BluetoothCallbackInfo> &cb, T& obj) -> napi_value {
-                return NapiEvent::CreateResult(cb, obj);
-            },
-            cb, obj);
-        AsyncEventData *asyncEvent = new (std::nothrow)AsyncEventData(cb, func);
-        if (asyncEvent == nullptr) {
-            HILOGI("asyncEvent is nullptr!");
-            return;
-        }
-        EventNotify(asyncEvent);
-    }
 };
 
 }  // namespace Bluetooth

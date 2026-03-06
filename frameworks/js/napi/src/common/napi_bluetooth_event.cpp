@@ -23,53 +23,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
-{
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(asyncEvent->env_, &loop);
-
-    uv_work_t *work = new uv_work_t;
-    if (work == nullptr) {
-        HILOGI("uv_work_t work is null.");
-        delete asyncEvent;
-        asyncEvent = nullptr;
-        return;
-    }
-    work->data = asyncEvent;
-
-    int ret = uv_queue_work(
-        loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            AsyncEventData *callbackInfo = static_cast<AsyncEventData*>(work->data);
-            napi_value callback = nullptr;
-            napi_status ret = napi_get_reference_value(callbackInfo->env_, callbackInfo->callback_, &callback);
-            if (ret == napi_ok && callback != nullptr) {
-                napi_value result = nullptr;
-                napi_value undefined = nullptr;
-                napi_value callResult = nullptr;
-                if (napi_get_undefined(callbackInfo->env_, &undefined) == napi_ok) {
-                    result = callbackInfo->packResult();
-                }
-                if (result != nullptr) {
-                    napi_call_function(callbackInfo->env_, undefined, callback, ARGS_SIZE_ONE,
-                        &result, &callResult);
-                }
-            }
-            delete callbackInfo;
-            delete work;
-            work = nullptr;
-        }
-    );
-    if (ret != 0) {
-        delete asyncEvent;
-        asyncEvent = nullptr;
-        delete work;
-        work = nullptr;
-    }
-}
-
 napi_value NapiEvent::CreateResult(const std::shared_ptr<BluetoothCallbackInfo> &cb, int value)
 {
     napi_value result = nullptr;

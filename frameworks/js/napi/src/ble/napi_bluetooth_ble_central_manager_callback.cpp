@@ -210,8 +210,8 @@ void SysOnScanCallBack(sysBLEMap &observers, const BleScanResult &result)
     data->callbackFail = callbackInfos[PARAM1]->callback_;
     data->result = std::make_shared<BleScanResult>(result);
     work->data = static_cast<void *>(data);
-    int ret = uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, AfterWorkCallbackToSysBLEDeviceFound);
+    int ret = uv_queue_work_internal(
+        loop, work, [](uv_work_t *work) {}, AfterWorkCallbackToSysBLEDeviceFound, "SysOnScanCallBackTask");
     if (ret != 0) {
         delete data;
         data = nullptr;
@@ -358,8 +358,8 @@ static void StartBLESysScanTask(int resultCode)
     data->callbackFail = callbackInfos[PARAM1]->callback_;
     data->callbackComplete = callbackInfos[PARAM2]->callback_;
     work->data = static_cast<void *>(data);
-    int ret = uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, AfterWorkCallbackToSysBLEScan);
+    int ret = uv_queue_work_internal(
+        loop, work, [](uv_work_t *work) {}, AfterWorkCallbackToSysBLEScan, "StartBLESysScanTask");
     if (ret != 0) {
         delete data;
         data = nullptr;
