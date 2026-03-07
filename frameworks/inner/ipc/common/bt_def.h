@@ -488,6 +488,9 @@ const uint8_t BLE_INVALID_ADVERTISING_HANDLE = 0xFF;
 // Report delay millis default value
 const int BLE_REPORT_DELAY_MILLIS = 5000;
 
+// BLE adv init timeout 200ms
+constexpr int BLE_ADV_INIT_TIMEOUT = 200;
+
 // Definitions for UUID length constants.
 const int BLE_UUID_LEN_16 = 2;
 const int BLE_UUID_LEN_32 = 4;
