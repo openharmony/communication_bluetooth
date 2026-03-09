@@ -38,19 +38,20 @@ int BluetoothGattServerProxy::AddService(int32_t appId, BluetoothGattService *se
 
     return reply.ReadInt32();
 }
-void BluetoothGattServerProxy::ClearServices(int appId)
+int BluetoothGattServerProxy::ClearServices(int appId)
 {
     MessageParcel data;
-    CHECK_AND_RETURN_LOG(
-        data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()), "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG(data.WriteInt32(appId), "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattServerProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_IPC_TRANS_FAILED, "write appId error");
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
 
-    SEND_IPC_REQUEST_RETURN(BluetoothGattServerInterfaceCode::GATT_SERVER_CLEAR_SERVICES, data, reply, option);
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattServerInterfaceCode::GATT_SERVER_CLEAR_SERVICES,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
-    return;
+    return reply.ReadInt32();
 }
 
 int BluetoothGattServerProxy::Connect(int appId, const BluetoothGattDevice &device, bool isDirect)
