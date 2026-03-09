@@ -501,7 +501,7 @@ void BleAdvertiser::SetAdvOrRspData(const std::vector<uint8_t> &data, bool isAdv
 
     BluetoothBleAdvertiserData bleAdvData;
     bleAdvData.SetPayload(std::string(data.begin(), data.end()));
-    proxy->SetAdvertisingData(bleAdvData, isAdvData, advHandle, isAdvData ? SET_ADV_ONLY : SET_RSP_ONLY);
+    proxy->SetAdvertisingData(bleAdvData, bleAdvData, advHandle, isAdvData ? SET_ADV_ONLY : SET_RSP_ONLY);
 }
 
 int BleAdvertiser::ChangeAdvertisingParams(uint8_t advHandle, const BleAdvertiserSettings &settings)
