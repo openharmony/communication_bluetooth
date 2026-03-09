@@ -35,6 +35,7 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace OHOS::bluetooth;
+static const int INT8_BITS = 8;
 struct BleAdvertiser::impl {
     impl();
     ~impl();
