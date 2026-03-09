@@ -127,13 +127,13 @@ struct BleAdvertiser::impl {
             std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
             CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
 
-            HILOGD("result: %{public}d, advHandle: %{public}d", result, advHandle);
+            HILOGI("result: %{public}d, advHandle: %{public}d, type: %{public}d", result, advHandle, type);
             auto observer = advertiserSptr->pimpl->callbacks_.GetAdvertiserObserver(advHandle);
             if (observer) {
                 if (type == FwkOnSetAdvDataType::FWK_ON_BOTH) {
                     observer->OnSetAdvDataEvent(result);
                 } else {
-                    int32_t tempResult = (type << INT8_BITS) + result < 0 ? 0XFF : result; // 前8位表示type，后8位表示status
+                    int32_t tempResult = (type << INT8_BITS) + (result < 0 ? 0XFF : result); // 前8位表示type，后8位表示status
                     observer->OnSetAdvDataEvent(tempResult);
                 }
             }
