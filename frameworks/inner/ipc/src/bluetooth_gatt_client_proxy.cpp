@@ -149,7 +149,7 @@ int BluetoothGattClientProxy::ReadCharacteristic(int32_t appId, const BluetoothG
     return reply.ReadInt32();
 }
 
-int BluetoothGattClientProxy::ReadUsingCharacteristicUuid(int32_t appId, const std::string& uuid,
+int BluetoothGattClientProxy::ReadCharacteristicByUuid(int32_t appId, const std::string& uuid,
     int startHandle, int endHandle)
 {
     MessageParcel data;
@@ -163,7 +163,7 @@ int BluetoothGattClientProxy::ReadUsingCharacteristicUuid(int32_t appId, const s
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
 
-    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattClientInterfaceCode::BT_GATT_READ_USING_CHARACTERISTIC_UUID,
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattClientInterfaceCode::BT_GATT_READ_CHARACTERISTIC_BY_UUID,
         data, reply, option, BT_ERR_IPC_TRANS_FAILED);
 
     return reply.ReadInt32();

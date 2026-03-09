@@ -22,6 +22,12 @@
 
 namespace OHOS {
 namespace Bluetooth {
+enum FwkOnSetAdvDataType: int {
+    FWK_ON_BOTH = 0,
+    FWK_ON_ADV_ONLY,
+    FWK_ON_RSP_ONLY
+};
+
 class IBluetoothBleAdvertiseCallback : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothBleAdvertiseCallback");
@@ -31,7 +37,7 @@ public:
     virtual void OnEnableResultEvent(int32_t result, int32_t advHandle) = 0;
     virtual void OnDisableResultEvent(int32_t result, int32_t advHandle) = 0;
     virtual void OnStopResultEvent(int32_t result, int32_t advHandle) = 0;
-    virtual void OnSetAdvDataEvent(int32_t result, int32_t advHandle) = 0;
+    virtual void OnSetAdvDataEvent(int32_t result, int32_t advHandle, FwkOnSetAdvDataType type = FWK_ON_BOTH) = 0;
     virtual void OnChangeAdvResultEvent(int32_t result, int32_t advHandle) = 0;
 };
 }  // namespace Bluetooth

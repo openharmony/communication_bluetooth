@@ -141,7 +141,13 @@ ErrCode BluetoothBleAdvertiseCallbackStub::OnSetAdvDataEventInner(
 {
     const int32_t result = static_cast<int32_t>(data.ReadInt32());
     const int32_t advHandle = static_cast<int32_t>(data.ReadInt32());
-    stub->OnSetAdvDataEvent(result, advHandle);
+    const int inType = data.ReadInt32();
+    if (inType < FwkOnSetAdvDataType::FWK_ON_BOTH || inType > FwkOnSetAdvDataType::FWK_ON_RSP_ONLY) {
+        HILOGE("invalid callback type");
+        return IPC_STUB_INVALID_DATA_ERR;
+    }
+    const FwkOnSetAdvDataType type = static_cast<FwkOnSetAdvDataType>(inType);
+    stub->OnSetAdvDataEvent(result, advHandle, type);
     return NO_ERROR;
 }
 

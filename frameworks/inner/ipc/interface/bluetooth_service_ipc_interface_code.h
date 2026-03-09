@@ -46,7 +46,6 @@ enum BluetoothBleAdvertiserInterfaceCode {
     BLE_ENABLE_ADVERTISING,
     BLE_DISABLE_ADVERTISING,
     BLE_CHANGE_ADVERTISING_PARAMS,
-    BLE_SET_ADVE_OR_RSP_DATA,
     // The last code, if you want to add a new code, please add it before this
     BLE_ADVERTISER_BUTT
 };
@@ -132,7 +131,7 @@ enum BluetoothGattClientInterfaceCode {
     BT_GATT_CLIENT_GET_CONNECTED_STATE,
     BT_GATT_CLIENT_SET_PHY,
     BT_GATT_CLIENT_READ_PHY,
-    BT_GATT_READ_USING_CHARACTERISTIC_UUID,
+    BT_GATT_READ_CHARACTERISTIC_BY_UUID,
     // The last code, if you want to add a new code, please add it before this
     BT_GATT_CLIENT_BUTT
 };

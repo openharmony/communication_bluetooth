@@ -26,6 +26,12 @@
 
 namespace OHOS {
 namespace Bluetooth {
+enum SetAdvDataType:int {
+    SET_BOTH = 0,
+    SET_ADV_ONLY,
+    SET_RSP_ONLY
+};
+
 class IBluetoothBleAdvertiser : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothBleAdvertiser");
@@ -41,10 +47,8 @@ public:
     virtual void Close(int32_t advHandle) = 0;
     virtual int32_t GetAdvertiserHandle(int32_t &advHandle, const sptr<IBluetoothBleAdvertiseCallback> &callback) = 0;
     virtual void SetAdvertisingData(const BluetoothBleAdvertiserData &advData,
-        const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle) = 0;
+        const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle, SetAdvDataType type = SET_BOTH) = 0;
     virtual int ChangeAdvertisingParams(uint8_t advHandle, const BluetoothBleAdvertiserSettings &settings) = 0;
-    virtual void SetAdvOrRspData(const BluetoothBleAdvertiserData &bleAdvData,
- 	    bool isAdv, int32_t advHandle) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

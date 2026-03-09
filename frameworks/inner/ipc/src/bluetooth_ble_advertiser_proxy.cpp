@@ -242,7 +242,7 @@ int32_t BluetoothBleAdvertiserProxy::GetAdvertiserHandle(int32_t &advHandle,
 }
 
 void BluetoothBleAdvertiserProxy::SetAdvertisingData(const BluetoothBleAdvertiserData &advData,
-    const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle)
+    const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle, SetAdvDataType type)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleAdvertiserProxy::GetDescriptor())) {
@@ -265,43 +265,16 @@ void BluetoothBleAdvertiserProxy::SetAdvertisingData(const BluetoothBleAdvertise
         return;
     }
 
+    if (!data.WriteInt32(type)) {
+        HILOGW("[SetAdvertisingData] fail: write type failed.");
+        return;
+    }
+
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     ErrCode result = InnerTransact(BLE_SET_ADVERTISING_DATA, option, data, reply);
     if (result != NO_ERROR) {
         HILOGW("[SetAdvertisingData] fail: transact ErrCode=%{public}d", result);
-    }
-}
-
-void BluetoothBleAdvertiserProxy::SetAdvOrRspData(const BluetoothBleAdvertiserData &bleAdvData,
-    bool isAdv, int32_t advHandle)
-{
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(BluetoothBleAdvertiserProxy::GetDescriptor())) {
-        HILOGW("[SetAdvOrRspData] fail: write interface token failed.");
-        return;
-    }
-
-    if (!data.WriteParcelable(&bleAdvData)) {
-        HILOGW("[SetAdvOrRspData] fail:write data failed");
-        return;
-    }
-
-    if (!data.WriteBool(isAdv)) {
-        HILOGW("[SetAdvOrRspData] fail:write isAdv failed");
-        return;
-    }
-
-    if (!data.WriteInt32(advHandle)) {
-        HILOGW("[SetAdvOrRspData] fail: write advHandle failed.");
-        return;
-    }
-
-    MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_SET_ADVE_OR_RSP_DATA, option, data, reply);
-    if (result != NO_ERROR) {
-        HILOGW("[SetAdvOrRspData] fail: transact ErrCode=%{public}d", result);
     }
 }
 	  

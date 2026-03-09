@@ -342,7 +342,7 @@ public:
     * @since 22
     *
     */
-    int ReadUsingCharacteristicUuid(const std::string& uuid, int startHandle, int endHandle);
+    int ReadCharacteristicByUuid(const std::string& uuid, int startHandle = 0x0001, int endHandle = 0xFFFF);
 
     /**
      * @brief The function to read descriptor.

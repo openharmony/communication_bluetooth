@@ -121,7 +121,7 @@ struct BleAdvertiser::impl {
             }
         }
 
-        void OnSetAdvDataEvent(int32_t result, int32_t advHandle) override
+        void OnSetAdvDataEvent(int32_t result, int32_t advHandle, FwkOnSetAdvDataType type = FWK_ON_BOTH) override
         {
             std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
             CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
@@ -129,7 +129,12 @@ struct BleAdvertiser::impl {
             HILOGD("result: %{public}d, advHandle: %{public}d", result, advHandle);
             auto observer = advertiserSptr->pimpl->callbacks_.GetAdvertiserObserver(advHandle);
             if (observer) {
-                observer->OnSetAdvDataEvent(result);
+                if (type == FwkOnSetAdvDataType::FWK_ON_BOTH) {
+                    observer->OnSetAdvDataEvent(result);
+                } else {
+                    int32_t tempResult = (type << INT8_BITS) + result < 0 ? 0XFF : result; // 前8位表示type，后8位表示status
+                    observer->OnSetAdvDataEvent(tempResult);
+                }
             }
         }
 
@@ -496,7 +501,7 @@ void BleAdvertiser::SetAdvOrRspData(const std::vector<uint8_t> &data, bool isAdv
 
     BluetoothBleAdvertiserData bleAdvData;
     bleAdvData.SetPayload(std::string(data.begin(), data.end()));
-    proxy->SetAdvOrRspData(bleAdvData, isAdvData, advHandle);
+    proxy->SetAdvertisingData(bleAdvData, isAdvData, advHandle, isAdvData ? SET_ADV_ONLY : SET_RSP_ONLY);
 }
 
 int BleAdvertiser::ChangeAdvertisingParams(uint8_t advHandle, const BleAdvertiserSettings &settings)
