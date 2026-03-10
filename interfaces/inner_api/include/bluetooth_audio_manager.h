@@ -75,6 +75,16 @@ public:
     */
     int SendDeviceSelection(const BluetoothRemoteDevice &device, int useA2dp, int useHfp, int userSelection) const;
 
+    /**
+    * @brief Get a2dp and hfp profile status.
+    * @param device Remote device.
+    * @param a2dpState A2dp profile status.
+    * @param hfpState Hfp profile status.
+    * @return Returns {@link BT_NO_ERROR} if the operation success;
+    * returns an error code defined in {@link BtErrCode} otherwise.
+    */
+    int GetProfileStatus(const BluetoothRemoteDevice &device, uint8_t &a2dpState, uint8_t &hfpState);
+
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.

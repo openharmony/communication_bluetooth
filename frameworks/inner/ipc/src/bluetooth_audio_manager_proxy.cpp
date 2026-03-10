@@ -156,5 +156,32 @@ int32_t BluetoothAudioManagerProxy::SendDeviceSelection(const BluetoothRawAddres
     return reply.ReadInt32();
 }
 
+int32_t BluetoothAudioManagerProxy::GetProfileStatus(const BluetoothRawAddress &device,
+    uint8_t &a2dpState, uint8_t &hfpState)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothAudioManagerProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "BluetoothAudioManagerProxy::GetProfileStatus WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::GetProfileStatus Write device error");
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    auto remote = Remote();
+    CHECK_AND_RETURN_LOG_RET(remote, BT_ERR_IPC_TRANS_FAILED, "remote nullptr");
+    int error = remote->SendRequest(
+        BluetoothAudioManagerInterfaceCode::BT_GET_PROFILE_STATUS, data, reply, option);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR,
+        "BluetoothAudioManagerProxy::GetProfileStatus fail, error: %{public}d", error);
+
+    int32_t ret = reply.ReadInt32();
+    if (ret == BT_NO_ERROR) {
+        a2dpState = reply.ReadUint8();
+        hfpState = reply.ReadUint8();
+    }
+
+    return ret;
+}
+
 }  // namespace Bluetooth
 }  // namespace OHOS
