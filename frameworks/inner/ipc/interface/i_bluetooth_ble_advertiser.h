@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-enum SetAdvDataType:int {
+enum SetAdvDataType:int32_t {
     SET_BOTH = 0,
     SET_ADV_ONLY,
     SET_RSP_ONLY

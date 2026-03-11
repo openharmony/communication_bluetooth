@@ -150,7 +150,7 @@ int BluetoothGattClientProxy::ReadCharacteristic(int32_t appId, const BluetoothG
 }
 
 int BluetoothGattClientProxy::ReadCharacteristicByUuid(int32_t appId, const std::string& uuid,
-    int startHandle, int endHandle)
+    int32_t  startHandle, int32_t  endHandle)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattClientProxy::GetDescriptor()),

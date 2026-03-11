@@ -843,7 +843,7 @@ int GattClient::ReadCharacteristic(GattCharacteristic &characteristic)
     return result;
 }
 
-int GattClient::ReadCharacteristicByUuid(const std::string& uuid, int startHandle, int endHandle)
+int GattClient::ReadCharacteristicByUuid(const std::string& uuid, int32_t startHandle, int32_t endHandle)
 {
     CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     CHECK_AND_RETURN_LOG_RET(pimpl != nullptr && pimpl->Init(weak_from_this()),
