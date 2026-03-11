@@ -170,7 +170,6 @@ int BluetoothAudioManager::SendDeviceSelection(const BluetoothRemoteDevice &devi
 
 int BluetoothAudioManager::GetProfileStatus(const BluetoothRemoteDevice &device, uint8_t &a2dpState, uint8_t &hfpState)
 {
-    HILOGI("GetProfileStatus enter, a2dpState: %{public}d, hfpState: %{public}d", a2dpState, hfpState);
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
@@ -185,7 +184,11 @@ int BluetoothAudioManager::GetProfileStatus(const BluetoothRemoteDevice &device,
         HILOGE("pimpl is null");
         return BT_ERR_INVALID_STATE;
     }
-    return pimpl->GetProfileStatus(device, a2dpState, hfpState);
+
+    int ret = pimpl->GetProfileStatus(device, a2dpState, hfpState);
+
+    HILOGI("ret: %{public}d, a2dpState: %{public}d, hfpState: %{public}d", ret, a2dpState, hfpState);
+    return ret;
 }
 
 BluetoothAudioManager &BluetoothAudioManager::GetInstance()
