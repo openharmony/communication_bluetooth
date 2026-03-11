@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-enum FwkOnSetAdvDataType: int {
+enum FwkOnSetAdvDataType: int32_t {
     FWK_ON_BOTH = 0,
     FWK_ON_ADV_ONLY,
     FWK_ON_RSP_ONLY

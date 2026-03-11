@@ -35,7 +35,6 @@
 namespace OHOS {
 namespace Bluetooth {
 using namespace OHOS::bluetooth;
-static const int INT8_BITS = 8;
 struct BleAdvertiser::impl {
     impl();
     ~impl();
@@ -127,7 +126,7 @@ struct BleAdvertiser::impl {
             std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
             CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
 
-            HILOGI("result: %{public}d, advHandle: %{public}d, type: %{public}d", result, advHandle, type);
+            HILOGD("result: %{public}d, advHandle: %{public}d, type: %{public}d", result, advHandle, type);
             auto observer = advertiserSptr->pimpl->callbacks_.GetAdvertiserObserver(advHandle);
             if (observer) {
                 if (type == FwkOnSetAdvDataType::FWK_ON_BOTH) {
