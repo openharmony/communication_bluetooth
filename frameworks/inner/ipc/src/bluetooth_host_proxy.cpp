@@ -2217,6 +2217,30 @@ int32_t BluetoothHostProxy::SetConnectionPriority(const std::string &address, in
     return reply.ReadInt32();
 }
 
+int32_t BluetoothHostProxy::GetVirtualAddressByHash(
+    int hashAlgorithmType, const std::string &hashValue, std::string &virtualAddress)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "WriteToken err");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(hashAlgorithmType),
+        BT_ERR_INTERNAL_ERROR, "write hash algorithm type error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(hashValue), BT_ERR_INTERNAL_ERROR, "write hashValue error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_VIRTUAL_ADDRESS_BY_HASH, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::GetVirtualAddressByHash fail, error: %{public}d", error);
+        return error;
+    }
+    int errCode = reply.ReadInt32();
+    if (errCode != BT_NO_ERROR) {
+        return errCode;
+    }
+    virtualAddress = reply.ReadString();
+    return BT_NO_ERROR;
+}
+
 int32_t BluetoothHostProxy::IsProfileExist(const std::string &profileName, bool &isProfileExist)
 {
     MessageParcel data;

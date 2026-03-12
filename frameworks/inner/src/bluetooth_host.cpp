@@ -1471,6 +1471,15 @@ int32_t BluetoothHost::SetCallingPackageName(const std::string &address, const s
     return BT_NO_ERROR;
 }
 
+int32_t BluetoothHost::GetVirtualAddressByHash(int hashAlgorithmType,
+    const std::string &hashValue, std::string &virtualAddress) const
+{
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
+    return proxy->GetVirtualAddressByHash(hashAlgorithmType, hashValue, virtualAddress);
+}
+
 int BluetoothHost::SetConnectionPriority(const std::string &address, int priority)
 {
     HILOGI("Set connection priority, address: %{public}s, priority: %{public}d",

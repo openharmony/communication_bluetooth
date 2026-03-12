@@ -69,6 +69,8 @@ static std::map<int32_t, std::string> napiErrMsgMap {
     { BtErrCode::BT_ERR_BLE_SCAN_ALREADY_STARTED, "Failed to start scan as Ble scan is already started by the app."},
     { BtErrCode::BT_ERR_DIALOG_FOR_USER_NOT_RESPOND, "The user does not respond."},
     { BtErrCode::BT_ERR_DIALOG_FOR_USER_REFUSE, "User refuse the action."},
+    { BtErrCode::BT_ERR_PARAM_NOT_COMPLIANT, "Param not match specification." },
+    { BtErrCode::BT_ERR_UNPAIRED_DEVICE, "Device is not paired." },
     { BtErrCode::BT_ERR_HID_APPLICATION_NOT_IN_FOREGROUND, "HID application is not in the foreground."},
     { BtErrCode::BT_ERR_HID_APP_HAS_BEEN_REGISTERED, "Any HID application has been registered."},
     { BtErrCode::BT_ERR_HID_APP_NOT_REGISTER, "HID application does not register."},

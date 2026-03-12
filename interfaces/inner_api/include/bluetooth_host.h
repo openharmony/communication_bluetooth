@@ -954,6 +954,18 @@ public:
     int32_t SetCallingPackageName(const std::string &address, const std::string &packageName);
 
     /**
+     * @brief obtain the virtual address by hash algorithm and hash value.
+     *
+     * @param algorithmType The hash algorithm type.
+     * @param hashValue The hash value of the device MAC address.
+     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+     *         returns an error code defined in {@link BtErrCode} otherwise.
+     * @since 24
+     */
+    int32_t GetVirtualAddressByHash(int hashAlgorithmType,
+        const std::string &hashValue, std::string &virtualAddress) const;
+
+    /**
       * @brief Set connection priority for incoming or existed socket connection.
       *
       * @param address The remote device address.
