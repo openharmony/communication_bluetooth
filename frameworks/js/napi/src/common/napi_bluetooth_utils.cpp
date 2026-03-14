@@ -491,7 +491,7 @@ void UnregisterSysBLEObserver(napi_env env, const std::string &type)
 
 int DoInJsMainThread(napi_env env, std::function<void(void)> func)
 {
-    if (napi_send_event(env, func, napi_eprio_high) != napi_ok) {
+    if (napi_send_event(env, func, napi_eprio_high, "BluetoothTask") != napi_ok) {
         HILOGE("Failed to SendEvent");
         return -1;
     }
