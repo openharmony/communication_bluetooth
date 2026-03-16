@@ -34,7 +34,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-constexpr int INT8_BITS = 8;
 using namespace OHOS::bluetooth;
 struct BleAdvertiser::impl {
     impl();
@@ -122,7 +121,8 @@ struct BleAdvertiser::impl {
             }
         }
 
-        void OnSetAdvDataEvent(int32_t result, int32_t advHandle, FwkOnSetAdvDataType type = FWK_ON_BOTH) override
+        void OnSetAdvDataEvent(int32_t result, int32_t advHandle,
+            bluetooth::SetAdvDataType type = bluetooth::SET_ADV_DATA_BOTH) override
         {
             std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
             CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
@@ -130,12 +130,8 @@ struct BleAdvertiser::impl {
             HILOGD("result: %{public}d, advHandle: %{public}d, type: %{public}d", result, advHandle, type);
             auto observer = advertiserSptr->pimpl->callbacks_.GetAdvertiserObserver(advHandle);
             if (observer) {
-                if (type == FwkOnSetAdvDataType::FWK_ON_BOTH) {
-                    observer->OnSetAdvDataEvent(result);
-                } else {
-                    int32_t tempResult = (type << INT8_BITS) + (result < 0 ? 0XFF : result); // 前8位表示type，后8位表示status
-                    observer->OnSetAdvDataEvent(tempResult);
-                }
+                observer->OnSetAdvDataEvent(result);
+                observer->OnSetAdvDataEvent(result, static_cast<Bluetooth::SetAdvDataType>(type));
             }
         }
 

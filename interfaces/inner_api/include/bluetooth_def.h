@@ -1821,6 +1821,12 @@ enum FreezeType : uint8_t {
     UNSET_TYPE = 0xFF,
 };
 
+enum SetAdvDataType : int32_t {
+    SET_ADV_DATA_BOTH = 0,
+    SET_ADV_DATA_ONLY_ADV,
+    SET_ADV_DATA_ONLY_RSP
+};
+
 struct BluetoothAddress {
     std::string address = {};
     uint8_t addressType = AddressType::UNSET_ADDRESS;

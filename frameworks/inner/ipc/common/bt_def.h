@@ -1938,6 +1938,12 @@ enum DialogBoxType {
     BLUETOOTH_SWITCH = 0,
 };
 
+enum SetAdvDataType : int32_t {
+    SET_ADV_DATA_BOTH = 0,
+    SET_ADV_DATA_ONLY_ADV,
+    SET_ADV_DATA_ONLY_RSP
+};
+
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else

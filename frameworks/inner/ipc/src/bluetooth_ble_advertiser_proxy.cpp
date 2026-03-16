@@ -242,7 +242,7 @@ int32_t BluetoothBleAdvertiserProxy::GetAdvertiserHandle(int32_t &advHandle,
 }
 
 void BluetoothBleAdvertiserProxy::SetAdvertisingData(const BluetoothBleAdvertiserData &advData,
-    const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle, SetAdvDataType type)
+    const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle, bluetooth::SetAdvDataType type)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleAdvertiserProxy::GetDescriptor())) {
