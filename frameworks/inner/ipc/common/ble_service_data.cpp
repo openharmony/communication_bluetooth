@@ -374,6 +374,16 @@ int32_t BleScanFilterImpl::GetRssiThreshold() const
     return rssiThreshold_;
 }
 
+void BleScanFilterImpl::SetLpDeviceFlag(bool enable)
+{
+    isLpDevice_ = enable;
+}
+
+bool BleScanFilterImpl::GetLpDeviceFlag() const
+{
+    return isLpDevice_;
+}
+
 /**
  * @brief Check if the device service is connectable.
  *
