@@ -408,6 +408,16 @@ public:
     virtual void OnSetAdvDataEvent(int result) = 0;
 
     /**
+     * @brief Set advertising data result event callback.
+     *
+     * @param result Set advertising data result
+     * @param type SET_ADV_DATA_BOTH means the callback of SetAdvertisingData.
+     *             SET_ADV_DATA_ONLY_ADV or  SET_ADV_DATA_ONLY_RSP means the callback of SetAdvOrRspData.
+     * @since 22
+     */
+    virtual void OnSetAdvDataEvent(int result, SetAdvDataType type) {};
+
+    /**
      * @brief Get advertising handle callback.
      *
      * @param result get advertising handle result.
@@ -538,6 +548,15 @@ public:
      * @since 16
      */
     std::vector<std::shared_ptr<BleAdvertiseCallback>> GetAdvObservers();
+
+    /**
+    * @brief Set Advertisement Data or Scan Response Data
+    *
+    * @param advHandle Advertising handle.
+    * @since 22
+    */
+    void SetAdvOrRspData(const std::vector<uint8_t> &data, bool isAdv,
+        std::shared_ptr<BleAdvertiseCallback> callback);
 
 private:
     BleAdvertiser();

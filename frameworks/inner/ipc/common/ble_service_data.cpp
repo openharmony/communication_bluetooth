@@ -987,6 +987,17 @@ int8_t BlePeripheralDevice::GetTXPower() const
 }
 
 /**
+* @brief Get Timestamp data.
+*
+* @return Returns device timestamp.
+* @since 22
+*/
+uint16_t BlePeripheralDevice::GetTimestamp() const
+{
+    return timestamp_;
+}
+
+/**
  * @brief Get the advertising data.
  *
  * @return Returns the advertising data.
@@ -1128,6 +1139,18 @@ bool BlePeripheralDevice::IsTXPower() const
 }
 
 /**
+* @brief Check if the device timestamp is included.
+*
+* @return Returns <b>true</b> if include device timestamp;
+*         Returns <b>false</b> otherwise.
+* @since 22
+*/
+bool BlePeripheralDevice::IsTimestamp() const
+{
+    return isTimestamp_;
+}
+
+/**
  * @brief Check if advertising data is included.
  *
  * @return Returns <b>true</b> if advertising data is included;
@@ -1190,6 +1213,19 @@ void BlePeripheralDevice::SetRSSI(int8_t rssi)
     rssi_ = rssi;
     isRSSI_ = true;
 }
+
+/**
+* @brief Set Timestamp data.
+*
+* @param timestamp Timestamp when the scan result was observed.
+* @since 22
+*/
+void BlePeripheralDevice::SetTimestamp(uint16_t timestamp)
+{
+    timestamp_ = timestamp;
+    isTimestamp_ = true;
+}
+	 
 /**
  * @brief Check whether device is connectable.
  *

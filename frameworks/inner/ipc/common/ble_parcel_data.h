@@ -676,6 +676,16 @@ public:
         advertiseFlag_ = flag;
     }
 
+    void SetTimestamp(uint16_t timestamp)
+    {
+        timestamp_ = timestamp;
+    }
+
+    uint16_t GetTimestamp()
+    {
+        return timestamp_;
+    }
+
     void SetPayload(const std::string &payload)
     {
         payload_ = payload;
@@ -741,6 +751,7 @@ public:
     uint16_t eventType_{};
     int8_t txPowerLevel_ {};
     std::map<uint8_t, std::string> advertisingData_ {};
+    uint16_t timestamp_{};
 };
 
 /**

@@ -149,6 +149,26 @@ int BluetoothGattClientProxy::ReadCharacteristic(int32_t appId, const BluetoothG
     return reply.ReadInt32();
 }
 
+int BluetoothGattClientProxy::ReadCharacteristicByUuid(int32_t appId, const std::string& uuid,
+    int32_t  startHandle, int32_t  endHandle)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothGattClientProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(appId), BT_ERR_IPC_TRANS_FAILED, "write appId error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(uuid), BT_ERR_IPC_TRANS_FAILED, "write uuid error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(startHandle), BT_ERR_IPC_TRANS_FAILED, "write startHandle error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(endHandle), BT_ERR_IPC_TRANS_FAILED, "write endHandle error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothGattClientInterfaceCode::BT_GATT_READ_CHARACTERISTIC_BY_UUID,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+
+    return reply.ReadInt32();
+}
+
 int BluetoothGattClientProxy::WriteCharacteristic(
     int32_t appId, BluetoothGattCharacteristic *characteristic, bool withoutRespond, bool isWithContext)
 {

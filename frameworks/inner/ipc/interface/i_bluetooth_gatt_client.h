@@ -40,6 +40,8 @@ public:
     virtual int Disconnect(int32_t appId) = 0;
     virtual int DiscoveryServices(int32_t appId) = 0;
     virtual int ReadCharacteristic(int32_t appId, const BluetoothGattCharacteristic &characteristic) = 0;
+    virtual int ReadCharacteristicByUuid(int32_t appId, const std::string &uuid,
+ 	    int32_t startHandle = 0x0001, int32_t endHandle = 0xFFFF) = 0;
     virtual int WriteCharacteristic(
         int32_t appId, BluetoothGattCharacteristic *characteristic, bool withoutRespond, bool isWithContext) = 0;
     virtual int SignedWriteCharacteristic(int32_t appId, BluetoothGattCharacteristic *characteristic) = 0;

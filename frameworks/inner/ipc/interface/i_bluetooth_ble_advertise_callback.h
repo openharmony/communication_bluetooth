@@ -31,7 +31,8 @@ public:
     virtual void OnEnableResultEvent(int32_t result, int32_t advHandle) = 0;
     virtual void OnDisableResultEvent(int32_t result, int32_t advHandle) = 0;
     virtual void OnStopResultEvent(int32_t result, int32_t advHandle) = 0;
-    virtual void OnSetAdvDataEvent(int32_t result, int32_t advHandle) = 0;
+    virtual void OnSetAdvDataEvent(int32_t result, int32_t advHandle,
+        bluetooth::SetAdvDataType type = bluetooth::SET_ADV_DATA_BOTH) = 0;
     virtual void OnChangeAdvResultEvent(int32_t result, int32_t advHandle) = 0;
 };
 }  // namespace Bluetooth

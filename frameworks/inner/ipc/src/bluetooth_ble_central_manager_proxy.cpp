@@ -552,6 +552,28 @@ int BluetoothBleCentralManagerProxy::ChangeScanParams(int32_t scannerId, const B
     return reply.ReadInt32();
 }
 
+int BluetoothBleCentralManagerProxy::FlushBatchScanResults(int32_t scannerId)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothBleCentralManagerProxy::GetDescriptor())) {
+        HILOGW("[FlushBatchScanResults] fail: write interface token failed.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    if (!data.WriteInt32(scannerId)) {
+        HILOGW("[FlushBatchScanResults] fail: write scannerId failed.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(BLE_FLUSH_BATCH_SCAN_RESULTS, option, data, reply);
+    if (result != NO_ERROR) {
+        HILOGE("[FlushBatchScanResults] fail: transact ErrCode=%{public}d", result);
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    return reply.ReadInt32();
+}
+
 int BluetoothBleCentralManagerProxy::IsValidScannerId(int32_t scannerId, bool &isValid)
 {
     MessageParcel data;

@@ -79,6 +79,7 @@ enum BluetoothBleCentralManagerInterfaceCode {
     BLE_REMOVE_LPDEVICE_PARAM,
     BLE_CHANGE_SCAN_PARAM,
     BLE_IS_VALID_SCANNERID,
+    BLE_FLUSH_BATCH_SCAN_RESULTS,
     // The last code, if you want to add a new code, please add it before this
     BLE_CENTRAL_MANAGER_BUTT
 };
@@ -130,6 +131,7 @@ enum BluetoothGattClientInterfaceCode {
     BT_GATT_CLIENT_GET_CONNECTED_STATE,
     BT_GATT_CLIENT_SET_PHY,
     BT_GATT_CLIENT_READ_PHY,
+    BT_GATT_READ_CHARACTERISTIC_BY_UUID,
     // The last code, if you want to add a new code, please add it before this
     BT_GATT_CLIENT_BUTT
 };

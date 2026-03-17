@@ -234,6 +234,9 @@ public:
     void SetAddress(const BluetoothAddress &address);
     BluetoothAddress GetAddress(void) const;
 
+    void SetTimestamp(uint16_t timestamp);
+    uint16_t GetTimestamp(void) const;
+
 private:
     std::vector<UUID> serviceUuids_ {};
     std::map<uint16_t, std::string> manufacturerSpecificData_ {};
@@ -248,6 +251,7 @@ private:
     uint16_t eventType_ {};
     int8_t txPowerLevel_ {};
     std::map<uint8_t, std::string> advertisingData_ {};
+    uint16_t timestamp_ {};
 };
 /**
  * @brief Represents central manager callback.
@@ -761,6 +765,14 @@ public:
     * @since 6
     */
     int RemoveLpDeviceParam(const UUID &uuid);
+
+    /**
+    * @brief Flush pending batch scan results stored in Bluetooth controller.
+    *
+    * @return Returns immediately, batch scan results will be delivered through OnBleBatchScanResultsEvent
+    * @since 22
+    */
+    int FlushBatchScanResults();
 
     /**
      * @brief Change a scan with BleScanConfigs and filter.

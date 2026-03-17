@@ -335,6 +335,16 @@ public:
     int ReadCharacteristic(GattCharacteristic &characteristic);
 
     /**
+    * @brief Reads the characteristic using its UUID from the associated remote device.
+    *
+    * @param uuid UUID of characteristic to read from the remote device
+    * @return int Read Characteristic Using Uuid.
+    * @since 22
+    *
+    */
+    int ReadCharacteristicByUuid(const std::string& uuid, int32_t startHandle = 0x0001, int32_t endHandle = 0xFFFF);
+
+    /**
      * @brief The function to read descriptor.
      *
      * @param descriptor descriptor object.

@@ -242,7 +242,7 @@ int32_t BluetoothBleAdvertiserProxy::GetAdvertiserHandle(int32_t &advHandle,
 }
 
 void BluetoothBleAdvertiserProxy::SetAdvertisingData(const BluetoothBleAdvertiserData &advData,
-    const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle)
+    const BluetoothBleAdvertiserData &scanResponse, int32_t advHandle, bluetooth::SetAdvDataType type)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleAdvertiserProxy::GetDescriptor())) {
@@ -265,6 +265,11 @@ void BluetoothBleAdvertiserProxy::SetAdvertisingData(const BluetoothBleAdvertise
         return;
     }
 
+    if (!data.WriteInt32(type)) {
+        HILOGW("[SetAdvertisingData] fail: write type failed.");
+        return;
+    }
+
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     ErrCode result = InnerTransact(BLE_SET_ADVERTISING_DATA, option, data, reply);
@@ -272,7 +277,7 @@ void BluetoothBleAdvertiserProxy::SetAdvertisingData(const BluetoothBleAdvertise
         HILOGW("[SetAdvertisingData] fail: transact ErrCode=%{public}d", result);
     }
 }
-
+	  
 int BluetoothBleAdvertiserProxy::ChangeAdvertisingParams(uint8_t advHandle,
     const BluetoothBleAdvertiserSettings &settings)
 {

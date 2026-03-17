@@ -123,15 +123,17 @@ struct BleAdvertiser::impl {
             }
         }
 
-        void OnSetAdvDataEvent(int32_t result, int32_t advHandle) override
+        void OnSetAdvDataEvent(int32_t result, int32_t advHandle,
+            bluetooth::SetAdvDataType type = bluetooth::SET_ADV_DATA_BOTH) override
         {
             std::shared_ptr<BleAdvertiser> advertiserSptr = advertiser_.lock();
             CHECK_AND_RETURN_LOG(advertiserSptr, "BleAdvertiser is destructed");
 
-            HILOGD("result: %{public}d, advHandle: %{public}d", result, advHandle);
+            HILOGD("result: %{public}d, advHandle: %{public}d, type: %{public}d", result, advHandle, type);
             auto observer = advertiserSptr->pimpl->callbacks_.GetAdvertiserObserver(advHandle);
             if (observer) {
                 observer->OnSetAdvDataEvent(result);
+                observer->OnSetAdvDataEvent(result, static_cast<Bluetooth::SetAdvDataType>(type));
             }
         }
 
@@ -506,6 +508,30 @@ void BleAdvertiser::SetAdvertisingData(const std::vector<uint8_t> &advData, cons
     BluetoothBleAdvertiserData bleScanResponse;
     bleScanResponse.SetPayload(std::string(scanResponse.begin(), scanResponse.end()));
     proxy->SetAdvertisingData(bleAdvertiserData, bleScanResponse, advHandle);
+}
+
+void BleAdvertiser::SetAdvOrRspData(const std::vector<uint8_t> &data, bool isAdvData,
+    std::shared_ptr<BleAdvertiseCallback> callback)
+{
+    if (!IS_BLE_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return;
+    }
+    sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
+    CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
+
+    CHECK_AND_RETURN_LOG(callback != nullptr, "callback is nullptr");
+
+    int advHandle = BLE_INVALID_ADVERTISING_HANDLE;
+    if (!pimpl->callbacks_.IsExistAdvertiserCallback(callback, advHandle)) {
+        HILOGE("Advertising is not started");
+        return;
+    }
+
+    BluetoothBleAdvertiserData bleAdvData;
+    bleAdvData.SetPayload(std::string(data.begin(), data.end()));
+    bluetooth::SetAdvDataType type = isAdvData ? bluetooth::SET_ADV_DATA_ONLY_ADV : bluetooth::SET_ADV_DATA_ONLY_RSP;
+    proxy->SetAdvertisingData(bleAdvData, bleAdvData, advHandle, type);
 }
 
 int BleAdvertiser::ChangeAdvertisingParams(uint8_t advHandle, const BleAdvertiserSettings &settings)
