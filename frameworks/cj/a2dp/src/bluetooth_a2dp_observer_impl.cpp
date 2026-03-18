@@ -24,13 +24,9 @@ void A2dpSourceObserverImpl::OnConnectionStateChanged(const BluetoothRemoteDevic
 {
     HILOGD("enter, remote device address: %{public}s, state: %{public}d, cause: %{public}d", GET_ENCRYPT_ADDR(device),
         state, cause);
-    if (!stateChangeFunc) {
-        HILOGD("failed to register state change callback");
-        return;
-    }
     char* deviceId = MallocCString(device.GetDeviceAddr());
     if (deviceId == nullptr) {
-        HILOGD("failed to malloc memory");
+        HILOGE("failed to malloc memory");
         return;
     }
     StateChangeParam param = StateChangeParam {
@@ -40,6 +36,11 @@ void A2dpSourceObserverImpl::OnConnectionStateChanged(const BluetoothRemoteDevic
     {
         std::lock_guard<std::mutex> lock(mtx_);
         stateChangeFuncCopy = stateChangeFunc;
+    }
+    if (!stateChangeFuncCopy) {
+        HILOGE("callback function not registered");
+        free(deviceId);
+        return;
     }
     stateChangeFuncCopy(param);
     free(deviceId);

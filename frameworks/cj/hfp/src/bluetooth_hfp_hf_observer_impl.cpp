@@ -37,10 +37,6 @@ void HandsFreeUnitObserverImpl::OnConnectionStateChanged(const BluetoothRemoteDe
 {
     HILOGD("enter, remote device address: %{public}s, state: %{public}d, cause: %{public}d", GET_ENCRYPT_ADDR(device),
         state, cause);
-    if (!stateChangeFunc) {
-        HILOGE("failed to register state change callback");
-        return;
-    }
     char* deviceId = MallocCString(device.GetDeviceAddr());
     if (deviceId == nullptr) {
         HILOGE("failed to malloc memory");
@@ -53,6 +49,11 @@ void HandsFreeUnitObserverImpl::OnConnectionStateChanged(const BluetoothRemoteDe
     {
         std::lock_guard<std::mutex> lock(mtx_);
         stateChangeFuncCopy = stateChangeFunc;
+    }
+    if (!stateChangeFuncCopy) {
+        HILOGE("callback function not registered");
+        free(deviceId);
+        return;
     }
     stateChangeFuncCopy(param);
     free(deviceId);
