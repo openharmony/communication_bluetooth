@@ -404,6 +404,16 @@ public:
     int32_t GetDeviceVendorId(uint16_t &vendorId) const;
 
     /**
+     * @brief Get the device of type of the device.
+     *
+     * @param[out] deviceOfType The device of type of device.
+     * @return Returns <b>BT_NO_ERROR</b> if the operation is successful;
+     *         returns <b>Other code</b> if the operation fails.
+     * @since 12
+     */
+    int32_t GetDeviceDeviceOfType(uint8_t &deviceOfType) const;
+
+    /**
      * @brief Get the product id of the device.
      *
      * @param[out] productId The product id of device.

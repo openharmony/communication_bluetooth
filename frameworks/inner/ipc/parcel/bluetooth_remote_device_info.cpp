@@ -32,6 +32,9 @@ bool BluetoothRemoteDeviceInfo::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(customType_)) {
         return false;
     }
+    if (!parcel.WriteUint8(deviceOfType_)) {
+        return false;
+    }
     return true;
 }
 
@@ -62,6 +65,9 @@ bool BluetoothRemoteDeviceInfo::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!parcel.ReadInt32(customType_)) {
+        return false;
+    }
+    if (!parcel.ReadUint8(deviceOfType_)) {
         return false;
     }
     return true;

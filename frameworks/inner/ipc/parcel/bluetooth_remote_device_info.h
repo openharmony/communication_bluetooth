@@ -35,6 +35,7 @@ public:
     uint16_t productId_;
     std::string modelId_;
     int32_t customType_;
+    uint8_t deviceOfType_;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
