@@ -90,6 +90,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getCarKeyDfxData", GetCarKeyDfxData),
         DECLARE_NAPI_FUNCTION("setCarKeyDfxData", SetCarKeyCardData),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceTransport", GetRemoteDeviceTransport),
+        DECLARE_NAPI_FUNCTION("getVirtualAddressByHash", GetVirtualAddressByHash),
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
@@ -234,6 +235,38 @@ napi_value DeRegisterConnectionObserverWithName(
         env, info, connectionObserverFuncWithName, remoteDeviceObserverFuncWithName, typeName);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     return NapiGetUndefinedRet(env);
+}
+
+napi_status CheckGetVirtualAddressByHashParam(napi_env env, napi_callback_info info,
+    HashAlgorithmType &outHashAlgorithmType, std::string &hashValue)
+{
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = {nullptr};
+    int hashAlgorithmType = INVALID_TYPE;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_TWO, "Requires 2 arguments.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseInt32(env, hashAlgorithmType, argv[PARAM0]), "ParseInt32 failed", napi_invalid_arg);
+    outHashAlgorithmType = static_cast<HashAlgorithmType>(hashAlgorithmType);
+    NAPI_BT_RETURN_IF(!ParseString(env, hashValue, argv[PARAM1]), "ParseString failed", napi_invalid_arg);
+    return napi_ok;
+}
+
+napi_value GetVirtualAddressByHash(napi_env env, napi_callback_info info)
+{
+    HILOGD("enter");
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "connection.GetVirtualAddressByHash");
+    HashAlgorithmType hashAlgorithmType = HashAlgorithmType::HASH_ALGORITHM_UNKNOWN;
+    std::string hashValue;
+    std::string virtualAddress;
+    auto status = CheckGetVirtualAddressByHashParam(env, info, hashAlgorithmType, hashValue);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    int32_t err = host->GetVirtualAddressByHash(static_cast<int>(hashAlgorithmType), hashValue, virtualAddress);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, err == BT_NO_ERROR, err);
+    napi_value result = nullptr;
+    napi_create_string_utf8(env, virtualAddress.c_str(), virtualAddress.size(), &result);
+    return result;
 }
 
 napi_value OnScanModeChange(napi_env env, napi_callback_info info)
@@ -1076,6 +1109,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
 #endif
     napi_value deviceTypeObject = DeviceTypeInit(env);
     napi_value deviceChargeStateObject = DeviceChargeStateInit(env);
+    napi_value hashAlgorithmTypeObject = HashAlgorithmTypeInit(env);
     napi_property_descriptor exportProperties[] = {
         DECLARE_NAPI_PROPERTY("ScanMode", scanModeObj),
         DECLARE_NAPI_PROPERTY("BondState", bondStateObj),
@@ -1087,6 +1121,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
 #endif
         DECLARE_NAPI_PROPERTY("DeviceType", deviceTypeObject),
         DECLARE_NAPI_PROPERTY("DeviceChargeState", deviceChargeStateObject),
+        DECLARE_NAPI_PROPERTY("HashAlgorithmType", hashAlgorithmTypeObject),
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
     napi_define_properties(env, exports, sizeof(exportProperties) / sizeof(*exportProperties), exportProperties);
@@ -1238,6 +1273,17 @@ napi_value DeviceChargeStateInit(napi_env env)
         env, deviceChargeState, static_cast<int32_t>(DeviceChargeState::DEVICE_SUPER_CHARGE_IN_CHARGING),
         "DEVICE_SUPER_CHARGE_IN_CHARGING");
     return deviceChargeState;
+}
+
+napi_value HashAlgorithmTypeInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value hashAlgorithmType = nullptr;
+    napi_create_object(env, &hashAlgorithmType);
+    SetNamedPropertyByInteger(
+        env, hashAlgorithmType, static_cast<int32_t>(HashAlgorithmType::HASH_ALGORITHM_SHA256),
+        "HASH_ALGORITHM_SHA256");
+    return hashAlgorithmType;
 }
 
 void RegisterObserverToHost()

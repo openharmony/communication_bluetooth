@@ -40,6 +40,11 @@ enum class BluetoothTransport {
     TRANSPORT_UNKNOWN = 3
 };
 
+enum class HashAlgorithmType {
+    HASH_ALGORITHM_SHA256 = 0,
+    HASH_ALGORITHM_UNKNOWN,
+};
+
 const char * const REGISTER_DEVICE_FIND_TYPE = "bluetoothDeviceFind";
 const char * const REGISTER_DISCOVERY_RESULT_TYPE = "discoveryResult";
 const char * const REGISTER_PIN_REQUEST_TYPE = "pinRequired";
@@ -94,11 +99,13 @@ napi_value SetRemoteDeviceName(napi_env env, napi_callback_info info);
 napi_value SetRemoteDeviceType(napi_env env, napi_callback_info info);
 napi_value GetRemoteDeviceType(napi_env env, napi_callback_info info);
 napi_value GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info info);
+napi_value GetVirtualAddressByHash(napi_env env, napi_callback_info info);
 
 napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports);
 napi_value ScanModeInit(napi_env env);
 napi_value BondStateInit(napi_env env);
 napi_value UnbondCauseInit(napi_env env);
+napi_value HashAlgorithmTypeInit(napi_env env);
 #ifdef BLUETOOTH_API_SINCE_10
 napi_value BluetoothTransportInit(napi_env env);
 napi_value PinTypeInit(napi_env env);

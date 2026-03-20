@@ -345,6 +345,7 @@ enum BluetoothHostInterfaceCode {
     SET_CONNECTION_PRIORITY,
     IS_PROFILE_EXIST,
     GET_REAL_ADDRESS,
+    GET_VIRTUAL_ADDRESS_BY_HASH,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
