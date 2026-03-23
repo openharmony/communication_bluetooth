@@ -26,6 +26,7 @@
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
 #include "iservice_registry.h"
+#include "bluetooth_host_proxy.h"
 #include "system_ability_definition.h"
 #include "bluetooth_no_destructor.h"
 #include "ohos_bt_gatt.h"
@@ -119,7 +120,7 @@ sptr<IRemoteObject> BluetoothProfileManager::GetProfileRemote(const std::string 
     if (objectName == BLUETOOTH_HOST) {
         remote = hostRemote;
     } else {
-        sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
+        sptr<IBluetoothHost> hostProxy = new BluetoothHostProxy(hostRemote);
         CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, nullptr, "hostProxy is nullptr");
         if (objectName == BLE_ADVERTISER_SERVER || objectName == BLE_CENTRAL_MANAGER_SERVER) {
             remote = hostProxy->GetBleRemote(objectName);

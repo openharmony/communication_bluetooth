@@ -42,6 +42,7 @@
 #include "raw_address.h"
 #include "refbase.h"
 #include "string"
+#include "bluetooth_a2dp_sink_proxy.h"
 #include "system_ability_definition.h"
 #include "vector"
 
@@ -97,7 +98,7 @@ A2dpSink::impl::impl()
     CHECK_AND_RETURN_LOG(observerImp_ != nullptr, "observerImp_ is nullptr");
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_A2DP_SINK,
         [this](sptr<IRemoteObject> remote) {
-        sptr<IBluetoothA2dpSink> proxy = iface_cast<IBluetoothA2dpSink>(remote);
+        sptr<IBluetoothA2dpSink> proxy = new BluetoothA2dpSinkProxy(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->RegisterObserver(observerImp_);
     });

@@ -26,6 +26,7 @@
 #include "bluetooth_hfp_hf_observer_stub.h"
 #include "i_bluetooth_host.h"
 #include "iservice_registry.h"
+#include "bluetooth_hfp_hf_proxy.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
@@ -456,7 +457,7 @@ HandsFreeUnit::impl::impl()
     serviceObserver_ = new HfServiceObserver(observers_);
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_HFP_HF,
         [this](sptr<IRemoteObject> remote) {
-        sptr<IBluetoothHfpHf> proxy = iface_cast<IBluetoothHfpHf>(remote);
+        sptr<IBluetoothHfpHf> proxy = new BluetoothHfpHfProxy(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->RegisterObserver(serviceObserver_);
     });

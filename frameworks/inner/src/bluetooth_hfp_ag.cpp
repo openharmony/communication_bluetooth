@@ -29,6 +29,7 @@
 #include "bluetooth_hfp_ag_observer_stub.h"
 #include "i_bluetooth_host.h"
 #include "iservice_registry.h"
+#include "bluetooth_hfp_ag_proxy.h"
 #include "system_ability_definition.h"
 #include "bt_def.h"
 
@@ -419,7 +420,7 @@ HandsFreeAudioGateway::impl::impl()
     serviceObserver_ = new AgServiceObserver(observers_);
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_HFP_AG,
         [this](sptr<IRemoteObject> remote) {
-        sptr<IBluetoothHfpAg> proxy = iface_cast<IBluetoothHfpAg>(remote);
+        sptr<IBluetoothHfpAg> proxy = new BluetoothHfpAgProxy(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->RegisterObserver(serviceObserver_);
     });

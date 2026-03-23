@@ -139,7 +139,7 @@ A2dpSource::impl::impl()
     CHECK_AND_RETURN_LOG(observerImp_ != nullptr, "observerImp_ is nullptr");
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_A2DP_SRC,
         [this](sptr<IRemoteObject> remote) {
-        sptr<IBluetoothA2dpSrc> proxy = iface_cast<IBluetoothA2dpSrc>(remote);
+        sptr<IBluetoothA2dpSrc> proxy = new BluetoothA2dpSrcProxy(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->RegisterObserver(observerImp_);
     });

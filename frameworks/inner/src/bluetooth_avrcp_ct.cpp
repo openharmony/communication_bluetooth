@@ -30,6 +30,7 @@
 #include "bluetooth_observer_list.h"
 #include "i_bluetooth_avrcp_ct.h"
 #include "iservice_registry.h"
+#include "bluetooth_avrcp_ct_proxy.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
@@ -897,7 +898,7 @@ AvrcpController::impl::impl()
     CHECK_AND_RETURN_LOG(observer_ != nullptr, "observer_ is nullptr");
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_AVRCP_CT,
         [this](sptr<IRemoteObject> remote) {
-        sptr<IBluetoothAvrcpCt> proxy = iface_cast<IBluetoothAvrcpCt>(remote);
+        sptr<IBluetoothAvrcpCt> proxy = new BluetoothAvrcpCtProxy(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->RegisterObserver(observer_);
     });

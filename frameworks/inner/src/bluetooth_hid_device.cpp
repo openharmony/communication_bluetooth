@@ -28,6 +28,7 @@
 #include "i_bluetooth_hid_device.h"
 #include "i_bluetooth_host.h"
 #include "iservice_registry.h"
+#include "bluetooth_hid_device_proxy.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
@@ -241,7 +242,7 @@ HidDevice::impl::impl()
     innerObserver_ = new HidDeviceInnerObserver(observers_);
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_HID_DEVICE_SERVER,
         [this](sptr<IRemoteObject> remote) {
-        sptr<IBluetoothHidDevice> proxy = iface_cast<IBluetoothHidDevice>(remote);
+        sptr<IBluetoothHidDevice> proxy = new BluetoothHidDeviceProxy(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->RegisterObserver(innerObserver_);
     });
