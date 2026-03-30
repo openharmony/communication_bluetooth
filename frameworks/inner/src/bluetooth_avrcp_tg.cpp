@@ -65,7 +65,7 @@ public:
         CHECK_AND_RETURN_LOG(observer_ != nullptr, "observer_ is nullptr");
         profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_AVRCP_TG,
             [this](sptr<IRemoteObject> remote) {
-            sptr<IBluetoothAvrcpTg> proxy = iface_cast<IBluetoothAvrcpTg>(remote);
+            sptr<IBluetoothAvrcpTg> proxy = new BluetoothAvrcpTgProxy(remote);
             CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
             proxy->RegisterObserver(observer_);
         });

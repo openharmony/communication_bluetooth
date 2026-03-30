@@ -570,7 +570,7 @@ BluetoothHost::impl::impl()
 
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(BLUETOOTH_HOST,
         [this](sptr<IRemoteObject> remote) {
-        sptr<IBluetoothHost> proxy = iface_cast<IBluetoothHost>(remote);
+        sptr<IBluetoothHost> proxy = new BluetoothHostProxy(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
         proxy->RegisterObserver(observerImp_);
         proxy->RegisterBleAdapterObserver(bleObserverImp_);

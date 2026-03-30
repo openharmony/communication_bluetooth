@@ -27,6 +27,7 @@
 #include "i_bluetooth_ble_advertiser.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "bluetooth_ble_advertiser_proxy.h"
 #include "securec.h"
 
 #include <memory>
@@ -219,7 +220,7 @@ void BleAdvertiser::impl::Init(std::weak_ptr<BleAdvertiser> advertiser)
     callbackImp_ = new BluetoothBleAdvertiserCallbackImp(advertiser);
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(BLE_ADVERTISER_SERVER,
         [this, advertiser](sptr<IRemoteObject> remote) {
-        sptr<IBluetoothBleAdvertiser> proxy = iface_cast<IBluetoothBleAdvertiser>(remote);
+        sptr<IBluetoothBleAdvertiser> proxy = new BluetoothBleAdvertiserProxy(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->RegisterBleAdvertiserCallback(callbackImp_);
         deathRecipient_ = new BleAdvertiserDeathRecipient(advertiser);

@@ -26,6 +26,7 @@
 #include "i_bluetooth_host.h"
 #include "bluetooth_utils.h"
 #include "iservice_registry.h"
+#include "bluetooth_pan_proxy.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
@@ -155,7 +156,7 @@ Pan::impl::impl()
     innerObserver_ = new PanInnerObserver(observers_);
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_PAN_SERVER,
         [this](sptr<IRemoteObject> remote) {
-        sptr<IBluetoothPan> proxy = iface_cast<IBluetoothPan>(remote);
+        sptr<IBluetoothPan> proxy = new BluetoothPanProxy(remote);
         if (proxy == nullptr) {
             HILOGD("failed: no proxy");
             return;

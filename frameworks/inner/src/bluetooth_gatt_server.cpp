@@ -518,7 +518,7 @@ bool GattServer::impl::Init(std::weak_ptr<GattServer> server)
     serviceCallback_ = new BluetoothGattServerCallbackStubImpl(server);
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_GATT_SERVER,
         [this](sptr<IRemoteObject> remote) {
-        sptr<IBluetoothGattServer> proxy = iface_cast<IBluetoothGattServer>(remote);
+        sptr<IBluetoothGattServer> proxy = new BluetoothGattServerProxy(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         int result = proxy->RegisterApplication(serviceCallback_);
         if (result > 0) {

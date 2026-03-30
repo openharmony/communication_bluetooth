@@ -79,7 +79,7 @@ PbapPse::impl::impl()
     serviceObserverImp_ = new BluetoothPbapPseObserverImp(observers_);
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_PBAP_PSE,
         [this](sptr<IRemoteObject> remote) {
-        sptr<IBluetoothPbapPse> proxy = iface_cast<IBluetoothPbapPse>(remote);
+        sptr<IBluetoothPbapPse> proxy = new BluetoothPbapPseProxy(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         proxy->RegisterObserver(serviceObserverImp_);
     });

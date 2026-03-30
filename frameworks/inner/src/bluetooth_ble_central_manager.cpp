@@ -27,6 +27,7 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "bluetooth_profile_manager.h"
+#include "bluetooth_ble_central_manager_proxy.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -155,7 +156,7 @@ BleCentralManager::impl::impl()
 {
     callbackImp_ = new BluetoothBleCentralManagerCallbackImp();
     auto bleTurnOnFunc = [this](sptr<IRemoteObject> remote) {
-        sptr<IBluetoothBleCentralManager> proxy = iface_cast<IBluetoothBleCentralManager>(remote);
+        sptr<IBluetoothBleCentralManager> proxy = new BluetoothBleCentralManagerProxy(remote);
         CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
         std::lock_guard<std::mutex> lock(scannerIdMutex_);
         if (scannerId_ == BLE_SCAN_INVALID_ID) {
