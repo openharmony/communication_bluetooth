@@ -98,7 +98,12 @@ static NapiBleScanner *NapiGetBleScanner(napi_env env, napi_callback_info info)
 napi_value NapiBleScanner::StartScan(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "ble.BleScanner.StartScan");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_BLE_SCAN_NO_RESOURCE,
+        BT_ERR_INTERNAL_ERROR, BT_ERR_BLE_SCAN_ALREADY_STARTED
+    };
+    NAPI_BT_CONTEXT(env, "ble.BleScanner.StartScan", validErrCodes);
     std::vector<BleScanFilter> scanFilters;
     BleScanSettings settings;
     auto status = CheckBleScanParams(env, info, scanFilters, settings);
@@ -119,7 +124,7 @@ napi_value NapiBleScanner::StartScan(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(ret);
     };
 
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     bool success =
         napiBleScanner->GetCallback()->asyncWorkMap_.TryPush(NapiAsyncType::BLE_START_SCAN, asyncWork);

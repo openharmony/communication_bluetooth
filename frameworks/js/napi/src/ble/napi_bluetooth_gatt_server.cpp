@@ -286,6 +286,11 @@ napi_value NapiGattServer::RemoveGattService(napi_env env, napi_callback_info in
 napi_value NapiGattServer::GetService(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR, BT_ERR_GATT_SERVICE_NOT_FOUND
+    };
+    NAPI_BT_CONTEXT(env, "ble.GattServer.GetService", validErrCodes);
     std::shared_ptr<GattServer> server {nullptr};
     UUID serviceUuid;
     auto status = CheckGattsServiceUuid(env, info, server, serviceUuid);
@@ -297,7 +302,7 @@ napi_value NapiGattServer::GetService(napi_env env, napi_callback_info info)
     if (ret != BT_NO_ERROR) {
         ret = server->GetService(serviceUuid, false, outService);
     }
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_ERR_RETURN_VERIFY(env, ret == BT_NO_ERROR, ret);
 
     napi_value obj = nullptr;
     napi_create_object(env, &obj);
@@ -438,6 +443,11 @@ static napi_status CheckNotifyCharacteristicChangedEx(napi_env env, napi_callbac
 napi_value NapiGattServer::NotifyCharacteristicChangedEx(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "ble.GattServer.NotifyCharacteristicChangedEx", validErrCodes);
     NapiGattServer* napiServer = nullptr;
     std::string deviceId {};
     NapiNotifyCharacteristic notifyCharacter;
@@ -450,14 +460,14 @@ napi_value NapiGattServer::NotifyCharacteristicChangedEx(napi_env env, napi_call
         auto character = GetGattCharacteristic(server, notifyCharacter.serviceUuid, notifyCharacter.characterUuid);
         if (character == nullptr) {
             HILOGI("character is null!");
-            return NapiAsyncWorkRet(ret);
+            return NapiAsyncWorkRet(BT_ERR_GATT_CHARACTER_ERROR);
         }
         character->SetValue(notifyCharacter.characterValue.data(), notifyCharacter.characterValue.size());
         BluetoothRemoteDevice remoteDevice(deviceId, BTTransport::ADAPTER_BLE);
         ret = server->NotifyCharacteristicChanged(remoteDevice, *character, notifyCharacter.confirm);
         return NapiAsyncWorkRet(ret);
     };
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
 
     bool success = napiServer->GetCallback()->asyncWorkMap_.TryPush(NapiAsyncType::GATT_SERVER_NOTIFY_CHARACTERISTIC,

@@ -95,7 +95,8 @@ void NapiCallback::CallFunction(const std::shared_ptr<NapiNativeObject> &object)
 {
     g_napiCallFunctionCount++;
 }
-void NapiCallback::CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object) {}
+void NapiCallback::CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object,
+    const std::string &errMsg) {}
 napi_env NapiCallback::GetNapiEnv(void)
 {
     return env_;

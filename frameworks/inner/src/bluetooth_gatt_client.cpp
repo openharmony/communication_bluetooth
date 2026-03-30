@@ -1051,7 +1051,7 @@ int GattClient::WriteCharacteristic(GattCharacteristic &characteristic, std::vec
     HILOGD("length:%{public}zu", length);
     if (length == 0) {
         HILOGE("Invalid parameters");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_INVALID_PARAM_ERROR;
     }
     std::lock_guard<std::mutex> lock(pimpl->requestInformation_.mutex_);
     if (pimpl->requestInformation_.doing_) {

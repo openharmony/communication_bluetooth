@@ -765,8 +765,9 @@ static napi_status CheckWriteCharacteristicValueEx(napi_env env, napi_callback_i
 }
 
 napi_value NapiGattClient::WriteCharacteristicValueCommon(napi_env env, napi_callback_info info,
-    bool isWithContext, std::shared_ptr<NapiHaEventUtils> haUtils)
+    bool isWithContext, const std::string& apiName, const std::vector<int32_t> &validErrCodes)
 {
+    NAPI_BT_CONTEXT(env, apiName, validErrCodes);
     GattCharacteristic* character = nullptr;
     NapiGattClient* client = nullptr;
     NapiAsyncType asyncType = GATT_CLIENT_WRITE_CHARACTER;
@@ -784,7 +785,7 @@ napi_value NapiGattClient::WriteCharacteristicValueCommon(napi_env env, napi_cal
     auto func = [gattClient = client->GetClient(), character, isWithContext]() {
         if (character == nullptr) {
             HILOGE("character is nullptr");
-            return NapiAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
+            return NapiAsyncWorkRet(BT_ERR_GATT_CHARACTER_ERROR);
         }
         int ret = BT_ERR_INTERNAL_ERROR;
         if (gattClient) {
@@ -795,8 +796,8 @@ napi_value NapiGattClient::WriteCharacteristicValueCommon(napi_env env, napi_cal
     };
 
     bool isNeedCallback = character->GetWriteType() == GattCharacteristic::WriteType::DEFAULT;
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(
-        env, info, func, isNeedCallback ? ASYNC_WORK_NEED_CALLBACK : ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func,
+        isNeedCallback ? ASYNC_WORK_NEED_CALLBACK : ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     // GattCharacteristic write need callback, write no response is not needed.
     if (isNeedCallback) {
@@ -811,17 +812,29 @@ napi_value NapiGattClient::WriteCharacteristicValueCommon(napi_env env, napi_cal
 napi_value NapiGattClient::WriteCharacteristicValueEx(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils =
-        std::make_shared<NapiHaEventUtils>(env, "ble.GattClientDevice.WriteCharacteristicValueEx");
-    return WriteCharacteristicValueCommon(env, info, false, haUtils);
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_OPERATION_BUSY, BT_ERR_INTERNAL_ERROR, BT_ERR_GATT_WRITE_NOT_PERMITTED,
+        BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED, BT_ERR_GATT_CONNECTION_CONGESTED,
+        BT_ERR_GATT_CONNECTION_NOT_ENCRYPTED, BT_ERR_GATT_CONNECTION_NOT_AUTHENTICATED,
+        BT_ERR_GATT_CONNECTION_NOT_AUTHORIZED
+    };
+    std::string apiName = "ble.GattClientDevice.WriteCharacteristicValueEx";
+    return WriteCharacteristicValueCommon(env, info, false, apiName, validErrCodes);
 }
 
 napi_value NapiGattClient::WriteCharacteristicValueWithContext(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils =
-        std::make_shared<NapiHaEventUtils>(env, "ble.GattClientDevice.WriteCharacteristicValueWithContext");
-    return WriteCharacteristicValueCommon(env, info, true, haUtils);
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_OPERATION_BUSY, BT_ERR_INTERNAL_ERROR, BT_ERR_GATT_WRITE_NOT_PERMITTED,
+        BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED, BT_ERR_GATT_CONNECTION_CONGESTED,
+        BT_ERR_GATT_CONNECTION_NOT_ENCRYPTED, BT_ERR_GATT_CONNECTION_NOT_AUTHENTICATED,
+        BT_ERR_GATT_CONNECTION_NOT_AUTHORIZED
+    };
+    std::string apiName = "ble.GattClientDevice.WriteCharacteristicValueWithContext";
+    return WriteCharacteristicValueCommon(env, info, true, apiName, validErrCodes);
 }
 
 static napi_status CheckWriteDescriptorValueEx(napi_env env, napi_callback_info info,
@@ -897,8 +910,15 @@ static napi_status CheckSetCharacteristicChange(napi_env env, napi_callback_info
     return napi_ok;
 }
 
-static napi_value setCharacteristicChangeInner(napi_env env, napi_callback_info info, bool isNotify)
+static napi_value setCharacteristicChangeInner(napi_env env, napi_callback_info info, bool isNotify,
+    const std::string& apiName)
 {
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_OPERATION_BUSY, BT_ERR_INTERNAL_ERROR,
+        BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED
+    };
+    NAPI_BT_CONTEXT(env, apiName, validErrCodes);
     GattCharacteristic *character = nullptr;
     bool enable = false;
     NapiGattClient *client = nullptr;
@@ -910,7 +930,7 @@ static napi_value setCharacteristicChangeInner(napi_env env, napi_callback_info 
     auto func = [gattClient = client->GetClient(), character, enable, isNotify]() {
         if (character == nullptr) {
             HILOGE("character is nullptr");
-            return NapiAsyncWorkRet(BT_ERR_INTERNAL_ERROR);
+            return NapiAsyncWorkRet(BT_ERR_GATT_CHARACTER_ERROR);
         }
         int ret = BT_ERR_INTERNAL_ERROR;
         if (gattClient) {
@@ -923,7 +943,7 @@ static napi_value setCharacteristicChangeInner(napi_env env, napi_callback_info 
         }
         return NapiAsyncWorkRet(ret);
     };
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     bool success = client->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_ENABLE_CHARACTER_CHANGED, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
@@ -935,13 +955,15 @@ static napi_value setCharacteristicChangeInner(napi_env env, napi_callback_info 
 napi_value NapiGattClient::setCharacteristicChangeNotification(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    return setCharacteristicChangeInner(env, info, true);
+    std::string apiName = "ble.GattClientDevice.setCharacteristicChangeNotification";
+    return setCharacteristicChangeInner(env, info, true, apiName);
 }
 
 napi_value NapiGattClient::setCharacteristicChangeIndication(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    return setCharacteristicChangeInner(env, info, false);
+    std::string apiName = "ble.GattClientDevice.setCharacteristicChangeIndication";
+    return setCharacteristicChangeInner(env, info, false, apiName);
 }
 
 static napi_status ParseSetPhyValue(napi_env env, napi_callback_info info,
@@ -1042,6 +1064,11 @@ static napi_status CheckWriteCharacteristicValue(napi_env env, napi_callback_inf
 napi_value NapiGattClient::WriteCharacteristicValue(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_GATT_WRITE_NOT_PERMITTED, BT_ERR_INTERNAL_ERROR,
+    };
+    NAPI_BT_CONTEXT(env, "bluetoothmanager.GattClientDevice.WriteCharacteristicValue", validErrCodes);
     GattCharacteristic* characteristic = nullptr;
     NapiGattClient* gattClient = nullptr;
 
@@ -1053,7 +1080,7 @@ napi_value NapiGattClient::WriteCharacteristicValue(napi_env env, napi_callback_
     int ret = client->WriteCharacteristic(*characteristic, std::move(value));
     ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret)); // Adaptation for old sdk
     HILOGI("ret: %{public}d", ret);
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_RETURN_FALSE_VERIFY(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
 

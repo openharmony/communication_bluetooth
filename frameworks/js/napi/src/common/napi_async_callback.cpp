@@ -22,7 +22,8 @@
 
 namespace OHOS {
 namespace Bluetooth {
-void NapiAsyncCallback::CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object)
+void NapiAsyncCallback::CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object,
+    const std::string &errMsg)
 {
     if (callback == nullptr && promise == nullptr) {
         HILOGE("callback & promise is nullptr");
@@ -34,11 +35,11 @@ void NapiAsyncCallback::CallFunction(int errCode, const std::shared_ptr<NapiNati
     }
 
     if (callback) {
-        callback->CallFunction(errCode, object);
+        callback->CallFunction(errCode, object, errMsg);
         return;
     }
     if (promise) {
-        promise->ResolveOrReject(errCode, object);
+        promise->ResolveOrReject(errCode, object, errMsg);
     }
 }
 
@@ -131,7 +132,7 @@ void NapiCallback::CallFunction(const std::shared_ptr<NapiNativeObject> &object)
     NapiCallFunction(env_, callbackRef_, &val, ARGS_SIZE_ONE);
 }
 
-void NapiCallback::CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object)
+void NapiCallback::CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object, const std::string &errMsg)
 {
     if (!IsValidNapiEnv()) {
         HILOGW("napi env is exit");
@@ -143,7 +144,7 @@ void NapiCallback::CallFunction(int errCode, const std::shared_ptr<NapiNativeObj
     }
 
     NapiHandleScope scope(env_);
-    napi_value code = GetCallbackErrorValue(env_, errCode);
+    napi_value code = GetCallbackErrorValue(env_, errCode, errMsg);
     napi_value val = object->ToNapiValue(env_);
     napi_value argv[ARGS_SIZE_TWO] = {code, val};
     NapiCallFunction(env_, callbackRef_, argv, ARGS_SIZE_TWO);
@@ -206,7 +207,8 @@ NapiPromise::~NapiPromise()
     napi_remove_env_cleanup_hook(env_, NapiPromiseEnvCleanupHook, this);
 }
 
-void NapiPromise::ResolveOrReject(int errCode, const std::shared_ptr<NapiNativeObject> &object)
+void NapiPromise::ResolveOrReject(int errCode, const std::shared_ptr<NapiNativeObject> &object,
+    const std::string &errMsg)
 {
     if (!IsValidNapiEnv()) {
         HILOGW("napi env is exit");
@@ -228,7 +230,7 @@ void NapiPromise::ResolveOrReject(int errCode, const std::shared_ptr<NapiNativeO
         napi_value val = object->ToNapiValue(env_);
         Resolve(val);
     } else {
-        napi_value code = GetCallbackErrorValue(env_, errCode);
+        napi_value code = GetCallbackErrorValue(env_, errCode, errMsg);
         Reject(code);
     }
     isResolvedOrRejected_ = true;

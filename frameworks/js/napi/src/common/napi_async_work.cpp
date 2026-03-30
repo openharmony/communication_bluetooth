@@ -20,6 +20,7 @@
 #include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "napi_async_callback.h"
+#include "napi_bluetooth_error.h"
 #include "napi_bluetooth_utils.h"
 #include "napi_timer.h"
 #include "parser/napi_parser_utils.h"
@@ -37,6 +38,27 @@ std::shared_ptr<NapiAsyncWork> NapiAsyncWorkFactory::CreateAsyncWork(napi_env en
     // add custom deleter for destructing in JS thread.
     std::shared_ptr<NapiAsyncWork> napiAsyncWork(
         new NapiAsyncWork(env, asyncWork, asyncCallback, needCallback, haUtils),
+        [env](NapiAsyncWork *ptr) {
+            DoInJsMainThread(env, [ptr]() {
+                if (ptr) {
+                    delete ptr;
+                }
+            });
+        });
+    return napiAsyncWork;
+}
+
+std::shared_ptr<NapiAsyncWork> NapiAsyncWorkFactory::CreateAsyncWork(napi_env env, napi_callback_info info,
+    std::function<NapiAsyncWorkRet(void)> asyncWork, bool needCallback, ApiContext apiContext)
+{
+    auto asyncCallback = NapiParseAsyncCallback(env, info);
+    if (!asyncCallback) {
+        HILOGE("asyncCallback is nullptr!");
+        return nullptr;
+    }
+    // add custom deleter for destructing in JS thread.
+    std::shared_ptr<NapiAsyncWork> napiAsyncWork(
+        new NapiAsyncWork(env, asyncWork, asyncCallback, needCallback, apiContext),
         [env](NapiAsyncWork *ptr) {
             DoInJsMainThread(env, [ptr]() {
                 if (ptr) {
@@ -99,7 +121,14 @@ void NapiAsyncWork::Info::Complete(void)
         if (haUtils) {
             haUtils->WriteErrCode(errCode);
         }
-        napiAsyncWork->napiAsyncCallback_->CallFunction(errCode, object);
+        std::vector<int32_t> validErrCodes = napiAsyncWork->validErrCodes_;
+        if (!validErrCodes.empty()) {
+            validErrCodes.emplace_back(BT_NO_ERROR); // BT_NO_ERROR is valid error code
+            auto result = ProcessErrCode(errCode, validErrCodes);
+            errCode = result.errCode;
+            errMsg = result.errMsg;
+        }
+        napiAsyncWork->napiAsyncCallback_->CallFunction(errCode, object, errMsg);
     }
 }
 
@@ -178,13 +207,20 @@ void NapiAsyncWork::CallFunction(int errCode, std::shared_ptr<NapiNativeObject> 
     NapiTimer::GetInstance()->Unregister(timerId_);
 
     triggered_ = true;
-    auto func = [errCode, nativeObj, asyncWorkPtr = shared_from_this()]() {
+    auto func = [errCode, nativeObj, asyncWorkPtr = shared_from_this(), this]() {
         if (asyncWorkPtr && asyncWorkPtr->napiAsyncCallback_) {
             auto haUtils = asyncWorkPtr->GetHaUtilsPtr();
             if (haUtils) {
                 haUtils->WriteErrCode(errCode);
             }
-            asyncWorkPtr->napiAsyncCallback_->CallFunction(errCode, nativeObj);
+            std::vector<int32_t> validErrCodes = validErrCodes_;
+            if (!validErrCodes.empty()) {
+                validErrCodes.emplace_back(BT_NO_ERROR); // BT_NO_ERROR is valid error code
+                auto result = ProcessErrCode(errCode, validErrCodes);
+                asyncWorkPtr->napiAsyncCallback_->CallFunction(result.errCode, nativeObj, result.errMsg);
+            } else {
+                asyncWorkPtr->napiAsyncCallback_->CallFunction(errCode, nativeObj);
+            }
         }
     };
     DoInJsMainThread(env_, std::move(func));
