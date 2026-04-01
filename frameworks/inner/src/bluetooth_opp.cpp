@@ -26,7 +26,6 @@
 #include "i_bluetooth_opp.h"
 #include "i_bluetooth_host.h"
 #include "iservice_registry.h"
-#include "bluetooth_opp_proxy.h"
 #include "system_ability_definition.h"
 #ifndef CROSS_PLATFORM
 #include "ipc_skeleton.h"
@@ -113,7 +112,7 @@ struct Opp::impl {
         serviceObserverImp_ = new BluetoothOppObserverImpl(observers_);
         profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_OPP_SERVER,
         [this](sptr<IRemoteObject> remote) {
-            sptr<IBluetoothOpp> proxy = new BluetoothOppProxy(remote);
+            sptr<IBluetoothOpp> proxy = iface_cast<IBluetoothOpp>(remote);
             CHECK_AND_RETURN_LOG(proxy != nullptr, "failed: no proxy");
             proxy->RegisterObserver(serviceObserverImp_);
         });
