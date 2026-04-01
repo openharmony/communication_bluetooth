@@ -1066,7 +1066,7 @@ int GetCurrentSdkVersion(void)
         HILOGE("fail to get bundle manager proxy.");
         return version;
     }
-    sptr<AppExecFwk::IBundleMgr> iBundleMgr = new AppExecFwk::BundleMgrProxy(remoteObject);
+    sptr<AppExecFwk::IBundleMgr> iBundleMgr = iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
     if (iBundleMgr == nullptr) {
         HILOGE("Failed to get bundle manager proxy.");
         return version;
