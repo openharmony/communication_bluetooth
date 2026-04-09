@@ -45,7 +45,6 @@ std::mutex deviceMutex;
 #ifdef BLUETOOTH_API_SINCE_10
 napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
 {
-    HILOGD("enter");
     RegisterObserverToHost();
     ConnectionPropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {
@@ -60,10 +59,6 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("pairCredibleDevice", PairCredibleDevice),
         DECLARE_NAPI_FUNCTION("getLocalProfileUuids", GetLocalProfileUuids),
         DECLARE_NAPI_FUNCTION("getRemoteProfileUuids", GetRemoteProfileUuids),
-        DECLARE_NAPI_FUNCTION("on", RegisterConnectionObserver),
-        DECLARE_NAPI_FUNCTION("off", DeRegisterConnectionObserver),
-        DECLARE_NAPI_FUNCTION("onScanModeChange", OnScanModeChange),
-        DECLARE_NAPI_FUNCTION("offScanModeChange", OffScanModeChange),
         DECLARE_NAPI_FUNCTION("isBluetoothDiscovering", IsBluetoothDiscovering),
         DECLARE_NAPI_FUNCTION("getPairState", GetPairState),
         DECLARE_NAPI_FUNCTION("connectAllowedProfiles", ConnectAllowedProfiles),
@@ -94,8 +89,24 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+    DefineConnectionOnOffFunctions(env, exports);
     return exports;
 }
+
+void DefineConnectionOnOffFunctions(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_FUNCTION("on", RegisterConnectionObserver),
+        DECLARE_NAPI_FUNCTION("off", DeRegisterConnectionObserver),
+        DECLARE_NAPI_FUNCTION("onScanModeChange", OnScanModeChange),
+        DECLARE_NAPI_FUNCTION("offScanModeChange", OffScanModeChange),
+        DECLARE_NAPI_FUNCTION("onAclStateChange", OnAclStateChange),
+        DECLARE_NAPI_FUNCTION("offAclStateChange", OffAclStateChange),
+    };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
+    napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+}
+
 #else
 napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
 {
@@ -148,7 +159,8 @@ static napi_status NapiConnectionOnOffExecute(napi_env env, napi_callback_info i
         typeName == REGISTER_PIN_REQUEST_TYPE ||
         typeName == REGISTER_SCAN_MODE_CHANGE_TYPE) {
         status = connectionObserverFunc(env, info);
-    } else if (typeName == REGISTER_BOND_STATE_TYPE || typeName == REGISTER_BATTERY_CHANGE_TYPE) {
+    } else if (typeName == REGISTER_BOND_STATE_TYPE || typeName == REGISTER_BATTERY_CHANGE_TYPE ||
+        typeName == REGISTER_ACL_STATE_TYPE) {
         status = remoteDeviceObserverFunc(env, info);
     } else {
         HILOGE("Unsupported callback: %{public}s", typeName.c_str());
@@ -168,7 +180,8 @@ static napi_status NapiConnectionOnOffExecuteWithName(napi_env env, napi_callbac
         typeName == REGISTER_PIN_REQUEST_TYPE ||
         typeName == REGISTER_SCAN_MODE_CHANGE_TYPE) {
         status = connectionObserverFuncWithName(env, info, typeName);
-    } else if (typeName == REGISTER_BOND_STATE_TYPE || typeName == REGISTER_BATTERY_CHANGE_TYPE) {
+    } else if (typeName == REGISTER_BOND_STATE_TYPE || typeName == REGISTER_BATTERY_CHANGE_TYPE ||
+        typeName == REGISTER_ACL_STATE_TYPE) {
         status = remoteDeviceObserverFuncWithName(env, info, typeName);
     } else {
         HILOGE("Unsupported callback: %{public}s", typeName.c_str());
@@ -277,6 +290,16 @@ napi_value OnScanModeChange(napi_env env, napi_callback_info info)
 napi_value OffScanModeChange(napi_env env, napi_callback_info info)
 {
     return DeRegisterConnectionObserverWithName(env, info, REGISTER_SCAN_MODE_CHANGE_TYPE);
+}
+
+napi_value OnAclStateChange(napi_env env, napi_callback_info info)
+{
+    return RegisterConnectionObserverWithName(env, info, REGISTER_ACL_STATE_TYPE);
+}
+
+napi_value OffAclStateChange(napi_env env, napi_callback_info info)
+{
+    return DeRegisterConnectionObserverWithName(env, info, REGISTER_ACL_STATE_TYPE);
 }
 
 napi_value GetBtConnectionState(napi_env env, napi_callback_info info)
@@ -1110,6 +1133,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
     napi_value deviceTypeObject = DeviceTypeInit(env);
     napi_value deviceChargeStateObject = DeviceChargeStateInit(env);
     napi_value hashAlgorithmTypeObject = HashAlgorithmTypeInit(env);
+    napi_value aclStateObject = AclStateInit(env);
     napi_property_descriptor exportProperties[] = {
         DECLARE_NAPI_PROPERTY("ScanMode", scanModeObj),
         DECLARE_NAPI_PROPERTY("BondState", bondStateObj),
@@ -1122,6 +1146,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("DeviceType", deviceTypeObject),
         DECLARE_NAPI_PROPERTY("DeviceChargeState", deviceChargeStateObject),
         DECLARE_NAPI_PROPERTY("HashAlgorithmType", hashAlgorithmTypeObject),
+        DECLARE_NAPI_PROPERTY("AclState", aclStateObject),
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
     napi_define_properties(env, exports, sizeof(exportProperties) / sizeof(*exportProperties), exportProperties);
@@ -1284,6 +1309,18 @@ napi_value HashAlgorithmTypeInit(napi_env env)
         env, hashAlgorithmType, static_cast<int32_t>(HashAlgorithmType::HASH_ALGORITHM_SHA256),
         "HASH_ALGORITHM_SHA256");
     return hashAlgorithmType;
+}
+
+napi_value AclStateInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value aclState = nullptr;
+    napi_create_object(env, &aclState);
+    SetNamedPropertyByInteger(env, aclState, static_cast<int32_t>(AclConnectionState::STATE_CONNECTED),
+        "STATE_CONNECTED");
+    SetNamedPropertyByInteger(env, aclState, static_cast<int32_t>(AclConnectionState::STATE_DISCONNECTED),
+        "STATE_DISCONNECTED");
+    return aclState;
 }
 
 void RegisterObserverToHost()

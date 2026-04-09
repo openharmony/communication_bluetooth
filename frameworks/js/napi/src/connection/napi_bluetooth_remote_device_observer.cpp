@@ -30,13 +30,19 @@ namespace OHOS {
 namespace Bluetooth {
 NapiBluetoothRemoteDeviceObserver::NapiBluetoothRemoteDeviceObserver()
     : eventSubscribe_({REGISTER_BOND_STATE_TYPE,
-        REGISTER_BATTERY_CHANGE_TYPE},
+        REGISTER_BATTERY_CHANGE_TYPE,
+        REGISTER_ACL_STATE_TYPE},
         BT_MODULE_NAME)
 {}
 
 void NapiBluetoothRemoteDeviceObserver::OnAclStateChanged(
     const BluetoothRemoteDevice &device, int state, unsigned int reason)
-{}
+{
+    int napiAclState = (state == 0) ? static_cast<int>(AclConnectionState::STATE_DISCONNECTED) : // 0代表断连
+        static_cast<int>(AclConnectionState::STATE_CONNECTED);
+    auto nativeObject = std::make_shared<NapiNativeAclStateParam>(device.GetDeviceAddr(), napiAclState);
+    eventSubscribe_.PublishEvent(REGISTER_ACL_STATE_TYPE, nativeObject);
+}
 
 void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device, int status, int cause)
 {

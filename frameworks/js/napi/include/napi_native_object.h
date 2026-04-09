@@ -326,6 +326,17 @@ private:
     int txPhy_;
     int rxPhy_;
 };
+
+class NapiNativeAclStateParam : public NapiNativeObject {
+public:
+    NapiNativeAclStateParam(std::string deviceAddr, int aclState) : deviceAddr_(deviceAddr), aclState_(aclState) {}
+    ~NapiNativeAclStateParam() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    std::string deviceAddr_ = "";
+    int aclState_ = 1; // 1代表断连
+};
 }  // namespace Bluetooth
 }  // namespace OHOS
 #endif  // NAPI_NATIVE_OBJECT_H

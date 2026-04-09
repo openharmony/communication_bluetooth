@@ -435,5 +435,21 @@ napi_value NapiNativeBlePhyInfo::ToNapiValue(napi_env env) const
     napi_set_named_property(env, object, "rxPhy", value);
     return object;
 }
+
+napi_value NapiNativeAclStateParam::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    napi_value device = nullptr;
+    napi_create_string_utf8(env, deviceAddr_.c_str(), deviceAddr_.size(), &device);
+    napi_set_named_property(env, result, "deviceId", device);
+
+    napi_value aclState = nullptr;
+    napi_create_int32(env, aclState_, &aclState);
+    napi_set_named_property(env, result, "state", aclState);
+
+    return result;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
