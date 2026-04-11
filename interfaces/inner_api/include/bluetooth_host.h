@@ -943,6 +943,15 @@ public:
     int NotifyDialogResult(uint32_t dialogType, bool dialogResult);
 
     /**
+     * @brief Check if bluetooth is supported on this device.
+     *
+     * @return Returns <b>true<b> if bluetooth is supported;
+     *         returns <b>false<b> if bluetooth is not supported.
+     * @since 26
+     */
+    bool IsBluetoothSupported();
+
+    /**
      * @brief set the package name of calling app which is pairing or connecting remote bluetooth device.
      *
      * @param address The address of remote bluetooth device.
