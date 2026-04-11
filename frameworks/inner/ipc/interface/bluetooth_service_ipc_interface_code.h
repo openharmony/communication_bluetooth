@@ -346,6 +346,7 @@ enum BluetoothHostInterfaceCode {
     IS_PROFILE_EXIST,
     GET_REAL_ADDRESS,
     GET_VIRTUAL_ADDRESS_BY_HASH,
+    IS_BLUETOOTH_SUPPORTED,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
