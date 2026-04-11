@@ -43,7 +43,7 @@
     ],
     "features": [
       "bluetooth_kia_enable",
-      "bluetooth_pluggable_suppoorted"
+      "bluetooth_pluggable_supported"
     ],
     "adapted_system_type": [
       "standard"
