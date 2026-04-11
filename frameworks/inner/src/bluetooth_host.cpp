@@ -1396,7 +1396,7 @@ bool BluetoothHost::IsBluetoothSupported()
     CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().pimpl->LoadBluetoothHostService(),
         false, "load bluetooth service failed.");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "bluetooth host is nullptr");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "bluetooth host is nullptr");
     bool result = proxy->IsBluetoothSupported();
     pimpl->btPluggableState_ = (result ? BLUETOOTH_PLUGGABLE_EMPLACE : BLUETOOTH_PLUGGABLE_EXTRACT);
     return result;
