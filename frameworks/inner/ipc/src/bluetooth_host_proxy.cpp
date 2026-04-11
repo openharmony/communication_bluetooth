@@ -2266,7 +2266,7 @@ bool BluetoothHostProxy::IsBluetoothSupported()
 {
     MessageParcel reply;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
-        BT_ERR_IPC_TRANS_FAILED, "WriteToken err");
+        false, "WriteToken err");
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::IS_BLUETOOTH_SUPPORTED, option, data, reply);
