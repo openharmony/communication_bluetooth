@@ -45,12 +45,18 @@ enum class HashAlgorithmType {
     HASH_ALGORITHM_UNKNOWN,
 };
 
+enum class AclConnectionState {
+    STATE_CONNECTED = 0,
+    STATE_DISCONNECTED = 1,
+};
+
 const char * const REGISTER_DEVICE_FIND_TYPE = "bluetoothDeviceFind";
 const char * const REGISTER_DISCOVERY_RESULT_TYPE = "discoveryResult";
 const char * const REGISTER_PIN_REQUEST_TYPE = "pinRequired";
 const char * const REGISTER_BOND_STATE_TYPE = "bondStateChange";
 const char * const REGISTER_BATTERY_CHANGE_TYPE = "batteryChange";
 const char * const REGISTER_SCAN_MODE_CHANGE_TYPE = "scanModeChange";
+const char * const REGISTER_ACL_STATE_TYPE = "aclStateChange";
 const char * const INVALID_PIN_CODE = "000000";
 
 napi_value DefineConnectionFunctions(napi_env env, napi_value exports);
@@ -58,6 +64,7 @@ napi_value GetBtConnectionState(napi_env env, napi_callback_info info);
 #ifdef BLUETOOTH_API_SINCE_10
 napi_value PairDeviceAsync(napi_env env, napi_callback_info info);
 napi_value CancelPairedDeviceAsync(napi_env env, napi_callback_info info);
+void DefineConnectionOnOffFunctions(napi_env env, napi_value exports);
 #else
 napi_value PairDevice(napi_env env, napi_callback_info info);
 napi_value CancelPairedDevice(napi_env env, napi_callback_info info);
@@ -92,6 +99,8 @@ napi_value GetRemoteProductId(napi_env env, napi_callback_info info);
 napi_value GetRemoteDeviceTransport(napi_env env, napi_callback_info info);
 napi_value OnScanModeChange(napi_env env, napi_callback_info info);
 napi_value OffScanModeChange(napi_env env, napi_callback_info info);
+napi_value OnAclStateChange(napi_env env, napi_callback_info info);
+napi_value OffAclStateChange(napi_env env, napi_callback_info info);
 napi_value RegisterConnectionObserverWithName(napi_env env, napi_callback_info info, std::string typeName);
 napi_value DeRegisterConnectionObserverWithName(napi_env env, napi_callback_info info, std::string typeName);
 #endif
@@ -106,6 +115,7 @@ napi_value ScanModeInit(napi_env env);
 napi_value BondStateInit(napi_env env);
 napi_value UnbondCauseInit(napi_env env);
 napi_value HashAlgorithmTypeInit(napi_env env);
+napi_value AclStateInit(napi_env env);
 #ifdef BLUETOOTH_API_SINCE_10
 napi_value BluetoothTransportInit(napi_env env);
 napi_value PinTypeInit(napi_env env);
