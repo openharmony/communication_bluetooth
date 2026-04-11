@@ -2264,7 +2264,7 @@ int32_t BluetoothHostProxy::IsProfileExist(const std::string &profileName, bool 
 
 bool BluetoothHostProxy::IsBluetoothSupported()
 {
-    MessageParcel reply;
+    MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
         false, "WriteToken err");
     MessageParcel reply;
