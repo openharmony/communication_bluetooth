@@ -37,6 +37,7 @@ public:
     static napi_value DeregisterAccessObserver(napi_env env, napi_callback_info info);
     static napi_value EnableBluetoothAsync(napi_env env, napi_callback_info info);
     static napi_value DisableBluetoothAsync(napi_env env, napi_callback_info info);
+    static napi_value IsBluetoothSupported(napi_env env, napi_callback_info info);
     static napi_value NotifyDialogResult(napi_env env, napi_callback_info info);
 #ifdef BLUETOOTH_API_SINCE_10
     static napi_value FactoryReset(napi_env env, napi_callback_info info);
