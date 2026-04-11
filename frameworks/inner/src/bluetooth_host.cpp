@@ -106,7 +106,7 @@ struct BluetoothHost::impl {
     std::mutex switchModuleMutex_ {};  // used for serial execute enableBluetoothToRestrictMode.
     std::shared_ptr<BluetoothSwitchModule> switchModule_ { nullptr };
     int64_t refusePolicyProhibitedTime_ = 0;
-    std::atomic<uint8_t> btPluggableState_ = BLUETOOTH_PLUGGABLE_UNKNOWN;
+    std::atomic<uint8_t> btPluggableState_ = BLUETOOTH_PLUGGABLE_STATE_UNKNOWN;
 
 private:
     SaManagerStatus saManagerStatus_ = SaManagerStatus::WAIT_NOTIFY;
