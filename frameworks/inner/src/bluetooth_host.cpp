@@ -1378,7 +1378,7 @@ bool BluetoothHost::IsBluetoothSupported()
 #ifndef BLUETOOTH_PLUGGABLE_SUPPORTED
     return true;
 #else
-    if(pimpl->btPluggableState_ != BLUETOOTH_PLUGGABLE_UNKNOWN) {
+    if (pimpl->btPluggableState_ != BLUETOOTH_PLUGGABLE_UNKNOWN) {
         return (pimpl->btPluggableState_ == BLUETOOTH_PLUGGABLE_EMPLACE);
     }
 
@@ -1392,7 +1392,7 @@ bool BluetoothHost::IsBluetoothSupported()
     }
 
     CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
-            BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited!");
+        BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited!");
     CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().pimpl->LoadBluetoothHostService(),
         BT_ERR_INTERNAL_ERROR, "load bluetooth service failed.");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
