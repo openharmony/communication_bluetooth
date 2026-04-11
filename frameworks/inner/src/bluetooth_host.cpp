@@ -41,6 +41,7 @@
 #include "common_event.h"
 #include "common_event_data.h"
 #include "common_event_manager.h"
+#include "param_wrapper.h"
 
 using namespace OHOS::EventFwk;
 
@@ -48,6 +49,9 @@ namespace OHOS {
 namespace Bluetooth {
 namespace {
 constexpr int32_t LOAD_SA_TIMEOUT_MS = 4000;
+constexpr int8_t BLUETOOTH_PLUGGABLE_UNKNOWN = -1;
+constexpr int8_t BLUETOOTH_PLUGGABLE_EMPLACE = 1;
+constexpr int8_t BLUETOOTH_PLUGGABLE_EXTRACT = 2;
 }
 
 struct BluetoothHost::impl {
@@ -102,6 +106,7 @@ struct BluetoothHost::impl {
     std::mutex switchModuleMutex_ {};  // used for serial execute enableBluetoothToRestrictMode.
     std::shared_ptr<BluetoothSwitchModule> switchModule_ { nullptr };
     int64_t refusePolicyProhibitedTime_ = 0;
+    std::atomic<uint8_t> btPluggableState_ = BLUETOOTH_PLUGGABLE_UNKNOWN;
 
 private:
     SaManagerStatus saManagerStatus_ = SaManagerStatus::WAIT_NOTIFY;
@@ -526,6 +531,8 @@ public:
 
     int EnableBluetooth(bool noAutoConnect, std::string callingName, bool isAsync) override
     {
+        CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBluetoothSupported(),
+            BT_ERR_API_NOT_SUPPORT, "bluetooth is not supported!");
         CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
             BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited !");
         CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().pimpl->LoadBluetoothHostService(),
@@ -545,6 +552,8 @@ public:
 
     int EnableBluetoothToRestrictMode(std::string callingName) override
     {
+        CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBluetoothSupported(),
+            BT_ERR_API_NOT_SUPPORT, "bluetooth is not supported!");
         CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
             BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited !");
         CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().pimpl->LoadBluetoothHostService(),
@@ -1362,6 +1371,36 @@ static bool IsBluetoothSystemAbilityOn(void)
     CHECK_AND_RETURN_LOG_RET(samgrProxy != nullptr, false, "samgrProxy is nullptr");
     auto object = samgrProxy->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
     return object != nullptr;
+}
+
+bool BluetoothHost::IsBluetoothSupported()
+{
+#ifndef BLUETOOTH_PLUGGABLE_SUPPORTED
+    return true;
+#else
+    if(pimpl->btPluggableState_ != BLUETOOTH_PLUGGABLE_UNKNOWN) {
+        return (pimpl->btPluggableState_ == BLUETOOTH_PLUGGABLE_EMPLACE);
+    }
+
+    std::string btPluggableState = std::to_string(BLUETOOTH_PLUGGABLE_UNKNOWN);
+    int32_t res = OHOS::system::GetStringParameter("bluetooth.pluggable.state", btPluggableState,
+        std::to_string(BLUETOOTH_PLUGGABLE_UNKNOWN));
+    if (res == 0 && btPluggableState != BLUETOOTH_PLUGGABLE_UNKNOWN) {
+        pimpl->btPluggableState_ = (btPluggableState == std::to_string(BLUETOOTH_PLUGGABLE_EMPLACE) ?
+            BLUETOOTH_PLUGGABLE_EMPLACE : BLUETOOTH_PLUGGABLE_EXTRACT);
+        return (pimpl->btPluggableState_ == BLUETOOTH_PLUGGABLE_EMPLACE);
+    }
+
+    CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
+            BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited!");
+    CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().pimpl->LoadBluetoothHostService(),
+        BT_ERR_INTERNAL_ERROR, "load bluetooth service failed.");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "bluetooth host is nullptr");
+    bool result = proxy->IsBluetoothSupported();
+    pimpl->btPluggableState_ = (result ? BLUETOOTH_PLUGGABLE_EMPLACE : BLUETOOTH_PLUGGABLE_EXTRACT);
+    return result;
+#endif
 }
 
 void BluetoothHost::OnRemoveBluetoothSystemAbility()
