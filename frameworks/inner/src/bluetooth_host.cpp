@@ -1392,9 +1392,9 @@ bool BluetoothHost::IsBluetoothSupported()
     }
 
     CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
-        BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited!");
+        false, "bluetooth is prohibited!");
     CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().pimpl->LoadBluetoothHostService(),
-        BT_ERR_INTERNAL_ERROR, "load bluetooth service failed.");
+        false, "load bluetooth service failed.");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "bluetooth host is nullptr");
     bool result = proxy->IsBluetoothSupported();
