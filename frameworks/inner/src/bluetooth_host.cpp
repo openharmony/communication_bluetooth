@@ -1387,7 +1387,7 @@ bool BluetoothHost::IsBluetoothSupported()
         std::to_string(BLUETOOTH_PLUGGABLE_STATE_UNKNOWN));
     if (res == 0 && btPluggableState != BLUETOOTH_PLUGGABLE_STATE_UNKNOWN) {
         pimpl->btPluggableState_ = (btPluggableState == std::to_string(BLUETOOTH_PLUGGABLE_STATE_EMPLACE) ?
-            BLUETOOTH_PLUGGABLE_EMPLACE : BLUETOOTH_PLUGGABLE_STATE_EXTRACT);
+            BLUETOOTH_PLUGGABLE_STATE_EMPLACE : BLUETOOTH_PLUGGABLE_STATE_EXTRACT);
         return (pimpl->btPluggableState_ == BLUETOOTH_PLUGGABLE_STATE_EMPLACE);
     }
 
