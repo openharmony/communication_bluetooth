@@ -41,7 +41,6 @@
 #include "common_event.h"
 #include "common_event_data.h"
 #include "common_event_manager.h"
-#include "param_wrapper.h"
 
 using namespace OHOS::EventFwk;
 
