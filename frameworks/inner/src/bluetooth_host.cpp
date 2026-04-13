@@ -530,7 +530,7 @@ public:
 
     int EnableBluetooth(bool noAutoConnect, std::string callingName, bool isAsync) override
     {
-        CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBluetoothSupported(),
+        CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().IsBluetoothSupported(),
             BT_ERR_API_NOT_SUPPORT, "bluetooth is not supported!");
         CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
             BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited !");
@@ -551,7 +551,7 @@ public:
 
     int EnableBluetoothToRestrictMode(std::string callingName) override
     {
-        CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBluetoothSupported(),
+        CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().IsBluetoothSupported(),
             BT_ERR_API_NOT_SUPPORT, "bluetooth is not supported!");
         CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
             BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited !");
