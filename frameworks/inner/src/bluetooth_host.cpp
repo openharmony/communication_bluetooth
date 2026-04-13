@@ -49,9 +49,9 @@ namespace OHOS {
 namespace Bluetooth {
 namespace {
 constexpr int32_t LOAD_SA_TIMEOUT_MS = 4000;
-constexpr int8_t BLUETOOTH_PLUGGABLE_STATE_UNKNOWN = -1;
-constexpr int8_t BLUETOOTH_PLUGGABLE_STATE_EMPLACE = 1;
-constexpr int8_t BLUETOOTH_PLUGGABLE_STATE_EXTRACT = 2;
+const std::string BLUETOOTH_PLUGGABLE_STATE_UNKNOWN = "-1";
+const std::string BLUETOOTH_PLUGGABLE_STATE_EMPLACE = "1";
+const std::string BLUETOOTH_PLUGGABLE_STATE_EXTRACT = "2";
 }
 
 struct BluetoothHost::impl {
@@ -106,7 +106,6 @@ struct BluetoothHost::impl {
     std::mutex switchModuleMutex_ {};  // used for serial execute enableBluetoothToRestrictMode.
     std::shared_ptr<BluetoothSwitchModule> switchModule_ { nullptr };
     int64_t refusePolicyProhibitedTime_ = 0;
-    std::atomic<uint8_t> btPluggableState_ = BLUETOOTH_PLUGGABLE_STATE_UNKNOWN;
 
 private:
     SaManagerStatus saManagerStatus_ = SaManagerStatus::WAIT_NOTIFY;
@@ -1378,17 +1377,11 @@ bool BluetoothHost::IsBluetoothSupported()
 #ifndef BLUETOOTH_PLUGGABLE_SUPPORTED
     return true;
 #else
-    if (pimpl->btPluggableState_ != BLUETOOTH_PLUGGABLE_STATE_UNKNOWN) {
-        return (pimpl->btPluggableState_ == BLUETOOTH_PLUGGABLE_STATE_EMPLACE);
-    }
-
-    std::string btPluggableState = std::to_string(BLUETOOTH_PLUGGABLE_STATE_UNKNOWN);
+    std::string btPluggableState = BLUETOOTH_PLUGGABLE_STATE_UNKNOWN;
     int32_t res = OHOS::system::GetStringParameter("bluetooth.pluggable.state", btPluggableState,
-        std::to_string(BLUETOOTH_PLUGGABLE_STATE_UNKNOWN));
-    if (res == 0 && btPluggableState != std::to_string(BLUETOOTH_PLUGGABLE_STATE_UNKNOWN)) {
-        pimpl->btPluggableState_ = (btPluggableState == std::to_string(BLUETOOTH_PLUGGABLE_STATE_EMPLACE) ?
-            BLUETOOTH_PLUGGABLE_STATE_EMPLACE : BLUETOOTH_PLUGGABLE_STATE_EXTRACT);
-        return (pimpl->btPluggableState_ == BLUETOOTH_PLUGGABLE_STATE_EMPLACE);
+        BLUETOOTH_PLUGGABLE_STATE_UNKNOWN);
+    if (res == 0 && btPluggableState != BLUETOOTH_PLUGGABLE_STATE_UNKNOWN) {
+        return (btPluggableState == BLUETOOTH_PLUGGABLE_STATE_EMPLACE);
     }
 
     CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
@@ -1397,10 +1390,7 @@ bool BluetoothHost::IsBluetoothSupported()
         false, "load bluetooth service failed.");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "bluetooth host is nullptr");
-    bool result = proxy->IsBluetoothSupported();
-    pimpl->btPluggableState_ = (result ? BLUETOOTH_PLUGGABLE_STATE_EMPLACE :
-        BLUETOOTH_PLUGGABLE_STATE_EXTRACT);
-    return result;
+    return proxy->IsBluetoothSupported();
 #endif
 }
 
