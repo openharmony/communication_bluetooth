@@ -526,6 +526,8 @@ public:
 
     int EnableBluetooth(bool noAutoConnect, std::string callingName, bool isAsync) override
     {
+        CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().IsBluetoothSupported(),
+            BT_ERR_API_NOT_SUPPORT, "bluetooth is not supported!");
         CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
             BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited !");
         CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().pimpl->LoadBluetoothHostService(),
@@ -545,6 +547,8 @@ public:
 
     int EnableBluetoothToRestrictMode(std::string callingName) override
     {
+        CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().IsBluetoothSupported(),
+            BT_ERR_API_NOT_SUPPORT, "bluetooth is not supported!");
         CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
             BT_ERR_PROHIBITED_BY_EDM, "bluetooth is prohibited !");
         CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().pimpl->LoadBluetoothHostService(),
@@ -1362,6 +1366,11 @@ static bool IsBluetoothSystemAbilityOn(void)
     CHECK_AND_RETURN_LOG_RET(samgrProxy != nullptr, false, "samgrProxy is nullptr");
     auto object = samgrProxy->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
     return object != nullptr;
+}
+
+bool BluetoothHost::IsBluetoothSupported()
+{
+    return true;
 }
 
 void BluetoothHost::OnRemoveBluetoothSystemAbility()

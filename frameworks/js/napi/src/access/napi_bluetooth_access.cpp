@@ -57,6 +57,7 @@ napi_value NapiAccess::DefineAccessJSFunction(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("isValidRandomDeviceId", isValidRandomDeviceId),
         DECLARE_NAPI_FUNCTION("enableBluetoothAsync", EnableBluetoothAsync),
         DECLARE_NAPI_FUNCTION("disableBluetoothAsync", DisableBluetoothAsync),
+        DECLARE_NAPI_FUNCTION("isBluetoothSupported", IsBluetoothSupported),
         DECLARE_NAPI_FUNCTION("notifyDialogResult", NotifyDialogResult),
         DECLARE_NAPI_FUNCTION("convertUuid", ConvertUuid),
 #endif
@@ -335,6 +336,16 @@ napi_value NapiAccess::DisableBluetoothAsync(napi_env env, napi_callback_info in
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
+}
+
+napi_value NapiAccess::IsBluetoothSupported(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    bool isSupported = BluetoothHost::GetDefaultHost().IsBluetoothSupported();
+    HILOGI("isBluetoothSupported isSupported: %{public}d", isSupported);
+    napi_value result = nullptr;
+    napi_get_boolean(env, isSupported, &result);
+    return result;
 }
 
 napi_status ParseNotifyDialogResultParams(napi_env env, napi_value object,
