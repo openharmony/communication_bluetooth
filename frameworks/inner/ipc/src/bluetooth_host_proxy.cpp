@@ -2261,20 +2261,5 @@ int32_t BluetoothHostProxy::IsProfileExist(const std::string &profileName, bool 
     isProfileExist = reply.ReadBool();
     return BT_NO_ERROR;
 }
-
-bool BluetoothHostProxy::IsBluetoothSupported()
-{
-    MessageParcel data;
-    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
-        false, "WriteToken err");
-    MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::IS_BLUETOOTH_SUPPORTED, option, data, reply);
-    if (error != BT_NO_ERROR) {
-        HILOGE("fail error: %{public}d", error);
-        return false;
-    }
-    return reply.ReadBool();
-}
 }  // namespace Bluetooth
 }  // namespace OHOS
