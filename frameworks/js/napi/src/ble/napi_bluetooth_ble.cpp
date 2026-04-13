@@ -436,7 +436,7 @@ static napi_status ParseScanParameters(
 {
     (void)info;
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(
-        env, scanArg, {"interval", "dutyMode", "matchMode", "phyType", "reportMode"}));
+        env, scanArg, {"interval", "dutyMode", "matchMode", "phyType", "reportMode", "isExtended"}));
 
     bool exist = false;
     int32_t interval = 0;
@@ -473,6 +473,13 @@ static napi_status ParseScanParameters(
         HILOGI("Scan reportMode is %{public}d", scanReportMode);
         // Default value of params is ScanReportMode::NORMAL.
         ConvertScanReportMode(params, scanReportMode);
+    }
+    
+    bool isExtended = false;
+    NAPI_BT_CALL_RETURN(ParseBooleanParams(env, scanArg, "isExtended", exist, isExtended));
+    if (exist) {
+        HILOGI("Scan isExtended is %{public}d", isExtended);
+        params.isExtended = isExtended;
     }
     return napi_ok;
 }
@@ -779,6 +786,7 @@ napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vecto
         outSettinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
         outSettinngs.SetPhy(static_cast<int32_t>(scanOptions.phyType));
         SetCbTypeSensMode(scanOptions, outSettinngs);
+        outSettinngs.SetLegacy(!scanOptions.isExtended);
     }
 
     outScanfilters = std::move(scanfilters);
@@ -824,7 +832,8 @@ static napi_status ParseAdvertisingSettingsParameters(
     const napi_env &env, const napi_value &object, BleAdvertiserSettings &outSettings)
 {
     HILOGD("enter");
-    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object, {"interval", "txPower", "connectable"}));
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, object,
+        {"interval", "txPower", "connectable", "isExtended"}));
 
     bool exist = false;
     uint32_t interval = 0;
@@ -858,6 +867,13 @@ static napi_status ParseAdvertisingSettingsParameters(
     if (exist) {
         HILOGI("connectable: %{public}d", connectable);
         outSettings.SetConnectable(connectable);
+    }
+
+    bool isExtended = false;
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(env, object, "isExtended", isExtended, exist));
+    if (exist) {
+        HILOGI("isExtended: %{public}d", isExtended);
+        outSettings.SetLegacyMode(!isExtended);
     }
     return napi_ok;
 }

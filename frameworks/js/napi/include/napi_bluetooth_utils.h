@@ -265,6 +265,7 @@ struct ScanOptions {
     SensitivityMode sensitivityMode = SensitivityMode::SENSITIVITY_MODE_HIGH; // Sensitivity Mode for scan
     PhyType phyType = PhyType::PHY_LE_1M;                    // Phy for Bluetooth LE scan
     ScanReportMode reportMode = ScanReportMode::NORMAL;      // Scan report mode
+    bool isExtended = false;                                 // Whether to use extended scan mode
 };
 
 struct ScanResult {
