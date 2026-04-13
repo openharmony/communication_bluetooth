@@ -49,9 +49,6 @@ namespace OHOS {
 namespace Bluetooth {
 namespace {
 constexpr int32_t LOAD_SA_TIMEOUT_MS = 4000;
-const std::string BLUETOOTH_PLUGGABLE_STATE_UNKNOWN = "-1";
-const std::string BLUETOOTH_PLUGGABLE_STATE_EMPLACE = "1";
-const std::string BLUETOOTH_PLUGGABLE_STATE_EXTRACT = "2";
 }
 
 struct BluetoothHost::impl {
@@ -1374,24 +1371,7 @@ static bool IsBluetoothSystemAbilityOn(void)
 
 bool BluetoothHost::IsBluetoothSupported()
 {
-#ifndef BLUETOOTH_PLUGGABLE_SUPPORTED
     return true;
-#else
-    std::string btPluggableState = BLUETOOTH_PLUGGABLE_STATE_UNKNOWN;
-    int32_t res = OHOS::system::GetStringParameter("bluetooth.pluggable.state", btPluggableState,
-        BLUETOOTH_PLUGGABLE_STATE_UNKNOWN);
-    if (res == 0 && btPluggableState != BLUETOOTH_PLUGGABLE_STATE_UNKNOWN) {
-        return (btPluggableState == BLUETOOTH_PLUGGABLE_STATE_EMPLACE);
-    }
-
-    CHECK_AND_RETURN_LOG_RET(!BluetoothHost::GetDefaultHost().IsBtProhibitedByEdm(),
-        false, "bluetooth is prohibited!");
-    CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().pimpl->LoadBluetoothHostService(),
-        false, "load bluetooth service failed.");
-    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "bluetooth host is nullptr");
-    return proxy->IsBluetoothSupported();
-#endif
 }
 
 void BluetoothHost::OnRemoveBluetoothSystemAbility()
