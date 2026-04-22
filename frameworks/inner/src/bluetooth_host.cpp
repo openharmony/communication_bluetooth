@@ -1374,7 +1374,7 @@ static bool IsBluetoothSystemAbilityOn(void)
 
 bool BluetoothHost::IsBluetoothSupported()
 {
-    std:string btPluggableState = BLUETOOTH_PLUGGABLE_STATE_EXTRACT;
+    std::string btPluggableState = BLUETOOTH_PLUGGABLE_STATE_EXTRACT;
     int32_t res = system::GetStringParameter(BLUETOOTH_PLUGGABLE_STATE, btPluggableState,
         BLUETOOTH_PLUGGABLE_STATE_EXTRACT)
     return (res == 0 && btPluggableState == BLUETOOTH_PLUGGABLE_STATE_EMPLACE);
