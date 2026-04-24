@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,7 +39,12 @@ CjBluetoothConnectionObserver::CjBluetoothConnectionObserver() {}
 void CjBluetoothConnectionObserver::OnDiscoveryResult(
     const BluetoothRemoteDevice& device, int rssi, const std::string deviceName, int deviceClass)
 {
-    if (deviceFindFunc == nullptr) {
+    std::function<void(CArrString)> deviceFindFuncCopy;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        deviceFindFuncCopy = deviceFindFunc;
+    }
+    if (deviceFindFuncCopy == nullptr) {
         HILOGD("not register bluetoothDeviceFind event failed");
         return;
     }
@@ -56,7 +61,7 @@ void CjBluetoothConnectionObserver::OnDiscoveryResult(
     }
     array.head = retValue;
 
-    deviceFindFunc(array);
+    deviceFindFuncCopy(array);
 
     for (int i = 0; i < array.size; i++) {
         free(array.head[i]);
@@ -68,7 +73,12 @@ void CjBluetoothConnectionObserver::OnDiscoveryResult(
 
 void CjBluetoothConnectionObserver::OnPairConfirmed(const BluetoothRemoteDevice& device, int reqType, int number)
 {
-    if (pinRequestFunc == nullptr) {
+    std::function<void(CPinRequiredParam)> pinRequestFuncCopy;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        pinRequestFuncCopy = pinRequestFunc;
+    }
+    if (pinRequestFuncCopy == nullptr) {
         HILOGD("not register pinRequired event failed");
         return;
     }
@@ -79,7 +89,7 @@ void CjBluetoothConnectionObserver::OnPairConfirmed(const BluetoothRemoteDevice&
     char* pinCodeNative = MallocCString(GetFormatPinCode(reqType, number));
     cPinRequiredParam.pinCode = pinCodeNative;
 
-    pinRequestFunc(cPinRequiredParam);
+    pinRequestFuncCopy(cPinRequiredParam);
 
     free(deviceAddr);
     deviceAddr = nullptr;
@@ -89,19 +99,34 @@ void CjBluetoothConnectionObserver::OnPairConfirmed(const BluetoothRemoteDevice&
 
 void CjBluetoothConnectionObserver::RegisterDeviceFindFunc(std::function<void(CArrString)> cjCallback)
 {
-    deviceFindFunc = cjCallback;
+    [[maybe_unused]] std::function<void(CArrString)> deviceFindFuncCopy;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        deviceFindFuncCopy = deviceFindFunc;
+        deviceFindFunc = cjCallback;
+    }
 }
 
 void CjBluetoothConnectionObserver::RegisterPinRequestFunc(std::function<void(CPinRequiredParam)> cjCallback)
 {
-    pinRequestFunc = cjCallback;
+    [[maybe_unused]] std::function<void(CPinRequiredParam)> pinRequestFuncCopy;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        pinRequestFuncCopy = pinRequestFunc;
+        pinRequestFunc = cjCallback;
+    }
 }
 
 CjBluetoothRemoteDeviceObserver::CjBluetoothRemoteDeviceObserver() {}
 
 void CjBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice& device, int status, int cause)
 {
-    if (bondStateFunc == nullptr) {
+    std::function<void(CBondStateParam)> bondStateFuncCopy;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        bondStateFuncCopy = bondStateFunc;
+    }
+    if (bondStateFuncCopy == nullptr) {
         HILOGD("not register bondStateChange event failed");
         return;
     }
@@ -115,7 +140,7 @@ void CjBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteD
     cBondStateParam.state = bondStatus;
     cBondStateParam.cause = cause;
 
-    bondStateFunc(cBondStateParam);
+    bondStateFuncCopy(cBondStateParam);
 
     free(deviceAddr);
     deviceAddr = nullptr;
@@ -124,7 +149,12 @@ void CjBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteD
 void CjBluetoothRemoteDeviceObserver::OnRemoteBatteryChanged(
     const BluetoothRemoteDevice& device, const DeviceBatteryInfo& batteryInfo)
 {
-    if (batteryChangeFunc == nullptr) {
+    std::function<void(CBatteryInfo)> batteryChangeFuncCopy;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        batteryChangeFuncCopy = batteryChangeFunc;
+    }
+    if (batteryChangeFuncCopy == nullptr) {
         HILOGD("not register batteryChange event failed");
         return;
     }
@@ -137,17 +167,27 @@ void CjBluetoothRemoteDeviceObserver::OnRemoteBatteryChanged(
     cBatteryInfo.boxBatteryLevel = batteryInfo.boxBatteryLevel_;
     cBatteryInfo.boxChargeState = static_cast<int32_t>(batteryInfo.boxChargeState_);
 
-    batteryChangeFunc(cBatteryInfo);
+    batteryChangeFuncCopy(cBatteryInfo);
 }
 
 void CjBluetoothRemoteDeviceObserver::RegisterBondStateFunc(std::function<void(CBondStateParam)> cjCallback)
 {
-    bondStateFunc = cjCallback;
+    [[maybe_unused]] std::function<void(CBondStateParam)> bondStateFuncCopy;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        bondStateFuncCopy = bondStateFunc;
+        bondStateFunc = cjCallback;
+    }
 }
 
 void CjBluetoothRemoteDeviceObserver::RegisterBatteryChangeFunc(std::function<void(CBatteryInfo)> cjCallback)
 {
-    batteryChangeFunc = cjCallback;
+    [[maybe_unused]] std::function<void(CBatteryInfo)> batteryChangeFuncCopy;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        batteryChangeFuncCopy = batteryChangeFunc;
+        batteryChangeFunc = cjCallback;
+    }
 }
 
 static void RegisterObserverToHost()

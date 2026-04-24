@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -171,6 +171,10 @@ void ConnectionImpl::SetDevicePairingConfirmation(std::string deviceId, bool acc
 
 void ConnectionImpl::SetDevicePinCode(std::string deviceId, std::string code, int32_t* errCode)
 {
+    if (!IsValidAddress(deviceId)) {
+        *errCode = BT_ERR_INVALID_PARAM;
+        return;
+    }
     BluetoothRemoteDevice remoteDevice = Bluetooth::BluetoothRemoteDevice(deviceId);
     *errCode = remoteDevice.SetDevicePin(code);
     return;

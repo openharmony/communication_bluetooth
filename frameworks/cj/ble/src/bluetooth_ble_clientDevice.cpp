@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,7 +68,7 @@ std::string FfiClientDevice::GetDeviceName(int32_t* errCode)
 int32_t FfiClientDevice::GetServices(CArrGattService& service)
 {
     if (client_ == nullptr) {
-        HILOGI("gattClient is nullptr");
+        HILOGE("gattClient is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
     int ret = client_->DiscoverServices();
@@ -108,7 +108,7 @@ static GattCharacteristic* GetGattcCharacteristic(
 int32_t FfiClientDevice::ReadCharacteristicValue(NativeBLECharacteristic& characteristic, void (*callback)())
 {
     if (client_ == nullptr) {
-        HILOGI("gattClient is nullptr");
+        HILOGE("gattClient is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
     GattCharacteristic* character = GetGattcCharacteristic(client_, characteristic);
@@ -144,7 +144,7 @@ static GattDescriptor* GetGattcDescriptor(
 int32_t FfiClientDevice::ReadDescriptorValue(NativeBLEDescriptor& inputDescriptor, void (*callback)())
 {
     if (client_ == nullptr) {
-        HILOGI("gattClient is nullptr");
+        HILOGE("gattClient is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
     GattDescriptor* descriptor = GetGattcDescriptor(client_, inputDescriptor);
@@ -162,7 +162,7 @@ int32_t FfiClientDevice::WriteCharacteristicValue(
     NativeBLECharacteristic characteristic, int32_t writeType, void (*callback)())
 {
     if (client_ == nullptr) {
-        HILOGI("gattClient is nullptr");
+        HILOGE("gattClient is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
     GattCharacteristic* character = GetGattcCharacteristic(client_, characteristic);
@@ -182,7 +182,7 @@ int32_t FfiClientDevice::WriteCharacteristicValue(
 int32_t FfiClientDevice::WriteDescriptorValue(NativeBLEDescriptor inputDescriptor, void (*callback)())
 {
     if (client_ == nullptr) {
-        HILOGI("gattClient is nullptr");
+        HILOGE("gattClient is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
     GattDescriptor* descriptor = GetGattcDescriptor(client_, inputDescriptor);
@@ -199,7 +199,7 @@ int32_t FfiClientDevice::WriteDescriptorValue(NativeBLEDescriptor inputDescripto
 int32_t FfiClientDevice::GetRssiValue(void (*callback)())
 {
     if (client_ == nullptr) {
-        HILOGI("gattClient is nullptr");
+        HILOGE("gattClient is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
     auto getRssiValueFunc = CJLambda::Create(reinterpret_cast<void (*)(RetDataI32)>(callback));
@@ -209,42 +209,46 @@ int32_t FfiClientDevice::GetRssiValue(void (*callback)())
 
 int32_t FfiClientDevice::SetBLEMtuSize(int32_t mut)
 {
+    if (client_ == nullptr) {
+        HILOGE("gattClient is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     return client_->RequestBleMtuSize(mut);
 }
 
 int32_t FfiClientDevice::SetCharacteristicChangeNotification(NativeBLECharacteristic characteristic, bool enable)
 {
+    if (client_ == nullptr) {
+        HILOGE("gattClient is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     GattCharacteristic* character = GetGattcCharacteristic(client_, characteristic);
     if (character == nullptr) {
         HILOGE("character is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
-    int ret = BT_ERR_INTERNAL_ERROR;
-    if (client_) {
-        ret = client_->SetNotifyCharacteristic(*character, enable);
-    }
-    return ret;
+    return client_->SetNotifyCharacteristic(*character, enable);
 }
 
 int32_t FfiClientDevice::SetCharacteristicChangeIndication(NativeBLECharacteristic characteristic, bool enable)
 {
+    if (client_ == nullptr) {
+        HILOGE("gattClient is nullptr");
+        return BT_ERR_INTERNAL_ERROR;
+    }
     GattCharacteristic* character = GetGattcCharacteristic(client_, characteristic);
     if (character == nullptr) {
         HILOGE("character is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
-    int ret = BT_ERR_INTERNAL_ERROR;
-    if (client_) {
-        ret = client_->SetIndicateCharacteristic(*character, enable);
-    }
-    return ret;
+    return client_->SetIndicateCharacteristic(*character, enable);
 }
 
 int32_t FfiClientDevice::SetCharacteristicChangeNotificationCallback(
     NativeBLECharacteristic characteristic, bool enable, int64_t callback)
 {
     if (client_ == nullptr) {
-        HILOGI("gattClient is nullptr");
+        HILOGE("gattClient is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
     GattCharacteristic* character = GetGattcCharacteristic(client_, characteristic);
@@ -261,7 +265,7 @@ int32_t FfiClientDevice::SetCharacteristicChangeIndicationCallback(
     NativeBLECharacteristic characteristic, bool enable, int64_t callback)
 {
     if (client_ == nullptr) {
-        HILOGI("gattClient is nullptr");
+        HILOGE("gattClient is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
     GattCharacteristic* character = GetGattcCharacteristic(client_, characteristic);

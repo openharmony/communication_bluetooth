@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,11 +52,16 @@ void CjBluetoothAccessObserver::OnStateChanged(const int transport, const int st
     }
 
     HILOGD("state is %{public}d", state);
-    if (!stateChangeFunc) {
+    std::function<void(int32_t)> stateChangeFuncCopy;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        stateChangeFuncCopy = stateChangeFunc;
+    }
+    if (!stateChangeFuncCopy) {
         HILOGD("failed to register state change callback");
         return;
     }
-    stateChangeFunc(static_cast<int32_t>(state));
+    stateChangeFuncCopy(static_cast<int32_t>(state));
 }
 
 bool CjBluetoothAccessObserver::DealStateChange(const int transport, const int status, BluetoothState& state)
@@ -121,7 +126,12 @@ void CjBluetoothAccessObserver::GetBleStateByStatus(const int status, BluetoothS
 
 void CjBluetoothAccessObserver::RegisterStateChangeFunc(std::function<void(int32_t)> cjCallback)
 {
-    stateChangeFunc = cjCallback;
+    [[maybe_unused]] std::function<void(int32_t)> stateChangeFuncCopy;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        stateChangeFuncCopy = stateChangeFunc;
+        stateChangeFunc = cjCallback;
+    }
 }
 
 void AccessImpl::RegisterAccessObserver(int32_t callbackType, void (*callback)(), int32_t* errCode)

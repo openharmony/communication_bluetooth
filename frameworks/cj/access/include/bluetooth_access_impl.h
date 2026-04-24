@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #define BLUETOOTH_ACCESS_IMPL_H
 
 #include <cstdint>
+#include <mutex>
 
 #include "bluetooth_host.h"
 #include "napi_bluetooth_utils.h"
@@ -60,6 +61,7 @@ private:
     void GetBrStateByStatus(const int status, BluetoothState& state, bool& isCallback);
     void GetBleStateByStatus(const int status, BluetoothState& state);
     std::function<void(int32_t)> stateChangeFunc { nullptr };
+    std::mutex mtx_;
 };
 } // namespace CJBluetoothAccess
 } // namespace CJSystemapi
