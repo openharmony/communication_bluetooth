@@ -198,7 +198,6 @@ config("btcommon_public_config") {
   include_dirs = [
     "ipc",
     "ipc/common",
-    "ipc/include",
     "ipc/interface",
     "ipc/parcel",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc",
