@@ -21,13 +21,13 @@ static { loadLibraryWithPermissionCheck("bluetoothAccess_taihe_native.z", "@ohos
 from ohos.bluetooth.baseProfile use BaseProfile;
 
 @!sts_inject("""
-export function on(type: string, cb: (arg_0: Object) => void) {
+export function on(type: string, cb: (arg_0: Object) => void): void {
     switch (type) {
         case "stateChange": return onStateChange(cb);
         default: throw new Error(`Unknown type: ${type}`);
     }
 }
-export function off(type: string, cb?: (arg_0: Object) => void) {
+export function off(type: string, cb?: (arg_0: Object) => void): void {
     switch (type) {
         case "stateChange": return offStateChange(cb as (((arg_0: BluetoothState) => void) | undefined));
         default: throw new Error(`Unknown type: ${type}`);
