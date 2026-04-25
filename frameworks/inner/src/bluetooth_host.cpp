@@ -41,7 +41,9 @@
 #include "common_event.h"
 #include "common_event_data.h"
 #include "common_event_manager.h"
+#ifdef BLUETOOTH_PLUGGABLE_SUPPORTED
 #include "param_wrapper.h"
+#endif
 
 using namespace OHOS::EventFwk;
 
@@ -49,9 +51,11 @@ namespace OHOS {
 namespace Bluetooth {
 namespace {
 constexpr int32_t LOAD_SA_TIMEOUT_MS = 4000;
+#ifdef BLUETOOTH_PLUGGABLE_SUPPORTED
 const std::string BLUETOOTH_PLUGGABLE_STATE = "persist.bluetooth.pluggable.state";
 const std::string BLUETOOTH_PLUGGABLE_STATE_EXTRACT = "0";
 const std::string BLUETOOTH_PLUGGABLE_STATE_EMPLACE = "1";
+#endif
 }
 
 struct BluetoothHost::impl {
@@ -1374,10 +1378,14 @@ static bool IsBluetoothSystemAbilityOn(void)
 
 bool BluetoothHost::IsBluetoothSupported()
 {
+#ifdef BLUETOOTH_PLUGGABLE_SUPPORTED
     std::string btPluggableState = BLUETOOTH_PLUGGABLE_STATE_EXTRACT;
     int32_t res = system::GetStringParameter(BLUETOOTH_PLUGGABLE_STATE, btPluggableState,
         BLUETOOTH_PLUGGABLE_STATE_EXTRACT);
     return (res == 0 && btPluggableState == BLUETOOTH_PLUGGABLE_STATE_EMPLACE);
+#else
+    return true
+#endif
 }
 
 void BluetoothHost::OnRemoveBluetoothSystemAbility()
