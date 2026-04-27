@@ -1384,7 +1384,7 @@ bool BluetoothHost::IsBluetoothSupported()
         BLUETOOTH_PLUGGABLE_STATE_EXTRACT);
     return (res == 0 && btPluggableState == BLUETOOTH_PLUGGABLE_STATE_EMPLACE);
 #else
-    return true
+    return true;
 #endif
 }
 
