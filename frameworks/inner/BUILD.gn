@@ -136,6 +136,9 @@ config("btframework_config") {
   if (bluetooth_service_resourceschedule) {
     defines += [ "RES_SCHED_SUPPORT" ]
   }
+  if (bluetooth_pluggable_supported) {
+    defines += [ "BLUETOOTH_PLUGGABLE_SUPPORTED" ]
+  }
 }
 
 config("btframework_public_config") {

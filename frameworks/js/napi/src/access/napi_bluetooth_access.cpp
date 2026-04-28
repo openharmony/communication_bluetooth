@@ -340,9 +340,7 @@ napi_value NapiAccess::DisableBluetoothAsync(napi_env env, napi_callback_info in
 
 napi_value NapiAccess::IsBluetoothSupported(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
     bool isSupported = BluetoothHost::GetDefaultHost().IsBluetoothSupported();
-    HILOGI("isBluetoothSupported isSupported: %{public}d", isSupported);
     napi_value result = nullptr;
     napi_get_boolean(env, isSupported, &result);
     return result;
