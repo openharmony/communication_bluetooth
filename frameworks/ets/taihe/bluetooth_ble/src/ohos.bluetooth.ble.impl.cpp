@@ -392,7 +392,9 @@ static TaiheStatus ParseAdvertisDataParameters(const ohos::bluetooth::ble::Adver
                                                BleAdvertiserData &advDataOut)
 {
     for (auto &serviceUuid: advDataIn.serviceUuids) {
-        advDataOut.AddServiceUuid(UUID::FromString(std::string(serviceUuid)));
+        UUID uuid {};
+        TAIHE_BT_CALL_RETURN(ParseUuidParams(std::string(serviceUuid), uuid));
+        advDataOut.AddServiceUuid(uuid);
         HILOGI("Service Uuid = %{public}s", std::string(serviceUuid).c_str());
     }
     for (auto &manufacture: advDataIn.manufactureData) {
@@ -401,8 +403,9 @@ static TaiheStatus ParseAdvertisDataParameters(const ohos::bluetooth::ble::Adver
             std::string(manufacture.manufactureValue.begin(), manufacture.manufactureValue.end()));
     }
     for (auto &service: advDataIn.serviceData) {
-        advDataOut.AddServiceData(UUID::FromString(std::string(service.serviceUuid)),
-            std::string(service.serviceValue.begin(), service.serviceValue.end()));
+        UUID dataUuid {};
+        TAIHE_BT_CALL_RETURN(ParseUuidParams(std::string(service.serviceUuid), dataUuid));
+        advDataOut.AddServiceData(dataUuid, std::string(service.serviceValue.begin(), service.serviceValue.end()));
     }
     if (advDataIn.includeDeviceName.has_value()) {
         HILOGI("includeDeviceName: %{public}d", advDataIn.includeDeviceName.value());
