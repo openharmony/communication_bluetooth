@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include "bluetooth_host.h"
 #include "cj_common_ffi.h"
 #include "native/ffi_remote_data.h"
+#include <mutex>
 
 namespace OHOS {
 namespace CJSystemapi {
@@ -77,6 +78,7 @@ public:
 private:
     std::function<void(CArrString)> deviceFindFunc { nullptr };
     std::function<void(CPinRequiredParam)> pinRequestFunc { nullptr };
+    std::mutex mtx_;
 };
 
 class CjBluetoothRemoteDeviceObserver : public BluetoothRemoteDeviceObserver {
@@ -100,6 +102,7 @@ public:
 private:
     std::function<void(CBondStateParam)> bondStateFunc { nullptr };
     std::function<void(CBatteryInfo)> batteryChangeFunc { nullptr };
+    std::mutex mtx_;
 };
 } // namespace CJBluetoothConnection
 } // namespace CJSystemapi

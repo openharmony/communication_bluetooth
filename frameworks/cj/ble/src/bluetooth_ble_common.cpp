@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -109,7 +109,10 @@ NativeBLEDescriptor ConvertBLEDescriptorToCJ(GattDescriptor& descriptor)
 
     size_t valueSize;
     uint8_t* valueData = descriptor.GetValue(&valueSize).get();
-    vector<uint8_t> vec(valueData, valueData + valueSize);
+    vector<uint8_t> vec;
+    if (valueData != nullptr && valueSize > 0) {
+        vec.assign(valueData, valueData + valueSize);
+    }
     outDescriptor.descriptorValue = Convert2CArrUI8(vec);
     return outDescriptor;
 }

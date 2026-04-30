@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -144,6 +144,10 @@ int32_t FfiGattServer::SendResponse(NativeServerResponse serverResponse)
     BluetoothRemoteDevice remoteDevice(serverResponse.deviceId, BTTransport::ADAPTER_BLE);
     if (server_ == nullptr) {
         return BT_ERR_INTERNAL_ERROR;
+    }
+    if (serverResponse.value.size > static_cast<int64_t>(std::numeric_limits<int>::max())) {
+        HILOGE("value size exceeds int max");
+        return BT_ERR_INVALID_PARAM;
     }
     return server_->SendResponse(remoteDevice, serverResponse.transId, serverResponse.status, serverResponse.offset,
         serverResponse.value.head, static_cast<int>(serverResponse.value.size));
