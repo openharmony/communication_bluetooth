@@ -20,7 +20,7 @@ static { loadLibraryWithPermissionCheck("bluetoothConnection_taihe_native.z", "@
 from ohos.bluetooth.constant use MajorClass, MajorMinorClass, ProfileConnectionState, ProfileId, ProfileUuids;
 
 @!sts_inject("""
-export function on(type: string, cb: (arg_0: Object) => void) {
+export function on(type: string, cb: (arg_0: Object) => void): void {
     switch (type) {
         case "discoveryResult": return onDiscoveryResult(cb);
         case "batteryChange": return onBatteryChange(cb);
@@ -30,7 +30,7 @@ export function on(type: string, cb: (arg_0: Object) => void) {
         default: throw new Error(`Unknown type: ${type}`);
     }
 }
-export function off(type: string, cb?: (arg_0: Object) => void) {
+export function off(type: string, cb?: (arg_0: Object) => void): void {
     switch (type) {
         case "discoveryResult": return offDiscoveryResult(cb as (((arg_0: Array<DiscoveryResult>) => void) | undefined));
         case "batteryChange": return offBatteryChange(cb as (((arg_0: BatteryInfo) => void) | undefined));
