@@ -46,7 +46,6 @@
 #include <functional>
 #include "ohos_bt_gap.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
