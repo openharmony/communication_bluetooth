@@ -324,7 +324,7 @@ int BluetoothBleAdvertiserProxy::BleStartRangeAdv(bluetooth::BleAppType appType)
         HILOGE("[BleStartRangeAdv] fail: transact ErrCode=%{public}d", result);
         return INNER_BLE_RANGING_INVALID_ADVPOWER;
     }
-    return reply.ReadInt8();
+    return reply.ReadInt32();
 }
 
 int BluetoothBleAdvertiserProxy::BleStopRangeAdv(bluetooth::BleAppType appType)
