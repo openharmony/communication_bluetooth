@@ -93,8 +93,8 @@ static bool GetAndRemoveAdvIdAppType(int advId, BleApplicationType &appType)
     if (it != g_advIdAppTypeMap.end()) {
         appType = it->second;
         g_advIdAppTypeMap.erase(it);
-            HILOGI("GetAndRemoveAdvIdAppType: advId %{public}d -> appType %{public}d, removed",
-                advId, appType);
+        HILOGI("GetAndRemoveAdvIdAppType: advId %{public}d -> appType %{public}d, removed",
+            advId, appType);
         return true;
     }
     HILOGD("GetAndRemoveAdvIdAppType: advId %{public}d not found in map", advId);
@@ -428,7 +428,7 @@ int BleStopAdv(int advId)
     }
 
      BleApplicationType appType;
-    if (GetAndRemoveAdvIdAppType(advId, appType) {
+    if (GetAndRemoveAdvIdAppType(advId, appType)) {
         BleStopRangeAdv(appType);
     }
 
