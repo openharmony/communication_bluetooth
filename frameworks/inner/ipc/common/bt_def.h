@@ -1951,6 +1951,17 @@ enum SetAdvDataType : int32_t {
     SET_ADV_DATA_ONLY_RSP
 };
 
+typedef enum {
+    /** default Bussiness */
+    INNER_BLE_NO_RANGING_TYPE = 0X00,
+    /** touch Bussiness */
+    INNER_BLE_RANGING_TOUCH = 0X01,
+    /** Nearby Discovery Bussiness */
+    INNER_BLE_RANGING_APPROACH = 0X02,
+} BleAppType;
+
+#define INNER_BLE_RANGING_INVALID_ADVPOWER 127
+
 #ifdef BLUETOOTH_EXPORT
 #define BLUETOOTH_API __attribute__((visibility("default")))
 #else

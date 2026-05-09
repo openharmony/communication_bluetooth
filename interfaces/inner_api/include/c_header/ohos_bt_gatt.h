@@ -349,6 +349,8 @@ typedef struct {
     int txPower;
     /** Advertising duration. It is calculated as follows: [N * 10 ms], where N indicates the value of this field. */
     int duration;
+    /** Advertising application type */
+    BleApplicationType appType;
 } BleAdvParams;
 
 /**
@@ -1060,6 +1062,18 @@ void CheckAdvIdInUse(void);
  * @since 16
  */
 int CheckAndAllocateAdvHandle(void);
+
+/**
+* @brief send start ble range adv msg, Determine whether to perform antenna switching based on the appType.
+* @since 26
+*/
+int8_t BleStartRangeAdv(BleApplicationType appType);
+
+/**
+* @brief send stop ble range adv msg, Determine whether to unlock the antenna based on the appType.
+* @since 26
+*/
+int BleStopRangeAdv(BleApplicationType appType);
 #ifdef __cplusplus
 }
 #endif

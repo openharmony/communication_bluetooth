@@ -77,6 +77,30 @@ static ffrt::queue startAdvQueue("startAdv_Queue");
 
 static void ClearAdvertisingResource(int advId);
 
+static std::map<int, BleApplicationType> g_advIdAppTypeMap;
+static ffrt::mutex g_advIdAppTypeMutex;
+
+static void RegisterAdvIdAppType(int advId, BleApplicationType appType)
+{
+    lock_guard<ffrt::mutex> lock(g_advIdAppTypeMutex);
+    g_advIdAppTypeMap[advId] = appType;
+}
+
+static bool GetAndRemoveAdvIdAppType(int advId, BleApplicationType &appType)
+{
+    lock_guard<ffrt::mutex> lock(g_advIdAppTypeMutex);
+    auto it = g_advIdAppTypeMap.find(advId);
+    if (it != g_advIdAppTypeMap.end()) {
+        appType = it->second;
+        g_advIdAppTypeMap.erase(it);
+        HILOGI("GetAndRemoveAdvIdAppType: advId %{public}d -> appType %{public}d, removed",
+            advId, appType);
+        return true;
+    }
+    HILOGD("GetAndRemoveAdvIdAppType: advId %{public}d not found in map", advId);
+    return false;
+}
+
 class BleCentralManagerCallbackWapper : public BleCentralManagerCallback {
 public:
     /**
@@ -403,6 +427,11 @@ int BleStopAdv(int advId)
         g_advAddrTimerIds[advId] = 0;
     }
 
+    BleApplicationType appType;
+    if (GetAndRemoveAdvIdAppType(advId, appType)) {
+        BleStopRangeAdv(appType);
+    }
+
     std::function stopAdvFunc = [advId]() {
         HILOGD("stop adv in adv_Queue thread, advId = %{public}d", advId);
         lock_guard<ffrt::mutex> lock(g_advMutex);
@@ -630,7 +659,6 @@ static bool IsRpa(const AdvOwnAddrParams *ownAddrParams)
 int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdvParams *advParam,
     const AdvOwnAddrParams *ownAddrParams)
 {
-    HILOGD("BleStartAdvWithAddr enter");
     CHECK_AND_RETURN_LOG_RET((advId != nullptr && rawData != nullptr && advParam != nullptr && IsRpa(ownAddrParams)),
         OHOS_BT_STATUS_PARM_INVALID, "params are invalid");
     if (!IsBleEnabled()) {
@@ -667,6 +695,7 @@ int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdv
         g_BleAdvertiser = BleAdvertiser::CreateInstance();
     }
 
+    RegisterAdvIdAppType(*advId, advParam->appType);
     std::function startAdvFunc = [i, advData, scanResponse, settings]() {
         HILOGI("start adv in startAdv_Queue thread, handle = %{public}d", i);
         lock_guard<ffrt::mutex> lock(g_advMutex);
@@ -723,6 +752,7 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
     auto advData = ConvertDataToVec(rawData.advData, rawData.advDataLen);
     auto scanResponse = ConvertDataToVec(rawData.rspData, rawData.rspDataLen);
 
+    RegisterAdvIdAppType(*advId, advParam.appType);
     std::function startAdvFunc = [i, advData, scanResponse, settings]() {
         HILOGI("start adv in startAdv_Queue thread, handle = %{public}d", i);
         lock_guard<ffrt::mutex> lock(g_advMutex);
@@ -1598,6 +1628,32 @@ int CheckAndAllocateAdvHandle(void)
         i = AllocateAdvHandle();
     }
     return i;
+}
+
+int8_t BleStartRangeAdv(BleApplicationType appType)
+{
+    HILOGI("BleStartRangeAdv enter, appType = %{public}u", appType);
+    CHECK_AND_RETURN_LOG_RET(appType == BLE_RANGING_TOUCH || appType == BLE_RANGING_APPROACH,
+        BLE_RANGING_INVALID_ADVPOWER, "BleStartRangeAdv fail: invalid appType = %{public}u", appType);
+    if (g_BleAdvertiser == nullptr) {
+        g_BleAdvertiser = BleAdvertiser::CreateInstance();
+    }
+
+    int8_t ret = static_cast<int8_t>(g_BleAdvertiser->BleStartRangeAdv(appType));
+    return ret;
+}
+
+int BleStopRangeAdv(BleApplicationType appType)
+{
+    HILOGI("BleStopRangeAdv enter, appType = %{public}u", appType);
+    CHECK_AND_RETURN_LOG_RET(appType == BLE_RANGING_TOUCH,
+        BT_ERR_INVALID_PARAM, "BleStopRangeAdv fail: invalid appType = %{public}u", appType);
+    if (g_BleAdvertiser == nullptr) {
+        g_BleAdvertiser = BleAdvertiser::CreateInstance();
+    }
+
+    int ret = g_BleAdvertiser->BleStopRangeAdv(appType);
+    return ret;
 }
 
 }  // namespace Bluetooth

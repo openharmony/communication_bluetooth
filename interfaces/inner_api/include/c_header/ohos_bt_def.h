@@ -103,6 +103,12 @@
 #define OHOS_ACTIVE_DEVICE_ID_LEN 8
 
 /**
+ * @brief Defines invalid advpower
+ *
+*/
+#define BLE_RANGING_INVALID_ADVPOWER 127
+
+/**
  * @brief Enumerates characteristic properties.
  *
  * Characteristic properties determine how characteristic values are used and\n
@@ -403,5 +409,14 @@ typedef enum {
     /** Priority won't be refused by frequent connect limit */
     OHOS_SOCKET_PRIORITY_NO_REFUSE_FREQUENT_CONNECT = 0x10,
 } BtSocketPriority;
+
+typedef enum {
+    /** default Bussiness */
+    BLE_NO_RANGING_TYPE = 0X00,
+    /** touch Bussiness */
+    BLE_RANGING_TOUCH = 0X01,
+    /** Nearby Discovery Bussiness */
+    BLE_RANGING_APPROACH = 0X02,
+} BleApplicationType;
 #endif
 /** @} */
