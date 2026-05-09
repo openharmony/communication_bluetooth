@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,8 +103,8 @@
 #define OHOS_ACTIVE_DEVICE_ID_LEN 8
 
 /**
-* @brief Defines invalid advpower
-*
+ * @brief Defines invalid advpower
+ *
 */
 #define BLE_RANGING_INVALID_ADVPOWER 127
 
