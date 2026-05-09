@@ -659,7 +659,6 @@ static bool IsRpa(const AdvOwnAddrParams *ownAddrParams)
 int BleStartAdvWithAddr(int *advId, const StartAdvRawData *rawData, const BleAdvParams *advParam,
     const AdvOwnAddrParams *ownAddrParams)
 {
-    HILOGD("BleStartAdvWithAddr enter");
     CHECK_AND_RETURN_LOG_RET((advId != nullptr && rawData != nullptr && advParam != nullptr && IsRpa(ownAddrParams)),
         OHOS_BT_STATUS_PARM_INVALID, "params are invalid");
     if (!IsBleEnabled()) {
