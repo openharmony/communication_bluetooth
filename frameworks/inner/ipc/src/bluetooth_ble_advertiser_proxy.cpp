@@ -312,7 +312,7 @@ int BluetoothBleAdvertiserProxy::BleStartRangeAdv(bluetooth::BleAppType appType)
         return INNER_BLE_RANGING_INVALID_ADVPOWER;
     }
 
-    if(!data.WriteInt32(appType)) {
+    if (!data.WriteInt32(appType)) {
         HILOGE("[BleStartRangeAdv] fail: write appType failed.");
         return INNER_BLE_RANGING_INVALID_ADVPOWER;
     }
