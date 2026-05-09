@@ -547,7 +547,7 @@ public:
     * @param appType Advertising application type.
     * @since 26
     */
-    int8_t BleStartRangeAdv(BleApplicationType appType);
+    int BleStartRangeAdv(BleApplicationType appType);
 
     /**
     * @brief send stop ble range adv msg, Determine whether to unlock the antenna based on the appType.
