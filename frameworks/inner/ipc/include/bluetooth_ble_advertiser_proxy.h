@@ -40,7 +40,7 @@ public:
     void SetAdvertisingData(const BluetoothBleAdvertiserData &advData, const BluetoothBleAdvertiserData &scanResponse,
         int32_t advHandle, bluetooth::SetAdvDataType type = bluetooth::SET_ADV_DATA_BOTH) override;
     int ChangeAdvertisingParams(uint8_t advHandle, const BluetoothBleAdvertiserSettings &settings) override;
-    int8_t BleStartRangeAdv(bluetooth::BleAppType appType) override;
+    int BleStartRangeAdv(bluetooth::BleAppType appType) override;
     int BleStopRangeAdv(bluetooth::BleAppType appType) override;
 
 private:
