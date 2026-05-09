@@ -304,7 +304,7 @@ int BluetoothBleAdvertiserProxy::ChangeAdvertisingParams(uint8_t advHandle,
     return result;
 }
 
-int8_t BluetoothBleAdvertiserProxy::BleStartRangeAdv(bluetooth::BleAppType appType)
+int BluetoothBleAdvertiserProxy::BleStartRangeAdv(bluetooth::BleAppType appType)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleAdvertiserProxy::GetDescriptor())) {
@@ -335,7 +335,7 @@ int BluetoothBleAdvertiserProxy::BleStopRangeAdv(bluetooth::BleAppType appType)
         return BT_ERR_IPC_TRANS_FAILED;
     }
 
-    if(!data.WriteInt32(appType)) {
+    if (!data.WriteInt32(appType)) {
         HILOGE("[BleStopRangeAdv] fail: write appType failed.");
         return BT_ERR_IPC_TRANS_FAILED;
     }
