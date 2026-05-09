@@ -427,7 +427,7 @@ int BleStopAdv(int advId)
         g_advAddrTimerIds[advId] = 0;
     }
 
-     BleApplicationType appType;
+    BleApplicationType appType;
     if (GetAndRemoveAdvIdAppType(advId, appType)) {
         BleStopRangeAdv(appType);
     }
