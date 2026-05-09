@@ -1640,7 +1640,7 @@ int8_t BleStartRangeAdv(BleApplicationType appType)
         g_BleAdvertiser = BleAdvertiser::CreateInstance();
     }
 
-    int8_t ret = g_BleAdvertiser->BleStartRangeAdv(appType);
+    int8_t ret = static_cast<int8_t>g_BleAdvertiser->BleStartRangeAdv(appType);
     return ret;
 }
 
@@ -1648,7 +1648,7 @@ int BleStopRangeAdv(BleApplicationType appType)
 {
     HILOGI("BleStopRangeAdv enter, appType = %{public}u", appType);
     CHECK_AND_RETURN_LOG_RET(appType == BLE_RANGING_TOUCH,
-        BT_ERR_INVALID_PARAM, "BleStopRangeAdv fail, invalid appType = %{public}u", appType);
+        BT_ERR_INVALID_PARAM, "BleStopRangeAdv fail: invalid appType = %{public}u", appType);
     if (g_BleAdvertiser == nullptr) {
         g_BleAdvertiser = BleAdvertiser::CreateInstance();
     }
