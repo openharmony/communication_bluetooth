@@ -1,0 +1,197 @@
+{
+  "name": "ohos-bluetoothTool",
+  "version": "1.0.0",
+  "description": "Bluetooth device management CLI tool. Used for enabling, disabling, and querying Bluetooth state. Not suitable for Bluetooth device pairing or connection management.",
+  "executablePath": "/system/bin/cli_tool/executable/ohos-bluetoothTool",
+  "requirePermissions": [
+    "ohos.permission.ACCESS_BLUETOOTH"
+  ],
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "command": {
+        "type": "string",
+        "description": "Subcommand to execute"
+      }
+    },
+    "required": []
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string",
+        "enum": ["result"]
+      },
+      "status": {
+        "type": "string",
+        "enum": ["success", "failed"]
+      },
+      "data": {
+        "type": "object",
+        "properties": {},
+        "description": "Response data for successful operations"
+      },
+      "errCode": {
+        "type": "string",
+        "description": "Error code for failed operations"
+      },
+      "errMsg": {
+        "type": "string",
+        "description": "Error message for failed operations"
+      },
+      "suggestion": {
+        "type": "string",
+        "description": "Suggested action for failed operations"
+      }
+    },
+    "required": ["status"]
+  },
+  "hasSubCommand": true,
+  "subcommands": {
+    "enable-bt": {
+      "description": "Enable Bluetooth. Used for activating Bluetooth functionality when the device is in disabled state. Requires Bluetooth service to be available.",
+      "requirePermissions": [
+        "ohos.permission.ACCESS_BLUETOOTH"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["result"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["success", "failed"]
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "Success message"
+              }
+            }
+          },
+          "errCode": {
+            "type": "string"
+          },
+          "errMsg": {
+            "type": "string"
+          },
+          "suggestion": {
+            "type": "string"
+          }
+        },
+        "required": ["status"]
+      }
+    },
+    "disable-bt": {
+      "description": "Disable Bluetooth functionality. Used for turning off Bluetooth when the device is enabled. Cannot be executed while Bluetooth is in connecting state.",
+      "requirePermissions": [
+        "ohos.permission.ACCESS_BLUETOOTH"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["result"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["success", "failed"]
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "Success message"
+              }
+            }
+          },
+          "errCode": {
+            "type": "string"
+          },
+          "errMsg": {
+            "type": "string"
+          },
+          "suggestion": {
+            "type": "string"
+          }
+        },
+        "required": ["status"]
+      }
+    },
+    "get-state": {
+      "description": "Get current Bluetooth adapter state. Used for querying Bluetooth status in diagnostic scenarios. Returns state information only, does not modify Bluetooth settings.",
+      "requirePermissions": [
+        "ohos.permission.ACCESS_BLUETOOTH"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["result"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["success", "failed"]
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "type": "string",
+                "enum": ["STATE_OFF", "STATE_TURNING_ON", "STATE_ON", "STATE_TURNING_OFF"],
+                "description": "Bluetooth state enum value"
+              },
+              "stateCode": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 3,
+                "description": "Bluetooth state code"
+              },
+              "description": {
+                "type": "string",
+                "description": "Human-readable state description"
+              },
+              "classicBluetooth": {
+                "type": "string",
+                "enum": ["Enabled", "Disabled"],
+                "description": "Classic Bluetooth status"
+              },
+              "ble": {
+                "type": "string",
+                "enum": ["Enabled", "Disabled"],
+                "description": "BLE status"
+              }
+            },
+            "required": ["state", "stateCode", "description"]
+          }
+        },
+        "required": ["status", "data"]
+      }
+    }
+  },
+  "eventTypes": [],
+  "eventSchemas": {}
+}

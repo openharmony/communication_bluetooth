@@ -98,6 +98,7 @@
           "//foundation/communication/bluetooth/frameworks/ets/taihe/bluetooth_hid:bluetoothHid_taihe"
         ],
         "service_group": [
+          "//foundation/communication/bluetooth/tools/ohos-bluetoothTool:ohos-bluetoothTool"
         ]
       },
       "inner_kits": [
