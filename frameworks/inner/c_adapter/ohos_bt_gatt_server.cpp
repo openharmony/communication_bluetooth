@@ -860,6 +860,10 @@ int BleGattsAddDescriptor(int serverId, int srvcHandle, BtUuid descUuid, int per
             HILOGE("GATTSERVICE(serverId, srvcHandle) is null!");
             return OHOS_BT_STATUS_UNHANDLED;
         }
+        if (GATTSERVICE(serverId, srvcHandle)->GetCharacteristics().empty()) {
+            HILOGE("GATTSERVICE(serverId, srvcHandle)->Chararcteristics is null!");
+            return OHOS_BT_STATUS_UNHANDLED;
+        }
         GattCharacteristic &characteristic = GATTSERVICE(serverId, srvcHandle)->GetCharacteristics().back();
         desHandle = GetNextAttributeHandle();
         GattDescriptor descriptor(uuid, desHandle, permissions);

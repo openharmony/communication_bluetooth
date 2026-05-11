@@ -764,7 +764,7 @@ napi_status ParseAddressInfoParam(napi_env env, napi_value object, AddressInfo &
     std::string address {};
     NAPI_BT_CALL_RETURN(ParseStringParams(env, object, "address", exist, address));
     if (!IsValidAddress(address)) {
-        HILOGE("Invalid address: %{public}s", address.c_str());
+        HILOGE("Invalid address");
         return napi_invalid_arg;
     }
     addressInfo.SetAddress(address);
