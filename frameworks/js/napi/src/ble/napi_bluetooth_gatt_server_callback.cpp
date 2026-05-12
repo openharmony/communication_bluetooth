@@ -58,8 +58,8 @@ void NapiGattServerCallback::OnCharacteristicWriteRequest(const BluetoothRemoteD
     eventSubscribe_.PublishEvent(STR_BT_GATT_SERVER_CALLBACK_CHARACTERISTIC_WRITE, nativeObject);
 }
 
-void NapiGattServerCallback::OnConnectionStateUpdateWithReason(
-    const BluetoothRemoteDevice &device, int state, int disconnectReason)
+void NapiGattServerCallback::OnConnectionStateUpdateWithMessage(
+    const BluetoothRemoteDevice &device, int state, GattDisconnectParam disconnectParam)
 {
     HILOGI("enter, state: %{public}d, remote device address: %{public}s", state, GET_ENCRYPT_ADDR(device));
     std::lock_guard<std::mutex> lock(NapiGattServer::deviceListMutex_);
@@ -87,7 +87,7 @@ void NapiGattServerCallback::OnConnectionStateUpdateWithReason(
             }
         }
         auto nativeObject = std::make_shared<NapiNativeBleConnectionStateChangeParam>(
-            device.GetDeviceAddr(), state, 0, true, disconnectReason);
+            device.GetDeviceAddr(), state, 0, true, disconnectParam);
         eventSubscribe_.PublishEvent(STR_BT_GATT_SERVER_CALLBACK_CONNECT_STATE_CHANGE, nativeObject);
     }
 }
@@ -143,5 +143,6 @@ void NapiGattServerCallback::OnBlePhyRead(int32_t txPhy, int32_t rxPhy, int32_t 
     auto napiBlePhy = std::make_shared<NapiNativeBlePhyInfo>(txPhy, rxPhy);
     AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_SERVER_READ_PHY, napiBlePhy, status);
 }
+
 } // namespace Bluetooth
 } // namespace OHOS

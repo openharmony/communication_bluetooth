@@ -28,7 +28,7 @@ public:
 
     virtual void OnReadRemoteRssiEvent(const BluetoothRawAddress &device, int rssi, int status) = 0;
     virtual void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device,
-        int status, int cause) = 0;
+        int status, int cause, const std::string &causeMessage) = 0;
     virtual void OnAclStateChanged(const BluetoothRawAddress &device, int state, unsigned int reason) = 0;
 };
 }  // namespace Bluetooth

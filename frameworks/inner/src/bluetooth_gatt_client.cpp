@@ -143,7 +143,8 @@ public:
         WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnServicesChanged);
     }
 
-    void OnConnectionStateChanged(int32_t state, int32_t newState, int32_t disconnectReason) override
+    void OnConnectionStateChanged(
+        int32_t state, int32_t newState, int32_t disconnectReason, const std::string &reasonMessage) override
     {
         HILOGD("gattClient conn state, status: %{public}d, newState: %{public}s",
             state, GetProfileConnStateName(newState).c_str());
@@ -164,6 +165,9 @@ public:
         WPTR_GATT_CBACK(clientSptr->pimpl->callback_, OnConnectionStateChanged, newState, state);
         WPTR_GATT_CBACK(
             clientSptr->pimpl->callback_, OnConnectionStateChangedWithReason, newState, state, disconnectReason);
+        GattDisconnectParam disconnectParam(disconnectReason, reasonMessage);
+        WPTR_GATT_CBACK(
+            clientSptr->pimpl->callback_, OnConnectionStateChangedWithMessage, newState, state, disconnectParam);
     }
 
     void OnCharacteristicChanged(const BluetoothGattCharacteristic &characteristic) override

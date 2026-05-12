@@ -101,7 +101,8 @@ int32_t BluetoothRemoteDeviceObserverstub::OnPairStatusChangedInner(BluetoothRem
     }
     int32_t status = data.ReadInt32();
     int32_t cause = data.ReadInt32();
-    stub->OnPairStatusChanged(transport, *result, status, cause);
+    std::string causeMessage = data.ReadString();
+    stub->OnPairStatusChanged(transport, *result, status, cause, causeMessage);
     return NO_ERROR;
 }
 

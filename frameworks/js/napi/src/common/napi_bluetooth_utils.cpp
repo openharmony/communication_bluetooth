@@ -241,6 +241,13 @@ void ConvertStateChangeParamToJS(napi_env env, napi_value result, const ConnStat
         napi_create_int32(env, stateChangeParam.reason, &disconnectReason);
         napi_set_named_property(env, result, "reason", disconnectReason);
     }
+    if (GetCurrentSdkVersion() >= SDK_VERSION_26 && stateChangeParam.isDisconnected &&
+        !stateChangeParam.reasonMessage.empty()) {
+        napi_value reasonMessage = nullptr;
+        HILOGI("ZHY msg: %{public}s", stateChangeParam.reasonMessage.c_str());
+        napi_create_string_utf8(env, stateChangeParam.reasonMessage.c_str(), NAPI_AUTO_LENGTH, &reasonMessage);
+        napi_set_named_property(env, result, "reasonMessage", reasonMessage);
+    }
 
     napi_value stateChangeCause = nullptr;
     napi_create_int32(env, stateChangeParam.cause, &stateChangeCause);

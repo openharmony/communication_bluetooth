@@ -195,6 +195,19 @@ public:
     virtual void OnBlePhyRead(int32_t txPhy, int32_t rxPhy, int32_t status) {}
 
     /**
+     * @brief The callback function to notify connection state update.
+     *
+     * @param device Remote device object.
+     * @param state Connection state.
+     * @param disconnectParam Disconnection Param.
+     * @since 26
+     *
+     */
+    virtual void OnConnectionStateUpdateWithMessage(
+        const BluetoothRemoteDevice &device, int state, GattDisconnectParam disconnectParam)
+    {}
+
+    /**
      * @brief A destructor of GattServerCallback.
      *
      * @since 6

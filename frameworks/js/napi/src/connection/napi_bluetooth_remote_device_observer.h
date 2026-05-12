@@ -38,6 +38,8 @@ public:
     void OnReadRemoteRssiEvent(const BluetoothRemoteDevice &device, int rssi, int status) override;
     void OnRemoteBatteryChanged(const BluetoothRemoteDevice &device, const DeviceBatteryInfo &batteryInfo) override;
 
+    void OnPairStatusChangedWithMessage(
+        const BluetoothRemoteDevice &device, int status, int cause, const std::string &causeMessage) override;
     NapiEventSubscribeModule eventSubscribe_;
 };
 }  // namespace Bluetooth

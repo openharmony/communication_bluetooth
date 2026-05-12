@@ -64,13 +64,14 @@ void NapiGattClientCallback::OnDescriptorReadResult(const GattDescriptor &descri
     AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_READ_DESCRIPTOR, napiDescriptor, ret);
 }
 
-void NapiGattClientCallback::OnConnectionStateChangedWithReason(int connectionState, int ret, int disconnectReason)
+void NapiGattClientCallback::OnConnectionStateChangedWithMessage(
+    int connectionState, int ret, GattDisconnectParam disconnectParam)
 {
-    HILOGI("connectionState:%{public}d, disconnectReason:%{public}d, ret:%{public}d",
-        connectionState, disconnectReason, ret);
+    HILOGI("connectionState:%{public}d, disconnectReason:%{public}d, ret:%{public}d, msg:%{public}s",
+        connectionState, disconnectParam.disconnectReason_, ret, disconnectParam.reasonMessage_.c_str());
     if (connectionState == static_cast<int>(BTConnectState::DISCONNECTED)) {
         auto nativeObject = std::make_shared<NapiNativeBleConnectionStateChangeParam>(
-            deviceAddr_, connectionState, 0, true, disconnectReason);
+            deviceAddr_, connectionState, 0, true, disconnectParam);
         eventSubscribe_.PublishEvent(STR_BT_GATT_CLIENT_CALLBACK_BLE_CONNECTIION_STATE_CHANGE, nativeObject);
         return;
     }
