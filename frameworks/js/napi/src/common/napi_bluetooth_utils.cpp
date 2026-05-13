@@ -1087,7 +1087,9 @@ int GetCurrentSdkVersion(void)
     }
 
     version = static_cast<int>(bundleInfo.targetVersion % 100); // %100 to get the real version
-    return version;
+    HILOGI("version: %{public}d", version);
+    // return version;
+    return SDK_VERSION_26;
 }
 
 int GetSDKAdaptedStatusCode(int status)
