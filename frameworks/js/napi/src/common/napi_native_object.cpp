@@ -264,7 +264,6 @@ napi_value NapiNativeBondStateParam::ToNapiValue(napi_env env) const
     napi_set_named_property(env, result, "cause", unbondCause);
 
     if (GetCurrentSdkVersion() >= SDK_VERSION_26 && !causeMessage_.empty()) {
-        HILOGI("msg:%{public}s", causeMessage_.c_str());
         napi_value causeMessage = nullptr;
         napi_create_string_utf8(env, causeMessage_.c_str(), NAPI_AUTO_LENGTH, &causeMessage);
         napi_set_named_property(env, result, "causeMessage", causeMessage);

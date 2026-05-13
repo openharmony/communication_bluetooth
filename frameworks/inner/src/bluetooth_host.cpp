@@ -348,7 +348,7 @@ public:
     void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device,
         int32_t status, int32_t cause, const std::string &causeMessage) override
     {
-        HILOGI("enter, transport: %{public}d, device: %{public}s, status: %{public}d, cause: %{public}d"
+        HILOGD("enter, transport: %{public}d, device: %{public}s, status: %{public}d, cause: %{public}d"
             "msg:%{public}s", transport, GET_ENCRYPT_RAW_ADDR(device), status, cause, causeMessage.c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), transport);
         host_.remoteObservers_.ForEach(
