@@ -252,6 +252,24 @@ int32_t FfiGattServer::RegisterBleGattServerObserver(int32_t callbackType, void 
     return BT_NO_ERROR;
 }
 
+int32_t FfiGattServer::Connect(std::string deviceId, bool autoConnect)
+{
+    if (server_ == nullptr) {
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    BluetoothRemoteDevice device(deviceId, 1);
+    return server_->Connect(device, !autoConnect);
+}
+
+int32_t FfiGattServer::CancelConnection(std::string deviceId)
+{
+    if (server_ == nullptr) {
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    BluetoothRemoteDevice device(deviceId, 1);
+    return server_->CancelConnection(device);
+}
+
 std::vector<std::string> FfiGattServer::deviceList_;
 std::mutex FfiGattServer::deviceListMutex_;
 } // namespace CJBluetoothBle

@@ -82,7 +82,7 @@ private:
 class FfiClientDevice : public OHOS::FFI::FFIData {
     DECL_TYPE(FfiClientDevice, OHOS::FFI::FFIData)
 public:
-    explicit FfiClientDevice(std::string deviceId)
+    explicit FfiClientDevice(std::string deviceId, bool autoConnect = false, int transport = 1)
     {
         device_ = std::make_shared<BluetoothRemoteDevice>(deviceId, 1);
         client_ = std::make_shared<GattClient>(*device_);
@@ -114,6 +114,8 @@ private:
     std::shared_ptr<GattClient> client_ = nullptr;
     std::shared_ptr<FfiGattClientCallback> callback_;
     std::shared_ptr<BluetoothRemoteDevice> device_ = nullptr;
+    bool autoConnect_ = false;
+    int transport_ = 1;
 };
 } // namespace CJBluetoothBle
 } // namespace CJSystemapi

@@ -36,7 +36,7 @@ int32_t FfiClientDevice::Connect()
     if (client_ == nullptr) {
         return BT_ERR_INTERNAL_ERROR;
     }
-    return client_->Connect(callback_, false, GATT_TRANSPORT_TYPE_LE);
+    return client_->Connect(callback_, autoConnect_, transport_);
 }
 
 int32_t FfiClientDevice::Disconnect()

@@ -385,6 +385,43 @@ void FfiBluetoothBleGattServerOn(int64_t id, int32_t callbackType, void (*callba
     *errCode = gattServer->RegisterBleGattServerObserver(callbackType, callback);
     return;
 }
+
+void FfiBluetoothBleGattServerConnect(int64_t id, NativeGattServerConnectOption option, int32_t* errCode)
+{
+    auto gattServer = FFIData::GetData<FfiGattServer>(id);
+    if (gattServer == nullptr) {
+        HILOGE("Failed to obtain the gatt server object");
+        *errCode = BT_ERR_INTERNAL_ERROR;
+        return;
+    }
+    *errCode = gattServer->Connect(option.deviceId, option.autoConnect == 1);
+}
+
+void FfiBluetoothBleGattServerCancelConnection(int64_t id, char* deviceId, int32_t* errCode)
+{
+    auto gattServer = FFIData::GetData<FfiGattServer>(id);
+    if (gattServer == nullptr) {
+        HILOGE("Failed to obtain the gatt server object");
+        *errCode = BT_ERR_INTERNAL_ERROR;
+        return;
+    }
+    *errCode = gattServer->CancelConnection(deviceId);
+}
+
+int64_t FfiBluetoothBleCreateGattClientDeviceWithOption(NativeGattClientOption option, int32_t* errCode)
+{
+    FfiClientDevice* nativeGattClientDevice = nullptr;
+    *errCode = BleImpl::CreateGattClientDeviceWithOption(
+        option.deviceId,
+        option.autoConnect == 1,
+        option.transport,
+        nativeGattClientDevice);
+    if (*errCode != BT_NO_ERROR) {
+        HILOGE("Failed to creat the gatt client object");
+        return -1;
+    }
+    return nativeGattClientDevice->GetID();
+}
 }
 } // namespace CJBluetoothBle
 } // namespace CJSystemapi
