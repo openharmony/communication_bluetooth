@@ -46,11 +46,19 @@ void NapiBluetoothRemoteDeviceObserver::OnAclStateChanged(
 
 void NapiBluetoothRemoteDeviceObserver::OnPairStatusChanged(const BluetoothRemoteDevice &device, int status, int cause)
 {
+    // 该接口只继承不做实现，配对状态回调通过OnPairStatusChangedWithMessage上报，增加causeMessage字段，原因更加清晰
+}
+
+void NapiBluetoothRemoteDeviceObserver::OnPairStatusChangedWithMessage(
+    const BluetoothRemoteDevice &device, int status, int cause, const std::string &causeMessage)
+{
     int bondStatus = 0;
     DealPairStatus(status, bondStatus);
-    HILOGI("addr:%{public}s, bondStatus:%{public}d, cause:%{public}d", GET_ENCRYPT_ADDR(device), bondStatus, cause);
+    HILOGI("addr:%{public}s, bondStatus:%{public}d, cause:%{public}d, msg:%{public}s",
+        GET_ENCRYPT_ADDR(device), bondStatus, cause, causeMessage.c_str());
 
-    auto nativeObject = std::make_shared<NapiNativeBondStateParam>(device.GetDeviceAddr(), bondStatus, cause);
+    auto nativeObject = std::make_shared<NapiNativeBondStateParam>(device.GetDeviceAddr(), bondStatus, cause,
+        causeMessage);
     eventSubscribe_.PublishEvent(REGISTER_BOND_STATE_TYPE, nativeObject);
 }
 
@@ -96,5 +104,6 @@ void NapiBluetoothRemoteDeviceObserver ::OnReadRemoteRssiEvent(
 {
     HILOGD("addr:%{public}s, rssi:%{public}d, status is %{public}d", GET_ENCRYPT_ADDR(device), rssi, status);
 }
+
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -297,7 +297,7 @@ public:
     }
 
     void OnConnectionStateChanged(const BluetoothGattDevice &device,
-        int32_t ret, int32_t state, int32_t disconnectReason) override
+        int32_t ret, int32_t state, int32_t disconnectReason, const std::string &reasonMessage) override
     {
         HILOGD("gattServer conn state, remote device: %{public}s, ret: %{public}d, state: %{public}s",
             GET_ENCRYPT_GATT_ADDR(device), ret, GetProfileConnStateName(state).c_str());
@@ -327,6 +327,11 @@ public:
                 BluetoothRemoteDevice(device.addr_.GetAddress(),
                     (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
                 state, disconnectReason);
+            GattDisconnectParam disconnectParam(disconnectReason, reasonMessage);
+            serverSptr->pimpl->callback_->OnConnectionStateUpdateWithMessage(
+                BluetoothRemoteDevice(device.addr_.GetAddress(),
+                    (device.transport_ == GATT_TRANSPORT_TYPE_LE) ? BT_TRANSPORT_BLE : BT_TRANSPORT_BREDR),
+                state, disconnectParam);
         }
 
         return;

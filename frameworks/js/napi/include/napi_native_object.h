@@ -138,6 +138,8 @@ class NapiNativeBondStateParam : public NapiNativeObject {
 public:
     NapiNativeBondStateParam(std::string deviceAddr, int bondStatus, int unbondCause)
         : deviceAddr_(deviceAddr), bondStatus_(bondStatus), unbondCause_(unbondCause) {}
+    NapiNativeBondStateParam(std::string deviceAddr, int bondStatus, int unbondCause, std::string causeMessage)
+        : deviceAddr_(deviceAddr), bondStatus_(bondStatus), unbondCause_(unbondCause), causeMessage_(causeMessage) {}
     ~NapiNativeBondStateParam() override = default;
 
     napi_value ToNapiValue(napi_env env) const override;
@@ -145,14 +147,16 @@ private:
     std::string deviceAddr_ = "";
     int bondStatus_ = -1;
     int unbondCause_ = -1;
+    std::string causeMessage_ = "";
 };
 
 class NapiNativeStateChangeParam : public NapiNativeObject {
 public:
     NapiNativeStateChangeParam(std::string deviceAddr, int connectState,
-        int cause = 0, bool isDisconnected = false, int disconnectReason = -1)
+        int cause = 0, bool isDisconnected = false, GattDisconnectParam disconnectParam = GattDisconnectParam())
         : deviceAddr_(deviceAddr), connectState_(connectState), stateChangeCause_(cause),
-          isDisconnected_(isDisconnected), disconnectReason_(disconnectReason) {}
+          isDisconnected_(isDisconnected), disconnectReason_(disconnectParam.disconnectReason_),
+          reasonMessage_(disconnectParam.reasonMessage_) {}
     virtual ~NapiNativeStateChangeParam() override = default;
 
     napi_value ToNapiValue(napi_env env) const override;
@@ -162,6 +166,7 @@ private:
     int stateChangeCause_ = -1;
     bool isDisconnected_ = false;
     int disconnectReason_ = -1;
+    std::string reasonMessage_ = "";
 };
 
 class NapiNativeBleConnectionStateChangeParam : public NapiNativeStateChangeParam {
@@ -169,8 +174,8 @@ public:
     NapiNativeBleConnectionStateChangeParam(std::string deviceAddr, int connectState)
         : NapiNativeStateChangeParam(deviceAddr, connectState) {}
     NapiNativeBleConnectionStateChangeParam(
-        std::string deviceAddr, int connectState, int cause, bool isDisconnected, int disconnectReason)
-        : NapiNativeStateChangeParam(deviceAddr, connectState, cause, isDisconnected, disconnectReason) {}
+        std::string deviceAddr, int connectState, int cause, bool isDisconnected, GattDisconnectParam disconnectParam)
+        : NapiNativeStateChangeParam(deviceAddr, connectState, cause, isDisconnected, disconnectParam) {}
     ~NapiNativeBleConnectionStateChangeParam() override = default;
 };
 

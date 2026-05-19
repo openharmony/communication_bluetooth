@@ -68,6 +68,7 @@ constexpr int32_t BLE_DEVICE_FIND_TYPE = 5;
 constexpr uint32_t INVALID_REF_COUNT = 0xFF;
 
 constexpr int SDK_VERSION_20 = 20;
+constexpr int SDK_VERSION_26 = 26;
 
 struct ServerResponse {
     std::string deviceId = "";
@@ -101,6 +102,7 @@ struct ConnStateChangeParam {
     bool isDisconnected = false;
     int reason = -1;
     int cause = -1;
+    std::string reasonMessage = "";
 };
 
 struct NapiMap {

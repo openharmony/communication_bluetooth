@@ -346,14 +346,15 @@ public:
     }
 
     void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device,
-        int32_t status, int32_t cause) override
+        int32_t status, int32_t cause, const std::string &causeMessage) override
     {
-        HILOGD("enter, transport: %{public}d, device: %{public}s, status: %{public}d, cause: %{public}d",
-            transport, GET_ENCRYPT_RAW_ADDR(device), status, cause);
+        HILOGD("enter, transport: %{public}d, device: %{public}s, status: %{public}d, cause: %{public}d"
+            "msg:%{public}s", transport, GET_ENCRYPT_RAW_ADDR(device), status, cause, causeMessage.c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), transport);
         host_.remoteObservers_.ForEach(
-            [remoteDevice, status, cause](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
+            [remoteDevice, status, cause, causeMessage](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
                 observer->OnPairStatusChanged(remoteDevice, status, cause);
+                observer->OnPairStatusChangedWithMessage(remoteDevice, status, cause, causeMessage);
             });
     }
 
@@ -453,14 +454,16 @@ public:
             });
     }
 
-    void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int status, int cause) override
+    void OnPairStatusChanged(const int32_t transport, const BluetoothRawAddress &device, int status, int cause,
+        const std::string &causeMessage) override
     {
-        HILOGI("enter, transport: %{public}d, device: %{public}s, status: %{public}d, cause: %{public}d",
-            transport, GET_ENCRYPT_RAW_ADDR(device), status, cause);
+        HILOGI("enter, transport: %{public}d, device: %{public}s, status: %{public}d, cause: %{public}d"
+            "msg:%{public}s", transport, GET_ENCRYPT_RAW_ADDR(device), status, cause, causeMessage.c_str());
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), transport);
         host_.remoteObservers_.ForEach(
-            [remoteDevice, status, cause](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
+            [remoteDevice, status, cause, causeMessage](std::shared_ptr<BluetoothRemoteDeviceObserver> observer) {
                 observer->OnPairStatusChanged(remoteDevice, status, cause);
+                observer->OnPairStatusChangedWithMessage(remoteDevice, status, cause, causeMessage);
             });
     }
 

@@ -262,6 +262,12 @@ napi_value NapiNativeBondStateParam::ToNapiValue(napi_env env) const
     napi_value unbondCause = nullptr;
     napi_create_int32(env, unbondCause_, &unbondCause);
     napi_set_named_property(env, result, "cause", unbondCause);
+
+    if (GetCurrentSdkVersion() >= SDK_VERSION_26 && !causeMessage_.empty()) {
+        napi_value causeMessage = nullptr;
+        napi_create_string_utf8(env, causeMessage_.c_str(), NAPI_AUTO_LENGTH, &causeMessage);
+        napi_set_named_property(env, result, "causeMessage", causeMessage);
+    }
     return result;
 }
 
@@ -270,7 +276,7 @@ napi_value NapiNativeStateChangeParam::ToNapiValue(napi_env env) const
     napi_value result = nullptr;
     napi_create_object(env, &result);
     ConnStateChangeParam stateChangeParam {
-        deviceAddr_, connectState_, isDisconnected_, disconnectReason_, stateChangeCause_
+        deviceAddr_, connectState_, isDisconnected_, disconnectReason_, stateChangeCause_, reasonMessage_
     };
     ConvertStateChangeParamToJS(env, result, stateChangeParam);
     return result;

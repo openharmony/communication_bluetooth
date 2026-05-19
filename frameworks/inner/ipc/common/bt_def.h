@@ -129,6 +129,27 @@ enum class GattDisconnectReason : int {
     CONN_UNKNOWN = 4                // Disconnection due to unknown reason.
 };
 
+constexpr const char *GATT_DIS_MSG_EMPTY = "";
+constexpr const char *GATT_DIS_MSG_NO_ERROR = "NO_ERROR";
+constexpr const char *GATT_DIS_MSG_L2C_FAILURE = "L2C_FAILURE";
+constexpr const char *GATT_DIS_MSG_0X08_CONN_TIMEOUT = "0X08_CONN_TIMEOUT";
+constexpr const char *GATT_DIS_MSG_0X13_PEER_USER = "0X13_PEER_USER";
+constexpr const char *GATT_DIS_MSG_0X16_LOCAL_HOST = "0X16_LOCAL_HOST";
+constexpr const char *GATT_DIS_MSG_0X22_LMP_TIMEOUT = "0X22_LMP_TIMEOUT";
+constexpr const char *GATT_DIS_MSG_NO_CONNECTED = "NO_CONNECTED";
+constexpr const char *GATT_DIS_MSG_NO_CONN_TO_CANCEL = "NO_CONN_TO_CANCEL";
+constexpr const char *GATT_DIS_MSG_CONNECT_FAIL = "CONNECT_FAIL";
+constexpr const char *GATT_DIS_MSG_CONN_UNKNOWN = "CONN_UNKNOWN";
+
+struct GattDisconnectParam {
+    int disconnectReason_ = -1;
+    std::string reasonMessage_ = "";
+
+    GattDisconnectParam() : disconnectReason_(-1), reasonMessage_("") {}
+    GattDisconnectParam(int disconnectReason, std::string reasonMessage)
+        : disconnectReason_(disconnectReason), reasonMessage_(reasonMessage) {}
+};
+
 /**
  * @brief The profile in the BLE protocol.
  *
@@ -261,6 +282,19 @@ enum UnbondCause : int {
     UNBOND_CAUSE_AUTH_REJECTED = 3,      // Remote device rejected.
     UNBOND_CAUSE_INTERNAL_ERROR = 4,     // Internal error.
 };
+
+constexpr const char *BOND_MSG_NO_ERROR = "NO_ERROR";
+constexpr const char *UNBOND_MSG_MAX_LINK = "MAX_LINK";
+constexpr const char *UNBOND_MSG_USER_REMOVED = "USER_REMOVED";
+constexpr const char *UNBOND_MSG_NOT_EXIST = "DEVICE_NOT_EXIST";
+constexpr const char *UNBOND_MSG_AUTH_FAILURE = "AUTH_FAILURE";
+constexpr const char *UNBOND_MSG_AUTH_REJECTED = "AUTH_REJECTED";
+constexpr const char *UNBOND_MSG_STATUS_BUSY = "STATUS_BUSY";
+constexpr const char *UNBOND_MSG_NOT_READY = "NOT_READY";
+constexpr const char *UNBOND_MSG_UNSUPPORTED = "UNSUPPORTED";
+constexpr const char *UNBOND_MSG_PARM_INVALID = "PARM_INVALID";
+constexpr const char *UNBOND_MSG_JNI_ERROR = "JNI_ERROR";
+constexpr const char *UNBOND_MSG_UNKNOWN = "UNKNOWN";
 
 /**
  * @brief discoverable mode and connect mode

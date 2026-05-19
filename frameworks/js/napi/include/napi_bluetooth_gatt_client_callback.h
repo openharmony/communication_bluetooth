@@ -34,7 +34,6 @@ class NapiGattClient;
 
 class NapiGattClientCallback : public GattClientCallback {
 public:
-    void OnConnectionStateChangedWithReason(int connectionState, int ret, int disconnectReason) override;
     void OnCharacteristicChanged(const GattCharacteristic &characteristic) override;
     void OnServicesChanged() override;
     void OnCharacteristicReadResult(const GattCharacteristic &characteristic, int ret)  override;
@@ -50,6 +49,8 @@ public:
     void OnReadRemoteRssiValueResult(int rssi, int status)  override;
     void OnBlePhyUpdate(int32_t txPhy, int32_t rxPhy, int32_t status) override;
     void OnBlePhyRead(int32_t txPhy, int32_t rxPhy, int32_t status) override;
+    void OnConnectionStateChangedWithMessage(
+        int connectionState, int ret, GattDisconnectParam disconnectParam) override;
 
     NapiGattClientCallback();
     ~NapiGattClientCallback() override = default;

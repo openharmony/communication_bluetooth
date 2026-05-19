@@ -222,6 +222,18 @@ public:
     {}
 
     /**
+     * @brief The function to OnConnectionStateChanged.
+     *
+     * @param connectionState callback of gattClientCallback.
+     * @param ret ret of GattClientCallback.
+     * @param disconnectParam disconnect param.
+     * @since 26
+     *
+     */
+    virtual void OnConnectionStateChangedWithMessage(int connectionState, int ret, GattDisconnectParam disconnectParam)
+    {}
+
+    /**
      * @brief A destructor of GattClientCallback.
      *
      * @since 6

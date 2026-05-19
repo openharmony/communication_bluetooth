@@ -248,6 +248,10 @@ public:
      */
     virtual void OnRemoteDeviceCommonInfoReport(const BluetoothRemoteDevice &device, const std::vector<uint8_t> &value)
     {};
+
+    virtual void OnPairStatusChangedWithMessage(
+        const BluetoothRemoteDevice &device, int status, int cause, const std::string &causeMessage)
+    {};
 };
 
 /**
