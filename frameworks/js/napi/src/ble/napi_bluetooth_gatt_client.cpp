@@ -18,6 +18,7 @@
 
 #include "napi_bluetooth_gatt_client.h"
 #include <unistd.h>
+#include "bluetooth_def.h"
 #include "bluetooth_errorcode.h"
 #include "bluetooth_host.h"
 #include "bluetooth_log.h"
@@ -36,6 +37,9 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
+constexpr int32_t TRANSPORT_MIN = GATT_TRANSPORT_TYPE_AUTO;    //0
+constexpr int32_t TRANSPORT_MAX = GATT_TRANSPORT_TYPE_CLASSIC; //2
+
 thread_local napi_ref NapiGattClient::consRef_ = nullptr;
 
 const std::vector<std::pair<int, int>> NapiGattClient::g_gattStatusSrvToNapi = {
@@ -47,17 +51,37 @@ const std::vector<std::pair<int, int>> NapiGattClient::g_gattStatusSrvToNapi = {
     { Bluetooth::BT_ERR_GATT_CONNECTION_NOT_AUTHENTICATED,    AUTHENTICATION_FAILED },
     { Bluetooth::BT_ERR_GATT_CONNECTION_NOT_AUTHORIZED,       INSUFFICIENT_AUTHORIZATION },
 };
+
+static napi_status ParseGattClientOptions(napi_env env, napi_value optionsArg, bool &autoConnect, int32_t &transport)
+{
+    NAPI_BT_CALL_RETURN(NapiIsObject(env, optionsArg));
+
+    bool isExist = false;
+    NAPI_BT_CALL_RETURN(NapiParseObjectBooleanOptional(env, optionsArg, "autoConnect", autoConnect, isExist));
+
+    int32_t transportVal = BT_TRANSPORT_BLE;
+    isExist = false;
+    NAPI_BT_CALL_RETURN(NapiParseObjectInt32Optional(env, optionsArg, "transport", transportVal, isExist));
+    if (isExist) {
+        if (transportVal < TRANSPORT_MIN || transportVal > TRANSPORT_MAX) {
+            HILOGE("invalid transport value");
+            return napi_invalid_arg;
+        }
+        transport = transportVal;
+    }
+    return napi_ok;
+}
+
 static napi_status CheckCreateGattClientDeviceParams(napi_env env, napi_callback_info info, napi_value &outResult)
 {
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
+    size_t argc = ARGS_SIZE_THREE;
+    napi_value argv[ARGS_SIZE_THREE] = {0};
 
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
-    NAPI_BT_RETURN_IF(argc != expectedArgsCount, "expect 1 args", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO, "expect 1 or 2 args", napi_invalid_arg);
 
     std::string deviceId {};
-    if (!ParseString(env, deviceId, argv[0])) {
+    if (!ParseString(env, deviceId, argv[PARAM0])) {
         HILOGE("expect string");
         return napi_string_expected;
     }
@@ -66,9 +90,23 @@ static napi_status CheckCreateGattClientDeviceParams(napi_env env, napi_callback
         return napi_invalid_arg;
     }
 
+    bool autoConnect = false;
+    int32_t transport = BT_TRANSPORT_BLE;
+    if (argc == ARGS_SIZE_TWO) {
+        auto status = ParseGattClientOptions(env, argv[PARAM1], autoConnect, transport);
+        if (status != napi_ok) {
+            return status;
+        }
+    }
+
+    napi_value argvNew[ARGS_SIZE_THREE] = {0};
+    napi_create_string_utf8(env, deviceId.c_str(), deviceId.length(), &argvNew[PARAM0]);
+    napi_get_boolean(env, autoConnect, &argvNew[PARAM1]);
+    napi_create_int32(env, transport, &argvNew[PARAM2]);
+
     napi_value constructor = nullptr;
     NAPI_BT_CALL_RETURN(napi_get_reference_value(env, NapiGattClient::consRef_, &constructor));
-    NAPI_BT_CALL_RETURN(napi_new_instance(env, constructor, argc, argv, &outResult));
+    NAPI_BT_CALL_RETURN(napi_new_instance(env, constructor, ARGS_SIZE_THREE, argvNew, &outResult));
     return napi_ok;
 }
 
@@ -125,17 +163,21 @@ napi_value NapiGattClient::GattClientConstructor(napi_env env, napi_callback_inf
     HILOGI("enter");
     napi_value thisVar = nullptr;
 
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
+    size_t expectedArgsCount = ARGS_SIZE_THREE;
     size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = {0};
+    napi_value argv[ARGS_SIZE_THREE] = {0};
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
 
     string deviceId;
+    bool autoConnect = false;
+    int32_t transport = BT_TRANSPORT_BLE;
     ParseString(env, deviceId, argv[PARAM0]);
+    ParseBool(env, autoConnect, argv[PARAM1]);
+    ParseInt32(env, transport, argv[PARAM2]);
     SetGattClientDeviceId(deviceId);
 
-    NapiGattClient *gattClient = new NapiGattClient(deviceId);
+    NapiGattClient *gattClient = new NapiGattClient(deviceId, autoConnect, transport);
 
     auto status = napi_wrap(
         env, thisVar, gattClient,
@@ -316,7 +358,7 @@ napi_value NapiGattClient::Connect(napi_env env, napi_callback_info info)
     std::shared_ptr<GattClient> client = gattClient->GetClient();
     NAPI_BT_ASSERT_RETURN_FALSE(env, client != nullptr, BT_ERR_INTERNAL_ERROR);
 
-    int ret = client->Connect(gattClient->GetCallback(), false, GATT_TRANSPORT_TYPE_LE);
+    int ret = client->Connect(gattClient->GetCallback(), gattClient->GetAutoConnect(), gattClient->GetTransport());
     HILOGI("ret: %{public}d", ret);
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);

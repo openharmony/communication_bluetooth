@@ -469,17 +469,6 @@ int32_t BleImpl::RegisterBleObserver(int32_t callbackType, void (*callback)())
     }
     return BT_NO_ERROR;
 }
-
-int32_t BleImpl::CreateGattClientDeviceWithOption(
-    std::string deviceId, bool autoConnect, int transport, FfiClientDevice*& ffiClientDevice)
-{
-    if (!IsValidAddress(deviceId)) {
-        HILOGE("Invalid deviceId: %{public}s", deviceId.c_str());
-        return BT_ERR_INVALID_PARAM;
-    }
-    ffiClientDevice = FFIData::Create<FfiClientDevice>(deviceId, autoConnect, transport);
-    return BT_NO_ERROR;
-}
 } // namespace CJBluetoothBle
 } // namespace CJSystemapi
 } // namespace OHOS

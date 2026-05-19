@@ -82,8 +82,6 @@ public:
     int32_t NotifyCharacteristicChanged(std::string deviceId, NativeNotifyCharacteristic characteristic);
     int32_t SendResponse(NativeServerResponse serverResponse);
     int32_t RegisterBleGattServerObserver(int32_t callbackType, void (*callback)());
-    int32_t Connect(std::string deviceId, bool autoConnect);
-    int32_t CancelConnection(std::string deviceId);
 
     std::shared_ptr<GattServer>& GetServer()
     {

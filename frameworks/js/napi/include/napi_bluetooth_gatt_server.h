@@ -42,6 +42,8 @@ public:
     static napi_value GetService(napi_env env, napi_callback_info info);
     static napi_value GetServices(napi_env env, napi_callback_info info);
     static napi_value GetConnectedState(napi_env env, napi_callback_info info);
+    static napi_value Connect(napi_env env, napi_callback_info info);
+    static napi_value CancelConnection(napi_env env, napi_callback_info info);
 
 #ifdef BLUETOOTH_API_SINCE_10
     static napi_value NotifyCharacteristicChangedEx(napi_env env, napi_callback_info info);

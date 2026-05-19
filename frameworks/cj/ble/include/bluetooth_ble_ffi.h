@@ -304,24 +304,6 @@ FFI_EXPORT void FfiBluetoothBleGattServerNotifyCharacteristicChanged(
 FFI_EXPORT void FfiBluetoothBleGattServerSendResponse(
     int64_t id, NativeServerResponse serverResponse, int32_t* errCode);
 FFI_EXPORT void FfiBluetoothBleGattServerOn(int64_t id, int32_t callbackType, void (*callback)(), int32_t* errCode);
-
-typedef struct {
-    char* deviceId;
-    int32_t autoConnect;
-} NativeGattServerConnectOption;
-
-typedef struct {
-    char* deviceId;
-    int32_t autoConnect;
-    int32_t transport;
-} NativeGattClientOption;
-
-FFI_EXPORT void FfiBluetoothBleGattServerConnect(
-    int64_t id, NativeGattServerConnectOption option, int32_t* errCode);
-FFI_EXPORT void FfiBluetoothBleGattServerCancelConnection(
-    int64_t id, char* deviceId, int32_t* errCode);
-FFI_EXPORT int64_t FfiBluetoothBleCreateGattClientDeviceWithOption(
-    NativeGattClientOption option, int32_t* errCode);
 }
 
 #endif // BLUETOOTH_BLE_FFI_H

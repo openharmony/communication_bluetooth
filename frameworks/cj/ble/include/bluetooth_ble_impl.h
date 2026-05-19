@@ -97,8 +97,6 @@ public:
     static int32_t DisableAdvertising(NativeAdvertisingDisableParams advertisingDisableParams);
     static int32_t StopAdvertising(uint32_t advertisingId);
     static int32_t RegisterBleObserver(int32_t callbackType, void (*callback)());
-    static int32_t CreateGattClientDeviceWithOption(
-        std::string deviceId, bool autoConnect, int transport, FfiClientDevice*& ffiClientDevice);
 };
 } // namespace CJBluetoothBle
 } // namespace CJSystemapi
