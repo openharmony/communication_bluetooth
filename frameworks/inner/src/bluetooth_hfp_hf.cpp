@@ -236,22 +236,24 @@ struct HandsFreeUnit::impl {
         bool isDiscovering = false;
         BluetoothHost::GetDefaultHost().IsBtDiscovering(isDiscovering);
         sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
+        int ret = BT_ERR_INTERNAL_ERROR;
         if (proxy != nullptr && !isDiscovering && device.IsValidBluetoothRemoteDevice()) {
-            return proxy->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
+            ret = proxy->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
         }
-        HILOGE("fw return false!");
-        return false;
+        HILOGI("ret: %{public}d", ret);
+        return ret == BT_NO_ERROR;
     }
 
     bool Disconnect(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
+        int ret = BT_ERR_INTERNAL_ERROR;
         if (proxy != nullptr && device.IsValidBluetoothRemoteDevice()) {
-            return proxy->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
+            ret = proxy->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
         }
-        HILOGE("fw return false!");
-        return false;
+        HILOGI("ret: %{public}d", ret);
+        return ret == BT_NO_ERROR;
     }
 
     bool OpenVoiceRecognition(const BluetoothRemoteDevice &device)
