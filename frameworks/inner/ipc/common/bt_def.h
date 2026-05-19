@@ -129,17 +129,17 @@ enum class GattDisconnectReason : int {
     CONN_UNKNOWN = 4                // Disconnection due to unknown reason.
 };
 
-inline const std::string GATT_DIS_MSG_EMPTY = "";
-inline const std::string GATT_DIS_MSG_NO_ERROR = "NO_ERROR";
-inline const std::string GATT_DIS_MSG_L2C_FAILURE = "L2C_FAILURE";
-inline const std::string GATT_DIS_MSG_0X08_CONN_TIMEOUT = "0X08_CONN_TIMEOUT";
-inline const std::string GATT_DIS_MSG_0X13_PEER_USER = "0X13_PEER_USER";
-inline const std::string GATT_DIS_MSG_0X16_LOCAL_HOST = "0X16_LOCAL_HOST";
-inline const std::string GATT_DIS_MSG_0X22_LMP_TIMEOUT = "0X22_LMP_TIMEOUT";
-inline const std::string GATT_DIS_MSG_NO_CONNECTED = "NO_CONNECTED";
-inline const std::string GATT_DIS_MSG_NO_CONN_TO_CANCEL = "NO_CONN_TO_CANCEL";
-inline const std::string GATT_DIS_MSG_CONNECT_FAIL = "CONNECT_FAIL";
-inline const std::string GATT_DIS_MSG_CONN_UNKNOWN = "CONN_UNKNOWN";
+constexpr const char *GATT_DIS_MSG_EMPTY = "";
+constexpr const char *GATT_DIS_MSG_NO_ERROR = "NO_ERROR";
+constexpr const char *GATT_DIS_MSG_L2C_FAILURE = "L2C_FAILURE";
+constexpr const char *GATT_DIS_MSG_0X08_CONN_TIMEOUT = "0X08_CONN_TIMEOUT";
+constexpr const char *GATT_DIS_MSG_0X13_PEER_USER = "0X13_PEER_USER";
+constexpr const char *GATT_DIS_MSG_0X16_LOCAL_HOST = "0X16_LOCAL_HOST";
+constexpr const char *GATT_DIS_MSG_0X22_LMP_TIMEOUT = "0X22_LMP_TIMEOUT";
+constexpr const char *GATT_DIS_MSG_NO_CONNECTED = "NO_CONNECTED";
+constexpr const char *GATT_DIS_MSG_NO_CONN_TO_CANCEL = "NO_CONN_TO_CANCEL";
+constexpr const char *GATT_DIS_MSG_CONNECT_FAIL = "CONNECT_FAIL";
+constexpr const char *GATT_DIS_MSG_CONN_UNKNOWN = "CONN_UNKNOWN";
 
 struct GattDisconnectParam {
     int disconnectReason_ = -1;
@@ -283,18 +283,18 @@ enum UnbondCause : int {
     UNBOND_CAUSE_INTERNAL_ERROR = 4,     // Internal error.
 };
 
-inline const std::string BOND_MSG_NO_ERROR = "NO_ERROR";
-inline const std::string UNBOND_MSG_MAX_LINK = "MAX_LINK";
-inline const std::string UNBOND_MSG_USER_REMOVED = "USER_REMOVED";
-inline const std::string UNBOND_MSG_NOT_EXIST = "DEVICE_NOT_EXIST";
-inline const std::string UNBOND_MSG_AUTH_FAILURE = "AUTH_FAILURE";
-inline const std::string UNBOND_MSG_AUTH_REJECTED = "AUTH_REJECTED";
-inline const std::string UNBOND_MSG_STATUS_BUSY = "STATUS_BUSY";
-inline const std::string UNBOND_MSG_NOT_READY = "NOT_READY";
-inline const std::string UNBOND_MSG_UNSUPPORTED = "UNSUPPORTED";
-inline const std::string UNBOND_MSG_PARM_INVALID = "PARM_INVALID";
-inline const std::string UNBOND_MSG_JNI_ERROR = "JNI_ERROR";
-inline const std::string UNBOND_MSG_UNKNOW = "UNKNOW";
+constexpr const char *BOND_MSG_NO_ERROR = "NO_ERROR";
+constexpr const char *UNBOND_MSG_MAX_LINK = "MAX_LINK";
+constexpr const char *UNBOND_MSG_USER_REMOVED = "USER_REMOVED";
+constexpr const char *UNBOND_MSG_NOT_EXIST = "DEVICE_NOT_EXIST";
+constexpr const char *UNBOND_MSG_AUTH_FAILURE = "AUTH_FAILURE";
+constexpr const char *UNBOND_MSG_AUTH_REJECTED = "AUTH_REJECTED";
+constexpr const char *UNBOND_MSG_STATUS_BUSY = "STATUS_BUSY";
+constexpr const char *UNBOND_MSG_NOT_READY = "NOT_READY";
+constexpr const char *UNBOND_MSG_UNSUPPORTED = "UNSUPPORTED";
+constexpr const char *UNBOND_MSG_PARM_INVALID = "PARM_INVALID";
+constexpr const char *UNBOND_MSG_JNI_ERROR = "JNI_ERROR";
+constexpr const char *UNBOND_MSG_UNKNOW = "UNKNOW";
 
 /**
  * @brief discoverable mode and connect mode
