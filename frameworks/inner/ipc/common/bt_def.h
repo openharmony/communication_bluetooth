@@ -294,7 +294,7 @@ constexpr const char *UNBOND_MSG_NOT_READY = "NOT_READY";
 constexpr const char *UNBOND_MSG_UNSUPPORTED = "UNSUPPORTED";
 constexpr const char *UNBOND_MSG_PARM_INVALID = "PARM_INVALID";
 constexpr const char *UNBOND_MSG_JNI_ERROR = "JNI_ERROR";
-constexpr const char *UNBOND_MSG_UNKNOW = "UNKNOW";
+constexpr const char *UNBOND_MSG_UNKNOWN = "UNKNOWN";
 
 /**
  * @brief discoverable mode and connect mode
