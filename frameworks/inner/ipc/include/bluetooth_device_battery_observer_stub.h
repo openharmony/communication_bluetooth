@@ -21,10 +21,24 @@
 #include "i_bluetooth_device_battery_observer.h"
 #include "bluetooth_service_ipc_interface_code.h"
 
-namespace {
+namespace OHOS {
 namespace Bluetooth {
 class BluetoothDeviceBatteryObserverStub : public IRemoteStub<IBluetoothDeviceBatteryObserver> {
+public:
+    BluetoothDeviceBatteryObserverStub();
+    ~BluetoothDeviceBatteryObserverStub();
+
+    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageParcel &option) override;
+
+private:
+    ErrCode OnGetBatteryLevelEventInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode OnBatteryLevelChangedInner(MessageParcel &data, MessageParcel &reply);
+
+    std::map<uint32_t,
+        ErrCode (BluetoothDeviceBatteryObserverStub::*)(MessageParcel &data, MessageParcel &reply)>
+        memberFuncMap_;
+    DISALLOW_COPY_ADN_MOVE(BluetoothDeviceBatteryObserverStub);
 };
-}
-}
+} // namespace Bluetooth
+} // namespace OHOS
 #endif
