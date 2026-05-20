@@ -16,10 +16,12 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_HOST_INTERFACE_H
 #define OHOS_BLUETOOTH_STANDARD_HOST_INTERFACE_H
 
+#include <map>
 #include "bluetooth_raw_address.h"
 #include "bluetooth_service_ipc_interface_code.h"
 #include "parcel_bt_uuid.h"
 #include "i_bluetooth_ble_peripheral_observer.h"
+#include "i_bluetooth_device_battery_observer.h"
 #include "i_bluetooth_host_observer.h"
 #include "i_bluetooth_remote_device_observer.h"
 #include "i_bluetooth_resource_manager_observer.h"
@@ -165,6 +167,10 @@ public:
     virtual int32_t GetVirtualAddressByHash(int hashAlgorithmType,
         const std::string &hashValue, std::string &virtualAddress) = 0;
     virtual int32_t IsProfileExist(const std::string &profileName, bool &isProfileExist) = 0;
+    virtual bool IsBasSupported() = 0;
+    virtual int32_t RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) = 0;
+    virtual int32_t DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) = 0;
+    virtual std::map<std::string, int32_t> GetConnectedDeviceBatterInfos() = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS
