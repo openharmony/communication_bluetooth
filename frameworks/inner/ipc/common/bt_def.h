@@ -60,6 +60,7 @@ constexpr const char *BLUETOOTH_UUID_HOGP = "00001812-0000-1000-8000-00805F9B34F
 constexpr const char *ADV_AUDIO_DIST = "0000110D-0000-1000-8000-00805F9B34FB";
 constexpr const char *BLUETOOTH_UUID_HEARING_AID = "0000FDF0-0000-1000-8000-00805F9B34FB";
 constexpr const char *BLUETOOTH_UUID_HID_DEVICE = "00001812-0000-1000-8000-00805F9B34FB";
+constexpr const char *BLUETOOTH_UUID_BAS = "0000180F-0000-1000-8000-00805F9B34FB";
 /*********************************************
  *
  * Adapter Macro Define
@@ -239,6 +240,7 @@ const uint32_t PROFILE_ID_PAN = 0x00080000;
 const uint32_t PROFILE_ID_HOST = 0x00100000;
 const uint32_t PROFILE_ID_HEARING_AID = 0x00200000;
 const uint32_t PROFILE_ID_HID_DEVICE = 0x00400000;
+const uint32_t PROFILE_ID_BAS = 0x00800000;
 
 /**
  * @brief default value
