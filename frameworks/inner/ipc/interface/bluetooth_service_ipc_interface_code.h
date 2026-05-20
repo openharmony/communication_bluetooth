@@ -348,6 +348,11 @@ enum BluetoothHostInterfaceCode {
     IS_PROFILE_EXIST,
     GET_REAL_ADDRESS,
     GET_VIRTUAL_ADDRESS_BY_HASH,
+    IS_BAS_SUPPORTED,
+    BT_REGISTER_DEVICE_BATTERY_OBSERVER,
+    BT_DEREGISTER_DEVICE_BATTERY_OBSERVER,
+    BT_GET_BATTERY_LEVEL,
+    GET_CONNECTED_DEVICE_BATTERY_INFOS,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
@@ -555,6 +560,13 @@ enum BluetoothResourceManagerObserverInterfaceCode {
     BLUETOOTH_RESOURCE_DECISION,
     // The last code, if you want to add a new code, please add it before this
     BT_RESOURCE_MANAGER_OBSERVER_BUTT
+};
+
+enum BluetoothDeviceBatteryObserverInterfaceCode {
+    BT_DEVICE_GET_BATTERLEVEL_EVENT = 0,
+    BT_DEVICE_BATTERYLEVEL_CHANGED,
+    // The last code, if you want to add a new code, please add it before this
+    BT_DEVICE_BATTERY_OBSERVER_BUTT
 };
 
 }  // namespace Bluetooth

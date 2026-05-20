@@ -135,6 +135,11 @@ public:
     int32_t GetVirtualAddressByHash(int hashAlgorithmType,
         const std::string &hashValue, std::string &virtualAddress) override;
     int32_t IsProfileExist(const std::string &profileName, bool &isProfileExist) override;
+    bool IsBasSupported() override;
+    int32_t RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) override;
+    int32_t DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) override;
+    std::map<std::string, int32_t> GetConnectedDeviceBatterInfos() override;
+    
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;

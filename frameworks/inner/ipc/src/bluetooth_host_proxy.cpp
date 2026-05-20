@@ -2261,5 +2261,25 @@ int32_t BluetoothHostProxy::IsProfileExist(const std::string &profileName, bool 
     isProfileExist = reply.ReadBool();
     return BT_NO_ERROR;
 }
+
+bool BluetoothHostProxy::IsBasSupported()
+{
+
+}
+
+int32_t BluetoothHostProxy::RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer)
+{
+
+}
+
+int32_t BluetoothHostProxy::DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer)
+{
+
+}
+
+std::map<std::string, int32_t> BluetoothHostProxy::GetConnectedDeviceBatterInfos()
+{
+    
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
