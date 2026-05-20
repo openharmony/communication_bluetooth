@@ -85,6 +85,8 @@ ohos_shared_library("bluetooth") {
     "src/pan/napi_bluetooth_pan_observer.cpp",
     "src/socket/napi_bluetooth_spp_client.cpp",
     "src/socket/napi_bluetooth_spp_server.cpp",
+    "src/bas/napi_bluetooth_bas.cpp",
+    "src/bas/napi_bluetooth_bas_callback.cpp",
   ]
 
   deps = [
@@ -190,6 +192,8 @@ ohos_shared_library("bluetoothmanager") {
     "src/pan/napi_bluetooth_pan_observer.cpp",
     "src/socket/napi_bluetooth_spp_client.cpp",
     "src/socket/napi_bluetooth_spp_server.cpp",
+    "src/bas/napi_bluetooth_bas.cpp",
+    "src/bas/napi_bluetooth_bas_callback.cpp",
   ]
 
   deps = [
@@ -244,5 +248,6 @@ group("bluetooth_napi") {
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/pan:pan",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/pbap:pbap",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/socket:socket",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/bas:bas",
   ]
 }

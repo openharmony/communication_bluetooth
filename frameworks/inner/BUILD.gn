@@ -82,6 +82,7 @@ FwkIpcSrc = [
   "$BT_IPCSRC_DIR/bluetooth_ble_central_manager_callback_stub.cpp",
   "$BT_IPCSRC_DIR/bluetooth_ble_central_manager_proxy.cpp",
   "$BT_IPCSRC_DIR/bluetooth_ble_peripheral_observer_stub.cpp",
+  "$BT_IPCSRC_DIR/bluetooth_device_battery_observer_stub.cpp",
   "$BT_IPCSRC_DIR/bluetooth_gatt_client_callback_stub.cpp",
   "$BT_IPCSRC_DIR/bluetooth_gatt_client_proxy.cpp",
   "$BT_IPCSRC_DIR/bluetooth_gatt_server_callback_stub.cpp",

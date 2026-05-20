@@ -163,6 +163,7 @@
               "interface/i_bluetooth_ble_central_manager.h",
               "interface/i_bluetooth_ble_central_manager_callback.h",
               "interface/i_bluetooth_ble_peripheral_observer.h",
+              "interface/i_bluetooth_device_battery_observer.h",
               "interface/i_bluetooth_gatt_client.h",
               "interface/i_bluetooth_gatt_client_callback.h",
               "interface/i_bluetooth_gatt_observer.h",

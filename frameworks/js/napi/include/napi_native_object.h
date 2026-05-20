@@ -252,6 +252,16 @@ private:
     DeviceBatteryInfo batteryInfo_;
 };
 
+class NapiNativeBasBatteryInfo : public NapiNativeObject {
+public:
+    explicit NapiNativeBasBatteryInfo(BasBatteryInfo batteryInfo) : batteryInfo_(batteryInfo) {}
+    ~NapiNativeBasBatteryInfo() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    BasBatteryInfo batteryInfo_;
+};
+
 class NapiNativeInt64 : public NapiNativeObject {
 public:
     explicit NapiNativeInt64(int64_t value) : value_(value) {}
