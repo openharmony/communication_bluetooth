@@ -138,6 +138,7 @@ public:
     bool IsBasSupported() override;
     int32_t RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) override;
     int32_t DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) override;
+    int32_t GetBatteryLevel(const std::string &address) override;
     std::map<std::string, int32_t> GetConnectedDeviceBatterInfos() override;
     
 private:

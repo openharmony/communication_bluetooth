@@ -170,6 +170,7 @@ public:
     virtual bool IsBasSupported() = 0;
     virtual int32_t RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) = 0;
     virtual int32_t DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) = 0;
+    virtual int32_t GetBatteryLevel(const std::string &address) = 0;
     virtual std::map<std::string, int32_t> GetConnectedDeviceBatterInfos() = 0;
 };
 }  // namespace Bluetooth

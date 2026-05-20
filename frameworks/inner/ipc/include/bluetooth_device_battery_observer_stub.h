@@ -41,4 +41,4 @@ private:
 };
 } // namespace Bluetooth
 } // namespace OHOS
-#endif
+#endif // BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H

@@ -2264,22 +2264,121 @@ int32_t BluetoothHostProxy::IsProfileExist(const std::string &profileName, bool 
 
 bool BluetoothHostProxy::IsBasSupported()
 {
-
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("WriteInterfaceToken error");
+        return false;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::IS_BAS_SUPPORTED, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("fail error: %{public}d", error);
+        return false;
+    }
+    return reply.ReadBool();
 }
 
 int32_t BluetoothHostProxy::RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer)
 {
-
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (observer == nullptr) {
+        HILOGE("observer is nullptr");
+        return BT_ERR_INVALID_PARAM;
+    }
+    if (!data.WriteRemoteObject(observer->AsObject())) {
+        HILOGE("write RemoteObject error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_DEVICE_BATTERY_OBSERVER, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("fail error: %{public}d", error);
+        return error;
+    }
+    return BT_NO_ERROR;
 }
 
 int32_t BluetoothHostProxy::DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer)
 {
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (observer == nullptr) {
+        HILOGE("observer is nullptr");
+        return BT_ERR_INVALID_PARAM;
+    }
+    if (!data.WriteRemoteObject(observer->AsObject())) {
+        HILOGE("write RemoteObject error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error =
+        InnerTransact(BluetoothHostInterfaceCode::BT_DEREGISTER_DEVICE_BATTERY_OBSERVER, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("fail error: %{public}d", error);
+        return error;
+    }
+    return BT_NO_ERROR;
+}
 
+int32_t BluetoothHostProxy::GetBatteryLevel(const std::string &address)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!data.WriteString(address)) {
+        HILOGE("write address error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error =
+        InnerTransact(BluetoothHostInterfaceCode::BT_GET_BATTERY_LEVEL, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("fail error: %{public}d", error);
+        return error;
+    }
+    return reply.ReadInt32();
 }
 
 std::map<std::string, int32_t> BluetoothHostProxy::GetConnectedDeviceBatterInfos()
 {
-    
+    std::map<std::string, int32_t> batteryInfos;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("WriteInterfaceToken error");
+        return batteryInfos;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error =
+        InnerTransact(BluetoothHostInterfaceCode::GET_CONNECTED_DEVICE_BATTERY_INFOS, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("fail error: %{public}d", error);
+        return batteryInfos;
+    }
+    int32_t size = reply.ReadInt32();
+    const int32_t maxSize = 100;
+    if (size < 0 || size > maxSize) {
+        HILOGE("invalid size");
+        return batteryInfos;
+    }
+    for (int32_t i = 0; i < size; i++) {
+        std::string address = reply.ReadString();
+        int32_t batteryLevel = reply.ReadInt32();
+        batteryInfos[address] = batteryLevel;
+    }
+    return batteryInfos;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

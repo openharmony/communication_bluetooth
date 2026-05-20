@@ -13,32 +13,69 @@
  * limitations under the License.
  */
 
-#ifndef BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H
-#define BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H
-
-#include <map>
-#include "iremote_stub.h"
-#include "i_bluetooth_device_battery_observer.h"
-#include "bluetooth_service_ipc_interface_code.h"
+#include "bluetooth_device_battery_observer_stub.h"
+#include "bluetooth_log.h"
+#include "ipc_types.h"
+#include "string_ex.h"
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothDeviceBatteryObserverStub : public IRemoteStub<IBluetoothDeviceBatteryObserver> {
-public:
-    BluetoothDeviceBatteryObserverStub();
-    ~BluetoothDeviceBatteryObserverStub();
+BluetoothDeviceBatteryObserverStub::BluetoothDeviceBatteryObserverStub()
+{
+    memberFuncMap_ = {
+        {static_cast<uint32_t>(BluetoothDeviceBatteryObserverInterfaceCode::BT_GET_BATTERYLEVEL_EVENT),
+            &BluetoothDeviceBatteryObserverStub::OnGetBatteryLevelEventInner},
+        {static_cast<uint32_t>(BluetoothDeviceBatteryObserverInterfaceCode::BT_BATTERYLEVEL_CHANGED),
+            &BluetoothDeviceBatteryObserverStub::OnBatteryLevelChangedInner},
+    };
+}
 
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageParcel &option) override;
+BluetoothDeviceBatteryObserverStub::~BluetoothDeviceBatteryObserverStub()
+{
+    memberFuncMap_.clear();
+}
 
-private:
-    ErrCode OnGetBatteryLevelEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnBatteryLevelChangedInner(MessageParcel &data, MessageParcel &reply);
+int32_t BluetoothDeviceBatteryObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageParcel &option)
+{
+    if (BluetoothDeviceBatteryObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
+        HILOGE("local descriptor is not equal to remote");
+        return ERR_INVALID_STATE;
+    }
+    auto itFunc = memberFuncMap_.find(code);
+    if (itFunc != memberFuncMap_.end()) {
+        auto memberFunc = itFunc->second;
+        if (memberFunc != nullptr) {
+            return (this->*memberFunc)(data, reply);
+        }
+    }
+    HILOGW("default case, need check.");
+    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+}
 
-    std::map<uint32_t,
-        ErrCode (BluetoothDeviceBatteryObserverStub::*)(MessageParcel &data, MessageParcel &reply)>
-        memberFuncMap_;
-    DISALLOW_COPY_ADN_MOVE(BluetoothDeviceBatteryObserverStub);
-};
+ErrCode BluetoothDeviceBatteryObserverStub::OnGetBatteryLevelEventInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (device == nullptr) {
+        HILOGE("device transaction wrong.");
+        return TRANSACTION_ERR;
+    }
+    int32_t batteryLevel = data.ReadInt32();
+    OnGetBatteryLevelEvent(*device, batteryLevel);
+    return NO_ERROR;
+}
+
+ErrCode BluetoothDeviceBatteryObserverStub::OnBatteryLevelChangedInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::shared_ptr<BluetoothRawAddress> device(data.ReadParcelable<BluetoothRawAddress>());
+    if (device == nullptr) {
+        HILOGE("device transaction wrong.");
+        return TRANSACTION_ERR;
+    }
+    int32_t batteryLevel = data.ReadInt32();
+    OnBatteryLevelChanged(*device, batteryLevel);
+    return NO_ERROR;
+}
 } // namespace Bluetooth
 } // namespace OHOS
 #endif
