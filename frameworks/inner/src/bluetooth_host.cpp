@@ -498,8 +498,7 @@ public:
     ~BluetoothDeviceBatteryObserverImp() override = default;
 
     void OnGetBatteryLevelEvent(const BluetoothRawAddress &device, int32_t batteryLevel) {
-        HILOGI("enter, device: %{public}s, batteryLevel: %{public}d",
-            GET_ENCRYPT_RAW_ADDR(device), batteryLevel);
+        HILOGD("enter, device: %{public}s, batteryLevel: %{public}d", GET_ENCRYPT_RAW_ADDR(device), batteryLevel);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BLE);
         host_.remoteBatteryObservers_.ForEach(
             [remoteDevice, batteryLevel](std::shared_ptr<BluetoothRemoteDeviceBatteryObserver> observer) {
@@ -510,8 +509,7 @@ public:
     }
 
     void OnBatteryLevelChanged(const BluetoothRawAddress &device, int32_t batteryLevel) {
-        HILOGI("enter, device: %{public}s, batteryLevel: %{public}d",
-            GET_ENCRYPT_RAW_ADDR(device), batteryLevel);
+        HILOGD("enter, device: %{public}s, batteryLevel: %{public}d", GET_ENCRYPT_RAW_ADDR(device), batteryLevel);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BLE);
         host_.remoteBatteryObservers_.ForEach(
             [remoteDevice, batteryLevel](std::shared_ptr<BluetoothRemoteDeviceBatteryObserver> observer) {
@@ -1570,7 +1568,7 @@ bool BluetoothHost::IsBasSupported()
     return proxy->IsBasSupported();
 }
 
-int32_t BluetoothHost::RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &obsBT_NO_ERRORerver)
+int32_t BluetoothHost::RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer)
 {
     CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_INTERNAL_ERROR, "pimpl is null.");
     CHECK_AND_RETURN_LOG_RET(observer != nullptr, BT_ERR_INVALID_PARAM, "observer is null.");
