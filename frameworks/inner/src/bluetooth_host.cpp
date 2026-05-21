@@ -1572,7 +1572,7 @@ int32_t BluetoothHost::RegisterDeviceBatteryObserver(const std::shared_ptr<Bluet
 {
     CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_INTERNAL_ERROR, "pimpl is null.");
     CHECK_AND_RETURN_LOG_RET(observer != nullptr, BT_ERR_INVALID_PARAM, "observer is null.");
-    CHECK_AND_RETURN_LOG_RET(pimpl->basObserverRegStatus_ != BT_NO_ERROR, pimpl->basObserverRegStatus_,
+    CHECK_AND_RETURN_LOG_RET(pimpl->basObserverRegStatus_ == BT_NO_ERROR, pimpl->basObserverRegStatus_,
         "register bas observer failed, ret: %{public}d", pimpl->basObserverRegStatus_.load());
 
     auto batteryInfos = GetConnectedDeviceBatterInfos();
@@ -1592,7 +1592,7 @@ int32_t BluetoothHost::DeregisterDeviceBatteryObserver(const std::shared_ptr<Blu
 {
     CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_INTERNAL_ERROR, "pimpl is null.");
     CHECK_AND_RETURN_LOG_RET(observer != nullptr, BT_ERR_INVALID_PARAM, "observer is null.");
-    CHECK_AND_RETURN_LOG_RET(pimpl->basObserverRegStatus_ != BT_NO_ERROR, pimpl->basObserverRegStatus_,
+    CHECK_AND_RETURN_LOG_RET(pimpl->basObserverRegStatus_ == BT_NO_ERROR, pimpl->basObserverRegStatus_,
         "deregister bas observer failed, ret: %{public}d", pimpl->basObserverRegStatus_.load());
     pimpl->remoteBatteryObservers_.Deregister(observer);
     return BT_NO_ERROR;
@@ -1602,7 +1602,7 @@ int32_t BluetoothHost::GetBatteryLevel(const std::string &address)
 {
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
+    CHECK_AND_RETURN_LOG_RET(proxy = nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     return proxy->GetBatteryLevel(address);
 }
 
