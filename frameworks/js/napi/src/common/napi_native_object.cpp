@@ -326,6 +326,19 @@ napi_value NapiNativeBatteryInfo::ToNapiValue(napi_env env) const
     return result;
 }
 
+napi_value NapiNativeBasBatteryInfo::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    napi_value value = nullptr;
+    napi_create_string_utf8(env, batteryInfo_.deviceId_.c_str(), batteryInfo_.deviceId_.size(), &value);
+    napi_set_named_property(env, result, "deviceId", value);
+    napi_create_int32(env, batteryInfo_.batteryLevel_, &value);
+    napi_set_named_property(env, result, "batteryLevel", value);
+    return result;
+}
+
 napi_value NapiNativeArrayBuffer::ToNapiValue(napi_env env) const
 {
     napi_value object = nullptr;

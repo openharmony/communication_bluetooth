@@ -291,6 +291,39 @@ public:
 };
 
 /**
+ * @brief Represents remote device battery observer.
+ *
+ * @since 26
+ */
+class BluetoothRemoteDeviceBatteryObserver {
+public:
+    /**
+     * @brief A destructor used to delete the <b>BluetoothRemoteDeviceBatteryObserver</b> instance.
+     *
+     * @since 26
+     */
+    virtual ~BluetoothRemoteDeviceBatteryObserver() = default;
+
+    /**
+     * @brief Get batteryLevel event.
+     *
+     * @param device Remote device.
+     * @param batteryLevel battery level. default value or no response value: -1.
+     * @since 26
+     */
+    virtual void OnGetBatteryLevelEvent(const BluetoothRemoteDevice &device, int32_t batteryLevel) {};
+
+    /**
+     * @brief Notify batteryLevel changed.
+     *
+     * @param device Remote device.
+     * @param batteryLevel battery level. default value or no response value: -1.
+     * @since 26
+     */
+    virtual void OnBatteryLevelChanged(const BluetoothRemoteDevice &device, int32_t batteryLevel) {};
+};
+
+/**
  * @brief Represents bluetooth oob callback.
  *
  * @since 23
@@ -987,6 +1020,54 @@ public:
       * @since 21
      */
     int SetConnectionPriority(const std::string &address, int priority);
+
+    /**
+      * @brief Determine whether the local device can obtain ther battery level of the remote device.
+      *
+      * @return Returns <b>true</b> if the battery service is enabled;
+      *         Returns <b>false</b> if the battery service is disabled;
+      * @since 26
+     */
+    bool IsBasSupported();
+
+    /**
+      * @brief Register remote device battery observer.
+      *
+      * @param observer Class BluetoothRemoteDeviceBatteryObserver pointer to register observer.
+      * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+      *         returns an error code defined in {@link BtErrCode} otherwise.
+      * @since 26
+     */
+    int32_t RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer);
+
+    /**
+      * @brief Deregister remote device battery observer.
+      *
+      * @param observer Class BluetoothRemoteDeviceBatteryObserver pointer to deregister observer.
+      * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+      *         returns an error code defined in {@link BtErrCode} otherwise.
+      * @since 26
+     */
+    int32_t DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer);
+
+    /**
+      * @brief Request the battery level of a remote device.
+      *
+      * @param address The address of the remote device.
+      * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+      *         returns an error code defined in {@link BtErrCode} otherwise.
+      * @since 26
+     */
+    int32_t GetBatteryLevel(const std::string &address);
+
+    /**
+      * @brief Get the battery levels of all connected remote devices.
+      *
+      * @return Returns a map where the key is the device address and the value is the battery level (0-100)
+      *         If the battery level is not available, the value is -1.
+      * @since 26
+     */
+    std::map<std::string, int32_t> GetConnectedDeviceBatterInfos();
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
