@@ -72,7 +72,7 @@ napi_value NapiBas::GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info 
     auto func = [deviceId]() {
         int32_t ret = BluetoothHost::GetDefaultHost().GetBatteryLevel(deviceId);
         return NapiAsyncWorkRet(ret);
-    }
+    };
 
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
