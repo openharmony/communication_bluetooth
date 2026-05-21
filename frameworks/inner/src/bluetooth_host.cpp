@@ -1568,7 +1568,7 @@ bool BluetoothHost::IsBasSupported()
     return proxy->IsBasSupported();
 }
 
-int32_t BluetoothHost::RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer)
+int32_t BluetoothHost::RegisterDeviceBatteryObserver(const sptr<BluetoothRemoteDeviceBatteryObserver> &observer)
 {
     CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_INTERNAL_ERROR, "pimpl is null.");
     CHECK_AND_RETURN_LOG_RET(observer != nullptr, BT_ERR_INVALID_PARAM, "observer is null.");
@@ -1588,7 +1588,7 @@ int32_t BluetoothHost::RegisterDeviceBatteryObserver(const sptr<IBluetoothDevice
     return BT_NO_ERROR;
 }
 
-int32_t BluetoothHost::DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer)
+int32_t BluetoothHost::DeregisterDeviceBatteryObserver(const sptr<BluetoothRemoteDeviceBatteryObserver> &observer)
 {
     CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_INTERNAL_ERROR, "pimpl is null.");
     CHECK_AND_RETURN_LOG_RET(observer != nullptr, BT_ERR_INVALID_PARAM, "observer is null.");
