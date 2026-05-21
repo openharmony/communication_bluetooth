@@ -13,32 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H
-#define BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H
+#ifndef NAPI_BLUETOOTH_BAS_CALLBACK_H_
+#define NAPI_BLUETOOTH_BAS_CALLBACK_H_
 
-#include <map>
-#include "iremote_stub.h"
-#include "i_bluetooth_device_battery_observer.h"
-#include "bluetooth_service_ipc_interface_code.h"
+#include "napi_async_callback.h"
+#include "napi_event_subscribe_module.h"
+#include "napi_bluetooth_utils.h"
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothDeviceBatteryObserverStub : public IRemoteStub<IBluetoothDeviceBatteryObserver> {
+
+const char * const STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE = "BatteryLevelChange";
+
+class NapiBasCallback : public BluetoothRemoteDeviceBatteryObserver {
 public:
-    BluetoothDeviceBatteryObserverStub();
-    ~BluetoothDeviceBatteryObserverStub();
+    NapiBasCallback();
+    ~NapiBasCallback() override = default;
 
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageParcel &option) override;
+    void OnGetBatteryLevelEvent(const BluetoothRemoteDevice &device, int32_t batteryLevel) override;
+    void OnBatteryLevelChanged(const BluetoothRemoteDevice &device, int32_t batteryLevel) override;
 
-private:
-    ErrCode OnGetBatteryLevelEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnBatteryLevelChangedInner(MessageParcel &data, MessageParcel &reply);
-
-    std::map<uint32_t,
-        ErrCode (BluetoothDeviceBatteryObserverStub::*)(MessageParcel &data, MessageParcel &reply)>
-        memberFuncMap_;
-    DISALLOW_COPY_ADN_MOVE(BluetoothDeviceBatteryObserverStub);
+    NapiAysncWorkMap aysncWorkMap_ {};
+    NapiEventSubscribeModule eventSubscribe_;
 };
 } // namespace Bluetooth
 } // namespace OHOS
-#endif
+#endif /* NAPI_BLUETOOTH_BAS_CALLBACK_H_ */

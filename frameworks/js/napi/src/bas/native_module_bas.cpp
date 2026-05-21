@@ -12,33 +12,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef LOG_TAG
+#define LOG_TAG "bt_napi_native_module_bas"
+#endif
 
-#ifndef BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H
-#define BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H
-
-#include <map>
-#include "iremote_stub.h"
-#include "i_bluetooth_device_battery_observer.h"
-#include "bluetooth_service_ipc_interface_code.h"
+#include "bluetooth_log.h"
+#include "napi_bluetooth_bas.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothDeviceBatteryObserverStub : public IRemoteStub<IBluetoothDeviceBatteryObserver> {
-public:
-    BluetoothDeviceBatteryObserverStub();
-    ~BluetoothDeviceBatteryObserverStub();
+EXTERN_C_START
+/*
+ * Module initialization function
+ */
+static napi_value Init(napi_env env, napi_value exports)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "bas init");
+    HILOGD("-----Bas Init start------");
+    napi_property_descriptor desc[] = {};
+    napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageParcel &option) override;
+    NapiA2dpSource::DefineBasJsFunction(env, exports);
 
-private:
-    ErrCode OnGetBatteryLevelEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnBatteryLevelChangedInner(MessageParcel &data, MessageParcel &reply);
-
-    std::map<uint32_t,
-        ErrCode (BluetoothDeviceBatteryObserverStub::*)(MessageParcel &data, MessageParcel &reply)>
-        memberFuncMap_;
-    DISALLOW_COPY_ADN_MOVE(BluetoothDeviceBatteryObserverStub);
-};
-} // namespace Bluetooth
-} // namespace OHOS
-#endif
+    HILOGD("-----Bas Init end------");
+    return exports;
+}
+EXTERN_C_END
+/*
+ * Module define
+ */
+static napi_module bluetoothBasModule = {
+    .nm_version = 1,
+    .nm_flags = 0,
+    .nm_filename = NULL,
+    .nm_register_func = Init,
+    .nm_modname = "bluetooth.bas",
+    .nm_priv = ((void *)0),
+    .reserved = {0}};
+/*
+ * Module register function
+ */
+extern "C" __attribute__((constructor)) void RegisterModule(void)
+{
+    HILOGI("Register bluetoothBasModule nm_modname:%{public}s", bluetoothBasModule.nm_modname);
+    napi_module_register(&bluetoothBasModule);
+}
+}  // namespace Bluetooth
+}  // namespace OHOS

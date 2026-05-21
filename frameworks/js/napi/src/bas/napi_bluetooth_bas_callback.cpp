@@ -13,32 +13,41 @@
  * limitations under the License.
  */
 
-#ifndef BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H
-#define BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H
+#ifndef LOG_TAG
+#define LOG_TAG "bt_napi_bas_callback"
+#endif
 
-#include <map>
-#include "iremote_stub.h"
-#include "i_bluetooth_device_battery_observer.h"
-#include "bluetooth_service_ipc_interface_code.h"
+#include "bluetooth_battery_info.h"
+#include "bluetooth_errorcode.h"
+#include "bluetooth_log.h"
+#include "napi_bluetooth_bas_callback.h"
+#include "napi_native_object.h"
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothDeviceBatteryObserverStub : public IRemoteStub<IBluetoothDeviceBatteryObserver> {
-public:
-    BluetoothDeviceBatteryObserverStub();
-    ~BluetoothDeviceBatteryObserverStub();
 
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageParcel &option) override;
+NapiBasCallback::NapiBasCallback()
+    : eventSubscribe_(STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE, BT_MODULE_NAME)
+{}
 
-private:
-    ErrCode OnGetBatteryLevelEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnBatteryLevelChangedInner(MessageParcel &data, MessageParcel &reply);
+void NapiBasCallback::OnGetBatteryLevelEvent(const BluetoothRemoteDevice &device, int32_t batteryLevel)
+{
+    BasBatteryInfo batteryInfo;
+    batteryInfo.deviceId_ = device.GetDeviceAddr();
+    batteryInfo.batteryLevel_ = batteryLevel;
+    auto nativeObject = std::make_shared<NapiNativeBasBatteryInfo(batteryInfo);
+    AsyncWorkCallFunction(aysncWorkMap_, NapiAsyncType::BAS_GET_BATTERY_LEVEL, nativeObject,
+        static_cast<int>(BT_NO_ERROR));
+}
 
-    std::map<uint32_t,
-        ErrCode (BluetoothDeviceBatteryObserverStub::*)(MessageParcel &data, MessageParcel &reply)>
-        memberFuncMap_;
-    DISALLOW_COPY_ADN_MOVE(BluetoothDeviceBatteryObserverStub);
-};
+void NapiBasCallback::OnBatteryLevelChanged(const BluetoothRemoteDevice &device, int32_t batteryLevel)
+{
+    BasBatteryInfo batteryInfo;
+    batteryInfo.deviceId_ = device.GetDeviceAddr();
+    batteryInfo.batteryLevel_ = batteryLevel;
+    auto nativeObject = std::make_shared<NapiNativeBasBatteryInfo(batteryInfo);
+    eventSubscribe_.PublishEvent(STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE, nativeObject);
+}
 } // namespace Bluetooth
 } // namespace OHOS
 #endif

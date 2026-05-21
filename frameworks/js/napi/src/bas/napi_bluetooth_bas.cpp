@@ -107,7 +107,7 @@ napi_value NapiBas::OnBatteryChange(napi_env env, napi_callback_info info)
 {
     NAPI_BT_ASSERT_RETURN_UNDEF(env, g_registerStatus == BT_NO_ERROR, g_registerStatus);
     auto status->g_basObserver->enventSubscribe_.RegisterWithName(env, info,
-        STR_BT_BAS_CALLBACK_BATTERY_LEVLE_CHANGE);
+        STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
     auto batteryInfos = BluetoothHost::GetDefaultHost().GetConnectedDeviceBatteryInfos();
     const int32_t maxBatteryLevel = 100;
@@ -125,7 +125,7 @@ napi_value NapiBas::OffBatteryChange(napi_env env, napi_callback_info info)
 {
     NAPI_BT_ASSERT_RETURN_UNDEF(env, g_registerStatus == BT_NO_ERROR, g_registerStatus);
     auto status->g_basObserver->enventSubscribe_.DeregisterWithName(env, info,
-        STR_BT_BAS_CALLBACK_BATTERY_LEVLE_CHANGE);
+        STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
     return NapiGetUndefineRet(env);
 }
