@@ -35,8 +35,8 @@ void NapiBasCallback::OnGetBatteryLevelEvent(const BluetoothRemoteDevice &device
     BasBatteryInfo batteryInfo;
     batteryInfo.deviceId_ = device.GetDeviceAddr();
     batteryInfo.batteryLevel_ = batteryLevel;
-    auto nativeObject = std::make_shared<NapiNativeBasBatteryInfo(batteryInfo);
-    AsyncWorkCallFunction(aysncWorkMap_, NapiAsyncType::BAS_GET_BATTERY_LEVEL, nativeObject,
+    auto nativeObject = std::make_shared<NapiNativeBasBatteryInfo>(batteryInfo);
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::BAS_GET_BATTERY_LEVEL, nativeObject,
         static_cast<int>(BT_NO_ERROR));
 }
 
@@ -45,7 +45,7 @@ void NapiBasCallback::OnBatteryLevelChanged(const BluetoothRemoteDevice &device,
     BasBatteryInfo batteryInfo;
     batteryInfo.deviceId_ = device.GetDeviceAddr();
     batteryInfo.batteryLevel_ = batteryLevel;
-    auto nativeObject = std::make_shared<NapiNativeBasBatteryInfo(batteryInfo);
+    auto nativeObject = std::make_shared<NapiNativeBasBatteryInfo>(batteryInfo);
     eventSubscribe_.PublishEvent(STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE, nativeObject);
 }
 } // namespace Bluetooth
