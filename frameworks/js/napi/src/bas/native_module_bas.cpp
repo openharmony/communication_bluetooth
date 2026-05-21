@@ -33,7 +33,7 @@ static napi_value Init(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {};
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 
-    NapiA2dpSource::DefineBasJSFunction(env, exports);
+    NapiBas::DefineBasJSFunction(env, exports);
 
     HILOGD("-----Bas Init end------");
     return exports;
