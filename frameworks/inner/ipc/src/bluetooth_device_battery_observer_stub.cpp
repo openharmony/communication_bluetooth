@@ -23,9 +23,9 @@ namespace Bluetooth {
 BluetoothDeviceBatteryObserverStub::BluetoothDeviceBatteryObserverStub()
 {
     memberFuncMap_ = {
-        {static_cast<uint32_t>(BluetoothDeviceBatteryObserverInterfaceCode::BT_GET_BATTERYLEVEL_EVENT),
+        {static_cast<uint32_t>(BluetoothDeviceBatteryObserverInterfaceCode::BT_DEVICE_GET_BATTERYLEVEL_EVENT),
             &BluetoothDeviceBatteryObserverStub::OnGetBatteryLevelEventInner},
-        {static_cast<uint32_t>(BluetoothDeviceBatteryObserverInterfaceCode::BT_BATTERYLEVEL_CHANGED),
+        {static_cast<uint32_t>(BluetoothDeviceBatteryObserverInterfaceCode::BT_DEVICE_BATTERYLEVEL_CHANGED),
             &BluetoothDeviceBatteryObserverStub::OnBatteryLevelChangedInner},
     };
 }
@@ -36,7 +36,7 @@ BluetoothDeviceBatteryObserverStub::~BluetoothDeviceBatteryObserverStub()
 }
 
 int32_t BluetoothDeviceBatteryObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-    MessageParcel &option)
+    MessageOption &option)
 {
     if (BluetoothDeviceBatteryObserverStub::GetDescriptor() != data.ReadInterfaceToken()) {
         HILOGE("local descriptor is not equal to remote");

@@ -563,7 +563,7 @@ enum BluetoothResourceManagerObserverInterfaceCode {
 };
 
 enum BluetoothDeviceBatteryObserverInterfaceCode {
-    BT_DEVICE_GET_BATTERLEVEL_EVENT = 0,
+    BT_DEVICE_GET_BATTERYLEVEL_EVENT = 0,
     BT_DEVICE_BATTERYLEVEL_CHANGED,
     // The last code, if you want to add a new code, please add it before this
     BT_DEVICE_BATTERY_OBSERVER_BUTT

@@ -2296,7 +2296,8 @@ int32_t BluetoothHostProxy::RegisterDeviceBatteryObserver(const sptr<IBluetoothD
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_DEVICE_BATTERY_OBSERVER, option, data, reply);
+    int32_t error =
+        InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_DEVICE_BATTERY_OBSERVER, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("fail error: %{public}d", error);
         return error;
@@ -2351,7 +2352,7 @@ int32_t BluetoothHostProxy::GetBatteryLevel(const std::string &address)
     return reply.ReadInt32();
 }
 
-std::map<std::string, int32_t> BluetoothHostProxy::GetConnectedDeviceBatterInfos()
+std::map<std::string, int32_t> BluetoothHostProxy::GetConnectedDeviceBatteryInfos()
 {
     std::map<std::string, int32_t> batteryInfos;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {

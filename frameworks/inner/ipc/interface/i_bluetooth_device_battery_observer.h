@@ -26,8 +26,8 @@ class IBluetoothDeviceBatteryObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.IBluetoothDeviceBatteryObserver");
 
-    void OnGetBatteryLevelEvent(const BluetoothRawAddress &device, int32_t batteryLevel);
-    void OnBatteryLevelChanged(const BluetoothRawAddress &device, int32_t batteryLevel);
+    virtual void OnGetBatteryLevelEvent(const BluetoothRawAddress &device, int32_t batteryLevel) = 0;
+    virtual void OnBatteryLevelChanged(const BluetoothRawAddress &device, int32_t batteryLevel) = 0;
 };
 } // namespace Bluetooth
 } // namespace OHOS
