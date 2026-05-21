@@ -1038,7 +1038,7 @@ public:
       *         returns an error code defined in {@link BtErrCode} otherwise.
       * @since 26
       */
-    int32_t RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer);
+    int32_t RegisterBatteryObserver(std::shared_ptr<BluetoothRemoteDeviceBatteryObserver> observer);
 
     /**
       * @brief Deregister remote device battery observer.
@@ -1048,7 +1048,7 @@ public:
       *         returns an error code defined in {@link BtErrCode} otherwise.
       * @since 26
       */
-    int32_t DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer);
+    int32_t DeregisterBatteryObserver(std::shared_ptr<BluetoothRemoteDeviceBatteryObserver> observer);
 
     /**
       * @brief Request the battery level of a remote device.
@@ -1067,7 +1067,7 @@ public:
       *         If the battery level is not available, the value is -1.
       * @since 26
       */
-    std::map<std::string, int32_t> GetConnectedDeviceBatterInfos();
+    std::map<std::string, int32_t> GetConnectedDeviceBatteryInfos();
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
