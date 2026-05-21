@@ -2343,8 +2343,7 @@ int32_t BluetoothHostProxy::GetBatteryLevel(const std::string &address)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error =
-        InnerTransact(BluetoothHostInterfaceCode::BT_GET_BATTERY_LEVEL, option, data, reply);
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_BATTERY_LEVEL, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("fail error: %{public}d", error);
         return error;
