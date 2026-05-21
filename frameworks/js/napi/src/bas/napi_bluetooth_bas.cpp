@@ -109,7 +109,7 @@ napi_status NapiBas::ParseGetRemoteDeviceBatteryInfoParams(napi_env env, napi_ca
     deviceId.addressType = static_cast<uint8_t>(addressType);
 
     int32_t rawAddressType = RawAddressType::UNSET_RAW_ADDRESS;
-    NAPI_BT_CALL_RETURN(ParseInt32Params(env, argv[PARAM0], "rawAddressType", exist, deviceId.rawAddressType));
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, argv[PARAM0], "rawAddressType", exist, rawAddressType));
     if (!exist) {
         HILOGE("rawAddressType not exist");
         return napi_invalid_arg;
