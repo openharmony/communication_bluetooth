@@ -1022,10 +1022,10 @@ public:
     int SetConnectionPriority(const std::string &address, int priority);
 
     /**
-     * @brief Determine whether the local device can obtain ther battery level of the remote device.
+     * @brief Determine whether the local device can obtain the battery level of the remote device.
      *
      * @return Returns <b>true</b> if the battery service is enabled;
-     *         Returns <b>false</b> if the battery service is disabled;
+     *         returns <b>false</b> if the battery service is disabled.
      * @since 26
      */
     bool IsBasSupported();
@@ -1063,7 +1063,7 @@ public:
     /**
      * @brief Get the battery levels of all connected remote devices.
      *
-     * @return Returns a map where the key is the device address and the value is the battery level (0-100)
+     * @return Returns a map where the key is the device address and the value is the battery level (0-100).
      *         If the battery level is not available, the value is -1.
      * @since 26
      */
