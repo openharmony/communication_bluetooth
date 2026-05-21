@@ -1,44 +1,73 @@
-/*
- * Copyright (C) 2026 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+# Copyright (C) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-#ifndef BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H
-#define BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H
+import("//build/ohos.gni")
 
-#include <map>
-#include "iremote_stub.h"
-#include "i_bluetooth_device_battery_observer.h"
-#include "bluetooth_service_ipc_interface_code.h"
+BT_PART_DIR = "../../../../.."
+BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
 
-namespace OHOS {
-namespace Bluetooth {
-class BluetoothDeviceBatteryObserverStub : public IRemoteStub<IBluetoothDeviceBatteryObserver> {
-public:
-    BluetoothDeviceBatteryObserverStub();
-    ~BluetoothDeviceBatteryObserverStub();
+ohos_shared_library("bas") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  stack_protector_ret = true
 
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageParcel &option) override;
+  sanitize = {
+    cfi = true
+    boundary_sanitize = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
-private:
-    ErrCode OnGetBatteryLevelEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnBatteryLevelChangedInner(MessageParcel &data, MessageParcel &reply);
+  include_dirs = [
+    "$BT_PART_DIR/frameworks/inner/include",
+    "$BT_PART_DIR/frameworks/inner/ipc/parcel",
+    "$BT_NAPI_DIR/include",
+    "$BT_NAPI_DIR/interfaces/inner_api/include",
+    "$BT_NAPI_DIR/src",
+  ]
 
-    std::map<uint32_t,
-        ErrCode (BluetoothDeviceBatteryObserverStub::*)(MessageParcel &data, MessageParcel &reply)>
-        memberFuncMap_;
-    DISALLOW_COPY_ADN_MOVE(BluetoothDeviceBatteryObserverStub);
-};
-} // namespace Bluetooth
-} // namespace OHOS
-#endif
+  defines = [
+    "BT_LOG_TAG = \"bluetooth_napi\"",
+    "BT_LOG_DOMAIN = 0xD000100",
+    "ENABLE_NAPI_BLUETOOTH_MANAGER",
+    "BLUETOOTH_API_SINCE_10",
+    "BT_MODULE_NAME = \"bluetooth.bas\"",
+  ]
+
+  sources = [
+    "$BT_NAPI_DIR/src/napi_bluetooth_bas.cpp",
+    "$BT_NAPI_DIR/src/napi_bluetooth_bas_callback.cpp",
+    "$BT_NAPI_DIR/src/native_module_bas.cpp",
+  ]
+
+  deps = [
+    "$BT_PART_DIR/frameworks/inner:btframework",
+    "$BT_PART_DIR/frameworks/js/napi/src/common:bt_napi_common",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:ability_manager",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_single",
+    "libuv:uv",
+    "napi:ace_napi",
+  ]
+
+  relative_install_dir = "module/bluetooth"
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}
