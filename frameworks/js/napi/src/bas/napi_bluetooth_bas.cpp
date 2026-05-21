@@ -75,22 +75,22 @@ napi_value NapiBas::GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info 
     }
 
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, aysncWork, BT_ERR_INTERNAL_ERROR);
-    bool success = g_basObserver->asyncWorkMap.TryPush(NapiAsyncType::BAS_GET_BATTERY_LEVEL, asyncWork);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    bool success = g_basObserver->asyncWorkMap_.TryPush(NapiAsyncType::BAS_GET_BATTERY_LEVEL, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
     asyncWork->Run();
     return asyncWork->GetRet();
 }
 
-napi_value NapiBas::ParseGetRemoteDeviceBatteryInfoParams(napi_env env, napi_callback_info info, std::string &deviceId)
+napi_status NapiBas::ParseGetRemoteDeviceBatteryInfoParams(napi_env env, napi_callback_info info, std::string &deviceId)
 {
     size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size argc = expectedArgsCount;
+    size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
 
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
-    NAPI_BT_RETURN_IF(argc != expectedArgsCount, "Requires 1 argumnent.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(argc != expectedArgsCount, "Requires 1 argument.", napi_invalid_arg);
 
     if (!ParseString(env, deviceId, argv[PARAM0])) {
         HILOGE("Parse deviceId failed");
@@ -106,7 +106,7 @@ napi_value NapiBas::ParseGetRemoteDeviceBatteryInfoParams(napi_env env, napi_cal
 napi_value NapiBas::OnBatteryChange(napi_env env, napi_callback_info info)
 {
     NAPI_BT_ASSERT_RETURN_UNDEF(env, g_registerStatus == BT_NO_ERROR, g_registerStatus);
-    auto status->g_basObserver->enventSubscribe_.RegisterWithName(env, info,
+    auto status = g_basObserver->eventSubscribe_.RegisterWithName(env, info,
         STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
     auto batteryInfos = BluetoothHost::GetDefaultHost().GetConnectedDeviceBatteryInfos();
@@ -118,16 +118,16 @@ napi_value NapiBas::OnBatteryChange(napi_env env, napi_callback_info info)
         BluetoothRemoteDevice remoteDevice(deviceAddr, BTTransport::ADAPTER_BLE);
         g_basObserver->OnBatteryLevelChanged(remoteDevice, batteryLevel);
     }
-    return NapiGetUndefineRet(env);
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiBas::OffBatteryChange(napi_env env, napi_callback_info info)
 {
     NAPI_BT_ASSERT_RETURN_UNDEF(env, g_registerStatus == BT_NO_ERROR, g_registerStatus);
-    auto status->g_basObserver->enventSubscribe_.DeregisterWithName(env, info,
+    auto status = g_basObserver->eventSubscribe_.DeregisterWithName(env, info,
         STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
-    return NapiGetUndefineRet(env);
+    return NapiGetUndefinedRet(env);
 }
 } // namespace Bluetooth
 } // namespace OHOS
