@@ -34,7 +34,7 @@ public:
     void OnGetBatteryLevelEvent(const BluetoothRemoteDevice &device, int32_t batteryLevel) override;
     void OnBatteryLevelChanged(const BluetoothRemoteDevice &device, int32_t batteryLevel) override;
 
-    NapiAysncWorkMap aysncWorkMap_ {};
+    NapiAsyncWorkMap asyncWorkMap_ {};
     NapiEventSubscribeModule eventSubscribe_;
 };
 } // namespace Bluetooth
