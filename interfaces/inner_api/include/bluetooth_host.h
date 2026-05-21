@@ -1018,7 +1018,7 @@ public:
       * @param priority Connection priority {@link BtLinkPriority}.
       * @return Returns the operation result status {@link BtStatus}.
       * @since 21
-     */
+      */
     int SetConnectionPriority(const std::string &address, int priority);
 
     /**
@@ -1027,7 +1027,7 @@ public:
       * @return Returns <b>true</b> if the battery service is enabled;
       *         Returns <b>false</b> if the battery service is disabled;
       * @since 26
-     */
+      */
     bool IsBasSupported();
 
     /**
@@ -1037,7 +1037,7 @@ public:
       * @return Returns {@link BT_NO_ERROR} if the operation is successful;
       *         returns an error code defined in {@link BtErrCode} otherwise.
       * @since 26
-     */
+      */
     int32_t RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer);
 
     /**
@@ -1047,7 +1047,7 @@ public:
       * @return Returns {@link BT_NO_ERROR} if the operation is successful;
       *         returns an error code defined in {@link BtErrCode} otherwise.
       * @since 26
-     */
+      */
     int32_t DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer);
 
     /**
@@ -1057,7 +1057,7 @@ public:
       * @return Returns {@link BT_NO_ERROR} if the operation is successful;
       *         returns an error code defined in {@link BtErrCode} otherwise.
       * @since 26
-     */
+      */
     int32_t GetBatteryLevel(const std::string &address);
 
     /**
@@ -1066,7 +1066,7 @@ public:
       * @return Returns a map where the key is the device address and the value is the battery level (0-100)
       *         If the battery level is not available, the value is -1.
       * @since 26
-     */
+      */
     std::map<std::string, int32_t> GetConnectedDeviceBatterInfos();
 private:
     /**
