@@ -37,7 +37,7 @@ private:
     std::map<uint32_t,
         ErrCode (BluetoothDeviceBatteryObserverStub::*)(MessageParcel &data, MessageParcel &reply)>
         memberFuncMap_;
-    DISALLOW_COPY_ADN_MOVE(BluetoothDeviceBatteryObserverStub);
+    DISALLOW_COPY_AND_MOVE(BluetoothDeviceBatteryObserverStub);
 };
 } // namespace Bluetooth
 } // namespace OHOS
