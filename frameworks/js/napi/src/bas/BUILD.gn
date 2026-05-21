@@ -31,7 +31,7 @@ ohos_shared_library("bas") {
     "$BT_PART_DIR/frameworks/inner/include",
     "$BT_PART_DIR/frameworks/inner/ipc/parcel",
     "$BT_NAPI_DIR/include",
-    "$BT_NAPI_DIR/interfaces/inner_api/include",
+    "$BT_PART_DIR/interfaces/inner_api/include",
     "$BT_NAPI_DIR/src",
   ]
 
@@ -44,9 +44,9 @@ ohos_shared_library("bas") {
   ]
 
   sources = [
-    "$BT_NAPI_DIR/src/napi_bluetooth_bas.cpp",
-    "$BT_NAPI_DIR/src/napi_bluetooth_bas_callback.cpp",
-    "$BT_NAPI_DIR/src/native_module_bas.cpp",
+    "$BT_NAPI_DIR/src/bas/napi_bluetooth_bas.cpp",
+    "$BT_NAPI_DIR/src/bas/napi_bluetooth_bas_callback.cpp",
+    "$BT_NAPI_DIR/src/bas/native_module_bas.cpp",
   ]
 
   deps = [
