@@ -75,7 +75,7 @@ struct DeviceBatteryInfo {
 
 struct BasBatteryInfo {
     // The device
-    std::string deviceId_;
+    BluetoothAddress deviceId_;
 
     // Electricity value of the general device. -1 means no power infomation.
     int32_t batteryLevel_;

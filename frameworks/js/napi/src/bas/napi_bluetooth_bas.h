@@ -16,6 +16,7 @@
 #ifndef NAPI_BLUETOOTH_BAS_H_
 #define NAPI_BLUETOOTH_BAS_H_
 
+#include "bluetooth_def.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
@@ -32,7 +33,7 @@ public:
 private:
     static void RegisterAccessObserverToHost();
     static napi_status ParseGetRemoteDeviceBatteryInfoParams(napi_env env, napi_callback_info info,
-        std::string &deviceId);
+        BluetoothAddress &deviceId);
 };
 } // namespace Bluetooth
 } // namespace OHOS

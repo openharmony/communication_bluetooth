@@ -331,9 +331,18 @@ napi_value NapiNativeBasBatteryInfo::ToNapiValue(napi_env env) const
     napi_value result = nullptr;
     napi_create_object(env, &result);
 
+    napi_value bluetoothAddress = nullptr;
+    napi_create_object(env, &bluetoothAddress);
+
     napi_value value = nullptr;
-    napi_create_string_utf8(env, batteryInfo_.deviceId_.c_str(), batteryInfo_.deviceId_.size(), &value);
-    napi_set_named_property(env, result, "deviceId", value);
+    std::string address = batteryInfo_.deviceId_.address;
+    napi_create_string_utf8(env, address.c_str(), address.size(), &value);
+    napi_set_named_property(env, bluetoothAddress, "deviceId", value);
+    napi_create_int32(env, batteryInfo_.deviceId_.addressType, &value);
+    napi_set_named_property(env, bluetoothAddress, "addressType", value);
+    napi_create_int32(env, batteryInfo_.deviceId_.rawAddressType, &value);
+    napi_set_named_property(env, bluetoothAddress, "rawAddressType", value);
+    napi_set_named_property(env, result, "deviceId", bluetoothAddress);
     napi_create_int32(env, batteryInfo_.batteryLevel_, &value);
     napi_set_named_property(env, result, "batteryLevel", value);
     return result;

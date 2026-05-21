@@ -65,12 +65,12 @@ napi_value NapiBas::IsBasSupported(napi_env env, napi_callback_info info)
 
 napi_value NapiBas::GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info info)
 {
-    std::string deviceId;
+    BluetoothAddress deviceId;
     auto status = ParseGetRemoteDeviceBatteryInfoParams(env, info, deviceId);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     auto func = [deviceId]() {
-        int32_t ret = BluetoothHost::GetDefaultHost().GetBatteryLevel(deviceId);
+        int32_t ret = BluetoothHost::GetDefaultHost().GetBatteryLevel(deviceId.address);
         return NapiAsyncWorkRet(ret);
     };
 
@@ -83,23 +83,38 @@ napi_value NapiBas::GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info 
     return asyncWork->GetRet();
 }
 
-napi_status NapiBas::ParseGetRemoteDeviceBatteryInfoParams(napi_env env, napi_callback_info info, std::string &deviceId)
+napi_status NapiBas::ParseGetRemoteDeviceBatteryInfoParams(napi_env env, napi_callback_info info,
+    BluetoothAddress &deviceId)
 {
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
+    size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = {0};
 
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
-    NAPI_BT_RETURN_IF(argc != expectedArgsCount, "Requires 1 argument.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 argument.", napi_invalid_arg);
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, argv[PARAM0], {"address", "addressType", "rawAddressType"}));
 
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("Parse deviceId failed");
+    bool exist = false;
+    NAPI_BT_CALL_RETURN(ParseStringParams(env, argv[PARAM0], "address", exist, deviceId.address));
+    if (!exist || !IsValidAddress(deviceId.address)) {
+        HILOGE("Invalid address");
         return napi_invalid_arg;
     }
-    if (!IsValidAddress(deviceId)) {
-        HILOGE("Invalid deviceId");
+
+    int32_t addressType = AddressType::UNSET_ADDRESS;
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, argv[PARAM0], "addressType", exist, addressType));
+    if (!exist) {
+        HILOGE("addressType not exist");
         return napi_invalid_arg;
     }
+    deviceId.addressType = static_cast<uint8_t>(addressType);
+
+    int32_t rawAddressType = RawAddressType::UNSET_RAW_ADDRESS;
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, argv[PARAM0], "rawAddressType", exist, deviceId.rawAddressType));
+    if (!exist) {
+        HILOGE("rawAddressType not exist");
+        return napi_invalid_arg;
+    }
+    deviceId.rawAddressType = static_cast<uint8_t>(rawAddressType);
     return napi_ok;
 }
 
