@@ -35,7 +35,7 @@ const std::shared_ptr<NapiBasCallback> g_basObserver =
 int32_t g_registerStatus = BT_NO_ERROR;
 } //namespace
 
-napi_value NapiBas::DefineBasJsFunction(napi_env env, napi_value exports)
+napi_value NapiBas::DefineBasJSFunction(napi_env env, napi_value exports)
 {
     HILOGI("start");
     RegisterAccessObserverToHost();
@@ -67,20 +67,20 @@ napi_value NapiBas::GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info 
 {
     std::string deviceId;
     auto status = ParseGetRemoteDeviceBatteryInfoParams(env, info, deviceId);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status = napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     auto func = [deviceId]() {
         int32_t ret = BluetoothHost::GetDefaultHost().GetBatteryLevel(deviceId);
         return NapiAsyncWorkRet(ret);
     }
 
-    auto aysncWork = NapiAsyncWorkFactory::CreateAysncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, aysncWork, BT_ERR_INTERNAL_ERROR);
     bool success = g_basObserver->asyncWorkMap.TryPush(NapiAsyncType::BAS_GET_BATTERY_LEVEL, asyncWork);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
 
-    aysncWork->Run();
-    return aysncWork->GetRet();
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 
 napi_value NapiBas::ParseGetRemoteDeviceBatteryInfoParams(napi_env env, napi_callback_info info, std::string &deviceId)

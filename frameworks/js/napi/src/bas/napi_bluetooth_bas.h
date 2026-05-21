@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Bluetooth {
 class NapiBas {
 public:
-    static napi_value DefineBasJsFunction(napi_env env, napi_value exports);
+    static napi_value DefineBasJSFunction(napi_env env, napi_value exports);
     static napi_value IsBasSupported(napi_env env, napi_callback_info info);
     static napi_value GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info info);
     static napi_value OnBatteryChange(napi_env env, napi_callback_info info);
