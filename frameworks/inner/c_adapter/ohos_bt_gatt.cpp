@@ -431,7 +431,7 @@ int BleStopAdv(int advId)
     if (GetAndRemoveAdvIdAppType(advId, appType)) {
         if (appType == BLE_RANGING_TOUCH) {
             if (g_BleAdvertiser == nullptr) {
-                g_BleAdvertiser == BleAdvertiser::CreateInstance();
+                g_BleAdvertiser = BleAdvertiser::CreateInstance();
             }
             int ret = g_BleAdvertiser->BleRestoreRangingAntSwitch(appType);
             if (ret != BT_NO_ERROR) {
