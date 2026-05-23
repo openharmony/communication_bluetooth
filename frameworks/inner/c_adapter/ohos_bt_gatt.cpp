@@ -433,9 +433,9 @@ int BleStopAdv(int advId)
             if (g_BleAdvertiser == nullptr) {
                 g_BleAdvertiser == BleAdvertiser::CreateInstance();
             }
-            int ret = g_BleAdvertiser->BleRestoreRangingAntSwtich(appType);
+            int ret = g_BleAdvertiser->BleRestoreRangingAntSwitch(appType);
             if (ret != BT_NO_ERROR) {
-                HILOGE("BleRestoreRangingAntSwtich fail, advId: %{public}d, ret: %{public}d", advId, ret);
+                HILOGE("BleRestoreRangingAntSwitch fail, advId: %{public}d, ret: %{public}d", advId, ret);
             }
         }
     }

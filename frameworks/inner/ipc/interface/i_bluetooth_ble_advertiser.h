@@ -45,7 +45,7 @@ public:
         bluetooth::SetAdvDataType type = bluetooth::SET_ADV_DATA_BOTH) = 0;
     virtual int ChangeAdvertisingParams(uint8_t advHandle, const BluetoothBleAdvertiserSettings &settings) = 0;
     virtual int GetAdvPowerForRangingBusiness(bluetooth::BleAppType appType, int8_t &advpower) = 0;
-    virtual int BleRestoreRangingAntSwtich(bluetooth::BleAppType appType) = 0;
+    virtual int BleRestoreRangingAntSwitch(bluetooth::BleAppType appType) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

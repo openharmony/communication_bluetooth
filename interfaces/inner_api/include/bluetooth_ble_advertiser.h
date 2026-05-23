@@ -554,7 +554,7 @@ public:
     * @param appType Advertising application type.
     * @since 26
     */
-    int BleRestoreRangingAntSwtich(BleApplicationType appType);
+    int BleRestoreRangingAntSwitch(BleApplicationType appType);
 
     /**
      * @brief Get all Advertise Observer.
