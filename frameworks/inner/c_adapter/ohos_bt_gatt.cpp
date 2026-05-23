@@ -429,7 +429,15 @@ int BleStopAdv(int advId)
 
     BleApplicationType appType;
     if (GetAndRemoveAdvIdAppType(advId, appType)) {
-        BleStopRangeAdv(appType);
+        if (appType == BLE_RANGING_TOUCH) {
+            if (g_BleAdvertiser == nullptr) {
+                g_BleAdvertiser == BleAdvertiser::CreateInstance();
+            }
+            int ret = g_BleAdvertiser->BleRestoreRangingAntSwtich(appType);
+            if (ret != BT_NO_ERROR) {
+                HILOGE("BleRestoreRangingAntSwtich fail, advId: %{public}d, ret: %{public}d", advId, ret);
+            }
+        }
     }
 
     std::function stopAdvFunc = [advId]() {
@@ -1630,29 +1638,16 @@ int CheckAndAllocateAdvHandle(void)
     return i;
 }
 
-int8_t BleStartRangeAdv(BleApplicationType appType)
+int8_t GetAdvPowerForRangingBusiness(BleApplicationType appType)
 {
-    HILOGI("BleStartRangeAdv enter, appType = %{public}u", appType);
+    HILOGI("GetAdvPowerForRangingBusiness enter, appType = %{public}u", appType);
     CHECK_AND_RETURN_LOG_RET(appType == BLE_RANGING_TOUCH || appType == BLE_RANGING_APPROACH,
-        BLE_RANGING_INVALID_ADVPOWER, "BleStartRangeAdv fail: invalid appType = %{public}u", appType);
+        BLE_RANGING_INVALID_ADVPOWER, "GetAdvPowerForRangingBusiness fail: invalid appType = %{public}u", appType);
     if (g_BleAdvertiser == nullptr) {
         g_BleAdvertiser = BleAdvertiser::CreateInstance();
     }
 
-    int8_t ret = static_cast<int8_t>(g_BleAdvertiser->BleStartRangeAdv(appType));
-    return ret;
-}
-
-int BleStopRangeAdv(BleApplicationType appType)
-{
-    HILOGI("BleStopRangeAdv enter, appType = %{public}u", appType);
-    CHECK_AND_RETURN_LOG_RET(appType == BLE_RANGING_TOUCH,
-        BT_ERR_INVALID_PARAM, "BleStopRangeAdv fail: invalid appType = %{public}u", appType);
-    if (g_BleAdvertiser == nullptr) {
-        g_BleAdvertiser = BleAdvertiser::CreateInstance();
-    }
-
-    int ret = g_BleAdvertiser->BleStopRangeAdv(appType);
+    int8_t ret = static_cast<int8_t>(g_BleAdvertiser->GetAdvPowerForRangingBusiness(appType));
     return ret;
 }
 
