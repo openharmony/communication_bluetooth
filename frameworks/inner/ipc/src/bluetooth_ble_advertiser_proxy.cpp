@@ -304,39 +304,41 @@ int BluetoothBleAdvertiserProxy::ChangeAdvertisingParams(uint8_t advHandle,
     return result;
 }
 
-int BluetoothBleAdvertiserProxy::BleStartRangeAdv(bluetooth::BleAppType appType)
+int BluetoothBleAdvertiserProxy::GetAdvPowerForRangingBusiness(bluetooth::BleAppType appType, int8_t &advpower)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleAdvertiserProxy::GetDescriptor())) {
-        HILOGE("[BleStartRangeAdv] fail: write interface token failed.");
-        return INNER_BLE_RANGING_INVALID_ADVPOWER;
+        HILOGE("[GetAdvPowerForRangingBusiness] fail: write interface token failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     if (!data.WriteInt32(appType)) {
-        HILOGE("[BleStartRangeAdv] fail: write appType failed.");
-        return INNER_BLE_RANGING_INVALID_ADVPOWER;
+        HILOGE("[GetAdvPowerForRangingBusiness] fail: write appType failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     ErrCode result = InnerTransact(BLE_START_RANGE_ADVERTISING, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGE("[BleStartRangeAdv] fail: transact ErrCode=%{public}d", result);
-        return INNER_BLE_RANGING_INVALID_ADVPOWER;
+        HILOGE("[GetAdvPowerForRangingBusiness] fail: transact ErrCode=%{public}d", result);
+        return BT_ERR_IPC_TRANS_FAILED;
     }
-    return reply.ReadInt32();
+    int32_t errorCode = reply.ReadInt32();
+    advpower = reply.ReadInt32();
+    return errorCode;
 }
 
-int BluetoothBleAdvertiserProxy::BleStopRangeAdv(bluetooth::BleAppType appType)
+int BluetoothBleAdvertiserProxy::BleRestoreRangingAntSwtich(bluetooth::BleAppType appType)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBleAdvertiserProxy::GetDescriptor())) {
-        HILOGE("[BleStopRangeAdv] fail: write interface token failed.");
+        HILOGE("[BleRestoreRangingAntSwtich] fail: write interface token failed.");
         return BT_ERR_IPC_TRANS_FAILED;
     }
 
     if (!data.WriteInt32(appType)) {
-        HILOGE("[BleStopRangeAdv] fail: write appType failed.");
+        HILOGE("[BleRestoreRangingAntSwtich] fail: write appType failed.");
         return BT_ERR_IPC_TRANS_FAILED;
     }
 
@@ -344,7 +346,7 @@ int BluetoothBleAdvertiserProxy::BleStopRangeAdv(bluetooth::BleAppType appType)
     MessageOption option = {MessageOption::TF_SYNC};
     ErrCode result = InnerTransact(BLE_STOP_RANGE_ADVERTISING, option, data, reply);
     if (result != NO_ERROR) {
-        HILOGE("[BleStopRangeAdv] fail: transact ErrCode=%{public}d", result);
+        HILOGE("[BleRestoreRangingAntSwtich] fail: transact ErrCode=%{public}d", result);
         return BT_ERR_IPC_TRANS_FAILED;
     }
     return reply.ReadInt32();
