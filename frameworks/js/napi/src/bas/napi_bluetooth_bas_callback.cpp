@@ -50,4 +50,3 @@ void NapiBasCallback::OnBatteryLevelChanged(const BluetoothRemoteDevice &device,
 }
 } // namespace Bluetooth
 } // namespace OHOS
-#endif
