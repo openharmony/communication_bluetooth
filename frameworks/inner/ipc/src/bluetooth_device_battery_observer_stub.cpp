@@ -78,4 +78,3 @@ ErrCode BluetoothDeviceBatteryObserverStub::OnBatteryLevelChangedInner(MessagePa
 }
 } // namespace Bluetooth
 } // namespace OHOS
-#endif
