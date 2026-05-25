@@ -542,19 +542,19 @@ public:
     int ChangeAdvertisingParams(uint8_t advHandle, const BleAdvertiserSettings &settings);
 
     /**
-    * @brief send start ble range adv msg, Determine whether to perform antenna switching based on the appType.
+    * @brief Get advertising power for ranging business.
     *
     * @param appType Advertising application type.
     * @since 26
     */
-    int BleStartRangeAdv(BleApplicationType appType);
+    int GetAdvPowerForRangingBusiness(BleApplicationType appType);
 
     /**
     * @brief send stop ble range adv msg, Determine whether to unlock the antenna based on the appType.
     * @param appType Advertising application type.
     * @since 26
     */
-    int BleStopRangeAdv(BleApplicationType appType);
+    int BleRestoreRangingAntSwitch(BleApplicationType appType);
 
     /**
      * @brief Get all Advertise Observer.

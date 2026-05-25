@@ -555,23 +555,27 @@ int BleAdvertiser::ChangeAdvertisingParams(uint8_t advHandle, const BleAdvertise
     return proxy->ChangeAdvertisingParams(advHandle, setting);
 }
 
-int BleAdvertiser::BleStartRangeAdv(BleApplicationType appType)
+int BleAdvertiser::GetAdvPowerForRangingBusiness(BleApplicationType appType)
 {
     CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
 
-    int ret = proxy->BleStartRangeAdv(static_cast<bluetooth::BleAppType>(appType));
-    return ret;
+    int8_t advpower = BLE_RANGING_INVALID_ADVPOWER;
+    int ret = proxy->GetAdvPowerForRangingBusiness(static_cast<bluetooth::BleAppType>(appType), advpower);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("proxy fail, ret: %{public}d", ret);
+    }
+    return advpower;
 }
 
-int BleAdvertiser::BleStopRangeAdv(BleApplicationType appType)
+int BleAdvertiser::BleRestoreRangingAntSwitch(BleApplicationType appType)
 {
     CHECK_AND_RETURN_LOG_RET(IS_BLE_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     sptr<IBluetoothBleAdvertiser> proxy = GetRemoteProxy<IBluetoothBleAdvertiser>(BLE_ADVERTISER_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
 
-    int ret = proxy->BleStopRangeAdv(static_cast<bluetooth::BleAppType>(appType));
+    int ret = proxy->BleRestoreRangingAntSwitch(static_cast<bluetooth::BleAppType>(appType));
     return ret;
 }
 

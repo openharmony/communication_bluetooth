@@ -1064,16 +1064,10 @@ void CheckAdvIdInUse(void);
 int CheckAndAllocateAdvHandle(void);
 
 /**
-* @brief send start ble range adv msg, Determine whether to perform antenna switching based on the appType.
+* @brief Get advertising power for ranging business.
 * @since 26
 */
-int8_t BleStartRangeAdv(BleApplicationType appType);
-
-/**
-* @brief send stop ble range adv msg, Determine whether to unlock the antenna based on the appType.
-* @since 26
-*/
-int BleStopRangeAdv(BleApplicationType appType);
+int8_t GetAdvPowerForRangingBusiness(BleApplicationType appType);
 #ifdef __cplusplus
 }
 #endif
