@@ -88,7 +88,6 @@ napi_status NapiBas::ParseGetRemoteDeviceBatteryInfoParams(napi_env env, napi_ca
 {
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = {0};
-
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
     NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 argument.", napi_invalid_arg);
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, argv[PARAM0], {"address", "addressType", "rawAddressType"}));
