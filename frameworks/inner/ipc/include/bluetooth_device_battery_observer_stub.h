@@ -28,7 +28,7 @@ public:
     BluetoothDeviceBatteryObserverStub();
     ~BluetoothDeviceBatteryObserverStub();
 
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageParcel &option) override;
+    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
     ErrCode OnGetBatteryLevelEventInner(MessageParcel &data, MessageParcel &reply);
