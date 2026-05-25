@@ -497,7 +497,7 @@ public:
     explicit BluetoothDeviceBatteryObserverImp(BluetoothHost::impl &host) : host_(host){};
     ~BluetoothDeviceBatteryObserverImp() override = default;
 
-    void OnGetBatteryLevelEvent(const BluetoothRawAddress &device, int32_t batteryLevel)
+    void OnGetBatteryLevelEvent(const BluetoothRawAddress &device, int32_t batteryLevel) override
     {
         HILOGD("enter, device: %{public}s, batteryLevel: %{public}d", GET_ENCRYPT_RAW_ADDR(device), batteryLevel);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BLE);
@@ -509,7 +509,7 @@ public:
             });
     }
 
-    void OnBatteryLevelChanged(const BluetoothRawAddress &device, int32_t batteryLevel)
+    void OnBatteryLevelChanged(const BluetoothRawAddress &device, int32_t batteryLevel) override
     {
         HILOGD("enter, device: %{public}s, batteryLevel: %{public}d", GET_ENCRYPT_RAW_ADDR(device), batteryLevel);
         BluetoothRemoteDevice remoteDevice(device.GetAddress(), BTTransport::ADAPTER_BLE);
