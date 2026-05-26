@@ -141,7 +141,7 @@ napi_value SysStartBLEScan(napi_env env, napi_callback_info info)
     settings.SetReportDelay(scanOptions.interval);
     settings.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
     settings.SetPhy(static_cast<int32_t>(scanOptions.phyType));
-    
+
     BleCentralManagerGetInstance()->StartScan(settings, scanFilters);
     return NapiGetNull(env);
 }
