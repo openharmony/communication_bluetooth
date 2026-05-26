@@ -250,5 +250,6 @@ bool CheckAccessAuthorizationInvalid(int32_t accessAuthorization)
     }
     return false;
 }
+
 }  // namespace Bluetooth
 }  // namespace OHOS
