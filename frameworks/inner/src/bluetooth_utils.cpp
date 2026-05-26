@@ -32,7 +32,6 @@
 #include "iservice_registry.h"
 #include "string"
 #include "system_ability_definition.h"
-#include "bluetooth_ble_central_manager.h"
 
 using namespace std;
 
@@ -251,23 +250,5 @@ bool CheckAccessAuthorizationInvalid(int32_t accessAuthorization)
     }
     return false;
 }
-
-bool IsValidBleScanEnhanceMode(bool isEnable, const BleScanEnhanceMode &enhanceMode)
-{
-    if (enhanceMode.timeout < 0 || enhanceMode.timeout > BLE_SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS) {
-        HILOGE("Invalid enhanceMode timeout: %{public}lld", (long long)enhanceMode.timeout);
-        return false;
-    }
-    if (enhanceMode.mode < 0 || enhanceMode.mode > BLE_SCAN_ENHANCE_MODE_INVALID) {
-        HILOGE("Invalid mode: %{public}d", enhanceMode.mode);
-        return false;
-    }
-    if (isEnable && (enhanceMode.timeout == 0 || enhanceMode.mode == BLE_SCAN_ENHANCE_MODE_INVALID)) {
-        HILOGE("Invalid enhanceMode timeout: %{public}ld, mode: %{public}d", enhanceMode.timeout, enhanceMode.mode);
-        return false;
-    }
-    return true;
-}
-
 }  // namespace Bluetooth
 }  // namespace OHOS
