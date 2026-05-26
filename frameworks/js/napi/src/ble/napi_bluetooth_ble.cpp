@@ -431,6 +431,29 @@ static void ConvertScanReportMode(ScanOptions &params, int32_t scanReportMode)
     }
 }
 
+static void ConvertScanEnhanceMode(ScanOptions &params, int32_t enhanceMode)
+{
+    switch (enhanceMode) {
+        case static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_BALANCED):
+            params.scanEnhanceMode.mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_BALANCED;
+            break;
+        case static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_MEDIUM):
+            params.scanEnhanceMode.mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_MEDIUM;
+            break;
+        case static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_FAST):
+            params.scanEnhanceMode.mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_FAST;
+            break;
+        case static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_ULTRA_FAST):
+            params.scanEnhanceMode.mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_ULTRA_FAST;
+            break;
+        case static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_INVALID):
+            params.scanEnhanceMode.mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_INVALID;
+            break;
+        default:
+            break;
+    }
+}
+
 static napi_status ParseScanEnhanceModeParameters(
     const napi_env &env, const napi_callback_info &info, const napi_value &scanArg, ScanOptions &params)
 {
