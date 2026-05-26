@@ -442,7 +442,6 @@ static napi_status ParseScanEnhanceModeParameters(
     NAPI_BT_CALL_RETURN(ParseInt32Params(env, scanArg, "enhanceMode", exist, enhanceMode));
     if (exist) {
         HILOGI("Scan enhanceMode is %{public}d", enhanceMode);
-
         ConvertScanEnhanceMode(params, enhanceMode);
     }
 
