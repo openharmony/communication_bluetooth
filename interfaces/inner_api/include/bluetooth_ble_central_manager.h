@@ -473,8 +473,9 @@ public:
     /**
      * @brief Set enhance mode.
      *
-     * @param enhanceMode enhance mode.
-     * @since 24
+     * @param mode enhance mode.
+     * @param timeout enhance mode timeout.
+     * @since 26
      */
     void SetEnhanceMode(EnhanceMode mode, int64_t timeout);
  
@@ -482,7 +483,7 @@ public:
      * @brief Get enhance mode.
      *
      * @return enhance mode.
-     * @since 24
+     * @since 26
      */
     BleScanEnhanceMode GetEnhanceMode() const;
 
