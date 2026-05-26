@@ -201,6 +201,7 @@ void BleCentralManager::impl::ConvertBleScanSetting(const BleScanSettings &inSet
     outSetting.SetCallbackType(inSettings.GetCallbackType());
     outSetting.SetSensitivityMode(inSettings.GetSensitivityMode());
     outSetting.SetMatchTrackAdvType(inSettings.GetMatchTrackAdvType());
+    outSetting.SetEnhanceMode(inSettings.GetEnhanceMode().mode, inSettings.GetEnhanceMode().timeout);
 }
 
 void BleCentralManager::impl::ConvertBleScanFilter(const std::vector<BleScanFilter> &filters,
@@ -858,6 +859,17 @@ void BleScanSettings::SetMatchTrackAdvType(uint8_t matchTrackAdvType)
 uint8_t BleScanSettings::GetMatchTrackAdvType() const
 {
     return matchTrackAdvType_;
+}
+
+void BleScanSettings::SetEnhanceMode(EnhanceMode mode, int64_t timeout)
+{
+    enhanceMode_.mode = mode;
+    enhanceMode_.timeout = timeout;
+}
+ 
+BleScanEnhanceMode BleScanSettings::GetEnhanceMode() const
+{
+    return enhanceMode_;
 }
 
 BleScanFilter::BleScanFilter()

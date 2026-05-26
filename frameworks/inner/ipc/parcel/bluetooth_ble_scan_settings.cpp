@@ -43,6 +43,12 @@ bool BluetoothBleScanSettings::Marshalling(Parcel &parcel) const
     if (!parcel.WriteUint8(matchTrackAdvType_)) {
         return false;
     }
+    if (!parcel.WriteInt32(enhanceMode_.mode)) {
+        return false;
+    }
+    if (!parcel.WriteInt64(enhanceMode_.timeout)) {
+        return false;
+    }
     return true;
 }
 
@@ -88,6 +94,12 @@ bool BluetoothBleScanSettings::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!parcel.ReadUint8(matchTrackAdvType_)) {
+        return false;
+    }
+    if (!parcel.ReadInt32(enhanceMode_.mode)) {
+        return false;
+    }
+    if (!parcel.ReadInt64(enhanceMode_.timeout)) {
         return false;
     }
     return true;

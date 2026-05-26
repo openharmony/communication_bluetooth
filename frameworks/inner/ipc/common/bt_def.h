@@ -1910,6 +1910,8 @@ enum BluetoothSensingEventId : uint8_t {
     BLE_ADV_STOPPED = 0X41,
     BLE_SCAN_STARTED_EVENT = 0X50,
     BLE_SCAN_STOPPED_EVENT = 0X51,
+    BLE_SCAN_ENHANCE_MODE_STARTED_EVENT = 0x52,
+    BLE_SCAN_ENHANCE_MODE_STOPPED_EVENT = 0x53,
 };
 
 enum BluetoothDecisionEventId : uint8_t {
@@ -1922,6 +1924,30 @@ enum BluetoothResourceDecisionResult {
     CONNECTION_ACCEPT,
     CONNECTION_ACCEPT_WITH_PARAM_ADJUST,
     CONNECTION_PREEMPTION,
+};
+
+// Ble scan enhance mode
+typedef enum {
+    BLE_SCAN_ENHANCE_MODE_BALANCED = 0x00,
+    BLE_SCAN_ENHANCE_MODE_MEDIUM = 0x01,
+    BLE_SCAN_ENHANCE_MODE_FAST = 0x02,
+    BLE_SCAN_ENHANCE_MODE_ULTRA_FAST = 0x03,
+    BLE_SCAN_ENHANCE_MODE_INVALID = 0xFF,
+} EnhanceMode;
+ 
+// ble scan enhance mode max timeout
+constexpr int64_t BLE_SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS = 2500;
+ 
+struct BleScanEnhanceModeImpl {
+    BleScanEnhanceModeImpl() = default;
+    BleScanEnhanceModeImpl(bool isEnable, int mode, int64_t timeout)
+        : isEnable(isEnable), mode(mode), timeout(timeout)
+    {}
+    ~BleScanEnhanceModeImpl() {}
+        
+    bool isEnable = false;
+    int mode = BLE_SCAN_ENHANCE_MODE_INVALID;
+    int64_t timeout = BLE_SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS;
 };
 
 enum BluetoothSwitchState {

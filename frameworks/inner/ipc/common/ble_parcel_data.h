@@ -754,6 +754,14 @@ public:
     uint16_t timestamp_{};
 };
 
+struct BleScanEnhanceMode {
+    BleScanEnhanceMode() = default;
+    BleScanEnhanceMode(EnhanceMode mode, uint64_t timeout) : mode(mode), timeout(timeout) {}
+    ~BleScanEnhanceMode() {};
+    int mode = BLE_SCAN_ENHANCE_MODE_INVALID;
+    int64_t timeout = BLE_SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS;
+};
+
 /**
  * @brief Represents Scan settings.
  *
@@ -953,6 +961,29 @@ public:
         return matchTrackAdvType_;
     }
 
+    /**
+     * @brief Set enhance mode.
+     *
+     * @param enhanceMode enhance mode.
+     * @since 26
+     */
+    void SetEnhanceMode(int mode, int64_t timeout)
+    {
+        enhanceMode_.mode = mode;
+        enhanceMode_.timeout = timeout;
+    }
+ 
+    /**
+     * @brief Get enhance mode.
+     *
+     * @return enhance mode.
+     * @since 24
+     */
+    BleScanEnhanceMode GetEnhanceMode() const
+    {
+        return enhanceMode_;
+    }
+
 public:
     long reportDelayMillis_ = 0;
     int scanMode_ = 0;
@@ -962,6 +993,7 @@ public:
     uint8_t callbackType_ = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
     uint8_t sensitivityMode_ = SENSITIVITY_MODE_HIGH;
     uint8_t matchTrackAdvType_ = MAX_MATCH_TRACK_ADV;
+    BleScanEnhanceMode enhanceMode_ = {};
 };
 
 /**

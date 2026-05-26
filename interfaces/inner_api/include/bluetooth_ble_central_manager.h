@@ -312,6 +312,14 @@ public:
     virtual void OnNotifyMsgReportFromLpDevice(const UUID &uuid, int msgType, const std::vector<uint8_t> &value) {};
 };
 
+struct BleScanEnhanceMode {
+    BleScanEnhanceMode() = default;
+    BleScanEnhanceMode(EnhanceMode mode, uint64_t timeout) : mode(mode), timeout(timeout) {}
+    ~BleScanEnhanceMode() {};
+    int mode = BLE_SCAN_ENHANCE_MODE_INVALID;
+    int64_t timeout = BLE_SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS;
+};
+
 /**
  * @brief Represents Scan settings.
  *
@@ -462,6 +470,22 @@ public:
      */
     uint8_t GetMatchTrackAdvType() const;
 
+    /**
+     * @brief Set enhance mode.
+     *
+     * @param enhanceMode enhance mode.
+     * @since 24
+     */
+    void SetEnhanceMode(EnhanceMode mode, int64_t timeout);
+ 
+    /**
+     * @brief Get enhance mode.
+     *
+     * @return enhance mode.
+     * @since 24
+     */
+    BleScanEnhanceMode GetEnhanceMode() const;
+
 private:
     long reportDelayMillis_ = 0;
     int scanMode_ = SCAN_MODE_LOW_POWER;
@@ -471,6 +495,7 @@ private:
     uint8_t callbackType_ = BLE_SCAN_CALLBACK_TYPE_ALL_MATCH;
     uint8_t sensitivityMode_ = SENSITIVITY_MODE::SENSITIVITY_MODE_HIGH;
     uint8_t matchTrackAdvType_ = MAX_MATCH_TRACK_ADV;
+    BleScanEnhanceMode enhanceMode_ = {};
 };
 
 /**
