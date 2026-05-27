@@ -2306,7 +2306,7 @@ int32_t BluetoothHostProxy::RegisterDeviceBatteryObserver(const sptr<IBluetoothD
         HILOGE("fail error: %{public}d", error);
         return error;
     }
-    return BT_NO_ERROR;
+    return reply.ReadInt32();
 }
 
 int32_t BluetoothHostProxy::DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer)
@@ -2332,7 +2332,7 @@ int32_t BluetoothHostProxy::DeregisterDeviceBatteryObserver(const sptr<IBluetoot
         HILOGE("fail error: %{public}d", error);
         return error;
     }
-    return BT_NO_ERROR;
+    return reply.ReadInt32();
 }
 
 int32_t BluetoothHostProxy::GetBatteryLevel(const std::string &address)
