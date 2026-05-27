@@ -2358,7 +2358,6 @@ int32_t BluetoothHostProxy::GetBatteryLevel(const std::string &address)
 
 int32_t BluetoothHostProxy::GetConnectedDeviceBatteryInfos(std::map<std::string, int32_t> &batteryInfos)
 {
-    std::map<std::string, int32_t> batteryInfos;
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
         HILOGE("WriteInterfaceToken error");
@@ -2374,7 +2373,7 @@ int32_t BluetoothHostProxy::GetConnectedDeviceBatteryInfos(std::map<std::string,
     }
     int32_t exception = reply.ReadInt32();
     if (exception != BT_NO_ERROR) {
-        HILOE("fail result: %{public}d", exception);
+        HILOGE("fail result: %{public}d", exception);
         return exception;
     }
     int32_t size = reply.ReadInt32();
