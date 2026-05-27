@@ -319,7 +319,7 @@ int BluetoothBleAdvertiserProxy::GetAdvPowerForRangingBusiness(bluetooth::BleApp
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_START_RANGE_ADVERTISING, option, data, reply);
+    ErrCode result = InnerTransact(BLE_GET_ADVPOWER_FOR_RANGING, option, data, reply);
     if (result != NO_ERROR) {
         HILOGE("[GetAdvPowerForRangingBusiness] fail: transact ErrCode=%{public}d", result);
         return BT_ERR_IPC_TRANS_FAILED;
@@ -344,7 +344,7 @@ int BluetoothBleAdvertiserProxy::BleRestoreRangingAntSwitch(bluetooth::BleAppTyp
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(BLE_STOP_RANGE_ADVERTISING, option, data, reply);
+    ErrCode result = InnerTransact(BLE_RESTORE_RANGING_ANT_SWITCH, option, data, reply);
     if (result != NO_ERROR) {
         HILOGE("[BleRestoreRangingAntSwitch] fail: transact ErrCode=%{public}d", result);
         return BT_ERR_IPC_TRANS_FAILED;
