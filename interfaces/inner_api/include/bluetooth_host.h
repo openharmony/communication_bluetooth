@@ -1024,11 +1024,13 @@ public:
     /**
      * @brief Determine whether the local device can obtain the battery level of the remote device.
      *
-     * @return Returns <b>true</b> if the battery service is enabled;
-     *         returns <b>false</b> if the battery service is disabled.
+     * @param[out] isSupported Returns <b>true</b> if the battery service is enabled;
+     *             returns <b>false</b> if the battery service is disabled.
+     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+     *         returns an error code defined in {@link BtErrCode} otherwise.
      * @since 26
      */
-    bool IsBasSupported();
+    int32_t IsBasSupported(bool &isSupported);
 
     /**
      * @brief Register remote device battery observer.
@@ -1063,11 +1065,14 @@ public:
     /**
      * @brief Get the battery levels of all connected remote devices.
      *
-     * @return Returns a map where the key is the device address and the value is the battery level (0-100).
-     *         If the battery level is not available, the value is -1.
+     * @param[out] batteryInfos Returns a map where the key is the device address
+     *             and the value is the battery level (0-100).
+     *             If the battery level is not available, the value is -1.
+     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+     *         returns an error code defined in {@link BtErrCode} otherwise.
      * @since 26
      */
-    std::map<std::string, int32_t> GetConnectedDeviceBatteryInfos();
+    int32_t GetConnectedDeviceBatteryInfos(std::map<std::string, int32_t> &batteryInfos);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.

@@ -57,7 +57,9 @@ void NapiBas::RegisterAccessObserverToHost()
 
 napi_value NapiBas::IsBasSupported(napi_env env, napi_callback_info info)
 {
-    bool isSupported = BluetoothHost::GetDefaultHost().IsBasSupported();
+    bool isSupported = false;
+    int32_t ret = BluetoothHost::GetDefaultHost().IsBasSupported(isSupported);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
     napi_value result = nullptr;
     napi_get_boolean(env, isSupported, &result);
     return result;
@@ -123,7 +125,9 @@ napi_value NapiBas::OnBatteryChange(napi_env env, napi_callback_info info)
     auto status = g_basObserver->eventSubscribe_.RegisterWithName(env, info,
         STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
-    auto batteryInfos = BluetoothHost::GetDefaultHost().GetConnectedDeviceBatteryInfos();
+    std::map<std::string, int32_t> batteryInfos;
+    int32_t ret = GetConnectedDeviceBatteryInfos(batteryInfos);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
     const int32_t maxBatteryLevel = 100;
     for (const auto &[deviceAddr, batteryLevel] : batteryInfos) {
         if (batteryLevel < 0 || batteryLevel > maxBatteryLevel || !IsValidAddress(deviceAddr)) {
