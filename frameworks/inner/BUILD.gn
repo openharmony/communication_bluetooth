@@ -149,6 +149,8 @@ config("btframework_public_config") {
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/include",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/parcel",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
   ]
 }
 
@@ -206,6 +208,10 @@ config("btcommon_public_config") {
     "ipc/parcel",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/parcel",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
   ]
 }
 
