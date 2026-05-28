@@ -29,7 +29,6 @@ public:
     ~BluetoothBasProxy()
     {}
 
-    int32_t IsBasSupported(bool &isSupported) override;
     int32_t RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) override;
     int32_t DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) override;
     int32_t GetBatteryLevel(const std::string &address) override;
