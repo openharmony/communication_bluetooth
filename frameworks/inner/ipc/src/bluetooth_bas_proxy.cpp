@@ -42,7 +42,7 @@ int32_t BluetoothBasProxy::RegisterDeviceBatteryObserver(const sptr<IBluetoothDe
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error =
-        InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_DEVICE_BATTERY_OBSERVER, option, data, reply);
+        InnerTransact(BluetoothBasInterfaceCode::BT_REGISTER_DEVICE_BATTERY_OBSERVER, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("fail error: %{public}d", error);
         return error;
@@ -68,7 +68,7 @@ int32_t BluetoothBasProxy::DeregisterDeviceBatteryObserver(const sptr<IBluetooth
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error =
-        InnerTransact(BluetoothHostInterfaceCode::BT_DEREGISTER_DEVICE_BATTERY_OBSERVER, option, data, reply);
+        InnerTransact(BluetoothBasInterfaceCode::BT_DEREGISTER_DEVICE_BATTERY_OBSERVER, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("fail error: %{public}d", error);
         return error;
@@ -89,7 +89,7 @@ int32_t BluetoothBasProxy::GetBatteryLevel(const std::string &address)
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_GET_BATTERY_LEVEL, option, data, reply);
+    int32_t error = InnerTransact(BluetoothBasInterfaceCode::BT_GET_BATTERY_LEVEL, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("fail error: %{public}d", error);
         return error;
@@ -107,7 +107,7 @@ int32_t BluetoothBasProxy::GetConnectedDeviceBatteryInfos(std::map<std::string, 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     int32_t error =
-        InnerTransact(BluetoothHostInterfaceCode::GET_CONNECTED_DEVICE_BATTERY_INFOS, option, data, reply);
+        InnerTransact(BluetoothBasInterfaceCode::GET_CONNECTED_DEVICE_BATTERY_INFOS, option, data, reply);
     if (error != BT_NO_ERROR) {
         HILOGE("fail error: %{public}d", error);
         return error;
