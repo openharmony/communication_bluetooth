@@ -861,7 +861,7 @@ uint8_t BleScanSettings::GetMatchTrackAdvType() const
     return matchTrackAdvType_;
 }
 
-void BleScanSettings::SetEnhanceMode(int32_t mode, int64_t timeout)
+void BleScanSettings::SetEnhanceMode(int mode, int64_t timeout)
 {
     enhanceMode_.mode = mode;
     enhanceMode_.timeout = timeout;
