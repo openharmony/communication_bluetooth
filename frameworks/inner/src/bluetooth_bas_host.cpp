@@ -185,7 +185,7 @@ int32_t BluetoothBasHost::GetBatteryLevel(const std::string &address)
 {
 #ifdef BLUETOOTH_BAS_FEATURE_ENABLE
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
-    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    sptr<IBluetoothBas> proxy = GetRemoteProxy<IBluetoothHost>(PROFILE_BAS_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     return proxy->GetBatteryLevel(address);
 #else
@@ -197,7 +197,7 @@ int32_t BluetoothBasHost::GetConnectedDeviceBatteryInfos(std::map<std::string, i
 {
 #ifdef BLUETOOTH_BAS_FEATURE_ENABLE
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
-    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    sptr<IBluetoothBas> proxy = GetRemoteProxy<IBluetoothHost>(PROFILE_BAS_SERVER);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
     return proxy->GetConnectedDeviceBatteryInfos(batteryInfos);
 #else
