@@ -167,11 +167,6 @@ public:
     virtual int32_t GetVirtualAddressByHash(int hashAlgorithmType,
         const std::string &hashValue, std::string &virtualAddress) = 0;
     virtual int32_t IsProfileExist(const std::string &profileName, bool &isProfileExist) = 0;
-    virtual int32_t IsBasSupported(bool &isSupported) = 0;
-    virtual int32_t RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) = 0;
-    virtual int32_t DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) = 0;
-    virtual int32_t GetBatteryLevel(const std::string &address) = 0;
-    virtual int32_t GetConnectedDeviceBatteryInfos(std::map<std::string, int32_t> &batteryInfos) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

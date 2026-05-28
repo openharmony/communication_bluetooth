@@ -13,32 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H
-#define BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H
+#ifndef OHOS_BLUETOOTH_IBLUETOOTHBAS_H
+#define OHOS_BLUETOOTH_IBLUETOOTHBAS_H
 
 #include <map>
-#include "iremote_stub.h"
-#include "i_bluetooth_device_battery_observer.h"
+#include "string_ex.h"
+#include "iremote_broker.h"
 #include "bluetooth_service_ipc_interface_code.h"
+#include "i_bluetooth_device_battery_observer.h"
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothDeviceBatteryObserverStub : public IRemoteStub<IBluetoothDeviceBatteryObserver> {
+class IBluetoothBas : public IRemoteBroker {
 public:
-    BluetoothDeviceBatteryObserverStub();
-    ~BluetoothDeviceBatteryObserverStub();
+    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Bluetooth.IBluetoothBas");
 
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageParcel &option) override;
-
-private:
-    ErrCode OnGetBatteryLevelEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnBatteryLevelChangedInner(MessageParcel &data, MessageParcel &reply);
-
-    std::map<uint32_t,
-        ErrCode (BluetoothDeviceBatteryObserverStub::*)(MessageParcel &data, MessageParcel &reply)>
-        memberFuncMap_;
-    DISALLOW_COPY_ADN_MOVE(BluetoothDeviceBatteryObserverStub);
+    virtual int32_t RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) = 0;
+    virtual int32_t DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) = 0;
+    virtual int32_t GetBatteryLevel(const std::string &address) = 0;
+    virtual int32_t GetConnectedDeviceBatteryInfos(std::map<std::string, int32_t> &batteryInfos) = 0;
 };
 } // namespace Bluetooth
 } // namespace OHOS
-#endif
+#endif  // OHOS_BLUETOOTH_IBLUETOOTHBAS_H
