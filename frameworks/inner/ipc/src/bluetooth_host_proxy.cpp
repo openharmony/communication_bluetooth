@@ -2271,7 +2271,7 @@ int32_t BluetoothHostProxy::VerifyMultiPermissions(bool systemHapNeeded,
     CHECK_AND_RETURN_LOG_RET(data.WriteBool(systemHapNeeded),
         BT_ERR_IPC_TRANS_FAILED, "WriteBool systemHapNeeded error");
     CHECK_AND_RETURN_LOG_RET(data.WriteInt32(static_cast<int32_t>(permissionsApi9.size())),
-        BT_ERR_IPC_TRANS_FAILED, "WriteInt32 permissionsApi9 error");
+        BT_ERR_IPC_TRANS_FAILED, "WriteInt32 permissionsApi9 size error");
     for (const auto &perm : permissionsApi9) {
         if (!data.WriteString(perm)) {
             HILOGE("WriteString permissionsApi9 element error");
@@ -2279,7 +2279,7 @@ int32_t BluetoothHostProxy::VerifyMultiPermissions(bool systemHapNeeded,
         }
     }
     CHECK_AND_RETURN_LOG_RET(data.WriteInt32(static_cast<int32_t>(permissionsApi10.size())),
-        BT_ERR_IPC_TRANS_FAILED, "WriteInt32 permissionsApi10 error");
+        BT_ERR_IPC_TRANS_FAILED, "WriteInt32 permissionsApi10 size error");
     for (const auto &perm : permissionsApi10) {
         if (!data.WriteString(perm)) {
             HILOGE("WriteString permissionsApi10 element error");
