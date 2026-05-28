@@ -78,7 +78,7 @@ ohos::bluetooth::ble::GattClientDevice CreateGattClientDevice(taihe::string_view
     std::string remoteAddr = std::string(deviceId);
     bool checkRet = CheckDeviceIdParam(remoteAddr);
     TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM,
-        (taihe::make_holder<GattClientDeviceImpl, ohos::bluetooth::ble::GattClientDevice>(nullptr)));
+        (taihe::make_holder<GattClientDeviceImpl, ohos::bluetooth::ble::GattClientDevice>("")));
     return taihe::make_holder<GattClientDeviceImpl, ohos::bluetooth::ble::GattClientDevice>(remoteAddr);
 }
 
