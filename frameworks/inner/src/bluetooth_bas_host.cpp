@@ -95,10 +95,10 @@ BluetoothBasHost::impl::impl()
     deviceBatteryObserverImp_ = new BluetoothDeviceBatteryObserverImp(*this);
     profileRegisterId = BluetoothProfileManager::GetInstance().RegisterFunc(PROFILE_BAS_SERVER,
         [this](sptr<IRemoteObject> remote) {
-            sptr<IBluetoothBasHost> proxy = iface_cast<IBluetoothBasHost>(remote);
+            sptr<IBluetoothBas> proxy = iface_cast<IBluetoothBas>(remote);
             CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
             proxy->RegisterDeviceBatteryObserver(deviceBatteryObserverImp_);
-       });
+        });
 #endif
 }
 
@@ -106,7 +106,7 @@ BluetoothBasHost::impl::~impl()
 {
 #ifdef BLUETOOTH_BAS_FEATURE_ENABLE
     BluetoothProfileManager::GetInstance().DeregisterFunc(profileRegisterId);
-    sptr<IBluetoothBasHost> proxy = GetRemoteProxy<IBluetoothBasHost>(PROFILE_BAS_SERVER);
+    sptr<IBluetoothBas> proxy = GetRemoteProxy<IBluetoothBas>(PROFILE_BAS_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
     proxy->DeregisterDeviceBatteryObserver(deviceBatteryObserverImp_);
 #endif    
