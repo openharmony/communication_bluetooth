@@ -1020,59 +1020,6 @@ public:
       * @since 21
     */
     int SetConnectionPriority(const std::string &address, int priority);
-
-    /**
-     * @brief Determine whether the local device can obtain the battery level of the remote device.
-     *
-     * @param[out] isSupported Returns <b>true</b> if the battery service is enabled;
-     *             returns <b>false</b> if the battery service is disabled.
-     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
-     *         returns an error code defined in {@link BtErrCode} otherwise.
-     * @since 26
-     */
-    int32_t IsBasSupported(bool &isSupported);
-
-    /**
-     * @brief Register remote device battery observer.
-     *
-     * @param observer Class BluetoothRemoteDeviceBatteryObserver pointer to register observer.
-     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
-     *         returns an error code defined in {@link BtErrCode} otherwise.
-     * @since 26
-     */
-    int32_t RegisterBatteryObserver(std::shared_ptr<BluetoothRemoteDeviceBatteryObserver> observer);
-
-    /**
-     * @brief Deregister remote device battery observer.
-     *
-     * @param observer Class BluetoothRemoteDeviceBatteryObserver pointer to deregister observer.
-     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
-     *         returns an error code defined in {@link BtErrCode} otherwise.
-     * @since 26
-     */
-    int32_t DeregisterBatteryObserver(std::shared_ptr<BluetoothRemoteDeviceBatteryObserver> observer);
-
-    /**
-     * @brief Request the battery level of a remote device.
-     *
-     * @param address The address of the remote device.
-     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
-     *         returns an error code defined in {@link BtErrCode} otherwise.
-     * @since 26
-     */
-    int32_t GetBatteryLevel(const std::string &address);
-
-    /**
-     * @brief Get the battery levels of all connected remote devices.
-     *
-     * @param[out] batteryInfos Returns a map where the key is the device address
-     *             and the value is the battery level (0-100).
-     *             If the battery level is not available, the value is -1.
-     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
-     *         returns an error code defined in {@link BtErrCode} otherwise.
-     * @since 26
-     */
-    int32_t GetConnectedDeviceBatteryInfos(std::map<std::string, int32_t> &batteryInfos);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
