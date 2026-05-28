@@ -127,7 +127,7 @@ napi_value NapiBas::OnBatteryChange(napi_env env, napi_callback_info info)
         STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
     std::map<std::string, int32_t> batteryInfos;
-    int32_t ret = BluetoothHost::GetDefaultHost().GetConnectedDeviceBatteryInfos(batteryInfos);
+    int32_t ret = BluetoothBasHost::GetProfile()->GetConnectedDeviceBatteryInfos(batteryInfos);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
     const int32_t maxBatteryLevel = 100;
     for (const auto &[deviceAddr, batteryLevel] : batteryInfos) {
