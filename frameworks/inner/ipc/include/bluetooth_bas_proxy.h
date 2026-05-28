@@ -33,7 +33,6 @@ public:
     int32_t DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) override;
     int32_t GetBatteryLevel(const std::string &address) override;
     int32_t GetConnectedDeviceBatteryInfos(std::map<std::string, int32_t> &batteryInfos) override;
-
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothBasProxy> delegator_;

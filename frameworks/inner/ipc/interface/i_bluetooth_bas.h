@@ -17,13 +17,15 @@
 #define OHOS_BLUETOOTH_IBLUETOOTHBAS_H
 
 #include <map>
-#include "string_ex.h"
-#include "iremote_broker.h"
+#include <string_ex.h>
+#include <iremote_broker.h>
 #include "bluetooth_service_ipc_interface_code.h"
 #include "i_bluetooth_device_battery_observer.h"
 
 namespace OHOS {
 namespace Bluetooth {
+using namespace OHOS::bluetooth;
+
 class IBluetoothBas : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Bluetooth.IBluetoothBas");
