@@ -65,6 +65,7 @@ FwkSrc = [
   "src/bluetooth_audio_manager.cpp",
   "src/uuid.cpp",
   "src/bluetooth_switch_module.cpp",
+  "src/bluetooth_bas_host.cpp",
 ]
 
 BT_IPCSRC_DIR = "ipc/src"
@@ -82,7 +83,6 @@ FwkIpcSrc = [
   "$BT_IPCSRC_DIR/bluetooth_ble_central_manager_callback_stub.cpp",
   "$BT_IPCSRC_DIR/bluetooth_ble_central_manager_proxy.cpp",
   "$BT_IPCSRC_DIR/bluetooth_ble_peripheral_observer_stub.cpp",
-  "$BT_IPCSRC_DIR/bluetooth_device_battery_observer_stub.cpp",
   "$BT_IPCSRC_DIR/bluetooth_gatt_client_callback_stub.cpp",
   "$BT_IPCSRC_DIR/bluetooth_gatt_client_proxy.cpp",
   "$BT_IPCSRC_DIR/bluetooth_gatt_server_callback_stub.cpp",
@@ -113,6 +113,13 @@ FwkIpcSrc = [
   "$BT_IPCSRC_DIR/bluetooth_oob_observer_stub.cpp",
 ]
 
+if (bluetooth_bas_feature) {
+  FwkIpcSrc += [
+    "$BT_IPCSRC_DIR/bluetooth_device_battery_observer_stub.cpp",
+    "$BT_IPCSRC_DIR/bluetooth_bas_proxy.cpp",
+  ]
+}
+
 config("btframework_config") {
   cflags_cc = [
     "-fPIC",
@@ -139,6 +146,10 @@ config("btframework_config") {
   }
   if (bluetooth_pluggable_supported) {
     defines += [ "BLUETOOTH_PLUGGABLE_SUPPORTED" ]
+  }
+
+  if (bluetooth_bas_feature) {
+    defines += [ "BLUETOOTH_BAS_FEATURE_ENABLE" ]
   }
 }
 

@@ -13,32 +13,32 @@
  * limitations under the License.
  */
 
-#ifndef BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H
-#define BLUETOOTH_DEVICE_BATTERY_OBSERVER_STUB_H
+#ifndef OHOS_BLUETOOTH_STANDARD_BAS_PROXY_H
+#define OHOS_BLUETOOTH_STANDARD_BAS_PROXY_H
 
-#include <map>
-#include "iremote_stub.h"
-#include "i_bluetooth_device_battery_observer.h"
-#include "bluetooth_service_ipc_interface_code.h"
+#include "i_bluetooth_bas.h"
+#include "iremote_proxy.h"
+#include "bt_def.h"
 
 namespace OHOS {
 namespace Bluetooth {
-class BluetoothDeviceBatteryObserverStub : public IRemoteStub<IBluetoothDeviceBatteryObserver> {
+class BluetoothBasProxy : public IRemoteProxy<IBluetoothBas> {
 public:
-    BluetoothDeviceBatteryObserverStub();
-    ~BluetoothDeviceBatteryObserverStub();
+    explicit BluetoothBasProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBluetoothBas>(impl)
+    {}
+    ~BluetoothBasProxy()
+    {}
 
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageParcel &option) override;
+    int32_t IsBasSupported(bool &isSupported) override;
+    int32_t RegisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) override;
+    int32_t DeregisterDeviceBatteryObserver(const sptr<IBluetoothDeviceBatteryObserver> &observer) override;
+    int32_t GetBatteryLevel(const std::string &address) override;
+    int32_t GetConnectedDeviceBatteryInfos(std::map<std::string, int32_t> &batteryInfos) override;
 
 private:
-    ErrCode OnGetBatteryLevelEventInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnBatteryLevelChangedInner(MessageParcel &data, MessageParcel &reply);
-
-    std::map<uint32_t,
-        ErrCode (BluetoothDeviceBatteryObserverStub::*)(MessageParcel &data, MessageParcel &reply)>
-        memberFuncMap_;
-    DISALLOW_COPY_ADN_MOVE(BluetoothDeviceBatteryObserverStub);
+    int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
+    static inline BrokerDelegator<BluetoothBasProxy> delegator_;
 };
 } // namespace Bluetooth
 } // namespace OHOS
-#endif
+#endif  // OHOS_BLUETOOTH_STANDARD_BAS_PROXY_H
