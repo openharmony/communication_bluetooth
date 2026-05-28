@@ -33,6 +33,7 @@
 #ifndef BLUETOOTH_HOST_H
 #define BLUETOOTH_HOST_H
 
+#include <set>
 #include <string>
 
 #include "bluetooth_battery_info.h"
@@ -1020,6 +1021,9 @@ public:
       * @since 21
     */
     int SetConnectionPriority(const std::string &address, int priority);
+
+    int32_t VerifyMultiPermissions(bool systemHapNeeded, const std::set<std::string> &permissionsApi9,
+        const std::set<std::string> &permissionsApi10)
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.

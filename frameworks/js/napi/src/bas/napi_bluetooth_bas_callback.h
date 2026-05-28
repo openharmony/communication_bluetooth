@@ -16,7 +16,7 @@
 #ifndef NAPI_BLUETOOTH_BAS_CALLBACK_H_
 #define NAPI_BLUETOOTH_BAS_CALLBACK_H_
 
-#include "bluetooth_host.h"
+#include "bluetooth_bas_host.h"
 #include "napi_async_callback.h"
 #include "napi_event_subscribe_module.h"
 #include "napi_bluetooth_utils.h"
