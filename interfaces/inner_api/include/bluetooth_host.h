@@ -292,39 +292,6 @@ public:
 };
 
 /**
- * @brief Represents remote device battery observer.
- *
- * @since 26
- */
-class BluetoothRemoteDeviceBatteryObserver {
-public:
-    /**
-     * @brief A destructor used to delete the <b>BluetoothRemoteDeviceBatteryObserver</b> instance.
-     *
-     * @since 26
-     */
-    virtual ~BluetoothRemoteDeviceBatteryObserver() = default;
-
-    /**
-     * @brief Get batteryLevel event.
-     *
-     * @param device Remote device.
-     * @param batteryLevel battery level. default value or no response value: -1.
-     * @since 26
-     */
-    virtual void OnGetBatteryLevelEvent(const BluetoothRemoteDevice &device, int32_t batteryLevel) {};
-
-    /**
-     * @brief Notify batteryLevel changed.
-     *
-     * @param device Remote device.
-     * @param batteryLevel battery level. default value or no response value: -1.
-     * @since 26
-     */
-    virtual void OnBatteryLevelChanged(const BluetoothRemoteDevice &device, int32_t batteryLevel) {};
-};
-
-/**
  * @brief Represents bluetooth oob callback.
  *
  * @since 23
