@@ -109,7 +109,7 @@ BluetoothBasHost::impl::~impl()
     sptr<IBluetoothBas> proxy = GetRemoteProxy<IBluetoothBas>(PROFILE_BAS_SERVER);
     CHECK_AND_RETURN_LOG(proxy != nullptr, "proxy is nullptr");
     proxy->DeregisterDeviceBatteryObserver(deviceBatteryObserverImp_);
-#endif    
+#endif
 }
 
 BluetoothBasHost::BluetoothBasHost()
