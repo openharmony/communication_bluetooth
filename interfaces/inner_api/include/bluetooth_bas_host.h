@@ -91,7 +91,7 @@ public:
      * @return Returns the pointer to the BluetoothBasHost instance.
      * @since 26
      */
-    static HidHost *GetProfile();
+    static BluetoothBasHost *GetProfile();
 
     /**
      * @brief Determine whether the local device can obtain the battery level of the remote device.
