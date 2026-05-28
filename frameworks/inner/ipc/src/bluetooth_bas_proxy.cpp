@@ -130,5 +130,20 @@ int32_t BluetoothBasProxy::GetConnectedDeviceBatteryInfos(std::map<std::string, 
     }
     return exception;
 }
+
+int32_t BluetoothBasProxy::InnerTransact(
+    uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply)
+{
+    auto remote = Remote();
+    if (remote == nullptr) {
+        HILOGW("[InnerTransact] fail: get Remote fail code %{public}d", code);
+        return OBJECT_NULL;
+    }
+    int32_t err = remote->SendRequest(code, data, reply, flags);
+    if (err != NO_ERROR) {
+        HILOGD("[InnerTransact] fail: ipcErr=%{public}d code %{public}d", err, code);
+    }
+    return err;
+}
 } // namespace Bluetooth
 } // namespace OHOS
