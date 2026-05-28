@@ -446,9 +446,6 @@ static void ConvertScanEnhanceMode(ScanOptions &params, int32_t enhanceMode)
         case static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_ULTRA_FAST):
             params.scanEnhanceMode.mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_ULTRA_FAST;
             break;
-        case static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_INVALID):
-            params.scanEnhanceMode.mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_INVALID;
-            break;
         default:
             break;
     }
