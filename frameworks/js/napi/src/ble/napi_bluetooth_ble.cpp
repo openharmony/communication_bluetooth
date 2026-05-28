@@ -836,7 +836,7 @@ napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vecto
         outSettinngs.SetReportMode(static_cast<int32_t>(scanOptions.reportMode));
         outSettinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
         outSettinngs.SetPhy(static_cast<int32_t>(scanOptions.phyType));
-        outSettinngs.SetEnhanceMode(static_cast<int32_t>(scanOptions.scanEnhanceMode.mode), 
+        outSettinngs.SetEnhanceMode(static_cast<int32_t>(scanOptions.scanEnhanceMode.mode),
             scanOptions.scanEnhanceMode.timeout);
         SetCbTypeSensMode(scanOptions, outSettinngs);
         outSettinngs.SetLegacy(!scanOptions.isExtended);
