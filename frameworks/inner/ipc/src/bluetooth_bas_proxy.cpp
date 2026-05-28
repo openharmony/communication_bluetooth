@@ -132,4 +132,3 @@ int32_t BluetoothBasProxy::GetConnectedDeviceBatteryInfos(std::map<std::string, 
 }
 } // namespace Bluetooth
 } // namespace OHOS
-#endif
