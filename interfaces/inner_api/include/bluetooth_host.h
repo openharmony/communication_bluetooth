@@ -1027,13 +1027,13 @@ public:
      *
      * @param systemHapNeeded Indicates whether a system hap is required.
      * @param permissionsApi9 Set of permissions to be verified for API 9.
-     * @param permissionsApi10 Set of permissions to be verified for API 10 and later.
+     * @param permissionsApi10 Set of permissions to be verified for API 10 and later versions.
      * @return Returns {@link BT_NO_ERROR} if the permissions are verified successfully;
      *         returns an error code defined in {@link BtErrCode} otherwise.
      * @since 26
      */
     int32_t VerifyMultiPermissions(bool systemHapNeeded, const std::set<std::string> &permissionsApi9,
-        const std::set<std::string> &permissionsApi10)
+        const std::set<std::string> &permissionsApi10);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
