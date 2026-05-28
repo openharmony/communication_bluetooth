@@ -25,7 +25,7 @@ ohos_shared_library("bas") {
     "-ffunction-sections",
     "-fno-unwind-tables",
     "-fno-asynchronous-unwind-tables",
-    "-fno-merge-all-contants",
+    "-fno-merge-all-constants",
     "-flto",
   ]
 
