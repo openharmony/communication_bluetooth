@@ -477,7 +477,7 @@ public:
      * @param timeout enhance mode timeout.
      * @since 26
      */
-    void SetEnhanceMode(EnhanceMode mode, int64_t timeout);
+    void SetEnhanceMode(int mode, int64_t timeout);
  
     /**
      * @brief Get enhance mode.
