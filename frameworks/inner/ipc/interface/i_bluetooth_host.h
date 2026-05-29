@@ -16,10 +16,13 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_HOST_INTERFACE_H
 #define OHOS_BLUETOOTH_STANDARD_HOST_INTERFACE_H
 
+#include <map>
+#include <set>
 #include "bluetooth_raw_address.h"
 #include "bluetooth_service_ipc_interface_code.h"
 #include "parcel_bt_uuid.h"
 #include "i_bluetooth_ble_peripheral_observer.h"
+#include "i_bluetooth_device_battery_observer.h"
 #include "i_bluetooth_host_observer.h"
 #include "i_bluetooth_remote_device_observer.h"
 #include "i_bluetooth_resource_manager_observer.h"
@@ -54,6 +57,7 @@ constexpr const char *PROFILE_HID_DEVICE_SERVER = "BluetoothHidDeviceServer";
 constexpr const char *PROFILE_PAN_SERVER = "BluetoothPanServer";
 constexpr const char *PROFILE_OPP_SERVER = "BluetoothOppServer";
 constexpr const char *PROFILE_AUDIO_MANAGER = "BluetoothAudioManagerServer";
+constexpr const char *PROFILE_BAS_SERVER = "BluetoothBasServer";
 }  // namespace
 
 class IBluetoothHost : public OHOS::IRemoteBroker {
@@ -165,6 +169,7 @@ public:
     virtual int32_t GetVirtualAddressByHash(int hashAlgorithmType,
         const std::string &hashValue, std::string &virtualAddress) = 0;
     virtual int32_t IsProfileExist(const std::string &profileName, bool &isProfileExist) = 0;
+    virtual int32_t VerifyMultiPermissions(bool systemHapNeeded, const std::set<std::string> &permissions) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

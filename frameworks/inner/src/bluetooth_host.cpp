@@ -17,12 +17,14 @@
 #endif
 
 #include "bluetooth_host.h"
+#include <set>
 #include <memory>
 #include <mutex>
 #include <unistd.h>
 #include <thread>
 #include <cinttypes>
 #include "bluetooth_ble_peripheral_observer_stub.h"
+#include "bluetooth_device_battery_observer_stub.h"
 #include "bluetooth_host_load_callback.h"
 #include "bluetooth_host_observer_stub.h"
 #include "bluetooth_host_proxy.h"
@@ -1514,6 +1516,20 @@ int BluetoothHost::SetConnectionPriority(const std::string &address, int priorit
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
     return proxy->SetConnectionPriority(address, priority);
+}
+
+int32_t BluetoothHost::VerifyMultiPermissions(bool systemHapNeeded,
+    const std::set<std::string> &permissions)
+{
+    constexpr size_t MAX_SET_SIZE = 100;
+    if (permissions.size() > MAX_SET_SIZE) {
+        HILOGE("permissions set size exceeds maximum limit of 100");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
+    return proxy->VerifyMultiPermissions(systemHapNeeded, permissions);
 }
 } // namespace Bluetooth
 } // namespace OHOS

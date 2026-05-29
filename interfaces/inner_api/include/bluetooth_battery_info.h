@@ -72,6 +72,14 @@ struct DeviceBatteryInfo {
     // The charge state of the box
     DeviceChargeState boxChargeState_;
 };
+
+struct BasBatteryInfo {
+    // The device
+    BluetoothAddress deviceId_;
+
+    // Electricity value of the general device. -1 means no power infomation.
+    int32_t batteryLevel_;
+};
 } // namespace Bluetooth
 } // namespace OHOS
 #endif

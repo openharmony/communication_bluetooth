@@ -239,6 +239,7 @@ const uint32_t PROFILE_ID_OPP = 0x00040000;
 const uint32_t PROFILE_ID_PAN = 0x00080000;
 const uint32_t PROFILE_ID_HOST = 0x00100000;
 const uint32_t PROFILE_ID_HID_DEVICE = 0x00200000;
+const uint32_t PROFILE_ID_BAS = 0x00800000;
 
 /**
  * @brief default value

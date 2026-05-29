@@ -2261,5 +2261,32 @@ int32_t BluetoothHostProxy::IsProfileExist(const std::string &profileName, bool 
     isProfileExist = reply.ReadBool();
     return BT_NO_ERROR;
 }
+
+int32_t BluetoothHostProxy::VerifyMultiPermissions(bool systemHapNeeded,
+    const std::set<std::string> &permissions)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteBool(systemHapNeeded),
+        BT_ERR_IPC_TRANS_FAILED, "WriteBool systemHapNeeded error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(static_cast<int32_t>(permissions.size())),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInt32 permissions size error");
+    for (const auto &perm : permissions) {
+        if (!data.WriteString(perm)) {
+            HILOGE("WriteString permissions element error");
+            return BT_ERR_IPC_TRANS_FAILED;
+        }
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_VERIFY_MULTI_PERMISSIONS, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("fail error: %{public}d", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

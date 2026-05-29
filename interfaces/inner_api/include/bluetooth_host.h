@@ -33,6 +33,7 @@
 #ifndef BLUETOOTH_HOST_H
 #define BLUETOOTH_HOST_H
 
+#include <set>
 #include <string>
 
 #include "bluetooth_battery_info.h"
@@ -985,8 +986,19 @@ public:
       * @param priority Connection priority {@link BtLinkPriority}.
       * @return Returns the operation result status {@link BtStatus}.
       * @since 21
-     */
+    */
     int SetConnectionPriority(const std::string &address, int priority);
+
+    /**
+     * @brief Verify permissions for bluetooth operations.
+     *
+     * @param systemHapNeeded Indicates whether a system hap is required.
+     * @param permissions Set of permissions to be verified.
+     * @return Returns {@link BT_NO_ERROR} if the permissions are verified successfully;
+     *         returns an error code defined in {@link BtErrCode} otherwise.
+     * @since 26
+     */
+    int32_t VerifyMultiPermissions(bool systemHapNeeded, const std::set<std::string> &permissions);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.

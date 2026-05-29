@@ -15,6 +15,7 @@ declare_args() {
   bluetooth_service_resourceschedule = true
   bluetooth_kia_enable = false
   bluetooth_pluggable_supported = false
+  bluetooth_bas_feature = false
 
   if (defined(global_parts_info) &&
       !defined(global_parts_info.resourceschedule_resource_schedule_service)) {

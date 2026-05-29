@@ -65,6 +65,7 @@ FwkSrc = [
   "src/bluetooth_audio_manager.cpp",
   "src/uuid.cpp",
   "src/bluetooth_switch_module.cpp",
+  "src/bluetooth_bas_host.cpp",
 ]
 
 BT_IPCSRC_DIR = "ipc/src"
@@ -112,6 +113,13 @@ FwkIpcSrc = [
   "$BT_IPCSRC_DIR/bluetooth_oob_observer_stub.cpp",
 ]
 
+if (bluetooth_bas_feature) {
+  FwkIpcSrc += [
+    "$BT_IPCSRC_DIR/bluetooth_device_battery_observer_stub.cpp",
+    "$BT_IPCSRC_DIR/bluetooth_bas_proxy.cpp",
+  ]
+}
+
 config("btframework_config") {
   cflags_cc = [
     "-fPIC",
@@ -139,6 +147,10 @@ config("btframework_config") {
   if (bluetooth_pluggable_supported) {
     defines += [ "BLUETOOTH_PLUGGABLE_SUPPORTED" ]
   }
+
+  if (bluetooth_bas_feature) {
+    defines += [ "BLUETOOTH_BAS_FEATURE_ENABLE" ]
+  }
 }
 
 config("btframework_public_config") {
@@ -148,6 +160,8 @@ config("btframework_public_config") {
     "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include/c_header",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/include",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/parcel",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
   ]
 }
 
@@ -205,6 +219,10 @@ config("btcommon_public_config") {
     "ipc/parcel",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/include",
+    "$SUBSYSTEM_DIR/bluetooth/interfaces/inner_api/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/include",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/parcel",
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
   ]
 }
 
