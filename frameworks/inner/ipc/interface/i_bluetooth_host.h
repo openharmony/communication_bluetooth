@@ -169,8 +169,7 @@ public:
     virtual int32_t GetVirtualAddressByHash(int hashAlgorithmType,
         const std::string &hashValue, std::string &virtualAddress) = 0;
     virtual int32_t IsProfileExist(const std::string &profileName, bool &isProfileExist) = 0;
-    virtual int32_t VerifyMultiPermissions(bool systemHapNeeded, const std::set<std::string> &permissionsApi9,
-        const std::set<std::string> &permissionsApi10) = 0;
+    virtual int32_t VerifyMultiPermissions(bool systemHapNeeded, const std::set<std::string> &permissions) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

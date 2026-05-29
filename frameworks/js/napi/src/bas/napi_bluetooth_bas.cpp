@@ -122,7 +122,7 @@ napi_status NapiBas::ParseGetRemoteDeviceBatteryInfoParams(napi_env env, napi_ca
 napi_value NapiBas::OnBatteryChange(napi_env env, napi_callback_info info)
 {
     int32_t permissionRet = BluetoothHost::GetDefaultHost().
-        VerifyMultiPermissions(true, {}, {ACCESS_BLUETOOTH});
+        VerifyMultiPermissions(true, {ACCESS_BLUETOOTH});
     NAPI_BT_ASSERT_RETURN_UNDEF(env, permissionRet == BT_NO_ERROR, permissionRet);
     auto status = g_basObserver->eventSubscribe_.RegisterWithName(env, info,
         STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE);
@@ -144,7 +144,7 @@ napi_value NapiBas::OnBatteryChange(napi_env env, napi_callback_info info)
 napi_value NapiBas::OffBatteryChange(napi_env env, napi_callback_info info)
 {
     int32_t permissionRet = BluetoothHost::GetDefaultHost().
-        VerifyMultiPermissions(true, {}, {ACCESS_BLUETOOTH});
+        VerifyMultiPermissions(true, {ACCESS_BLUETOOTH});
     NAPI_BT_ASSERT_RETURN_UNDEF(env, permissionRet == BT_NO_ERROR, permissionRet);
     auto status = g_basObserver->eventSubscribe_.DeregisterWithName(env, info,
         STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE);

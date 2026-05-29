@@ -2263,26 +2263,18 @@ int32_t BluetoothHostProxy::IsProfileExist(const std::string &profileName, bool 
 }
 
 int32_t BluetoothHostProxy::VerifyMultiPermissions(bool systemHapNeeded,
-    const std::set<std::string> &permissionsApi9, const std::set<std::string> &permissionsApi10)
+    const std::set<std::string> &permissions)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
         BT_ERR_IPC_TRANS_FAILED, "WriteToken error");
     CHECK_AND_RETURN_LOG_RET(data.WriteBool(systemHapNeeded),
         BT_ERR_IPC_TRANS_FAILED, "WriteBool systemHapNeeded error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(static_cast<int32_t>(permissionsApi9.size())),
-        BT_ERR_IPC_TRANS_FAILED, "WriteInt32 permissionsApi9 size error");
-    for (const auto &perm : permissionsApi9) {
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(static_cast<int32_t>(permissions.size())),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInt32 permissions size error");
+    for (const auto &perm : permissions) {
         if (!data.WriteString(perm)) {
-            HILOGE("WriteString permissionsApi9 element error");
-            return BT_ERR_IPC_TRANS_FAILED;
-        }
-    }
-    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(static_cast<int32_t>(permissionsApi10.size())),
-        BT_ERR_IPC_TRANS_FAILED, "WriteInt32 permissionsApi10 size error");
-    for (const auto &perm : permissionsApi10) {
-        if (!data.WriteString(perm)) {
-            HILOGE("WriteString permissionsApi10 element error");
+            HILOGE("WriteString permissions element error");
             return BT_ERR_IPC_TRANS_FAILED;
         }
     }

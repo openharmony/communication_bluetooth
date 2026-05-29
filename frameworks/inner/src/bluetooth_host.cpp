@@ -1519,17 +1519,17 @@ int BluetoothHost::SetConnectionPriority(const std::string &address, int priorit
 }
 
 int32_t BluetoothHost::VerifyMultiPermissions(bool systemHapNeeded,
-    const std::set<std::string> &permissionsApi9, const std::set<std::string> &permissionsApi10)
+    const std::set<std::string> &permissions)
 {
     constexpr size_t MAX_SET_SIZE = 100;
-    if (permissionsApi9.size() > MAX_SET_SIZE || permissionsApi10.size() > MAX_SET_SIZE) {
+    if (permissions.size() > MAX_SET_SIZE) {
         HILOGE("permissions set size exceeds maximum limit of 100");
         return BT_ERR_INTERNAL_ERROR;
     }
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
-    return proxy->VerifyMultiPermissions(systemHapNeeded, permissionsApi9, permissionsApi10);
+    return proxy->VerifyMultiPermissions(systemHapNeeded, permissions);
 }
 } // namespace Bluetooth
 } // namespace OHOS

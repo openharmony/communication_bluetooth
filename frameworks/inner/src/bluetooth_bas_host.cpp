@@ -143,7 +143,7 @@ int32_t BluetoothBasHost::IsBasSupported(bool &isSupported)
 int32_t BluetoothBasHost::RegisterBatteryObserver(std::shared_ptr<BluetoothRemoteDeviceBatteryObserver> observer)
 {
 #ifdef BLUETOOTH_BAS_FEATURE_ENABLE
-    int32_t ret = BluetoothHost::GetDefaultHost().VerifyMultiPermissions(true, {}, {ACCESS_BLUETOOTH});
+    int32_t ret = BluetoothHost::GetDefaultHost().VerifyMultiPermissions(true, {ACCESS_BLUETOOTH});
     CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "register bas observer failed, ret: %{public}d", ret);
     CHECK_AND_RETURN_LOG_RET(observer != nullptr, BT_ERR_INVALID_PARAM, "observer is null.");
 
@@ -171,7 +171,7 @@ int32_t BluetoothBasHost::RegisterBatteryObserver(std::shared_ptr<BluetoothRemot
 int32_t BluetoothBasHost::DeregisterBatteryObserver(std::shared_ptr<BluetoothRemoteDeviceBatteryObserver> observer)
 {
 #ifdef BLUETOOTH_BAS_FEATURE_ENABLE
-    int32_t ret = BluetoothHost::GetDefaultHost().VerifyMultiPermissions(true, {}, {ACCESS_BLUETOOTH});
+    int32_t ret = BluetoothHost::GetDefaultHost().VerifyMultiPermissions(true, {ACCESS_BLUETOOTH});
     CHECK_AND_RETURN_LOG_RET(ret == BT_NO_ERROR, ret, "register bas observer failed, ret: %{public}d", ret);
     CHECK_AND_RETURN_LOG_RET(observer != nullptr, BT_ERR_INVALID_PARAM, "observer is null.");
     pimpl->remoteBatteryObservers_.Deregister(observer);
