@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 BT_PART_DIR = "../../../../.."
 BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
@@ -59,6 +60,10 @@ ohos_shared_library("bas") {
     "BLUETOOTH_API_SINCE_10",
     "BT_MODULE_NAME = \"bluetooth.bas\"",
   ]
+
+  if (bluetooth_bas_feature) {
+    defines += [ "BLUETOOTH_BAS_FEATURE_ENABLE" ]
+  }
 
   sources = [
     "$BT_NAPI_DIR/src/bas/napi_bluetooth_bas.cpp",
