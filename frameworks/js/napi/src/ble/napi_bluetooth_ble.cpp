@@ -453,13 +453,11 @@ static void ConvertScanEnhanceMode(ScanOptions &params, int32_t enhanceMode)
 
 static bool IsValidBleScanEnhanceMode(ScanEnhanceMode &scanEnhanceMode)
 {
-    if (static_cast<int32_t>(scanEnhanceMode.mode) > SCAN_ENHANCE_MODE_INVALID_MODE ||
+    if (scanEnhanceMode.mode >= EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_BUTT ||
         static_cast<int32_t>(scanEnhanceMode.mode) < 0) {
-        scanEnhanceMode.mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_INVALID;
         return false;
     }
     if (scanEnhanceMode.timeout <= 0) {
-        HILOGE("Invalid enhanceMode timeout: %{public}ld", scanEnhanceMode.timeout);
         return false;
     }
     if (scanEnhanceMode.timeout > SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS) {
