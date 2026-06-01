@@ -451,6 +451,23 @@ static void ConvertScanEnhanceMode(ScanOptions &params, int32_t enhanceMode)
     }
 }
 
+static bool IsValidBleScanEnhanceMode(ScanEnhanceMode &scanEnhanceMode)
+{
+    if (static_cast<int32_t>(scanEnhanceMode.mode) > SCAN_ENHANCE_MODE_INVALID_MODE ||
+        static_cast<int32_t>(scanEnhanceMode.mode) < 0) {
+        scanEnhanceMode.mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_INVALID;
+        return false;
+    }
+    if (scanEnhanceMode.timeout <= 0) {
+        HILOGE("Invalid enhanceMode timeout: %{public}ld", scanEnhanceMode.timeout);
+        return false;
+    }
+    if (scanEnhanceMode.timeout > SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS) {
+        scanEnhanceMode.timeout = SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS;
+    }
+    return true;
+}
+
 static napi_status ParseScanEnhanceModeParameters(
     const napi_env &env, const napi_callback_info &info, const napi_value &scanArg, ScanOptions &params)
 {
@@ -471,7 +488,12 @@ static napi_status ParseScanEnhanceModeParameters(
         HILOGI("Scan timeout is %{public}d", timeout);
         params.scanEnhanceMode.timeout = timeout;
     }
-    return napi_ok;
+    
+    if (IsValidBleScanEnhanceMode(params.scanEnhanceMode)) {
+        return napi_ok;
+    } else {
+        return napi_invalid_arg;
+    }
 }
 
 static napi_status ParseScanParameters(
