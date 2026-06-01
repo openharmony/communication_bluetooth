@@ -65,6 +65,7 @@ constexpr int32_t PIN_REQUEST_TYPE = 3;
 constexpr int32_t BOND_STATE_CHANGE_TYPE = 4;
 constexpr int32_t BLE_DEVICE_FIND_TYPE = 5;
 constexpr int64_t SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS = 2500;
+constexpr int32_t SCAN_ENHANCE_MODE_INVALID_MODE = 255;
 
 constexpr uint32_t INVALID_REF_COUNT = 0xFF;
 
