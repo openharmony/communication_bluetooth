@@ -1941,7 +1941,7 @@ constexpr int64_t BLE_SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS = 2500;
 struct BleScanEnhanceModeImpl {
     BleScanEnhanceModeImpl() = default;
     BleScanEnhanceModeImpl(bool isEnable, int mode, int64_t timeout)
-        : isEnable(isEnable), mode(mode), timeout(timeout)
+        : isEnable(isEnable), mode(mode), timeout(timeout),
         timestamp(std::chrono::duration_cast<std::chrono::milliseconds>
             (std::chrono::system_clock::now().time_since_epoch()).count())
     {}
