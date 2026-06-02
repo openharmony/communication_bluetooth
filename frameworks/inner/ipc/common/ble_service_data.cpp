@@ -147,6 +147,16 @@ void BleScanSettingsImpl::SetScanWindow(uint16_t scanWindow)
     scanWindow_ = scanWindow;
 }
 
+void BleScanSettingsImpl::SetEnhanceMode(const BleScanEnhanceModeImpl &enhanceMode)
+{
+    enhanceMode_ = enhanceMode;
+}
+ 
+BleScanEnhanceModeImpl BleScanSettingsImpl::GetEnhanceMode() const
+{
+    return enhanceMode_;
+}
+ 
 void BleScanFilterImpl::SetDeviceId(const std::string &deviceId)
 {
     deviceId_ = deviceId;

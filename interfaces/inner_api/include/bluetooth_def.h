@@ -566,6 +566,18 @@ typedef enum {
     REPORT_MODE_INVALID
 } REPORT_MODE;
 
+// Ble scan enhance mode
+typedef enum {
+    BLE_SCAN_ENHANCE_MODE_BALANCED = 0x00,
+    BLE_SCAN_ENHANCE_MODE_MEDIUM = 0x01,
+    BLE_SCAN_ENHANCE_MODE_FAST = 0x02,
+    BLE_SCAN_ENHANCE_MODE_ULTRA_FAST = 0x03,
+    BLE_SCAN_ENHANCE_MODE_INVALID = 0xFF,
+} EnhanceMode;
+ 
+// ble scan enhance mode max timeout
+constexpr int64_t BLE_SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS = 2500;
+
 // Scan callback type
 constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_ALL_MATCH = 1;
 constexpr uint8_t BLE_SCAN_CALLBACK_TYPE_FIRST_MATCH = 2;

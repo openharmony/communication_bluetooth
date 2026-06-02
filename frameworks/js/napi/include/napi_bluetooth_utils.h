@@ -64,6 +64,7 @@ constexpr int32_t STATE_CHANGE_TYPE = 2;
 constexpr int32_t PIN_REQUEST_TYPE = 3;
 constexpr int32_t BOND_STATE_CHANGE_TYPE = 4;
 constexpr int32_t BLE_DEVICE_FIND_TYPE = 5;
+constexpr int64_t SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS = 2500;
 
 constexpr uint32_t INVALID_REF_COUNT = 0xFF;
 
@@ -260,6 +261,20 @@ enum class ScanReportMode {
     FENCE_SENSITIVITY_HIGH = 11,
 };
 
+enum class EnhanceModeOption {
+    BLE_SCAN_ENHANCE_MODE_BALANCED = 0x00,
+    BLE_SCAN_ENHANCE_MODE_MEDIUM,
+    BLE_SCAN_ENHANCE_MODE_FAST,
+    BLE_SCAN_ENHANCE_MODE_ULTRA_FAST,
+    BLE_SCAN_ENHANCE_MODE_BUTT,
+    BLE_SCAN_ENHANCE_MODE_INVALID = 0xFF,
+};
+ 
+struct ScanEnhanceMode {
+    EnhanceModeOption mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_INVALID;
+    int64_t timeout = SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS;
+};
+
 struct ScanOptions {
     int32_t interval = 0;                                   // Time of delay for reporting the scan result
     ScanDuty dutyMode = ScanDuty::SCAN_MODE_LOW_POWER;       // Bluetooth LE scan mode
@@ -268,6 +283,7 @@ struct ScanOptions {
     PhyType phyType = PhyType::PHY_LE_1M;                    // Phy for Bluetooth LE scan
     ScanReportMode reportMode = ScanReportMode::NORMAL;      // Scan report mode
     bool isExtended = false;                                 // Whether to use extended scan mode
+    ScanEnhanceMode scanEnhanceMode = {};
 };
 
 struct ScanResult {

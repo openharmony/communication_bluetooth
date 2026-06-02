@@ -518,6 +518,26 @@ napi_value ScanReportModeInit(napi_env env)
     return reportModeObj;
 }
 
+napi_value ScanEnhanceModeInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value enhanceModeObj = nullptr;
+    napi_create_object(env, &enhanceModeObj);
+    SetNamedPropertyByInteger(
+        env, enhanceModeObj, static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_BALANCED),
+        "BLE_SCAN_ENHANCE_MODE_BALANCED");
+    SetNamedPropertyByInteger(
+        env, enhanceModeObj, static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_MEDIUM),
+        "BLE_SCAN_ENHANCE_MODE_MEDIUM");
+    SetNamedPropertyByInteger(
+        env, enhanceModeObj, static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_FAST),
+        "BLE_SCAN_ENHANCE_MODE_FAST");
+    SetNamedPropertyByInteger(
+        env, enhanceModeObj, static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_ULTRA_FAST),
+        "BLE_SCAN_ENHANCE_MODE_ULTRA_FAST");
+    return enhanceModeObj;
+}
+
 napi_value GattDisconnectReasonInit(napi_env env)
 {
     napi_value gattDisconnectReasonObj = nullptr;

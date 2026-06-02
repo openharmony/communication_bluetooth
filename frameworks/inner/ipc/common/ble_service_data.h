@@ -249,6 +249,22 @@ public:
      */
     void SetScanWindow(uint16_t scanWindow);
 
+    /**
+     * @brief Set enhance mode.
+     *
+     * @param enhanceMode enhance mode.
+     * @since 26
+     */
+    void SetEnhanceMode(const BleScanEnhanceModeImpl &enhanceMode);
+ 
+    /**
+     * @brief Get enhance mode.
+     *
+     * @return enhance mode.
+     * @since 26
+     */
+    BleScanEnhanceModeImpl GetEnhanceMode() const;
+ 
     bool operator == (const BleScanSettingsImpl &rhs) const
     {
         return (legacy_ == rhs.GetLegacy()) &&
@@ -273,6 +289,7 @@ private:
     uint8_t matchMode_ = MATCH_MODE_AGGRESSIVE;
     uint16_t scanInterval_ = 0;
     uint16_t scanWindow_ = 0;
+    BleScanEnhanceModeImpl enhanceMode_ = {};
 };
 
 /**

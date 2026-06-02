@@ -431,12 +431,75 @@ static void ConvertScanReportMode(ScanOptions &params, int32_t scanReportMode)
     }
 }
 
+static void ConvertScanEnhanceMode(ScanOptions &params, int32_t enhanceMode)
+{
+    switch (enhanceMode) {
+        case static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_BALANCED):
+            params.scanEnhanceMode.mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_BALANCED;
+            break;
+        case static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_MEDIUM):
+            params.scanEnhanceMode.mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_MEDIUM;
+            break;
+        case static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_FAST):
+            params.scanEnhanceMode.mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_FAST;
+            break;
+        case static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_ULTRA_FAST):
+            params.scanEnhanceMode.mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_ULTRA_FAST;
+            break;
+        default:
+            break;
+    }
+}
+
+static bool IsValidBleScanEnhanceMode(ScanEnhanceMode &scanEnhanceMode)
+{
+    if (scanEnhanceMode.mode >= EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_BUTT ||
+        static_cast<int32_t>(scanEnhanceMode.mode) < 0) {
+        return false;
+    }
+    if (scanEnhanceMode.timeout <= 0) {
+        return false;
+    }
+    if (scanEnhanceMode.timeout > SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS) {
+        scanEnhanceMode.timeout = SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS;
+    }
+    return true;
+}
+
+static napi_status ParseScanEnhanceModeParameters(
+    const napi_env &env, const napi_callback_info &info, const napi_value &scanArg, ScanOptions &params)
+{
+    (void)info;
+    NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(env, scanArg, {"enhanceMode", "timeout"}));
+
+    bool exist = false;
+    int32_t enhanceMode = static_cast<int32_t>(EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_INVALID);
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, scanArg, "enhanceMode", exist, enhanceMode));
+    if (exist) {
+        HILOGI("Scan enhanceMode is %{public}d", enhanceMode);
+        ConvertScanEnhanceMode(params, enhanceMode);
+    }
+
+    int32_t timeout = SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS;
+    NAPI_BT_CALL_RETURN(ParseInt32Params(env, scanArg, "timeout", exist, timeout));
+    if (exist) {
+        HILOGI("Scan timeout is %{public}d", timeout);
+        params.scanEnhanceMode.timeout = timeout;
+    }
+    
+    if (IsValidBleScanEnhanceMode(params.scanEnhanceMode)) {
+        return napi_ok;
+    } else {
+        return napi_invalid_arg;
+    }
+}
+
 static napi_status ParseScanParameters(
     const napi_env &env, const napi_callback_info &info, const napi_value &scanArg, ScanOptions &params)
 {
     (void)info;
     NAPI_BT_CALL_RETURN(NapiCheckObjectPropertiesName(
-        env, scanArg, {"interval", "dutyMode", "matchMode", "phyType", "reportMode", "isExtended"}));
+        env, scanArg, {"interval", "dutyMode", "matchMode", "phyType", "reportMode", "isExtended", "scanEnhanceMode"}));
 
     bool exist = false;
     int32_t interval = 0;
@@ -480,6 +543,11 @@ static napi_status ParseScanParameters(
     if (exist) {
         HILOGI("Scan isExtended is %{public}d", isExtended);
         params.isExtended = isExtended;
+    }
+
+    napi_value scanEnhanceModeArg = GetPropertyValueByNamed(env, scanArg, "scanEnhanceMode", napi_object);
+    if (scanEnhanceModeArg) {
+        NAPI_BT_CALL_RETURN(ParseScanEnhanceModeParameters(env, info, scanEnhanceModeArg, params));
     }
     return napi_ok;
 }
@@ -785,6 +853,8 @@ napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vecto
         outSettinngs.SetReportMode(static_cast<int32_t>(scanOptions.reportMode));
         outSettinngs.SetScanMode(static_cast<int32_t>(scanOptions.dutyMode));
         outSettinngs.SetPhy(static_cast<int32_t>(scanOptions.phyType));
+        outSettinngs.SetEnhanceMode(static_cast<int32_t>(scanOptions.scanEnhanceMode.mode),
+            scanOptions.scanEnhanceMode.timeout);
         SetCbTypeSensMode(scanOptions, outSettinngs);
         outSettinngs.SetLegacy(!scanOptions.isExtended);
     }
@@ -1356,6 +1426,7 @@ napi_value PropertyInit(napi_env env, napi_value exports)
     napi_value scanDutyObj = ScanDutyInit(env);
     napi_value phyTypeObj = PhyTypeInit(env);
     napi_value reportModeObj = ScanReportModeInit(env);
+    napi_value enhanceModeObj = ScanEnhanceModeInit(env);
 
 #ifdef BLUETOOTH_API_SINCE_10
     napi_value gattWriteTypeObj = nullptr;
@@ -1384,6 +1455,7 @@ napi_value PropertyInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("ScanDuty", scanDutyObj),
         DECLARE_NAPI_PROPERTY("PhyType", phyTypeObj),
         DECLARE_NAPI_PROPERTY("ScanReportMode", reportModeObj),
+        DECLARE_NAPI_PROPERTY("EnhanceMode", enhanceModeObj),
 
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_PROPERTY("GattWriteType", gattWriteTypeObj),
