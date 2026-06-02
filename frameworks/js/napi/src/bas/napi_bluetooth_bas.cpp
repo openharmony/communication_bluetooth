@@ -122,15 +122,14 @@ napi_status NapiBas::ParseGetRemoteDeviceBatteryInfoParams(napi_env env, napi_ca
 napi_value NapiBas::OnBatteryChange(napi_env env, napi_callback_info info)
 {
 #ifdef BLUETOOTH_BAS_FEATURE_ENABLE
-    int32_t permissionRet = BluetoothHost::GetDefaultHost().
-        VerifyMultiPermissions(true, {ACCESS_BLUETOOTH});
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, permissionRet == BT_NO_ERROR, permissionRet);
     auto status = g_basObserver->eventSubscribe_.RegisterWithName(env, info,
         STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
     std::map<std::string, int32_t> batteryInfos;
     int32_t ret = BluetoothBasHost::GetProfile()->GetConnectedDeviceBatteryInfos(batteryInfos);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("GetConnectedDeviceBatteryInfos failed, ret: %{public}d", ret);
+    }
     const int32_t maxBatteryLevel = 100;
     for (const auto &[deviceAddr, batteryLevel] : batteryInfos) {
         if (batteryLevel < 0 || batteryLevel > maxBatteryLevel || !IsValidAddress(deviceAddr)) {
@@ -148,9 +147,6 @@ napi_value NapiBas::OnBatteryChange(napi_env env, napi_callback_info info)
 napi_value NapiBas::OffBatteryChange(napi_env env, napi_callback_info info)
 {
 #ifdef BLUETOOTH_BAS_FEATURE_ENABLE
-    int32_t permissionRet = BluetoothHost::GetDefaultHost().
-        VerifyMultiPermissions(true, {ACCESS_BLUETOOTH});
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, permissionRet == BT_NO_ERROR, permissionRet);
     auto status = g_basObserver->eventSubscribe_.DeregisterWithName(env, info,
         STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
