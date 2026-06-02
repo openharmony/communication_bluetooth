@@ -144,7 +144,6 @@ int32_t BluetoothBasHost::RegisterBatteryObserver(std::shared_ptr<BluetoothRemot
 {
 #ifdef BLUETOOTH_BAS_FEATURE_ENABLE
     CHECK_AND_RETURN_LOG_RET(observer != nullptr, BT_ERR_INVALID_PARAM, "observer is null.");
-
     std::map<std::string, int32_t> batteryInfos;
     int32_t ret = GetConnectedDeviceBatteryInfos(batteryInfos);
     if (ret != BT_NO_ERROR) {
