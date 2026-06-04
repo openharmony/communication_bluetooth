@@ -27,14 +27,18 @@ public:
 
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
+    static napi_value OnConnectionStateChange(napi_env env, napi_callback_info info);
+    static napi_value OffConnectionStateChange(napi_env env, napi_callback_info info);
 
     static napi_value GetConnectionDevices(napi_env env, napi_callback_info info);
     static napi_value GetDeviceState(napi_env env, napi_callback_info info);
 
     static napi_value Disconnect(napi_env env, napi_callback_info info);
+    static napi_value Connect(napi_env env, napi_callback_info info);
 
     static napi_value SetTethering(napi_env env, napi_callback_info info);
     static napi_value IsTetheringOn(napi_env env, napi_callback_info info);
+    static napi_value IsPanSupported(napi_env env, napi_callback_info info);
     static napi_value CreatePanProfile(napi_env env, napi_callback_info info);
     static napi_value GetConnectedDevices(napi_env env, napi_callback_info info);
     static napi_value GetConnectionState(napi_env env, napi_callback_info info);
@@ -44,6 +48,11 @@ public:
     static thread_local napi_ref consRef_;
 
     static std::shared_ptr<NapiBluetoothPanObserver> observer_;
+#ifdef BLUETOOTH_PAN_FEATURE_ENABLE
+    static const bool IS_PAN_SUPPORTED = true;
+#else
+    static const bool IS_PAN_SUPPORTED = false;
+#endif
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

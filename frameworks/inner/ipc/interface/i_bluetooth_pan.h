@@ -31,6 +31,7 @@ class IBluetoothPan : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Bluetooth.IBluetoothPan");
 
+    virtual int32_t Connect(const BluetoothRawAddress &device) = 0;
     virtual int32_t Disconnect(const BluetoothRawAddress &device) = 0;
     virtual int32_t GetDeviceState(const BluetoothRawAddress &device, int32_t &state) = 0;
     virtual int32_t GetDevicesByStates(const std::vector<int32_t> &states,
@@ -39,15 +40,8 @@ public:
     virtual ErrCode DeregisterObserver(const sptr<IBluetoothPanObserver> observer) = 0;
     virtual int32_t SetTethering(const bool value) = 0;
     virtual int32_t IsTetheringOn(bool &result) = 0;
-
-protected:
-    static constexpr int COMMAND_DISCONNECT = MIN_TRANSACTION_ID + 0;
-    static constexpr int COMMAND_GET_DEVICE_STATE = MIN_TRANSACTION_ID + 1;
-    static constexpr int COMMAND_GET_DEVICES_BY_STATES = MIN_TRANSACTION_ID + 2;
-    static constexpr int COMMAND_REGISTER_OBSERVER = MIN_TRANSACTION_ID + 3;
-    static constexpr int COMMAND_DEREGISTER_OBSERVER = MIN_TRANSACTION_ID + 4;
-    static constexpr int COMMAND_SET_TETHERING = MIN_TRANSACTION_ID + 5;
-    static constexpr int COMMAND_IS_TETHERING_ON = MIN_TRANSACTION_ID + 6;
+    virtual int32_t SetConnectStrategy(const BluetoothRawAddress &device, int strategy) = 0;
+    virtual int32_t GetConnectStrategy(const BluetoothRawAddress &device, int &strategy) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

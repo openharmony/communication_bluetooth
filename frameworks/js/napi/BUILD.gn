@@ -36,6 +36,10 @@ ohos_shared_library("bluetooth") {
     "BT_LOG_DOMAIN = 0xD000100",
     "BT_MODULE_NAME = \"bluetooth\"",
   ]
+  if (bluetooth_pan_feature) {
+    defines += [ "BLUETOOTH_PAN_FEATURE_ENABLE" ]
+  }
+
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
     boundary_sanitize = true  # Enable boundary san detection
@@ -143,6 +147,9 @@ ohos_shared_library("bluetoothmanager") {
     "ENABLE_NAPI_BLUETOOTH_MANAGER",
     "BT_MODULE_NAME = \"bluetoothmanager\"",
   ]
+  if (bluetooth_pan_feature) {
+    defines += [ "BLUETOOTH_PAN_FEATURE_ENABLE" ]
+  }
 
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection

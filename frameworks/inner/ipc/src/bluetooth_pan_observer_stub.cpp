@@ -37,7 +37,8 @@ int BluetoothPanObserverStub::OnRemoteRequest(
             }
             int state = data.ReadInt32();
             int cause = data.ReadInt32();
-            OnConnectionStateChanged(*address, state, cause);
+            int role = data.ReadInt32();
+            OnConnectionStateChanged(*address, state, cause, role);
             return NO_ERROR;
         }
         default:

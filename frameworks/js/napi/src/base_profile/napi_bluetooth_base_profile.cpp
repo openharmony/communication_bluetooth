@@ -39,9 +39,11 @@ napi_value NapiBaseProfile::BaseProfilePropertyValueInit(napi_env env, napi_valu
     HILOGD("start");
     napi_value strategyObj = ConnectionStrategyInit(env);
     napi_value disconnectCauseObj = DisconnectCauseInit(env);
+    napi_value panRoleObj = PanRoleInit(env);
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("ConnectionStrategy", strategyObj),
         DECLARE_NAPI_PROPERTY("DisconnectCause", disconnectCauseObj),
+        DECLARE_NAPI_PROPERTY("PanRole", panRoleObj),
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "baseprofile:napi_define_properties");
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
@@ -81,6 +83,16 @@ napi_value NapiBaseProfile::DisconnectCauseInit(napi_env env)
     SetNamedPropertyByInteger(env, disconnectCauseObj,
         static_cast<int>(ConnChangeCause::DISCONNECT_CAUSE_CONNECT_FAIL_INTERNAL), "CONNECT_FAIL_INTERNAL");
     return disconnectCauseObj;
+}
+
+napi_value NapiBaseProfile::PanRoleInit(napi_env env)
+{
+    HILOGI("enter");
+    napi_value panRoleObj = nullptr;
+    napi_create_object(env, &panRoleObj);
+    SetNamedPropertyByInteger(env, panRoleObj, static_cast<int>(PanRole::ROLE_PANNAP), "ROLE_PANNAP");
+    SetNamedPropertyByInteger(env, panRoleObj, static_cast<int>(PanRole::ROLE_PANU), "ROLE_PANU");
+    return panRoleObj;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

@@ -34,7 +34,7 @@ thread_local napi_ref NapiBluetoothPan::consRef_ = nullptr;
 
 napi_value NapiBluetoothPan::CreatePanProfile(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT);
     napi_value napiProfile;
     napi_value constructor = nullptr;
     napi_get_reference_value(env, consRef_, &constructor);
@@ -42,8 +42,6 @@ napi_value NapiBluetoothPan::CreatePanProfile(napi_env env, napi_callback_info i
     NapiProfile::SetProfile(env, ProfileId::PROFILE_PAN_NETWORK, napiProfile);
     Pan *profile = Pan::GetProfile();
     profile->RegisterObserver(NapiBluetoothPan::observer_);
-    HILOGI("finished");
-
     return napiProfile;
 }
 
@@ -53,9 +51,13 @@ void NapiBluetoothPan::DefinePanJSClass(napi_env env, napi_value exports)
     napi_property_descriptor properties [] = {
         DECLARE_NAPI_FUNCTION("on", NapiBluetoothPan::On),
         DECLARE_NAPI_FUNCTION("off", NapiBluetoothPan::Off),
+        DECLARE_NAPI_FUNCTION("onConnectionStateChange", NapiBluetoothPan::OnConnectionStateChange),
+        DECLARE_NAPI_FUNCTION("offConnectionStateChange", NapiBluetoothPan::OffConnectionStateChange),
         DECLARE_NAPI_FUNCTION("disconnect", NapiBluetoothPan::Disconnect),
+        DECLARE_NAPI_FUNCTION("connect", NapiBluetoothPan::Connect),
         DECLARE_NAPI_FUNCTION("setTethering", NapiBluetoothPan::SetTethering),
         DECLARE_NAPI_FUNCTION("isTetheringOn", NapiBluetoothPan::IsTetheringOn),
+        DECLARE_NAPI_FUNCTION("isPanSupported", NapiBluetoothPan::IsPanSupported),
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_WRITABLE_NAPI_FUNCTION("getConnectedDevices", NapiBluetoothPan::GetConnectedDevices),
         DECLARE_NAPI_FUNCTION("getConnectionState", NapiBluetoothPan::GetConnectionState),
@@ -79,8 +81,6 @@ void NapiBluetoothPan::DefinePanJSClass(napi_env env, napi_value exports)
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_PAN_NETWORK, napiProfile);
-    Pan *profile = Pan::GetProfile();
-    profile->RegisterObserver(NapiBluetoothPan::observer_);
 #endif
 }
 
@@ -96,16 +96,45 @@ napi_value NapiBluetoothPan::DefineCreateProfile(napi_env env, napi_value export
 
 napi_value NapiBluetoothPan::SetConnectionStrategy(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, false, BT_ERR_API_NOT_SUPPORT);
-    return NapiGetUndefinedRet(env);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT);
+    std::string remoteAddr {};
+    int32_t strategy = static_cast<int>(BTStrategyType::CONNECTION_UNKNOWN);
+    auto status = CheckSetConnectStrategyParam(env, info, remoteAddr, strategy);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [remoteAddr, strategy]() {
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        Pan *profile = Pan::GetProfile();
+        int32_t err = profile->SetConnectStrategy(remoteDevice, strategy);
+        HILOGI("Pan SetConnectionStrategy err: %{public}d", err);
+        return NapiAsyncWorkRet(err);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 
 napi_value NapiBluetoothPan::GetConnectionStrategy(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, false, BT_ERR_API_NOT_SUPPORT);
-    return NapiGetUndefinedRet(env);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT);
+    std::string remoteAddr {};
+    auto status = CheckDeviceAddressParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    auto func = [remoteAddr]() {
+        int strategy = 0;
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        Pan *profile = Pan::GetProfile();
+        int32_t err = profile->GetConnectStrategy(remoteDevice, strategy);
+        HILOGI("Pan GetConnectionStrategy err: %{public}d, strategy: %{public}d", err, strategy);
+        auto object = std::make_shared<NapiNativeInt>(strategy);
+        return NapiAsyncWorkRet(err, object);
+    };
+    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 
 napi_value NapiBluetoothPan::PanConstructor(napi_env env, napi_callback_info info)
@@ -117,6 +146,7 @@ napi_value NapiBluetoothPan::PanConstructor(napi_env env, napi_callback_info inf
 
 napi_value NapiBluetoothPan::On(napi_env env, napi_callback_info info)
 {
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT);
     if (observer_) {
         auto status = observer_->eventSubscribe_.Register(env, info);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
@@ -124,8 +154,20 @@ napi_value NapiBluetoothPan::On(napi_env env, napi_callback_info info)
     return NapiGetUndefinedRet(env);
 }
 
+napi_value NapiBluetoothPan::OnConnectionStateChange(napi_env env, napi_callback_info info)
+{
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT);
+    if (observer_) {
+        auto status = observer_->eventSubscribe_.RegisterWithName(env, info,
+            STR_BT_PAN_OBSERVER_CONNECTION_STATE_CHANGE);
+        NAPI_BT_ASSERT_ERR_NUM_RETURN(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
+    return NapiGetUndefinedRet(env);
+}
+
 napi_value NapiBluetoothPan::Off(napi_env env, napi_callback_info info)
 {
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT);
     if (observer_) {
         auto status = observer_->eventSubscribe_.Deregister(env, info);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
@@ -133,10 +175,21 @@ napi_value NapiBluetoothPan::Off(napi_env env, napi_callback_info info)
     return NapiGetUndefinedRet(env);
 }
 
+napi_value NapiBluetoothPan::OffConnectionStateChange(napi_env env, napi_callback_info info)
+{
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT);
+    if (observer_) {
+        auto status = observer_->eventSubscribe_.DeregisterWithName(env, info,
+            STR_BT_PAN_OBSERVER_CONNECTION_STATE_CHANGE);
+        NAPI_BT_ASSERT_ERR_NUM_RETURN(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    }
+    return NapiGetUndefinedRet(env);
+}
+
 napi_value NapiBluetoothPan::GetConnectionDevices(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
     napi_value ret = nullptr;
+    NAPI_BT_ASSERT_RETURN(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT, ret);
     if (napi_create_array(env, &ret) != napi_ok) {
         HILOGE("napi_create_array failed.");
     }
@@ -145,13 +198,13 @@ napi_value NapiBluetoothPan::GetConnectionDevices(napi_env env, napi_callback_in
     NAPI_BT_ASSERT_RETURN(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM, ret);
 
     Pan *profile = Pan::GetProfile();
-    vector<int> states = { static_cast<int>(BTConnectState::CONNECTED) };
-    vector<BluetoothRemoteDevice> devices;
+    std::vector<int> states = { static_cast<int>(BTConnectState::CONNECTED) };
+    std::vector<BluetoothRemoteDevice> devices;
     int errorCode = profile->GetDevicesByStates(states, devices);
     HILOGI("errorCode:%{public}s, devices size:%{public}zu", GetErrorCode(errorCode).c_str(), devices.size());
     NAPI_BT_ASSERT_RETURN(env, errorCode == BT_NO_ERROR, errorCode, ret);
 
-    vector<string> deviceVector;
+    std::vector<std::string> deviceVector;
     for (auto &device : devices) {
         deviceVector.push_back(device.GetDeviceAddr());
     }
@@ -161,8 +214,8 @@ napi_value NapiBluetoothPan::GetConnectionDevices(napi_env env, napi_callback_in
 
 napi_value NapiBluetoothPan::GetDeviceState(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
     napi_value result = nullptr;
+    NAPI_BT_ASSERT_RETURN(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT, result);
     int32_t profileState = ProfileConnectionState::STATE_DISCONNECTED;
     if (napi_create_int32(env, profileState, &result) != napi_ok) {
         HILOGE("napi_create_int32 failed.");
@@ -176,21 +229,19 @@ napi_value NapiBluetoothPan::GetDeviceState(napi_env env, napi_callback_info inf
     BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
     int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
     int32_t errorCode = profile->GetDeviceState(device, state);
-    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
     NAPI_BT_ASSERT_RETURN(env, errorCode == BT_NO_ERROR, errorCode, result);
 
     profileState = GetProfileConnectionState(state);
     if (napi_create_int32(env, profileState, &result) != napi_ok) {
         HILOGE("napi_create_int32 failed.");
     }
-    HILOGI("profileState: %{public}d", profileState);
     return result;
 }
 
 napi_value NapiBluetoothPan::GetConnectedDevices(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
     napi_value ret = nullptr;
+    NAPI_BT_ASSERT_RETURN(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT, ret);
     if (napi_create_array(env, &ret) != napi_ok) {
         HILOGE("napi_create_array failed.");
     }
@@ -199,13 +250,11 @@ napi_value NapiBluetoothPan::GetConnectedDevices(napi_env env, napi_callback_inf
     NAPI_BT_ASSERT_RETURN(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM, ret);
 
     Pan *profile = Pan::GetProfile();
-    vector<int> states = { static_cast<int>(BTConnectState::CONNECTED) };
-    vector<BluetoothRemoteDevice> devices;
-    int errorCode = profile->GetDevicesByStates(states, devices);
-    HILOGI("errorCode:%{public}s, devices size:%{public}zu", GetErrorCode(errorCode).c_str(), devices.size());
+    std::vector<BluetoothRemoteDevice> devices;
+    int32_t errorCode = profile->GetDevicesByStates({static_cast<int>(BTConnectState::CONNECTED)}, devices);
     NAPI_BT_ASSERT_RETURN(env, errorCode == BT_NO_ERROR, errorCode, ret);
 
-    vector<string> deviceVector;
+    std::vector<std::string> deviceVector;
     for (auto &device : devices) {
         deviceVector.push_back(device.GetDeviceAddr());
     }
@@ -215,8 +264,8 @@ napi_value NapiBluetoothPan::GetConnectedDevices(napi_env env, napi_callback_inf
 
 napi_value NapiBluetoothPan::GetConnectionState(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
     napi_value result = nullptr;
+    NAPI_BT_ASSERT_RETURN(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT, result);
     int32_t profileState = ProfileConnectionState::STATE_DISCONNECTED;
     if (napi_create_int32(env, profileState, &result) != napi_ok) {
         HILOGE("napi_create_int32 failed.");
@@ -230,20 +279,20 @@ napi_value NapiBluetoothPan::GetConnectionState(napi_env env, napi_callback_info
     BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
     int32_t state = static_cast<int32_t>(BTConnectState::DISCONNECTED);
     int32_t errorCode = profile->GetDeviceState(device, state);
-    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
     NAPI_BT_ASSERT_RETURN(env, errorCode == BT_NO_ERROR, errorCode, result);
 
     profileState = GetProfileConnectionState(state);
     if (napi_create_int32(env, profileState, &result) != napi_ok) {
         HILOGE("napi_create_int32 failed.");
     }
-    HILOGI("profileState: %{public}d", profileState);
     return result;
 }
 
 napi_value NapiBluetoothPan::Disconnect(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    NAPI_BT_ASSERT_RETURN_FALSE(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT);
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "pan.Disconnect");
     std::string remoteAddr {};
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
@@ -251,10 +300,24 @@ napi_value NapiBluetoothPan::Disconnect(napi_env env, napi_callback_info info)
     Pan *profile = Pan::GetProfile();
     BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
     int32_t errorCode = profile->Disconnect(device);
-    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
     NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_NO_ERROR, errorCode);
-
     return NapiGetBooleanTrue(env);
+}
+
+napi_value NapiBluetoothPan::Connect(napi_env env, napi_callback_info info)
+{
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT);
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "pan.Connect");
+    std::string remoteAddr {};
+    bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, checkRet, BT_ERR_INVALID_PARAM);
+
+    Pan *profile = Pan::GetProfile();
+    BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
+    int32_t errorCode = profile->Connect(device);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, errorCode == BT_NO_ERROR, errorCode);
+    return NapiGetUndefinedRet(env);
 }
 
 static bool CheckSetTetheringParam(napi_env env, napi_callback_info info, bool &out)
@@ -269,32 +332,49 @@ static bool CheckSetTetheringParam(napi_env env, napi_callback_info info, bool &
 
 napi_value NapiBluetoothPan::SetTethering(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT);
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "pan.SetTethering");
     bool value = false;
     bool checkRet = CheckSetTetheringParam(env, info, value);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet, BT_ERR_INVALID_PARAM);
 
     Pan *profile = Pan::GetProfile();
     int32_t errorCode = profile->SetTethering(value);
-    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
     NAPI_BT_ASSERT_RETURN_UNDEF(env, errorCode == BT_NO_ERROR, errorCode);
-
     return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiBluetoothPan::IsTetheringOn(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    NAPI_BT_ASSERT_RETURN_FALSE(env, IS_PAN_SUPPORTED, BT_ERR_API_NOT_SUPPORT);
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "pan.IsTetheringOn");
     napi_status checkRet = CheckEmptyParam(env, info);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
 
     Pan *profile = Pan::GetProfile();
     bool result = false;
     int32_t errorCode = profile->IsTetheringOn(result);
-    HILOGI("errorCode:%{public}s", GetErrorCode(errorCode).c_str());
+    if (errorCode == BT_ERR_INTERNAL_ERROR) {
+        result = false;
+        return NapiGetBooleanRet(env, result);
+    }
     NAPI_BT_ASSERT_RETURN_FALSE(env, errorCode == BT_NO_ERROR, errorCode);
+    return NapiGetBooleanRet(env, result);
+}
 
-    HILOGI("IsTetheringOn: %{public}d", result);
+napi_value NapiBluetoothPan::IsPanSupported(napi_env env, napi_callback_info info)
+{
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "pan.IsPanSupported");
+    napi_status status = CheckEmptyParam(env, info);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    Pan *profile = Pan::GetProfile();
+    bool result = false;
+    int32_t errorCode = profile->IsPanSupported(result);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, errorCode == BT_NO_ERROR, errorCode);
     return NapiGetBooleanRet(env, result);
 }
 }  // namespace Bluetooth
