@@ -46,8 +46,8 @@ enum BluetoothBleAdvertiserInterfaceCode {
     BLE_ENABLE_ADVERTISING,
     BLE_DISABLE_ADVERTISING,
     BLE_CHANGE_ADVERTISING_PARAMS,
-    BLE_START_RANGE_ADVERTISING,
-    BLE_STOP_RANGE_ADVERTISING,
+    BLE_GET_ADVPOWER_FOR_RANGING,
+    BLE_RESTORE_RANGING_ANT_SWITCH,
     // The last code, if you want to add a new code, please add it before this
     BLE_ADVERTISER_BUTT
 };
