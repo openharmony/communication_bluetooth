@@ -71,6 +71,9 @@ void NapiGattServer::DefineGattServerJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("onBlePhyUpdate", OnBlePhyUpdate),
         DECLARE_NAPI_FUNCTION("offBlePhyUpdate", OffBlePhyUpdate),
         DECLARE_NAPI_FUNCTION("getConnectedState", GetConnectedState),
+        DECLARE_NAPI_FUNCTION("connect", Connect),
+        DECLARE_NAPI_FUNCTION("cancelConnection", CancelConnection),
+        DECLARE_NAPI_FUNCTION("disconnect", CancelConnection),
     };
 
     napi_value constructor = nullptr;
@@ -621,5 +624,66 @@ napi_value NapiGattServer::NotifyCharacteristicChanged(napi_env env, napi_callba
     return NapiGetBooleanTrue(env);
 }
 #endif
+
+static napi_status ParseGattServerConnectParams(
+    napi_env env, napi_callback_info info, std::string &deviceId, bool &autoConnect, NapiGattServer **outGattServer)
+{
+    size_t argc = ARGS_SIZE_THREE;
+    napi_value argv[ARGS_SIZE_THREE] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE && argc != ARGS_SIZE_TWO, "expect 1 or 2 args", napi_invalid_arg);
+    NapiGattServer *gattServer = NapiGetGattServer(env, thisVar);
+    NAPI_BT_RETURN_IF(gattServer == nullptr || outGattServer == nullptr, "gattServer is nullptr.", napi_invalid_arg);
+
+    NAPI_BT_CALL_RETURN(NapiParseString(env, argv[PARAM0], deviceId));
+    if (!IsValidAddress(deviceId)) {
+        HILOGE("Invalid deviceId");
+        return napi_invalid_arg;
+    }
+
+    autoConnect = false;
+    if (argc == ARGS_SIZE_TWO) {
+        if (!ParseBool(env, autoConnect, argv[PARAM1])) {
+            HILOGE("parse bool failed");
+            return napi_invalid_arg;
+        }
+    }
+    *outGattServer = gattServer;
+    return napi_ok;
+}
+
+napi_value NapiGattServer::Connect(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::string deviceId;
+    bool autoConnect = false;
+    NapiGattServer *server = nullptr;
+
+    auto status = ParseGattServerConnectParams(env, info, deviceId, autoConnect, &server);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    std::shared_ptr<GattServer> gattServer = server->GetServer();
+    BluetoothRemoteDevice remoteDevice(deviceId, BTTransport::ADAPTER_BLE);
+    int ret = gattServer->Connect(remoteDevice, !autoConnect);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+    return NapiGetBooleanTrue(env);
+}
+
+napi_value NapiGattServer::CancelConnection(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    std::string deviceId;
+    NapiGattServer *server = nullptr;
+
+    auto status = ParseGattServerGetConnectState(env, info, deviceId, &server);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    std::shared_ptr<GattServer> gattServer = server->GetServer();
+    BluetoothRemoteDevice remoteDevice(deviceId, BTTransport::ADAPTER_BLE);
+    int ret = gattServer->CancelConnection(remoteDevice);
+    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+    return NapiGetBooleanTrue(env);
+}
 } // namespace Bluetooth
 } // namespace OHOS

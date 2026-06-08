@@ -86,7 +86,17 @@ public:
         return device_;
     }
 
-    explicit NapiGattClient(std::string &deviceId)
+    bool GetAutoConnect() const
+    {
+        return autoConnect_;
+    }
+
+    int GetTransport() const
+    {
+        return transport_;
+    }
+
+    explicit NapiGattClient(std::string &deviceId, bool autoConnect = false, int transport = 1)
     {
         HILOGI("enter");
         device_ = std::make_shared<BluetoothRemoteDevice>(deviceId, 1);
@@ -94,6 +104,8 @@ public:
         client_->Init();
         callback_ = std::make_shared<NapiGattClientCallback>();
         callback_->deviceAddr_ = deviceId;
+        autoConnect_ = autoConnect;
+        transport_ = transport;
     }
     ~NapiGattClient() = default;
 
@@ -105,6 +117,8 @@ private:
     std::shared_ptr<GattClient> client_ = nullptr;
     std::shared_ptr<NapiGattClientCallback> callback_;
     std::shared_ptr<BluetoothRemoteDevice> device_ = nullptr;
+    bool autoConnect_ = false;
+    int transport_ = 1;
 };
 } // namespace Bluetooth
 } // namespace OHOS

@@ -650,12 +650,10 @@ int GattClient::Connect(std::weak_ptr<GattClientCallback> callback, bool isAutoC
         HILOGE("bluetooth is off.");
         return BT_ERR_INVALID_STATE;
     }
-
     if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
         HILOGE("pimpl or gatt client proxy is nullptr");
         return BT_ERR_INTERNAL_ERROR;
     }
-
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
     if (pimpl->connectionState_ == static_cast<int>(BTConnectState::CONNECTED)) {
         HILOGE("Already connected");
@@ -668,23 +666,22 @@ int GattClient::Connect(std::weak_ptr<GattClientCallback> callback, bool isAutoC
         return proxy->Connect(pimpl->applicationId_, isAutoConnect);
     }
     pimpl->callback_ = callback;
-    if ((transport == GATT_TRANSPORT_TYPE_LE && !IS_BLE_ENABLED()) ||
-        (transport == GATT_TRANSPORT_TYPE_CLASSIC && !IS_BT_ENABLED())) {
-        HILOGE("Unsupported mode");
+    int gattTransport = bluetooth::ConvertToGattTransportType(transport);
+    if ((gattTransport == bluetooth::GATT_TRANSPORT_TYPE_CLASSIC && !IS_BT_ENABLED()) ||
+        (gattTransport == bluetooth::GATT_TRANSPORT_TYPE_INVALID)) {
+        HILOGE("Unsupported transport mode");
         return BT_ERR_INTERNAL_ERROR;
     }
-    if (transport == GATT_TRANSPORT_TYPE_CLASSIC && isAutoConnect) {
-        HILOGE("Unsupported mode");
+    if (gattTransport != bluetooth::GATT_TRANSPORT_TYPE_LE && isAutoConnect) {
+        HILOGE("Unsupported auto-connect mode");
         return BT_ERR_INTERNAL_ERROR;
     }
     if (!pimpl->device_.IsValidBluetoothRemoteDevice()) {
-        HILOGE("Invalid remote device");
         return BT_ERR_INTERNAL_ERROR;
     }
-
     int appId = 0;
     int32_t result = proxy->RegisterApplication(
-        pimpl->clientCallback_, bluetooth::RawAddress(pimpl->device_.GetDeviceAddr()), transport, appId);
+        pimpl->clientCallback_, bluetooth::RawAddress(pimpl->device_.GetDeviceAddr()), gattTransport, appId);
     HILOGI("Proxy register application : %{public}d", appId);
     if (result != BT_NO_ERROR) {
         HILOGE("register application fail");

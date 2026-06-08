@@ -368,6 +368,7 @@ const int LINK_TYPE_LE = 1;
 constexpr uint8_t GATT_TRANSPORT_TYPE_AUTO = 0x0;
 constexpr uint8_t GATT_TRANSPORT_TYPE_LE = 0x1;
 constexpr uint8_t GATT_TRANSPORT_TYPE_CLASSIC = 0x2;
+constexpr uint8_t GATT_TRANSPORT_TYPE_INVALID = 0x3;
 constexpr uint8_t GATT_ROLE_MASTER = 0x00;
 constexpr uint8_t GATT_ROLE_SLAVE = 0x01;
 constexpr uint8_t GATT_ROLE_INVALID = 0xFF;
@@ -721,6 +722,20 @@ constexpr int TRANSPORT_BR_EDR = 0;
 constexpr int TRANSPORT_LE = 1;
 constexpr int TRANSPORT_DUAL = 2;
 constexpr int TRANSPORT_UNKNOWN = 3;
+
+inline uint8_t ConvertToGattTransportType(int transport)
+{
+    switch (transport) {
+        case TRANSPORT_BR_EDR:
+            return GATT_TRANSPORT_TYPE_CLASSIC;
+        case TRANSPORT_LE:
+            return GATT_TRANSPORT_TYPE_LE;
+        case TRANSPORT_DUAL:
+            return GATT_TRANSPORT_TYPE_AUTO;
+        default:
+            return GATT_TRANSPORT_TYPE_INVALID;
+    }
+}
 
 // Phy type
 using PHY_TYPE = enum { PHY_LE_1M = 1, PHY_LE_2M = 2, PHY_LE_CODED = 3, PHY_LE_ALL_SUPPORTED = 255 };
