@@ -1,0 +1,63 @@
+{
+  "module": {
+    "name": "entry",
+    "type": "entry",
+    "srcEntrance": "",
+    "description": "$string:app_name",
+    "mainElement": "EntryAbility",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1",
+      "wearable",
+      "tv"
+    ],
+    "apiType": "stageMode",
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:main_pages",
+    "abilities": [
+      {
+        "name": "EntryAbility",
+        "srcEntry": "./ets/common/MainAbility.ets",
+        "label": "$string:app_name",
+        "skills": [
+          {
+            "entities": [
+              "entity.system.home"
+            ],
+            "actions": [
+              "action.system.home"
+            ]
+          }
+        ]
+      }
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.ACCESS_BLUETOOTH",
+        "reason": "use at bluetooth app"
+      },
+      {
+        "name": "ohos.permission.USE_BLUETOOTH",
+        "reason": "use at bluetooth app"
+      },
+      {
+        "name": "ohos.permission.MANAGE_BLUETOOTH",
+        "reason": "use at bluetooth app"
+      },
+      {
+        "name": "ohos.permission.ACCESS_SYSTEM_SETTINGS",
+        "reason": "use at bluetooth app"
+      },
+      {
+        "name": "ohos.permission.WRITE_IMAGEVIDEO",
+        "reason": "use at bluetooth app"
+      },
+      {
+        "name": "ohos.permission.KEEP_BACKGROUND_RUNNING",
+        "reason": "use at bluetooth app"
+      }
+    ]
+  }
+}
