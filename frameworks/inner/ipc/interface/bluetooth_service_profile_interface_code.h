@@ -16,7 +16,6 @@
 #ifndef BLUETOOTH_SERVICE_PROFILE_INTERFACE_CODE_H
 #define BLUETOOTH_SERVICE_PROFILE_INTERFACE_CODE_H
 
-
 #include "ipc_types.h"
 
 /* SAID: 1130 */
@@ -279,6 +278,8 @@ enum BluetoothHfpHfInterfaceCode {
     BT_HFP_HF_DEREGISTER_OBSERVER,
     BT_HFP_HF_SEND_VOICE_TAG,
     BT_HFP_HF_SEND_KEY_PRESSED,
+    BT_HFP_HF_SET_CONNECT_STRATEGY,
+    BT_HFP_HF_GET_CONNECT_STRATEGY,
     // The last code, if you want to add a new code, please add it before this
     BT_HFP_HF_BUTT
 };
