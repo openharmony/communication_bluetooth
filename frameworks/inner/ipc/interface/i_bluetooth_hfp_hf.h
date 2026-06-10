@@ -20,7 +20,6 @@
 #include "bluetooth_service_ipc_interface_code.h"
 #include "i_bluetooth_hfp_hf_observer.h"
 
-
 namespace OHOS {
 namespace Bluetooth {
 class IBluetoothHfpHf : public OHOS::IRemoteBroker {
@@ -52,6 +51,8 @@ public:
     virtual int StartDial(const BluetoothRawAddress &device, const std::string &number, BluetoothHfpHfCall &call) = 0;
     virtual void RegisterObserver(const sptr<IBluetoothHfpHfObserver> &observer) = 0;
     virtual void DeregisterObserver(const sptr<IBluetoothHfpHfObserver> &observer) = 0;
+    virtual int SetConnectStrategy(const BluetoothRawAddress &device, int strategy) = 0;
+    virtual int GetConnectStrategy(const BluetoothRawAddress &device, int &strategy) = 0;
 };
 
 }  // namespace Bluetooth
