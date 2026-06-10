@@ -20,6 +20,7 @@
 #include "bluetooth_service_ipc_interface_code.h"
 #include "i_bluetooth_hfp_hf_observer.h"
 
+
 namespace OHOS {
 namespace Bluetooth {
 class IBluetoothHfpHf : public OHOS::IRemoteBroker {

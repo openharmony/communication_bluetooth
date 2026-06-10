@@ -28,6 +28,7 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
+
 namespace OHOS {
 namespace Bluetooth {
 std::mutex g_hfpHFProxyMutex;
