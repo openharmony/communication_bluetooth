@@ -76,7 +76,6 @@
         "libuv",
         "napi",
         "samgr",
-        "resource_schedule_service",
         "security_guard",
         "runtime_core"
       ],
