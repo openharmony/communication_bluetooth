@@ -49,6 +49,8 @@ public:
     int StartDial(const BluetoothRawAddress &device, const std::string &number, BluetoothHfpHfCall &call) override;
     void RegisterObserver(const sptr<IBluetoothHfpHfObserver> &observer) override;
     void DeregisterObserver(const sptr<IBluetoothHfpHfObserver> &observer) override;
+    int SetConnectStrategy(const BluetoothRawAddress &device, int strategy) override;
+    int GetConnectStrategy(const BluetoothRawAddress &device, int &strategy) override;
 
 private:
     static inline BrokerDelegator<BluetoothHfpHfProxy> delegator_;

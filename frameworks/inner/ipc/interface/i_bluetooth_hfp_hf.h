@@ -51,6 +51,8 @@ public:
     virtual int StartDial(const BluetoothRawAddress &device, const std::string &number, BluetoothHfpHfCall &call) = 0;
     virtual void RegisterObserver(const sptr<IBluetoothHfpHfObserver> &observer) = 0;
     virtual void DeregisterObserver(const sptr<IBluetoothHfpHfObserver> &observer) = 0;
+    virtual int SetConnectStrategy(const BluetoothRawAddress &device, int strategy) = 0;
+    virtual int GetConnectStrategy(const BluetoothRawAddress &device, int &strategy) = 0;
 };
 
 }  // namespace Bluetooth

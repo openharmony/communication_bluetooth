@@ -444,6 +444,22 @@ struct HandsFreeUnit::impl {
         HILOGI("enter");
         observers_.Deregister(observer);
     }
+
+    int SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy)
+    {
+        HILOGD("enter");
+        sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is null");
+        return proxy->SetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
+    }
+ 
+    int GetConnectStrategy(const BluetoothRemoteDevice &device, int &strategy) const
+    {
+        HILOGD("enter");
+        sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is null");
+        return proxy->GetConnectStrategy(BluetoothRawAddress(device.GetDeviceAddr()), strategy);
+    }
     int32_t profileRegisterId = 0;
 private:
     const static int HFP_HF_SLC_STATE_DISCONNECTED = static_cast<int>(BTConnectState::DISCONNECTED);
@@ -774,6 +790,44 @@ void HandsFreeUnit::DeregisterObserver(std::shared_ptr<HandsFreeUnitObserver> ob
     HILOGD("enter");
     CHECK_AND_RETURN_LOG(pimpl != nullptr, "pimpl is null.");
     pimpl->DeregisterObserver(observer);
+}
+
+int HandsFreeUnit::SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy)
+{
+    HILOGI("enter, device: %{public}s, strategy: %{public}d", GET_ENCRYPT_ADDR(device), strategy);
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+ 
+    sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+ 
+    if ((!device.IsValidBluetoothRemoteDevice()) || (
+        (strategy != static_cast<int>(BTStrategyType::CONNECTION_ALLOWED)) &&
+        (strategy != static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN)))) {
+        HILOGI("input parameter error.");
+        return BT_ERR_INVALID_PARAM;
+    }
+    return pimpl->SetConnectStrategy(device, strategy);
+}
+ 
+int HandsFreeUnit::GetConnectStrategy(const BluetoothRemoteDevice &device, int &strategy) const
+{
+    HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
+    if (!IS_BT_ENABLED()) {
+        HILOGE("bluetooth is off.");
+        return BT_ERR_INVALID_STATE;
+    }
+ 
+    sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "failed: no proxy");
+ 
+    if (!device.IsValidBluetoothRemoteDevice()) {
+        HILOGI("input parameter error.");
+        return BT_ERR_INVALID_PARAM;
+    }
+    return pimpl->GetConnectStrategy(device, strategy);
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

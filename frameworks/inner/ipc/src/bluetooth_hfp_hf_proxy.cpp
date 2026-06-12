@@ -429,5 +429,42 @@ void BluetoothHfpHfProxy::DeregisterObserver(const sptr<IBluetoothHfpHfObserver>
     SEND_IPC_REQUEST_RETURN(BluetoothHfpHfInterfaceCode::BT_HFP_HF_DEREGISTER_OBSERVER, data, reply, option);
 }
 
+int BluetoothHfpHfProxy::SetConnectStrategy(const BluetoothRawAddress &device, int strategy)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(strategy), BT_ERR_IPC_TRANS_FAILED, "write strategy error");
+ 
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+ 
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothHfpHfInterfaceCode::BT_HFP_HF_SET_CONNECT_STRATEGY,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+ 
+    return reply.ReadInt32();
+}
+ 
+int BluetoothHfpHfProxy::GetConnectStrategy(const BluetoothRawAddress &device, int &strategy)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+ 
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+ 
+    SEND_IPC_REQUEST_RETURN_RESULT(BluetoothHfpHfInterfaceCode::BT_HFP_HF_GET_CONNECT_STRATEGY,
+        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+ 
+    int32_t res = reply.ReadInt32();
+    if (res == NO_ERROR) {
+        strategy = reply.ReadInt32();
+    }
+ 
+    return res;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
