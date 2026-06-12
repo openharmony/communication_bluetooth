@@ -1,0 +1,13 @@
+{
+  "app": {
+    "bundleName": "com.ohos.bluetooth",
+    "vendor": "example",
+    "versionCode": 700000010,
+    "versionName": "7.0.0.10",
+    "icon": "$media:app_icon",
+    "label": "$string:app_name",
+    "distributedNotificationEnabled": true,
+    "minAPIVersion": 26,
+    "targetAPIVersion": 26
+  }
+}

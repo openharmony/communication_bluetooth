@@ -63,6 +63,7 @@
         "cJSON",
         "common_event_service",
         "eventhandler",
+        "ets_frontend",
         "ffrt",
         "hicollie",
         "hilog",
@@ -99,7 +100,8 @@
           "//foundation/communication/bluetooth/frameworks/ets/taihe/bluetooth_hid:bluetoothHid_taihe"
         ],
         "service_group": [
-          "//foundation/communication/bluetooth/tools/ohos-bluetoothTool:ohos-bluetoothTool"
+          "//foundation/communication/bluetooth/tools/ohos-bluetoothTool:ohos-bluetoothTool",
+          "//foundation/communication/bluetooth/bluetooth_ui:bluetooth_hap"
         ]
       },
       "inner_kits": [
