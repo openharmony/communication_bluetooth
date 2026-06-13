@@ -31,12 +31,31 @@ NapiBluetoothPanObserver::NapiBluetoothPanObserver()
     : eventSubscribe_(STR_BT_PAN_OBSERVER_CONNECTION_STATE_CHANGE, BT_MODULE_NAME)
 {}
 
-void NapiBluetoothPanObserver::OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause)
+void NapiBluetoothPanObserver::OnConnectionStateChanged(
+    const BluetoothRemoteDevice &device, int state, int cause, int role)
 {
-    HILOGD("enter, remote device address: %{public}s, state: %{public}d, cause: %{public}d",
-        GET_ENCRYPT_ADDR(device), state, cause);
-    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(device.GetDeviceAddr(), state, cause);
+    HILOGD("enter, remote device address: %{public}s, state: %{public}d, cause: %{public}d, role: %{public}d",
+        GET_ENCRYPT_ADDR(device), state, cause, role);
+    bool hasPanRole = true;
+    auto nativeObject = std::make_shared<NapiNativeStateChangeParam>(
+        device.GetDeviceAddr(), state, cause, hasPanRole, ConvertPanRole(role));
     eventSubscribe_.PublishEvent(STR_BT_PAN_OBSERVER_CONNECTION_STATE_CHANGE, nativeObject);
+}
+
+int NapiBluetoothPanObserver::ConvertPanRole(int role)
+{
+    int outPanRole = INVALID_ROLE;
+    switch (role) {
+        case static_cast<int>(InputPanRole::ROLE_PANNAP):
+            outPanRole = static_cast<int>(PanRole::ROLE_PANNAP);
+            break;
+        case static_cast<int>(InputPanRole::ROLE_PANU):
+            outPanRole = static_cast<int>(PanRole::ROLE_PANU);
+            break;
+        default:
+            break;
+    }
+    return outPanRole;
 }
 }  // namespace Bluetooth
 }  // namespace OHOS

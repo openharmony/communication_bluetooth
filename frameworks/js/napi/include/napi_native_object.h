@@ -157,6 +157,10 @@ public:
         : deviceAddr_(deviceAddr), connectState_(connectState), stateChangeCause_(cause),
           isDisconnected_(isDisconnected), disconnectReason_(disconnectParam.disconnectReason_),
           reasonMessage_(disconnectParam.reasonMessage_) {}
+    NapiNativeStateChangeParam(std::string deviceAddr, int connectState, int cause, bool hasPanRole, int panRole)
+        : deviceAddr_(deviceAddr), connectState_(connectState), stateChangeCause_(cause),
+          hasPanRole_(hasPanRole), panRole_(panRole) {}
+
     virtual ~NapiNativeStateChangeParam() override = default;
 
     napi_value ToNapiValue(napi_env env) const override;
@@ -167,6 +171,8 @@ private:
     bool isDisconnected_ = false;
     int disconnectReason_ = -1;
     std::string reasonMessage_ = "";
+    bool hasPanRole_ = false;
+    int panRole_ = -1;
 };
 
 class NapiNativeBleConnectionStateChangeParam : public NapiNativeStateChangeParam {

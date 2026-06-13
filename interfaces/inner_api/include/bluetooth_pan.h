@@ -53,8 +53,9 @@ public:
      * @param device Remote device object.
      * @param state Connection state.
      * @param cause Connection cause.
+     * @param role Panrole.
      */
-    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause)
+    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state, int cause, int role)
     {}
 
     /**
@@ -102,6 +103,14 @@ public:
      */
     int32_t Disconnect(const BluetoothRemoteDevice &device);
 
+    /**
+     * @brief Connect to remote Pan device.
+     *
+     * @param device Remote device object.
+     * @return Returns <b>BT_NO_ERROR</b> if the operation is successful; returns an error code otherwise.
+     */
+    int32_t Connect(const BluetoothRemoteDevice &device);
+
         /**
      * @brief Register Pan observer instance.
      *
@@ -128,6 +137,40 @@ public:
      *
      */
     int32_t IsTetheringOn(bool &value);
+
+    /**
+     * @brief Is Pan Supported.
+     *
+     */
+    int32_t IsPanSupported(bool &value);
+
+    /**
+     * @brief Set connection strategy for peer bluetooth device.
+     *        If peer device is connected and the policy is set not allowed,then perform disconnect operation.
+     *        If peer device is disconnected and the policy is set allowed,then perform connect operation.
+     *
+     * @param device The address of the peer bluetooth device.
+     * @param strategy The device connect strategy.
+     * @return Returns <b>RET_NO_ERROR</b> if the operation is successful.
+     *         Returns <b>BT_ERR_PERMISSION_FAILED</b> Permission denied.
+     *         Returns <b>BT_ERR_INVALID_PARAM</b> Input error.
+     *         Returns <b>BT_ERR_INVALID_STATE</b> BT_ERR_INVALID_STATE.
+     *         Returns <b>BT_ERR_INTERNAL_ERROR</b> Operation failed.
+     */
+    int32_t SetConnectStrategy(const BluetoothRemoteDevice &device, int strategy);
+
+    /**
+     * @brief Get connection strategy of peer bluetooth device.
+     *
+     * @param device The address of the peer bluetooth device.
+     * @param strategy The device connect strategy.
+     * @return Returns <b>RET_NO_ERROR</b> if the operation is successful.
+     *         Returns <b>BT_ERR_PERMISSION_FAILED</b> Permission denied.
+     *         Returns <b>BT_ERR_INVALID_PARAM</b> Input error.
+     *         Returns <b>BT_ERR_INVALID_STATE</b> BT_ERR_INVALID_STATE.
+     *         Returns <b>BT_ERR_INTERNAL_ERROR</b> Operation failed.
+     */
+    int32_t GetConnectStrategy(const BluetoothRemoteDevice &device, int &strategy);
 
     /**
      * @brief The external process calls the Pan profile interface before the Bluetooth process starts. At this

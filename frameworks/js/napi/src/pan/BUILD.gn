@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 BT_PART_DIR = "../../../../.."
 BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
@@ -33,6 +34,9 @@ ohos_shared_library("pan") {
     "BLUETOOTH_API_SINCE_10",
     "BT_MODULE_NAME = \"bluetooth.pan\"",
   ]
+  if (bluetooth_pan_feature) {
+    defines += [ "BLUETOOTH_PAN_FEATURE_ENABLE" ]
+  }
 
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection

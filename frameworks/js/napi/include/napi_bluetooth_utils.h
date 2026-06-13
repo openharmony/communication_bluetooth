@@ -104,6 +104,8 @@ struct ConnStateChangeParam {
     int reason = -1;
     int cause = -1;
     std::string reasonMessage = "";
+    bool hasPanRole = false;
+    int panRole = -1;
 };
 
 struct NapiMap {
@@ -333,6 +335,16 @@ enum ConnectionStrategy {
     CONNECTION_UNKNOWN = 0,
     CONNECTION_ALLOWED = 1,
     CONNECTION_FORBIDDEN = 2,
+};
+
+enum class PanRole {
+    ROLE_PANNAP = 0,
+    ROLE_PANU = 1,
+};
+
+enum class InputPanRole {
+    ROLE_PANNAP = 1,
+    ROLE_PANU = 2,
 };
 
 enum MajorClass {

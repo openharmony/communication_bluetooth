@@ -23,19 +23,33 @@
 
 namespace OHOS {
 namespace Bluetooth {
+int32_t BluetoothPanProxy::Connect(const BluetoothRawAddress &device)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "write device error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_CONNECT),
+        data, reply, option, BT_ERR_INTERNAL_ERROR);
+    return reply.ReadInt32();
+}
+
 int32_t BluetoothPanProxy::Disconnect(const BluetoothRawAddress &device)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
-        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "write device error");
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
 
     SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_DISCONNECT),
-        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
-
+        data, reply, option, BT_ERR_INTERNAL_ERROR);
     return reply.ReadInt32();
 }
 
@@ -43,14 +57,14 @@ int32_t BluetoothPanProxy::GetDeviceState(const BluetoothRawAddress &device, int
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
-        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "write device error");
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
 
     SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_GET_DEVICE_STATE),
-        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+        data, reply, option, BT_ERR_INTERNAL_ERROR);
 
     // read error code
     int32_t errCode = reply.ReadInt32();
@@ -68,14 +82,14 @@ int32_t BluetoothPanProxy::GetDevicesByStates(const std::vector<int32_t> &states
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
-        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(WriteParcelableInt32Vector(states, data), BT_ERR_IPC_TRANS_FAILED, "write device error");
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(WriteParcelableInt32Vector(states, data), BT_ERR_INTERNAL_ERROR, "write device error");
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
 
     SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_GET_DEVICES_BY_STATES),
-        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+        data, reply, option, BT_ERR_INTERNAL_ERROR);
 
     // read error code
     int32_t errCode = reply.ReadInt32();
@@ -85,17 +99,17 @@ int32_t BluetoothPanProxy::GetDevicesByStates(const std::vector<int32_t> &states
     }
 
     // read size
-    int32_t rawAddsSize = reply.ReadInt32();
+    int32_t rawAddrSize = reply.ReadInt32();
     const int32_t maxSize = 100;
-    if (rawAddsSize > maxSize) {
+    if (rawAddrSize > maxSize) {
         return BT_ERR_INVALID_PARAM;
     }
 
     // read devices
-    for (int i = 0; i < rawAddsSize; i++) {
+    for (int i = 0; i < rawAddrSize; i++) {
         std::unique_ptr<BluetoothRawAddress> address(reply.ReadParcelable<BluetoothRawAddress>());
         if (!address) {
-            return TRANSACTION_ERR;
+            return BT_ERR_INTERNAL_ERROR;
         }
         result.push_back(*address);
     }
@@ -106,15 +120,15 @@ int32_t BluetoothPanProxy::RegisterObserver(const sptr<IBluetoothPanObserver> ob
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
-        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
     CHECK_AND_RETURN_LOG_RET(data.WriteRemoteObject(observer->AsObject()),
-        BT_ERR_IPC_TRANS_FAILED, "Write object error");
+        BT_ERR_INTERNAL_ERROR, "Write object error");
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
 
     SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_REGISTER_OBSERVER),
-        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+        data, reply, option, BT_ERR_INTERNAL_ERROR);
 
     return BT_NO_ERROR;
 }
@@ -123,15 +137,15 @@ int32_t BluetoothPanProxy::DeregisterObserver(const sptr<IBluetoothPanObserver> 
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
-        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
     CHECK_AND_RETURN_LOG_RET(data.WriteRemoteObject(observer->AsObject()),
-        BT_ERR_IPC_TRANS_FAILED, "Write object error");
+        BT_ERR_INTERNAL_ERROR, "Write object error");
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
 
     SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_DEREGISTER_OBSERVER),
-        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+        data, reply, option, BT_ERR_INTERNAL_ERROR);
 
     return BT_NO_ERROR;
 }
@@ -140,14 +154,14 @@ int32_t BluetoothPanProxy::SetTethering(const bool value)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
-        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteBool(value), BT_ERR_IPC_TRANS_FAILED, "write value error");
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteBool(value), BT_ERR_INTERNAL_ERROR, "write value error");
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
 
     SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_SET_TETHERING),
-        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+        data, reply, option, BT_ERR_INTERNAL_ERROR);
 
     return reply.ReadInt32();
 }
@@ -156,13 +170,13 @@ int32_t BluetoothPanProxy::IsTetheringOn(bool &result)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
-        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
 
     SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_IS_TETHERING_ON),
-        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+        data, reply, option, BT_ERR_INTERNAL_ERROR);
 
     int32_t ret = reply.ReadInt32();
     if (ret != BT_NO_ERROR) {
@@ -170,8 +184,45 @@ int32_t BluetoothPanProxy::IsTetheringOn(bool &result)
         return ret;
     }
 
-    result = reply.ReadInt32();
+    result = reply.ReadBool();
     return BT_NO_ERROR;
+}
+
+int32_t BluetoothPanProxy::SetConnectStrategy(const BluetoothRawAddress &device, int strategy)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "write device error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteInt32(strategy), BT_ERR_INTERNAL_ERROR, "write strategy error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_SET_CONNECT_STRATEGY),
+        data, reply, option, BT_ERR_INTERNAL_ERROR);
+
+    return reply.ReadInt32();
+}
+
+int32_t BluetoothPanProxy::GetConnectStrategy(const BluetoothRawAddress &device, int &strategy)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothPanProxy::GetDescriptor()),
+        BT_ERR_INTERNAL_ERROR, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_INTERNAL_ERROR, "write device error");
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    SEND_IPC_REQUEST_RETURN_RESULT(static_cast<uint32_t>(BluetoothPanInterfaceCode::COMMAND_GET_CONNECT_STRATEGY),
+        data, reply, option, BT_ERR_INTERNAL_ERROR);
+
+    int32_t res = reply.ReadInt32();
+    if (res == NO_ERROR) {
+        strategy = reply.ReadInt32();
+    }
+    return res;
 }
 
 bool BluetoothPanProxy::WriteParcelableInt32Vector(const std::vector<int32_t> &parcelableVector, Parcel &reply)

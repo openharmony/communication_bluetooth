@@ -276,7 +276,8 @@ napi_value NapiNativeStateChangeParam::ToNapiValue(napi_env env) const
     napi_value result = nullptr;
     napi_create_object(env, &result);
     ConnStateChangeParam stateChangeParam {
-        deviceAddr_, connectState_, isDisconnected_, disconnectReason_, stateChangeCause_, reasonMessage_
+        deviceAddr_, connectState_, isDisconnected_, disconnectReason_, stateChangeCause_,
+        reasonMessage_, hasPanRole_, panRole_
     };
     ConvertStateChangeParamToJS(env, result, stateChangeParam);
     return result;

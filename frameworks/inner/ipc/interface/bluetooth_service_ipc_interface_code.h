@@ -447,12 +447,15 @@ enum class BluetoothPanObserverInterfaceCode {
 
 enum class BluetoothPanInterfaceCode {
     COMMAND_DISCONNECT = MIN_TRANSACTION_ID + 0,
+    COMMAND_CONNECT,
     COMMAND_GET_DEVICE_STATE,
     COMMAND_GET_DEVICES_BY_STATES,
     COMMAND_REGISTER_OBSERVER,
     COMMAND_DEREGISTER_OBSERVER,
     COMMAND_SET_TETHERING,
     COMMAND_IS_TETHERING_ON,
+    COMMAND_SET_CONNECT_STRATEGY,
+    COMMAND_GET_CONNECT_STRATEGY,
     // The last code, if you want to add a new code, please add it before this
     COMMAND_PAN_BUTT
 };
