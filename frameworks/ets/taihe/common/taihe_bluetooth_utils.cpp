@@ -121,19 +121,19 @@ bool IsValidAddress(std::string bdaddr)
     const std::regex deviceIdRegex("^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$");
     return regex_match(bdaddr, deviceIdRegex);
 #else
-    if (bdaddr.empty() || bdaddr.length() != Bluetooth::ADDRESS_LENGTH) {
+    if (bdaddr.empty() || bdaddr.length() != ADDRESS_LENGTH) {
         return false;
     }
-    for (size_t i = 0; i < Bluetooth::ADDRESS_LENGTH; i++) {
+    for (size_t i = 0; i < ADDRESS_LENGTH; i++) {
         char c = bdaddr[i];
-        switch (i % Bluetooth::ADDRESS_SEPARATOR_UNIT) {
+        switch (i % ADDRESS_SEPARATOR_UNIT) {
             case 0:
             case 1:
                 if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
                     break;
                 }
                 return false;
-            case Bluetooth::ADDRESS_COLON_INDEX:
+            case ADDRESS_COLON_INDEX:
             default:
                 if (c == ':') {
                     break;
