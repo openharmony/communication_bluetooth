@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace Bluetooth {
-const std::regex uuidRegex("^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$");
 
 UUID::UUID(const long mostSigBits, const long leastSigBits)
 {
@@ -198,9 +197,29 @@ bool UUID::operator<(const UUID &uuid) const
     return !Equals(uuid);
 }
 
-bool IsValidUuid(std::string uuid)
+bool IsValidUuid(const std::string &uuid)
 {
-    return regex_match(uuid, uuidRegex);
+    if (bdaddr.empty() || uuid.length() != Bluetooth::ADDRESS_LENGTH) {
+        return false;
+    }
+    for (size_t i = 0; i < Bluetooth::ADDRESS_LENGTH; i++) {
+        char c = bdaddr[i];
+        switch (i % Bluetooth::ADDRESS_SEPARATOR_UNIT) {
+            case 0:
+            case 1:
+                if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+                    break;
+                }
+                return false;
+            case Bluetooth::ADDRESS_COLON_INDEX:
+            default:
+                if (c == ':') {
+                    break;
+                }
+                return false;
+        }
+    }
+    return true;
 }
 }
 }

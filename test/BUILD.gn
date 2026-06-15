@@ -16,5 +16,6 @@ group("unit_test") {
     testonly = true
     deps = [
         "unittest/napi:unittest",
+        "unittest/napi:unittest",
     ]
 }
