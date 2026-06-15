@@ -24,6 +24,17 @@
 #define CONSTANT_SIXTEEN 16
 #define CONSTANT_TWENTY 20
 
+namespace {
+constexpr int UUID_STRING_LENGTH = 36;
+constexpr bool IS_DASH_POSITION[UUID_STRING_LENGTH] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 1,
+    0, 0, 0, 0, 1,
+    0, 0, 0, 0, 1,
+    0, 0, 0, 0, 1,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+}
+
 namespace OHOS {
 namespace Bluetooth {
 
@@ -199,24 +210,19 @@ bool UUID::operator<(const UUID &uuid) const
 
 bool IsValidUuid(const std::string &uuid)
 {
-    if (bdaddr.empty() || uuid.length() != Bluetooth::ADDRESS_LENGTH) {
+    if (uuid.length() != UUID_STRING_LENGTH) {
         return false;
     }
-    for (size_t i = 0; i < Bluetooth::ADDRESS_LENGTH; i++) {
-        char c = bdaddr[i];
-        switch (i % Bluetooth::ADDRESS_SEPARATOR_UNIT) {
-            case 0:
-            case 1:
-                if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
-                    break;
-                }
+    for (int i = 0; i < UUID_STRING_LENGTH; ++i) {
+        if (IS_DASH_POSITION[i]) {
+            if (uuid[i] != '-') {
                 return false;
-            case Bluetooth::ADDRESS_COLON_INDEX:
-            default:
-                if (c == ':') {
-                    break;
-                }
-                return false;
+            }
+            continue;
+        }
+        char c = uuid[i];
+        if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
+            return false;
         }
     }
     return true;
