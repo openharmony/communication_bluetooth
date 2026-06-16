@@ -24,9 +24,19 @@
 #define CONSTANT_SIXTEEN 16
 #define CONSTANT_TWENTY 20
 
+namespace {
+constexpr int UUID_STRING_LENGTH = 36;
+constexpr bool IS_DASH_POSITION[UUID_STRING_LENGTH] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 1,
+    0, 0, 0, 0, 1,
+    0, 0, 0, 0, 1,
+    0, 0, 0, 0, 1,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+}
+
 namespace OHOS {
 namespace Bluetooth {
-const std::regex uuidRegex("^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$");
 
 UUID::UUID(const long mostSigBits, const long leastSigBits)
 {
@@ -198,9 +208,24 @@ bool UUID::operator<(const UUID &uuid) const
     return !Equals(uuid);
 }
 
-bool IsValidUuid(std::string uuid)
+bool IsValidUuid(const std::string &uuid)
 {
-    return regex_match(uuid, uuidRegex);
+    if (uuid.length() != UUID_STRING_LENGTH) {
+        return false;
+    }
+    for (int i = 0; i < UUID_STRING_LENGTH; ++i) {
+        if (IS_DASH_POSITION[i]) {
+            if (uuid[i] != '-') {
+                return false;
+            }
+            continue;
+        }
+        char c = uuid[i];
+        if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
+            return false;
+        }
+    }
+    return true;
 }
 }
 }

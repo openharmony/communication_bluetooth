@@ -183,7 +183,7 @@ private:
  */
 using ParcelUuid = UUID;
 
-bool IsValidUuid(std::string uuid);
+bool IsValidUuid(const std::string &uuid);
 
 } // namespace Bluetooth
 } // namespace OHOS
