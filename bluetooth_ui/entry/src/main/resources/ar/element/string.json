@@ -1,0 +1,95 @@
+{
+    "string":[
+        {
+            "name":"bluetooth_send_finish_title",
+            "value":"اكتمل النقل عبر البلوتوث",
+            "attr":{
+                "priority":"LT"
+            }
+        },
+        {
+            "name":"bluetooth_transfer_receive_text",
+            "value":"جارٍ الاستلام…",
+            "attr":{
+                "priority":"LT"
+            }
+        },
+        {
+            "name":"bluetooth_transfer_send_text",
+            "value":"جارٍ الإرسال…",
+            "attr":{
+                "priority":"LT"
+            }
+        },
+        {
+            "name":"bluetooth_receive_finish_title",
+            "value":"اكتمل النقل عبر البلوتوث",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"bluetooth_receive_notification_button_accept",
+            "value":"استلام",
+            "attr":{
+                "priority":"LT"
+            }
+        },
+        {
+            "name":"bluetooth_receive_notification_title",
+            "value":"نقل الملفات عبر البلوتوث",
+            "attr":{
+                "priority":"LT"
+            }
+        },
+        {
+            "name":"share_name",
+            "value":"البلوتوث",
+            "attr":{
+                "priority":"LT"
+            }
+        },
+        {
+            "name":"bluetooth_receive_notification_button_reject",
+            "value":"رفض",
+            "attr":{
+                "priority":"LT"
+            }
+        },
+        {
+            "name":"bluetooth_receive_finish_text",
+            "value":"%1$s، و%2$s",
+            "attr":{
+                "priority":"LT"
+            }
+        },
+        {
+            "name":"bluetooth_send_finish_text",
+            "value":"%1$s، و%2$s",
+            "attr":{
+                "priority":"LT"
+            }
+        },
+        {
+            "name":"bluetooth_transfer_notification_title",
+            "value":"نقل الملفات عبر البلوتوث",
+            "attr":{
+                "priority":"LT"
+            }
+        },
+        {
+            "name":"bluetooth_send_count_text",
+            "value":"البلوتوث: جارٍ إرسال %1$d‏/%2$d",
+            "attr":{
+                "priority":"LT"
+            }
+        },
+        {
+            "name":"bluetooth_receive_count_text",
+            "value":"البلوتوث: جارٍ استلام %1$d‏/%2$d",
+            "attr":{
+                "priority":"LT"
+            }
+        }
+    ]
+}
