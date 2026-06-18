@@ -44,7 +44,7 @@ constexpr int OOB_R_SIZE = 16; // size of randomizerHash of OobData
 constexpr int OOB_NAME_MAX_SIZE = 256; // size limit of deviceName of OobData
 constexpr int ADDRESS_BYTE_LEN = 6;
 
-napi_value GetCallbackErrorValue(napi_env env, int errCode)
+napi_value GetCallbackErrorValue(napi_env env, int errCode, const std::string &errMsg)
 {
     HILOGE("errCode: %{public}d", errCode);
     napi_value result = NapiGetNull(env);
@@ -56,9 +56,9 @@ napi_value GetCallbackErrorValue(napi_env env, int errCode)
     NAPI_CALL(env, napi_create_object(env, &result));
     NAPI_CALL(env, napi_set_named_property(env, result, "code", eCode));
 
-    std::string errMsg = GetNapiErrMsg(env, errCode);
+    std::string messageStr = errMsg.empty() ? GetNapiErrMsg(env, errCode) : errMsg;
     napi_value message = nullptr;
-    napi_create_string_utf8(env, errMsg.c_str(), NAPI_AUTO_LENGTH, &message);
+    napi_create_string_utf8(env, messageStr.c_str(), NAPI_AUTO_LENGTH, &message);
     napi_set_named_property(env, result, "message", message);
     return result;
 }

@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <mutex>
+#include "napi_bluetooth_error.h"
 #include "napi_bluetooth_utils.h"
 #include "napi_ha_event_utils.h"
 #include "napi_native_object.h"
@@ -68,6 +69,11 @@ public:
         std::shared_ptr<NapiAsyncCallback> asyncCallback, bool needCallback = false,
         std::shared_ptr<NapiHaEventUtils> haUtils = nullptr)
         : env_(env), func_(func), napiAsyncCallback_(asyncCallback), needCallback_(needCallback), haUtils_(haUtils) {}
+    NapiAsyncWork(napi_env env, std::function<NapiAsyncWorkRet(void)> func,
+        std::shared_ptr<NapiAsyncCallback> asyncCallback, bool needCallback = false,
+        ApiContext apiContext = ApiContext{nullptr, {}})
+        : env_(env), func_(func), napiAsyncCallback_(asyncCallback), needCallback_(needCallback),
+        haUtils_(apiContext.haUtils), validErrCodes_(apiContext.validErrCodes) {}
     ~NapiAsyncWork() = default;
 
     void Run(void);
@@ -84,6 +90,7 @@ public:
         napi_async_work asyncWork;
         std::shared_ptr<NapiNativeObject> object;
         std::shared_ptr<NapiAsyncWork> napiAsyncWork = nullptr;
+        std::string errMsg = "";
     };
 
 private:
@@ -98,6 +105,7 @@ private:
     std::atomic_bool needCallback_ = false; // Indicates whether an asynchronous work needs to wait for callback.
     std::atomic_bool triggered_ = false; // Indicates whether the asynchronous callback is called.
     std::shared_ptr<NapiHaEventUtils> haUtils_; // HA report tool, which is transferred fron the original API interface
+    std::vector<int32_t> validErrCodes_ {}; // Indicates valid error codes.
 };
 
 class NapiAsyncWorkFactory {
@@ -105,6 +113,9 @@ public:
     static std::shared_ptr<NapiAsyncWork> CreateAsyncWork(napi_env env, napi_callback_info info,
         std::function<NapiAsyncWorkRet(void)> asyncWork, bool needCallback = ASYNC_WORK_NO_NEED_CALLBACK,
         std::shared_ptr<NapiHaEventUtils> haUtils = nullptr);
+    static std::shared_ptr<NapiAsyncWork> CreateAsyncWork(napi_env env, napi_callback_info info,
+        std::function<NapiAsyncWorkRet(void)> asyncWork, bool needCallback,
+        ApiContext apiContext);
 };
 
 class NapiAsyncWorkMap {

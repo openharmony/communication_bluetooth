@@ -130,7 +130,13 @@ napi_status CheckSendFileParam(napi_env env, napi_callback_info info, std::strin
 napi_value NapiBluetoothOpp::SendFile(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_PROHIBITED_BY_EDM,
+        BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT, BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE,
+        BT_ERR_PROFILE_DISABLED, BT_ERR_INTERNAL_ERROR, BT_ERR_FILE_TYPE_NOT_SUPPORT,
+        BT_ERR_TRANSFER_BUSY, BT_ERR_FILE_NOT_ACCESSIBLE
+    };
+    NAPI_BT_CONTEXT(env, "opp.SendFile", validErrCodes);
     std::string device {};
     std::vector<FileHolder> fileHolders;
 
@@ -151,7 +157,7 @@ napi_value NapiBluetoothOpp::SendFile(napi_env env, napi_callback_info info)
         HILOGI("err: %{public}d result: %{public}d", errorCode, result);
         return NapiAsyncWorkRet(errorCode);
     };
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
@@ -160,7 +166,12 @@ napi_value NapiBluetoothOpp::SendFile(napi_env env, napi_callback_info info)
 napi_value NapiBluetoothOpp::SetIncomingFileConfirmation(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_PROHIBITED_BY_EDM,
+        BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT, BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE,
+        BT_ERR_PROFILE_DISABLED, BT_ERR_INTERNAL_ERROR, BT_ERR_TRANSFER_BUSY, BT_ERR_FILE_NOT_ACCESSIBLE
+    };
+    NAPI_BT_CONTEXT(env, "opp.SetIncomingFileConfirmation", validErrCodes);
     bool accept = false;
     int32_t fileFd = -1;
     auto status = CheckSetIncomingFileConfirmation(env, info, accept, fileFd);
@@ -173,7 +184,7 @@ napi_value NapiBluetoothOpp::SetIncomingFileConfirmation(napi_env env, napi_call
         HILOGI("err: %{public}d", errorCode);
         return NapiAsyncWorkRet(errorCode);
     };
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
@@ -182,17 +193,22 @@ napi_value NapiBluetoothOpp::SetIncomingFileConfirmation(napi_env env, napi_call
 napi_value NapiBluetoothOpp::GetCurrentTransferInformation(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_PROHIBITED_BY_EDM,
+        BT_ERR_API_NOT_SUPPORT, BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE,
+        BT_ERR_PROFILE_DISABLED, BT_ERR_INTERNAL_ERROR, BT_ERR_TRANSFER_INFORMATION_EMPTY
+    };
+    NAPI_BT_CONTEXT(env, "opp.GetCurrentTransferInformation", validErrCodes);
     napi_value ret = nullptr;
     napi_create_object(env, &ret);
     napi_status checkRet = CheckEmptyParam(env, info);
-    NAPI_BT_ASSERT_RETURN(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM, ret);
+    NAPI_BT_ASSERT_RETURN_VERIFY(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM, ret);
 
     Opp *profile = Opp::GetProfile();
     BluetoothOppTransferInformation information;
     int32_t errorCode = profile->GetCurrentTransferInformation(information);
     HILOGI("GetCurrentTransferInformation errorCode is %{public}d", errorCode);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, errorCode == BT_NO_ERROR, errorCode);
+    NAPI_BT_ASSERT_ERR_RETURN_VERIFY(env, errorCode == BT_NO_ERROR, errorCode);
 
     auto status = ConvertOppTransferInformationToJS(env, ret, information);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
@@ -212,7 +228,12 @@ napi_status CheckLastReceivedFileUri(napi_env env, napi_callback_info info, std:
 napi_value NapiBluetoothOpp::SetLastReceivedFileUri(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_PROHIBITED_BY_EDM,
+        BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT, BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE,
+        BT_ERR_PROFILE_DISABLED, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "opp.SetLastReceivedFileUri", validErrCodes);
     std::string uri {};
 
     auto status = CheckLastReceivedFileUri(env, info, uri);
@@ -225,7 +246,7 @@ napi_value NapiBluetoothOpp::SetLastReceivedFileUri(napi_env env, napi_callback_
         HILOGI("err: %{public}d result: %{public}d", errorCode, result);
         return NapiAsyncWorkRet(errorCode);
     };
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
@@ -234,7 +255,12 @@ napi_value NapiBluetoothOpp::SetLastReceivedFileUri(napi_env env, napi_callback_
 napi_value NapiBluetoothOpp::CancelTransfer(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_PROHIBITED_BY_EDM,
+        BT_ERR_API_NOT_SUPPORT, BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE,
+        BT_ERR_PROFILE_DISABLED, BT_ERR_INTERNAL_ERROR, BT_ERR_TRANSFER_BUSY
+    };
+    NAPI_BT_CONTEXT(env, "opp.CancelTransfer", validErrCodes);
     napi_value ret = nullptr;
     bool isOk = false;
     napi_get_boolean(env, isOk, &ret);

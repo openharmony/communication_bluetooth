@@ -866,7 +866,11 @@ napi_status CheckBleScanParams(napi_env env, napi_callback_info info, std::vecto
 napi_value StartBLEScan(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    NapiHaEventUtils haUtils(env, "ble.StartBLEScan");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "ble.StartBLEScan", validErrCodes);
     std::vector<BleScanFilter> scanfilters;
     BleScanSettings settings;
     auto status = CheckBleScanParams(env, info, scanfilters, settings);
@@ -877,7 +881,7 @@ napi_value StartBLEScan(napi_env env, napi_callback_info info)
     // the JS interface should check the scannerId's validity before each scan.
     BleCentralManagerGetInstance()->CheckValidScannerId();
     int ret = BleCentralManagerGetInstance()->StartScan(settings, scanfilters);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == NO_ERROR || ret == BT_ERR_BLE_SCAN_ALREADY_STARTED, ret);
+    NAPI_BT_ASSERT_ERR_RETURN_VERIFY(env, ret == NO_ERROR || ret == BT_ERR_BLE_SCAN_ALREADY_STARTED, ret);
 
     return NapiGetUndefinedRet(env);
 }

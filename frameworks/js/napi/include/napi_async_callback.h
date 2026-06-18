@@ -35,7 +35,7 @@ struct NapiAsyncCallback {
         PROMISE,
     };
 
-    void CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object);
+    void CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object, const std::string &errMsg = "");
     napi_value GetRet(void);
 
     Type type;
@@ -51,7 +51,7 @@ public:
     ~NapiCallback();
 
     void CallFunction(const std::shared_ptr<NapiNativeObject> &object);
-    void CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object);
+    void CallFunction(int errCode, const std::shared_ptr<NapiNativeObject> &object, const std::string &errMsg = "");
     napi_env GetNapiEnv(void);
     bool Equal(napi_env env, napi_value &callback) const;
     std::string ToLogString(void) const;
@@ -83,7 +83,7 @@ public:
     explicit NapiPromise(napi_env env);
     ~NapiPromise();
 
-    void ResolveOrReject(int errCode, const std::shared_ptr<NapiNativeObject> &object);
+    void ResolveOrReject(int errCode, const std::shared_ptr<NapiNativeObject> &object, const std::string &errMsg = "");
     void Resolve(napi_value resolution);
     void Reject(napi_value rejection);
     napi_value GetPromise(void) const;

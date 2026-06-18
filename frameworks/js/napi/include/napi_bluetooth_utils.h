@@ -128,7 +128,7 @@ bool ParseString(napi_env env, std::string &param, napi_value args);
 bool ParseInt32(napi_env env, int32_t &param, napi_value args);
 bool ParseBool(napi_env env, bool &param, napi_value args);
 bool ParseArrayBuffer(napi_env env, uint8_t **data, size_t &size, napi_value args);
-napi_value GetCallbackErrorValue(napi_env env, int errCode);
+napi_value GetCallbackErrorValue(napi_env env, int errCode, const std::string &errMsg = "");
 
 napi_status ConvertStringVectorToJS(napi_env env, napi_value result, const std::vector<std::string> &stringVector);
 void ConvertStateChangeParamToJS(napi_env env, napi_value result, const ConnStateChangeParam &stateChangeParam);
