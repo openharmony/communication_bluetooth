@@ -344,6 +344,7 @@ const int DEVICE_TYPE_DUAL_MONO = 2;
 constexpr uint8_t GATT_TRANSPORT_TYPE_AUTO = 0x0;
 constexpr uint8_t GATT_TRANSPORT_TYPE_LE = 0x1;
 constexpr uint8_t GATT_TRANSPORT_TYPE_CLASSIC = 0x2;
+constexpr uint8_t GATT_TRANSPORT_TYPE_INVALID = 0x3;
 
 /**
  * @brief user confirm type during paring process.

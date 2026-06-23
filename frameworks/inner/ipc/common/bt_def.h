@@ -723,20 +723,6 @@ constexpr int TRANSPORT_LE = 1;
 constexpr int TRANSPORT_DUAL = 2;
 constexpr int TRANSPORT_UNKNOWN = 3;
 
-inline uint8_t ConvertToGattTransportType(int transport)
-{
-    switch (transport) {
-        case TRANSPORT_BR_EDR:
-            return GATT_TRANSPORT_TYPE_CLASSIC;
-        case TRANSPORT_LE:
-            return GATT_TRANSPORT_TYPE_LE;
-        case TRANSPORT_DUAL:
-            return GATT_TRANSPORT_TYPE_AUTO;
-        default:
-            return GATT_TRANSPORT_TYPE_INVALID;
-    }
-}
-
 // Phy type
 using PHY_TYPE = enum { PHY_LE_1M = 1, PHY_LE_2M = 2, PHY_LE_CODED = 3, PHY_LE_ALL_SUPPORTED = 255 };
 
