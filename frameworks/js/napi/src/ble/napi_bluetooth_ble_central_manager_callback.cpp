@@ -103,7 +103,7 @@ void ConvertScanResult(const std::vector<BleScanResult> &results, const napi_env
         }
         uint8_t *native = nullptr;
         napi_value buffer = nullptr;
-        napi_create_arraybuffer(env, bleScanResult.GetPayload().size(), reinterpret_cast<void **>(&native), &buffer);
+        napi_create_arraybuffer(env, bleScanResult.GetPayload().size(), reinterpret_cast<void**>(&native), &buffer);
         if (memcpy_s(native, bleScanResult.GetPayload().size(), bleScanResult.GetPayload().data(),
             bleScanResult.GetPayload().size()) != EOK) {
             HILOGE("ConvertScanResult memcpy_s fail");

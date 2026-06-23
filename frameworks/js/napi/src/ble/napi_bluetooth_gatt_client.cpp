@@ -202,7 +202,7 @@ napi_value NapiGattClient::GattClientConstructor(napi_env env, napi_callback_inf
 static NapiGattClient *NapiGetGattClient(napi_env env, napi_value thisVar)
 {
     NapiGattClient *gattClient = nullptr;
-    auto status = napi_unwrap(env, thisVar, (void **)&gattClient);
+    auto status = napi_unwrap(env, thisVar, reinterpret_cast<void**>(&gattClient));
     if (status != napi_ok) {
         return nullptr;
     }
