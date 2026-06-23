@@ -37,8 +37,26 @@ namespace OHOS {
 namespace Bluetooth {
 using namespace std;
 
-constexpr int32_t TRANSPORT_MIN = GATT_TRANSPORT_TYPE_AUTO;    //0
-constexpr int32_t TRANSPORT_MAX = GATT_TRANSPORT_TYPE_CLASSIC; //2
+constexpr int TRANSPORT_BR_EDR = 0;
+constexpr int TRANSPORT_LE = 1;
+constexpr int TRANSPORT_DUAL = 2;
+
+constexpr int32_t TRANSPORT_MIN = GATT_TRANSPORT_TYPE_AUTO;
+constexpr int32_t TRANSPORT_MAX = GATT_TRANSPORT_TYPE_CLASSIC;
+
+static int32_t ConverToGattTransportType(int transport)
+{
+    switch (transport) {
+        case TRANSPORT_BR_EDR:
+            return GATT_TRANSPORT_TYPE_CLASSIC;
+        case TRANSPORT_LE:
+            return GATT_TRANSPORT_TYPE_LE;
+        case TRANSPORT_DUAL:
+            return GATT_TRANSPORT_TYPE_AUTO;
+        default:
+            return GATT_TRANSPORT_TYPE_INVALID;
+    }
+}
 
 thread_local napi_ref NapiGattClient::consRef_ = nullptr;
 
@@ -67,7 +85,7 @@ static napi_status ParseGattClientOptions(napi_env env, napi_value optionsArg, b
             HILOGE("invalid transport value");
             return napi_invalid_arg;
         }
-        transport = transportVal;
+        transport = ConverToGattTransportType(transportVal);
     }
     return napi_ok;
 }
