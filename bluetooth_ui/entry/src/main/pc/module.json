@@ -3,38 +3,21 @@
     "name": "entry",
     "type": "entry",
     "srcEntrance": "",
-    "description": "$string:share_name",
+    "description": "$string:module_desc",
     "mainElement": "EntryAbility",
     "deviceTypes": [
       "phone",
       "tablet",
       "2in1",
-      "wearable",
-      "tv"
+      "wearable"
     ],
-    "apiType": "stageMode",
     "deliveryWithInstall": true,
     "installationFree": false,
     "pages": "$profile:main_pages",
     "abilities": [
       {
-        "name": "EntryAbility",
-        "srcEntry": "./ets/common/MainAbility.ets",
-        "label": "$string:share_name",
-        "skills": [
-          {
-            "entities": [
-              "entity.system.home"
-            ],
-            "actions": [
-              "action.system.home"
-            ]
-          }
-        ]
-      },
-      {
         "name": "BluetoothReceiveUIAbility",
-        "srcEntry": "./ets/oppability/BluetoothReceiveUIAbility.ets",
+        "srcEntry": "./ets/oppability/BluetoothPcReceiveUIAbility.ets",
         "launchType": "singleton",
         "icon": "$media:app_icon",
         "label": "BluetoothReceiveUIAbility",
@@ -53,7 +36,7 @@
       },
       {
         "name": "BluetoothSendUIAbility",
-        "srcEntry": "./ets/oppability/BluetoothSendUIAbility.ets",
+        "srcEntry": "./ets/oppability/BluetoothPcSendUIAbility.ets",
         "launchType": "singleton",
         "icon": "$media:app_icon",
         "label": "BluetoothSendUIAbility",
@@ -104,7 +87,7 @@
       },
       {
         "name": "BluetoothReceiveServiceUIAbility",
-        "srcEntry": "./ets/oppability/BluetoothReceiveServiceUIAbility.ets",
+        "srcEntry": "./ets/oppability/BluetoothPcReceiveServiceUIAbility.ets",
         "description": "BluetoothReceiveServiceUIAbility",
         "label": "BluetoothReceiveServiceUIAbility",
         "exported": true,

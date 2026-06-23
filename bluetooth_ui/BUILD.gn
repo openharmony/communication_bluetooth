@@ -13,9 +13,14 @@
 
 import("//build/ohos.gni")
 import("./signature/bluetooth.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 ohos_hap("bluetooth_hap") {
-  hap_profile = "entry/src/main/module.json"
+  if (bluetooth_hap_opp_switch_feature == true) {
+    hap_profile = "entry/src/main/module.json"
+  } else {
+    hap_profile = "entry/src/main/pc/module.json"
+  }
 
   deps = [
     ":bluetooth_js_assets",
@@ -37,7 +42,12 @@ ohos_hap("bluetooth_hap") {
 }
 
 ohos_js_assets("bluetooth_js_assets") {
-  hap_profile = "entry/src/main/module.json"
+  if (bluetooth_hap_opp_switch_feature == true) {
+    hap_profile = "entry/src/main/module.json"
+  } else {
+    hap_profile = "entry/src/main/pc/module.json"
+  }
+
   ets2abc = true
   source_dir = "entry/src/main/ets"
 }
@@ -50,7 +60,11 @@ ohos_app_scope("bluetooth_app_profile") {
 ohos_resources("bluetooth_resources") {
   sources = [ "entry/src/main/resources" ]
   deps = [ ":bluetooth_app_profile" ]
-  hap_profile = "entry/src/main/module.json"
+  if (bluetooth_hap_opp_switch_feature == true) {
+    hap_profile = "entry/src/main/module.json"
+  } else {
+    hap_profile = "entry/src/main/pc/module.json"
+  }
 }
 
 group("hap") {
