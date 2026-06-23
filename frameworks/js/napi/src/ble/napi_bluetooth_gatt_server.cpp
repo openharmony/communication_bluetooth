@@ -110,7 +110,7 @@ napi_value NapiGattServer::GattServerConstructor(napi_env env, napi_callback_inf
 static NapiGattServer *NapiGetGattServer(napi_env env, napi_value thisVar)
 {
     NapiGattServer *gattServer = nullptr;
-    auto status = napi_unwrap(env, thisVar, (void **)&gattServer);
+    auto status = napi_unwrap(env, thisVar, reinterpret_cast<void**>(&gattServer));
     if (status != napi_ok) {
         return nullptr;
     }

@@ -182,7 +182,7 @@ public:
         GattcBuildUuid(&characData.attribute.characteristic.characteristicUuid, charcUuid);
         size_t tmpLen = 0;
         characData.data = characteristic.GetValue(&tmpLen).get();
-        characData.dataLen = (unsigned short)tmpLen;
+        characData.dataLen = static_cast<unsigned short>(tmpLen);
 
         HILOGI("clientId: %{public}d, ret: %{public}d, dataLen: %{public}d",
             clientId_, ret, characData.dataLen);
@@ -235,7 +235,7 @@ public:
         GattcBuildUuid(&descData.attribute.descriptor.descriptorUuid, descUuid);
         size_t tmpLen = 0;
         descData.data = descriptor.GetValue(&tmpLen).get();
-        descData.dataLen = (unsigned short)tmpLen;
+        descData.dataLen = static_cast<unsigned short>(tmpLen);
 
         HILOGI("clientId: %{public}d, ret: %{public}d, dataLen: %{public}d", clientId_, ret, descData.dataLen);
         HILOGI("srvUuid: %{public}s, charcUuid: %{public}s, descUuid: %{public}s",
@@ -310,7 +310,7 @@ public:
         GattcBuildUuid(&notificationData.attribute.characteristic.characteristicUuid, charcUuid);
         size_t tmpLen = 0;
         notificationData.data = characteristic.GetValue(&tmpLen).get();
-        notificationData.dataLen = (unsigned short)tmpLen;
+        notificationData.dataLen = static_cast<unsigned short>(tmpLen);
 
         HILOGD("clientId: %{public}d, dataLen: %{public}d, ", clientId_, notificationData.dataLen);
         HILOGD("srvUuid: %{public}s, charcUuid: %{public}s", srvUuid.c_str(), charcUuid.c_str());
@@ -330,7 +330,7 @@ public:
 private:
     void GattcBuildUuid(BtUuid *desUuid, const std::string &srcUuid)
     {
-        desUuid->uuid = (char *)srcUuid.c_str();
+        desUuid->uuid = const_cast<char*>(srcUuid.c_str());
         desUuid->uuidLen = srcUuid.size();
     }
 

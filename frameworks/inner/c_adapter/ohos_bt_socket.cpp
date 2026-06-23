@@ -63,7 +63,7 @@ public:
         GetAddrFromString(param.addr.GetDeviceAddr(), addr.addr);
         BtUuid btUuid;
         string strUuid = param.uuid.ToString();
-        btUuid.uuid = (char *)strUuid.c_str();
+        btUuid.uuid = const_cast<char*>(strUuid.c_str());
         btUuid.uuidLen = strUuid.size();
         if (param.type == OHOS_SOCKET_SPP_RFCOMM && socektConnectCallback.connStateCb != nullptr) {
             socektConnectCallback.connStateCb(&addr, btUuid, param.status, param.result);
