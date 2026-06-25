@@ -15,8 +15,8 @@
 
 import hilog from '@ohos.hilog'
 
-const DOMAIN: number = 0xD002300;
-const TAG: string = 'locationUi';
+const DOMAIN: number = 0xC00107;
+const TAG: string = 'BluetoothUI';
 
 export class LogUtils {
     d(tag: string, msg: string): void {

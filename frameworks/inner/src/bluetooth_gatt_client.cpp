@@ -666,13 +666,12 @@ int GattClient::Connect(std::weak_ptr<GattClientCallback> callback, bool isAutoC
         return proxy->Connect(pimpl->applicationId_, isAutoConnect);
     }
     pimpl->callback_ = callback;
-    int gattTransport = bluetooth::ConvertToGattTransportType(transport);
-    if ((gattTransport == bluetooth::GATT_TRANSPORT_TYPE_CLASSIC && !IS_BT_ENABLED()) ||
-        (gattTransport == bluetooth::GATT_TRANSPORT_TYPE_INVALID)) {
+    if ((transport == bluetooth::GATT_TRANSPORT_TYPE_CLASSIC && !IS_BT_ENABLED()) ||
+        (transport == bluetooth::GATT_TRANSPORT_TYPE_INVALID)) {
         HILOGE("Unsupported transport mode");
         return BT_ERR_INTERNAL_ERROR;
     }
-    if (gattTransport != bluetooth::GATT_TRANSPORT_TYPE_LE && isAutoConnect) {
+    if (transport != bluetooth::GATT_TRANSPORT_TYPE_LE && isAutoConnect) {
         HILOGE("Unsupported auto-connect mode");
         return BT_ERR_INTERNAL_ERROR;
     }
@@ -681,7 +680,7 @@ int GattClient::Connect(std::weak_ptr<GattClientCallback> callback, bool isAutoC
     }
     int appId = 0;
     int32_t result = proxy->RegisterApplication(
-        pimpl->clientCallback_, bluetooth::RawAddress(pimpl->device_.GetDeviceAddr()), gattTransport, appId);
+        pimpl->clientCallback_, bluetooth::RawAddress(pimpl->device_.GetDeviceAddr()), transport, appId);
     HILOGI("Proxy register application : %{public}d", appId);
     if (result != BT_NO_ERROR) {
         HILOGE("register application fail");

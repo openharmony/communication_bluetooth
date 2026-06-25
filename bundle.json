@@ -45,7 +45,8 @@
       "bluetooth_kia_enable",
       "bluetooth_pluggable_supported",
       "bluetooth_bas_feature",
-      "bluetooth_pan_feature"
+      "bluetooth_pan_feature",
+      "bluetooth_hap_opp_switch_feature"
     ],
     "adapted_system_type": [
       "standard"
