@@ -141,9 +141,6 @@ config("btframework_config") {
   if (is_asan || use_clang_coverage) {
     defines += [ "DTFUZZ_TEST" ]
   }
-  if (bluetooth_service_resourceschedule) {
-    defines += [ "RES_SCHED_SUPPORT" ]
-  }
   if (bluetooth_pluggable_supported) {
     defines += [ "BLUETOOTH_PLUGGABLE_SUPPORTED" ]
   }
@@ -188,10 +185,6 @@ ohos_shared_library("btframework") {
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
-
-  if (bluetooth_service_resourceschedule) {
-    external_deps += [ "resource_schedule_service:ressched_client" ]
-  }
 
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
