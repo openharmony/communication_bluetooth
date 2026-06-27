@@ -78,7 +78,8 @@
         "napi",
         "samgr",
         "security_guard",
-        "runtime_core"
+        "runtime_core",
+        "bounds_checking_function"
       ],
       "third_party": []
     },

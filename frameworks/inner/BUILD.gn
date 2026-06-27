@@ -282,6 +282,7 @@ ohos_shared_library("btcommon") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
+    "bounds_checking_function:libsec_shared",
   ]
 
   subsystem_name = "communication"
