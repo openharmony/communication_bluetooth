@@ -17,6 +17,21 @@ import("//foundation/communication/bluetooth/bluetooth.gni")
 SUBSYSTEM_DIR = "//foundation/communication"
 
 ohos_shared_library("bluetooth") {
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+  ]
+  ldflags = [
+    "-Wl,--as-needed",
+    "-Wl,--gc-sections",
+  ]
   branch_protector_ret = "pac_ret"  # Enable PAC CFI
 
   #install_enable = true
@@ -127,6 +142,21 @@ ohos_shared_library("bluetooth") {
 }
 
 ohos_shared_library("bluetoothmanager") {
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+  ]
+  ldflags = [
+    "-Wl,--as-needed",
+    "-Wl,--gc-sections",
+  ]
   branch_protector_ret = "pac_ret"  # Enable PAC CFI
 
   #install_enable = true

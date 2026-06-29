@@ -38,6 +38,21 @@ config("bluetooth_ndk_config") {
 }
 
 ohos_shared_library("bluetooth_ndk") {
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+  ]
+  ldflags = [
+    "-Wl,--as-needed",
+    "-Wl,--gc-sections",
+  ]
   sources = [ "$BLUETOOTH_FRAMEWORK_DIR/c_api/src/oh_bluetooth.cpp" ]
   output_extension = "so"
   defines = [ "API_EXPORT=__attribute__((visibility (\"default\")))" ]

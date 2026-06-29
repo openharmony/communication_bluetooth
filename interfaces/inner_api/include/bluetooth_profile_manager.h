@@ -31,6 +31,8 @@
 
 namespace OHOS {
 namespace Bluetooth {
+class ApplicationUpdateCallbackImpl;
+
 constexpr const char *BLUETOOTH_HOST = "BluetoothHost";
 const int32_t BEGIN_ID = 0;
 // It is recommended to ues one of the between bluetoothLoadedfunc and bleTurnOnFunc
@@ -93,6 +95,7 @@ public:
     static void ClearSystemAbility();
 
     static BluetoothProfileManager &GetInstance();
+    void BluetoothProfileManagerUpdate();
 
 private:
     class BluetoothSystemAbility : public SystemAbilityStatusChangeStub {
@@ -116,6 +119,7 @@ private:
     std::mutex idMutex_;
     std::mutex getProfileRemoteMutex_;
     std::mutex needCheckBluetoothServiceOnMutex_;
+    std::shared_ptr<ApplicationUpdateCallbackImpl> applicationUpdateCallbackImpl_;
 };
 template <typename T>
 sptr<T> GetRemoteProxy(const std::string &objectName)
