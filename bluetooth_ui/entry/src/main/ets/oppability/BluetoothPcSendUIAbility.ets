@@ -27,6 +27,7 @@ import backgroundTaskManager from '@ohos.backgroundTaskManager';
 import fs from '@ohos.file.fs';
 import systemParameterEnhance from '@ohos.systemParameterEnhance';
 import PermissionUtils from 'common/PermissionUtils';
+import CommonUtils from 'common/CommonUtils';
 
 const TAG: string = '[BT_SEND_SERVICE]==>'
 
@@ -273,7 +274,7 @@ export default class BluetoothSendUIAbility extends UIAbility {
             content: {
                 notificationContentType: notificationManager.ContentType.NOTIFICATION_CONTENT_BASIC_TEXT,
                 normal: {
-                    title: this.context.resourceManager.getStringSync($r('app.string.bluetooth_send_finish_title').id),
+                    title: CommonUtils.ResourceManagerGetStringSync(this.context, $r('app.string.bluetooth_send_finish_title')),
                     text: this.getFormatString($r('app.string.bluetooth_send_finish_text'),
                         this.getFormatPlural($r('app.plural.bluetooth_send_finish_success_text', successNum, successNum), successNum),
                         this.getFormatPlural($r('app.plural.bluetooth_send_finish_fail_text', failNum, failNum), failNum))
@@ -456,14 +457,14 @@ export default class BluetoothSendUIAbility extends UIAbility {
     }
 
     getFormatString(resource: Resource, value1: string, value2: string): string {
-        let result = this.context.resourceManager.getStringSync(resource.id);
+        let result = CommonUtils.ResourceManagerGetStringSync(this.context, resource);
         result = result.replace('%1$s', value1);
         result = result.replace('%2$s', value2);
         return result;
     }
 
     getFormatNum(resource: Resource, value1: number, value2: number): string {
-        let result = this.context.resourceManager.getStringSync(resource.id);
+        let result = CommonUtils.ResourceManagerGetStringSync(this.context, resource);
         result = result.replace('%1$d', value1.toString());
         result = result.replace('%2$d', value2.toString());
         return result;
