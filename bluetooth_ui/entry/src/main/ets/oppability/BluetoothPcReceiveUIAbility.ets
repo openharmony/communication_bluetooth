@@ -32,6 +32,7 @@ import { DrawableDescriptor } from '@ohos.arkui.drawableDescriptor';
 import backgroundTaskManager from '@ohos.backgroundTaskManager';
 import systemParameterEnhance from '@ohos.systemParameterEnhance';
 import PermissionUtils from 'common/PermissionUtils';
+import CommonUtils from 'common/CommonUtils';
 
 const TAG: string = '[BT_RECEIVE_SERVICE]==>'
 const EVENT_TYPE_TRANSACTION: number = 6;
@@ -436,7 +437,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
             content: {
                 notificationContentType: notificationManager.ContentType.NOTIFICATION_CONTENT_BASIC_TEXT,
                 normal: {
-                    title: this.context.resourceManager.getStringSync($r('app.string.bluetooth_receive_notification_title').id),
+                    title: CommonUtils.ResourceManagerGetStringSync(this.context, $r('app.string.bluetooth_receive_notification_title')),
                     text: fileName,
                 }
             },
@@ -444,11 +445,11 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
             notificationSlotType: notificationManager.SlotType.SERVICE_INFORMATION,
             actionButtons: [
                 {
-                    title: this.context.resourceManager.getStringSync($r('app.string.bluetooth_receive_notification_button_reject').id),
+                    title: CommonUtils.ResourceManagerGetStringSync(this.context, $r('app.string.bluetooth_receive_notification_button_reject')),
                     wantAgent: wantAgentObjReject
                 },
                 {
-                    title: this.context.resourceManager.getStringSync($r('app.string.bluetooth_receive_notification_button_accept').id),
+                    title: CommonUtils.ResourceManagerGetStringSync(this.context, $r('app.string.bluetooth_receive_notification_button_accept')),
                     wantAgent: wantAgentObjAccept
                 }
             ],
@@ -485,7 +486,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
             content: {
                 notificationContentType: notificationManager.ContentType.NOTIFICATION_CONTENT_BASIC_TEXT,
                 normal: {
-                    title: this.context.resourceManager.getStringSync($r('app.string.bluetooth_receive_finish_title').id),
+                    title: CommonUtils.ResourceManagerGetStringSync(this.context, $r('app.string.bluetooth_receive_finish_title')),
                     text: this.getFormatString($r('app.string.bluetooth_receive_finish_text'),
                         this.getFormatPlural($r('app.plural.bluetooth_receive_finish_success_text', successNum, successNum), successNum),
                         this.getFormatPlural($r('app.plural.bluetooth_receive_finish_fail_text', failNum, failNum), failNum))
@@ -534,9 +535,9 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
         let progressName = name;
         if (this.totalCount == UNKNOWN_VALUE) {
             progressTitle =
-                this.context.resourceManager.getStringSync($r('app.string.bluetooth_transfer_notification_title').id);
+                CommonUtils.ResourceManagerGetStringSync(this.context, $r('app.string.bluetooth_transfer_notification_title'));
             progressName =
-                this.context.resourceManager.getStringSync($r('app.string.bluetooth_transfer_receive_text').id) + name;
+                CommonUtils.ResourceManagerGetStringSync(this.context, $r('app.string.bluetooth_transfer_receive_text')) + name;
         }
         let notificationRequest: notificationManager.NotificationRequest = {
             notificationSlotType: notificationManager.SlotType.LIVE_VIEW,
@@ -582,9 +583,9 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
         let progressName = name;
         if (this.totalCount == UNKNOWN_VALUE) {
             progressTitle =
-                this.context.resourceManager.getStringSync($r('app.string.bluetooth_transfer_notification_title').id);
+                CommonUtils.ResourceManagerGetStringSync(this.context, $r('app.string.bluetooth_transfer_notification_title'));
             progressName =
-                this.context.resourceManager.getStringSync($r('app.string.bluetooth_transfer_receive_text').id) + name;
+                CommonUtils.ResourceManagerGetStringSync(this.context, $r('app.string.bluetooth_transfer_receive_text')) + name;
         }
         let notificationRequest: notificationManager.NotificationRequest = {
             notificationSlotType: notificationManager.SlotType.SOCIAL_COMMUNICATION,
@@ -702,14 +703,14 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
     }
 
     getFormatString(resource: Resource, value1: string, value2: string): string {
-        let result = this.context.resourceManager.getStringSync(resource.id);
+        let result = CommonUtils.ResourceManagerGetStringSync(this.context, resource);
         result = result.replace('%1$s', value1);
         result = result.replace('%2$s', value2);
         return result;
     }
 
     getFormatNum(resource: Resource, value1: number, value2: number): string {
-        let result = this.context.resourceManager.getStringSync(resource.id);
+        let result = CommonUtils.ResourceManagerGetStringSync(this.context, resource);
         result = result.replace('%1$d', value1.toString());
         result = result.replace('%2$d', value2.toString());
         return result;
