@@ -72,7 +72,6 @@ void NapiGattServer::DefineGattServerJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("offBlePhyUpdate", OffBlePhyUpdate),
         DECLARE_NAPI_FUNCTION("getConnectedState", GetConnectedState),
         DECLARE_NAPI_FUNCTION("connect", Connect),
-        DECLARE_NAPI_FUNCTION("cancelConnection", CancelConnection),
         DECLARE_NAPI_FUNCTION("disconnect", CancelConnection),
     };
 
@@ -584,12 +583,18 @@ napi_value NapiGattServer::ReadPhy(napi_env env, napi_callback_info info)
 napi_value NapiGattServer::RemoveAllServices(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    //since 26.0.0
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "ble.GattServer.RemoveAllServices", validErrCodes);
     std::shared_ptr<GattServer> server {nullptr};
     auto status = CheckGattsEmptyParam(env, info, server);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, (status == napi_ok && server != nullptr), BT_ERR_INVALID_PARAM);
 
     int ret = server->ClearServices();
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, ret == BT_NO_ERROR, ret);
     return NapiGetUndefinedRet(env);
 }
 #else
@@ -666,33 +671,45 @@ static napi_status ParseGattServerConnectParams(
 napi_value NapiGattServer::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    //since 26.0.0
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "ble.GattServer.Connect", validErrCodes);
     std::string deviceId;
     bool autoConnect = false;
     NapiGattServer *server = nullptr;
 
     auto status = ParseGattServerConnectParams(env, info, deviceId, autoConnect, &server);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     std::shared_ptr<GattServer> gattServer = server->GetServer();
     BluetoothRemoteDevice remoteDevice(deviceId, BTTransport::ADAPTER_BLE);
     int ret = gattServer->Connect(remoteDevice, !autoConnect);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
 
 napi_value NapiGattServer::CancelConnection(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    //since 26.0.0
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "ble.GattServer.CancelConnection", validErrCodes);
     std::string deviceId;
     NapiGattServer *server = nullptr;
 
     auto status = ParseGattServerGetConnectState(env, info, deviceId, &server);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     std::shared_ptr<GattServer> gattServer = server->GetServer();
     BluetoothRemoteDevice remoteDevice(deviceId, BTTransport::ADAPTER_BLE);
     int ret = gattServer->CancelConnection(remoteDevice);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
 } // namespace Bluetooth
