@@ -79,7 +79,8 @@
         "samgr",
         "security_guard",
         "runtime_core",
-        "bounds_checking_function"
+        "bounds_checking_function",
+        "taihe_ffi_gen"
       ],
       "third_party": []
     },
