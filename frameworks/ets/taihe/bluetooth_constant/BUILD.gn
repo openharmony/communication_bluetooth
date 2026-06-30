@@ -35,6 +35,21 @@ ohos_taihe("run_taihe") {
 }
 
 taihe_shared_library("bluetoothConstant_taihe_native") {
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+  ]
+  ldflags = [
+    "-Wl,--as-needed",
+    "-Wl,--gc-sections",
+  ]
   taihe_generated_file_path = "${taihe_generated_file_path_constant}"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"

@@ -23,7 +23,6 @@
 #include "iremote_broker.h"
 #include "refbase.h"
 
-class IRemoteObject;
 namespace OHOS {
 namespace Bluetooth {
 static constexpr int GET_PROXY_SLEEP_SEC = 1; // 1s

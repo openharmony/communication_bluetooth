@@ -163,6 +163,21 @@ config("btframework_public_config") {
 }
 
 ohos_shared_library("btframework") {
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+  ]
+  ldflags = [
+    "-Wl,--as-needed",
+    "-Wl,--gc-sections",
+  ]
   branch_protector_ret = "pac_ret"  # Enable PAC CFI
   configs = [ ":btframework_config" ]
   public_configs = [ ":btframework_public_config" ]
@@ -184,6 +199,7 @@ ohos_shared_library("btframework") {
     "init:libbegetutil",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
+    "ability_runtime:application_image_observer_manager",
   ]
 
   sanitize = {
@@ -221,6 +237,21 @@ config("btcommon_public_config") {
 }
 
 ohos_shared_library("btcommon") {
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+  ]
+  ldflags = [
+    "-Wl,--as-needed",
+    "-Wl,--gc-sections",
+  ]
   branch_protector_ret = "pac_ret"  # Enable PAC CFI
   configs = [ ":btcommon_config" ]
   public_configs = [ ":btcommon_public_config" ]

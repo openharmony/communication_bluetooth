@@ -18,6 +18,21 @@ BT_CJ_DIR = "$BT_PART_DIR/frameworks/cj/connection"
 BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
 
 ohos_shared_library("cj_bluetooth_connection_ffi") {
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+  ]
+  ldflags = [
+    "-Wl,--as-needed",
+    "-Wl,--gc-sections",
+  ]
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
     boundary_sanitize = true  # Enable boundary san detection

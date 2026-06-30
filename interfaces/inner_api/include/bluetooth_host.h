@@ -77,6 +77,17 @@ public:
      */
     virtual void OnStateChanged(const int transport, const int status) = 0;
 
+    /**
+     * @brief Adapter state change function, including half state.
+     *
+     * @param state Change to the new state.
+     *        BluetoothSwitchState::STATE_ON;
+     *        BluetoothSwitchState::STATE_OFF;
+     *        BluetoothSwitchState::STATE_HALF;
+     * @since 6
+     */
+    virtual void OnBluetoothStateChanged(int state) {}
+
     // gap
     /**
      * @brief Discovery state changed observer.

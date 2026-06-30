@@ -158,6 +158,9 @@ public:
         if (state == bluetooth::BluetoothSwitchState::STATE_HALF) {
             host_.switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::BLUETOOTH_HALF);
         }
+        host_.observers_.ForEach([state](std::shared_ptr<BluetoothHostObserver> observer) {
+            observer->OnBluetoothStateChanged(state);
+        });
     }
 
     void OnBluetoothSwitchAction(int32_t action, const std::string &callingName) override

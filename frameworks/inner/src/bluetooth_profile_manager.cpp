@@ -29,9 +29,20 @@
 #include "system_ability_definition.h"
 #include "bluetooth_no_destructor.h"
 #include "ohos_bt_gatt.h"
+#include "app_image_observer_manager.h"
 
 namespace OHOS {
 namespace Bluetooth {
+class ApplicationUpdateCallbackImpl : public AbilityRuntime::AppImageLifeCycleCallback {
+public:
+    ApplicationUpdateCallbackImpl() = default;
+    virtual ~ApplicationUpdateCallbackImpl() = default;
+
+    /**
+     * Called back when the application update.
+     */
+    void NotifyApplicationUpdate() override;
+};
 
 sptr<BluetoothProfileManager::BluetoothSystemAbility> BluetoothProfileManager::bluetoothSystemAbility_ = nullptr;
 
@@ -39,6 +50,9 @@ BluetoothProfileManager::BluetoothProfileManager()
 {
     bluetoothSystemAbility_ = new BluetoothSystemAbility();
     SubScribeBluetoothSystemAbility();
+
+    applicationUpdateCallbackImpl_ = std::make_shared<ApplicationUpdateCallbackImpl>();
+    AppExecFwk::AppImageObserverManager::GetInstance().RegisterImageLifecycleCallback(applicationUpdateCallbackImpl_);
 }
 
 BluetoothProfileManager::~BluetoothProfileManager()
@@ -67,7 +81,7 @@ void BluetoothProfileManager::SubScribeBluetoothSystemAbility()
 {
     sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHECK_AND_RETURN_LOG(samgrProxy != nullptr, "[BLUETOOTH_PROFILE_MANAGER] failed to get samgrProxy");
-    int32_t ret = samgrProxy->SubscribeSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID, bluetoothSystemAbility_);
+    int32_t ret = samgrProxy->SubscribeSystemAbilityInImage(BLUETOOTH_HOST_SYS_ABILITY_ID, bluetoothSystemAbility_);
     CHECK_AND_RETURN_LOG(ret == ERR_OK,
         "[BLUETOOTH_PROFILE_MANAGER] subscribe systemAbilityId: bluetooth service failed!");
 }
@@ -272,6 +286,17 @@ void BluetoothProfileManager::DeregisterFunc(int32_t id)
 bool BluetoothProfileManager::IsBluetoothServiceOn()
 {
     return isBluetoothServiceOn_.load();
+}
+void BluetoothProfileManager::BluetoothProfileManagerUpdate()
+{
+    HILOGI("Clear the Binder cache when an app is loaded from an image.");
+    bluetoothSystemAbility_->OnRemoveSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID, "");
+    bluetoothSystemAbility_->OnAddSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID, "");
+}
+
+void ApplicationUpdateCallbackImpl::NotifyApplicationUpdate()
+{
+    BluetoothProfileManager::GetInstance().BluetoothProfileManagerUpdate();
 }
 } // namespace bluetooth
 } // namespace OHOS
