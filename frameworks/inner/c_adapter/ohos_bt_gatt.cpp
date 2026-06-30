@@ -1643,6 +1643,7 @@ int8_t GetAdvPowerForRangingBusiness(BleApplicationType appType)
     HILOGI("GetAdvPowerForRangingBusiness enter, appType = %{public}u", appType);
     CHECK_AND_RETURN_LOG_RET(appType == BLE_RANGING_TOUCH || appType == BLE_RANGING_APPROACH,
         BLE_RANGING_INVALID_ADVPOWER, "GetAdvPowerForRangingBusiness fail: invalid appType = %{public}u", appType);
+    lock_guard<ffrt::mutex> lock(g_advMutex);
     if (g_BleAdvertiser == nullptr) {
         g_BleAdvertiser = BleAdvertiser::CreateInstance();
     }
