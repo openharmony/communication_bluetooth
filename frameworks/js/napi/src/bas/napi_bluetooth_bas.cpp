@@ -57,9 +57,15 @@ void NapiBas::RegisterAccessObserverToHost()
 
 napi_value NapiBas::IsBasSupported(napi_env env, napi_callback_info info)
 {
+    //since 26.0.0
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_INVALID_PARAM,
+        BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "bas.IsBasSupported", validErrCodes);
     bool isSupported = false;
     int32_t ret = BluetoothBasHost::GetProfile()->IsBasSupported(isSupported);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, ret == BT_NO_ERROR, ret);
     napi_value result = nullptr;
     napi_get_boolean(env, isSupported, &result);
     return result;
@@ -67,19 +73,26 @@ napi_value NapiBas::IsBasSupported(napi_env env, napi_callback_info info)
 
 napi_value NapiBas::GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info info)
 {
+    //since 26.0.0
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_INVALID_PARAM,
+        BT_ERR_API_NOT_SUPPORT, BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE,
+        BT_ERR_PROFILE_DISABLED, BT_ERR_INTERNAL_ERROR, BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED
+    };
+    NAPI_BT_CONTEXT(env, "bas.GetRemoteDeviceBatteryInfo", validErrCodes);
     BluetoothAddress deviceId;
     auto status = ParseGetRemoteDeviceBatteryInfoParams(env, info, deviceId);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 
     int32_t ret = BluetoothBasHost::GetProfile()->GetBatteryLevel(deviceId.address);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, ret == BT_NO_ERROR, ret);
     auto func = [ret]() {
         return NapiAsyncWorkRet(ret);
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     bool success = g_basObserver->asyncWorkMap_.TryPush(NapiAsyncType::BAS_GET_BATTERY_LEVEL, asyncWork);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, success, BT_ERR_INTERNAL_ERROR);
 
     asyncWork->Run();
     return asyncWork->GetRet();
@@ -121,10 +134,16 @@ napi_status NapiBas::ParseGetRemoteDeviceBatteryInfoParams(napi_env env, napi_ca
 
 napi_value NapiBas::OnBatteryChange(napi_env env, napi_callback_info info)
 {
+    //since 26.0.0
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_INVALID_PARAM,
+        BT_ERR_API_NOT_SUPPORT, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "bas.OnBatteryChange", validErrCodes);
 #ifdef BLUETOOTH_BAS_FEATURE_ENABLE
     auto status = g_basObserver->eventSubscribe_.RegisterWithName(env, info,
         STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
     std::map<std::string, int32_t> batteryInfos;
     int32_t ret = BluetoothBasHost::GetProfile()->GetConnectedDeviceBatteryInfos(batteryInfos);
     if (ret != BT_NO_ERROR) {
@@ -139,19 +158,25 @@ napi_value NapiBas::OnBatteryChange(napi_env env, napi_callback_info info)
         g_basObserver->OnBatteryLevelChanged(remoteDevice, batteryLevel);
     }
 #else
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, false, BT_ERR_API_NOT_SUPPORT);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, false, BT_ERR_API_NOT_SUPPORT);
 #endif
     return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiBas::OffBatteryChange(napi_env env, napi_callback_info info)
 {
+    //since 26.0.0
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_INVALID_PARAM,
+        BT_ERR_API_NOT_SUPPORT, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "bas.OffBatteryChange", validErrCodes);
 #ifdef BLUETOOTH_BAS_FEATURE_ENABLE
     auto status = g_basObserver->eventSubscribe_.DeregisterWithName(env, info,
         STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
 #else
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, false, BT_ERR_API_NOT_SUPPORT);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, false, BT_ERR_API_NOT_SUPPORT);
 #endif
     return NapiGetUndefinedRet(env);
 }
