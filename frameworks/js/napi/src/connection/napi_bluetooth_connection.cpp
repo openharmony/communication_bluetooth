@@ -362,13 +362,18 @@ napi_value GetBtConnectionState(napi_env env, napi_callback_info info)
 napi_value PairDevice(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "connection.PairDevice", validErrCodes);
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
 
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
     int32_t ret = remoteDevice.StartPair();
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_RETURN_FALSE_VERIFY(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
 
@@ -629,9 +634,14 @@ napi_value GetBluetoothScanMode(napi_env env, napi_callback_info info)
 napi_value StartBluetoothDiscovery(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "connection.StartBluetoothDiscovery", validErrCodes);
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int ret = host->StartBtDiscovery();
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_RETURN_FALSE_VERIFY(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
 
@@ -733,7 +743,11 @@ napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::st
 napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "connection.PairDeviceAsync");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "connection.PairDeviceAsync", validErrCodes);
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     int32_t addressType = AddressType::UNSET_ADDRESS;
     auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr, addressType);
@@ -744,7 +758,7 @@ napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
         HILOGI("err: %{public}d", err);
         return NapiAsyncWorkRet(err);
     };
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
