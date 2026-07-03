@@ -101,10 +101,15 @@ void OffStateChange(::taihe::optional_view<::taihe::callback<void(
 void EnableBluetoothAsync()
 {
     HILOGI("enter");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT, BT_ERR_SERVICE_DISCONNECTED,
+        BT_ERR_DIALOG_FOR_USER_NOT_RESPOND, BT_ERR_DIALOG_FOR_USER_REFUSE, BT_ERR_INTERNAL_ERROR
+    };
+    TAIHE_BT_CONTEXT_WITHOUT_HA(validErrCodes);
     bool isAsync = true;
     int32_t ret = BluetoothHost::GetDefaultHost().EnableBle("", isAsync);
     HILOGI("EnableBluetoothAsync ret: %{public}d", ret);
-    TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
+    TAIHE_BT_ASSERT_RETURN_VOID_VERIFY(ret == BT_NO_ERROR, ret);
 }
 
 void DisableBluetoothAsync()

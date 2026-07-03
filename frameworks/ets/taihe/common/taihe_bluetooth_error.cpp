@@ -71,6 +71,60 @@ static std::map<int32_t, std::string> taiheErrMsgMap {
     { BtErrCode::BT_ERR_DIALOG_FOR_USER_NOT_RESPOND, "The user does not respond."},
     { BtErrCode::BT_ERR_DIALOG_FOR_USER_REFUSE, "User refuse the action."},
 };
+
+static std::map<int32_t, int32_t> innerToBusinessErrCodeMap {
+    // inner error code ->
+    // business error code (ARKTS API, file: bluetooth_errorcode.h, Common error codes + Customized error codes)
+    // One inner error code maps to one business error code, business error code can have multiple inner error codes.
+    { BtErrCode::BT_ERR_PEERS_MAC_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
+    { BtErrCode::BT_ERR_MANAGE_ADV_NAME_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
+    { BtErrCode::BT_ERR_ACCESS_BLUETOOTH_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
+    { BtErrCode::BT_ERR_DISCOVER_BLUETOOTH_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
+    { BtErrCode::BT_ERR_MANAGE_BLUETOOTH_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
+    { BtErrCode::BT_ERR_LOCATION_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
+    { BtErrCode::BT_ERR_AUDIO_SERVER_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
+    { BtErrCode::BT_ERR_API_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
+    { BtErrCode::BT_ERR_MULTI_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
+    { BtErrCode::BT_ERR_INVALID_PARAM_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_GATT_CHARACTER_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_ASYNCWORK_EXIST, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_ADDRESS_NOT_EXIST, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_BLUETOOTH_TURN_ON, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_BLUETOOTH_TURNING, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_RESTRICT_STATE, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_CLOUD_DEVICE_BONDING, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_DISCOVERY_STATE_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_CHARACTER_VALUE_ERROR, BtErrCode::BT_ERR_INVALID_PARAM },
+    { BtErrCode::BT_ERR_BLE_SCAN_NO_RESOURCE, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_GATT_CONNECT_STATE_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
+};
+
+static std::map<int32_t, std::string> innerErrMsgMap {
+    { BtErrCode::BT_ERR_PEERS_MAC_PERMISSION_FAILED, "PERSISTENT_BLUETOOTH_PEERS_MAC permission denied." },
+    { BtErrCode::BT_ERR_MANAGE_ADV_NAME_PERMISSION_FAILED, "MANAGE_BLUETOOTH_ADVERTISER_NAME permission denied." },
+    { BtErrCode::BT_ERR_ACCESS_BLUETOOTH_PERMISSION_FAILED, "ACCESS_BLUETOOTH permission denied." },
+    { BtErrCode::BT_ERR_DISCOVER_BLUETOOTH_PERMISSION_FAILED, "DISCOVER_BLUETOOTH permission denied." },
+    { BtErrCode::BT_ERR_MANAGE_BLUETOOTH_PERMISSION_FAILED, "MANAGE_BLUETOOTH permission denied." },
+    { BtErrCode::BT_ERR_LOCATION_PERMISSION_FAILED, "LOCATION permission denied." },
+    { BtErrCode::BT_ERR_AUDIO_SERVER_PERMISSION_FAILED, "Only for audio_server." },
+    { BtErrCode::BT_ERR_API_PERMISSION_FAILED, "Api version is unsupported." },
+    { BtErrCode::BT_ERR_MULTI_PERMISSION_FAILED, "Multiple permission denied." },
+    { BtErrCode::BT_ERR_INVALID_PARAM_ERROR, "Invalid parameter." },
+    { BtErrCode::BT_ERR_GATT_CHARACTER_ERROR, "Operation failed. GATT character is nullptr." },
+    { BtErrCode::BT_ERR_ASYNCWORK_EXIST,
+        "Operation failed. Please call the interface only after the previous callback has been completed." },
+    { BtErrCode::BT_ERR_ADDRESS_NOT_EXIST, "Operation failed. Address has not been discovered or recorded." },
+    { BtErrCode::BT_ERR_BLUETOOTH_TURN_ON, "Operation failed. Bluetooth switch state is turn on." },
+    { BtErrCode::BT_ERR_BLUETOOTH_TURNING, "Operation failed. Bluetooth switch state is turning state." },
+    { BtErrCode::BT_ERR_RESTRICT_STATE, "Operation failed. In restrict bluetooth state." },
+    { BtErrCode::BT_ERR_CLOUD_DEVICE_BONDING, "Operation failed. Cloud device is bonding." },
+    { BtErrCode::BT_ERR_DISCOVERY_STATE_ERROR, "Operation failed. In DISCOVERYING or DISCOVERY_STARTED state." },
+    { BtErrCode::BT_ERR_CHARACTER_VALUE_ERROR,
+        "Invalid parameter. CharacteristicValue is null or length of characteristicValue is zero." },
+    { BtErrCode::BT_ERR_BLE_SCAN_NO_RESOURCE, "Fails to start scan as it is out of hardware resources."},
+    { BtErrCode::BT_ERR_GATT_CONNECT_STATE_ERROR, "Operation failed. GATT not in connected state." },
+};
+
 std::string GetTaiheErrMsg(const int32_t errCode)
 {
     auto iter = taiheErrMsgMap.find(errCode);
@@ -82,6 +136,11 @@ std::string GetTaiheErrMsg(const int32_t errCode)
     return "Inner error.";
 }
 
+bool IsInnerErrorCode(int32_t errCode)
+{
+    return innerToBusinessErrCodeMap.find(errCode) != innerToBusinessErrCodeMap.end();
+}
+
 void HandleSyncErr(int32_t errCode)
 {
     if (errCode == BtErrCode::BT_NO_ERROR) {
@@ -91,6 +150,72 @@ void HandleSyncErr(int32_t errCode)
     if (errMsg != "") {
         taihe::set_business_error(errCode, errMsg.c_str());
     }
+}
+
+void HandleSyncErrWithValidCodes(int32_t errCode, const std::vector<int32_t> &validErrCodes)
+{
+    if (errCode == BtErrCode::BT_NO_ERROR) {
+        return;
+    }
+    auto processResult = ProcessErrCode(errCode, validErrCodes);
+    if (!processResult.errMsg.empty()) {
+        taihe::set_business_error(processResult.errCode, processResult.errMsg.c_str());
+    }
+}
+
+void HandleSyncErrAdapter(int32_t errCode, std::vector<int32_t> &validErrCodes)
+{
+    if (validErrCodes.empty()) {
+        HandleSyncErr(errCode);
+    } else {
+        HandleSyncErrWithValidCodes(errCode, validErrCodes);
+    }
+}
+
+void ConvertInnerToBusinessErrCode(int32_t innerCode, ErrInfo &info)
+{
+    info.errCode = innerCode;
+    info.errMsg = "Unknown inner error.";
+    // find business errCode
+    auto mapIter = innerToBusinessErrCodeMap.find(innerCode);
+    if (mapIter != innerToBusinessErrCodeMap.end()) {
+        info.errCode = mapIter->second;
+    }
+    // find inner errMsg
+    auto innerMsgIter = innerErrMsgMap.find(innerCode);
+    if (innerMsgIter != innerErrMsgMap.end()) {
+        info.errMsg = innerMsgIter->second;
+    }
+    HILOGI("innerCode: %{public}d -> errCode: %{public}d, msg: %{public}s",
+        innerCode, info.errCode, info.errMsg.c_str());
+}
+
+ErrInfo ProcessErrCode(int32_t originalCode, const std::vector<int32_t> &validErrCodes)
+{
+    ErrInfo result = { originalCode, "" };
+    // inner code: originalCode -> business errCode + specific errMsg
+    if (IsInnerErrorCode(originalCode)) {
+        ConvertInnerToBusinessErrCode(originalCode, result);
+        return result;
+    }
+    bool isValidCode = false;
+    for (const auto &code: validErrCodes) {
+        if (code == result.errCode) {
+            isValidCode = true;
+            break;
+        }
+    }
+    if (!isValidCode) {
+        // invalid code: BT_ERR_INTERNAL_ERROR + specific errMsg
+        result.errCode = BtErrCode::BT_ERR_INTERNAL_ERROR;
+        result.errMsg = "Operation failed";
+    } else {
+        auto detailIter = taiheErrMsgMap.find(result.errCode);
+        if (detailIter != taiheErrMsgMap.end()) {
+            result.errMsg = detailIter->second;
+        }
+    }
+    return result;
 }
 } // namespace Bluetooth
 } // namespace OHOS
