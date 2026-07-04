@@ -83,6 +83,7 @@ taihe_shared_library("bluetoothBaseProfile_taihe_native") {
     cfi = true  # Enable/disable control flow integrity detection
     boundary_sanitize = true  # Enable boundary san detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
+    cfi_vcall_icall_only = true  # CFI optimization, restrict CFI detection scope
     integer_overflow = true  # Enable integer overflow detection
     ubsan = true  # Enable some Ubsan options
     debug = false
