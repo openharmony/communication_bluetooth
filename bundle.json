@@ -76,6 +76,7 @@
         "ipc",
         "libuv",
         "napi",
+        "node",
         "samgr",
         "security_guard",
         "runtime_core",
