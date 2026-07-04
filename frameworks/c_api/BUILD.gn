@@ -63,6 +63,7 @@ ohos_shared_library("bluetooth_ndk") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
+    cfi_vcall_icall_only = true  # CFI optimization, restrict CFI detection scope
     debug = false
   }
 

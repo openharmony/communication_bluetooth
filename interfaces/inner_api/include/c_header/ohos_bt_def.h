@@ -396,9 +396,9 @@ typedef struct {
  */
 typedef struct {
     /** UUID length */
-    unsigned char uuidLen;
+    unsigned char uuidLen;  // 'uuidLen' is not used
     /** UUID field */
-    char *uuid;
+    char *uuid;  // 'uuid' is a C-style string
 } BtUuid;
 
 typedef enum {

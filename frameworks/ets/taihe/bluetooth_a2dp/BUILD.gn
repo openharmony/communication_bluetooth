@@ -55,6 +55,7 @@ taihe_shared_library("bluetoothA2dp_taihe_native") {
     "-Wl,--as-needed",
     "-Wl,--gc-sections",
   ]
+  shlib_type = "ani"
   taihe_generated_file_path = "${taihe_generated_file_path_a2dp}"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
@@ -88,6 +89,7 @@ taihe_shared_library("bluetoothA2dp_taihe_native") {
     cfi = true  # Enable/disable control flow integrity detection
     boundary_sanitize = true  # Enable boundary san detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
+    cfi_vcall_icall_only = true  # CFI optimization, restrict CFI detection scope
     integer_overflow = true  # Enable integer overflow detection
     ubsan = true  # Enable some Ubsan options
     debug = false
