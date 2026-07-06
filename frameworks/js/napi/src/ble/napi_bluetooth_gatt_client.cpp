@@ -616,6 +616,11 @@ static napi_status ParseGattClientGetServices(napi_env env, napi_callback_info i
 napi_value NapiGattClient::GetServices(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INTERNAL_ERROR,
+    };
+    NAPI_BT_CONTEXT(env, "ble.GattClientDevice.GetServices", validErrCodes);
     NapiGattClient *client = nullptr;
     auto status = ParseGattClientGetServices(env, info, &client);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok && client, BT_ERR_INVALID_PARAM);
@@ -635,7 +640,7 @@ napi_value NapiGattClient::GetServices(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(ret, object);
     };
 
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
@@ -856,7 +861,7 @@ napi_value NapiGattClient::WriteCharacteristicValueCommon(napi_env env, napi_cal
     // GattCharacteristic write need callback, write no response is not needed.
     if (isNeedCallback) {
         bool success = client->GetCallback()->asyncWorkMap_.TryPush(asyncType, asyncWork);
-        NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
+        NAPI_BT_ASSERT_ERR_RETURN_VERIFY(env, success, BT_ERR_ASYNCWORK_EXIST);
     }
 
     asyncWork->Run();
@@ -1000,7 +1005,7 @@ static napi_value setCharacteristicChangeInner(napi_env env, napi_callback_info 
     auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     bool success = client->GetCallback()->asyncWorkMap_.TryPush(GATT_CLIENT_ENABLE_CHARACTER_CHANGED, asyncWork);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, success, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_ERR_RETURN_VERIFY(env, success, BT_ERR_ASYNCWORK_EXIST);
 
     asyncWork->Run();
     return asyncWork->GetRet();

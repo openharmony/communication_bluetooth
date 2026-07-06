@@ -78,7 +78,8 @@ static std::map<int32_t, std::string> napiErrMsgMap {
 };
 
 static std::map<int32_t, int32_t> innerToBusinessErrCodeMap {
-    // inner error code -> business error code
+    // inner error code ->
+    // business error code (ARKTS API, file: bluetooth_errorcode.h, Common error codes + Customized error codes)
     // One inner error code maps to one business error code, business error code can have multiple inner error codes.
     { BtErrCode::BT_ERR_PEERS_MAC_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
     { BtErrCode::BT_ERR_MANAGE_ADV_NAME_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
@@ -91,6 +92,15 @@ static std::map<int32_t, int32_t> innerToBusinessErrCodeMap {
     { BtErrCode::BT_ERR_MULTI_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
     { BtErrCode::BT_ERR_INVALID_PARAM_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
     { BtErrCode::BT_ERR_GATT_CHARACTER_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_ASYNCWORK_EXIST, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_ADDRESS_NOT_EXIST, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_BLUETOOTH_TURN_ON, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_BLUETOOTH_TURNING, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_RESTRICT_STATE, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_CLOUD_DEVICE_BONDING, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_DISCOVERY_STATE_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_BLE_SCAN_NO_RESOURCE, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_GATT_CONNECT_STATE_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
 };
 
 static std::map<int32_t, std::string> innerErrMsgMap {
@@ -104,7 +114,19 @@ static std::map<int32_t, std::string> innerErrMsgMap {
     { BtErrCode::BT_ERR_API_PERMISSION_FAILED, "Api version is unsupported." },
     { BtErrCode::BT_ERR_MULTI_PERMISSION_FAILED, "Multiple permission denied." },
     { BtErrCode::BT_ERR_INVALID_PARAM_ERROR, "Invalid parameter." },
-    { BtErrCode::BT_ERR_GATT_CHARACTER_ERROR, "GATT character is nullptr." },
+    { BtErrCode::BT_ERR_GATT_CHARACTER_ERROR, "Operation failed. GATT character is nullptr." },
+    { BtErrCode::BT_ERR_ASYNCWORK_EXIST,
+        "Operation failed. Please call the interface only after the previous callback has been completed." },
+    { BtErrCode::BT_ERR_ADDRESS_NOT_EXIST, "Operation failed. Address has not been discovered or recorded." },
+    { BtErrCode::BT_ERR_BLUETOOTH_TURN_ON, "Operation failed. Bluetooth switch state is turn on." },
+    { BtErrCode::BT_ERR_BLUETOOTH_TURNING, "Operation failed. Bluetooth switch state is turning state." },
+    { BtErrCode::BT_ERR_RESTRICT_STATE, "Operation failed. In restrict bluetooth state." },
+    { BtErrCode::BT_ERR_CLOUD_DEVICE_BONDING, "Operation failed. Cloud device is bonding." },
+    { BtErrCode::BT_ERR_DISCOVERY_STATE_ERROR, "Operation failed. In DISCOVERYING or DISCOVERY_STARTED state." },
+    { BtErrCode::BT_ERR_CHARACTER_VALUE_ERROR,
+        "Invalid parameter. CharacteristicValue is null or length of characteristicValue is zero." },
+    { BtErrCode::BT_ERR_BLE_SCAN_NO_RESOURCE, "Fails to start scan as it is out of hardware resources."},
+    { BtErrCode::BT_ERR_GATT_CONNECT_STATE_ERROR, "Operation failed. GATT not in connected state." },
 };
 
 bool IsInnerErrorCode(int32_t errCode)
