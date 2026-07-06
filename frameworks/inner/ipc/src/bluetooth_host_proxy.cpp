@@ -38,7 +38,7 @@ void BluetoothHostProxy::RegisterObserver(const sptr<IBluetoothHostObserver> &ob
         return;
     }
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
+    MessageOption option = { MessageOption::TF_SYNC | MessageOption::TF_IMAGE };
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::RegisterObserver done fail, error: %{public}d", error);
@@ -739,7 +739,7 @@ void BluetoothHostProxy::RegisterRemoteDeviceObserver(const sptr<IBluetoothRemot
         return;
     }
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
+    MessageOption option = { MessageOption::TF_SYNC | MessageOption::TF_IMAGE };
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_REMOTE_DEVICE_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetBtConnectionState done fail, error: %{public}d", error);
@@ -1522,7 +1522,7 @@ void BluetoothHostProxy::RegisterBleAdapterObserver(const sptr<IBluetoothHostObs
         return;
     }
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
+    MessageOption option = { MessageOption::TF_SYNC | MessageOption::TF_IMAGE };
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_BLE_ADAPTER_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::RegisterBleAdapterObserver done fail, error: %{public}d", error);
@@ -1565,7 +1565,7 @@ void BluetoothHostProxy::RegisterBlePeripheralCallback(const sptr<IBluetoothBleP
         return;
     }
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
+    MessageOption option = { MessageOption::TF_SYNC | MessageOption::TF_IMAGE };
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_BLE_PERIPHERAL_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::RegisterBlePeripheralCallback done fail, error: %{public}d", error);
@@ -1792,7 +1792,7 @@ void BluetoothHostProxy::RegisterBtResourceManagerObserver(const sptr<IBluetooth
         return;
     }
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
+    MessageOption option = { MessageOption::TF_SYNC | MessageOption::TF_IMAGE };
     int32_t error = InnerTransact(
         BluetoothHostInterfaceCode::BT_REGISTER_RESOURCE_MANAGER_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
