@@ -67,6 +67,7 @@ public:
 #endif
 
     static napi_value SetBLEMtuSize(napi_env env, napi_callback_info info);
+    static napi_value SetBLEMtu(napi_env env, napi_callback_info info);
     static napi_value GetRssiValue(napi_env env, napi_callback_info info);
     static napi_value GetDeviceName(napi_env env, napi_callback_info info);
     static int GattStatusFromService(int status);
