@@ -100,7 +100,12 @@ static std::map<int32_t, int32_t> innerToBusinessErrCodeMap {
     { BtErrCode::BT_ERR_CLOUD_DEVICE_BONDING, BtErrCode::BT_ERR_INTERNAL_ERROR },
     { BtErrCode::BT_ERR_DISCOVERY_STATE_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
     { BtErrCode::BT_ERR_BLE_SCAN_NO_RESOURCE, BtErrCode::BT_ERR_INTERNAL_ERROR },
-    { BtErrCode::BT_ERR_GATT_CONNECT_STATE_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_IS_DISCOVERING, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_ADDRESS_OR_TRANSPORT_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_IPC_TRANSACTION_FAILED, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_SERVICE_MAX_CONNECTION, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_DEVICE_HAS_CONNECTED, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_DEVICE_IS_NOT_CONNECTED, BtErrCode::BT_ERR_INTERNAL_ERROR },
 };
 
 static std::map<int32_t, std::string> innerErrMsgMap {
@@ -127,6 +132,12 @@ static std::map<int32_t, std::string> innerErrMsgMap {
         "Invalid parameter. CharacteristicValue is null or length of characteristicValue is zero." },
     { BtErrCode::BT_ERR_BLE_SCAN_NO_RESOURCE, "Fails to start scan as it is out of hardware resources."},
     { BtErrCode::BT_ERR_GATT_CONNECT_STATE_ERROR, "Operation failed. GATT not in connected state." },
+    { BtErrCode::BT_ERR_IS_DISCOVERING, "Operation failed. Not allowed to connect during scanning." },
+    { BtErrCode::BT_ERR_ADDRESS_OR_TRANSPORT_ERROR, "Operation failed. Invalid bluetooth addr or transport type." },
+    { BtErrCode::BT_ERR_IPC_TRANSACTION_FAILED, "Operation failed. IPC trans failed." },
+    { BtErrCode::BT_ERR_SERVICE_MAX_CONNECTION, "Operation failed. Max connections has reached." },
+    { BtErrCode::BT_ERR_DEVICE_HAS_CONNECTED, "Operation failed. This device has connected." },
+    { BtErrCode::BT_ERR_DEVICE_IS_NOT_CONNECTED, "Operation failed. This device isn't connected." },
 };
 
 bool IsInnerErrorCode(int32_t errCode)
