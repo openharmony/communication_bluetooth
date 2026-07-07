@@ -32,6 +32,10 @@
 #include "napi_event_subscribe_module.h"
 #include "parser/napi_parser_utils.h"
 
+#ifndef GATT_MAX_MTU_SIZE
+#define GATT_MAX_MTU_SIZE 517
+#define GATT_DEF_BLE_MTU_SIZE 23
+#endif
 
 namespace OHOS {
 namespace Bluetooth {
@@ -149,6 +153,7 @@ void NapiGattClient::DefineGattClientJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("readDescriptorValue", ReadDescriptorValue),
         DECLARE_NAPI_FUNCTION("getRssiValue", GetRssiValue),
         DECLARE_NAPI_FUNCTION("setBLEMtuSize", SetBLEMtuSize),
+        DECLARE_NAPI_FUNCTION("setBLEMtu", SetBLEMtu),
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("onBlePhyUpdate", OnBlePhyUpdate),
@@ -696,6 +701,40 @@ napi_value NapiGattClient::SetBLEMtuSize(napi_env env, napi_callback_info info)
     HILOGI("ret: %{public}d", ret);
     NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
+}
+
+napi_value NapiGattClient::SetBLEMtu(napi_env env, napi_callback_info info)
+{
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_OPERATION_BUSY, BT_ERR_INTERNAL_ERROR, BT_ERR_GATT_CONNECTION_NOT_ESTABILISHED,
+    };
+    NAPI_BT_CONTEXT(env, "ble.GattClientDevice.SetBLEMtu", validErrCodes);
+
+    NapiGattClient* gattClient = nullptr;
+    int32_t mtuSize = 0;
+
+    auto status = CheckSetBLEMtuSize(env, info, mtuSize, &gattClient);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+
+    std::shared_ptr<GattClient> client = gattClient->GetClient();
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, client != nullptr, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env,
+        ((mtuSize >= GATT_DEF_BLE_MTU_SIZE) && (mtuSize <= GATT_MAX_MTU_SIZE)), BT_ERR_INVALID_PARAM);
+
+    NapiAsyncType asyncType = GATT_CLIENT_MTU_CHANGED;
+    auto func = [client, mtuSize] {
+        int ret = client->RequestBleMtuSize(mtuSize);
+        HILOGI("ret: %{public}d", ret);
+        ret = GetSDKAdaptedStatusCode(GattStatusFromService(ret));
+        return NapiAsyncWorkRet(ret);
+    };
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    bool success = gattClient->GetCallback()->asyncWorkMap_.TryPush(asyncType, asyncWork);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, success, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
 }
 
 static napi_status ParseGattClientReadRssiValue(napi_env env, napi_callback_info info, NapiGattClient **outGattClient)
