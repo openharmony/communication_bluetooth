@@ -148,6 +148,10 @@ config("btframework_config") {
   if (bluetooth_bas_feature) {
     defines += [ "BLUETOOTH_BAS_FEATURE_ENABLE" ]
   }
+
+  if (bluetooth_hfp_hf_feature_switch) {
+    defines += [ "BLUETOOTH_HFP_HF_FEATURE_ENABLE" ]
+  }
 }
 
 config("btframework_public_config") {
