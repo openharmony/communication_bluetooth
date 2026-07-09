@@ -50,6 +50,17 @@ do {                                                                       \
     }                                                                      \
 } while (0)
 #endif
+// verify error code
+#ifndef NAPI_BT_ASSERT_RETURN_VERIFY
+#define NAPI_BT_ASSERT_RETURN_VERIFY(env, cond, errCode, retObj)   \
+do {                                                               \
+    std::vector<int32_t> validErrCodes = apiContext.validErrCodes; \
+    if (!(cond)) {                                                 \
+        HandleSyncErrAdapter((env), (errCode), validErrCodes);     \
+        return (retObj);                                           \
+    }                                                              \
+} while (0)
+#endif
 #else // Under the else branch, the API version < 10, the HandleSyncErr func is not called.
 #ifndef NAPI_BT_ASSERT_RETURN
 #define NAPI_BT_ASSERT_RETURN(env, cond, errCode, retObj) \
@@ -67,6 +78,15 @@ do {                                                                       \
         HILOGE("bluetoothManager napi assert failed.");                    \
         return (retObj);                                                   \
     }                                                                      \
+} while (0)
+#endif
+#ifndef NAPI_BT_ASSERT_RETURN_VERIFY
+#define NAPI_BT_ASSERT_RETURN_VERIFY(env, cond, errCode, retObj)   \
+do {                                                               \
+    std::vector<int32_t> validErrCodes = apiContext.validErrCodes; \
+    if (!(cond)) {                                                 \
+        return (retObj);                                           \
+    }                                                              \
 } while (0)
 #endif
 #endif
@@ -115,16 +135,6 @@ do {                                                          \
     napi_value res = nullptr;                                 \
     napi_get_undefined((env), &res);                          \
     NAPI_BT_ASSERT_NUM_RETURN((env), (cond), (errCode), res); \
-} while (0)
-
-// verify error code
-#define NAPI_BT_ASSERT_RETURN_VERIFY(env, cond, errCode, retObj)   \
-do {                                                               \
-    std::vector<int32_t> validErrCodes = apiContext.validErrCodes; \
-    if (!(cond)) {                                                 \
-        HandleSyncErrAdapter((env), (errCode), validErrCodes);     \
-        return (retObj);                                           \
-    }                                                              \
 } while (0)
 
 #define NAPI_BT_ASSERT_ERR_RETURN_VERIFY(env, cond, errCode)     \
