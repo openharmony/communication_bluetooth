@@ -59,9 +59,11 @@ ohos_shared_library("cj_bluetooth_hfp_ffi") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "libuv:uv",
     "napi:ace_napi",
     "napi:cj_bind_ffi",
     "napi:cj_bind_native",
+    "node:node_header_notice",
   ]
 
   sources = [

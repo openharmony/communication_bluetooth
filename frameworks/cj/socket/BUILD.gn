@@ -58,9 +58,11 @@ ohos_shared_library("cj_bluetooth_socket_ffi") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "libuv:uv",
     "napi:ace_napi",
     "napi:cj_bind_ffi",
     "napi:cj_bind_native",
+    "node:node_header_notice",
   ]
 
   sources = [
