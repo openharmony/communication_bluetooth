@@ -245,6 +245,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
 
     handleReceivedEvent(data: commonEventManager.CommonEventData) {
         console.info(TAG, 'handleReceivedEvent: ' + data.event);
+        this.startContinuousTask();
         switch (data.event) {
           case 'usual.event.bluetooth.OPP.TAP.ACCEPT': {
               console.info(TAG, 'OPP.TAP.ACCEPT tapEventIsAllowed is ' + this.tapEventIsAllowed);
