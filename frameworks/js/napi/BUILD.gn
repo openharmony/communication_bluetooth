@@ -126,6 +126,7 @@ ohos_shared_library("bluetooth") {
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "libuv:uv",
+    "node:node_header_notice",
     "napi:ace_napi",
   ]
 
@@ -254,6 +255,7 @@ ohos_shared_library("bluetoothmanager") {
     "ipc:ipc_single",
     "libuv:uv",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   if (bluetooth_kia_enable) {
