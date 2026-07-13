@@ -29,7 +29,7 @@ import type { BusinessError } from '@ohos.base';
 import fileUri from '@ohos.file.fileuri';
 import rpc from '@ohos.rpc';
 import { DrawableDescriptor } from '@ohos.arkui.drawableDescriptor';
-import backgroundTaskManager from '@ohos.backgroundTaskManager';
+import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
 import systemParameterEnhance from '@ohos.systemParameterEnhance';
 import PermissionUtils from 'common/PermissionUtils';
 import CommonUtils from 'common/CommonUtils';
@@ -47,6 +47,9 @@ const RESULT_ERROR_CONNECTION_FAILED: number = 5;
 const RESULT_ERROR_TRANSFER_FAILED: number = 6;
 const RESULT_ERROR_UNKNOWN: number = 7;
 const RESULT_SUCCESS_DISCONNECT: number = 9;
+
+const USER_CANCEL_REMOVE_NOTIFICATION: number = 1;
+const SYSTEM_CANCEL_NOT_USE_BLUETOOTH: number = 9;
 
 const STATUS_PENDING: number = 0;
 const STATUS_RUNNING: number = 1;
@@ -128,6 +131,23 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
         console.info(TAG, 'BluetoothReceiveUIAbility onCreate');
         this.readyReceiveEvent();
         this.startContinuousTask();
+        try {
+            backgroundTaskManager.on('continuousTaskCancel',
+                (info: backgroundTaskManager.ContinuousTaskCancelInfo) => {
+                console.info('continuousTaskCancel callback id ' + info.id);
+                console.info('continuousTaskCancel callback reason ' + info.reason);
+                if (info.reason == USER_CANCEL_REMOVE_NOTIFICATION) {
+                    this.oppProfile.setIncomingFileConfirmation(false, -1);
+                    this.oppProfile.cancelTransfer();
+                    this.handleTerminate();
+                } else if (info.reason == SYSTEM_CANCEL_NOT_USE_BLUETOOTH) {
+                    this.startContinuousTask();
+                }
+            });
+        } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            console.error(`Operation onContinuousTaskCancel failed. code ${err.code}, message ${err.message}`);
+        }
         this.timerIdCreate = setTimeout(() => {
             console.info(TAG, 'onCreate 1 second but nothing received');
             this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
@@ -146,6 +166,12 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
 
     handleTerminate() {
         console.info(TAG, 'handleTerminate');
+        try {
+            backgroundTaskManager.off('continuousTaskCancel');
+        } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            console.error(`Operation offContinuousTaskCancel failed. code ${err.code}, message ${err.message}`);
+        }
         this.stopContinuousTask();
         commonEventManager.unsubscribe(this.subscriber);
         this.context.terminateSelf();
@@ -224,7 +250,6 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
 
     handleReceivedEvent(data: commonEventManager.CommonEventData) {
         console.info(TAG, 'handleReceivedEvent: ' + data.event);
-        this.startContinuousTask();
         switch (data.event) {
           case 'usual.event.bluetooth.OPP.TAP.ACCEPT': {
               console.info(TAG, 'OPP.TAP.ACCEPT tapEventIsAllowed is ' + this.tapEventIsAllowed);
