@@ -372,7 +372,7 @@ static void NapiThreadSafeFuncCallJs(napi_env, napi_value jsCallback, void *cont
 
     napi_value result = nullptr;
     uint8_t *bufferData = nullptr;
-    napi_create_arraybuffer(callbackInfo->env_, buffer->len_, (void **)&bufferData, &result);
+    napi_create_arraybuffer(callbackInfo->env_, buffer->len_, reinterpret_cast<void**>(&bufferData), &result);
     if (memcpy_s(bufferData, buffer->len_, buffer->data_.data(), buffer->len_) != EOK) {
         HILOGE("memcpy_s failed!");
         return;
@@ -471,7 +471,7 @@ napi_status CheckSppClientOff(napi_env env, napi_callback_info info)
     NAPI_BT_RETURN_IF(type != REGISTER_SPP_READ_TYPE, "Invalid type.", napi_invalid_arg);
 
     NAPI_BT_RETURN_IF(!ParseInt32(env, id, argv[PARAM1]), "Wrong argument type. Int expected.", napi_invalid_arg);
- 
+
     NAPI_BT_RETURN_IF(NapiSppClient::clientMap.count(id) == KEY_NOT_FOUND, "client is nullptr.", napi_invalid_arg);
     NAPI_BT_RETURN_IF(NapiSppClient::clientMap[id] == nullptr, "client is nullptr.", napi_invalid_arg);
     std::shared_ptr<NapiSppClient> client = NapiSppClient::clientMap[id];

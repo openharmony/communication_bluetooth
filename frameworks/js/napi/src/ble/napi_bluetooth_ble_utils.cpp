@@ -195,7 +195,7 @@ void ConvertBLECharacteristicToJS(napi_env env, napi_value result, GattCharacter
     {
         napi_value value = nullptr;
         uint8_t* bufferData = nullptr;
-        napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &value);
+        napi_create_arraybuffer(env, valueSize, reinterpret_cast<void**>(&bufferData), &value);
         if (valueSize > 0 && memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
             HILOGE("memcpy_s failed");
             return;
@@ -263,7 +263,7 @@ void ConvertBLEDescriptorToJS(napi_env env, napi_value result, GattDescriptor& d
     size_t valueSize;
     uint8_t* valueData = descriptor.GetValue(&valueSize).get();
     uint8_t* bufferData = nullptr;
-    napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &value);
+    napi_create_arraybuffer(env, valueSize, reinterpret_cast<void**>(&bufferData), &value);
     if (memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
         HILOGE("memcpy_s error");
     }
@@ -370,7 +370,7 @@ void ConvertCharacteristicWriteReqToJS(napi_env env, napi_value result, const st
     size_t valueSize;
     uint8_t* valueData = characteristic.GetValue(&valueSize).get();
     uint8_t* bufferData = nullptr;
-    napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &value);
+    napi_create_arraybuffer(env, valueSize, reinterpret_cast<void**>(&bufferData), &value);
     if (memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
         HILOGE("memcpy_s error");
     }
@@ -417,7 +417,7 @@ void ConvertDescriptorWriteReqToJS(napi_env env, napi_value result, const std::s
     size_t valueSize;
     uint8_t* valueData = descriptor.GetValue(&valueSize).get();
     uint8_t* bufferData = nullptr;
-    napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &value);
+    napi_create_arraybuffer(env, valueSize, reinterpret_cast<void**>(&bufferData), &value);
     if (memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
         HILOGE("memcpy_s error");
     }

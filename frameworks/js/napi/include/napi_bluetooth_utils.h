@@ -271,7 +271,7 @@ enum class EnhanceModeOption {
     BLE_SCAN_ENHANCE_MODE_BUTT,
     BLE_SCAN_ENHANCE_MODE_INVALID = 0xFF,
 };
- 
+
 struct ScanEnhanceMode {
     EnhanceModeOption mode = EnhanceModeOption::BLE_SCAN_ENHANCE_MODE_INVALID;
     int64_t timeout = SCAN_ENHANCE_MODE_MAX_TIMEOUT_MS;
@@ -632,7 +632,8 @@ napi_status ConvertDataMapToJS(const napi_env env, NapiMap &dataMapNapi,
             return napi_invalid_arg;
         }
 
-        NAPI_BT_CALL_RETURN(napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &napiBuffer));
+        NAPI_BT_CALL_RETURN(napi_create_arraybuffer(env, valueSize,
+            reinterpret_cast<void**>(&bufferData), &napiBuffer));
         if (memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
             HILOGE("memcpy_s error");
             return napi_invalid_arg;
