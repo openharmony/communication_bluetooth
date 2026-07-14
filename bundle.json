@@ -46,7 +46,8 @@
       "bluetooth_pluggable_supported",
       "bluetooth_bas_feature",
       "bluetooth_pan_feature",
-      "bluetooth_hap_opp_switch_feature"
+      "bluetooth_hap_opp_switch_feature",
+      "bluetooth_hfp_hf_feature_switch"
     ],
     "adapted_system_type": [
       "standard"

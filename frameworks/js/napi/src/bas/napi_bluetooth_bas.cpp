@@ -89,7 +89,7 @@ napi_value NapiBas::GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info 
     auto func = [ret]() {
         return NapiAsyncWorkRet(ret);
     };
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK);
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NEED_CALLBACK);
     NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     bool success = g_basObserver->asyncWorkMap_.TryPush(NapiAsyncType::BAS_GET_BATTERY_LEVEL, asyncWork);
     NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, success, BT_ERR_INTERNAL_ERROR);
