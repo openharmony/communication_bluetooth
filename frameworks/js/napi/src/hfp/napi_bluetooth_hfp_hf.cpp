@@ -23,6 +23,7 @@
 #include "napi_bluetooth_error.h"
 #include "napi_bluetooth_event.h"
 #include "napi_event_subscribe_module.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -31,8 +32,9 @@ using namespace std;
 std::shared_ptr<NapiHandsFreeUnitObserver> NapiHandsFreeUnit::observer_ =
     std::make_shared<NapiHandsFreeUnitObserver>();
 bool NapiHandsFreeUnit::isRegistered_ = false;
+thread_local napi_ref NapiHandsFreeUnit::consRef_ = nullptr;
 
-void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env)
+void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env, napi_value exports)
 {
     napi_value constructor;
     napi_property_descriptor properties[] = {
@@ -51,9 +53,35 @@ void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env)
     napi_define_class(env, "HandsFreeUnit", NAPI_AUTO_LENGTH, HandsFreeUnitConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
 
+#ifdef BLUETOOTH_API_SINCE_10
+    DefineCreateProfile(env, exports);
+    napi_create_reference(env, constructor, 1, &consRef_);
+#else
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_HANDS_FREE_UNIT, napiProfile);
+#endif
+}
+
+napi_value NapiHandsFreeAudioGateway::DefineCreateProfile(napi_env env, napi_value exports)
+{
+    napi_property_descriptor properties[] = {
+        DECLARE_NAPI_FUNCTION("createHfpHfProfile", CreateHfpAgProfile),
+    };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "hfphf:napi_define_properties");
+    napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties);
+    return exports;
+}
+
+napi_value NapiHandsFreeAudioGateway::CreateHfpHfProfile(napi_env env, napi_callback_info info)
+{
+    HILOGI("enter");
+    napi_value napiProfile;
+    napi_value constructor = nullptr;
+    napi_get_reference_value(env, consRef_, &constructor);
+    napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
+    NapiProfile::SetProfile(env, ProfileId::PROFILE_HANDS_FREE_AUDIO_GATEWAY, napiProfile);
+    return napiProfile;
 }
 
 napi_value NapiHandsFreeUnit::HandsFreeUnitConstructor(napi_env env, napi_callback_info info)
