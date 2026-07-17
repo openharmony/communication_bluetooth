@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Bluetooth {
 class NapiHandsFreeUnit {
 public:
-    static void DefineHandsFreeUnitJSClass(napi_env env);
+    static void DefineHandsFreeUnitJSClass(napi_env env, napi_value exports);
     static napi_value HandsFreeUnitConstructor(napi_env env, napi_callback_info info);
 
     static napi_value On(napi_env env, napi_callback_info info);
@@ -37,9 +37,12 @@ public:
     static napi_value ConnectSco(napi_env env, napi_callback_info info);
     static napi_value DisconnectSco(napi_env env, napi_callback_info info);
     static napi_value SendDTMF(napi_env env, napi_callback_info info);
+    static napi_value DefineCreateProfile(napi_env env, napi_value exports);
+    static napi_value CreateHfpHfProfile(napi_env env, napi_callback_info info);
 
     static std::shared_ptr<NapiHandsFreeUnitObserver> observer_;
     static bool isRegistered_;
+    static thread_local napi_ref consRef_;
 };
 
 }  // namespace Bluetooth
