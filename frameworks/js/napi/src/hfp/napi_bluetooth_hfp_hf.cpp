@@ -63,7 +63,7 @@ void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env, napi_value expo
 #endif
 }
 
-napi_value NapiHandsFreeAudioGateway::DefineCreateProfile(napi_env env, napi_value exports)
+napi_value NapiHandsFreeUnit::DefineCreateProfile(napi_env env, napi_value exports)
 {
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("createHfpHfProfile", CreateHfpAgProfile),
@@ -73,7 +73,7 @@ napi_value NapiHandsFreeAudioGateway::DefineCreateProfile(napi_env env, napi_val
     return exports;
 }
 
-napi_value NapiHandsFreeAudioGateway::CreateHfpHfProfile(napi_env env, napi_callback_info info)
+napi_value NapiHandsFreeUnit::CreateHfpHfProfile(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
     napi_value napiProfile;
