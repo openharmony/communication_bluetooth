@@ -66,7 +66,7 @@ static napi_value Init(napi_env env, napi_value exports)
     DefineSppFunctions(env, exports);
     NapiProfile::DefineProfileFunctions(env, exports);
     NapiHandsFreeAudioGateway::DefineHandsFreeAudioGatewayJSClass(env, exports);
-    NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(env);
+    NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(env, exports);
 
     NapiAccess::DefineAccessJSFunction(env, exports);
     DefineConnectionFunctions(env, exports);
