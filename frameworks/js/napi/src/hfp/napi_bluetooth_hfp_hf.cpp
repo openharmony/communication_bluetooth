@@ -80,7 +80,7 @@ napi_value NapiHandsFreeUnit::CreateHfpHfProfile(napi_env env, napi_callback_inf
     napi_value constructor = nullptr;
     napi_get_reference_value(env, consRef_, &constructor);
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
-    NapiProfile::SetProfile(env, ProfileId::PROFILE_HANDS_FREE_AUDIO_GATEWAY, napiProfile);
+    NapiProfile::SetProfile(env, ProfileId::PROFILE_HANDS_FREE_UNIT, napiProfile);
     return napiProfile;
 }
 
