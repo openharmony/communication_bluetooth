@@ -75,7 +75,6 @@ napi_value NapiHandsFreeUnit::DefineCreateProfile(napi_env env, napi_value expor
 
 napi_value NapiHandsFreeUnit::CreateHfpHfProfile(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
     napi_value napiProfile;
     napi_value constructor = nullptr;
     napi_get_reference_value(env, consRef_, &constructor);
