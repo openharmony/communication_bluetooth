@@ -38,6 +38,7 @@ ohos_shared_library("cj_bluetooth_a2dp_ffi") {
     ubsan = true  # Enable some Ubsan options
     debug = false
   }
+  branch_protector_ret = "pac_ret"
 
   if (!defined(defines)) {
     defines = []
