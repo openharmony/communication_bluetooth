@@ -1441,6 +1441,7 @@ int32_t BluetoothHost::UpdateCloudBluetoothDevice(const std::vector<TrustPairDev
         trustPairDevice.SetBluetoothClass(devParam.bluetoothClass_);
         trustPairDevice.SetToken(devParam.token_);
         trustPairDevice.SetSecureAdvertisingInfo(devParam.secureAdvertisingInfo_);
+        trustPairDevice.SetProductId(devParam.productId_);
         HILOGI("[CLOUD_DEV] UpdateCloudBluetoothDevice add device: %{public}s",
             GetEncryptAddr(trustPairDevice.GetMacAddress()).c_str());
         cloudDevicesVec.emplace_back(trustPairDevice);
