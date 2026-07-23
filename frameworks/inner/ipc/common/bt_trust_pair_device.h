@@ -47,6 +47,9 @@ public:
 
     void SetSecureAdvertisingInfo(const std::vector<uint8_t> &randomDeviceInfo);
     std::vector<uint8_t> GetSecureAdvertisingInfo();
+
+    void SetProductId(const std::string &productId);
+    std::string GetProductId() const;
 protected:
     std::string sn_{""};
     std::string deviceType_{""};
