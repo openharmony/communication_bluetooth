@@ -64,6 +64,7 @@ ohos_shared_library("cj_bluetooth_hfp_ffi") {
     "napi:cj_bind_ffi",
     "napi:cj_bind_native",
     "node:node_header_notice",
+    "bounds_checking_function:libsec_shared",
   ]
 
   sources = [
