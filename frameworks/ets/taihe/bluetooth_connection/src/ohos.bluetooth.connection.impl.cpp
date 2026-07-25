@@ -742,21 +742,16 @@ namespace {
 constexpr size_t TAIHE_OOB_C_SIZE = 16;
 constexpr size_t TAIHE_OOB_R_SIZE = 16;
 constexpr size_t TAIHE_OOB_NAME_MAX_SIZE = 256;
+constexpr size_t HEX_BYTES_PER_BYTE = 2;
+constexpr int HEX_RADIX = 16;
 
-bool TaiheBuildOobDataFromTaihe(const ::ohos::bluetooth::connection::OobData &src, int32_t transport,
-    OobData &outData)
+bool TaiheExtractAddress(const ::ohos::bluetooth::connection::OobData &src, int32_t transport,
+    std::vector<uint8_t> &addressWithType)
 {
     ::taihe::string_view addrView(src.device_id);
     std::string addrStr = std::string{std::string_view{addrView}};
     if (!IsValidAddress(addrStr)) {
         HILOGE("Invalid oobData deviceId");
-        return false;
-    }
-
-    std::vector<uint8_t> confirmHash {};
-    ParseArrayBufferParams(src.confirmation_hash, confirmHash);
-    if (confirmHash.size() != TAIHE_OOB_C_SIZE) {
-        HILOGE("confirmationHash size should be 16");
         return false;
     }
 
@@ -768,38 +763,61 @@ bool TaiheBuildOobDataFromTaihe(const ::ohos::bluetooth::connection::OobData &sr
         addressInfo.SetRawAddressType(RawAddressType::RANDOM_ADDRESS);
     }
 
-    std::vector<uint8_t> addressWithType {};
     std::string hexAddrStr = addrStr;
     hexAddrStr.erase(std::remove(hexAddrStr.begin(), hexAddrStr.end(), ':'), hexAddrStr.end());
-    for (size_t i = 0; i + 1 < hexAddrStr.length(); i += 2) {
-        uint8_t byte = static_cast<uint8_t>(std::stoi(hexAddrStr.substr(i, 2), nullptr, 16));
+    for (size_t i = 0; i + 1 < hexAddrStr.length(); i += HEX_BYTES_PER_BYTE) {
+        uint8_t byte = static_cast<uint8_t>(
+            std::stoi(hexAddrStr.substr(i, HEX_BYTES_PER_BYTE), nullptr, HEX_RADIX));
         addressWithType.push_back(byte);
     }
     addressWithType.push_back(addressInfo.GetRawAddressType());
+    return true;
+}
 
-    outData.SetAddressWithType(addressWithType);
-    outData.SetConfirmationHash(confirmHash);
-
-    if (src.randomizer_hash.has_value()) {
-        std::vector<uint8_t> randomHash {};
-        ParseArrayBufferParams(src.randomizer_hash.value(), randomHash);
-        if (randomHash.size() != TAIHE_OOB_R_SIZE) {
-            HILOGE("randomizerHash size should be 16");
-            return false;
-        }
-        outData.SetRandomizerHash(randomHash);
+bool TaiheExtractConfirmationHash(const ::ohos::bluetooth::connection::OobData &src,
+    std::vector<uint8_t> &confirmHash)
+{
+    ParseArrayBufferParams(src.confirmation_hash, confirmHash);
+    if (confirmHash.size() != TAIHE_OOB_C_SIZE) {
+        HILOGE("confirmationHash size should be %{public}zu", TAIHE_OOB_C_SIZE);
+        return false;
     }
+    return true;
+}
 
-    if (src.device_name.has_value()) {
-        ::taihe::string_view nameView(src.device_name.value());
-        std::string deviceName = std::string{std::string_view{nameView}};
-        if (deviceName.empty() || deviceName.length() > TAIHE_OOB_NAME_MAX_SIZE) {
-            HILOGE("deviceName length invalid");
-            return false;
-        }
-        outData.SetDeviceName(deviceName);
+bool TaiheExtractOptionalRandomizerHash(const ::ohos::bluetooth::connection::OobData &src,
+    OobData &outData)
+{
+    if (!src.randomizer_hash.has_value()) {
+        return true;
     }
+    std::vector<uint8_t> randomHash {};
+    ParseArrayBufferParams(src.randomizer_hash.value(), randomHash);
+    if (randomHash.size() != TAIHE_OOB_R_SIZE) {
+        HILOGE("randomizerHash size should be %{public}zu", TAIHE_OOB_R_SIZE);
+        return false;
+    }
+    outData.SetRandomizerHash(randomHash);
+    return true;
+}
 
+bool TaiheExtractOptionalDeviceName(const ::ohos::bluetooth::connection::OobData &src, OobData &outData)
+{
+    if (!src.device_name.has_value()) {
+        return true;
+    }
+    ::taihe::string_view nameView(src.device_name.value());
+    std::string deviceName = std::string{std::string_view{nameView}};
+    if (deviceName.empty() || deviceName.length() > TAIHE_OOB_NAME_MAX_SIZE) {
+        HILOGE("deviceName length invalid");
+        return false;
+    }
+    outData.SetDeviceName(deviceName);
+    return true;
+}
+
+bool TaiheExtractDeviceRole(const ::ohos::bluetooth::connection::OobData &src, OobData &outData)
+{
     int32_t deviceRole = src.device_role;
     if (deviceRole < static_cast<int32_t>(LeDeviceRole::DEVICE_ROLE_PERIPHERAL_ONLY) ||
         deviceRole > static_cast<int32_t>(LeDeviceRole::DEVICE_ROLE_BOTH_PREFER_CENTRAL)) {
@@ -807,6 +825,29 @@ bool TaiheBuildOobDataFromTaihe(const ::ohos::bluetooth::connection::OobData &sr
         return false;
     }
     outData.SetDeviceRole(static_cast<uint8_t>(deviceRole));
+    return true;
+}
+
+bool TaiheBuildOobDataFromTaihe(const ::ohos::bluetooth::connection::OobData &src, int32_t transport,
+    OobData &outData)
+{
+    std::vector<uint8_t> confirmHash {};
+    if (!TaiheExtractConfirmationHash(src, confirmHash)) {
+        return false;
+    }
+
+    std::vector<uint8_t> addressWithType {};
+    if (!TaiheExtractAddress(src, transport, addressWithType)) {
+        return false;
+    }
+    outData.SetAddressWithType(addressWithType);
+    outData.SetConfirmationHash(confirmHash);
+
+    if (!TaiheExtractOptionalRandomizerHash(src, outData) ||
+        !TaiheExtractOptionalDeviceName(src, outData) ||
+        !TaiheExtractDeviceRole(src, outData)) {
+        return false;
+    }
     return true;
 }
 }  // namespace
