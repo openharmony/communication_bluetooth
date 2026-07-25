@@ -21,8 +21,11 @@
 #include "ohos.bluetooth.connection.impl.hpp"
 #include "taihe/runtime.hpp"
 #include "stdexcept"
+#include "algorithm"
 #include "bluetooth_remote_device.h"
 #include "bluetooth_host.h"
+#include "bluetooth_oob_data.h"
+#include "bluetooth_address_info.h"
 #include "bluetooth_log.h"
 #include "bluetooth_errorcode.h"
 #include "taihe_bluetooth_connection_callback.h"
@@ -734,6 +737,115 @@ void PairCredibleDeviceSync(taihe::string_view deviceId, ohos::bluetooth::connec
     HILOGI("err: %{public}d", err);
     TAIHE_BT_ASSERT_RETURN_VOID(err == BT_NO_ERROR, err);
 }
+
+namespace {
+constexpr size_t TAIHE_OOB_C_SIZE = 16;
+constexpr size_t TAIHE_OOB_R_SIZE = 16;
+constexpr size_t TAIHE_OOB_NAME_MAX_SIZE = 256;
+
+bool TaiheBuildOobDataFromTaihe(const ::ohos::bluetooth::connection::OobData &src, int32_t transport,
+    OobData &outData)
+{
+    ::taihe::string_view addrView(src.device_id);
+    std::string addrStr = std::string{std::string_view{addrView}};
+    if (!IsValidAddress(addrStr)) {
+        HILOGE("Invalid oobData deviceId");
+        return false;
+    }
+
+    std::vector<uint8_t> confirmHash {};
+    ParseArrayBufferParams(src.confirmation_hash, confirmHash);
+    if (confirmHash.size() != TAIHE_OOB_C_SIZE) {
+        HILOGE("confirmationHash size should be 16");
+        return false;
+    }
+
+    AddressInfo addressInfo;
+    addressInfo.SetAddress(addrStr);
+    if (transport == BT_TRANSPORT_BREDR) {
+        addressInfo.SetRawAddressType(RawAddressType::PUBLIC_ADDRESS);
+    } else {
+        addressInfo.SetRawAddressType(RawAddressType::RANDOM_ADDRESS);
+    }
+
+    std::vector<uint8_t> addressWithType {};
+    std::string hexAddrStr = addrStr;
+    hexAddrStr.erase(std::remove(hexAddrStr.begin(), hexAddrStr.end(), ':'), hexAddrStr.end());
+    for (size_t i = 0; i + 1 < hexAddrStr.length(); i += 2) {
+        uint8_t byte = static_cast<uint8_t>(std::stoi(hexAddrStr.substr(i, 2), nullptr, 16));
+        addressWithType.push_back(byte);
+    }
+    addressWithType.push_back(addressInfo.GetRawAddressType());
+
+    outData.SetAddressWithType(addressWithType);
+    outData.SetConfirmationHash(confirmHash);
+
+    if (src.randomizer_hash.has_value()) {
+        std::vector<uint8_t> randomHash {};
+        ParseArrayBufferParams(src.randomizer_hash.value(), randomHash);
+        if (randomHash.size() != TAIHE_OOB_R_SIZE) {
+            HILOGE("randomizerHash size should be 16");
+            return false;
+        }
+        outData.SetRandomizerHash(randomHash);
+    }
+
+    if (src.device_name.has_value()) {
+        ::taihe::string_view nameView(src.device_name.value());
+        std::string deviceName = std::string{std::string_view{nameView}};
+        if (deviceName.empty() || deviceName.length() > TAIHE_OOB_NAME_MAX_SIZE) {
+            HILOGE("deviceName length invalid");
+            return false;
+        }
+        outData.SetDeviceName(deviceName);
+    }
+
+    int32_t deviceRole = src.device_role;
+    if (deviceRole < static_cast<int32_t>(LeDeviceRole::DEVICE_ROLE_PERIPHERAL_ONLY) ||
+        deviceRole > static_cast<int32_t>(LeDeviceRole::DEVICE_ROLE_BOTH_PREFER_CENTRAL)) {
+        HILOGE("invalid deviceRole");
+        return false;
+    }
+    outData.SetDeviceRole(static_cast<uint8_t>(deviceRole));
+    return true;
+}
+}  // namespace
+
+void StartPairOutOfBandSync(taihe::string_view deviceId, ohos::bluetooth::connection::BluetoothTransport transport,
+    ::taihe::optional<::ohos::bluetooth::connection::OobData> p192Data,
+    ::taihe::optional<::ohos::bluetooth::connection::OobData> p256Data)
+{
+    HILOGD("enter");
+    std::string remoteAddr = std::string(deviceId);
+    int transportType = transport.get_value();
+    bool checkRet = CheckPairCredibleDeviceParam(remoteAddr, transportType);
+    TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
+
+    bool hasP192 = p192Data.has_value();
+    bool hasP256 = p256Data.has_value();
+    if (!hasP192 && !hasP256) {
+        HILOGE("At least one oobData should be given");
+        TAIHE_BT_ASSERT_RETURN_VOID(false, BT_ERR_INVALID_PARAM);
+    }
+
+    OobData oobData;
+    if (hasP256) {
+        if (!TaiheBuildOobDataFromTaihe(p256Data.value(), transportType, oobData)) {
+            TAIHE_BT_ASSERT_RETURN_VOID(false, BT_ERR_INVALID_PARAM);
+        }
+        oobData.SetOobDataType(OobDataType::P256);
+    } else {
+        if (!TaiheBuildOobDataFromTaihe(p192Data.value(), transportType, oobData)) {
+            TAIHE_BT_ASSERT_RETURN_VOID(false, BT_ERR_INVALID_PARAM);
+        }
+        oobData.SetOobDataType(OobDataType::P192);
+    }
+
+    BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
+    int32_t err = remoteDevice.StartPairOutOfBand(oobData);
+    HILOGI("startPairOutOfBand err: %{public}d", err);
+    TAIHE_BT_ASSERT_RETURN_VOID(err == BT_NO_ERROR, err);
+}
 }  // Bluetooth
 }  // OHOS
 
@@ -778,4 +890,5 @@ TH_EXPORT_CPP_API_SetDevicePinCodeSync(OHOS::Bluetooth::SetDevicePinCodeSync);
 TH_EXPORT_CPP_API_CancelPairingDeviceSync(OHOS::Bluetooth::CancelPairingDeviceSync);
 TH_EXPORT_CPP_API_CancelPairedDeviceSync(OHOS::Bluetooth::CancelPairedDeviceSync);
 TH_EXPORT_CPP_API_PairCredibleDeviceSync(OHOS::Bluetooth::PairCredibleDeviceSync);
+TH_EXPORT_CPP_API_StartPairOutOfBandSync(OHOS::Bluetooth::StartPairOutOfBandSync);
 // NOLINTEND

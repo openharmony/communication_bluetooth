@@ -270,3 +270,16 @@ function CancelPairedDeviceSync(deviceId: String): void;
 @gen_async("pairCredibleDevice")
 @gen_promise("pairCredibleDevice")
 function PairCredibleDeviceSync(deviceId: String, transport: BluetoothTransport): void;
+
+struct OobData {
+    device_id: String;
+    confirmation_hash: @arraybuffer Array<u8>;
+    randomizer_hash: Optional<@arraybuffer Array<u8>>;
+    device_name: Optional<String>;
+    device_role: i32;
+}
+
+@gen_async("startPairOutOfBand")
+@gen_promise("startPairOutOfBand")
+function StartPairOutOfBandSync(deviceId: String, transport: BluetoothTransport,
+    p192Data: Optional<OobData>, p256Data: Optional<OobData>): void;
