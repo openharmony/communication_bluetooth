@@ -23,4 +23,4 @@
 ```
 
 - 异步接口`Promise`接口使用`NapiAsyncWorkFactory`实现，使用宏 `CREATE_ASYNC_WORK_WITH_CONTEXT`。
-- 新接口使用`NAPI_BT_ASSERT_*NUM*`的宏对外抛异常。
+- 新接口不允许使用不带 `NUM` 的 `NAPI_BT_ASSERT`的宏。

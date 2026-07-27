@@ -770,7 +770,7 @@ napi_status ParseUint8ArrayParam(napi_env env, napi_value array, std::vector<uin
     NAPI_BT_CALL_RETURN(napi_get_typedarray_info(env, array, &type, &dataLen, &data, &arrayBuffer, &offset));
     NAPI_BT_RETURN_IF(type != napi_typedarray_type::napi_uint8_array, "Wrong argument type, uint8array expected",
         napi_invalid_arg);
-    uint8_t *dataPtr = reinterpret_cast<uint8_t *>(data) + offset;
+    uint8_t *dataPtr = reinterpret_cast<uint8_t *>(data);
     std::vector<uint8_t> initDataStr(dataPtr, dataPtr + dataLen);
     outParam.assign(initDataStr.begin(), initDataStr.end());
     return napi_ok;

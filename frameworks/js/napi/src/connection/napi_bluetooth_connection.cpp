@@ -832,8 +832,8 @@ napi_status CheckStartPairDeviceOobParam(napi_env env, napi_callback_info info, 
     NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
     NAPI_BT_RETURN_IF(argc < ARGS_SIZE_TWO || argc > ARGS_SIZE_FOUR, "Requires 2 to 4 arguments", napi_invalid_arg);
 
-    NAPI_BT_RETURN_IF(!ParseString(env, deviceId, argv[PARAM_DEVICE_ID]), "Parse deviceId failed", napi_invalid_arg);
-    NAPI_BT_RETURN_IF(!IsValidAddress(deviceId), "Invalid deviceId", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(NapiParseBdAddr(env, argv[PARAM_DEVICE_ID], deviceId) != napi_ok,
+        "Parse deviceId failed", napi_invalid_arg);
 
     NAPI_BT_RETURN_IF(!ParseInt32(env, transport, argv[PARAM_TRANSPORT]), "Parse transport failed", napi_invalid_arg);
     NAPI_BT_RETURN_IF(!IsValidTransport(transport), "invalid transport", napi_invalid_arg);
@@ -870,7 +870,7 @@ napi_value StartPairOutOfBand(napi_env env, napi_callback_info info)
     OobData oobData;
     int32_t transport = BT_TRANSPORT_NONE;
     auto checkRet = CheckStartPairDeviceOobParam(env, info, deviceId, addressInfo, transport, oobData);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
     auto func = [deviceId, oobData]() {
         BluetoothRemoteDevice remoteDevice(deviceId);
         int32_t err = remoteDevice.StartPairOutOfBand(oobData);
@@ -878,7 +878,7 @@ napi_value StartPairOutOfBand(napi_env env, napi_callback_info info)
         return NapiAsyncWorkRet(err);
     };
     auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
 }
