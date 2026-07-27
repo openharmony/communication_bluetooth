@@ -637,6 +637,14 @@ napi_status NapiIsNull(napi_env env, napi_value value)
     return napi_ok;
 }
 
+napi_status NapiIsUndefined(napi_env env, napi_value value)
+{
+    napi_valuetype valuetype = napi_undefined;
+    NAPI_BT_CALL_RETURN(napi_typeof(env, value, &valuetype));
+    NAPI_BT_RETURN_IF(valuetype != napi_undefined, "Wrong argument type. Undefined expected.", napi_invalid_arg);
+    return napi_ok;
+}
+
 napi_status ParseNumberParams(napi_env env, napi_value object, const char *name, bool &outExist,
     napi_value &outParam)
 {

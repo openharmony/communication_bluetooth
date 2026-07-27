@@ -840,10 +840,10 @@ napi_status CheckStartPairDeviceOobParam(napi_env env, napi_callback_info info, 
 
     bool hasP192 = false;
     bool hasP256 = false;
-    if (argc >= ARGS_SIZE_THREE && NapiIsNull(env, argv[PARAM_P192]) != napi_ok) {
+    if (argc >= ARGS_SIZE_THREE && NapiIsUndefined(env, argv[PARAM_P192]) != napi_ok) {
         hasP192 = true;
     }
-    if (argc == ARGS_SIZE_FOUR && NapiIsNull(env, argv[PARAM_P256]) != napi_ok) {
+    if (argc == ARGS_SIZE_FOUR && NapiIsUndefined(env, argv[PARAM_P256]) != napi_ok) {
         hasP256 = true;
     }
     NAPI_BT_RETURN_IF(!hasP192 && !hasP256, "At least one oobData should be given", napi_invalid_arg);
