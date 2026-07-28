@@ -66,7 +66,7 @@ void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env, napi_value expo
 napi_value NapiHandsFreeUnit::DefineCreateProfile(napi_env env, napi_value exports)
 {
     napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("createHfpHfProfile", CreateHfpAgProfile),
+        DECLARE_NAPI_FUNCTION("createHfpHfProfile", CreateHfpHfProfile),
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "hfphf:napi_define_properties");
     napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties);
@@ -75,7 +75,6 @@ napi_value NapiHandsFreeUnit::DefineCreateProfile(napi_env env, napi_value expor
 
 napi_value NapiHandsFreeUnit::CreateHfpHfProfile(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
     napi_value napiProfile;
     napi_value constructor = nullptr;
     napi_get_reference_value(env, consRef_, &constructor);

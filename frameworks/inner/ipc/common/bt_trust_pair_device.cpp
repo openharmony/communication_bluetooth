@@ -86,5 +86,15 @@ std::vector<uint8_t> TrustPairDevice::GetSecureAdvertisingInfo()
 {
     return secureAdvertisingInfo_;
 }
+
+void TrustPairDevice::SetProductId(const std::string &productId)
+{
+    productId_ = productId;
+}
+
+std::string TrustPairDevice::GetProductId() const
+{
+    return productId_;
+}
 }  // namespace bluetooth
 }  // namespace OHOS

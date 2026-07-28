@@ -42,6 +42,7 @@ ohos_shared_library("cj_bluetooth_connection_ffi") {
     ubsan = true  # Enable some Ubsan options
     debug = false
   }
+  branch_protector_ret = "pac_ret"
 
   include_dirs = [
     "$BT_CJ_DIR/include",
