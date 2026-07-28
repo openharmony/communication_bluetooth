@@ -571,6 +571,7 @@ napi_status NapiIsArray(napi_env env, napi_value value);
 napi_status NapiIsArrayBuffer(napi_env env, napi_value value);
 napi_status NapiIsObject(napi_env env, napi_value value);
 napi_status NapiIsNull(napi_env env, napi_value value);
+napi_status NapiIsUndefined(napi_env env, napi_value value);
 napi_status ParseNumberParams(napi_env env, napi_value object, const char *name, bool &outExist, napi_value &outParam);
 napi_status ParseInt32Params(napi_env env, napi_value object, const char *name, bool &outExist, int32_t &outParam);
 napi_status ParseUint32Params(napi_env env, napi_value object, const char *name, bool &outExist, uint32_t &outParam);

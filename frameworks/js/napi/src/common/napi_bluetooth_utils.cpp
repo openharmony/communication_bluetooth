@@ -637,6 +637,14 @@ napi_status NapiIsNull(napi_env env, napi_value value)
     return napi_ok;
 }
 
+napi_status NapiIsUndefined(napi_env env, napi_value value)
+{
+    napi_valuetype valuetype = napi_undefined;
+    NAPI_BT_CALL_RETURN(napi_typeof(env, value, &valuetype));
+    NAPI_BT_RETURN_IF(valuetype != napi_undefined, "Wrong argument type. Undefined expected.", napi_invalid_arg);
+    return napi_ok;
+}
+
 napi_status ParseNumberParams(napi_env env, napi_value object, const char *name, bool &outExist,
     napi_value &outParam)
 {
@@ -762,7 +770,7 @@ napi_status ParseUint8ArrayParam(napi_env env, napi_value array, std::vector<uin
     NAPI_BT_CALL_RETURN(napi_get_typedarray_info(env, array, &type, &dataLen, &data, &arrayBuffer, &offset));
     NAPI_BT_RETURN_IF(type != napi_typedarray_type::napi_uint8_array, "Wrong argument type, uint8array expected",
         napi_invalid_arg);
-    uint8_t *dataPtr = reinterpret_cast<uint8_t *>(data) + offset;
+    uint8_t *dataPtr = reinterpret_cast<uint8_t *>(data);
     std::vector<uint8_t> initDataStr(dataPtr, dataPtr + dataLen);
     outParam.assign(initDataStr.begin(), initDataStr.end());
     return napi_ok;
