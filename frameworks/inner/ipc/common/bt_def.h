@@ -1891,7 +1891,8 @@ enum DeviceInfoType {
     DEVICE_PRODUCT_ID = 1,
     DEVICE_MODEL_ID = 2,
     DEVICE_CUSTOM_TYPE = 3,
-    DEVICE_DEVICE_OF_TYPE = 4
+    DEVICE_DEVICE_OF_TYPE = 4,
+    DEVICE_MANUFACTURER_DATA = 5
 };
 
 enum BluetoothSensingEventId : uint8_t {
