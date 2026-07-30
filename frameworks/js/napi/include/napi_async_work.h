@@ -49,6 +49,7 @@ enum NapiAsyncType : int {
     BLE_DISABLE_ADVERTISING,
     GENERATE_LOCAL_OOB_DATA,
     BAS_GET_BATTERY_LEVEL,
+    GATT_CLIENT_MTU_CHANGED,
 };
 
 static constexpr bool ASYNC_WORK_NEED_CALLBACK = true;
