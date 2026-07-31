@@ -106,6 +106,9 @@ static std::map<int32_t, int32_t> innerToBusinessErrCodeMap {
     { BtErrCode::BT_ERR_SERVICE_MAX_CONNECTION, BtErrCode::BT_ERR_INTERNAL_ERROR },
     { BtErrCode::BT_ERR_DEVICE_HAS_CONNECTED, BtErrCode::BT_ERR_INTERNAL_ERROR },
     { BtErrCode::BT_ERR_DEVICE_IS_NOT_CONNECTED, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_GATT_PREPARE_QUEUE_FULL, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_GATT_REMOTE_DEVICE_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_CHARACTER_VALUE_ERROR, BtErrCode::BT_ERR_INVALID_PARAM },
 };
 
 static std::map<int32_t, std::string> innerErrMsgMap {
@@ -118,7 +121,7 @@ static std::map<int32_t, std::string> innerErrMsgMap {
     { BtErrCode::BT_ERR_AUDIO_SERVER_PERMISSION_FAILED, "Only for audio_server." },
     { BtErrCode::BT_ERR_API_PERMISSION_FAILED, "Api version is unsupported." },
     { BtErrCode::BT_ERR_MULTI_PERMISSION_FAILED, "Multiple permission denied." },
-    { BtErrCode::BT_ERR_INVALID_PARAM_ERROR, "Invalid parameter." },
+    { BtErrCode::BT_ERR_INVALID_PARAM_ERROR, "Operation failed. Invalid parameter." },
     { BtErrCode::BT_ERR_GATT_CHARACTER_ERROR, "Operation failed. GATT character is nullptr." },
     { BtErrCode::BT_ERR_ASYNCWORK_EXIST,
         "Operation failed. Please call the interface only after the previous callback has been completed." },
@@ -129,8 +132,9 @@ static std::map<int32_t, std::string> innerErrMsgMap {
     { BtErrCode::BT_ERR_CLOUD_DEVICE_BONDING, "Operation failed. Cloud device is bonding." },
     { BtErrCode::BT_ERR_DISCOVERY_STATE_ERROR, "Operation failed. In DISCOVERYING or DISCOVERY_STARTED state." },
     { BtErrCode::BT_ERR_CHARACTER_VALUE_ERROR,
-        "Invalid parameter. CharacteristicValue is null or length of characteristicValue is zero." },
-    { BtErrCode::BT_ERR_BLE_SCAN_NO_RESOURCE, "Fails to start scan as it is out of hardware resources."},
+        "Invalid parameter. CharacteristicValue is not a valid arraybuffer." },
+    { BtErrCode::BT_ERR_BLE_SCAN_NO_RESOURCE,
+        "Operation failed. Fails to start scan as it is out of hardware resources."},
     { BtErrCode::BT_ERR_GATT_CONNECT_STATE_ERROR, "Operation failed. GATT not in connected state." },
     { BtErrCode::BT_ERR_IS_DISCOVERING, "Operation failed. Not allowed to connect during scanning." },
     { BtErrCode::BT_ERR_ADDRESS_OR_TRANSPORT_ERROR, "Operation failed. Invalid bluetooth addr or transport type." },
@@ -138,6 +142,8 @@ static std::map<int32_t, std::string> innerErrMsgMap {
     { BtErrCode::BT_ERR_SERVICE_MAX_CONNECTION, "Operation failed. Max connections has reached." },
     { BtErrCode::BT_ERR_DEVICE_HAS_CONNECTED, "Operation failed. This device has connected." },
     { BtErrCode::BT_ERR_DEVICE_IS_NOT_CONNECTED, "Operation failed. This device isn't connected." },
+    { BtErrCode::BT_ERR_GATT_PREPARE_QUEUE_FULL, "Operation failed. The prepare write queue of GATT server is full." },
+    { BtErrCode::BT_ERR_GATT_REMOTE_DEVICE_ERROR, "Operation failed. Remote device has an error." },
 };
 
 bool IsInnerErrorCode(int32_t errCode)
