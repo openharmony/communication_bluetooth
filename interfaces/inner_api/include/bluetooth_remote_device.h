@@ -286,6 +286,16 @@ public:
     int GetDeviceProductId(std::string &prodcutId) const;
 
     /**
+    * @brief Get the manufacturer specific data of a remote device.
+    *
+    * @param[out] manufacturerData The manufacturer specific data.
+    * @return Returns <b>BT_NO_ERROR</b> if the opration is successful;
+    *         returns <b>Other code</b> if the operation fails;
+    * @since 26
+    */
+    int32_t GetDeviceManufacturerData(std::vector<uint8_t> &manufacturerData) const;
+
+    /**
      * @brief Get device uuids.
      *
      * @return Returns device uuids;
