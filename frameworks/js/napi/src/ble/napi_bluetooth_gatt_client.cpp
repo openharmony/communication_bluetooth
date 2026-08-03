@@ -72,6 +72,8 @@ const std::vector<std::pair<int, int>> NapiGattClient::g_gattStatusSrvToNapi = {
     { Bluetooth::BT_ERR_GATT_CONNECTION_NOT_ENCRYPTED,        INSUFFICIENT_ENCRYPTION },
     { Bluetooth::BT_ERR_GATT_CONNECTION_NOT_AUTHENTICATED,    AUTHENTICATION_FAILED },
     { Bluetooth::BT_ERR_GATT_CONNECTION_NOT_AUTHORIZED,       INSUFFICIENT_AUTHORIZATION },
+    { Bluetooth::BT_ERR_GATT_PREPARE_QUEUE_FULL,              PREPARE_QUEUE_FULL },
+    { Bluetooth::BT_ERR_GATT_REMOTE_DEVICE_ERROR,             REMOTE_DEVICE_ERROR },
 };
 
 static napi_status ParseGattClientOptions(napi_env env, napi_value optionsArg, bool &autoConnect, int32_t &transport)
@@ -872,6 +874,7 @@ napi_value NapiGattClient::WriteCharacteristicValueCommon(napi_env env, napi_cal
 
     std::vector<uint8_t> value {};
     auto status = CheckWriteCharacteristicValueEx(env, info, &character, &client, value);
+    NAPI_BT_ASSERT_RETURN_FALSE_VERIFY(env, status != napi_arraybuffer_expected, BT_ERR_CHARACTER_VALUE_ERROR);
     NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok && character && client, BT_ERR_INVALID_PARAM);
     if (isWithContext) {
         NAPI_BT_ASSERT_RETURN_UNDEF(env, character->GetWriteType() == GattCharacteristic::WriteType::DEFAULT,
