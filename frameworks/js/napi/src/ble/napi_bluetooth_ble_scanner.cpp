@@ -88,7 +88,7 @@ static NapiBleScanner *NapiGetBleScanner(napi_env env, napi_callback_info info)
     }
 
     NapiBleScanner *bleScanner = nullptr;
-    auto status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&bleScanner));
+    auto status = napi_unwrap(env, thisVar, reinterpret_cast<void**>(&bleScanner));
     if (status != napi_ok) {
         return nullptr;
     }
