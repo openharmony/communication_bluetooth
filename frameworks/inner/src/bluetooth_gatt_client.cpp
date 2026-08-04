@@ -761,7 +761,7 @@ int GattClient::DiscoverServices()
     std::lock_guard<std::mutex> lck(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
         HILOGE("Request not supported");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_GATT_CONNECT_STATE_ERROR;
     }
     return pimpl->DiscoverStart();
 }

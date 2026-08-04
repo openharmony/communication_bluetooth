@@ -48,8 +48,47 @@ do {                                                      \
 } while (0)
 #endif
 
+// verify error code
+#define TAIHE_BT_ASSERT_RETURN_VERIFY(cond, errCode, retObj)       \
+do {                                                               \
+    std::vector<int32_t> validErrCodes = apiContext.validErrCodes; \
+    if (!(cond)) {                                                 \
+        HandleSyncErrAdapter((errCode), validErrCodes);            \
+        return (retObj);                                           \
+    }                                                              \
+} while (0)
+
+#define TAIHE_BT_ASSERT_RETURN_VOID_VERIFY(cond, errCode)          \
+do {                                                               \
+    std::vector<int32_t> validErrCodes = apiContext.validErrCodes; \
+    if (!(cond)) {                                                 \
+        HandleSyncErrAdapter((errCode), validErrCodes);            \
+    }                                                              \
+} while (0)
+
+struct ApiContext {
+    std::vector<int32_t> validErrCodes {};
+};
+
+#ifndef TAIHE_BT_CONTEXT_WITHOUT_HA
+#define TAIHE_BT_CONTEXT_WITHOUT_HA(validErrCodes)     \
+ApiContext apiContext = ApiContext{                    \
+    validErrCodes                                      \
+}
+#endif
+
 std::string GetTaiheErrMsg(const int32_t errCode);
 void HandleSyncErr(int32_t errCode);
+void HandleSyncErrWithValidCodes(int32_t errCode, const std::vector<int32_t> &validErrCodes);
+void HandleSyncErrAdapter(int32_t errCode, std::vector<int32_t> &validErrCodes);
+bool IsInnerErrorCode(int32_t errCode);
+
+struct ErrInfo {
+    int32_t errCode;
+    std::string errMsg;
+};
+void ConvertInnerToBusinessErrCode(int32_t innerCode, ErrInfo &info);
+ErrInfo ProcessErrCode(int32_t originalCode, const std::vector<int32_t> &validErrCodes);
 
 struct TaihePromiseAndCallback {
     bool success;
