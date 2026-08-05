@@ -666,12 +666,12 @@ int GattClient::Connect(std::weak_ptr<GattClientCallback> callback, bool isAutoC
         return proxy->Connect(pimpl->applicationId_, isAutoConnect);
     }
     pimpl->callback_ = callback;
-    if ((transport == bluetooth::GATT_TRANSPORT_TYPE_CLASSIC && !IS_BT_ENABLED()) ||
-        (transport == bluetooth::GATT_TRANSPORT_TYPE_INVALID)) {
+    if ((transport == bluetooth::GATT_TRANSPORT_TYPE_LE && !IS_BLE_ENABLED()) ||
+        (transport == bluetooth::GATT_TRANSPORT_TYPE_CLASSIC && !IS_BT_ENABLED())) {
         HILOGE("Unsupported transport mode");
         return BT_ERR_INTERNAL_ERROR;
     }
-    if (transport != bluetooth::GATT_TRANSPORT_TYPE_LE && isAutoConnect) {
+    if (transport == bluetooth::GATT_TRANSPORT_TYPE_CLASSIC && isAutoConnect) {
         HILOGE("Unsupported auto-connect mode");
         return BT_ERR_INTERNAL_ERROR;
     }
