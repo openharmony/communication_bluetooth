@@ -41,7 +41,11 @@ void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env, napi_value expo
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
+#ifdef BLUETOOTH_API_SINCE_10
+        DECLARE_NAPI_FUNCTION("getConnectionState", GetDeviceState),
+#else
         DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
+#endif
         DECLARE_NAPI_FUNCTION("getScoState", GetScoState),
         DECLARE_NAPI_FUNCTION("connect", Connect),
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
@@ -75,6 +79,7 @@ napi_value NapiHandsFreeUnit::DefineCreateProfile(napi_env env, napi_value expor
 
 napi_value NapiHandsFreeUnit::CreateHfpHfProfile(napi_env env, napi_callback_info info)
 {
+    HILOGI("enter");
     napi_value napiProfile;
     napi_value constructor = nullptr;
     napi_get_reference_value(env, consRef_, &constructor);
