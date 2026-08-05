@@ -32,6 +32,9 @@
 namespace OHOS {
 namespace Bluetooth {
 std::shared_ptr<TaiheBluetoothAccessObserver> g_accessCallback = TaiheBluetoothAccessObserver::GetInstance();
+constexpr int STR_LEN_OF_2_BYTES_UUID = 4;
+constexpr int STR_LEN_OF_4_BYTES_UUID = 8;
+constexpr int STR_LEN_OF_16_BYTES_UUID = 36;
 
 void RestrictBluetooth()
 {
@@ -208,6 +211,32 @@ void FactoryResetSync()
     HILOGI("factoryReset ret: %{public}d", ret);
     TAIHE_BT_ASSERT_RETURN_VOID(ret == BT_NO_ERROR, ret);
 }
+
+::taihe::string ConvertUuid(::taihe::string uuid)
+{
+    std::vector<int32_t> validErrCodes = { BT_ERR_INVALID_PARAM };
+    TAIHE_BT_CONTEXT_WITHOUT_HA(validErrCodes);
+    ::taihe::string completeUuid = "";
+    std::string uuidForCheck(uuid);
+    std::string completeUuidCheck = "";
+    if (uuidForCheck.size() != STR_LEN_OF_2_BYTES_UUID && uuidForCheck.size() != STR_LEN_OF_4_BYTES_UUID &&
+        uuidForCheck.size() != STR_LEN_OF_16_BYTES_UUID) {
+        HILOGE("invalid param");
+        HandleSyncErrAdapter(BT_ERR_INVALID_PARAM, validErrCodes);
+        return completeUuid;
+    }
+    if (uuidForCheck.size() == STR_LEN_OF_2_BYTES_UUID) {
+        completeUuidCheck = "0000" + uuidForCheck + "-0000-1000-8000-00805f9b34fb";
+    } else if (uuidForCheck.size() == STR_LEN_OF_4_BYTES_UUID) {
+        completeUuidCheck = uuidForCheck + "-0000-1000-8000-00805f9b34fb";
+    } else {
+        completeUuidCheck = uuidForCheck;
+    }
+    TAIHE_BT_ASSERT_RETURN_VERIFY(IsValidUuid(completeUuidCheck), BT_ERR_INVALID_PARAM, completeUuidCheck);
+    std::for_each(completeUuidCheck.begin(), completeUuidCheck.end(), [](char &c) { c = std::tolower(c); });
+    completeUuid = completeUuidCheck;
+    return completeUuid;
+}
 }  // Bluetooth
 }  // OHOS
 
@@ -228,4 +257,5 @@ TH_EXPORT_CPP_API_DeletePersistentDeviceId(OHOS::Bluetooth::DeletePersistentDevi
 TH_EXPORT_CPP_API_AddPersistentDeviceId(OHOS::Bluetooth::AddPersistentDeviceId);
 TH_EXPORT_CPP_API_NotifyDialogResult(OHOS::Bluetooth::NotifyDialogResult);
 TH_EXPORT_CPP_API_FactoryResetSync(OHOS::Bluetooth::FactoryResetSync);
+TH_EXPORT_CPP_API_ConvertUuid(OHOS::Bluetooth::ConvertUuid);
 // NOLINTEND
