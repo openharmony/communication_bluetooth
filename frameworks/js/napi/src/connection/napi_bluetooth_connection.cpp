@@ -871,8 +871,8 @@ napi_value StartPairOutOfBand(napi_env env, napi_callback_info info)
     int32_t transport = BT_TRANSPORT_NONE;
     auto checkRet = CheckStartPairDeviceOobParam(env, info, deviceId, addressInfo, transport, oobData);
     NAPI_BT_ASSERT_ERR_NUM_RETURN(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
-    auto func = [deviceId, oobData]() {
-        BluetoothRemoteDevice remoteDevice(deviceId);
+    auto func = [deviceId, transport, oobData]() {
+        BluetoothRemoteDevice remoteDevice(deviceId, transport);
         int32_t err = remoteDevice.StartPairOutOfBand(oobData);
         HILOGI("startPairOutOfBand err: %{public}d", err);
         return NapiAsyncWorkRet(err);
