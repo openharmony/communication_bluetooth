@@ -109,6 +109,9 @@ static std::map<int32_t, int32_t> innerToBusinessErrCodeMap {
     { BtErrCode::BT_ERR_GATT_PREPARE_QUEUE_FULL, BtErrCode::BT_ERR_INTERNAL_ERROR },
     { BtErrCode::BT_ERR_GATT_REMOTE_DEVICE_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
     { BtErrCode::BT_ERR_CHARACTER_VALUE_ERROR, BtErrCode::BT_ERR_INVALID_PARAM },
+    { BtErrCode::BT_ERR_OBJECT_NULL, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_REQUEST_NOT_SUPPORT, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_REGISTER_APPLICATION_FAILED, BtErrCode::BT_ERR_INTERNAL_ERROR },
 };
 
 static std::map<int32_t, std::string> innerErrMsgMap {
@@ -144,6 +147,9 @@ static std::map<int32_t, std::string> innerErrMsgMap {
     { BtErrCode::BT_ERR_DEVICE_IS_NOT_CONNECTED, "Operation failed. This device isn't connected." },
     { BtErrCode::BT_ERR_GATT_PREPARE_QUEUE_FULL, "Operation failed. The prepare write queue of GATT server is full." },
     { BtErrCode::BT_ERR_GATT_REMOTE_DEVICE_ERROR, "Operation failed. Remote device has an error." },
+    { BtErrCode::BT_ERR_OBJECT_NULL, "Operation failed. Judge object is null." },
+    { BtErrCode::BT_ERR_REQUEST_NOT_SUPPORT, "Operation failed. Unsupported request." },
+    { BtErrCode::BT_ERR_REGISTER_APPLICATION_FAILED, "Operation failed. Register Application failed." },
 };
 
 bool IsInnerErrorCode(int32_t errCode)
