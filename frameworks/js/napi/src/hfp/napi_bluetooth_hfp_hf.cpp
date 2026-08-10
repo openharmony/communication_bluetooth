@@ -79,12 +79,19 @@ napi_value NapiHandsFreeUnit::DefineCreateProfile(napi_env env, napi_value expor
 
 napi_value NapiHandsFreeUnit::CreateHfpHfProfile(napi_env env, napi_callback_info info)
 {
-    HILOGI("enter");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT
+    };
+    NAPI_BT_CONTEXT(env, "CreateHfpHfProfile", validErrCodes);
     napi_value napiProfile;
     napi_value constructor = nullptr;
     napi_get_reference_value(env, consRef_, &constructor);
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
+#ifdef BLUETOOTH_HFP_HF_FEATURE_ENABLE
     NapiProfile::SetProfile(env, ProfileId::PROFILE_HANDS_FREE_UNIT, napiProfile);
+#else
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, false, BT_ERR_API_NOT_SUPPORT);
+#endif
     return napiProfile;
 }
 
