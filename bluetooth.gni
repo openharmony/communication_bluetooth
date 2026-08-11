@@ -17,4 +17,5 @@ declare_args() {
   bluetooth_bas_feature = false
   bluetooth_pan_feature = false
   bluetooth_hap_opp_switch_feature = true
+  bluetooth_hfp_hf_feature_switch = false
 }

@@ -134,14 +134,14 @@ int BluetoothHfpHfProxy::Connect(const BluetoothRawAddress &device)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor()),
-        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+        BT_ERR_IPC_TRANSACTION_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANSACTION_FAILED, "write device error");
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
 
     SEND_IPC_REQUEST_RETURN_RESULT(BluetoothHfpHfInterfaceCode::BT_HFP_HF_CONNECT,
-        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+        data, reply, option, BT_ERR_IPC_TRANSACTION_FAILED);
 
     return reply.ReadInt32();
 }
@@ -150,14 +150,14 @@ int BluetoothHfpHfProxy::Disconnect(const BluetoothRawAddress &device)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHfpHfProxy::GetDescriptor()),
-        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
-    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANS_FAILED, "write device error");
+        BT_ERR_IPC_TRANSACTION_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteParcelable(&device), BT_ERR_IPC_TRANSACTION_FAILED, "write device error");
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
 
     SEND_IPC_REQUEST_RETURN_RESULT(BluetoothHfpHfInterfaceCode::BT_HFP_HF_DISCONNECT,
-        data, reply, option, BT_ERR_IPC_TRANS_FAILED);
+        data, reply, option, BT_ERR_IPC_TRANSACTION_FAILED);
 
     return reply.ReadInt32();
 }
