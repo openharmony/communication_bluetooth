@@ -130,6 +130,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
         }
         console.info(TAG, 'BluetoothReceiveUIAbility onCreate');
         this.readyReceiveEvent();
+        this.setTransferStateChange();
         this.startContinuousTask();
         try {
             backgroundTaskManager.on('continuousTaskCancel',
@@ -382,12 +383,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
         }
     }
 
-    async handleBtUri(data: commonEventManager.CommonEventData) {
-        if (data.parameters == undefined) {
-            console.error(TAG, 'data.parameters undefined');
-            return;
-        }
-
+    async setTransferStateChange() {
         this.oppProfile.off('transferStateChange');
         this.oppProfile.on('transferStateChange', (data: opp.OppTransferInformation) => {
             this.totalCount = data.totalCount;
@@ -406,6 +402,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
                 if (data.currentCount == data.totalCount || data.result == RESULT_ERROR_CANCELED ||
                     data.result == RESULT_ERROR_TRANSFER_FAILED) {
                     this.tapEventIsAllowed = true;
+                    this.cancelAllNotification();
                     this.cancelSendProgressNotification();
                     this.pullUpReceiveResultNotification();
                     this.oppProfile.off('transferStateChange');
@@ -417,7 +414,14 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
                 }
             }
         });
+    }
 
+    async handleBtUri(data: commonEventManager.CommonEventData) {
+        if (data.parameters == undefined) {
+            console.error(TAG, 'data.parameters undefined');
+            return;
+        }
+        this.setTransferStateChange();
         if ((data.parameters.uri == undefined) || (data.parameters.uri == null) ||
             (data.parameters.uri.length == 0)) {
             console.error(TAG, 'uri not right');
@@ -665,6 +669,18 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
         wantAgentObjRemove = await this.getNotificationWantAgent('ohos.event.notification.BT.LIVEVIEW_REMOVE');
         await this.publishTransProgessNotification(imagePixelMapButton, imagePixelMapCapsule,
             wantAgentObjRemove, percent, name, this.currentCount, this.totalCount);
+    }
+
+    cancelAllNotification() {
+        console.info(TAG, `cancelAllNotification begin.`);
+        let cancelAllCallback = (err: BusinessError): void => {
+            if (err) {
+                console.error(TAG, `Failed to cancel all notification. Code is ${err.code}, message ${err.message}`);
+            } else {
+                console.info(TAG, `Succeeded in canceling all notification.`);
+            }
+        }
+        notificationManager.cancelAll(cancelAllCallback);
     }
 
     cancelSendProgressNotification() {
