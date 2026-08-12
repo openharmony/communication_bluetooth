@@ -244,7 +244,6 @@ export default class BluetoothSendUIAbility extends UIAbility {
                     }
                     console.info(TAG, 'transfer finished');
                     let dirPath = this.context.filesDir;
-                    console.info(TAG, `transfer finished rmdirSync ${dirPath}`);
                     fs.rmdirSync(dirPath);
                 }
             });
