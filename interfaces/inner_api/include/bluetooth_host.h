@@ -33,8 +33,6 @@
 #ifndef BLUETOOTH_HOST_H
 #define BLUETOOTH_HOST_H
 
-
-
 #include <set>
 #include <string>
 
@@ -1012,6 +1010,16 @@ public:
      * @since 26
      */
     int32_t VerifyMultiPermissions(bool systemHapNeeded, const std::set<std::string> &permissions);
+
+    /**
+      * @brief updata second phone pair mode
+      *
+      * @param mode second phone pair mode
+      * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+      *         returns an error code defined in {@link BtErrCode} otherwise.
+      * @since 26
+    */
+    int UpdateSecondaryPairMode(int32_t mode);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
