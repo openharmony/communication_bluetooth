@@ -1536,12 +1536,12 @@ int32_t BluetoothHost::VerifyMultiPermissions(bool systemHapNeeded,
     return proxy->VerifyMultiPermissions(systemHapNeeded, permissions);
 }
 
-int BluetoothHost::UpdateSecondaryPairMode(int32_t action)
+int BluetoothHost::UpdateSecondaryPairMode(int32_t mode)
 {
     HILOGI("enter");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
-    return proxy->UpdateSecondaryPairMode(action);
+    return proxy->UpdateSecondaryPairMode(mode);
 }
 } // namespace Bluetooth
 } // namespace OHOS
