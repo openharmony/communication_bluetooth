@@ -16,8 +16,6 @@
 #define LOG_TAG "bt_ipc_host_proxy"
 #endif
 
-
-
 #include "bluetooth_host_proxy.h"
 #include "bluetooth_log.h"
 #include "bluetooth_errorcode.h"
