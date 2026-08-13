@@ -16,8 +16,6 @@
 #ifndef OHOS_BLUETOOTH_STANDARD_HOST_PROXY_H
 #define OHOS_BLUETOOTH_STANDARD_HOST_PROXY_H
 
-
-
 #include "bluetooth_raw_address.h"
 #include "i_bluetooth_host.h"
 #include "iremote_proxy.h"
@@ -138,6 +136,7 @@ public:
         const std::string &hashValue, std::string &virtualAddress) override;
     int32_t IsProfileExist(const std::string &profileName, bool &isProfileExist) override;
     int32_t VerifyMultiPermissions(bool systemHapNeeded, const std::set<std::string> &permissions) override;
+    int32_t UpdateSecondaryPairMode(int32_t mode) override;
 private:
     int32_t InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
     static inline BrokerDelegator<BluetoothHostProxy> delegator_;
