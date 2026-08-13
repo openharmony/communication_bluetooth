@@ -1,0 +1,671 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+domain: BLUETOOTH_UE
+
+MEDIA_RECV_CMD:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: bt receive audio avrcp conctrl cmd}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+STACK_CONN_SCO:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: bt stack connect sco}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  CODEC: {type: INT32, desc: codec}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+STACK_DISCONN_SCO:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: bt stack disconnect sco}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  CODEC: {type: INT32, desc: codec}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+HFP_RECV_CMD:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: receive bt hfp conctrl cmd}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+SEND_ECHO89:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: send echo89}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  MODE_ID: {type: INT32, desc: mode id}
+  A2DP_STATUS: {type: INT32, desc: a2dp status}
+  HFP_STATUS: {type: INT32, desc: hfp status}
+
+RECV_ECHO88:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: receive echo88}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  MODE_ID: {type: INT32, desc: mode id}
+  A2DP_STATUS: {type: INT32, desc: a2dp status}
+  HFP_STATUS: {type: INT32, desc: hfp status}
+
+AVRCP_VOL_CHANGE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: avrcp volume change}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  CUR_VOL_VALUE: {type: INT32, desc: current volume value}
+
+HFP_VOL_CHANGE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: hfp volume change}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  CUR_VOL_VALUE: {type: INT32, desc: current volume value}
+
+AVRCP_CONN_CMP:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: avrcp connection completed}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+AVRCP_DISCONN_CMP:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: avrcp disconnection completed}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+ACL_CONN_CMP:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: ACL connection completed}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+ACL_DISCONN_CMP:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: ACL disconnection completed}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+BLE_CONN_CMP:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: BLE connection completed}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+BLE_DISCONN_CMP:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: BLE disconnection completed}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+START_VOICE_REG:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: start voice assistant}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+STOP_VOICE_REG:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: stop voice assistant}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+ECHO11_SUPPORT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: echo11 is support}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  MODE_ID: {type: INT32, desc: mode id}
+  SUPPORT: {type: INT32, desc: is support}
+
+ABS_VOL_SUPPORT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: abs volume is support}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SUPPORT: {type: INT32, desc: is support}
+
+INBAND_RING_SUPPORT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: in-band ring is support}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SUPPORT: {type: INT32, desc: is support}
+
+BT_START_CONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: bt connection start}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+BT_SDP_CONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: bt sdp connect}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  UUID: {type: STRING, desc: uuid}
+
+USER_OPER_PAIR:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: user oper pair}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+BT_ANTENNA_SWITCH:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: user swith antenna}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+BLE_SCH_SKIP:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: ble sch skip}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+SET_CODEC_CONFIG:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: set codec configuration}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  IS_HITWS: {type: INT32, desc: Whether it is dual_fed}
+  CODEC_TYPE: {type: INT32, desc: codec type}
+  SAMPLE_RATE: {type: INT32, desc: sample rate}
+  BITS_PER_SAMPLE: {type: INT32, desc: bits per sample}
+  CHANNEL_MODE: {type: INT32, desc: channel mode}
+  SPECIFIC1: {type: INT32, desc: specific value1}
+  SPECIFIC2: {type: INT32, desc: specific value2}
+  SPECIFIC3: {type: INT32, desc: specific value3}
+  SPECIFIC4: {type: INT32, desc: specific value4}
+
+BLE_START_CONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: ble connection start}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+SOCKET_CLENT_CONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Socket Client connect}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  UUID: {type: STRING, desc: uuid}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+SOCKET_DISCONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Socket disconnect}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+SOCKET_SERVER_CONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Socket Server connect}
+  UUID: {type: STRING, desc: uuid}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+SOCKET_CALLBACK:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Socket Client connect}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  UUID: {type: STRING, desc: uuid}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+BT_VOL_CHANGE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: user triggered volume change}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  CUR_VOL_VALUE: {type: INT32, desc: current volume value}
+
+START_PAIR:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: start pairing}
+  PNAMEID: {type: STRING, desc: package name}
+  PVERSIONID: {type: STRING, desc: application version}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+REMOVE_PAIR:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: remove pairing}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+CANCEL_PAIR:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: cancel pairing}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+START_BT_DISCOVER:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: start bt discover}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+CANCEL_BT_DISCOVER:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: cancel bt discover}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+BLE_START_SCAN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: BLE start scan}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+BLE_STOP_SCAN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: BLE stop scan}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+BLE_CLIENT_CONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: BLE Client connect }
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+BLE_CLIENT_DISCONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: BLE Client disconnect}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+BLE_SERVER_CONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: BLE Server connect}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+BLE_SERVER_DISCONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: BLE Server disconnect}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+SET_BT_NAME:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: BT UI set bt name}
+  PKG_NAME: {type: STRING, desc: package name}
+  LOCAL_NAME: {type: STRING, desc: local device name}
+
+A2DP_START_PLAY:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: a2dp start play}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  CODEC: {type: INT32, desc: codec}
+
+A2DP_STOP_PLAY:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: a2dp stop play}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  CODEC: {type: INT32, desc: codec}
+
+AUDIO_STATUS_CHANGE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: hfp volume change}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  CODEC: {type: INT32, desc: codec}
+  OFFLOAD_FLAG: {type: INT32, desc: offload flag}
+  AUDIO_STREAMID: {type: INT32, desc: audio streamId}
+  ACTIVATE_DEVICE_PKG: {type: STRING, desc: active device package}
+  ACTIVATE_DEVICE_RESULT: {type: INT32, desc: activate device}
+  ABSOLUT_VOLUME: {type: INT32, desc: absolut volume}
+  ABSOLUT_VOLUME_STSTUS: {type: INT32, desc: absolut volume status}
+  VOLUME_TYPE: {type: INT32, desc: volume type}
+  VOLUME_VALUE: {type: INT32, desc: volume value}
+  AUDIO_START_TIME: {type: STRING, desc: audio start time}
+  AUDIO_STOP_TIME: {type: STRING, desc: audio stop time}
+
+SET_A2DP_ACTIVE_DEV:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: set a2dp active device}
+  PRE_ACT_DEV_ADDRESS: {type: STRING, desc: previous active device address}
+  PRE_ACT_DEV_NAME: {type: STRING, desc: previous active device name}
+  PRE_ACT_DEV_TYPE: {type: STRING, desc: previous active device type}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+SET_HFP_ACTIVE_DEV:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: set hfp active device}
+  PRE_ACT_DEV_ADDRESS: {type: STRING, desc: previous active device address}
+  PRE_ACT_DEV_NAME: {type: STRING, desc: previous active device name}
+  PRE_ACT_DEV_TYPE: {type: STRING, desc: previous active device type}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+F_HID_CONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: The F interface initiates a HID connection}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+F_HID_DISCONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: The F interface initiates a HID disconnection}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+F_A2DP_CONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: The F interface initiates a A2dp connection}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+F_A2DP_DISCONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: The F interface initiates a A2dp disconnection}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+A2DP_CONN_CMP:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Peripheral A2dp connection completed}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+A2DP_DISCONN_CMP:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Peripheral A2dp disconnection completed}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+F_HFP_CONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: The F interface initiates a HFP connection}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+F_HFP_DISCONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: The F interface initiates a HFP disconnection}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+HFP_CONN_CMP:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Peripheral HFP connection completed}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+HFP_DISCONN_CMP:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Peripheral HFP disconnection completed}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+SET_A2DP_SUSPEND:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: send system audio setA2dpSuspend true or false}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+CHANGE_BT_SWITCH:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: open or close bt switch}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+  BLE_APP_SIZE: {type: INT32, desc: ble app size}
+
+BT_UI_SWITCH_CHANGE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: BT UI switch state change}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+BRCAST_ACL_CONN:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: ACL state change brocast}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+  CUR_VAL: {type: INT32, desc: current value}
+
+SERVICE_CODEC_SETCONFIG:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Bluetooth service set codec configuration}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  CODEC_TYPE: {type: INT32, desc: codec type}
+  SAMPLE_RATE: {type: INT32, desc: sample rate}
+  BITS_PER_SAMPLE: {type: INT32, desc: bits per sample}
+  CHANNEL_MODE: {type: INT32, desc: channel mode}
+  SPECIFIC1: {type: INT32, desc: specific value1}
+  SPECIFIC2: {type: INT32, desc: specific value2}
+  SPECIFIC3: {type: INT32, desc: specific value3}
+  SPECIFIC4: {type: INT32, desc: specific value4}
+
+SEND_MEDIA_CMD:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: bt send audio conctrl cmd}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  COMMAND: {type: INT32, desc: command type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+TWS_WEAR_STATE_SUPPORT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: bt send audio conctrl cmd}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  MODE_ID: {type: INT32, desc: mode id}
+  SUPPORT: {type: INT32, desc: is support}
+
+VOIP_CONN_SCO:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: The VOIP call connect sco}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+VOIP_DISCONN_SCO:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: The VOIP call disconnect sco}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+CS_CONN_SCO:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: The Cellular Call connect sco}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+CS_DISCONN_SCO:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: The Cellular Call disconnect sco}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+UPDATE_HFP_OUTPUT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Update hfp output device}
+  PRE_ACT_DEV_ADDRESS: {type: STRING, desc: device address}
+  PRE_ACT_DEV_NAME: {type: STRING, desc: device name}
+  PRE_ACT_DEV_TYPE: {type: STRING, desc: device type}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  PKG_NAME: {type: STRING, desc: package name}
+
+UPDATE_A2DP_OUTPUT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Update a2dp output device}
+  PRE_ACT_DEV_ADDRESS: {type: STRING, desc: device address}
+  PRE_ACT_DEV_NAME: {type: STRING, desc: device name}
+  PRE_ACT_DEV_TYPE: {type: STRING, desc: device type}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  PKG_NAME: {type: STRING, desc: package name}
+
+BT_SYNC_PAIRED_EVENT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: BT sync paired event}
+  SYNC_PAIRED_NUM: {type: INT32, desc: sync paired info num}
+  SYNC_PAIRED_INFO: {type: STRING, desc: sync paired info}
+
+BAND_WEAR_STATE_CHANGE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: BT BandWrist wear state change}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  WEAR_STATE: {type: INT32, desc: wear state}
+
+BT_DEL_PAIRED_EVENT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: BT del cloud paired event}
+  DEL_CLOUD_NUM: {type: INT32, desc: del cloud paired info num}
+  DEL_CLOUD_INFO: {type: STRING, desc: del cloud paired info}
+
+KEEP_BLE_SCAN_IN_CONNECTION:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Keep BLE scan in BR or BLE fastest connection}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  SCENE_CODE: {type: INT32, desc: scene code}
+  PKG_NAME: {type: STRING, desc: package name}
+
+
+PAIRED_CUSTOM_TYPE_CHANGE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Paired device custom Type change}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  PRE_CUSTOM_DEVICE_TYPE: {type: INT32, desc: pre custom type}
+  CUR_CUSTOM_DEVICE_TYPE: {type: INT32, desc: cur custom type}
+
+SET_PHONE_MODE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: The phone mode set by the user}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: package name}
+  SCENE_CODE: {type: INT32, desc: scene code}
+
+BT_HDAP_OPER_EVENT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: hdap record operation event}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  PKG_NAME: {type: STRING, desc: device type}
+  ACTION_TYPE: {type: INT32, desc: action type}
+  ACTION_TIME: {type: STRING, desc: action operate time}
+  RECORD_MODE: {type: INT32, desc: current record mode}
+  HDAP_VER: {type: INT32, desc: current negotiated hdap version}
+
+FINISH_CLOUD_PAIR:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: cloud pair operation event}
+  DEV_ADDRESS: {type: STRING, desc: device address}
+  DEV_NAME: {type: STRING, desc: device name}
+  DEV_TYPE: {type: STRING, desc: device type}
+  SCENE_CODE: {type: INT32, desc: main scene code}
+  SUB_SCENE_CODE: {type: INT32, desc: sub scene code}
+
+SEND_MEDIA_MUTE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: send music mute event}
+  SCENE_CODE: {type: INT32, desc: mute or unmute}
+  STREAM_TYPE: {type: INT32, desc: streamType to mute}
+  MUTE_DEVICE: {type: INT32, desc: devices to Mute}
+
+SENSORHUB_COLLABORATION_EVENT:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: record sensorhub collaboration event}
+  SENSORHUB_RESET_COUNT: {type: INT32, desc: reset count of sensorhub}
+  SCAN_COLL_COUNT: {type: INT32, desc: scan collaboration total count}
+  SCAN_COLL_FAILED_COUNT: {type: INT32, desc: scan collaboration failed count}
+  SCAN_COLL_START_COUNT: {type: INT32, desc: sensorhub scan started count in collaboration}
+  SCAN_COLL_AVERAGE_COST_TIME: {type: INT32, desc: sensorhub scan collaboration average cost time}
+  SCAN_COLL_MAX_COST_TIME: {type: INT32, desc: sensorhub scan collaboration max cost time}
+  SCAN_COLL_SH_STARTED_PARAM: {type: STRING, desc: sensorhub scan param in collaboration}
+  CONN_COLL_COUNT: {type: INT32, desc: connection collaboration total count}
+  CONN_COLL_FAILED_COUNT: {type: INT32, desc: connection collaboration failed count}
+  CONN_COLL_AVERAGE_COST_TIME: {type: INT32, desc: sensorhub connection collaboration average cost time}
+  CONN_COLL_MAX_COST_TIME: {type: INT32, desc: sensorhub connection collaboration max cost time}
+
+BLUETOOTH_APP_WAKEUP:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: app wakeup AP event statistics via bluetooth}
+  APP_NAME: {type: STRING, desc: app name}
+  APP_UID: {type: INT64, desc: app uid}
+  APP_PID: {type: INT64, desc: app pid}
+  BUSINESS_TYPE: {type: INT64, desc: wakeup type}
+  TRIGGER_COUNT: {type: INT64, desc: trigger count}

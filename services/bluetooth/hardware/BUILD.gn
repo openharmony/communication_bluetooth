@@ -1,0 +1,91 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
+
+config("bluetooth_hdi_adapter_public_config") {
+  include_dirs = [
+    "include",
+  ]
+}
+
+ohos_shared_library("bluetooth_hdi_adapter") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  # stack_protector_ret = true
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      boundary_sanitize = true               # Enable boundary san detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      integer_overflow = true                # Enable integer overflow detection
+      ubsan = true                           # Enable some Ubsan options
+      debug = false
+  }
+  include_dirs = [
+    "include",
+  ]
+
+  cflags = [ "-fPIC" ]
+
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+  ]
+
+  configs = [
+    "${bluetooth_config_path}:feature_flags",
+  ]
+
+  public_configs = [
+    ":bluetooth_hdi_adapter_public_config",
+  ]
+
+  sources = [
+    "src/bluetooth_hci_callbacks.cpp",
+    "src/bluetooth_hdi.cpp",
+  ]
+
+  deps = [ ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "drivers_interface_bluetooth:libbluetooth_hci_proxy_1.0",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "hitrace:hitrace_meter",
+      "bounds_checking_function:libsec_shared",
+    ]
+  } else {
+    external_deps = [
+      "c_utils:utils",
+      "drivers_interface_bluetooth:libbluetooth_hci_proxy_1.0",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "hitrace:hitrace_meter",
+      "bounds_checking_function:libsec_shared",
+    ]
+  }
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}

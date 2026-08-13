@@ -1,0 +1,8 @@
+{
+  global:
+    "*HidDeviceServiceImplInterface*";
+    "*CreateHidDeviceServiceImplInterface*";
+    "*DestroyHidDeviceServiceImplInterface*";
+  local:
+    *;
+};

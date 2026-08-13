@@ -1,0 +1,6 @@
+version=1.10.23.100
+type=BLUETOOTH
+subtype=generic
+compatibleVersion=1
+classify=1
+displayVersion=BT.GENC.1.10.23.100

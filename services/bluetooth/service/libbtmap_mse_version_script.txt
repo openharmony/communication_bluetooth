@@ -1,0 +1,12 @@
+{
+  global:
+    "*MapMseServiceImplInterface*";
+    "*MapMseContent*";
+    "*MapMseAppParams*";
+    "*MapMseMasInstance*";
+    "*MapMseServiceImpl*";
+    "*CreateMapMseServiceImplInterface*";
+    "*DestroyMapMseServiceImplInterface*";
+  local:
+    *;
+};

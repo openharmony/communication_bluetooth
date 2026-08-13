@@ -1,0 +1,103 @@
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/ohos_var.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
+
+group("etc") {
+  deps = [
+    ":bt_config.xml",
+    ":bt_device_config.xml",
+    ":bt_device_info.xml",
+    ":bt_profile_config.xml",
+    ":version.txt",
+    ":bt_stack.conf",
+    ":bt_av_latency_config.json",
+    ":bt_did.conf",
+    ":silent.wav",
+  ]
+  if (bluetooth_service_override_build_mode == "full") {
+    deps += [ ":bluetooth_service_cfg" ]
+  }
+}
+
+ohos_prebuilt_etc("bt_config.xml") {
+  source = "bt_config.xml"
+  relative_install_dir = "bluetooth"
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}
+
+ohos_prebuilt_etc("bt_device_config.xml") {
+  source = "bt_device_config.xml"
+  relative_install_dir = "bluetooth"
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}
+
+ohos_prebuilt_etc("bt_device_info.xml") {
+  source = "bt_device_info.xml"
+  relative_install_dir = "bluetooth"
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}
+
+ohos_prebuilt_etc("bt_profile_config.xml") {
+  source = "bt_profile_config.xml"
+  relative_install_dir = "bluetooth"
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}
+
+ohos_prebuilt_etc("bluetooth_service_cfg") {
+  source = "bluetooth_service.cfg"
+  relative_install_dir = "init"
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}
+
+ohos_prebuilt_etc("version.txt") {
+  source = "version.txt"
+  relative_install_dir = "bluetooth"
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}
+
+ohos_prebuilt_etc("bt_stack.conf") {
+  source = "bt_stack.conf"
+  relative_install_dir = "bluetooth"
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}
+
+ohos_prebuilt_etc("bt_av_latency_config.json") {
+  source = "bt_av_latency_config.json"
+  relative_install_dir = "bluetooth"
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}
+
+ohos_prebuilt_etc("bt_did.conf") {
+  source = "bt_did.conf"
+  relative_install_dir = "bluetooth"
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}
+
+ohos_prebuilt_etc("silent.wav") {
+  source = "silent.wav"
+  relative_install_dir = "bluetooth"
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}

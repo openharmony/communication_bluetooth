@@ -1,0 +1,117 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
+
+BT_ROOT = "//foundation/communication/bluetooth/services/bluetooth"
+
+config("btchr_public_config") {
+  include_dirs = [
+    "$BT_ROOT/btchr/include",
+    "$BT_ROOT/common/include",
+    "$BT_ROOT/service/src/base",
+  ]
+}
+
+ohos_shared_library("btchr") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  # stack_protector_ret = true
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      boundary_sanitize = true               # Enable boundary san detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      integer_overflow = true                # Enable integer overflow detection
+      ubsan = true                           # Enable some Ubsan options
+      debug = false
+  }
+
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+    "-Wno-format",
+  ]
+
+  public_configs = [ ":btchr_public_config" ]
+
+  configs = [
+     ":btchr_public_config",
+     "${bluetooth_config_path}:feature_flags",
+  ]
+
+  include_dirs = [
+    "include",
+    # "$BT_ROOT/service/src/base",
+    "$BT_ROOT/common",
+    "$BT_ROOT/service/src/common",
+    "$BT_ROOT/service/src/util",
+  ]
+
+  sources = [
+    "src/bt_chr_app_behavior_reporter.cpp",
+    "src/bt_chr_base.cpp",
+    "src/bt_chr_dft_exception.cpp",
+    "src/bt_chr_dft_statictics.cpp",
+    "src/bt_chr_transaction_manager.cpp",
+    "src/bt_chr_subevent_manager.cpp",
+    "src/bt_chr_ue_manager.cpp",
+    "src/bt_chr_util.cpp",
+    "src/bt_chr_business_event.cpp",
+    "src/bt_chr_hci_process_data.cpp",
+    "src/bt_chr_car_key.cpp",
+    "src/bt_chr_switch.cpp",
+    "src/bt_chr_pkgname_manager.cpp",
+  ]
+
+  deps = [
+    "$BT_ROOT/common:btservice_common",
+  ]
+
+  external_deps = [
+    "bluetooth:btcommon",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
+    "hisysevent:libhisysevent",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "preferences:native_preferences",
+    "ability_base:want",
+    "ability_runtime:abilitykit_native",
+    "samgr:samgr_proxy",
+    "ipc:ipc_single",
+    "cJSON:cjson",
+    "init:libbegetutil",
+    "power_manager:powermgr_client",
+  ]
+
+  if (defined(global_parts_info) && defined(global_parts_info.powermgr_battery_manager)) {
+    external_deps += [
+      "battery_manager:batterysrv_client",
+    ]
+  }
+
+  if (bluetooth_service_override_ffrt_enable) {
+    external_deps += [ "ffrt:libffrt" ]
+  }
+
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}

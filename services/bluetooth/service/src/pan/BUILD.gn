@@ -1,0 +1,235 @@
+# Copyright (C) 2026-2027 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import("//build/ohos.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
+
+PART_DIR = "//foundation/communication/bluetooth/services/bluetooth"
+BT_SERVICE_DIR = "$PART_DIR/service"
+
+########################### btpan ###############################
+ohos_shared_library("btpan") {
+  branch_protector_ret = "pac_ret"
+  stack_protector_ret = false
+  version_script = "libbtpan_version_script.txt"
+  sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      integer_overflow = true
+      ubsan = true
+      debug = false
+  }
+
+  include_dirs = [
+    "$BT_SERVICE_DIR/include",
+    "$BT_SERVICE_DIR/src",
+    "$BT_SERVICE_DIR/src/base",
+    "$BT_SERVICE_DIR/src/common",
+    "$BT_SERVICE_DIR/src/permission",
+    "$BT_SERVICE_DIR/src/util",
+    "$BT_SERVICE_DIR/src/classic",
+    "$BT_SERVICE_DIR/src/hid_device",
+    "$PART_DIR/common",
+    "$PART_DIR/common/include",
+    "$PART_DIR/btchr/include",
+  ]
+
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+    "-fPIC",
+    "-Wno-format",
+    "-Wno-pessimizing-move",
+    "-Wunused-variable",
+    "-Wreorder",
+    "-Wmissing-braces",
+    "-Wimplicit-fallthrough",
+    "-Wunused-private-field",
+    "-Wlogical-op-parentheses",
+    "-Wmissing-field-initializers",
+    "-Wparentheses-equality",
+    "-Wparentheses",
+    "-Wdelete-non-abstract-non-virtual-dtor",
+    "-Wignored-qualifiers",
+    "-Wdelete-abstract-non-virtual-dtor",
+    "-Wuninitialized",
+    "-Woverloaded-virtual",
+    "-Wdangling-else",
+    "-Woverloaded-virtual",
+    "-Wno-non-c-typedef-for-linkage",
+    "-Wno-unused-but-set-variable",
+    "-Wno-array-parameter",
+  ]
+
+  ldflags = [
+    "-flto",
+    "-Wl,--as-needed",
+    "-Wl,--gc-sections",
+  ]
+
+  configs = [
+    "${bluetooth_config_path}:feature_flags",
+  ]
+
+  if (bluetooth_service_override_pan_feature_switch) {
+    sources = [
+      "pan_service_impl.cpp",
+      "pan_network_manager.cpp",
+      "pan_statemachine.cpp",
+    ]
+  }
+
+  deps = [
+    "$PART_DIR/common:btservice_common",
+    "$PART_DIR/btchr:btchr",
+  ]
+
+  external_deps = [
+    "bluetooth:btcommon",
+    "hilog:libhilog",
+    "c_utils:utils",
+    "bluetooth_service:btstack",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
+    "samgr:samgr_proxy",
+    "ipc:ipc_single",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
+    "netmanager_base:net_conn_manager_if",
+    "dhcp:dhcp_sdk",
+  ]
+
+  if (bluetooth_service_override_ffrt_enable) {
+    external_deps += [ "ffrt:libffrt" ]
+  }
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+########################### btpan_static ###############################
+ohos_static_library("btpan_static") {
+  branch_protector_ret = "pac_ret"
+  stack_protector_ret = false
+  sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      integer_overflow = true
+      ubsan = true
+      debug = false
+  }
+
+  include_dirs = [
+    "$BT_SERVICE_DIR/include",
+    "$BT_SERVICE_DIR/src",
+    "$BT_SERVICE_DIR/src/base",
+    "$BT_SERVICE_DIR/src/common",
+    "$BT_SERVICE_DIR/src/permission",
+    "$BT_SERVICE_DIR/src/util",
+    "$BT_SERVICE_DIR/src/classic",
+    "$BT_SERVICE_DIR/src/hid_device",
+    "$PART_DIR/common",
+    "$PART_DIR/common/include",
+    "$PART_DIR/btchr/include",
+  ]
+
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+    "-fPIC",
+    "-Wno-format",
+    "-Wno-pessimizing-move",
+    "-Wunused-variable",
+    "-Wreorder",
+    "-Wmissing-braces",
+    "-Wimplicit-fallthrough",
+    "-Wunused-private-field",
+    "-Wlogical-op-parentheses",
+    "-Wmissing-field-initializers",
+    "-Wparentheses-equality",
+    "-Wparentheses",
+    "-Wdelete-non-abstract-non-virtual-dtor",
+    "-Wignored-qualifiers",
+    "-Wdelete-abstract-non-virtual-dtor",
+    "-Wuninitialized",
+    "-Woverloaded-virtual",
+    "-Wdangling-else",
+    "-Woverloaded-virtual",
+    "-Wno-non-c-typedef-for-linkage",
+    "-Wno-unused-but-set-variable",
+    "-Wno-array-parameter",
+  ]
+
+  ldflags = [
+    "-flto",
+    "-Wl,--as-needed",
+    "-Wl,--gc-sections",
+  ]
+
+
+  configs = [
+    "${bluetooth_config_path}:feature_flags",
+  ]
+
+  if (bluetooth_service_override_pan_feature_switch) {
+    sources = [
+      "pan_service_impl.cpp",
+      "pan_network_manager.cpp",
+      "pan_statemachine.cpp",
+    ]
+  }
+
+  deps = [
+    "$PART_DIR/common:btservice_common",
+    "$PART_DIR/btchr:btchr",
+  ]
+
+  external_deps = [
+    "bluetooth:btcommon",
+    "hilog:libhilog",
+    "c_utils:utils",
+    "bluetooth_service:btstack",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
+    "samgr:samgr_proxy",
+    "ipc:ipc_single",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
+    "netmanager_base:net_conn_manager_if",
+    "dhcp:dhcp_sdk",
+  ]
+
+  if (bluetooth_service_override_ffrt_enable) {
+    external_deps += [ "ffrt:libffrt" ]
+  }
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}

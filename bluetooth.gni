@@ -11,10 +11,123 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+bluetooth_service_override_path = "//foundation/communication/bluetooth"
+bluetooth_config_path = "${bluetooth_service_override_path}/config"
+
 declare_args() {
   bluetooth_kia_enable = false
   bluetooth_pluggable_supported = false
   bluetooth_bas_feature = false
   bluetooth_pan_feature = false
   bluetooth_hap_opp_switch_feature = true
+
+  bluetooth_service_override_hfp_hf_feature_switch = false
+  bluetooth_service_override_a2dp_sink_feature_switch = false
+  bluetooth_service_override_hfp_ag_feature_switch = true
+  bluetooth_service_override_pan_feature_switch = false
+  bluetooth_service_override_avrcp_ct_feature_switch = false
+  bluetooth_service_override_avrcp_avsession = true
+  bluetooth_service_override_audio_framwwork = true
+  bluetooth_service_override_bt_chr_switch = true
+  bluetooth_service_override_contexthub_ble = true
+  bluetooth_service_override_pbap_pse_feature_switch = true
+  bluetooth_service_override_map_mse_feature_switch = true
+  bluetooth_service_override_sco_normalized_feature_switch = true
+  bluetooth_service_override_os_account = true
+  bluetooth_service_override_pc_ability_enhance = false
+  bluetooth_service_override_ble_mouse_fast = false
+  bluetooth_service_override_opp_feature_switch = true
+  bluetooth_service_override_highpowerv1_feature_switch = false
+  bluetooth_service_override_fastscan_feature_switch = false
+  bluetooth_service_override_edm_service_enable = false
+  bluetooth_service_override_ffrt_enable = true
+  bluetooth_service_override_watch_feature = false
+  bluetooth_service_override_comm_protocol_resource_manager = false
+  bluetooth_service_override_resourceschedule = true
+  bluetooth_service_override_qos_manager_enable = true
+  bluetooth_service_override_app_manager_enable = false
+  bluetooth_service_override_ddm_voice_combine_feature = false
+  bluetooth_service_override_hid_host_feature = true
+  bluetooth_service_override_bas_feature = false
+  bluetooth_service_override_audio_deadline = false
+  bluetooth_service_override_device_manager = true
+  bluetooth_service_override_kia_enable = false
+  bluetooth_service_override_hearingaid_feature_switch = false
+  bluetooth_service_override_audio_codec_aac_support = true
+  bluetooth_service_override_bt_mcu_proxy_enable = false
+  bluetooth_service_override_fusion_connectivity_support = false
+  bluetooth_service_override_disable_bt_supported = true
+  bluetooth_service_override_hid_device_feature_switch = false
+  bluetooth_service_override_audio_collaboration_enable = false
+  bluetooth_service_override_mmi_not_discover_ble = false
+  bluetooth_service_override_oobe_dialog_feature = false
+  bluetooth_service_override_io_cap_none_feature = false
+  bluetooth_service_override_intercept_peripheral_first_pair_dialog = false
+  bluetooth_service_override_local_ble_conn_public_address_enable = false
+  bluetooth_service_override_build_mode = "full"
+  bluetooth_service_override_power_on_reconnect_feature = false
+  bluetooth_service_override_pluggable_supported = false
+  bluetooth_service_override_ble_range_feature = false
+
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.telephony_call_manager) ||
+      !defined(global_parts_info.telephony_core_service) ||
+      !defined(global_parts_info.telephony_state_registry)) {
+    bluetooth_service_override_hfp_ag_feature_switch = false
+  }
+
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.multimedia_audio_framework)) {
+    bluetooth_service_override_audio_framwwork = false
+  }
+
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.distributedhardware_device_manager)) {
+    bluetooth_service_override_device_manager = false
+  }
+
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.account_os_account)) {
+    bluetooth_service_override_os_account = false
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.communication_wifi)) {
+    bluetooth_service_override_highpowerv1_feature_switch = true
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.communication_wifi)) {
+    bluetooth_service_override_fastscan_feature_switch = true
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.cloud_appgallery)) {
+    bluetooth_service_override_app_manager_enable = true
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.communication_comm_protocol_resource_manager)) {
+    bluetooth_service_override_comm_protocol_resource_manager = true
+  }
+
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.resourceschedule_resource_schedule_service)) {
+    bluetooth_service_override_resourceschedule = false
+  }
+
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.hdf_drivers_interface_audiocodec)) {
+    bluetooth_service_override_audio_codec_aac_support = false
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.communication_fusion_connectivity_manager_ext)) {
+    bluetooth_service_override_fusion_connectivity_support = true
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.msdp_spatial_awareness)) {
+    bluetooth_service_override_ble_range_feature = true
+  }
 }

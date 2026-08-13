@@ -1,0 +1,149 @@
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/ohos_var.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
+
+SUBSYSTEM_DIR = "//foundation/communication"
+PART_DIR = "//foundation/communication/bluetooth/services/bluetooth"
+BT_SERVICE_DIR = "$PART_DIR/service"
+
+config("btservice_common_config") {
+    include_dirs = [
+        ".",
+        "$BT_SERVICE_DIR/src",
+        "$BT_SERVICE_DIR/src/base",
+        "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
+    ]
+
+    cflags_cc = [
+        "-Os",
+        "-fno-rtti",
+        "-fno-exceptions",
+        "-fdata-sections",
+        "-ffunction-sections",
+        "-fno-unwind-tables",
+        "-fno-asynchronous-unwind-tables",
+        "-fno-merge-all-constants",
+        "-flto",
+        "-Wno-non-c-typedef-for-linkage",
+    ]
+}
+
+config("btservice_common_public_config") {
+    include_dirs = [
+        ".",
+        "include",
+        "src/dialog",
+    ]
+}
+
+btservice_common_sources = [
+    "src/adapter_device_config.cpp",
+    "src/bluetooth_code_convert_utils.cpp",
+    "src/common_util.cpp",
+    "src/dynamic_library_loader.cpp",
+    "src/state_machine.cpp",
+    "src/xml_parse.cpp",
+    "src/log_utils.cpp",
+    "src/preferences_manager.cpp",
+    "src/freeze_utils.cpp",
+    "src/system_ability_subscriber.cpp",
+]
+if (bluetooth_service_override_ffrt_enable) {
+    btservice_common_sources += [
+        "src/thread_util.cpp",
+        "src/timer_manager_ffrt.cpp",
+    ]
+} else {
+    btservice_common_sources += [
+        "src/thread_util_event_handler.cpp",
+        "src/timer_manager.cpp",
+    ]
+}
+
+btservice_common_deps = []
+
+btservice_common_external_deps = [
+    "ability_base:want",
+    "bluetooth:btcommon",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "ipc:ipc_single",
+    "hitrace:hitrace_meter",
+    "icu:shared_icuuc",
+    "preferences:native_preferences",
+    "samgr:samgr_proxy",
+    "libxml2:libxml2",
+]
+
+if (bluetooth_service_override_ffrt_enable) {
+    btservice_common_external_deps += [ "ffrt:libffrt" ]
+}
+
+if (bluetooth_service_override_resourceschedule) {
+  btservice_common_external_deps += [ "resource_schedule_service:ressched_client" ]
+}
+
+ohos_shared_library("btservice_common") {
+  # CFI
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  # stack_protector_ret = true
+  sanitize = {
+      cfi = true                            # Enable/disable control flow integrity detection
+      boundary_sanitize = false               # Enable boundary san detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      integer_overflow = true                # Enable integer overflow detection
+      ubsan = true                           # Enable some Ubsan options
+      debug = false
+  }
+
+  configs = [
+    ":btservice_common_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+  public_configs = [
+    ":btservice_common_public_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+  sources = btservice_common_sources
+  deps = btservice_common_deps
+  external_deps = btservice_common_external_deps
+
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}
+
+ohos_static_library("btservice_common_static") {
+  configs = [
+    ":btservice_common_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+  public_configs = [
+    ":btservice_common_public_config",
+  ]
+  sanitize = {
+    cfi = true                            # Enable/disable control flow integrity detection
+    cfi_cross_dso = true                   # Cross-SO CFI Checks
+    debug = false
+  }
+  sources = btservice_common_sources
+  deps = btservice_common_deps
+  external_deps = btservice_common_external_deps
+
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}

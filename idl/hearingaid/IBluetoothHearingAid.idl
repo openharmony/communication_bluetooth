@@ -1,0 +1,36 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package OHOS.Bluetooth;
+
+import BluetoothHearingAidType;
+import IBluetoothHearingAidObserver;
+sequenceable OHOS.IRemoteObject;
+interface_token hmos.ipc.IBluetootHearingAid;
+option_stub_hooks on;
+interface OHOS.Bluetooth.IBluetoothHearingAid {
+    void IsLocalDeviceSupportHearingAid([out] boolean support);
+    void Connect([in] String address);
+    void Disconnect([in] String address);
+    void SetVolume([in] String address, [in] long volume);
+    void GetHearingAidDeviceInfo([in] String address, [out] DeviceSide side, [out] DeviceMode mode, [out] long id);
+    void GetConnectedDevices([out] String[] connectedDevices);
+    void GetActiveDevice([out] String address, [out] String name);
+    void GetConnectionState([in] String address, [out] ConnectionState state);
+    void SetConnectionStrategy([in] String address, [in] ConnectionStrategy strategy);
+    void GetConnectionStrategy([in] String address, [out] ConnectionStrategy strategy);
+    void RegisterObserver([in] IBluetoothHearingAidObserver observer);
+    void DeRegisterObserver([in] IBluetoothHearingAidObserver observer);
+}

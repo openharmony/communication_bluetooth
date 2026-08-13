@@ -1,0 +1,27 @@
+/*
+ * Copyright (c) 2023-2023 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+persist.bluetooth.switch_enable=1
+persist.bluetooth.factoryreset="false"
+persist.bluetooth.forcesleep=0  // Only for pc
+persist.bluetooth.avrcpversion = avrcp16
+persist.bluetooth.collaboration_service=0
+persist.bluetooth.sync_sms_calllog_enable=0
+persist.bluetooth.watch_str_enable=0 // Only for watch
+persist.bluetooth.last_bluetooth_switch_action=0  // 记录上一次的开关操作，用于开关大数据感知因Crash导致的蓝牙打开失败
+persist.bluetooth.watch_hid_map_update_state=0 // Only for watch
+persist.bluetooth.watch_half_property = 0 // Only for watch
+persist.bluetooth.ranging_ant_info = 0:0 // mac:ant
+

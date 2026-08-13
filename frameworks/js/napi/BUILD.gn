@@ -290,3 +290,9 @@ group("bluetooth_napi") {
     "$SUBSYSTEM_DIR/bluetooth/frameworks/js/napi/src/bas:bas",
   ]
 }
+
+group("bluetooth_override_napi") {
+  deps = [
+    "//foundation/communication/bluetooth/frameworks/js/napi/src/hearingaid:hearingaid_napi",
+  ]
+}

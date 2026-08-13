@@ -1,0 +1,80 @@
+# Copyright (C) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
+
+BT_ROOT = "//foundation/communication/bluetooth"
+
+ohos_shared_library("hearingaid_napi") {
+  sanitize = {
+    cfi = true
+    boundary_sanitize = true
+    integer_overflow = true
+    cfi_cross_dso = true
+    debug = false
+    ubsan = true
+  }
+  branch_protector_ret = "pac_ret"
+
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+  ]
+  include_dirs = [
+    "$BT_ROOT/frameworks/js/napi/include",
+    "$BT_ROOT/services/bluetooth/common",
+    "$BT_ROOT/frameworks/inner/include",
+    "$BT_ROOT/frameworks/inner/ipc/parcel",
+  ]
+
+  defines = [
+    "ENABLE_NAPI_BLUETOOTH_MANAGER",
+  ]
+
+  sources = [
+    "native_module_hearingaid.cpp",
+    "napi_bluetooth_hearingaid.cpp",
+    "napi_bluetooth_hearingaid_observer.cpp",
+  ]
+
+  deps = [
+    "$BT_ROOT/frameworks/inner/src/hearingaid:hearingaid_framework",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "ipc:ipc_napi",
+    "napi:ace_napi",
+    "node:node_header_notice",
+    "libuv:uv",
+    "bluetooth:bt_napi_common",
+    "bluetooth:btcommon",
+    "bluetooth:btframework",
+    "samgr:samgr_proxy",
+    "hitrace:hitrace_meter",
+  ]
+
+  relative_install_dir = "module/hms/bluetooth"
+  part_name = "bluetooth"
+  subsystem_name = "communication"
+}

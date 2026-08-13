@@ -1,0 +1,106 @@
+/*
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#ifndef BT_CONFIG_H
+#define BT_CONFIG_H
+
+#define BT_TRUE true
+#define BT_FALSE false
+#define BT_FUNC_HOOK __attribute__((weak))
+
+#ifdef BLUETOOTH_WATCH_ENABLE
+#include "bt_watch_config.h"
+#endif
+
+#ifdef FEATURE_MOUSE_FAST_CONNECTION
+#include "bt_mouse_fast_connect_config.h"
+#endif
+
+#ifdef BLUETOOTH_PHONE_ENABLE
+#include "bt_phone_config.h"
+#endif
+
+#ifdef BLUETOOTH_TV_ENABLE
+#include "bt_tv_config.h"
+#endif
+
+#ifdef BLUETOOTH_HID_HOST_FEATURE_ENABLE
+#define HID_HOST_INCLUDED TRUE
+#else
+#define HID_HOST_INCLUDED FALSE
+#endif
+#ifndef BTA_HFP_VERSION
+#define BTA_HFP_VERSION HFP_VERSION_1_7
+#endif
+
+#ifndef BLUETOOTH_L2CAP_NEW_SCHED_ENABLED
+#define BLUETOOTH_L2CAP_NEW_SCHED_ENABLED BT_TRUE
+#endif  // BLUETOOTH_L2CAP_NEW_SCHED_ENABLED
+
+#ifndef BLUETOOTH_HID_DEVICE_VERSION
+#define BLUETOOTH_HID_DEVICE_VERSION 0x100
+#endif  // BLUETOOTH_HID_DEVICE_VERSION
+
+#ifndef BLUETOOTH_MAX_DEFAULT_CONNECTIONS_NUM
+#define BLUETOOTH_MAX_DEFAULT_CONNECTIONS_NUM 5
+#endif  // BLUETOOTH_MAX_DEFAULT_CONNECTIONS_NUM
+
+#ifndef BLUETOOTH_A2DP_CODEC_PRIORITY_LDAC
+#define BLUETOOTH_A2DP_CODEC_PRIORITY_LDAC A2DP_CODEC_PRIORITY_LDAC
+#endif  // BLUETOOTH_A2DP_CODEC_PRIORITY_LDAC
+
+#ifndef BLUETOOTH_A2DP_CODEC_L2HCST_PRIORITY
+#define BLUETOOTH_A2DP_CODEC_L2HCST_PRIORITY A2DP_CODEC_PRIORITY_L2HCST
+#endif  // BLUETOOTH_A2DP_CODEC_L2HCST_PRIORITY
+
+#ifndef BLUETOOTH_A2DP_CODEC_L2HCV2_PRIORITY
+#define BLUETOOTH_A2DP_CODEC_L2HCV2_PRIORITY A2DP_CODEC_PRIORITY_L2HCV2
+#endif  // BLUETOOTH_A2DP_CODEC_L2HCV2_PRIORITY
+
+#ifndef DEFAULT_STARTUP_TIMEOUT_MS
+#define DEFAULT_STARTUP_TIMEOUT_MS 4500
+#endif  // DEFAULT_STARTUP_TIMEOUT_MS
+
+#ifndef BLUETOOTH_GATT_SERVER_SYNC_TIMEOUT
+#define BLUETOOTH_GATT_SERVER_SYNC_TIMEOUT 2 // 2s
+#endif  // BLUETOOTH_GATT_SERVER_SYNC_TIMEOUT
+
+#ifndef BLUETOOTH_BLE_CREATE_ADV_TIMEOUT
+#define BLUETOOTH_BLE_CREATE_ADV_TIMEOUT 2 // 2s
+#endif  // BLUETOOTH_BLE_CREATE_ADV_TIMEOUT
+
+#ifndef HCI_SET_HIGH_POWER_MODE_DEFAULT
+#define HCI_SET_HIGH_POWER_MODE_DEFAULT (0x0200 | HCI_GRP_VENDOR_SPECIFIC)
+#endif // HCI_SET_HIGH_POWER_MODE_DEFAULT
+
+#ifndef A2DP_SBC_MAX_BITPOOL
+#define A2DP_SBC_MAX_BITPOOL 53
+#endif // A2DP_SBC_MAX_BITPOOL
+
+#ifndef HW_TWS_ECHO_VER_MAJOR_DEFAULT
+#define HW_TWS_ECHO_VER_MAJOR_DEFAULT 0x05
+#endif // HW_TWS_ECHO_VER_MAJOR_DEFAULT
+
+#ifndef HW_TWS_ECHO_VER_MINOR_DEFAULT
+#define HW_TWS_ECHO_VER_MINOR_DEFAULT 0x04
+#endif // HW_TWS_ECHO_VER_MAJOR_DEFAULT
+
+#ifndef BLUETOOTH_GATT_CLIENT_TIMEOUT
+#define BLUETOOTH_GATT_CLIENT_TIMEOUT 1 // 1s
+#endif // BLUETOOTH_GATT_CLIENT_TIMEOUT
+
+#ifndef HIGH_PRIORITY_MIN_INTERVAL
+#define HIGH_PRIORITY_MIN_INTERVAL "HighPriorityMinInterval"
+#endif
+#endif // BT_CONFIG_H

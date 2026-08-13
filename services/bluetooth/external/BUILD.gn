@@ -1,0 +1,62 @@
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+BT_ROOT = "//foundation/communication/bluetooth/services/bluetooth"
+
+config("btdummy_config") {
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+    "-fPIC",
+    "-Wno-unused-private-field",
+    "-Wno-format-nonliteral",
+    "-Wno-non-c-typedef-for-linkage",
+  ]
+  include_dirs = [ "$BT_ROOT/common" ]
+}
+
+config("btdummy_public_config") {
+  include_dirs = [ "dummy/include" ]
+}
+
+ohos_shared_library("btdummy") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  # stack_protector_ret = true
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      boundary_sanitize = true               # Enable boundary san detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      integer_overflow = true                # Enable integer overflow detection
+      ubsan = true                           # Enable some Ubsan options
+      debug = false
+  }
+  configs = [ ":btdummy_config" ]
+  public_configs = [ ":btdummy_public_config" ]
+  sources = [ "dummy/src/stub.cpp" ]
+  deps = []
+  external_deps = [
+    "bluetooth:btcommon",
+    "hilog:libhilog",
+  ]
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}

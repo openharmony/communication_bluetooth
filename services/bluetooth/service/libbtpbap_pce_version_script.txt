@@ -1,0 +1,8 @@
+{
+  global:
+    *PbapPceServiceImplInterface*;
+    *CreatePbapPceServiceImplInterface*;
+    *DestroyPbapPceServiceImplInterface*;
+  local:
+    *;
+};

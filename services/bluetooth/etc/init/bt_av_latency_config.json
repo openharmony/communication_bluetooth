@@ -1,0 +1,456 @@
+[
+    {
+        "latency_base": [
+            {
+                "device_name": "FlyPods Pro",
+                "latency_ms": 530
+            },
+            {
+                "device_name": "FlyPods",
+                "latency_ms": 530
+            },
+            {
+                "device_name": "HUAWEI FreeBuds",
+                "latency_ms": 530
+            },
+            {
+                "device_name": "FlyPods Lite",
+                "latency_ms": 530
+            },
+            {
+                "device_name": "FreeBuds Lite",
+                "latency_ms": 530
+            },
+            {
+                "device_name": "FreeBuds 2",
+                "latency_ms": 530
+            },
+            {
+                "device_name": "FreeBuds 2 Pro",
+                "latency_ms": 530
+            },
+            {
+                "device_name": "FreeBuds 3",
+                "latency_ms": 300
+            },
+            {
+                "device_name": "FlyPods 3",
+                "latency_ms": 500
+            },
+            {
+                "device_name": "HONOR Magic Earbuds",
+                "latency_ms": 500
+            },
+            {
+                "device_name": "HUAWEI FreeBuds 3i",
+                "latency_ms": 500
+            },
+            {
+                "device_name": "HONOR FlyPods 3",
+                "latency_ms": 500
+            },
+            {
+                "device_name": "WH-1000XM2",
+                "latency_ms": 250
+            },
+            {
+                "device_name": "HUAWEI FreeLace",
+                "latency_ms": 240
+            },
+            {
+                "device_name": "Galaxy Buds",
+                "latency_ms": 539
+            },
+            {
+                "device_name": "HAVIT I39",
+                "latency_ms": 312
+            },
+            {
+                "device_name": "HE05",
+                "latency_ms": 333
+            },
+            {
+                "device_name": "JBL Pulse 3",
+                "latency_ms": 388
+            },
+            {
+                "device_name": "Mi Soundbar",
+                "latency_ms": 402
+            },
+            {
+                "device_name": "EDIFIER R1700BT",
+                "latency_ms": 360
+            },
+            {
+                "device_name": "MI AIRDOTS BASIC_R",
+                "latency_ms": 480
+            },
+            {
+                "device_name": "Redmi AirDots_R",
+                "latency_ms": 316
+            },
+            {
+                "device_name": "EDIFIER TWS1",
+                "latency_ms": 400
+            },
+            {
+                "device_name": "EDIFIER LolliPods L",
+                "latency_ms": 353
+            },
+            {
+                "device_name": "QCY-T1_L",
+                "latency_ms": 358
+            },
+            {
+                "device_name": "MI Portable Bluetooth Speaker",
+                "latency_ms": 219
+            },
+            {
+                "device_name": "XMFHZ02",
+                "latency_ms": 344
+            },
+            {
+                "device_name": "i7nini",
+                "latency_ms": 396
+            },
+            {
+                "device_name": "GSG-01",
+                "latency_ms": 347
+            },
+            {
+                "device_name": "EDIFIER W200BT",
+                "latency_ms": 273
+            },
+            {
+                "device_name": "NDZ-03-GA",
+                "latency_ms": 173
+            },
+            {
+                "device_name": "AirPods",
+                "latency_ms": 386
+            },
+            {
+                "device_name": "Trekz Air by AfterShokz",
+                "latency_ms": 255
+            },
+            {
+                "device_name": "Mi True Wireless Earphones 2",
+                "latency_ms": 575
+            },
+            {
+                "device_name": "Honor xSport AM61",
+                "latency_ms": 357
+            },
+            {
+                "device_name": "MI BT18",
+                "latency_ms": 364
+            },
+            {
+                "device_name": "Mi True Wireless Earphones",
+                "latency_ms": 551
+            },
+            {
+                "device_name": "WF-1000XM3",
+                "latency_ms": 250
+            },
+            {
+                "device_name": "Kugou M1",
+                "latency_ms": 362
+            },
+            {
+                "device_name": "Beoplay A1",
+                "latency_ms": 285
+            },{
+                "device_name": "OPPO Enco Free",
+                "latency_ms": 270
+            },
+            {
+                "device_name": "AirPods Pro",
+                "latency_ms": 200
+            },
+            {
+                "device_name": "LE-Bose Revolve+ SoundLink",
+                "latency_ms": 398
+            },
+            {
+                "device_name": "Bose Revolve+ SoundLink",
+                "latency_ms": 398
+            },
+            {
+                "device_name": "Bose Revolve SoundLink",
+                "latency_ms": 450
+            },
+            {
+                "device_name": "Bose Mini II SoundLink",
+                "latency_ms": 210
+            },
+            {
+                "device_name": "Bose Mini SoundLink",
+                "latency_ms": 254
+            },
+            {
+                "device_name": "JBL Flip 4",
+                "latency_ms": 344
+            },
+            {
+                "device_name": "TWS",
+                "latency_ms": 366
+            },
+            {
+                "device_name": "JBL Charge 3",
+                "latency_ms": 275
+            },
+            {
+                "device_name": "BeatsX",
+                "latency_ms": 375
+            },
+            {
+                "device_name": "MI AIRDOTS BASIC_R",
+                "latency_ms": 480
+            },
+            {
+                "device_name": "EDIFIER TWS1",
+                "latency_ms": 450
+            },
+            {
+                "device_name": "猫王·原子唱机B612",
+                "latency_ms": 387
+            },
+            {
+                "device_name": "EDIFIER W288BT",
+                "latency_ms": 517
+            },
+            {
+                "device_name": "Galaxy Buds",
+                "latency_ms": 366
+            },
+            {
+                "device_name": "Airpods2",
+                "latency_ms": 350
+            },
+            {
+                "device_name": "HUAWEI FreeLace Pro",
+                "latency_ms": 392
+            },
+            {
+                "device_name": "HUAWEI Sound-",
+                "latency_ms": 408
+            },
+            {
+                "device_name": "HUAWEI Sound X-",
+                "latency_ms": 466
+            },
+            {
+                "device_name": "vivo TWS",
+                "latency_ms": 545
+            },
+            {
+                "device_name": "SANSUI",
+                "latency_ms": 477
+            },
+            {
+                "device_name": "SANSUI i37",
+                "latency_ms": 450
+            },
+            {
+                "device_name": "Beats Solo",
+                "latency_ms": 409
+            },
+            {
+                "device_name": "Powerbeats³",
+                "latency_ms": 385
+            },
+            {
+                "device_name": "Earbuds X1",
+                "latency_ms": 380
+            },
+            {
+                "device_name": "Beats Studio³",
+                "latency_ms": 374
+            },
+            {
+                "device_name": "Bluetooth music",
+                "latency_ms": 375
+            },
+            {
+                "device_name": "HONOR xSport PRO",
+                "latency_ms": 357
+            },
+            {
+                "device_name": "MDR-1000X",
+                "latency_ms": 336
+            },
+            {
+                "device_name": "Aeropex by AfterShokz",
+                "latency_ms": 335
+            },
+            {
+                "device_name": "Redmi AirDots 2",
+                "latency_ms": 326
+            },
+            {
+                "device_name": "LE-Bose QuietControl 30",
+                "latency_ms": 306
+            },
+            {
+                "device_name": "Bose QuietControl 30",
+                "latency_ms": 306
+            },
+            {
+                "device_name": "唱吧小巨蛋麦克风G2",
+                "latency_ms": 365
+            },
+            {
+                "device_name": "KTV",
+                "latency_ms": 366
+            },
+            {
+                "device_name": "唱吧喇叭麦克风G1",
+                "latency_ms": 367
+            },
+            {
+                "device_name": "AMOI F9",
+                "latency_ms": 369
+            },
+            {
+                "device_name": "HUAWEI CM510",
+                "latency_ms": 370
+            },
+            {
+                "device_name": "WH-1000XM4",
+                "latency_ms": 371
+            },
+            {
+                "device_name": "HONOR AM510",
+                "latency_ms": 373
+            },
+            {
+                "device_name": "Ugreen",
+                "latency_ms": 376
+            },
+            {
+                "device_name": "Beoplay E8",
+                "latency_ms": 384
+            },
+            {
+                "device_name": "Galaxy Buds",
+                "latency_ms": 544
+            },
+            {
+                "device_name": "HK Aura Studio 2",
+                "latency_ms": 397
+            },
+            {
+                "device_name": "Mi Bluetooth Neckband Earphones",
+                "latency_ms": 398
+            },
+            {
+                "device_name": "LE-Bose QC35 II",
+                "latency_ms": 400
+            },
+            {
+                "device_name": "Bose QC35 II",
+                "latency_ms": 400
+            },
+            {
+                "device_name": "Beats Solo³",
+                "latency_ms": 409
+            },
+            {
+                "device_name": "WS-858",
+                "latency_ms": 417
+            },
+            {
+                "device_name": "Jabra Elite 65t",
+                "latency_ms": 419
+            },
+            {
+                "device_name": "天猫精灵CCL",
+                "latency_ms": 437
+            },
+            {
+                "device_name": "JBL Charge 4",
+                "latency_ms": 441
+            },
+            {
+                "device_name": "TWS_p10 xsp",
+                "latency_ms": 452
+            },
+            {
+                "device_name": "nubia pods",
+                "latency_ms": 462
+            },
+            {
+                "device_name": "xiaodu-A1",
+                "latency_ms": 493
+            },
+            {
+                "device_name": "vivo TWS 1",
+                "latency_ms": 546
+            },
+            {
+                "device_name": "BLE_ATH-CKS5TW",
+                "latency_ms": 547
+            },
+            {
+                "device_name": "Galaxy Buds Live",
+                "latency_ms": 742
+            },
+            {
+                "label": "Nile",
+                "model_id": "279",
+                "latency_ms": 400
+            },
+            {
+                "label": "ROC",
+                "new_model_id": "ZA06",
+                "latency_ms": 100
+            },
+            {
+                "label": "ROC",
+                "model_id": "59",
+                "latency_ms": 100
+            },
+            {
+                "label": "ROC",
+                "new_model_id": "ZA07",
+                "latency_ms": 245
+            },
+            {
+                "label": "ROC",
+                "model_id": "60",
+                "label": "M1",
+                "latency_ms": 245
+            },
+            {
+                "label": "ROC",
+                "new_model_id": "ZC02",
+                "latency_ms": 400
+            },
+            {
+                "label": "ROC",
+                "model_id": "290",
+                "latency_ms": 400
+            },
+            {
+                "label": "ROC",
+                "model_id": "291",
+                "latency_ms": 400
+            },
+            {
+                "label": "ROC",
+                "model_id": "265",
+                "latency_ms": 300
+            },
+            {
+                "label": "ROC",
+                "model_id": "297",
+                "latency_ms": 100
+            },
+            {
+                "new_model_id": "ZA09",
+                "latency_ms": 100
+            }
+        ]
+    }
+]

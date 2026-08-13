@@ -321,3 +321,9 @@ ohos_shared_library("btcommon") {
   subsystem_name = "communication"
   part_name = "bluetooth"
 }
+
+group("bluetooth_override_framework") {
+  deps = [
+    "//foundation/communication/bluetooth/frameworks/inner/src/hearingaid:hearingaid_framework",
+  ]
+}

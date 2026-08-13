@@ -1,0 +1,16 @@
+{
+  global:
+    "*MediaInterfaceAdapter*";
+    "*AvrcpMediaInterfaceImpl*";
+    "*CreateAvrcpMediaInterface*";
+    "*DestroyAvrcpMediaInterface*";
+    "*AvrcpCoverArtStorage*";
+    "*CoverArt*";
+    "*BipService*";
+    "*BipImageProperties*";
+    "*BipStateMachine*";
+    "*BipDisconnectedState*";
+    "*BipConnectedState*";
+  local:
+    *;
+};

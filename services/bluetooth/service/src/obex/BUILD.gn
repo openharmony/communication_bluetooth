@@ -1,0 +1,121 @@
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
+
+SUBSYSTEM_DIR = "//foundation/communication"
+PART_DIR = "//foundation/communication/bluetooth/services/bluetooth"
+BT_SERVICE_DIR = "$PART_DIR/service"
+
+ServiceObexSrc = [
+  "obex_server_transport.cpp",
+  "obex_server_session.cpp",
+  "obex_header.cpp",
+  "obex_client_session.cpp",
+  "obex_server_actions.cpp",
+  "obex_server_action_interface.cpp",
+  "obex_reject_server.cpp",
+]
+
+config("btservice_config") {
+  include_dirs = [
+    "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
+    "$BT_SERVICE_DIR/include",
+    "$BT_SERVICE_DIR/src",
+    "$BT_SERVICE_DIR/src/base",
+    "$BT_SERVICE_DIR/src/common",
+    "$BT_SERVICE_DIR/src/permission",
+    "$BT_SERVICE_DIR/src/dialog",
+    "$BT_SERVICE_DIR/src/util",
+    "$BT_SERVICE_DIR/src/ble/ble_scan_filter",
+    "$BT_SERVICE_DIR/src/classic",
+    "$BT_SERVICE_DIR/src/ble",
+    "$BT_SERVICE_DIR/src/bluetooth_audio_manager",
+    "$BT_SERVICE_DIR/src/bluetooth_audio_manager_info",
+    "$BT_SERVICE_DIR/src/gavdp",
+    "$BT_SERVICE_DIR/src/hfp_ag",
+    "$BT_SERVICE_DIR/src/avrcp_tg",
+    "$BT_SERVICE_DIR/src/obex",
+    "$PART_DIR/btchr/include",
+    "$PART_DIR/common",
+  ]
+
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+    "-fPIC",
+    "-Wno-format",
+    "-Wno-pessimizing-move",
+    "-Wunused-variable",
+    "-Wreorder",
+    "-Wmissing-braces",
+    "-Wimplicit-fallthrough",
+    "-Wunused-private-field",
+    "-Wlogical-op-parentheses",
+    "-Wmissing-field-initializers",
+    "-Wparentheses-equality",
+    "-Wparentheses",
+    "-Wdelete-non-abstract-non-virtual-dtor",
+    "-Wignored-qualifiers",
+    "-Wdelete-abstract-non-virtual-dtor",
+    "-Wuninitialized",
+    "-Woverloaded-virtual",
+    "-Wdangling-else",
+    "-Woverloaded-virtual",
+    "-Wno-non-c-typedef-for-linkage",
+    "-Wno-unused-but-set-variable",
+    "-Wno-array-parameter",
+  ]
+}
+
+########################### obex ###############################
+ohos_shared_library("bt_obex") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  stack_protector_ret = false
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      boundary_sanitize = true               # Enable boundary san detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      integer_overflow = true                # Enable integer overflow detection
+      ubsan = true                           # Enable some Ubsan options
+      debug = false
+  }
+
+  configs = [
+    ":btservice_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+
+  sources = ServiceObexSrc
+
+  deps = [
+    "$PART_DIR/common:btservice_common",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "hilog:libhilog",
+    "c_utils:utils",
+  ]
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}

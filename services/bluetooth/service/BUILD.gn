@@ -1,0 +1,1382 @@
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
+
+PART_DIR = "//foundation/communication/bluetooth/services/bluetooth"
+BT_SERVICE_DIR = "$PART_DIR/service"
+
+ServiceA2dpSrcSrc = [ "src/a2dp_src/a2dp_src_service.cpp" ]
+
+ServiceAvrcpTgSrc = [
+  "src/avrcp_tg/avrcp_tg_service.cpp",
+  "src/avrcp_tg/avrcp_tg_volume.cpp",
+  "src/avrcp_tg/avrcp_tg_service_manager.cpp",
+  "src/avrcp_tg/avrcp_tg_avsession_media_loader.cpp",
+  "src/avrcp_tg/refuse_play_helper.cpp",
+]
+
+ServiceAvSyncSrc = [
+  "src/avsync/av_sync_config_info.cpp",
+  "src/avsync/av_sync_manager.cpp",
+]
+
+ServiceBleSrc = [
+  "src/ble/ble_adapter.cpp",
+  "src/ble/ble_advertiser_impl.cpp",
+  "src/ble/ble_central_manager_impl.cpp",
+  "src/ble/ble_range_impl.cpp",
+  "src/ble/ble_scan_filter.cpp",
+]
+
+ServiceClassicSrc = [
+  "src/classic/classic_sync_paired_device.cpp",
+  "src/classic/classic_adapter.cpp",
+  "src/classic/classic_config.cpp",
+]
+
+ServiceCommonSrc = [
+  "src/common/adapter_config.cpp",
+  "src/common/adapter_device_info.cpp",
+  "src/common/adapter_manager.cpp",
+  "src/common/adapter_state_machine.cpp",
+  "src/common/class_creator.cpp",
+  "src/common/compat.cpp",
+  "src/common/power_device.cpp",
+  "src/common/power_manager.cpp",
+  "src/common/power_spec.cpp",
+  "src/common/power_state_machine.cpp",
+  "src/common/profile_config.cpp",
+  "src/common/profile_info.cpp",
+  "src/common/profile_service_manager.cpp",
+  "src/common/sys_state_machine.cpp",
+  "src/common/adapter_properties.cpp",
+  "src/common/bluetooth_device.cpp",
+  "src/common/remote_device_properties.cpp",
+  "src/common/bluetooth_airplane_manager.cpp",
+  "src/common/bluetooth_common_event_subscriber.cpp",
+  "src/common/connect_strategy_manager.cpp",
+  "src/common/bluetooth_hw_interface.cpp",
+  "src/common/bluetooth_connection_manager.cpp",
+  "src/common/bluetooth_audio_framework_adapter.cpp",
+  "src/common/bluetooth_device_battery_manager.cpp",
+  "src/common/param_update_event_manager.cpp",
+  "src/common/switch_dependency.cpp",
+  "src/common/satellite_manager.cpp",
+  "src/common/bluetooth_state_manager.cpp",
+  "src/common/cloud_device_manager.cpp",
+  "src/common/system_ability_processer.cpp",
+  "src/common/bluetooth_hw_interface_hook.cpp",
+]
+
+ServiceGattSrc = [
+  "src/gatt/gatt_client_application.cpp",
+  "src/gatt/gatt_client_service.cpp",
+  "src/gatt/gatt_server_application.cpp",
+  "src/gatt/gatt_server_service.cpp",
+  "src/gatt/gatt_service_base.cpp",
+  "src/gatt/bluetooth_gatt_interface.cpp",
+]
+
+ServiceGavdpSrc = [
+  "src/gavdp/a2dp_service_connection.cpp",
+  "src/gavdp/a2dp_service_device.cpp",
+  "src/gavdp/a2dp_service_state_machine.cpp",
+  "src/gavdp/a2dp_service.cpp",
+  "src/gavdp/a2dp_service_codec.cpp",
+  "src/gavdp/hdf_dynamic_library_loader.cpp",
+]
+
+ServiceHfpAgSrc = [
+  "src/hfp_ag/hfp_ag_service.cpp",
+  "src/hfp_ag/hfp_ag_statemachine.cpp",
+  "src/hfp_ag/hfp_ag_system_event_processer.cpp",
+  "src/hfp_ag/hfp_ag_system_interface.cpp",
+  "src/hfp_ag/call_statemachine.cpp",
+  "src/hfp_ag/hfp_ag_at_phonebook.cpp",
+]
+
+ServiceObexSrc = [
+  "src/obex/obex_server_socket.cpp",
+  "src/obex/obex_server_socket_thread.cpp",
+]
+
+ServiceSdpAdapterSrc = [
+  "src/sdp_adapter/sdp_adapter.cpp",
+  "src/sdp_adapter/sdp_found_event_publish.cpp",
+]
+
+ServiceSockSrc = [
+  "src/sock/socket_service.cpp",
+]
+
+ServiceTransportSrc = [
+
+]
+
+ServiceUtilSrc = [
+  "src/util/bluetooth_common_event_helper.cpp",
+  "src/util/semaphore_utils.cpp",
+  "src/util/bluetooth_datashare_utils.cpp",
+  "src/util/json_utils.cpp",
+  "src/util/system_ability_manager_utils.cpp",
+  "src/util/bt_func_hook.cpp",
+  "src/util/control_intercept_plugin.cpp",
+  "src/util/hash_utils.cpp",
+]
+
+ServiceAudioMgrSrc = [
+  "src/bluetooth_audio_manager/bluetooth_audio_manager.cpp",
+  "src/bluetooth_audio_manager/bluetooth_audio_manager_interface.cpp",
+]
+
+ServiceAudioMgrInfoSrc = [
+  "src/bluetooth_audio_manager_info/bluetooth_audio_manager_info.cpp",
+]
+
+ServicePermissionSrc = [
+  "src/permission/permission_item.cpp",
+  "src/permission/permission_manager.cpp",
+]
+
+ServiceDialogSrc = [
+  "src/dialog/dialog_pair.cpp",
+  "src/dialog/dialog_switch.cpp",
+  "src/dialog/bluetooth_ability_connection.cpp",
+  "src/dialog/bluetooth_dialog.cpp",
+  "src/dialog/dialog_result.cpp",
+]
+
+ServiceRecoverSrc = [
+  "src/recover/a2dp_hfp_recover.cpp",
+]
+
+ServiceExternalDepsAdapterSrc = [
+  "src/external_deps_adapter/bluetooth_os_account.cpp",
+]
+
+config("btservice_public_config") {
+  include_dirs = [
+    "include",
+    "$PART_DIR/common",
+    "$PART_DIR/common/include",
+    "$PART_DIR/ipc/common",
+    "$BT_SERVICE_DIR/src/common",
+  ]
+}
+
+config("btservice_config") {
+  include_dirs = [
+    "$BT_SERVICE_DIR/include",
+    "$BT_SERVICE_DIR/src",
+    "$BT_SERVICE_DIR/src/base",
+    "$BT_SERVICE_DIR/src/common",
+    "$BT_SERVICE_DIR/src/permission",
+    "$BT_SERVICE_DIR/src/dialog",
+    "$BT_SERVICE_DIR/src/util",
+    "$BT_SERVICE_DIR/src/ble/ble_scan_filter",
+    "$BT_SERVICE_DIR/src/classic",
+    "$BT_SERVICE_DIR/src/ble",
+    "$BT_SERVICE_DIR/src/gatt",
+    "$BT_SERVICE_DIR/src/bluetooth_audio_manager",
+    "$BT_SERVICE_DIR/src/bluetooth_audio_manager_info",
+    "$BT_SERVICE_DIR/src/bluetooth_resource_manager",
+    "$BT_SERVICE_DIR/src/gavdp",
+    "$BT_SERVICE_DIR/src/hfp_ag",
+    "$BT_SERVICE_DIR/src/hfp_hf",
+    "$BT_SERVICE_DIR/src/hearing_aid",
+    "$BT_SERVICE_DIR/src/avrcp_tg",
+    "$BT_SERVICE_DIR/src/avsync",
+    "$BT_SERVICE_DIR/src/obex",
+    "$BT_SERVICE_DIR/src/watch",
+    "$BT_SERVICE_DIR/src/features",
+    "$BT_SERVICE_DIR/src/recover",
+    "$BT_SERVICE_DIR/src/external_deps_adapter",
+    "$BT_SERVICE_DIR/src/sensorhub_collaboration",
+    "$PART_DIR/btchr/include",
+    "$PART_DIR/common",
+    "$PART_DIR/common/include",
+  ]
+
+  defines = [
+    "COMMUNICATION_L2"
+  ]
+
+  if (bluetooth_service_override_bt_mcu_proxy_enable) {
+    defines += [
+      "BT_MCU_PROXY_ENABLE",
+      "HAS_NO_BDROID_BUILDCFG"
+    ]
+  }
+
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+    "-fPIC",
+    "-Wno-format",
+    "-Wno-pessimizing-move",
+    "-Wunused-variable",
+    "-Wreorder",
+    "-Wmissing-braces",
+    "-Wimplicit-fallthrough",
+    "-Wunused-private-field",
+    "-Wlogical-op-parentheses",
+    "-Wmissing-field-initializers",
+    "-Wparentheses-equality",
+    "-Wparentheses",
+    "-Wdelete-non-abstract-non-virtual-dtor",
+    "-Wignored-qualifiers",
+    "-Wdelete-abstract-non-virtual-dtor",
+    "-Wuninitialized",
+    "-Woverloaded-virtual",
+    "-Wdangling-else",
+    "-Woverloaded-virtual",
+    "-Wno-non-c-typedef-for-linkage",
+    "-Wno-unused-but-set-variable",
+    "-Wno-array-parameter",
+  ]
+}
+
+# btservice target sources
+btservice_sources = ServiceCommonSrc + ServiceUtilSrc
+btservice_sources += ServiceA2dpSrcSrc
+btservice_sources += ServiceAvrcpTgSrc
+btservice_sources += ServiceAvSyncSrc
+btservice_sources += ServiceBleSrc
+btservice_sources += ServiceClassicSrc
+btservice_sources += ServiceGattSrc
+btservice_sources += ServiceGavdpSrc
+btservice_sources += ServiceHfpAgSrc
+btservice_sources += ServiceObexSrc
+btservice_sources += ServiceSockSrc
+btservice_sources += ServiceTransportSrc
+btservice_sources += ServicePermissionSrc
+btservice_sources += ServiceDialogSrc
+btservice_sources += ServiceAudioMgrSrc
+btservice_sources += ServiceAudioMgrInfoSrc
+btservice_sources += ServiceSdpAdapterSrc
+btservice_sources += ServiceExternalDepsAdapterSrc
+btservice_sources += ServiceRecoverSrc
+
+if (bluetooth_service_override_hearingaid_feature_switch) {
+  btservice_sources += [
+    "src/hearing_aid/hearing_aid_service.cpp",
+  ]
+}
+
+if (bluetooth_service_override_hfp_hf_feature_switch) {
+  btservice_sources += [
+    "src/hfp_hf/hfp_hf_service.cpp",
+    "src/hfp_hf/hfp_hf_statemachine.cpp",
+    "src/hfp_hf/hfp_hf_call_manager.cpp"
+  ]
+}
+if (bluetooth_service_override_a2dp_sink_feature_switch) {
+  btservice_sources += ["src/a2dp_snk/a2dp_snk_service.cpp",]
+}
+if (bluetooth_service_override_pan_feature_switch) {
+  btservice_sources += [
+    "src/pan/pan_service.cpp",
+  ]
+}
+if (bluetooth_service_override_watch_feature) {
+  btservice_sources += [
+    "src/watch/watch_service.cpp",
+    "src/watch/watch_device_manager.cpp",
+  ]
+}
+
+if (bluetooth_service_override_power_on_reconnect_feature) {
+  btservice_sources += [
+    "src/features/power_on_reconnect.cpp",
+  ]
+}
+
+if (bluetooth_service_override_avrcp_ct_feature_switch) {
+  btservice_sources += ["src/avrcp_ct/avrcp_ct_service.cpp",]
+}
+if (bluetooth_service_override_pbap_pse_feature_switch) {
+  btservice_sources += [
+    "src/pbap_pse/pbap_pse_service.cpp",
+  ]
+}
+
+if (bluetooth_service_override_map_mse_feature_switch) {
+  btservice_sources += [
+    "src/map_mse/map_mse_service.cpp",
+  ]
+}
+
+if (bluetooth_service_override_opp_feature_switch) {
+  btservice_sources += [
+    "src/opp/opp_service.cpp",
+  ]
+}
+
+if (bluetooth_service_override_highpowerv1_feature_switch) {
+  btservice_sources += ["src/common/bluetooth_highpower_manager.cpp",]
+}
+
+if (bluetooth_service_override_fastscan_feature_switch) {
+  btservice_sources += ["src/common/bluetooth_fastscan_manager_loader.cpp",]
+}
+
+if (bluetooth_service_override_edm_service_enable) {
+  btservice_sources += [
+    "src/common/bluetooth_edm_manager.cpp"
+  ]
+}
+
+if(bluetooth_service_override_ble_mouse_fast){
+  btservice_sources += [
+    "src/common/pc_power_manager.cpp",
+  ]
+}
+
+if (bluetooth_service_override_comm_protocol_resource_manager) {
+  btservice_sources += [
+    "src/bluetooth_resource_manager/bluetooth_resource_manager.cpp",
+    "src/common/bluetooth_channel_rssi_manager.cpp",
+  ]
+}
+
+if (bluetooth_service_override_hid_host_feature) {
+    btservice_sources += [
+      "src/hid_host/hid_host_service.cpp",
+      "src/hid_host/hid_host_statemachine.cpp",
+    ]
+  }
+
+if (bluetooth_service_override_bas_feature) {
+  btservice_sources += [
+    "src/bas/bas_service.cpp",
+  ]
+}
+
+if (bluetooth_service_override_hid_device_feature_switch) {
+  btservice_sources += [
+    "src/hid_device/hid_device_service.cpp",
+  ]
+}
+
+if (bluetooth_service_override_contexthub_ble) {
+    btservice_sources += [
+      "src/sensorhub_collaboration/sensorhub_collaboration_service.cpp",
+    ]
+}
+
+btservice_deps = [
+  "$PART_DIR/btchr:btchr",
+  "$PART_DIR/common:btservice_common",
+  "$BT_SERVICE_DIR/src/obex:bt_obex",
+  "$PART_DIR/external:btdummy",
+]
+
+btservice_external_deps = [
+  "ability_base:want",
+  "ability_base:zuri",
+  "ability_runtime:ability_connect_callback_stub",
+  "ability_runtime:abilitykit_native",
+  "ability_runtime:extension_manager",
+  "bundle_framework:appexecfwk_base",
+  "access_token:libaccesstoken_sdk",
+  "access_token:libprivacy_sdk",
+  "access_token:libtokenid_sdk",
+  "bluetooth:btcommon",
+  "common_event_service:cesfwk_innerkits",
+  "c_utils:utils",
+  "data_share:datashare_common",
+  "data_share:datashare_consumer",
+  "hdf_core:libhdi",
+  "hdf_core:libhdf_ipc_adapter",
+  "hdf_core:libpub_utils",
+  "hisysevent:libhisysevent",
+  "hilog:libhilog",
+  "ipc:ipc_single",
+  "init:libbegetutil",
+  "init:libbeget_proxy",
+  "power_manager:powermgr_client",
+  "samgr:samgr_proxy",
+  "preferences:native_preferences",
+  "huks:libhukssdk",
+  "hitrace:hitrace_meter",
+  "cJSON:cjson",
+  "bounds_checking_function:libsec_shared",
+  "bluetooth_service:btstack",
+  "openssl:libcrypto_shared",
+]
+
+if (bluetooth_service_override_audio_framwwork) {
+  btservice_external_deps += [
+    "audio_framework:audio_policy_manager",
+    "audio_framework:audio_engine_manager",
+    "audio_framework:audio_foundation",
+  ]
+}
+
+if (bluetooth_service_override_device_manager) {
+  btservice_external_deps += [
+    "device_manager:devicemanagerminisdk",
+  ]
+}
+
+if (bluetooth_service_override_hfp_ag_feature_switch) {
+  btservice_external_deps += [
+    "call_manager:tel_call_manager_api",
+    "core_service:tel_core_service_api",
+    "state_registry:tel_state_registry_api",
+  ]
+}
+
+if (defined(global_parts_info) && defined(global_parts_info.powermgr_battery_manager)) {
+  btservice_external_deps += [
+    "battery_manager:batterysrv_client",
+  ]
+}
+
+if (bluetooth_service_override_hfp_hf_feature_switch) {
+  btservice_external_deps += [
+    "call_manager:tel_call_manager_api",
+  ]
+}
+
+if (bluetooth_service_override_os_account) {
+  btservice_external_deps += [
+    "os_account:libaccountkits",
+    "os_account:os_account_innerkits",
+  ]
+}
+
+if (bluetooth_service_override_edm_service_enable) {
+  btservice_external_deps += [ "enterprise_device_management:edmservice_kits" ]
+}
+
+if (bluetooth_service_override_highpowerv1_feature_switch) {
+  btservice_external_deps += ["wifi:wifi_sdk",]
+}
+
+if (bluetooth_service_override_ffrt_enable) {
+  btservice_external_deps += [ "ffrt:libffrt" ]
+}
+
+if (bluetooth_service_override_qos_manager_enable) {
+  btservice_external_deps += [ "qos_manager:concurrent_task_client" ]
+}
+
+if (bluetooth_service_override_resourceschedule) {
+  btservice_external_deps += [ "resource_schedule_service:ressched_client" ]
+}
+
+if (bluetooth_service_override_kia_enable) {
+  btservice_sources += [
+    "src/common/bluetooth_kia_refuse_policy_manager.cpp"
+  ]
+  btservice_external_deps += [
+    "cJSON:cjson",
+    "security_guard:libsg_collect_sdk",
+  ]
+}
+
+if (bluetooth_service_override_edm_service_enable) {
+  btservice_external_deps += [
+    "security_guard:libsg_collect_sdk",
+  ]
+}
+
+########################### btservice ###############################
+ohos_shared_library("btservice") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  # stack_protector_ret = true
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      boundary_sanitize = true               # Enable boundary san detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      integer_overflow = true                # Enable integer overflow detection
+      ubsan = true                           # Enable some Ubsan options
+      debug = false
+      blocklist = "./bluetooth_service_blocklist.txt"
+  }
+  configs = [
+    ":btservice_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+  public_configs = [ ":btservice_public_config" ]
+  # Used to control the export of dynamic library symbols.
+  version_script = "libbtservice_version_script.txt"
+
+  sources = btservice_sources
+  deps = btservice_deps
+  external_deps = btservice_external_deps
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+########################### btservice_static ###############################
+# Only used for unitest
+ohos_static_library("btservice_static") {
+  configs = [
+    ":btservice_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      debug = false
+      blocklist = "./bluetooth_service_static_blocklist.txt"
+  }
+  public_configs = [ ":btservice_public_config" ]
+
+  sources = btservice_sources
+  deps = btservice_deps
+  public_deps = [ "$PART_DIR/common:btservice_common", ]
+  external_deps = btservice_external_deps
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+fast_scan_sources = []
+fast_scan_deps = []
+fast_scan_external_deps = []
+if (bluetooth_service_override_fastscan_feature_switch) {
+  fast_scan_sources = [
+    "src/common/bluetooth_fastscan_manager.cpp"
+  ]
+
+  fast_scan_deps = [
+    "$PART_DIR/btchr:btchr",
+    "$PART_DIR/common:btservice_common",
+  ]
+
+  fast_scan_external_deps = [
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "samgr:samgr_proxy",
+    "ipc:ipc_single",
+    "c_utils:utils",
+    "bluetooth:btcommon",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
+    "wifi:wifi_sdk",
+    "power_manager:powermgr_client",
+    "bluetooth_service:btstack",
+  ]
+
+  if (bluetooth_service_override_ffrt_enable) {
+    fast_scan_external_deps += [ "ffrt:libffrt" ]
+  }
+
+  if (bluetooth_service_override_app_manager_enable) {
+    fast_scan_external_deps += [ "appgallery:appinfomanager_client" ]
+  }
+}
+
+########################### btfast_scan ##################################
+ohos_shared_library("btfast_scan") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  stack_protector_ret = false
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      boundary_sanitize = true               # Enable boundary san detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      integer_overflow = true                # Enable integer overflow detection
+      ubsan = true                           # Enable some Ubsan options
+      debug = false
+  }
+  configs = [
+    ":btservice_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+
+  public_configs = [ ":btservice_public_config" ]
+  # Used to control the export of dynamic library symbols.
+  version_script = "libbtfast_scan_version_script.txt"
+
+  sources = fast_scan_sources
+  deps = fast_scan_deps
+  external_deps = fast_scan_external_deps
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+########################### btfast_scan_static ##########################
+# Only used for unitest
+ohos_static_library("btfast_scan_static") {
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      debug = false
+  }
+  configs = [
+    ":btservice_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+
+  public_configs = [ ":btservice_public_config" ]
+
+  sources = fast_scan_sources
+  deps = fast_scan_deps
+  external_deps = fast_scan_external_deps
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+########################### btavrcp_media ###############################
+ohos_shared_library("btavrcp_media") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  stack_protector_ret = false
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      boundary_sanitize = true               # Enable boundary san detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      integer_overflow = true                # Enable integer overflow detection
+      ubsan = true                           # Enable some Ubsan options
+      debug = false
+  }
+
+  configs = [
+    ":btservice_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+  # Used to control the export of dynamic library symbols.
+  version_script = "libavrcp_media_version_script.txt"
+
+  if (bluetooth_service_override_avrcp_avsession) {
+    sources = [
+      "src/avrcp_tg/avrcp_tg_avsession_media.cpp",
+      "src/avrcp_tg/avrcp_cover_art_storage.cpp",
+      "src/avrcp_tg/avrcp_tg_bip_statemachine.cpp",
+      "src/avrcp_tg/avrcp_tg_bip_obex_server.cpp",
+      "src/avrcp_tg/avrcp_bip_service.cpp",
+      "src/avrcp_tg/bip_encoding.cpp",
+      "src/avrcp_tg/bip_image_properties.cpp",
+      "src/avrcp_tg/bip_image_format.cpp",
+      "src/avrcp_tg/bip_transformation.cpp",
+      "src/avrcp_tg/cover_art.cpp",
+      "src/avrcp_tg/bip_image_descriptor.cpp",
+    ]
+  }
+
+  if(bluetooth_service_override_audio_framwwork){
+    sources += [
+      "src/avrcp_tg/play_helper.cpp"
+    ]
+  }
+
+  deps = [
+    "$PART_DIR/btchr:btchr",
+    "$PART_DIR/common:btservice_common",
+  ]
+
+  if (bluetooth_service_override_avrcp_avsession) {
+    deps += [ 
+      "$BT_SERVICE_DIR/src/obex:bt_obex",
+    ]
+  }
+
+  external_deps = [
+    "bluetooth:btcommon",
+    "ability_base:configuration",
+    "ability_base:want",
+    "bundle_framework:appexecfwk_base",
+    "hilog:libhilog",
+    "c_utils:utils",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+    "hitrace:hitrace_meter",
+    "bluetooth_service:btstack",
+  ]
+
+  if (bluetooth_service_override_avrcp_avsession) {
+    external_deps += [
+      "ability_runtime:wantagent_innerkits",
+      "audio_framework:audio_policy_manager",
+      "audio_framework:audio_engine_manager",
+      "av_session:avsession_client",
+      "av_session:avsession_common",
+      "input:libmmi-client",
+      "image_framework:image_native",
+      "openssl:libcrypto_shared",
+      "libxml2:libxml2",
+    ]
+  }
+
+  if (bluetooth_service_override_ffrt_enable) {
+    external_deps += [ "ffrt:libffrt" ]
+  }
+
+  if (bluetooth_service_override_audio_framwwork) {
+    external_deps += [ "audio_framework:audio_renderer" ]
+  }
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+btpbap_pse_sources = []
+btpbap_pse_deps = []
+btpbap_pse_external_deps = []
+if (bluetooth_service_override_pbap_pse_feature_switch) {
+  btpbap_pse_sources = [
+    "src/pbap_pse/pbap_pse_statemachine.cpp",
+    "src/pbap_pse/pbap_pse_obex_server.cpp",
+    "src/pbap_pse/pbap_pse_vcard_manager.cpp",
+    "src/pbap_pse/pbap_pse_datashare_utils.cpp",
+    "src/pbap_pse/pbap_pse_appparam.cpp",
+    "src/pbap_pse/pbap_pse_service_impl.cpp",
+    "src/pbap_pse/pbab_pse_vcard_filter.cpp",
+  ]
+
+  btpbap_pse_deps = [
+    "$PART_DIR/common:btservice_common",
+    "$BT_SERVICE_DIR/src/obex:bt_obex",
+  ]
+
+  btpbap_pse_external_deps = [
+    "ability_base:zuri",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
+    "hilog:libhilog",
+    "c_utils:utils",
+    "bluetooth:btcommon",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "core_service:tel_core_service_api",
+    "state_registry:tel_state_registry_api",
+    "call_manager:tel_call_manager_api",
+    "audio_framework:audio_policy_manager",
+    "samgr:samgr_proxy",
+    "core_service:libtel_vcard",
+    "hitrace:hitrace_meter",
+    "common_event_service:cesfwk_innerkits",
+    "ability_base:want",
+    "bluetooth_service:btstack",
+  ]
+
+  if (bluetooth_service_override_ffrt_enable) {
+    btpbap_pse_external_deps += [ "ffrt:libffrt" ]
+  }
+  if (bluetooth_service_override_os_account) {
+    btpbap_pse_external_deps += [
+      "os_account:os_account_innerkits",
+    ]
+  }
+}
+
+########################### pbap_pse ###############################
+ohos_shared_library("btpbap_pse") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  stack_protector_ret = false
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      boundary_sanitize = true               # Enable boundary san detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      integer_overflow = true                # Enable integer overflow detection
+      ubsan = true                           # Enable some Ubsan options
+      debug = false
+  }
+
+  configs = [
+    ":btservice_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+  # Used to control the export of dynamic library symbols.
+  version_script = "libbtpbap_pse_version_script.txt"
+
+  public_configs = [ ":btservice_public_config" ]
+
+  sources = btpbap_pse_sources
+  deps = btpbap_pse_deps
+  external_deps = btpbap_pse_external_deps
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+########################### pbap_pse_static ###############################
+# Only used for unitest
+ohos_static_library("btpbap_pse_static") {
+  configs = [
+    ":btservice_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      debug = false
+      blocklist = "./bluetooth_service_static_blocklist.txt"
+  }
+  public_configs = [ ":btservice_public_config" ]
+
+  sources = btpbap_pse_sources
+  deps = btpbap_pse_deps
+  external_deps = btpbap_pse_external_deps
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+btbas_sources = []
+btbas_deps = []
+btbas_external_deps = []
+if (bluetooth_service_override_bas_feature) {
+  btbas_sources = [
+    "src/bas/bas_service_impl.cpp",
+    "src/bas/bas_statemachine.cpp",
+  ]
+
+  btbas_deps = [
+    "$PART_DIR/btchr:btchr",
+    "$PART_DIR/common:btservice_common",
+    "$PART_DIR/service:btservice",
+  ]
+
+  btbas_external_deps = [
+    "hilog:libhilog",
+    "c_utils:utils",
+    "bluetooth_service:btstack",
+    "bluetooth:btcommon",
+    "hitrace:hitrace_meter",
+    "ffrt:libffrt"
+  ]
+}
+
+########################### btbas ###############################
+ohos_shared_library("btbas") {
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+  ]
+
+  ldflags = [
+    "-Wl,--as-needed",
+    "-Wl,--gc-sections",
+  ]
+
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  stack_protector_ret = false
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      boundary_sanitize = true               # Enable boundary san detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      integer_overflow = true                # Enable integer overflow detection
+      ubsan = true                           # Enable some Ubsan options
+      debug = false
+  }
+
+  configs = [
+    ":btservice_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+
+  # Used to control the export of dynamic library symbols.
+  version_script = "libbtbas_version_script.txt"
+
+  public_configs = [ ":btservice_public_config" ]
+
+  sources = btbas_sources
+  deps = btbas_deps
+  external_deps = btbas_external_deps
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+########################### btbas_static ###############################
+# Only used for unitest
+ohos_static_library("btbas_static") {
+  configs = [
+    ":btservice_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  sanitize = {
+    cfi = true                             # Enable/disable control flow integrity detection
+    cfi_cross_dso = true                   # Cross-SO CFI Checks
+    debug = false
+  }
+  public_configs = [ ":btservice_public_config" ]
+
+  sources = btbas_sources
+  deps = btbas_deps
+  external_deps = btbas_external_deps
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+btmap_mse_sources = []
+btmap_mse_deps = []
+btmap_mse_external_deps = []
+btmap_mse_defines = []
+if (bluetooth_service_override_map_mse_feature_switch) {
+  btmap_mse_sources += [
+  "src/map_mse/map_mse_obex_server.cpp",
+  "src/map_mse/map_mse_masinstance.cpp",
+  "src/map_mse/map_mse_folder.cpp",
+  "src/map_mse/map_mse_bmessage.cpp",
+  "src/map_mse/map_mse_appparams.cpp",
+  "src/map_mse/map_mse_content.cpp",
+  "src/map_mse/map_mse_message_element.cpp",
+  "src/map_mse/map_mse_mns_client.cpp",
+  "src/map_mse/map_mse_content_observer.cpp",
+  "src/map_mse/map_mse_service_impl.cpp",
+]
+
+btmap_mse_deps += [
+  "$PART_DIR/btchr:btchr",
+  "$PART_DIR/common:btservice_common",
+  "$BT_SERVICE_DIR/src/obex:bt_obex",
+]
+
+btmap_mse_external_deps += [
+  "ability_base:want",
+  "ability_base:zuri",
+  "hilog:libhilog",
+  "c_utils:utils",
+  "ipc:ipc_single",
+  "core_service:tel_core_service_api",
+  "common_event_service:cesfwk_innerkits",
+  "bluetooth:btcommon",
+  "data_share:datashare_common",
+  "data_share:datashare_consumer",
+  "samgr:samgr_proxy",
+  "sms_mms:tel_sms_mms_api",
+  "hitrace:hitrace_meter",
+  "bluetooth_service:btstack",
+]
+
+if (bluetooth_service_override_ffrt_enable) {
+  btmap_mse_external_deps += [ "ffrt:libffrt" ]
+}
+}
+
+########################### map_mse ###############################
+ohos_shared_library("btmap_mse") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  stack_protector_ret = false
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      boundary_sanitize = true               # Enable boundary san detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      integer_overflow = true                # Enable integer overflow detection
+      ubsan = true                           # Enable some Ubsan options
+      debug = false
+  }
+
+  configs = [
+    ":btservice_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+  public_configs = [ ":btservice_public_config" ]
+  # Used to control the export of dynamic library symbols.
+  version_script = "libbtmap_mse_version_script.txt"
+
+  sources = btmap_mse_sources
+  deps = btmap_mse_deps
+  external_deps = btmap_mse_external_deps
+  defines = btmap_mse_defines
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+########################### map_mse_static use for tdd ###############################
+ohos_static_library("btmap_mse_static") {
+  stack_protector_ret = false
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      debug = false
+  }
+  configs = [
+    ":btservice_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+  public_configs = [ ":btservice_public_config" ]
+
+  sources = btmap_mse_sources
+  deps = btmap_mse_deps
+  external_deps = btmap_mse_external_deps
+  defines = btmap_mse_defines
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+########################### opp ###############################
+ohos_shared_library("btopp") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  stack_protector_ret = false
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      boundary_sanitize = true               # Enable boundary san detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      integer_overflow = true                # Enable integer overflow detection
+      ubsan = true                           # Enable some Ubsan options
+      debug = false
+  }
+  configs = [
+    ":btservice_config",
+    "${bluetooth_config_path}:feature_flags",
+  ]
+
+  public_configs = [ ":btservice_public_config" ]
+
+  sources = [
+      "src/opp/opp_file_utils.cpp",
+      "src/opp/opp_transfer.cpp",
+      "src/opp/opp_obex_server.cpp",
+      "src/opp/opp_obex_client.cpp",
+      "src/opp/opp_statemachine.cpp",
+      "src/opp/opp_service_impl.cpp",
+  ]
+
+  deps = [
+    "$PART_DIR/common:btservice_common",
+    "$PART_DIR/btchr:btchr",
+    "$BT_SERVICE_DIR/src/obex:bt_obex",
+  ]
+
+  external_deps = [
+    "ability_runtime:ability_connect_callback_stub",
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:extension_manager",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "c_utils:utils",
+    "cJSON:cjson",
+    "common_event_service:cesfwk_innerkits",
+    "bluetooth:btcommon",
+    "samgr:samgr_proxy",
+    "bluetooth_service:btstack",
+  ]
+
+  if (bluetooth_service_override_ffrt_enable) {
+    external_deps += [ "ffrt:libffrt" ]
+  }
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+########################### hearing aid ###############################
+ohos_shared_library("bthearing_aid_impl") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  stack_protector_ret = false
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      boundary_sanitize = true               # Enable boundary san detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      integer_overflow = true                # Enable integer overflow detection
+      ubsan = true                           # Enable some Ubsan options
+      debug = false
+  }
+
+  include_dirs = [
+    "include",
+    "$BT_SERVICE_DIR/include",
+    "$BT_SERVICE_DIR/src",
+    "$BT_SERVICE_DIR/src/base",
+    "$BT_SERVICE_DIR/src/common",
+    "$BT_SERVICE_DIR/src/util",
+    "$BT_SERVICE_DIR/src/classic",
+    "$BT_SERVICE_DIR/src/hearing_aid",
+    "$PART_DIR/btchr/include",
+    "$PART_DIR/common",
+    "$PART_DIR/common/include",
+  ]
+
+  defines = [
+    "COMMUNICATION_L2",
+  ]
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+    "-fPIC",
+    "-Wno-format",
+    "-Wno-pessimizing-move",
+    "-Wunused-variable",
+    "-Wreorder",
+    "-Wmissing-braces",
+    "-Wimplicit-fallthrough",
+    "-Wunused-private-field",
+    "-Wlogical-op-parentheses",
+    "-Wmissing-field-initializers",
+    "-Wparentheses-equality",
+    "-Wparentheses",
+    "-Wdelete-non-abstract-non-virtual-dtor",
+    "-Wignored-qualifiers",
+    "-Wdelete-abstract-non-virtual-dtor",
+    "-Wuninitialized",
+    "-Woverloaded-virtual",
+    "-Wdangling-else",
+    "-Woverloaded-virtual",
+    "-Wno-non-c-typedef-for-linkage",
+    "-Wno-unused-but-set-variable",
+    "-Wno-array-parameter",
+  ]
+
+  configs = [
+    "${bluetooth_config_path}:feature_flags",
+  ]
+  if (!bluetooth_service_override_bt_mcu_proxy_enable) {
+    sources = [
+      "src/hearing_aid/hearing_aid_statemachine.cpp",
+      "src/hearing_aid/hearing_aid_service_impl.cpp",
+    ]
+  }
+
+  deps = [
+    "$PART_DIR/common:btservice_common",
+    "$PART_DIR/btchr:btchr",
+  ]
+
+  external_deps = [
+    "bluetooth:btcommon",
+    "hilog:libhilog",
+    "common_event_service:cesfwk_innerkits",
+    "c_utils:utils",
+    "hdf_core:libhdi",
+    "ipc:ipc_single",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libpub_utils",
+    "audio_framework:audio_foundation",
+    "audio_framework:audio_renderer",
+    "audio_framework:audio_manager_client",
+    "bluetooth_service:btstack",
+  ]
+
+  if (bluetooth_service_override_ffrt_enable) {
+    external_deps += [ "ffrt:libffrt" ]
+  }
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+########################### hid device ###############################
+ohos_shared_library("bthiddevice") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  stack_protector_ret = false
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      boundary_sanitize = true               # Enable boundary san detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      integer_overflow = true                # Enable integer overflow detection
+      ubsan = true                           # Enable some Ubsan options
+      debug = false
+  }
+
+  include_dirs = [
+    "include",
+    "$BT_SERVICE_DIR/include",
+    "$BT_SERVICE_DIR/src",
+    "$BT_SERVICE_DIR/src/base",
+    "$BT_SERVICE_DIR/src/common",
+    "$BT_SERVICE_DIR/src/permission",
+    "$BT_SERVICE_DIR/src/util",
+    "$BT_SERVICE_DIR/src/classic",
+    "$BT_SERVICE_DIR/src/hid_device",
+    "$PART_DIR/common",
+    "$PART_DIR/common/include",
+  ]
+
+  cflags_cc = [
+    "-Os",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-merge-all-constants",
+    "-flto",
+    "-fPIC",
+    "-Wno-format",
+    "-Wno-pessimizing-move",
+    "-Wunused-variable",
+    "-Wreorder",
+    "-Wmissing-braces",
+    "-Wimplicit-fallthrough",
+    "-Wunused-private-field",
+    "-Wlogical-op-parentheses",
+    "-Wmissing-field-initializers",
+    "-Wparentheses-equality",
+    "-Wparentheses",
+    "-Wdelete-non-abstract-non-virtual-dtor",
+    "-Wignored-qualifiers",
+    "-Wdelete-abstract-non-virtual-dtor",
+    "-Wuninitialized",
+    "-Woverloaded-virtual",
+    "-Wdangling-else",
+    "-Woverloaded-virtual",
+    "-Wno-non-c-typedef-for-linkage",
+    "-Wno-unused-but-set-variable",
+    "-Wno-array-parameter",
+  ]
+
+  configs = [
+    "${bluetooth_config_path}:feature_flags",
+  ]
+  if (bluetooth_service_override_hid_device_feature_switch) {
+    sources = [
+      "src/hid_device/hid_device_service_impl.cpp",
+    ]
+  }
+
+  deps = [
+    "$PART_DIR/common:btservice_common",
+    "$PART_DIR/service:btservice",
+  ]
+
+  external_deps = [
+    "bluetooth:btcommon",
+    "hilog:libhilog",
+    "c_utils:utils",
+    "power_manager:powermgr_client",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
+    "samgr:samgr_proxy",
+    "ipc:ipc_single",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
+    "bluetooth_service:btstack",
+  ]
+  if (bluetooth_service_override_ffrt_enable) {
+    external_deps += [ "ffrt:libffrt" ]
+  }
+  if (bluetooth_service_override_app_manager_enable) {
+    external_deps += [ "appgallery:appinfomanager_client" ]
+  }
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}
+
+########################### hid device static ###############################
+# Only used for unitest
+ohos_static_library("bthiddevice_static") {
+  branch_protector_ret = "pac_ret"  # Enable PAC CFI
+  stack_protector_ret = false
+  sanitize = {
+      cfi = true                             # Enable/disable control flow integrity detection
+      cfi_cross_dso = true                   # Cross-SO CFI Checks
+      debug = false
+  }
+
+  include_dirs = [
+    "include",
+    "$BT_SERVICE_DIR/include",
+    "$BT_SERVICE_DIR/src",
+    "$BT_SERVICE_DIR/src/base",
+    "$BT_SERVICE_DIR/src/common",
+    "$BT_SERVICE_DIR/src/permission",
+    "$BT_SERVICE_DIR/src/util",
+    "$BT_SERVICE_DIR/src/classic",
+    "$BT_SERVICE_DIR/src/hid_device",
+    "$PART_DIR/common",
+    "$PART_DIR/common/include",
+  ]
+
+  cflags_cc = [
+    "-fPIC",
+    "-Wno-format",
+    "-Wno-pessimizing-move",
+    "-Wunused-variable",
+    "-Wreorder",
+    "-Wmissing-braces",
+    "-Wimplicit-fallthrough",
+    "-Wunused-private-field",
+    "-Wlogical-op-parentheses",
+    "-Wmissing-field-initializers",
+    "-Wparentheses-equality",
+    "-Wparentheses",
+    "-Wdelete-non-abstract-non-virtual-dtor",
+    "-Wignored-qualifiers",
+    "-Wdelete-abstract-non-virtual-dtor",
+    "-Wuninitialized",
+    "-Woverloaded-virtual",
+    "-Wdangling-else",
+    "-Woverloaded-virtual",
+    "-Wno-non-c-typedef-for-linkage",
+    "-Wno-unused-but-set-variable",
+    "-Wno-array-parameter",
+  ]
+
+  configs = [
+    "${bluetooth_config_path}:feature_flags",
+  ]
+  if (bluetooth_service_override_hid_device_feature_switch) {
+    sources = [
+      "src/hid_device/hid_device_service_impl.cpp",
+    ]
+  }
+
+  deps = [
+    "$PART_DIR/common:btservice_common",
+    "$PART_DIR/service:btservice",
+  ]
+
+  external_deps = [
+    "bluetooth:btcommon",
+    "hilog:libhilog",
+    "c_utils:utils",
+    "power_manager:powermgr_client",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
+    "samgr:samgr_proxy",
+    "ipc:ipc_single",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
+    "bluetooth_service:btstack",
+  ]
+  if (bluetooth_service_override_ffrt_enable) {
+    external_deps += [ "ffrt:libffrt" ]
+  }
+  if (bluetooth_service_override_app_manager_enable) {
+    external_deps += [ "appgallery:appinfomanager_client" ]
+  }
+
+  subsystem_name = "communication"
+  part_name = "bluetooth"
+}

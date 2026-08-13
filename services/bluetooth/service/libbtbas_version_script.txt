@@ -1,0 +1,9 @@
+{
+  global:
+    "*BasServiceImplInterface*";
+    "*CreateBasServiceImplInterface*";
+    "*DestroyBasServiceImplInterface*";
+    "*BasServiceImpl*";
+  local:
+    *;
+};
