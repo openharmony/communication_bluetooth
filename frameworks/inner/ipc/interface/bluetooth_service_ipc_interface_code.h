@@ -16,8 +16,6 @@
 #ifndef BLUETOOTH_SERVICE_IPC_INTERFACE_CODE_H
 #define BLUETOOTH_SERVICE_IPC_INTERFACE_CODE_H
 
-
-
 #include "bluetooth_service_profile_interface_code.h"
 #include "ipc_types.h"
 
@@ -351,6 +349,7 @@ enum BluetoothHostInterfaceCode {
     GET_REAL_ADDRESS,
     GET_VIRTUAL_ADDRESS_BY_HASH,
     BT_VERIFY_MULTI_PERMISSIONS,
+    BT_UPDATE_PHONE_TYPE,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
