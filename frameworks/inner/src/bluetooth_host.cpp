@@ -16,8 +16,6 @@
 #define LOG_TAG "bt_fwk_host"
 #endif
 
-
-
 #include "bluetooth_host.h"
 #include <set>
 #include <memory>
@@ -1536,6 +1534,14 @@ int32_t BluetoothHost::VerifyMultiPermissions(bool systemHapNeeded,
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
     return proxy->VerifyMultiPermissions(systemHapNeeded, permissions);
+}
+
+int BluetoothHost::UpdateSecondaryPairMode(int32_t action)
+{
+    HILOGI("enter");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
+    return proxy->UpdateSecondaryPairMode(action);
 }
 } // namespace Bluetooth
 } // namespace OHOS
