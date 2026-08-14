@@ -25,6 +25,7 @@
 #include "bluetooth_audio_manager.h"
 #include "bt_chr_ue_manager.h"
 #include <iomanip>
+#include <sstream>
 #include "bluetooth_common_event_helper.h"
 
 using namespace OHOS::Bluetooth;

@@ -101,10 +101,10 @@ ohos_shared_library("btpan") {
   deps = [
     "$PART_DIR/common:btservice_common",
     "$PART_DIR/btchr:btchr",
+    "//foundation/communication/bluetooth/frameworks/inner:btcommon",
   ]
 
   external_deps = [
-    "bluetooth:btcommon",
     "hilog:libhilog",
     "c_utils:utils",
     "bluetooth_service:btstack",
@@ -209,10 +209,10 @@ ohos_static_library("btpan_static") {
   deps = [
     "$PART_DIR/common:btservice_common",
     "$PART_DIR/btchr:btchr",
+    "//foundation/communication/bluetooth/frameworks/inner:btcommon",
   ]
 
   external_deps = [
-    "bluetooth:btcommon",
     "hilog:libhilog",
     "c_utils:utils",
     "bluetooth_service:btstack",

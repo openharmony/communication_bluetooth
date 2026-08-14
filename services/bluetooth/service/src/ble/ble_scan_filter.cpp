@@ -19,12 +19,13 @@
 #include "ble_scan_filter.h"
 
 #include <future>
+#include <sstream>
 
 #include "base/bind.h"
 #include "base/bind_helpers.h"
 #include "base/callback.h"
 #include "bt_gatt.h"
-#include "btm_ble_int_types.h"
+#include "btm_ble_api_types.h"
 #include "log.h"
 #include "securec.h"
 #include "service_util.h"

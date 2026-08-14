@@ -26,6 +26,11 @@
 
 namespace OHOS {
 namespace bluetooth {
+
+/* Huawei cloud-pairing advertisement info byte-array lengths. */
+constexpr int ADV_INFO_BYTE_ARRY_LEN_16 = 16;
+constexpr int ADV_INFO_BYTE_ARRY_LEN_49 = 49;
+
 class CloudDeviceManager {
 public:
     CloudDeviceManager();

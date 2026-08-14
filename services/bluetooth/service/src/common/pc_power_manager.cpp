@@ -17,6 +17,7 @@
 #endif
 
 #include "pc_power_manager.h"
+#include <sstream>
 #include <vector>
 #include "adapter_manager.h"
 #include "bt_def.h"

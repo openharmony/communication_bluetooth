@@ -24,6 +24,7 @@ bluetooth_server_deps = [
   "$BT_ROOT/etc/param:etc",
   "$BT_ROOT/ipc:bt_service_ipc",
   "$BT_ROOT/service:btservice",
+  "//foundation/communication/bluetooth/frameworks/inner:btcommon",
 ]
 
 if (bluetooth_service_override_hearingaid_feature_switch) {
@@ -33,7 +34,6 @@ if (bluetooth_service_override_hearingaid_feature_switch) {
 
 bluetooth_server_external_deps = [
   "access_token:libaccesstoken_sdk",
-  "bluetooth:btcommon",
   "c_utils:utils",
   "eventhandler:libeventhandler",
   "hicollie:libhicollie",

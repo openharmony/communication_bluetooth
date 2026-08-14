@@ -106,6 +106,8 @@ namespace bluetooth {
 constexpr int32_t INITIALIZE_DELAY_MS = 1000;
 constexpr int32_t CHECK_DELAY_MS = 500;
 constexpr int32_t AUTO_CONNECT_DELAY_MS = 300;
+constexpr int32_t BT_ERR_BLUETOOTH_TURN_ON = -1;
+constexpr int32_t BT_ERR_BLUETOOTH_TURNING = -2;
 const int32_t BLUETOOTH_SWITCH_STATUS_SIZE = 16;
 const int32_t SYSTEM_PARAMETER_ERROR_CODE = 0;
 const int32_t PROPERTY_VALUE_MAX = 128;

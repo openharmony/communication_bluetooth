@@ -57,6 +57,9 @@ ohos_shared_library("hearingaid_napi") {
 
   deps = [
     "$BT_ROOT/frameworks/inner/src/hearingaid:hearingaid_framework",
+    "$BT_ROOT/frameworks/js/napi/src/common:bt_napi_common",
+    "$BT_ROOT/frameworks/inner:btcommon",
+    "$BT_ROOT/frameworks/inner:btframework",
   ]
 
   external_deps = [
@@ -67,9 +70,6 @@ ohos_shared_library("hearingaid_napi") {
     "napi:ace_napi",
     "node:node_header_notice",
     "libuv:uv",
-    "bluetooth:bt_napi_common",
-    "bluetooth:btcommon",
-    "bluetooth:btframework",
     "samgr:samgr_proxy",
     "hitrace:hitrace_meter",
   ]

@@ -37,6 +37,11 @@ int32_t TrustPairDevice::GetBluetoothClass() const
     return bluetoothClass_;
 }
 
+std::string TrustPairDevice::GetProductId() const
+{
+    return productId_;
+}
+
 void TrustPairDevice::SetDeviceName(const std::string &deviceName)
 {
     deviceName_ = deviceName;

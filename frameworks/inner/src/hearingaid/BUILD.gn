@@ -71,6 +71,8 @@ ohos_shared_library("hearingaid_framework") {
   deps = [
     "$BT_ROOT/idl/hearingaid:libbluetooth_hearingaid_interface_proxy",
     "$BT_ROOT/idl/hearingaid:libbluetooth_hearingaid_interface_stub",
+    "$BT_ROOT/frameworks/inner:btframework",
+    "$BT_ROOT/frameworks/inner:btcommon",
   ]
 
   external_deps = [
@@ -79,8 +81,6 @@ ohos_shared_library("hearingaid_framework") {
     "ipc:ipc_core",
     "ipc:ipc_napi",
     "napi:ace_napi",
-    "bluetooth:btframework",
-    "bluetooth:btcommon",
     "samgr:samgr_proxy",
     "hitrace:hitrace_meter",
   ]

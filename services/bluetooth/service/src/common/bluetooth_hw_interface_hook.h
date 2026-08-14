@@ -15,6 +15,9 @@
 
 #ifndef BLUETOOTH_HW_INTERFACE_HOOK_H
 #define BLUETOOTH_HW_INTERFACE_HOOK_H
+
+#include <functional>
+
 namespace OHOS {
 namespace bluetooth {
 

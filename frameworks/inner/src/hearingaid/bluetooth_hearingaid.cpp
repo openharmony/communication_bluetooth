@@ -156,7 +156,7 @@ int32_t BluetoothHearingAid::Disconnect(const std::string& address)
 
 int32_t BluetoothHearingAid::SetVolume(const std::string& address, int64_t volume)
 {
-    HILOGI("SetVolume volume: %{public}ld", volume);
+    HILOGI("SetVolume volume: %{public}lld", volume);
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
         return BT_OV_ERR_SERVICE_DISABLED;
@@ -165,7 +165,7 @@ int32_t BluetoothHearingAid::SetVolume(const std::string& address, int64_t volum
         "invalid bluetooth addr");
 
     if (volume < VOLUME_MIN || volume > VOLUME_MAX) {
-        HILOGE("volume: %{public}ld is invalid", volume);
+        HILOGE("volume: %{public}lld is invalid", volume);
         return BT_OV_ERR_INVALID_PARAM;
     }
 

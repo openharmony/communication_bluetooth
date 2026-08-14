@@ -16,6 +16,8 @@
 #define LOG_TAG "bt_service_hfp_ag"
 #endif
 
+#include <iomanip>
+
 #include "bluetooth_audio_manager.h"
 #include "bluetooth_device_battery_manager.h"
 #include "hfp_ag_system_event_processer.h"

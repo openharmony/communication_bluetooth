@@ -119,12 +119,14 @@ ohos_source_set("bt_service_ipc") {
 
   cflags_cc = [ "-fvisibility=hidden" ]
 
-  deps = [ "$BT_ROOT/service:btservice" ]
+  deps = [
+    "$BT_ROOT/service:btservice",
+    "$BT_FWK_DIR:btcommon",
+  ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
-    "bluetooth:btcommon",
     "c_utils:utils",
     "hicollie:libhicollie",
     "hilog:libhilog",

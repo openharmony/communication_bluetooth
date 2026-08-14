@@ -60,6 +60,7 @@
 
 namespace {
     // Wake up voice recognition param
+    const std::string VOICE_RECOGNITION_BUNDLE_NAME = "com.huawei.voicerecognition";
     const std::string VOICE_RECOGNITION_ABILITY_NAME = "WakeUpExtAbility";
     const std::string VOICE_RECOGNITION_LANUCH_TYPE = "launch_type";
     const std::string VOICE_RECOGNITION_BLUETOOTH = "bluetooth_key";

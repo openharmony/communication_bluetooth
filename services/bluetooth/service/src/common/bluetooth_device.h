@@ -45,6 +45,14 @@
 
 namespace OHOS {
 namespace bluetooth {
+
+/* Cloud bond state constants */
+constexpr int32_t CLOUD_BOND_NONE = 0;
+constexpr int32_t CLOUD_BOND_BONDING = 1;
+constexpr int32_t CLOUD_BOND_BONDED = 2;
+constexpr int32_t CLOUD_BOND_REMOVING = 3;
+constexpr int32_t CLOUD_BOND_CREATE_BOND = 4;
+
 /**
  * @brief Represents remote device.
  *

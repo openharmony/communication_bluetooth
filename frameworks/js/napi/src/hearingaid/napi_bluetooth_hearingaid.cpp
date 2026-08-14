@@ -228,7 +228,7 @@ napi_value NapiHearingAid::SetVolume(napi_env env, napi_callback_info info)
 
     BluetoothHearingAid *profile = BluetoothHearingAid::GetProfile();
     int32_t ret = profile->SetVolume(remoteAddr, volume);
-    HILOGI("ret: %{public}d, volume: %{public}ld", ret, volume);
+    HILOGI("ret: %{public}d, volume: %{public}lld", ret, volume);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_OV_NO_ERROR, ret);
 
     return NapiGetUndefinedRet(env);
@@ -262,7 +262,7 @@ napi_value NapiHearingAid::GetHearingAidDeviceInfo(napi_env env, napi_callback_i
     int64_t id;
     BluetoothHearingAid *profile = BluetoothHearingAid::GetProfile();
     int32_t errorCode = profile->GetHearingAidDeviceInfo(remoteAddr, side, mode, id);
-    HILOGI("errorCode: %{public}d, side: %{public}d, mode: %{public}d, id: %{public}ld", errorCode, side, mode, id);
+    HILOGI("errorCode: %{public}d, side: %{public}d, mode: %{public}d, id: %{public}lld", errorCode, side, mode, id);
     NAPI_BT_ASSERT_RETURN(env, errorCode == BT_OV_NO_ERROR, errorCode, ret);
 
     ConvertDeviceInfoToJs(env, ret, side, mode, id);
@@ -277,7 +277,7 @@ napi_value NapiHearingAid::GetConnectedDevices(napi_env env, napi_callback_info 
     std::vector<std::string> connectedDevices;
     BluetoothHearingAid *profile = BluetoothHearingAid::GetProfile();
     int32_t errorCode = profile->GetConnectedDevices(connectedDevices);
-    HILOGI("errorCode: %{public}d, connectedDevices number: %{public}lu", errorCode, connectedDevices.size());
+    HILOGI("errorCode: %{public}d, connectedDevices number: %{public}u", errorCode, connectedDevices.size());
     NAPI_BT_ASSERT_RETURN(env, errorCode == BT_OV_NO_ERROR, errorCode, ret);
 
     auto status = ConvertStringVectorToJS(env, ret, connectedDevices);

@@ -52,9 +52,8 @@ ohos_shared_library("btdummy") {
   configs = [ ":btdummy_config" ]
   public_configs = [ ":btdummy_public_config" ]
   sources = [ "dummy/src/stub.cpp" ]
-  deps = []
+  deps = [ "//foundation/communication/bluetooth/frameworks/inner:btcommon" ]
   external_deps = [
-    "bluetooth:btcommon",
     "hilog:libhilog",
   ]
   subsystem_name = "communication"

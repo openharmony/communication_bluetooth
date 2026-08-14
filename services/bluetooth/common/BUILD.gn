@@ -73,11 +73,12 @@ if (bluetooth_service_override_ffrt_enable) {
     ]
 }
 
-btservice_common_deps = []
+btservice_common_deps = [
+    "//foundation/communication/bluetooth/frameworks/inner:btcommon",
+]
 
 btservice_common_external_deps = [
     "ability_base:want",
-    "bluetooth:btcommon",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",

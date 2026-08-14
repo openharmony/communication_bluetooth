@@ -35,6 +35,8 @@ public:
     void SetBluetoothClass(int32_t bluetoothClass);
     int32_t GetBluetoothClass() const;
 
+    std::string GetProductId() const;
+
     void SetDeviceName(const std::string &deviceName);
     std::string GetDeviceName() const;
 

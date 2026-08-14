@@ -20,6 +20,7 @@
 
 #include <array>
 #include <future>
+#include <sstream>
 
 #include "base/bind.h"
 #include "base/callback.h"
