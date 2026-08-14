@@ -65,6 +65,7 @@ declare_args() {
   bluetooth_service_override_intercept_peripheral_first_pair_dialog = false
   bluetooth_service_override_local_ble_conn_public_address_enable = false
   bluetooth_service_override_build_mode = "full"
+  bluetooth_use_open_stack = false
   bluetooth_service_override_power_on_reconnect_feature = false
   bluetooth_service_override_pluggable_supported = false
   bluetooth_service_override_ble_range_feature = false

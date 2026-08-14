@@ -243,6 +243,10 @@ config("feature_flags") {
         defines += ["BLUETOOTH_BLE_RANGE_FEATURE"]
     }
 
+    if (bluetooth_use_open_stack) {
+        defines += ["BT_USE_OPEN_STACK"]
+    }
+
     if (bluetooth_service_override_bas_feature) {
         defines += ["BLUETOOTH_BAS_FEATURE_ENABLE"]
     }
