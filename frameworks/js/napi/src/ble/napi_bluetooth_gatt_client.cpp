@@ -374,14 +374,18 @@ static napi_status CheckGattClientNoArgc(napi_env env, napi_callback_info info, 
 napi_value NapiGattClient::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    NapiHaEventUtils haUtils(env, "ble.GattClientDevice.Connect");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR,
+    };
+    NAPI_BT_CONTEXT(env, "ble.GattClientDevice.Connect", validErrCodes);
     NapiGattClient *gattClient = nullptr;
     auto status = CheckGattClientNoArgc(env, info, &gattClient);
     NAPI_BT_ASSERT_RETURN_FALSE(env, status == napi_ok, BT_ERR_INVALID_PARAM);
-    NAPI_BT_ASSERT_RETURN_UNDEF(env, gattClient->GetCallback() != nullptr, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_ERR_RETURN_VERIFY(env, gattClient->GetCallback() != nullptr, BT_ERR_OBJECT_NULL);
 
     std::shared_ptr<GattClient> client = gattClient->GetClient();
-    NAPI_BT_ASSERT_RETURN_FALSE(env, client != nullptr, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_RETURN_FALSE_VERIFY(env, client != nullptr, BT_ERR_OBJECT_NULL);
 
     int ret = client->Connect(gattClient->GetCallback(), gattClient->GetAutoConnect(), gattClient->GetTransport());
     HILOGI("ret: %{public}d", ret);

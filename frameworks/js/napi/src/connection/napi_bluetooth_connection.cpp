@@ -970,8 +970,11 @@ napi_status CheckPairCredibleDeviceParam(napi_env env, napi_callback_info info, 
 napi_value PairCredibleDevice(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils =
-        std::make_shared<NapiHaEventUtils>(env, "connection.PairCredibleDevice");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR,
+    };
+    NAPI_BT_CONTEXT(env, "connection.PairCredibleDevice", validErrCodes);
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     int transport = BT_TRANSPORT_NONE;
     auto status = CheckPairCredibleDeviceParam(env, info, remoteAddr, transport);
@@ -983,7 +986,7 @@ napi_value PairCredibleDevice(napi_env env, napi_callback_info info)
         HILOGI("err: %{public}d", err);
         return NapiAsyncWorkRet(err);
     };
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();

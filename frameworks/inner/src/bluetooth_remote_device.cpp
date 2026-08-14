@@ -223,10 +223,11 @@ int BluetoothRemoteDevice::GetPairState(int &pairState) const
 int BluetoothRemoteDevice::StartPair()
 {
     HILOGI("enter");
-    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
+    CHECK_AND_RETURN_LOG_RET(
+        IsValidBluetoothRemoteDevice(), BT_ERR_ADDRESS_OR_TRANSPORT_ERROR, "Invalid remote device");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_OBJECT_NULL, "proxy is nullptr.");
     BluetoothRawAddress bluetoothRawAddress(addressType_, address_);
     BluetoothOobData dummyOobdata;
     return hostProxy->StartPair(transport_, bluetoothRawAddress, dummyOobdata);
@@ -271,10 +272,11 @@ int BluetoothRemoteDevice::StartPairOutOfBand(const OobData &oobData)
 int BluetoothRemoteDevice::StartCrediblePair()
 {
     HILOGI("enter");
-    CHECK_AND_RETURN_LOG_RET(IsValidBluetoothRemoteDevice(), BT_ERR_INTERNAL_ERROR, "Invalid remote device");
+    CHECK_AND_RETURN_LOG_RET(
+        IsValidBluetoothRemoteDevice(), BT_ERR_ADDRESS_OR_TRANSPORT_ERROR, "Invalid remote device");
     CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     sptr<IBluetoothHost> hostProxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
-    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr.");
+    CHECK_AND_RETURN_LOG_RET(hostProxy != nullptr, BT_ERR_OBJECT_NULL, "proxy is nullptr.");
     return hostProxy->StartCrediblePair(transport_, address_);
 }
 
