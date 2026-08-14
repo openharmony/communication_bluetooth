@@ -142,8 +142,8 @@ std::shared_ptr<ObexSocketDevice> PbapPceObexClient::RecvSocketDevice(SocketType
         HILOGE("[PbapPceObexClient] recv channel error, ret=%{public}d", ret);
         return nullptr;
     }
-    sock_connect_info_t cs;
-    ret = recv(socketFd_, &cs, sizeof(sock_connect_info_t), MSG_NOSIGNAL);
+    sock_connect_signal_t cs;
+    ret = recv(socketFd_, &cs, sizeof(sock_connect_signal_t), MSG_NOSIGNAL);
     if (ret <= 0) {
         HILOGE("[PbapPceObexClient] recv connect_info error, ret=%{public}d", ret);
         return nullptr;

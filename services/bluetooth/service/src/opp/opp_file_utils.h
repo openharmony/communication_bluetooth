@@ -56,6 +56,9 @@ constexpr int32_t SIGNAL_NUM = 3;
 constexpr size_t MAX_FILE_NAME_LENGTH = 255;
 
 
+constexpr const char* PHOTO_BUNDLENAME = "com.huawei.hmos.photos";
+constexpr const char* PHOTO_ABILITYNAME = "com.huawei.hmos.photos.MainAbility";
+constexpr const char* FILES_BUNDLENAME = "com.huawei.hmos.filemanager";
 #ifdef BLUETOOTH_PC_ENABLE
 //PC filemanager bundlename is different from other product
 constexpr const char* FILES_ABILITYNAME = "MainAbility";

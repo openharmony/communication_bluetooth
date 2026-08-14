@@ -637,7 +637,7 @@ void BluetoothBleAdvertiserApplicationContainer::AddTokenId(const wptr<IRemoteOb
         HILOGE("Unknown remote");
         return;
     }
-    HILOGD("pid: %{public}d, uid: %{public}d, tokenId: %{public}lu", it->pid, it->uid, tokenId);
+    HILOGD("pid: %{public}d, uid: %{public}d, tokenId: %{public}llu", it->pid, it->uid, tokenId);
     it->tokenId = tokenId;
 }
 

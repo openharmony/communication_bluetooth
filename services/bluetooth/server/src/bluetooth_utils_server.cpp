@@ -25,6 +25,11 @@ using namespace std;
 
 namespace OHOS {
 namespace Bluetooth {
+// Bundle name and app id of the wallet service. The app id is validated
+// against the Hap app identifier, keep the default value so that the
+// wallet-specific behaviors are disabled on products without the wallet.
+constexpr const char *walletServiceBundleName = "com.huawei.wallet";
+constexpr const char *walletServiceAppId = "";
 constexpr int startPos = 6;
 constexpr int endPos = 13;
 std::string GetEncryptAddr(std::string addr)

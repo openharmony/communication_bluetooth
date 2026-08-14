@@ -20,6 +20,7 @@
 #include <cstring>
 #include <list>
 #include <memory>
+#include <set>
 #include <shared_mutex>
 #include <vector>
 

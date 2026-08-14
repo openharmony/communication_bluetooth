@@ -1956,7 +1956,7 @@ int32_t BluetoothHostServer::StartPair(int32_t transport, const BluetoothRawAddr
     BtChrAddConnSceneInfo(address, PAIR_TYPE_USER_PAIR, PermissionManager::GetCallingName(), 0);
     if (!BluetoothDeviceManager::GetInstance()->GetRealUsedAddrByAddrType(addr, addressType, realAddr)) {
         HILOGE("address not exist");
-        return BT_ERR_ADDRESS_NOT_EXIST;
+        return BT_ERR_INTERNAL_ERROR;
     }
     auto classicService = IAdapterManager::GetInstance()->GetClassicAdapterInterface();
     CHECK_AND_RETURN_LOG_RET(classicService != nullptr, BT_ERR_INVALID_STATE,

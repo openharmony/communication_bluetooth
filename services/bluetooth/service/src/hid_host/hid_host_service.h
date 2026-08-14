@@ -101,14 +101,18 @@ public:
     int GetConnectStrategy(const RawAddress &device) override;
     bthh_interface_t* getBluetoothHidInterface() const;
 
-    static void ConnectionStateCallback(BLUEDROID::RawAddress* bdAddr, bthh_connection_state_t state);
-    static void GetProtocolModeCallback(BLUEDROID::RawAddress* bdAddr, bthh_status_t hhStatus,
-        bthh_protocol_mode_t mode);
-    static void GetIdleTimeCallback(BLUEDROID::RawAddress* bdAddr, bthh_status_t hhStatus, int idleTime);
-    static void GetReportCallback(BLUEDROID::RawAddress* bdAddr, bthh_status_t hhStatus, uint8_t* rptData,
-        int rptSize);
-    static void VirtualUnplugCallback(BLUEDROID::RawAddress* bdAddr, bthh_status_t hhStatus);
-    static void HandshakeCallback(BLUEDROID::RawAddress* bdAddr, bthh_status_t hhStatus);
+    static void ConnectionStateCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+        tBT_TRANSPORT transport, bthh_connection_state_t state);
+    static void GetProtocolModeCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+        tBT_TRANSPORT transport, bthh_status_t hhStatus, bthh_protocol_mode_t mode);
+    static void GetIdleTimeCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+        tBT_TRANSPORT transport, bthh_status_t hhStatus, int idleTime);
+    static void GetReportCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+        tBT_TRANSPORT transport, bthh_status_t hhStatus, uint8_t* rptData, int rptSize);
+    static void VirtualUnplugCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+        tBT_TRANSPORT transport, bthh_status_t hhStatus);
+    static void HandshakeCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+        tBT_TRANSPORT transport, bthh_status_t hhStatus);
 
 private:
     /**

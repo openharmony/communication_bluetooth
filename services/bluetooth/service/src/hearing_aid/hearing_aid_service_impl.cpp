@@ -373,7 +373,7 @@ void HearingAidServiceImpl::NotifyActiveDeviceChanged(const RawAddress &device, 
         AudioStandard::SAMPLE_S16LE, AudioStandard::AudioChannel::STEREO
     };
     int32_t channelMask = 1;
-    deviceDesc->SetDeviceCapability(audioStreamInfo, channelMask);
+    deviceDesc->SetDeviceCapability(std::list<AudioStandard::DeviceStreamInfo>{audioStreamInfo}, channelMask);
     AudioStandard::AudioGeneralManager::GetInstance()->SetDeviceConnectionStatus(deviceDesc,
         device.GetAddress() != INVALID_MAC_ADDRESS);
 #endif

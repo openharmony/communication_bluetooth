@@ -560,7 +560,8 @@ fast_scan_deps = []
 fast_scan_external_deps = []
 if (bluetooth_service_override_fastscan_feature_switch) {
   fast_scan_sources = [
-    "src/common/bluetooth_fastscan_manager.cpp"
+    "src/common/bluetooth_fastscan_manager.cpp",
+    "src/common/hal_util.cpp",
   ]
 
   fast_scan_deps = [
@@ -676,6 +677,7 @@ ohos_shared_library("btavrcp_media") {
       "src/avrcp_tg/bip_transformation.cpp",
       "src/avrcp_tg/cover_art.cpp",
       "src/avrcp_tg/bip_image_descriptor.cpp",
+      "src/common/hal_util.cpp",
     ]
   }
 

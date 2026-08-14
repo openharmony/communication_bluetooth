@@ -45,7 +45,7 @@ bool DialogSwitch::RequestBluetoothSwitchDialog(DialogSwitchType type)
     std::string thirdlyBundleName = PermissionManager::GetCallingName();
     std::string connectStr = DialogSwitch::BuildStartCommand(type, thirdlyBundleName);
     HILOGI("The bundlename is %{public}s.", thirdlyBundleName.c_str());
-    if (!BluetoothDialog::DialogConnectExtension(connectStr, bundleName, abilityName)) {
+    if (!BluetoothDialog::DialogConnectExtension(connectStr, thirdlyBundleName, abilityName)) {
         HILOGE("failed to build switch dialog.");
         return false;
     }

@@ -188,8 +188,8 @@ std::shared_ptr<ObexSocketDevice> MapMseMnsClient::RecvSocketDevice(SocketType s
         HILOGE("[sock] recv error, ret is %{public}d", ret);
         return nullptr;
     }
-    sock_connect_info_t cs;
-    ret = recv(socketFd_, &cs, sizeof(sock_connect_info_t), MSG_NOSIGNAL);
+    sock_connect_signal_t cs;
+    ret = recv(socketFd_, &cs, sizeof(sock_connect_signal_t), MSG_NOSIGNAL);
     if (ret <= 0) {
         HILOGE("[sock] recv error, ret is %{public}d", ret);
         return nullptr;

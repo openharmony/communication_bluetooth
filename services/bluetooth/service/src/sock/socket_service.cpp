@@ -281,7 +281,6 @@ int SocketService::Connect(const std::string &addr, const Uuid &uuid, int securi
     }
     int socketFd = SOCK_INVALID_FD;
     std::string callingName = PermissionManager::GetCallingName();
-    int32_t pid = IPCSkeleton::GetCallingPid();
     int32_t uid = IPCSkeleton::GetCallingUid();
     if (!sBluetoothSocketInterface) {
         HILOGE("[SocketService] sBluetoothSocketInterface invalid");
@@ -305,7 +304,7 @@ int SocketService::Connect(const std::string &addr, const Uuid &uuid, int securi
         (type == SOCK_L2CAP_LE) ? BT_TRANSPORT_LE : BT_TRANSPORT_BR_EDR, rawAddr);
     const BLUEDROID::bluetooth::Uuid temp = ServiceUtil::UuidToBluedroid(uuid);
     int result = sBluetoothSocketInterface->connect(&rawAddr, ConvertBtSockType(type), &temp, psm, &socketFd,
-        GetSecurityFlags(securityFlag, type), uid, pid, callingName.c_str());
+        GetSecurityFlags(securityFlag, type), uid);
     if (result != RET_NO_ERROR) {
         HILOGE("[SocketService] connect failed");
         if (type == SOCK_L2CAP_LE) {
@@ -332,14 +331,13 @@ int SocketService::Listen(const std::string &name, const Uuid &uuid, int securit
         return socketFd;
     }
     int32_t uid = IPCSkeleton::GetCallingUid();
-    int32_t pid = IPCSkeleton::GetCallingPid();
     std::string callingName = PermissionManager::GetCallingName();
     BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_SOCKET_SERVER_CONN, RawAddress(""), -1,
         uuid.ToString(), callingName);
     // convert uuid to bluedroid type
     const BLUEDROID::bluetooth::Uuid temp = ServiceUtil::UuidToBluedroid(uuid);
     int ret = sBluetoothSocketInterface->listen(ConvertBtSockType(type), name.c_str(),
-        &temp, channel, &socketFd, GetSecurityFlags(securityFlag, type), uid, pid, callingName.c_str());
+        &temp, channel, &socketFd, GetSecurityFlags(securityFlag, type), uid);
     if (ret != RET_NO_ERROR) {
         HILOGD("[SocketService] listen failed, ret=%{public}d", ret);
         socketFd = SOCK_INVALID_FD;
@@ -371,7 +369,7 @@ void SocketService::ShutDownInternal()
 void SocketService::UpdateCocConnectionParams(const Bluetooth::BluetoothSocketCocInfo &info)
 {
     const bt_interface_t *btInterface = nullptr;
-    int params[COC_PARAMS_LEN] = {};
+    uint16_t params[COC_PARAMS_LEN] = {};
     int ret = hal_util_load_bt_library(&btInterface);
     if (ret != BT_STATUS_SUCCESS || btInterface == nullptr) {
         HILOGE("Load bluetooth library failed");

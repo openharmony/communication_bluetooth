@@ -208,7 +208,7 @@ RawAddress ConvertRfcommAddr(BLUEDROID::RawAddress &addr)
 
 std::shared_ptr<ObexSocketDevice> ObexServerSocketThread::RecvSocketDevice(int fd, SocketType socketType)
 {
-    char buffer[sizeof(sock_connect_info_t)] = {0};
+    char buffer[sizeof(sock_connect_signal_t)] = {0};
     char msgCtrlBuff[CMSG_SPACE(1)] = {0};
     struct iovec iv = {.iov_base = buffer, .iov_len = sizeof(buffer)};
     struct msghdr msg;
@@ -231,7 +231,7 @@ std::shared_ptr<ObexSocketDevice> ObexServerSocketThread::RecvSocketDevice(int f
     int acceptFd = *(reinterpret_cast<int *>(CMSG_DATA(cmsg)));
 
     std::shared_ptr<ObexSocketDevice> socketDevice = nullptr;
-    sock_connect_info_t *info = static_cast<sock_connect_info_t *>(msg.msg_iov->iov_base);
+    sock_connect_signal_t *info = static_cast<sock_connect_signal_t *>(msg.msg_iov->iov_base);
     if (info == nullptr) {
         HILOGE("[sock] recvmsg error cs nullptr");
         return nullptr;

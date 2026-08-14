@@ -51,7 +51,13 @@ struct HwConnAttr {
 
 /* Stack callback parameter for socket connection observer */
 struct StackCallbackParam {
-    uint8_t reserved;
+    BLUEDROID::RawAddress addr;
+    bt_status_t status;
+    int result;
+    int type;
+    int psm;
+    uint64_t msb;
+    uint64_t lsb;
 };
 
 enum BtStackErrno : int32_t {

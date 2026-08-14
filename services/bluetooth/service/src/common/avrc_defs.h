@@ -32,6 +32,25 @@ enum AvrcCommandId : uint8_t {
     AVRC_ID_FAST_FOR = 0x06,
 };
 
+/* AVRCP player application setting values used by the Huawei service layer.
+ * Value 0x00 stands for the query/status request, matching the reserved
+ * value of the AVRCP player attribute value space. */
+enum AvrcShuffleValue : uint8_t {
+    SHUFFLE_QUERY = 0x00,
+    SHUFFLE_OFF = 0x01,
+    SHUFFLE_ALL_TRACKS = 0x02,
+    SHUFFLE_GROUP = 0x03,
+    SHUFFLE_INVALID = 0xFF,
+};
+
+enum AvrcRepeatValue : uint8_t {
+    REPEAT_OFF = 0x01,
+    REPEAT_SINGLE_TRACK = 0x02,
+    REPEAT_ALL_TRACKS = 0x03,
+    REPEAT_GROUP = 0x04,
+    REPEAT_INVALID = 0xFF,
+};
+
 }  // namespace bluetooth
 }  // namespace OHOS
 

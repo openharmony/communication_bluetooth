@@ -260,7 +260,7 @@ bool HidHostStateMachine::ProcessConnectEvent()
         return false;
     }
     HILOGI("[HID_MACHINE]Hid device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t status = bluetoothHidInterface->connect(&rawAddr);
+    bt_status_t status = bluetoothHidInterface->connect(&rawAddr, BLE_ADDR_PUBLIC, BT_TRANSPORT_BR_EDR);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HID_MACHINE]Failed HID channel connection, status: %{public}d", status);
         return false;
@@ -282,7 +282,7 @@ bool HidHostStateMachine::ProcessDisConnectEvent()
     RawAddress device(address_);
     BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
     HILOGI("[HID_MACHINE]Hid device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t status = bluetoothHidInterface->disconnect(&rawAddr);
+    bt_status_t status = bluetoothHidInterface->disconnect(&rawAddr, BLE_ADDR_PUBLIC, BT_TRANSPORT_BR_EDR, false);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HID_MACHINE]Failed disconnect hid channel, status: %{public}d", status);
         return false;
@@ -304,7 +304,7 @@ void HidHostStateMachine::ProcessVCUnplugEvent()
         return;
     }
     HILOGI("[HID_MACHINE]Hid device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t status = bluetoothHidInterface->virtual_unplug(&rawAddr);
+    bt_status_t status = bluetoothHidInterface->virtual_unplug(&rawAddr, BLE_ADDR_PUBLIC, BT_TRANSPORT_BR_EDR);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HID_MACHINE]Failed virtual unplug, status: %{public}d", status);
         return;
@@ -326,7 +326,8 @@ void HidHostStateMachine::ProcessSetReportEvent(const HidHostMessage &msg)
     }
     HILOGI("[HID_MACHINE]hid device address[%{public}s]", GetEncryptAddr(address_).c_str());
     bt_status_t status = bluetoothHidInterface->set_report(
-        &rawAddr, static_cast<bthh_report_type_t>(msg.sendData_.type), reinterpret_cast<char*>(msg.data_.get()));
+        &rawAddr, BLE_ADDR_PUBLIC, BT_TRANSPORT_BR_EDR,
+        static_cast<bthh_report_type_t>(msg.sendData_.type), reinterpret_cast<char*>(msg.data_.get()));
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HID_MACHINE]Failed set report, status: %{public}d", status);
         return;
@@ -348,7 +349,8 @@ void HidHostStateMachine::ProcessGetReportEvent(const HidHostMessage &msg)
     }
     HILOGI("[HID_MACHINE]Hid device address[%{public}s]", GetEncryptAddr(address_).c_str());
     bt_status_t status = bluetoothHidInterface->get_report(
-        &rawAddr, static_cast<bthh_report_type_t>(msg.sendData_.type), msg.sendData_.reportId, msg.sendData_.dataSize);
+        &rawAddr, BLE_ADDR_PUBLIC, BT_TRANSPORT_BR_EDR,
+        static_cast<bthh_report_type_t>(msg.sendData_.type), msg.sendData_.reportId, msg.sendData_.dataSize);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HID_MACHINE]Failed get report, status: %{public}d", status);
         return;

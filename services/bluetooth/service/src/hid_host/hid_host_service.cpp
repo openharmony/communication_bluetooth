@@ -94,7 +94,7 @@ void HidHostService::ConnectionStateCallbackInner(RawAddress rawAddr, int state)
     if (!IsAcceptConnection(rawAddr, state)) {
         if (bluetoothHidInterface != nullptr) {
             BLUEDROID::RawAddress device = ServiceUtil::AddrToBluedroid(rawAddr);
-            bluetoothHidInterface->disconnect(&device);
+            bluetoothHidInterface->disconnect(&device, BLE_ADDR_PUBLIC, BT_TRANSPORT_BR_EDR, false);
         }
         return;
     }
@@ -133,7 +133,8 @@ void HidHostService::HidProcessBtChrEvent(const std::string& addr, int toState)
     }
 }
 
-void HidHostService::ConnectionStateCallback(BLUEDROID::RawAddress* bd_addr, bthh_connection_state_t state)
+void HidHostService::ConnectionStateCallback(BLUEDROID::RawAddress* bd_addr, tBLE_ADDR_TYPE addrType,
+    tBT_TRANSPORT transport, bthh_connection_state_t state)
 {
     HILOGI("[HID_SERVICE]HidConnectState = %{public}d", state);
     RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bd_addr);
@@ -158,25 +159,28 @@ bool HidHostService::IsAcceptConnection(RawAddress &rawAddr, int state)
     return true;
 }
 
-void HidHostService::GetProtocolModeCallback(BLUEDROID::RawAddress* bdAddr, bthh_status_t hhStatus,
-    bthh_protocol_mode_t mode)
+void HidHostService::GetProtocolModeCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+    tBT_TRANSPORT transport, bthh_status_t hhStatus, bthh_protocol_mode_t mode)
 {
 }
 
-void HidHostService::GetIdleTimeCallback(BLUEDROID::RawAddress* bdAddr, bthh_status_t hhStatus, int idleTime)
+void HidHostService::GetIdleTimeCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+    tBT_TRANSPORT transport, bthh_status_t hhStatus, int idleTime)
 {
 }
 
-void HidHostService::GetReportCallback(BLUEDROID::RawAddress* bdAddr, bthh_status_t hhStatus, uint8_t* rptData,
-    int rptSize)
+void HidHostService::GetReportCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+    tBT_TRANSPORT transport, bthh_status_t hhStatus, uint8_t* rptData, int rptSize)
 {
 }
 
-void HidHostService::VirtualUnplugCallback(BLUEDROID::RawAddress* bdAddr, bthh_status_t hhStatus)
+void HidHostService::VirtualUnplugCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+    tBT_TRANSPORT transport, bthh_status_t hhStatus)
 {
 }
 
-void HidHostService::HandshakeCallback(BLUEDROID::RawAddress* bdAddr, bthh_status_t hhStatus)
+void HidHostService::HandshakeCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+    tBT_TRANSPORT transport, bthh_status_t hhStatus)
 {
 }
 

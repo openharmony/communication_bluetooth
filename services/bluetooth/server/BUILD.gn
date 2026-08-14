@@ -47,6 +47,7 @@ bluetooth_server_external_deps = [
   "init:libbeget_proxy",
   "preferences:native_preferences",
   "wifi:wifi_sdk",
+  "common_event_service:cesfwk_innerkits",
 ]
 if (bluetooth_service_override_ffrt_enable) {
   bluetooth_server_external_deps += [ "ffrt:libffrt" ]
@@ -141,6 +142,7 @@ config("bluetooth_server_config") {
     "-fno-asynchronous-unwind-tables",
     "-fno-merge-all-constants",
     "-flto",
+    "-Wno-format",
   ]
 }
 

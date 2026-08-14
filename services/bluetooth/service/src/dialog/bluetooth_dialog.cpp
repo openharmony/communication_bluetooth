@@ -38,6 +38,7 @@ namespace OHOS {
 namespace bluetooth {
 namespace {
     constexpr int32_t DEFAULT_VALUE = -1;
+    constexpr const char *CALLING_NAME = "com.ohos.settings";
     constexpr const char *UI_TYPE_KEY = "ability.want.params.uiExtensionType";
     constexpr const char *UI_TYPE_VAL = "sysDialog/common";
     constexpr const char *PARAM_DEVICE_ID = "deviceId";
