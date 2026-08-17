@@ -112,6 +112,9 @@ static std::map<int32_t, int32_t> innerToBusinessErrCodeMap {
     { BtErrCode::BT_ERR_OBJECT_NULL, BtErrCode::BT_ERR_INTERNAL_ERROR },
     { BtErrCode::BT_ERR_REQUEST_NOT_SUPPORT, BtErrCode::BT_ERR_INTERNAL_ERROR },
     { BtErrCode::BT_ERR_REGISTER_APPLICATION_FAILED, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_BAS_NO_MATCH_OBSERVER, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_BAS_OBSERVER_EXCEEDS_LIMIT, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_BAS_REQUEST_BUSY, BtErrCode::BT_ERR_INTERNAL_ERROR },
 };
 
 static std::map<int32_t, std::string> innerErrMsgMap {
@@ -150,6 +153,9 @@ static std::map<int32_t, std::string> innerErrMsgMap {
     { BtErrCode::BT_ERR_OBJECT_NULL, "Operation failed. Judge object is null." },
     { BtErrCode::BT_ERR_REQUEST_NOT_SUPPORT, "Operation failed. Unsupported request." },
     { BtErrCode::BT_ERR_REGISTER_APPLICATION_FAILED, "Operation failed. Register Application failed." },
+    { BtErrCode::BT_ERR_BAS_NO_MATCH_OBSERVER, "Operation failed. Unregistered observer." },
+    { BtErrCode::BT_ERR_BAS_OBSERVER_EXCEEDS_LIMIT, "Operation failed. Observers exceeds the limit." },
+    { BtErrCode::BT_ERR_BAS_REQUEST_BUSY, "Operation failed. Request busy." },
 };
 
 bool IsInnerErrorCode(int32_t errCode)
