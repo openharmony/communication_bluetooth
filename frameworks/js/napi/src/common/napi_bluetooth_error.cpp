@@ -153,9 +153,9 @@ static std::map<int32_t, std::string> innerErrMsgMap {
     { BtErrCode::BT_ERR_OBJECT_NULL, "Operation failed. Judge object is null." },
     { BtErrCode::BT_ERR_REQUEST_NOT_SUPPORT, "Operation failed. Unsupported request." },
     { BtErrCode::BT_ERR_REGISTER_APPLICATION_FAILED, "Operation failed. Register Application failed." },
-    { BtErrCode::BT_ERR_BAS_NO_MATCH_OBSERVER, "Operation failed. Unregistered observer." },
-    { BtErrCode::BT_ERR_BAS_OBSERVER_EXCEEDS_LIMIT, "Operation failed. Observers exceeds the limit." },
-    { BtErrCode::BT_ERR_BAS_REQUEST_BUSY, "Operation failed. Request busy." },
+    { BtErrCode::BT_ERR_BAS_NO_MATCH_OBSERVER, "Operation failed. Unregistered bas observer." },
+    { BtErrCode::BT_ERR_BAS_OBSERVER_EXCEEDS_LIMIT, "Operation failed. Bas observers exceeds the limit." },
+    { BtErrCode::BT_ERR_BAS_REQUEST_BUSY, "Operation failed. Bas request busy." },
 };
 
 bool IsInnerErrorCode(int32_t errCode)
