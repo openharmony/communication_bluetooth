@@ -1020,7 +1020,7 @@ public:
       *         returns an error code defined in {@link BtErrCode} otherwise.
       * @since 26
     */
-    int UpdateSecondaryPairMode(int32_t mode);
+    int UpdateSecondaryPhonePairMode(int32_t mode);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
