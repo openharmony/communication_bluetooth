@@ -1012,7 +1012,7 @@ public:
     int32_t VerifyMultiPermissions(bool systemHapNeeded, const std::set<std::string> &permissions);
 
     /**
-      * @brief updata second phone pair mode when second phone start change in watch product. 
+      * @brief update second phone pair mode when second phone start change in watch product. 
       *
       * @param mode second phone pair mode 0: enter pair, 1: exit pair, 2: Switch Sub-phone to Main Phone.
       *             The mode can be extended based on the actual scenarios of the watch.
