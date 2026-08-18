@@ -81,11 +81,11 @@ int32_t BluetoothBasProxy::GetBatteryLevel(const std::string &address)
     MessageParcel data;
     if (!data.WriteInterfaceToken(BluetoothBasProxy::GetDescriptor())) {
         HILOGE("WriteInterfaceToken error");
-        return BT_ERR_IPC_TRANS_FAILED;
+        return BT_ERR_IPC_TRANSACTION_FAILED;
     }
     if (!data.WriteString(address)) {
         HILOGE("write address error");
-        return BT_ERR_IPC_TRANS_FAILED;
+        return BT_ERR_IPC_TRANSACTION_FAILED;
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
