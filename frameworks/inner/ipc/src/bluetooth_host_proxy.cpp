@@ -2288,5 +2288,24 @@ int32_t BluetoothHostProxy::VerifyMultiPermissions(bool systemHapNeeded,
     }
     return reply.ReadInt32();
 }
+
+int32_t BluetoothHostProxy::UpdateSecondaryPhonePairMode(int32_t mode)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::UpdateSecondaryPhonePairMode WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint32(mode), BT_ERR_IPC_TRANS_FAILED, "write mode error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::BT_UPDATE_PHONE_TYPE, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::UpdateSecondaryPhonePairMode done fail error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadInt32();
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
