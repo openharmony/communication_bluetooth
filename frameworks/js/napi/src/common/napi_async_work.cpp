@@ -166,8 +166,15 @@ void NapiAsyncWork::Run(void)
         delete info;
         return;
     }
-
-    status = napi_queue_async_work(env_, info->asyncWork);
+    if (qos_ >= 0) {
+#ifdef BLUETOOTH_API_SINCE_10
+        status = napi_queue_async_work_with_qos(env_, info->asyncWork, static_cast<napi_qos_t>(qos_));
+#else
+        status = napi_queue_async_work(env_, info->asyncWork);
+#endif
+    } else {
+        status = napi_queue_async_work(env_, info->asyncWork);
+    }
     if (status != napi_ok) {
         HILOGE("napi_queue_async_work failed, status(%{public}d)", status);
         napi_delete_async_work(env_, info->asyncWork);
@@ -179,6 +186,11 @@ void NapiAsyncWork::Run(void)
 std::shared_ptr<NapiHaEventUtils> NapiAsyncWork::GetHaUtilsPtr(void) const
 {
     return haUtils_;
+}
+
+void NapiAsyncWork::SetQos(int qos)
+{
+    qos_ = qos;
 }
 
 void NapiAsyncWork::TimeoutCallback(void)
