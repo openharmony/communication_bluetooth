@@ -3,7 +3,7 @@
     "systemability":[
         {
             "name":1130,
-            "libpath":"/system/lib64/libbluetooth_server.z.so",
+            "libpath":"libbluetooth_server.z.so",
             "run-on-create":false,
             "auto-restart":true,
             "distributed":false,

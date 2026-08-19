@@ -81,7 +81,8 @@
       "bluetooth_service_override_local_ble_conn_public_address_enable",
       "bluetooth_service_override_build_mode",
       "bluetooth_service_override_power_on_reconnect_feature",
-      "bluetooth_service_override_pluggable_supported"
+      "bluetooth_service_override_pluggable_supported",
+      "bluetooth_use_open_stack"
     ],
     "adapted_system_type": [
       "standard"

@@ -103,18 +103,28 @@ void AdapterTurningOnState::Entry()
             transport);
         bt_interface_t* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
         if (bluetoothInterface == nullptr) {
+            HILOGE("bluetoothInterface is nullptr, abort enable");
+            DoInAdapterManagerThread([this] { this->Transition(TURNING_OFF_STATE); });
             return;
         }
         const bthwif_interface_t *bthwif = reinterpret_cast<const bthwif_interface_t *>(
             bluetoothInterface->get_profile_interface(BT_VENDER_INTERFACE_ID));
         if (bthwif == nullptr) {
+#ifdef BT_USE_OPEN_STACK
+            // Open stack (libbtstack) has no Huawei vendor profile; still enable HCI stack.
+            HILOGW("bthwif unavailable on open stack, enable bluetooth stack directly");
+#else
             HILOGE("Failed to get bthwif interface handle");
+            DoInAdapterManagerThread([this] { this->Transition(TURNING_OFF_STATE); });
             return;
-        }
-        bool result = BluetoothHwInterface::GetInstance()->InitBtHwInterface(bthwif);
-        if (!result) {
-            HILOGE("Failed to init bthwif interface handle");
-            return;
+#endif
+        } else {
+            bool result = BluetoothHwInterface::GetInstance()->InitBtHwInterface(bthwif);
+            if (!result) {
+                HILOGE("Failed to init bthwif interface handle");
+                DoInAdapterManagerThread([this] { this->Transition(TURNING_OFF_STATE); });
+                return;
+            }
         }
 #ifdef QOS_MANAGER_ENABLE
         std::unordered_map<std::string, std::string> payload;
@@ -123,7 +133,11 @@ void AdapterTurningOnState::Entry()
 	    payload["pid"] = std::to_string(getpid()); // 这里需要将pid的输入转化为string类型
 	    OHOS::ConcurrentTask::ConcurrentTaskClient::GetInstance().RequestAuth(payload); // 向concurrent_task服务申请对自己进程鉴权
 #endif
-        bluetoothInterface->enable();
+        int enableRet = bluetoothInterface->enable();
+        if (enableRet != BT_STATUS_SUCCESS) {
+            HILOGE("bluetoothInterface->enable failed: %{public}d", enableRet);
+            DoInAdapterManagerThread([this] { this->Transition(TURNING_OFF_STATE); });
+        }
     } else {
         HILOGI("[ADAPTER_STATE_MACHINE]AdapterTurningOnState, enable adapter, transport = %{public}d", transport);
         adapterContext->Enable();

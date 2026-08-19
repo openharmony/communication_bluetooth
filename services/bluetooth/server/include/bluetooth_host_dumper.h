@@ -34,6 +34,7 @@ private:
     static void IllegalDumpInput(std::string& result);
     static bool DumpDefault(std::string& result);
     static void ShowRssFreezeInfo(std::string& result);
+    static void ForceStartPair(const std::string& address, std::string& result);
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

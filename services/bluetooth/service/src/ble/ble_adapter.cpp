@@ -117,8 +117,15 @@ bool InitStackGattProfile(void)
     const btgatt_interface_t* gattInterface =
         reinterpret_cast<const btgatt_interface_t*>(btInterface->get_profile_interface(BT_PROFILE_GATT_ID));
     if (gattInterface == nullptr) {
+#ifdef BT_USE_OPEN_STACK
+        // Open stack DM has not exported btif GATT glue yet; keep adapter enable
+        // so HCI/stack can stay on for discovery and basic radio bring-up.
+        HILOGW("GATT profile unavailable on open stack, skip GATT init");
+        return true;
+#else
         HILOGE("Failed to get gatt interface handle");
         return false;
+#endif
     }
     return BluetoothGattInterface::GetInstance()->Initialize(gattInterface);
 }

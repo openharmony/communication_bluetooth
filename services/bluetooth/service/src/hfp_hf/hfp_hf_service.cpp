@@ -421,15 +421,34 @@ void HfpHfService::StartUp()
         return;
     }
     bt_interface_t* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
-    CHECK_AND_RETURN_LOG(bluetoothInterface != nullptr, "bluetoothInterface is null.");
+    if (bluetoothInterface == nullptr) {
+#ifdef BT_USE_OPEN_STACK
+        HILOGW("[HFP HF]bluetoothInterface null on open stack, skip stack init");
+        GetContext()->OnEnable(PROFILE_NAME_HFP_HF, true);
+#else
+        HILOGE("[HFP HF]bluetoothInterface is null.");
+#endif
+        return;
+    }
 
     bluetoothHfInterface = reinterpret_cast<bthf_client_interface_t*>(
         const_cast<void *>(bluetoothInterface->get_profile_interface(BT_PROFILE_HANDSFREE_CLIENT_ID)));
-    CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "bluetoothHfInterface is null.");
+    if (bluetoothHfInterface == nullptr) {
+#ifdef BT_USE_OPEN_STACK
+        HILOGW("[HFP HF]HFP HF profile unavailable on open stack, skip stack init");
+        GetContext()->OnEnable(PROFILE_NAME_HFP_HF, true);
+#else
+        HILOGE("[HFP HF]bluetoothHfInterface is null.");
+#endif
+        return;
+    }
 
     bt_status_t status = bluetoothHfInterface->init(&g_sBluetoothHFCallbacks);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP HF]Failed to initialize Bluetooth HFP AG, status: %{public}d", status);
+#ifdef BT_USE_OPEN_STACK
+        GetContext()->OnEnable(PROFILE_NAME_HFP_HF, true);
+#endif
         return;
     }
 

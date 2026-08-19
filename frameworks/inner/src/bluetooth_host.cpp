@@ -143,16 +143,29 @@ public:
         host_.observers_.ForEach([transport, status](std::shared_ptr<BluetoothHostObserver> observer) {
             observer->OnStateChanged(transport, status);
         });
+        // After both transports report TURN_OFF, unblock BluetoothSwitchModule.
+        // (pre* states are updated inside isNeedInterceptSwitchStatus above.)
+        if (status == BTStateID::STATE_TURN_OFF &&
+            preBrState_ == BTStateID::STATE_TURN_OFF &&
+            preBleState_ == BTStateID::STATE_TURN_OFF) {
+            std::lock_guard<std::mutex> lock(host_.switchModuleMutex_);
+            if (host_.switchModule_ != nullptr) {
+                HILOGI("both BR and BLE off, notify BLUETOOTH_OFF to switch module");
+                host_.switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::BLUETOOTH_OFF);
+            }
+        }
     }
 
     void OnBluetoothStateChanged(int32_t state) override
     {
+        HILOGI("OnBluetoothStateChanged V2 state=%{public}d", state);
         std::lock_guard<std::mutex> lock(host_.switchModuleMutex_);
         CHECK_AND_RETURN_LOG(host_.switchModule_, "switchModule is nullptr");
         if (state == bluetooth::BluetoothSwitchState::STATE_ON) {
             host_.switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::BLUETOOTH_ON);
         }
         if (state == bluetooth::BluetoothSwitchState::STATE_OFF) {
+            HILOGI("V2 STATE_OFF -> BLUETOOTH_OFF");
             host_.switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::BLUETOOTH_OFF);
         }
         if (state == bluetooth::BluetoothSwitchState::STATE_HALF) {

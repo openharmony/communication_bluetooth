@@ -214,6 +214,10 @@ config("btservice_config") {
     "COMMUNICATION_L2"
   ]
 
+  if (bluetooth_use_open_stack) {
+    defines += [ "BT_USE_OPEN_STACK" ]
+  }
+
   if (bluetooth_service_override_bt_mcu_proxy_enable) {
     defines += [
       "BT_MCU_PROXY_ENABLE",

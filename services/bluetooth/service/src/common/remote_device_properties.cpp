@@ -749,9 +749,16 @@ void RemoteDeviceProperties::DeviceFoundInner(int numProperties, bt_property_t* 
     BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(address);
     GetRemoteDevicePropsCallbackInner(rawAddr, numProperties, properties);
     std::shared_ptr<BluetoothDevice> remoteDevice = FindRemoteDevice(address);
+    if (remoteDevice == nullptr) {
+        HILOGE("remoteDevice is null after DeviceFound");
+        return;
+    }
 
     auto classicAdapter = AdapterManager::GetInstance()->GetClassicAdapter();
-    if (classicAdapter && IsBrDeviceType(address.GetAddress())) {
+    int deviceType = GetDeviceType(address);
+    // Prefer classic discovery callback unless the device is known LE-only.
+    // Settings "available devices" listens on classic OnDiscoveryResult.
+    if (classicAdapter && deviceType != DEVICE_TYPE_LE) {
         classicAdapter->SendDiscoveryResult(
             address, remoteDevice->GetRssi(), remoteDevice->GetRemoteName(), remoteDevice->GetDeviceClass());
         return;
@@ -790,7 +797,7 @@ bt_property_t* RemoteDeviceProperties::PropertyDeepCopy(int numProperties, bt_pr
             auto len = properties[i].len;
             copy[i].type = properties[i].type;
             copy[i].len = len;
-            if (len <= 0) {
+            if (len <= 0 || properties[i].val == nullptr) {
                 continue;
             }
             copy[i].val = content;

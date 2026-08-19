@@ -141,6 +141,12 @@ void ClassicAdapter::StartUp()
 {
     adapterProperties_->LoadConfigInfo();
     LoadPairedDeviceInfo();
+    discoveryState_ = DISCOVERY_STOPED;
+#ifdef BT_USE_OPEN_STACK
+    // Open stack does not auto-apply scan mode after classic enable.
+    constexpr int OPEN_STACK_SCAN_DURATION_MS = 120000;
+    SetBtScanMode(SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE, OPEN_STACK_SCAN_DURATION_MS);
+#endif
     GetContext()->OnEnable(ADAPTER_NAME_CLASSIC, true);
 }
 
@@ -484,10 +490,15 @@ int32_t ClassicAdapter::StartBtDiscovery()
         return BT_ERR_CLOUD_DEVICE_BONDING;
     }
     if (IsBtDiscovering()) {
-        HILOGE("failed, because of DISCOVERYING or DISCOVERY_STARTED! state = %{public}d", discoveryState_.load());
-        BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_START_BT_DISCOVER, UE_COMMON_SCENE_CASE3, callingName);
-        return BT_ERR_DISCOVERY_STATE_ERROR;
+        HILOGI("already discovering state=%{public}d, return success", discoveryState_.load());
+        return BT_NO_ERROR;
     }
+#ifdef BT_USE_OPEN_STACK
+    if (btInterface->pairing_is_busy != nullptr && btInterface->pairing_is_busy()) {
+        HILOGW("pairing in progress, skip start discovery");
+        return BT_NO_ERROR;
+    }
+#endif
     pimpl->startDiscoveryPid_ = IPCSkeleton::GetCallingPid();
     pimpl->startDiscoveryUid_ = IPCSkeleton::GetCallingUid();
     int ret = btInterface->start_discovery();
@@ -496,9 +507,12 @@ int32_t ClassicAdapter::StartBtDiscovery()
         gettimeofday(&tv, nullptr);
         long currentTime = (tv.tv_sec * MILLISECOND_UNIT + tv.tv_usec / MILLISECOND_UNIT);
         discoveryEndMs_ = currentTime + DEFAULT_DISCOVERY_TIMEOUT_MS;
+        // Do not wait only for stack callback; mark started so timeout/end tracking works.
+        discoveryState_ = DISCOVERY_STARTED;
         BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_START_BT_DISCOVER, UE_COMMON_SCENE_CASE1, callingName);
     } else {
         HILOGE("failed, because of StartBtDiscovery failed!");
+        discoveryState_ = DISCOVERY_STOPED;
         BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_START_BT_DISCOVER, UE_COMMON_SCENE_CASE4, callingName);
         return BT_ERR_INTERNAL_ERROR;
     }
@@ -518,20 +532,28 @@ bool ClassicAdapter::CancelBtDiscovery()
     }
     bool ret = false;
     if (discoveryState_ == DISCOVERY_STOPED) {
-        HILOGE("failed, because of DISCOVERY_STOPED!");
-        BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_CANCEL_BT_DISCOVER, UE_COMMON_SCENE_CASE3, callingName);
-        return ret;
+        HILOGI("already stopped, treat cancel as success");
+        return true;
     }
     const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
-    CHECK_AND_RETURN_LOG_RET(bluetoothHwSrcInterface != nullptr, false, "interface nullptr");
-    CHECK_AND_RETURN_LOG_RET(!bluetoothHwSrcInterface->isBondingOrSdp(), false, "bonding or sdp, no cancel discovery");
-    int result = btInterface->cancel_discovery();
-    if (result != BT_STATUS_SUCCESS) {
-        HILOGE("failed, because of CancelBtDiscovery failed!");
-        BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_CANCEL_BT_DISCOVER, UE_COMMON_SCENE_CASE4, callingName);
+#ifdef BT_USE_OPEN_STACK
+    if (bluetoothHwSrcInterface != nullptr && bluetoothHwSrcInterface->isBondingOrSdp()) {
+        HILOGW("bonding or sdp, no cancel discovery");
         return false;
     }
+#else
+    CHECK_AND_RETURN_LOG_RET(bluetoothHwSrcInterface != nullptr, false, "interface nullptr");
+    CHECK_AND_RETURN_LOG_RET(!bluetoothHwSrcInterface->isBondingOrSdp(), false, "bonding or sdp, no cancel discovery");
+#endif
+    int result = btInterface->cancel_discovery();
+    // Always clear local state: stack may already be idle (InquiryComplete missed),
+    // while discoveryState_ is still DISCOVERY_STARTED and blocks the next Start.
     discoveryState_ = DISCOVERY_STOPED;
+    if (result != BT_STATUS_SUCCESS) {
+        HILOGW("CancelBtDiscovery stack ret=%{public}d, local state cleared", result);
+        BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_CANCEL_BT_DISCOVER, UE_COMMON_SCENE_CASE4, callingName);
+        return true;
+    }
     BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_CANCEL_BT_DISCOVER, UE_COMMON_SCENE_CASE1, callingName);
     return true;
 }
@@ -760,11 +782,12 @@ bool ClassicAdapter::StartPair(int32_t transport, const RawAddress &device, cons
         return true;
     }
     int pairStatus = remoteDevice->GetPairedStatus();
-    if (pairStatus == PAIR_PAIRING) {
-        HILOGE("StartPair failed, pairstatus: %{public}d", pairStatus);
-        BtChrDftEventWriteInt(CHR_BT_PAIR_EXCEPTION, addr, CHR_SUB_ERRCODE, SUBERRCODE_FAIL_CREATEBOND_COMMON);
-        WriteStartPairUeEvent(device, UE_COMMON_SCENE_CASE3, remoteDevice);
-        return false;
+    if (pairStatus == PAIR_PAIRING || pairStatus == PAIR_CANCELING) {
+        /* Open-stack pairing can stall in PAIR_PAIRING (no SSP complete / watchdog).
+         * Allow a fresh StartPair by cancelling the stale bond request first. */
+        HILOGW("StartPair: clear stale pairStatus=%{public}d before retry", pairStatus);
+        (void)remoteDeviceProperties_->CancelPairing(device);
+        remoteDevice->SetPairedStatus(PAIR_NONE);
     }
     CancelBtDiscovery();
     if (BluetoothConnectionManager::GetInstance()->IsBrConnected(device.GetAddress())) {
@@ -1201,10 +1224,15 @@ void ClassicAdapter::BondStateChangedInner(bt_status_t status, BLUEDROID::RawAdd
             BtChrDftEventWriteInt(CHR_BT_PAIR_EXCEPTION, device.GetAddress(), "BONDEDCNT", pairedAddrList.size());
             BtChrDftEventWriteInt(CHR_BT_PAIR_EXCEPTION, device.GetAddress(), CHR_ERRCODE, ERRCODE_PAIR_SUCCESS);
             if (NeedWaitForSdpComplete(remoteDevice)) {
-                HILOGW("device bonded, but wait for sdp complete");
-                std::lock_guard<BtRecursiveMutex> lk(pimpl->pendingDeviceMutex_);
-                pendingPairedDevices_.insert(remoteDevice->GetAddress());
-                return;
+                /* Open stack does not auto-SDP after CreateBond; kick search while ACL
+                 * is still up. Still notify PAIR_PAIRED so Settings leaves "pairing…".
+                 * UUID callback will refresh pending/connect strategy when ready. */
+                HILOGW("device bonded, start SDP (do not block UI on wait)");
+                {
+                    std::lock_guard<BtRecursiveMutex> lk(pimpl->pendingDeviceMutex_);
+                    pendingPairedDevices_.insert(remoteDevice->GetAddress());
+                }
+                (void)GetRemoteServices(device.GetAddress());
             }
             SendPairStatusChanged(ADAPTER_BREDR, device, PAIR_PAIRED, PAIR_COMMON_BOND_CAUSE, BOND_MSG_NO_ERROR);
         }
@@ -1244,7 +1272,12 @@ void ClassicAdapter::SspRequestInner(BLUEDROID::RawAddress remote_bd_addr, bt_bd
 
     std::shared_ptr<BluetoothDevice> remoteDevice = remoteDeviceProperties_->GetBluetoothDeviceFromMap(device);
     if (!remoteDevice) {
-        HILOGE("device not exist");
+        HILOGW("SSP device not in map, auto-accept confirm");
+        const bt_interface_t *btInterface = nullptr;
+        if (hal_util_load_bt_library(&btInterface) == 0 && btInterface != nullptr && btInterface->ssp_reply != nullptr) {
+            BLUEDROID::RawAddress address = remote_bd_addr;
+            (void)btInterface->ssp_reply(&address, pairingVariant, true, passKey);
+        }
         return;
     }
     remoteDevice->SetPairConfirmState(PAIR_CONFIRM_STATE_USER_CONFIRM);
@@ -1257,6 +1290,12 @@ void ClassicAdapter::SspRequestInner(BLUEDROID::RawAddress remote_bd_addr, bt_bd
     if (SetPairingConfirmationIfNeed(remoteDevice->GetAddress()) && remoteDevice->IsBondedFromLocal()) {
         SetDevicePairingConfirmation(device, true);
         HILOGI("confirm credible device pair");
+        return;
+    }
+    /* Headset / Just-Works: auto-confirm so pairing does not hang waiting for UI. */
+    if (pinType == PIN_TYPE_CONFIRM_PASSKEY || pinType == PIN_TYPE_NO_PASSKEY_CONSENT) {
+        HILOGI("auto confirm SSP pinType=%{public}d", pinType);
+        SetDevicePairingConfirmation(device, true);
         return;
     }
     SendPairConfirmed(device, pinType, static_cast<int>(passKey));

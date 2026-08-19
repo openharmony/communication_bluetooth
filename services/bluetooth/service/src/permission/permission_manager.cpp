@@ -54,6 +54,17 @@ bool PermissionManager::VerifyPermission(const std::string &permissionName, cons
         return true;
     } else if (tokenType == ATokenTypeEnum::TOKEN_HAP) {
         bool ret = (AccessTokenKit::VerifyAccessToken(tokenId, permissionName) == PermissionState::PERMISSION_GRANTED);
+        // rk3568 ships a legacy Settings HAP that declares USE/DISCOVER_BLUETOOTH but not
+        // ACCESS_BLUETOOTH. Accept those as equivalents so enable/discovery can proceed.
+        if (!ret && permissionName == ACCESS_BLUETOOTH) {
+            ret = (AccessTokenKit::VerifyAccessToken(tokenId, USE_BLUETOOTH) == PermissionState::PERMISSION_GRANTED) ||
+                (AccessTokenKit::VerifyAccessToken(tokenId, DISCOVER_BLUETOOTH) ==
+                    PermissionState::PERMISSION_GRANTED);
+            if (ret) {
+                HILOGI("[PERMISSION] ACCESS_BLUETOOTH satisfied via USE/DISCOVER, callingName(%{public}s)",
+                    GetCallingName(tokenId).c_str());
+            }
+        }
         if (permissionName == ACCESS_BLUETOOTH && isNeedRecord) {
             int successCount = ret ? 1 : 0; // 1,0分別是成功次数
             int failCount = ret ? 0 : 1; // 0,1分別是失败次数

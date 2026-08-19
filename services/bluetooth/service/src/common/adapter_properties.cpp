@@ -593,8 +593,8 @@ uint32_t AdapterProperties::ParseDeviceCod(bt_property_t* property)
 
 int8_t AdapterProperties::ParseDeviceRssi(bt_property_t* property)
 {
-    if (property->len != sizeof(uint8_t)) {
-        HILOGE("Invalid length for BT_PROPERTY_PROPERTY_REMOTE_RSSI");
+    if (property->len != sizeof(int8_t) && property->len != sizeof(uint8_t)) {
+        HILOGE("Invalid length %{public}d for BT_PROPERTY_REMOTE_RSSI", property->len);
         return INVALID_VALUE;
     }
     if (property->val != nullptr) {

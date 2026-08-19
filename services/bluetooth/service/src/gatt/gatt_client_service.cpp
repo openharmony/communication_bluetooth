@@ -291,19 +291,24 @@ void GattClientService::impl::RegisterApplication(std::weak_ptr<IGattClientCallb
         [this](int status, int clientIf, const GattClientServiceRegisterObserver::Context &context) {
             this->RegisterClientCallback(status, clientIf, context);
         });
+    if (btIfGattClient == nullptr || btIfGattClient->register_client == nullptr) {
+        // Open stack currently exports empty btgattClientInterface; avoid null call SEGV.
+        HILOGE("GATT client interface unavailable");
+        promise->set_value(GattStatus::REQUEST_NOT_SUPPORT);
+        return;
+    }
+
     BluetoothGattInterface::GetInstance()->AddGattClientObserver(observer);
     std::swap(registerObserver, observer);
 
-    if (btIfGattClient) {
-        // not support eatt transport now
-        int ret = btIfGattClient->register_client(BLUEDROID::bluetooth::Uuid::GetRandom(), false);
-        if (ret != BT_STATUS_SUCCESS) {
-            HILOGE("Register client failed, ret: %{public}d", ret);
-            // Release and delete the observer.
-            registerObserver.reset();
-            promise->set_value(GattStatus::GATT_FAILURE);
-            return;
-        }
+    // not support eatt transport now
+    int ret = btIfGattClient->register_client(BLUEDROID::bluetooth::Uuid::GetRandom(), false);
+    if (ret != BT_STATUS_SUCCESS) {
+        HILOGE("Register client failed, ret: %{public}d", ret);
+        // Release and delete the observer.
+        registerObserver.reset();
+        promise->set_value(GattStatus::GATT_FAILURE);
+        return;
     }
 }
 

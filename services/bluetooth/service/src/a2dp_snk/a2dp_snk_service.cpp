@@ -184,13 +184,21 @@ void A2dpSnkService::StartUp()
     bt_interface_t *bt_interface = AdapterManager::GetInstance()->getBluetoothInterface();
     if (!bt_interface) {
         HILOGE("Failed to open the bt_interface");
+#ifdef BT_USE_OPEN_STACK
+        GetContext()->OnEnable(PROFILE_NAME_A2DP_SINK, true);
+#endif
         return;
     }
 
     btAvSinkInterface_ =
         (btav_sink_interface_t *)(bt_interface->get_profile_interface(BT_PROFILE_ADVANCED_AUDIO_SINK_ID));
     if (!btAvSinkInterface_) {
+#ifdef BT_USE_OPEN_STACK
+        HILOGW("A2DP sink profile unavailable on open stack, skip stack init");
+        GetContext()->OnEnable(PROFILE_NAME_A2DP_SINK, true);
+#else
         HILOGE("Failed to get btAvSinkInterface_");
+#endif
         return;
     }
 

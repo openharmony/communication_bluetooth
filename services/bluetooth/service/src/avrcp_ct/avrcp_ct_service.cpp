@@ -297,12 +297,20 @@ void AvrcpCtService::StartUp()
     bt_interface_t *btInterface = AdapterManager::GetInstance()->getBluetoothInterface();
     if (!btInterface) {
         HILOGE("btInterface is nullptr");
+#ifdef BT_USE_OPEN_STACK
+        GetContext()->OnEnable(PROFILE_NAME_AVRCP_CT, true);
+#endif
         return;
     }
 
     btAvrcpInterface_ = (btrc_ctrl_interface_t *)btInterface->get_profile_interface(BT_PROFILE_AV_RC_CTRL_ID);
     if (!btAvrcpInterface_) {
+#ifdef BT_USE_OPEN_STACK
+        HILOGW("AVRCP CT profile unavailable on open stack, skip stack init");
+        GetContext()->OnEnable(PROFILE_NAME_AVRCP_CT, true);
+#else
         HILOGE("btAvrcpInterface is nullptr");
+#endif
         return;
     }
 

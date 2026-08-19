@@ -76,10 +76,19 @@ int BluetoothSwitchModule::ProcessBluetoothSwitchEvent(
 
 void BluetoothSwitchModule::OnTaskTimeout(void)
 {
-    HILOGW("Bluetooth switch action timeout, clear resources");
-    std::lock_guard<std::mutex> lock(bluetoothSwitchEventMutex_);
-    isBtSwitchProcessing_ = false;
-    cachedEventVec_.clear();
+    HILOGW("Bluetooth switch action timeout, retry cached events instead of dropping");
+    std::vector<BluetoothSwitchCacheEvent> cached;
+    {
+        std::lock_guard<std::mutex> lock(bluetoothSwitchEventMutex_);
+        isBtSwitchProcessing_ = false;
+        cached.swap(cachedEventVec_);
+    }
+    /* Open-stack disable may never deliver BLUETOOTH_OFF; without this, ENABLE
+     * cached during disable is discarded and UI cannot turn BT on again. */
+    for (const auto &ev : cached) {
+        HILOGI("timeout retry cached %{public}s", ToString(ev.event));
+        (void)ProcessBluetoothSwitchEvent(ev.event, ev.callingName);
+    }
 }
 
 int BluetoothSwitchModule::ProcessBluetoothSwitchAction(

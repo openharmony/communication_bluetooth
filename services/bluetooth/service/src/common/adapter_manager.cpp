@@ -871,6 +871,18 @@ bool AdapterManager::AdapterStop() const
         pimpl->bleAdapter_ = nullptr;
     }
 
+#ifdef BT_USE_OPEN_STACK
+    // SA may stay in-process across unload/reload; release stack so next Start can DmInit again.
+    if (pimpl->bluetoothInterface != nullptr && pimpl->bluetoothInterface->cleanup != nullptr) {
+        HILOGI("cleanup open bluetooth stack on AdapterStop");
+        pimpl->bluetoothInterface->cleanup();
+    }
+#endif
+    {
+        std::lock_guard<std::mutex> lock(pimpl->initializedMutex_);
+        pimpl->isInitialized_ = false;
+    }
+
     utility::Message msg(SysStateMachine::MSG_SYS_STOP_CMP);
     DoInAdapterManagerThread([this, msg] {this->pimpl->sysStateMachine_.ProcessMessage(msg);});
 
@@ -970,6 +982,22 @@ int32_t AdapterManager::Enable(BTTransport transport, bool isAsync, std::string 
     if (GetState(transport) == BTStateID::STATE_TURN_OFF) {
         return EnableInner(callingName, transport, isAsync, isUserTriggered);
     } else if (GetState(transport) == BTStateID::STATE_TURN_ON) {
+        // svc/Settings call Enable(BLE). When BLE is already on, continue classic bring-up.
+        if (transport == ADAPTER_BLE) {
+            int brState = GetState(ADAPTER_BREDR);
+            if (brState == BTStateID::STATE_TURN_OFF) {
+                HILOGI("[ADAPTER_MANAGER]BLE already on, enable ADAPTER_BREDR");
+                return Enable(ADAPTER_BREDR, isAsync, callingName, isUserTriggered);
+            }
+            if (brState == BTStateID::STATE_TURNING_ON) {
+                // Classic profiles may still be completing; treat as in-progress success for svc.
+                HILOGI("[ADAPTER_MANAGER]BLE already on, ADAPTER_BREDR is turning on");
+                return BT_NO_ERROR;
+            }
+            // BREDR already on: full bluetooth is on.
+            HILOGI("[ADAPTER_MANAGER]BLE and BREDR already on");
+            return BT_NO_ERROR;
+        }
         HILOGE("[ADAPTER_MANAGER]bluetooth switch state is turn on");
         BtChrUeManager::GetInstance()->WriteBtSwitchChangeUe(transport, UE_COMMON_SCENE_CASE0, UE_COMMON_SCENE_CASE3,
             callingName, 0);
@@ -1397,17 +1425,27 @@ void AdapterManager::UnLoadBluetoothSystemAbility(const BTTransport transport, c
 #endif
     OnBluetoothOffHook();
     HILOGI("set persist.bluetooth.switch_enable %{public}s", g_bluetoothSwitchStateOff);
-#ifndef DISABLE_BT_SUPPORTED
-    HILOGI("Bluetooth cannot be disabled!");
-#else
+#if defined(DISABLE_BT_SUPPORTED) || defined(BT_USE_OPEN_STACK)
     SetParameter(g_bluetoothSwitchStatePropertyName, g_bluetoothSwitchStateOff);
+#else
+    HILOGI("Bluetooth cannot be disabled!");
 #endif
+    // Unblock framework BluetoothSwitchModule: without STATE_OFF, isBtSwitchProcessing_
+    // stays true and a later UI enable is only cached then dropped on timeout.
+    NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_OFF);
     BtChrWriteSwitchEvent(ChrSwitchEvent(EVENT_TYPE_BT_DISABLE_SUCCESS));
     BtChrTransactionManager::GetInstance().ReportTransaction();
 
     if (IsFactoryReset() || pimpl->isAppCloseBt_.load()) {
         pimpl->isAppCloseBt_ = false;
+#ifdef BT_USE_OPEN_STACK
+        // Open stack HCI reopen is fragile across SA process kill/restart.
+        // Keep process alive briefly so UI can turn BT back on without full reload.
+        HILOGI("open stack: defer SA unload after UI disable (10s)");
+        StartUnloadBluetoothSaTimer();
+#else
         PromptUnloadBluetoothSystemAbility();
+#endif
         return;
     }
 

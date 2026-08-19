@@ -230,6 +230,12 @@ int GattServerService::RegisterApplication(std::weak_ptr<IGattServerCallback> ca
         HILOGE("GattServerService is not start up.");
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
+    // Open stack currently exports an empty btgattServerInterface (all nullptrs).
+    // SoftBus/others register immediately after BLE ON; calling null register_server SEGV.
+    if (btIfGattServer_ == nullptr || btIfGattServer_->register_server == nullptr) {
+        HILOGE("GATT server interface unavailable");
+        return GattStatus::REQUEST_NOT_SUPPORT;
+    }
 
     auto resourceMgr = BluetoothResourceManager::GetInstance();
     if (resourceMgr) {
@@ -245,39 +251,42 @@ int GattServerService::RegisterApplication(std::weak_ptr<IGattServerCallback> ca
         // enter inner thread
         using std::placeholders::_1;
         using std::placeholders::_2;
+        if (btIfGattServer_ == nullptr || btIfGattServer_->register_server == nullptr) {
+            HILOGE("GATT server interface unavailable");
+            promise->set_value(GattStatus::REQUEST_NOT_SUPPORT);
+            return;
+        }
         std::shared_ptr<GattServerServiceRegisterObserver> obs = std::make_shared<GattServerServiceRegisterObserver>(
             [this](int status, int serverIf) { pimpl->RegisterServerCallback(status, serverIf); });
         BluetoothGattInterface::GetInstance()->AddGattServerObserver(obs);
 
         auto appUuid = BLUEDROID::bluetooth::Uuid::GetRandom();
-        if (btIfGattServer_) {
-            int ret = btIfGattServer_->register_server(appUuid, false);
-            if (ret != BT_STATUS_SUCCESS) {
-                HILOGE("register server failed, ret: %{public}d", ret);
-                promise->set_value(GattStatus::GATT_FAILURE);
-                return;
-            }
-
-            int appId = 0;
-            if (!pimpl->WaitForRegisterCallback(appId)) {
-                HILOGI("failed");
-                promise->set_value(GattStatus::GATT_FAILURE);
-                return;
-            }
-            // Create Gatt server application
-            std::shared_ptr<GattServerApplication> server = std::make_shared<GattServerApplication>(appId,
-                btIfGattServer_, tokenId, callback, [this](int appId, const Service &service) {
-                    pimpl->NotifyServiceChanged(appId, service);
-                });
-            BluetoothGattInterface::GetInstance()->AddGattServerObserver(server);
-            pimpl->servers.emplace(pimpl->servers.end(), server);
-
-            std::lock_guard<std::mutex> appIdLock(pimpl->appIdMutex);
-            pimpl->appIds.insert(appId);
-
-            // Sync
-            promise->set_value(appId);
+        int ret = btIfGattServer_->register_server(appUuid, false);
+        if (ret != BT_STATUS_SUCCESS) {
+            HILOGE("register server failed, ret: %{public}d", ret);
+            promise->set_value(GattStatus::GATT_FAILURE);
+            return;
         }
+
+        int appId = 0;
+        if (!pimpl->WaitForRegisterCallback(appId)) {
+            HILOGI("failed");
+            promise->set_value(GattStatus::GATT_FAILURE);
+            return;
+        }
+        // Create Gatt server application
+        std::shared_ptr<GattServerApplication> server = std::make_shared<GattServerApplication>(appId,
+            btIfGattServer_, tokenId, callback, [this](int appId, const Service &service) {
+                pimpl->NotifyServiceChanged(appId, service);
+            });
+        BluetoothGattInterface::GetInstance()->AddGattServerObserver(server);
+        pimpl->servers.emplace(pimpl->servers.end(), server);
+
+        std::lock_guard<std::mutex> appIdLock(pimpl->appIdMutex);
+        pimpl->appIds.insert(appId);
+
+        // Sync
+        promise->set_value(appId);
     });
 
     if (future.wait_for(std::chrono::seconds(impl::SYNC_TIMEOUT)) != std::future_status::ready) {

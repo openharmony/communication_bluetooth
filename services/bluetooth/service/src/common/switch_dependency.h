@@ -81,9 +81,10 @@ private:
     };
     mutable std::mutex dependedSystemParamsVecMutex_ {};
     std::vector<DependedSystemParam> dependedSystemParamsVec_ {
-#if !(defined(BT_MCU_PROXY_ENABLE) || defined(BLUETOOTH_WATCH_ENABLE)) // 眼镜驱动节点不在AP侧挂载
+#if !(defined(BT_MCU_PROXY_ENABLE) || defined(BLUETOOTH_WATCH_ENABLE) || defined(BT_USE_OPEN_STACK))
+        // Qualcomm mpxx driver node; not used by open-stack UART boards (e.g. rk3568/BCM).
         {"vendor.setup_mpxx_dir_mode", "success", "false", false},
-#endif // BT_MCU_PROXY_ENABLE and BLUETOOTH_WATCH_ENABLE
+#endif // BT_MCU_PROXY_ENABLE / BLUETOOTH_WATCH_ENABLE / BT_USE_OPEN_STACK
     };
 
     std::atomic_bool isDataShareReady_ { false };

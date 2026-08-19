@@ -18,9 +18,13 @@
 
 #include "bluetooth_host_dumper.h"
 
+#include "bluetooth_def.h"
 #include "bluetooth_host_server.h"
 #include "bluetooth_log.h"
-#include "bluetooth_def.h"
+#include "bluetooth_oob_data_parcel.h"
+#include "bluetooth_utils_server.h"
+#include "interface_adapter_manager.h"
+#include "raw_address.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -29,6 +33,7 @@ constexpr size_t MIN_ARGS_SIZE = 1;
 const std::string ARGS_HELP = "-h";
 const std::string ARGS_BR = "-br";
 const std::string ARGS_SHOW_RSSPROXY_MAP = "-shwoRssroxyMap";
+const std::string ARGS_PAIR = "-pair";
 }
 
 void BluetoothHostDumper::BluetoothDump(const std::vector<std::string>& args, std::string& result)
@@ -56,6 +61,11 @@ void BluetoothHostDumper::BluetoothDump(const std::vector<std::string>& args, st
             return;
         }
     }
+    /* Bypass Settings UI: hidumper -s 1130 -a "-pair AA:BB:CC:DD:EE:FF" */
+    if (args.size() >= 2 && args[0] == ARGS_PAIR) {
+        ForceStartPair(args[1], result);
+        return;
+    }
     IllegalDumpInput(result);
 }
 
@@ -64,7 +74,30 @@ void BluetoothHostDumper::ShowDumpHelp(std::string& result)
     result.append("Bluetooth Dump options:\n")
         .append("[-h]: show cmd help.\n")
         .append("[-br]: show common state.\n")
-        .append("[-shwoRssroxyMap]: show Rss proxy map.\n");
+        .append("[-shwoRssroxyMap]: show Rss proxy map.\n")
+        .append("[-pair <MAC>]: force StartPair (bypass Settings).\n");
+}
+
+void BluetoothHostDumper::ForceStartPair(const std::string& address, std::string& result)
+{
+    HILOGI("dump force StartPair addr=%{public}s", GetEncryptAddr(address).c_str());
+    auto classicService = bluetooth::IAdapterManager::GetInstance()->GetClassicAdapterInterface();
+    if (classicService == nullptr) {
+        result.append("FAIL: classic adapter null (BT off?)\n");
+        return;
+    }
+    bluetooth::RawAddress addr(address);
+    /*
+     * Do not CancelPairing while BONDING: cancel_bond → GAPIF_CancelAuthenticationReq
+     * blocks if GAP is stuck (e.g. prior LinkKeyRsp deadlock). StartPair itself clears
+     * stale PAIR_PAIRING/CANCELING and disconnects ACL before CreateBond when needed.
+     */
+    BluetoothOobData oobData;
+    if (classicService->StartPair(BT_TRANSPORT_BREDR, addr, oobData)) {
+        result.append("OK: StartPair accepted for ").append(address).append("\n");
+    } else {
+        result.append("FAIL: StartPair rejected for ").append(address).append("\n");
+    }
 }
 
 void BluetoothHostDumper::BtCommStateDump(std::string& result)
