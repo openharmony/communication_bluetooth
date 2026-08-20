@@ -248,6 +248,7 @@ napi_value NapiBluetoothOpp::SetLastReceivedFileUri(napi_env env, napi_callback_
     };
     auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    HILOGI("setLastReceivedFileUri napi run");
     asyncWork->Run();
     return asyncWork->GetRet();
 }

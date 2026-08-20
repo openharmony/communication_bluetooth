@@ -698,8 +698,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
             this.fileFd = -1;
         }
         if (this.successCount == 0) {
-            console.info(TAG, 'no success file, terminate it.');
-            this.handleTerminate();
+            console.info(TAG, 'no success file, cancelSendProgressNotification.');
         }
     }
 
