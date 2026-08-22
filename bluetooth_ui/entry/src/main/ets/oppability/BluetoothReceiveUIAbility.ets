@@ -229,7 +229,6 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
             console.info(TAG, `unlink file begin`);
             const uri = new fileUri.FileUri(this.receiveDirectory);
             let deleteSandBoxUri = uri.path;
-            console.info(TAG, `unlink file begin fileUri ${this.receiveDirectory} sandBoxUri ${deleteSandBoxUri}`);
             if (this.fileFd != -1) {
                 fs.close(this.fileFd);
                 this.fileFd = -1;
@@ -240,7 +239,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
             this.cancelSendProgressNotification();
             this.oppProfile.off('transferStateChange');
             let err: BusinessError = error as BusinessError;
-            console.error(TAG, `unlink failed, uri ${this.receiveDirectory} code ${err.code}, message ${err.message}`);
+            console.error(TAG, `unlink failed, code ${err.code}, message ${err.message}`);
             this.oppProfile.setLastReceivedFileUri('removeFile: ' + this.receiveDirectory);
         }
     }
@@ -335,6 +334,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
           }
           case 'usual.event.bluetooth.OPP.FINISH.NOTIFICATION': {
               this.oppProfile.setLastReceivedFileUri(this.receiveDirectory);
+              this.tapEventIsAllowed = true;
               setTimeout(() => {
                   if (this.transfering) {
                       console.info(TAG, 'still transfering, do not terminate');
@@ -347,6 +347,10 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
           }
           case 'usual.event.bluetooth.OPP.FINISH.REMOVE': {
               console.info(TAG, 'user OPP.FINISH.REMOVE tapEventIsAllowed is ' + this.tapEventIsAllowed);
+              if (this.transfering) {
+                  console.info(TAG, 'still transfering, do not terminate');
+                  return;
+              }
               clearTimeout(this.timerIdReceive);
               this.transfering = false;
               this.oppProfile.setIncomingFileConfirmation(false, -1);
@@ -442,7 +446,6 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
             } else {
                 this.sandBoxUri = this.receiveDirectory;
             }
-            console.info(TAG, `openFile begin fileUri ${this.sandBoxUri}`);
             let file = fs.openSync(this.sandBoxUri, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
             this.fileFd = file.fd;
             await this.oppProfile.setIncomingFileConfirmation(true, file.fd);
