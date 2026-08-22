@@ -49,6 +49,7 @@ const RESULT_ERROR_UNKNOWN: number = 7;
 const RESULT_SUCCESS_DISCONNECT: number = 9;
 
 const USER_CANCEL_REMOVE_NOTIFICATION: number = 1;
+const SYSTEM_CANCEL_REMOVE_NOTIFICATION: number = 2;
 const SYSTEM_CANCEL_NOT_USE_BLUETOOTH: number = 9;
 
 const STATUS_PENDING: number = 0;
@@ -141,7 +142,8 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
                     this.oppProfile.setIncomingFileConfirmation(false, -1);
                     this.oppProfile.cancelTransfer();
                     this.handleTerminate();
-                } else if (info.reason == SYSTEM_CANCEL_NOT_USE_BLUETOOTH) {
+                } else if (info.reason == SYSTEM_CANCEL_NOT_USE_BLUETOOTH ||
+                    info.reason == SYSTEM_CANCEL_REMOVE_NOTIFICATION) {
                     this.startContinuousTask();
                 }
             });
