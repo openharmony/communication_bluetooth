@@ -871,6 +871,12 @@ bool AdapterManager::AdapterStop() const
         pimpl->bleAdapter_ = nullptr;
     }
 
+    /* Unified stack (libbtstack): release HCI/modules so the next StackInit can DmInit again. */
+    if (pimpl->bluetoothInterface != nullptr && pimpl->bluetoothInterface->cleanup != nullptr) {
+        HILOGI("cleanup bluetooth stack on AdapterStop");
+        pimpl->bluetoothInterface->cleanup();
+    }
+
     {
         std::lock_guard<std::mutex> lock(pimpl->initializedMutex_);
         pimpl->isInitialized_ = false;

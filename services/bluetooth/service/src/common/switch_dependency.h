@@ -80,12 +80,11 @@ private:
         bool isSatisfied = false;  // 该系统参数是否满足诉求
     };
     mutable std::mutex dependedSystemParamsVecMutex_ {};
-    std::vector<DependedSystemParam> dependedSystemParamsVec_ {
-#if !(defined(BT_MCU_PROXY_ENABLE) || defined(BLUETOOTH_WATCH_ENABLE))
-        // Qualcomm mpxx driver node.
-        {"vendor.setup_mpxx_dir_mode", "success", "false", false},
-#endif // BT_MCU_PROXY_ENABLE / BLUETOOTH_WATCH_ENABLE
-    };
+    /* Do not wait on Qualcomm-only vendor.setup_mpxx_dir_mode here.
+     * Unified stack (libbtstack) runs on boards without that driver node;
+     * blocking on it prevents Bluetooth from ever turning on (e.g. rk3568).
+     * BOOT_COMPLETED still notifies the same key for products that watch it. */
+    std::vector<DependedSystemParam> dependedSystemParamsVec_ {};
 
     std::atomic_bool isDataShareReady_ { false };
     std::shared_ptr<BluetoothCommonEventSubscriberEx> dataShareReadySubscribe_ { nullptr };
