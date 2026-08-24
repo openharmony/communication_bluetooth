@@ -1021,6 +1021,18 @@ public:
       * @since 26
     */
     int UpdateSecondaryPhonePairMode(int32_t mode);
+
+    /**
+     * @brief Set bluetooth channel scan.
+     *
+     * @param isEnable Enable/disable flag. 0 for disable, 1 for enable.
+     * @param interval Channel scan interval in slots (0.625ms) {@link ChannelScanInterval}.
+     *                 Should be set to CHANNEL_SCAN_INTERVAL_BYPASS in disable case.
+     * @return Returns {@link BT_NO_ERROR} if the operation is successful;
+     *         returns an error code defined in {@link BtErrCode} otherwise.
+     * @since 26
+     */
+    int SetBtChannelScan(bool isEnable, uint32_t interval);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.

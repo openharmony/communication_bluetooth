@@ -2307,5 +2307,19 @@ int32_t BluetoothHostProxy::UpdateSecondaryPhonePairMode(int32_t mode)
     }
     return reply.ReadInt32();
 }
+
+int32_t BluetoothHostProxy::SetBtChannelScan(bool isEnable, uint32_t interval)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), BT_ERR_IPC_TRANS_FAILED,
+        "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteBool(isEnable), BT_ERR_IPC_TRANS_FAILED, "Write isEnable error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint32(interval), BT_ERR_IPC_TRANS_FAILED, "Write interval error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SET_BT_CHANNEL_SCAN, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    return reply.ReadInt32();
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

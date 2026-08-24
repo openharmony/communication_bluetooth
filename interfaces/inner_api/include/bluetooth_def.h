@@ -1883,6 +1883,12 @@ enum SetAdvDataType : int32_t {
     SET_ADV_DATA_ONLY_RSP
 };
 
+enum ChannelScanInterval : uint32_t {
+    CHANNEL_SCAN_INTERVAL_100MS = 0x000000A0,
+    CHANNEL_SCAN_INTERVAL_1000MS = 0x00000640,
+    CHANNEL_SCAN_INTERVAL_BYPASS = 0xFFFFFFFF,
+};
+
 struct BluetoothAddress {
     std::string address = {};
     uint8_t addressType = AddressType::UNSET_ADDRESS;
