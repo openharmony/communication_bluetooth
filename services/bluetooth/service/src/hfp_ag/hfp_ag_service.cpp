@@ -175,12 +175,7 @@ void HfpAgService::StartUp()
     bt_interface_t* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
     if (bluetoothInterface == nullptr) {
         BtChrBtExcpEvent("", BTOPT_HFP, CHR_SUB_ERRCODE_CASE3);
-#ifdef BT_USE_OPEN_STACK
-        HILOGW("bluetoothInterface null on open stack, skip HFP AG init");
-        GetContext()->OnEnable(PROFILE_NAME_HFP_AG, true);
-#else
         HILOGE("Start up failed, bluetoothInterface is null.");
-#endif
         return;
     }
 #ifndef BT_MCU_PROXY_ENABLE
@@ -188,12 +183,7 @@ void HfpAgService::StartUp()
         const_cast<void *>(bluetoothInterface->get_profile_interface(BT_PROFILE_HANDSFREE_ID)));
     if (bluetoothHfpInterface == nullptr) {
         BtChrBtExcpEvent("", BTOPT_HFP, CHR_SUB_ERRCODE_CASE4);
-#ifdef BT_USE_OPEN_STACK
-        HILOGW("HFP AG profile unavailable on open stack, skip stack init");
-        GetContext()->OnEnable(PROFILE_NAME_HFP_AG, true);
-#else
         HILOGE("Start up failed, bluetoothHfpInterface is null.");
-#endif
         return;
     }
 #endif

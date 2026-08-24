@@ -161,20 +161,12 @@ void SocketService::EnableNative()
     int status = hal_util_load_bt_library(&bt_interface);
     if (status || bt_interface == nullptr) {
         HILOGE("[SocketService] Failed to open the Bluetooth module");
-#ifdef BT_USE_OPEN_STACK
-        GetContext()->OnEnable(PROFILE_NAME_SPP, true);
-#endif
         return;
     }
     sBluetoothSocketInterface = static_cast<btsock_interface_t*>(
         const_cast<void *>(bt_interface->get_profile_interface(BT_PROFILE_SOCKETS_ID)));
     if (!sBluetoothSocketInterface) {
-#ifdef BT_USE_OPEN_STACK
-        HILOGW("[SocketService] socket profile unavailable on open stack, skip stack init");
-        GetContext()->OnEnable(PROFILE_NAME_SPP, true);
-#else
         HILOGE("Error getting socket BT_PROFILE_SOCKETS_ID interface");
-#endif
         return;
     }
     GetContext()->OnEnable(PROFILE_NAME_SPP, true);

@@ -282,19 +282,13 @@ void HidHostService::StartUp()
     }
     bt_interface_t* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
     if (bluetoothInterface == nullptr) {
-#ifdef BT_USE_OPEN_STACK
-        HILOGW("[HID_SERVICE]bluetoothInterface null on open stack, skip stack init");
-        GetContext()->OnEnable(PROFILE_NAME_HID_HOST, true);
-#endif
+        HILOGE("[HID_SERVICE]bluetoothInterface is null");
         return;
     }
     bluetoothHidInterface = reinterpret_cast<bthh_interface_t*>(
         const_cast<void *>(bluetoothInterface->get_profile_interface(BT_PROFILE_HIDHOST_ID)));
     if (bluetoothHidInterface == nullptr) {
-#ifdef BT_USE_OPEN_STACK
-        HILOGW("[HID_SERVICE]HID host profile unavailable on open stack, skip stack init");
-        GetContext()->OnEnable(PROFILE_NAME_HID_HOST, true);
-#endif
+        HILOGE("[HID_SERVICE]bluetoothHidInterface is null");
         return;
     }
     if (!AdapterManager::GetInstance()->IsBluetoothRestricted()) {

@@ -110,21 +110,15 @@ void AdapterTurningOnState::Entry()
         const bthwif_interface_t *bthwif = reinterpret_cast<const bthwif_interface_t *>(
             bluetoothInterface->get_profile_interface(BT_VENDER_INTERFACE_ID));
         if (bthwif == nullptr) {
-#ifdef BT_USE_OPEN_STACK
-            // Open stack (libbtstack) has no Huawei vendor profile; still enable HCI stack.
-            HILOGW("bthwif unavailable on open stack, enable bluetooth stack directly");
-#else
-            HILOGE("Failed to get bthwif interface handle");
+            HILOGW("Failed to get bthwif interface handle");
             DoInAdapterManagerThread([this] { this->Transition(TURNING_OFF_STATE); });
             return;
-#endif
-        } else {
-            bool result = BluetoothHwInterface::GetInstance()->InitBtHwInterface(bthwif);
-            if (!result) {
-                HILOGE("Failed to init bthwif interface handle");
-                DoInAdapterManagerThread([this] { this->Transition(TURNING_OFF_STATE); });
-                return;
-            }
+        }
+        bool result = BluetoothHwInterface::GetInstance()->InitBtHwInterface(bthwif);
+        if (!result) {
+            HILOGE("Failed to init bthwif interface handle");
+            DoInAdapterManagerThread([this] { this->Transition(TURNING_OFF_STATE); });
+            return;
         }
 #ifdef QOS_MANAGER_ENABLE
         std::unordered_map<std::string, std::string> payload;
