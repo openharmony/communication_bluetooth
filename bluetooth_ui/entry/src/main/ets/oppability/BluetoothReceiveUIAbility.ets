@@ -33,10 +33,11 @@ import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager'
 import systemParameterEnhance from '@ohos.systemParameterEnhance';
 import PermissionUtils from 'common/PermissionUtils';
 import CommonUtils from 'common/CommonUtils';
+import { btTransactionStatisticsType, btTransactionStatisticsResult,
+    btTransactionStatisticsSceneCode } from 'common/CommonUtils';
 
 const TAG: string = '[BT_RECEIVE_SERVICE]==>'
 const EVENT_TYPE_TRANSACTION: number = 6;
-const BT_TRANSACTION_EVENT: string = 'usual.event.bluetooth.REPORT.TRANSACTION';
 
 const RESULT_SUCCESS: number = 0;
 const RESULT_ERROR_UNSUPPORTED_TYPE: number = 1;
@@ -58,37 +59,6 @@ const STATUS_FINISH: number = 2;
 const OPP_TRANSFER_USER_ACCEPT: number = 0;
 const OPP_TRANSFER_AUTO_ACCEPT: number = 1;
 const UNKNOWN_VALUE: number = -1;
-
-const btTransactionStatisticsType = {
-    TRANSACTION_TYPE_OPP_SEND : 1,
-    TRANSACTION_TYPE_OPP_RECEIVE : 2,
-};
-
-const btTransactionStatisticsResult = {
-    TRANSACTION_RESULT_TOTAL : 1,
-    TRANSACTION_RESULT_SUCCESS : 2,
-    TRANSACTION_RESULT_FAIL : 3,
-};
-
-const btTransactionStatisticsSceneCode = {
-    TRANSACTION_SCENECODE_NA : 0,
-    TRANSACTION_SCENECODE_1 : 1,
-    TRANSACTION_SCENECODE_2 : 2,
-    TRANSACTION_SCENECODE_3 : 3,
-    TRANSACTION_SCENECODE_4 : 4,
-    TRANSACTION_SCENECODE_5 : 5,
-    TRANSACTION_SCENECODE_6 : 6,
-    TRANSACTION_SCENECODE_7 : 7,
-    TRANSACTION_SCENECODE_8 : 8,
-    TRANSACTION_SCENECODE_9 : 9,
-    TRANSACTION_SCENECODE_10 : 10,
-    TRANSACTION_SCENECODE_11 : 11,
-    TRANSACTION_SCENECODE_12 : 12,
-    TRANSACTION_SCENECODE_13 : 13,
-    TRANSACTION_SCENECODE_14 : 14,
-    TRANSACTION_SCENECODE_15 : 15,
-    TRANSACTION_SCENECODE_16 : 16,
-};
 
 export default class BluetoothReceiveUIAbility extends UIAbility {
     private subscriber: commonEventManager.CommonEventSubscriber | null = null;
@@ -153,7 +123,8 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
         }
         this.timerIdCreate = setTimeout(() => {
             console.info(TAG, 'onCreate 1 second but nothing received');
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
+            CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE,
+                btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
                 1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_1, 1);
             this.handleTerminate();
         }, 1000);
@@ -177,50 +148,6 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
         }
         this.stopContinuousTask();
         this.context.terminateSelf();
-    }
-
-    reportBtChrDataByResult(dataResult: number) {
-        console.info(TAG, 'reportBtChrDataByResult dataResult ' + dataResult +
-            ' totalCount' + this.totalCount + ' successCount' + this.successCount);
-        if (dataResult == RESULT_SUCCESS) {
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_SUCCESS,
-                1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
-        } else if ((dataResult == RESULT_ERROR_NOT_ACCEPTABLE ||
-            dataResult == RESULT_ERROR_BAD_REQUEST) && this.totalCount > 0) {
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
-                this.totalCount, dataResult, this.totalCount);
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
-                this.totalCount - 1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
-        } else if ((dataResult == RESULT_ERROR_CANCELED || dataResult == RESULT_ERROR_TRANSFER_FAILED) &&
-            this.totalCount - this.successCount >= 1) {
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
-                this.totalCount - this.successCount, dataResult, this.totalCount - this.successCount);
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
-                this.totalCount - this.successCount -1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
-        } else if (dataResult == RESULT_ERROR_CONNECTION_FAILED) {
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL, 1, dataResult, 1);
-        }
-        this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
-            1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
-    }
-
-    reportBtTransactionChr(result: number, resultCount: number, sceneCode: number, sceneCodeCount: number) {
-        const options: commonEventManager.CommonEventPublishData = {
-            code: 0,
-            data: 'message',
-            subscriberPermissions: ['ohos.permission.MANAGE_BLUETOOTH'],
-            isOrdered: true,
-            isSticky: false,
-            parameters: { 'transactionType': btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE, 'result': result,
-                'resultCount': resultCount, 'sceneCode': sceneCode, 'sceneCodeCount': sceneCodeCount}
-        }
-        commonEventManager.publish(BT_TRANSACTION_EVENT, options, (err) => {
-            if (err) {
-            console.info(TAG, 'get bt transaction event publish failed.' + JSON.stringify(err));
-            } else {
-            console.info(TAG, 'get bt transaction event publish success.');
-            }
-        })
     }
 
     unlinkFile() {
@@ -304,9 +231,11 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
               clearTimeout(this.timerIdReceive);
               this.transfering = false;
               this.oppProfile.setIncomingFileConfirmation(false, -1);
-              this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
+              CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE,
+                  btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
                   this.totalCount, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_2, this.totalCount);
-              this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
+              CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE,
+                  btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
                   this.totalCount, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
               this.pullUpReceiveResultNotification();
               this.handleTerminate();
@@ -318,9 +247,11 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
               clearTimeout(this.timerIdReceive);
               this.transfering = false;
               this.oppProfile.setIncomingFileConfirmation(false, -1);
-              this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
+              CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE,
+                  btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
                   this.totalCount, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_5, this.totalCount);
-              this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
+              CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE,
+                  btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
                   this.totalCount, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
               this.tapEventIsAllowed = true;
               this.handleTerminate();
@@ -354,9 +285,11 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
               clearTimeout(this.timerIdReceive);
               this.transfering = false;
               this.oppProfile.setIncomingFileConfirmation(false, -1);
-              this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
+              CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE,
+                  btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
                   this.totalCount, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_5, this.totalCount);
-              this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
+              CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE,
+                  btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
                   this.totalCount, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
               this.tapEventIsAllowed = true;
               this.handleTerminate();
@@ -400,7 +333,8 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
             } else if (data.status == STATUS_FINISH) {
                 if (data.result != RESULT_SUCCESS_DISCONNECT) {
                     data.result == RESULT_SUCCESS ? this.successCount++ : this.failedCount++;
-                    this.reportBtChrDataByResult(data.result);
+                    CommonUtils.reportBtReceiveChrDataByResult(data.result,
+                        this.totalCount, this.successCount);
                 }
                 if (data.result != RESULT_SUCCESS && data.filePath != undefined && data.filePath.trim().length > 0) {
                     this.unlinkFile();
@@ -441,9 +375,15 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
                 return;
             }
             if (data.parameters.fileType == 'files') {
+                CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE_MEDIA_TYPE,
+                    btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
+                    1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_2, 1);
                 this.sandBoxUri = uri.path + '/' + this.fileName;
                 this.receiveDirectory = this.receiveDirectory + '/' + this.fileName;
             } else {
+                CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE_MEDIA_TYPE,
+                    btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
+                    1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_1, 1);
                 this.sandBoxUri = this.receiveDirectory;
             }
             let file = fs.openSync(this.sandBoxUri, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
@@ -524,7 +464,8 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
                 console.info(TAG, 'receive notification 50 seconds but no tap');
                 this.transfering = false;
                 this.oppProfile.setIncomingFileConfirmation(false, -1);
-                this.reportBtChrDataByResult(RESULT_ERROR_NOT_ACCEPTABLE);
+                CommonUtils.reportBtReceiveChrDataByResult(RESULT_ERROR_NOT_ACCEPTABLE,
+                    this.totalCount, this.successCount);
             }, waitTime);
         }).catch((err: Base.BusinessError) => {
             console.error(TAG, 'publishReceiveNotification fail');
