@@ -61,7 +61,7 @@ btservice_common_sources = [
     "src/freeze_utils.cpp",
     "src/system_ability_subscriber.cpp",
 ]
-if (bluetooth_service_override_ffrt_enable) {
+if (bluetooth_ffrt_enable) {
     btservice_common_sources += [
         "src/thread_util.cpp",
         "src/timer_manager_ffrt.cpp",
@@ -91,11 +91,11 @@ btservice_common_external_deps = [
     "libxml2:libxml2",
 ]
 
-if (bluetooth_service_override_ffrt_enable) {
+if (bluetooth_ffrt_enable) {
     btservice_common_external_deps += [ "ffrt:libffrt" ]
 }
 
-if (bluetooth_service_override_resourceschedule) {
+if (bluetooth_resourceschedule) {
   btservice_common_external_deps += [ "resource_schedule_service:ressched_client" ]
 }
 

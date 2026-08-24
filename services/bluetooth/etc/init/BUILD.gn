@@ -27,7 +27,7 @@ group("etc") {
     ":bt_did.conf",
     ":silent.wav",
   ]
-  if (bluetooth_service_override_build_mode == "full") {
+  if (bluetooth_build_mode == "full") {
     deps += [ ":bluetooth_service_cfg" ]
   }
 }

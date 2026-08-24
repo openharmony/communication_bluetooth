@@ -30,16 +30,11 @@ std::once_flag g_loadOnceFlag;
 const bt_interface_t *g_btInterface = nullptr;
 int g_loadResult = 0;
 
-/* Stack library selection: the loader entry stays the same, only the .so
- * name is chosen at build time. The closed-source vendor stack keeps the
- * historical name; the open stack is the btstack DM in libbtstack.z.so. */
+/* Stack library selection: both the closed-source and open stack expose the
+ * same DM entry symbol and ship under the fixed name libbtstack.z.so. */
 const char *GetStackLibraryName()
 {
-#ifdef BT_USE_OPEN_STACK
     return "libbtstack.z.so";
-#else
-    return "libbluetooth_vendor.z.so";
-#endif
 }
 
 /* Both stacks must export the same entry symbol (bluedroid HAL contract). */

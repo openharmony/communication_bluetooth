@@ -142,11 +142,6 @@ void ClassicAdapter::StartUp()
     adapterProperties_->LoadConfigInfo();
     LoadPairedDeviceInfo();
     discoveryState_ = DISCOVERY_STOPED;
-#ifdef BT_USE_OPEN_STACK
-    // Open stack does not auto-apply scan mode after classic enable.
-    constexpr int OPEN_STACK_SCAN_DURATION_MS = 120000;
-    SetBtScanMode(SCAN_MODE_CONNECTABLE_GENERAL_DISCOVERABLE, OPEN_STACK_SCAN_DURATION_MS);
-#endif
     GetContext()->OnEnable(ADAPTER_NAME_CLASSIC, true);
 }
 
@@ -493,12 +488,6 @@ int32_t ClassicAdapter::StartBtDiscovery()
         HILOGI("already discovering state=%{public}d, return success", discoveryState_.load());
         return BT_NO_ERROR;
     }
-#ifdef BT_USE_OPEN_STACK
-    if (btInterface->pairing_is_busy != nullptr && btInterface->pairing_is_busy()) {
-        HILOGW("pairing in progress, skip start discovery");
-        return BT_NO_ERROR;
-    }
-#endif
     pimpl->startDiscoveryPid_ = IPCSkeleton::GetCallingPid();
     pimpl->startDiscoveryUid_ = IPCSkeleton::GetCallingUid();
     int ret = btInterface->start_discovery();
@@ -536,15 +525,8 @@ bool ClassicAdapter::CancelBtDiscovery()
         return true;
     }
     const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
-#ifdef BT_USE_OPEN_STACK
-    if (bluetoothHwSrcInterface != nullptr && bluetoothHwSrcInterface->isBondingOrSdp()) {
-        HILOGW("bonding or sdp, no cancel discovery");
-        return false;
-    }
-#else
     CHECK_AND_RETURN_LOG_RET(bluetoothHwSrcInterface != nullptr, false, "interface nullptr");
     CHECK_AND_RETURN_LOG_RET(!bluetoothHwSrcInterface->isBondingOrSdp(), false, "bonding or sdp, no cancel discovery");
-#endif
     int result = btInterface->cancel_discovery();
     // Always clear local state: stack may already be idle (InquiryComplete missed),
     // while discoveryState_ is still DISCOVERY_STARTED and blocks the next Start.

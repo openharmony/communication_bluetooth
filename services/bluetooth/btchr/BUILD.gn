@@ -108,7 +108,7 @@ ohos_shared_library("btchr") {
     ]
   }
 
-  if (bluetooth_service_override_ffrt_enable) {
+  if (bluetooth_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]
   }
 

@@ -25,7 +25,7 @@ group("bluetooth_group") {
           "//foundation/communication/bluetooth/config:feature_flags_static",
           "//foundation/communication/bluetooth/tools/ohos-bluetoothTool:ohos-bluetoothTool",
           "//foundation/communication/bluetooth/bluetooth_ui:bluetooth_hap",
-          "//foundation/communication/bluetooth/sa_profile:communication_bluetooth_service_override_sa_profile",
+          "//foundation/communication/bluetooth/sa_profile:communication_bluetooth_sa_profile",
           "//foundation/communication/bluetooth/services/bluetooth/server:bluetooth_server",
           "//foundation/communication/bluetooth/services/bluetooth/service:btavrcp_media",
           "//foundation/communication/bluetooth/services/bluetooth/service:btfast_scan",

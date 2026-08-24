@@ -48,10 +48,6 @@
 #include "thread_util.h"
 #include "hdf_device_class.h"
 #include "hfp_ag_system_interface.h"
-
-#ifdef BT_USE_OPEN_STACK
-extern "C" bt_status_t btif_av_write_frame(const uint8_t *data, uint32_t size, uint32_t timeStamp);
-#endif
 #include "hfp_ag_service.h"
 #include "hitrace_meter.h"
 #include "refuse_play_helper.h"
@@ -1546,21 +1542,9 @@ void A2dpService::DeregisterObserver(IA2dpObserver *observer)
 
 int A2dpService::WriteFrame(const uint8_t *data, uint32_t size)
 {
-#ifdef BT_USE_OPEN_STACK
-    /* Open-stack path: btif_av → AVDT_WriteReq (contract P1). */
-    static uint32_t s_ts = 0;
-    s_ts += 1;
-    bt_status_t st = btif_av_write_frame(data, size, s_ts);
-    if (st != BT_STATUS_SUCCESS) {
-        HILOGD("btif_av_write_frame status=%{public}d size=%{public}u", static_cast<int>(st), size);
-        return Bluetooth::BT_ERR_INTERNAL_ERROR;
-    }
-    return RET_NO_ERROR;
-#else
     (void)data;
     (void)size;
     return RET_NO_ERROR;
-#endif
 }
 
 int A2dpService::GetRenderPosition(const RawAddress &device, uint32_t &delayValue, uint64_t &sendDataSize,

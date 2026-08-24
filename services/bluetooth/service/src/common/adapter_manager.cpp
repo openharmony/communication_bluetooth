@@ -871,13 +871,6 @@ bool AdapterManager::AdapterStop() const
         pimpl->bleAdapter_ = nullptr;
     }
 
-#ifdef BT_USE_OPEN_STACK
-    // SA may stay in-process across unload/reload; release stack so next Start can DmInit again.
-    if (pimpl->bluetoothInterface != nullptr && pimpl->bluetoothInterface->cleanup != nullptr) {
-        HILOGI("cleanup open bluetooth stack on AdapterStop");
-        pimpl->bluetoothInterface->cleanup();
-    }
-#endif
     {
         std::lock_guard<std::mutex> lock(pimpl->initializedMutex_);
         pimpl->isInitialized_ = false;
@@ -1425,7 +1418,7 @@ void AdapterManager::UnLoadBluetoothSystemAbility(const BTTransport transport, c
 #endif
     OnBluetoothOffHook();
     HILOGI("set persist.bluetooth.switch_enable %{public}s", g_bluetoothSwitchStateOff);
-#if defined(DISABLE_BT_SUPPORTED) || defined(BT_USE_OPEN_STACK)
+#if defined(DISABLE_BT_SUPPORTED)
     SetParameter(g_bluetoothSwitchStatePropertyName, g_bluetoothSwitchStateOff);
 #else
     HILOGI("Bluetooth cannot be disabled!");
@@ -1438,14 +1431,7 @@ void AdapterManager::UnLoadBluetoothSystemAbility(const BTTransport transport, c
 
     if (IsFactoryReset() || pimpl->isAppCloseBt_.load()) {
         pimpl->isAppCloseBt_ = false;
-#ifdef BT_USE_OPEN_STACK
-        // Open stack HCI reopen is fragile across SA process kill/restart.
-        // Keep process alive briefly so UI can turn BT back on without full reload.
-        HILOGI("open stack: defer SA unload after UI disable (10s)");
-        StartUnloadBluetoothSaTimer();
-#else
         PromptUnloadBluetoothSystemAbility();
-#endif
         return;
     }
 

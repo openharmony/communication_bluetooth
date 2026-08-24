@@ -68,49 +68,49 @@ ohos_source_set("bt_service_ipc") {
     "src/bluetooth_hid_device_stub.cpp",
   ]
 
-  if (bluetooth_service_override_pan_feature_switch) {
+  if (bluetooth_pan_feature_switch) {
     sources += [
       "src/bluetooth_pan_observer_proxy.cpp",
       "src/bluetooth_pan_stub.cpp",
     ]
   }
 
-  if (bluetooth_service_override_hfp_hf_feature_switch) {
+  if (bluetooth_hfp_hf_feature_switch) {
     sources += [
       "src/bluetooth_hfp_hf_observer_proxy.cpp",
       "src/bluetooth_hfp_hf_stub.cpp",
     ]
   }
 
-  if (bluetooth_service_override_avrcp_ct_feature_switch) {
+  if (bluetooth_avrcp_ct_feature_switch) {
     sources += [
       "src/bluetooth_avrcp_ct_observer_proxy.cpp",
       "src/bluetooth_avrcp_ct_stub.cpp",
     ]
   }
 
-  if (bluetooth_service_override_pbap_pse_feature_switch) {
+  if (bluetooth_pbap_pse_feature_switch) {
     sources += [
       "src/bluetooth_pbap_pse_observer_proxy.cpp",
       "src/bluetooth_pbap_pse_stub.cpp",
     ]
   }
 
-  if (bluetooth_service_override_map_mse_feature_switch) {
+  if (bluetooth_map_mse_feature_switch) {
     sources += [
       "src/bluetooth_map_mse_observer_proxy.cpp",
       "src/bluetooth_map_mse_stub.cpp",
     ]
   }
 
-  if (bluetooth_service_override_opp_feature_switch) {
+  if (bluetooth_opp_feature_switch) {
     sources += [
       "src/bluetooth_opp_observer_proxy.cpp",
       "src/bluetooth_opp_stub.cpp",
     ]
   }
 
-  if (bluetooth_service_override_bas_feature) {
+  if (bluetooth_bas_feature) {
     sources += [
       "src/bluetooth_device_battery_observer_proxy.cpp",
       "src/bluetooth_bas_stub.cpp",

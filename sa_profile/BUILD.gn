@@ -13,7 +13,7 @@
 
 import("//build/ohos/sa_profile/sa_profile.gni")
 
-ohos_sa_profile("communication_bluetooth_service_override_sa_profile") {
+ohos_sa_profile("communication_bluetooth_sa_profile") {
   if (defined(factory) && factory == true) {
     sources = [ "1130_factory.json" ]
   } else {

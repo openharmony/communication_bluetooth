@@ -214,11 +214,7 @@ config("btservice_config") {
     "COMMUNICATION_L2"
   ]
 
-  if (bluetooth_use_open_stack) {
-    defines += [ "BT_USE_OPEN_STACK" ]
-  }
-
-  if (bluetooth_service_override_bt_mcu_proxy_enable) {
+  if (bluetooth_bt_mcu_proxy_enable) {
     defines += [
       "BT_MCU_PROXY_ENABLE",
       "HAS_NO_BDROID_BUILDCFG"
@@ -281,108 +277,108 @@ btservice_sources += ServiceSdpAdapterSrc
 btservice_sources += ServiceExternalDepsAdapterSrc
 btservice_sources += ServiceRecoverSrc
 
-if (bluetooth_service_override_hearingaid_feature_switch) {
+if (bluetooth_hearingaid_feature_switch) {
   btservice_sources += [
     "src/hearing_aid/hearing_aid_service.cpp",
   ]
 }
 
-if (bluetooth_service_override_hfp_hf_feature_switch) {
+if (bluetooth_hfp_hf_feature_switch) {
   btservice_sources += [
     "src/hfp_hf/hfp_hf_service.cpp",
     "src/hfp_hf/hfp_hf_statemachine.cpp",
     "src/hfp_hf/hfp_hf_call_manager.cpp"
   ]
 }
-if (bluetooth_service_override_a2dp_sink_feature_switch) {
+if (bluetooth_a2dp_sink_feature_switch) {
   btservice_sources += ["src/a2dp_snk/a2dp_snk_service.cpp",]
 }
-if (bluetooth_service_override_pan_feature_switch) {
+if (bluetooth_pan_feature_switch) {
   btservice_sources += [
     "src/pan/pan_service.cpp",
   ]
 }
-if (bluetooth_service_override_watch_feature) {
+if (bluetooth_watch_feature) {
   btservice_sources += [
     "src/watch/watch_service.cpp",
     "src/watch/watch_device_manager.cpp",
   ]
 }
 
-if (bluetooth_service_override_power_on_reconnect_feature) {
+if (bluetooth_power_on_reconnect_feature) {
   btservice_sources += [
     "src/features/power_on_reconnect.cpp",
   ]
 }
 
-if (bluetooth_service_override_avrcp_ct_feature_switch) {
+if (bluetooth_avrcp_ct_feature_switch) {
   btservice_sources += ["src/avrcp_ct/avrcp_ct_service.cpp",]
 }
-if (bluetooth_service_override_pbap_pse_feature_switch) {
+if (bluetooth_pbap_pse_feature_switch) {
   btservice_sources += [
     "src/pbap_pse/pbap_pse_service.cpp",
   ]
 }
 
-if (bluetooth_service_override_map_mse_feature_switch) {
+if (bluetooth_map_mse_feature_switch) {
   btservice_sources += [
     "src/map_mse/map_mse_service.cpp",
   ]
 }
 
-if (bluetooth_service_override_opp_feature_switch) {
+if (bluetooth_opp_feature_switch) {
   btservice_sources += [
     "src/opp/opp_service.cpp",
   ]
 }
 
-if (bluetooth_service_override_highpowerv1_feature_switch) {
+if (bluetooth_highpowerv1_feature_switch) {
   btservice_sources += ["src/common/bluetooth_highpower_manager.cpp",]
 }
 
-if (bluetooth_service_override_fastscan_feature_switch) {
+if (bluetooth_fastscan_feature_switch) {
   btservice_sources += ["src/common/bluetooth_fastscan_manager_loader.cpp",]
 }
 
-if (bluetooth_service_override_edm_service_enable) {
+if (bluetooth_edm_service_enable) {
   btservice_sources += [
     "src/common/bluetooth_edm_manager.cpp"
   ]
 }
 
-if(bluetooth_service_override_ble_mouse_fast){
+if(bluetooth_ble_mouse_fast){
   btservice_sources += [
     "src/common/pc_power_manager.cpp",
   ]
 }
 
-if (bluetooth_service_override_comm_protocol_resource_manager) {
+if (bluetooth_comm_protocol_resource_manager) {
   btservice_sources += [
     "src/bluetooth_resource_manager/bluetooth_resource_manager.cpp",
     "src/common/bluetooth_channel_rssi_manager.cpp",
   ]
 }
 
-if (bluetooth_service_override_hid_host_feature) {
+if (bluetooth_hid_host_feature) {
     btservice_sources += [
       "src/hid_host/hid_host_service.cpp",
       "src/hid_host/hid_host_statemachine.cpp",
     ]
   }
 
-if (bluetooth_service_override_bas_feature) {
+if (bluetooth_bas_feature) {
   btservice_sources += [
     "src/bas/bas_service.cpp",
   ]
 }
 
-if (bluetooth_service_override_hid_device_feature_switch) {
+if (bluetooth_hid_device_feature_switch) {
   btservice_sources += [
     "src/hid_device/hid_device_service.cpp",
   ]
 }
 
-if (bluetooth_service_override_contexthub_ble) {
+if (bluetooth_contexthub_ble) {
     btservice_sources += [
       "src/sensorhub_collaboration/sensorhub_collaboration_service.cpp",
     ]
@@ -429,7 +425,7 @@ btservice_external_deps = [
   "openssl:libcrypto_shared",
 ]
 
-if (bluetooth_service_override_audio_framwwork) {
+if (bluetooth_audio_framwwork) {
   btservice_external_deps += [
     "audio_framework:audio_policy_manager",
     "audio_framework:audio_engine_manager",
@@ -437,13 +433,13 @@ if (bluetooth_service_override_audio_framwwork) {
   ]
 }
 
-if (bluetooth_service_override_device_manager) {
+if (bluetooth_device_manager) {
   btservice_external_deps += [
     "device_manager:devicemanagerminisdk",
   ]
 }
 
-if (bluetooth_service_override_hfp_ag_feature_switch) {
+if (bluetooth_hfp_ag_feature_switch) {
   btservice_external_deps += [
     "call_manager:tel_call_manager_api",
     "core_service:tel_core_service_api",
@@ -457,40 +453,40 @@ if (defined(global_parts_info) && defined(global_parts_info.powermgr_battery_man
   ]
 }
 
-if (bluetooth_service_override_hfp_hf_feature_switch) {
+if (bluetooth_hfp_hf_feature_switch) {
   btservice_external_deps += [
     "call_manager:tel_call_manager_api",
   ]
 }
 
-if (bluetooth_service_override_os_account) {
+if (bluetooth_os_account) {
   btservice_external_deps += [
     "os_account:libaccountkits",
     "os_account:os_account_innerkits",
   ]
 }
 
-if (bluetooth_service_override_edm_service_enable) {
+if (bluetooth_edm_service_enable) {
   btservice_external_deps += [ "enterprise_device_management:edmservice_kits" ]
 }
 
-if (bluetooth_service_override_highpowerv1_feature_switch) {
+if (bluetooth_highpowerv1_feature_switch) {
   btservice_external_deps += ["wifi:wifi_sdk",]
 }
 
-if (bluetooth_service_override_ffrt_enable) {
+if (bluetooth_ffrt_enable) {
   btservice_external_deps += [ "ffrt:libffrt" ]
 }
 
-if (bluetooth_service_override_qos_manager_enable) {
+if (bluetooth_qos_manager_enable) {
   btservice_external_deps += [ "qos_manager:concurrent_task_client" ]
 }
 
-if (bluetooth_service_override_resourceschedule) {
+if (bluetooth_resourceschedule) {
   btservice_external_deps += [ "resource_schedule_service:ressched_client" ]
 }
 
-if (bluetooth_service_override_kia_enable) {
+if (bluetooth_kia_enable) {
   btservice_sources += [
     "src/common/bluetooth_kia_refuse_policy_manager.cpp"
   ]
@@ -500,7 +496,7 @@ if (bluetooth_service_override_kia_enable) {
   ]
 }
 
-if (bluetooth_service_override_edm_service_enable) {
+if (bluetooth_edm_service_enable) {
   btservice_external_deps += [
     "security_guard:libsg_collect_sdk",
   ]
@@ -562,7 +558,7 @@ ohos_static_library("btservice_static") {
 fast_scan_sources = []
 fast_scan_deps = []
 fast_scan_external_deps = []
-if (bluetooth_service_override_fastscan_feature_switch) {
+if (bluetooth_fastscan_feature_switch) {
   fast_scan_sources = [
     "src/common/bluetooth_fastscan_manager.cpp",
     "src/common/hal_util.cpp",
@@ -587,11 +583,11 @@ if (bluetooth_service_override_fastscan_feature_switch) {
     "bluetooth_service:btstack",
   ]
 
-  if (bluetooth_service_override_ffrt_enable) {
+  if (bluetooth_ffrt_enable) {
     fast_scan_external_deps += [ "ffrt:libffrt" ]
   }
 
-  if (bluetooth_service_override_app_manager_enable) {
+  if (bluetooth_app_manager_enable) {
     fast_scan_external_deps += [ "appgallery:appinfomanager_client" ]
   }
 }
@@ -668,7 +664,7 @@ ohos_shared_library("btavrcp_media") {
   # Used to control the export of dynamic library symbols.
   version_script = "libavrcp_media_version_script.txt"
 
-  if (bluetooth_service_override_avrcp_avsession) {
+  if (bluetooth_avrcp_avsession) {
     sources = [
       "src/avrcp_tg/avrcp_tg_avsession_media.cpp",
       "src/avrcp_tg/avrcp_cover_art_storage.cpp",
@@ -685,7 +681,7 @@ ohos_shared_library("btavrcp_media") {
     ]
   }
 
-  if(bluetooth_service_override_audio_framwwork){
+  if(bluetooth_audio_framwwork){
     sources += [
       "src/avrcp_tg/play_helper.cpp"
     ]
@@ -697,7 +693,7 @@ ohos_shared_library("btavrcp_media") {
     "//foundation/communication/bluetooth/frameworks/inner:btcommon",
   ]
 
-  if (bluetooth_service_override_avrcp_avsession) {
+  if (bluetooth_avrcp_avsession) {
     deps += [ 
       "$BT_SERVICE_DIR/src/obex:bt_obex",
     ]
@@ -715,7 +711,7 @@ ohos_shared_library("btavrcp_media") {
     "bluetooth_service:btstack",
   ]
 
-  if (bluetooth_service_override_avrcp_avsession) {
+  if (bluetooth_avrcp_avsession) {
     external_deps += [
       "ability_runtime:wantagent_innerkits",
       "audio_framework:audio_policy_manager",
@@ -729,11 +725,11 @@ ohos_shared_library("btavrcp_media") {
     ]
   }
 
-  if (bluetooth_service_override_ffrt_enable) {
+  if (bluetooth_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]
   }
 
-  if (bluetooth_service_override_audio_framwwork) {
+  if (bluetooth_audio_framwwork) {
     external_deps += [ "audio_framework:audio_renderer" ]
   }
 
@@ -744,7 +740,7 @@ ohos_shared_library("btavrcp_media") {
 btpbap_pse_sources = []
 btpbap_pse_deps = []
 btpbap_pse_external_deps = []
-if (bluetooth_service_override_pbap_pse_feature_switch) {
+if (bluetooth_pbap_pse_feature_switch) {
   btpbap_pse_sources = [
     "src/pbap_pse/pbap_pse_statemachine.cpp",
     "src/pbap_pse/pbap_pse_obex_server.cpp",
@@ -781,10 +777,10 @@ if (bluetooth_service_override_pbap_pse_feature_switch) {
     "bluetooth_service:btstack",
   ]
 
-  if (bluetooth_service_override_ffrt_enable) {
+  if (bluetooth_ffrt_enable) {
     btpbap_pse_external_deps += [ "ffrt:libffrt" ]
   }
-  if (bluetooth_service_override_os_account) {
+  if (bluetooth_os_account) {
     btpbap_pse_external_deps += [
       "os_account:os_account_innerkits",
     ]
@@ -848,7 +844,7 @@ ohos_static_library("btpbap_pse_static") {
 btbas_sources = []
 btbas_deps = []
 btbas_external_deps = []
-if (bluetooth_service_override_bas_feature) {
+if (bluetooth_bas_feature) {
   btbas_sources = [
     "src/bas/bas_service_impl.cpp",
     "src/bas/bas_statemachine.cpp",
@@ -946,7 +942,7 @@ btmap_mse_sources = []
 btmap_mse_deps = []
 btmap_mse_external_deps = []
 btmap_mse_defines = []
-if (bluetooth_service_override_map_mse_feature_switch) {
+if (bluetooth_map_mse_feature_switch) {
   btmap_mse_sources += [
   "src/map_mse/map_mse_obex_server.cpp",
   "src/map_mse/map_mse_masinstance.cpp",
@@ -983,7 +979,7 @@ btmap_mse_external_deps += [
   "bluetooth_service:btstack",
 ]
 
-if (bluetooth_service_override_ffrt_enable) {
+if (bluetooth_ffrt_enable) {
   btmap_mse_external_deps += [ "ffrt:libffrt" ]
 }
 }
@@ -1091,7 +1087,7 @@ ohos_shared_library("btopp") {
     "bluetooth_service:btstack",
   ]
 
-  if (bluetooth_service_override_ffrt_enable) {
+  if (bluetooth_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]
   }
 
@@ -1166,7 +1162,7 @@ ohos_shared_library("bthearing_aid_impl") {
   configs = [
     "${bluetooth_config_path}:feature_flags",
   ]
-  if (!bluetooth_service_override_bt_mcu_proxy_enable) {
+  if (!bluetooth_bt_mcu_proxy_enable) {
     sources = [
       "src/hearing_aid/hearing_aid_statemachine.cpp",
       "src/hearing_aid/hearing_aid_service_impl.cpp",
@@ -1193,7 +1189,7 @@ ohos_shared_library("bthearing_aid_impl") {
     "bluetooth_service:btstack",
   ]
 
-  if (bluetooth_service_override_ffrt_enable) {
+  if (bluetooth_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]
   }
 
@@ -1265,7 +1261,7 @@ ohos_shared_library("bthiddevice") {
   configs = [
     "${bluetooth_config_path}:feature_flags",
   ]
-  if (bluetooth_service_override_hid_device_feature_switch) {
+  if (bluetooth_hid_device_feature_switch) {
     sources = [
       "src/hid_device/hid_device_service_impl.cpp",
     ]
@@ -1289,10 +1285,10 @@ ohos_shared_library("bthiddevice") {
     "access_token:libtokenid_sdk",
     "bluetooth_service:btstack",
   ]
-  if (bluetooth_service_override_ffrt_enable) {
+  if (bluetooth_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]
   }
-  if (bluetooth_service_override_app_manager_enable) {
+  if (bluetooth_app_manager_enable) {
     external_deps += [ "appgallery:appinfomanager_client" ]
   }
 
@@ -1353,7 +1349,7 @@ ohos_static_library("bthiddevice_static") {
   configs = [
     "${bluetooth_config_path}:feature_flags",
   ]
-  if (bluetooth_service_override_hid_device_feature_switch) {
+  if (bluetooth_hid_device_feature_switch) {
     sources = [
       "src/hid_device/hid_device_service_impl.cpp",
     ]
@@ -1377,10 +1373,10 @@ ohos_static_library("bthiddevice_static") {
     "access_token:libtokenid_sdk",
     "bluetooth_service:btstack",
   ]
-  if (bluetooth_service_override_ffrt_enable) {
+  if (bluetooth_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]
   }
-  if (bluetooth_service_override_app_manager_enable) {
+  if (bluetooth_app_manager_enable) {
     external_deps += [ "appgallery:appinfomanager_client" ]
   }
 

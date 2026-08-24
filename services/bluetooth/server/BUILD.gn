@@ -27,7 +27,7 @@ bluetooth_server_deps = [
   "//foundation/communication/bluetooth/frameworks/inner:btcommon",
 ]
 
-if (bluetooth_service_override_hearingaid_feature_switch) {
+if (bluetooth_hearingaid_feature_switch) {
   IDL_ROOT = "//foundation/communication/bluetooth/idl"
   bluetooth_server_deps += ["$IDL_ROOT/hearingaid:libbluetooth_hearingaid_interface_stub",]
 }
@@ -49,10 +49,10 @@ bluetooth_server_external_deps = [
   "wifi:wifi_sdk",
   "common_event_service:cesfwk_innerkits",
 ]
-if (bluetooth_service_override_ffrt_enable) {
+if (bluetooth_ffrt_enable) {
   bluetooth_server_external_deps += [ "ffrt:libffrt" ]
 }
-if (bluetooth_service_override_resourceschedule) {
+if (bluetooth_resourceschedule) {
   bluetooth_server_external_deps += [ "resource_schedule_service:ressched_client" ]
 }
 
@@ -78,39 +78,39 @@ bluetooth_server_sources = [
   "src/bluetooth_observer_application_container.cpp",
   "src/bluetooth_svc_cmd.cpp",
 ]
-if (bluetooth_service_override_hfp_hf_feature_switch) {
+if (bluetooth_hfp_hf_feature_switch) {
   bluetooth_server_sources += ["src/bluetooth_hfp_hf_server.cpp",]
 }
-if (bluetooth_service_override_a2dp_sink_feature_switch) {
+if (bluetooth_a2dp_sink_feature_switch) {
   bluetooth_server_sources += ["src/bluetooth_a2dp_sink_server.cpp",]
 }
-if (bluetooth_service_override_pan_feature_switch) {
+if (bluetooth_pan_feature_switch) {
   bluetooth_server_sources += ["src/bluetooth_pan_server.cpp"]
 }
-if (bluetooth_service_override_avrcp_ct_feature_switch) {
+if (bluetooth_avrcp_ct_feature_switch) {
   bluetooth_server_sources += ["src/bluetooth_avrcp_ct_server.cpp",]
 }
-if (bluetooth_service_override_pbap_pse_feature_switch) {
+if (bluetooth_pbap_pse_feature_switch) {
   bluetooth_server_sources += ["src/bluetooth_pbap_pse_server.cpp",]
 }
-if (bluetooth_service_override_map_mse_feature_switch) {
+if (bluetooth_map_mse_feature_switch) {
   bluetooth_server_sources += ["src/bluetooth_map_mse_server.cpp",]
 }
-if (bluetooth_service_override_opp_feature_switch) {
+if (bluetooth_opp_feature_switch) {
   bluetooth_server_sources += ["src/bluetooth_opp_server.cpp",]
 }
-if (bluetooth_service_override_hearingaid_feature_switch) {
+if (bluetooth_hearingaid_feature_switch) {
   bluetooth_server_sources += ["src/bluetooth_hearingaid_server.cpp",]
 }
-if (bluetooth_service_override_contexthub_ble) {
+if (bluetooth_contexthub_ble) {
   bluetooth_server_sources += ["src/bluetooth_sensorhub_collaboration.cpp",]
 }
 
-if (bluetooth_service_override_hid_device_feature_switch) {
+if (bluetooth_hid_device_feature_switch) {
   bluetooth_server_sources += ["src/bluetooth_hid_device_server.cpp",]
 }
 
-if (bluetooth_service_override_bas_feature) {
+if (bluetooth_bas_feature) {
   bluetooth_server_sources += ["src/bluetooth_bas_server.cpp",]
 }
 
@@ -166,7 +166,7 @@ ohos_shared_library("bluetooth_server") {
     "${bluetooth_config_path}:feature_flags",
   ]
   defines = []
-  if (bluetooth_service_override_bt_mcu_proxy_enable) {
+  if (bluetooth_bt_mcu_proxy_enable) {
     defines += ["BT_MCU_PROXY_ENABLE"]
   }
   sources = bluetooth_server_sources

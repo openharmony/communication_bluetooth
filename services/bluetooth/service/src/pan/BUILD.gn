@@ -90,7 +90,7 @@ ohos_shared_library("btpan") {
     "${bluetooth_config_path}:feature_flags",
   ]
 
-  if (bluetooth_service_override_pan_feature_switch) {
+  if (bluetooth_pan_feature_switch) {
     sources = [
       "pan_service_impl.cpp",
       "pan_network_manager.cpp",
@@ -119,7 +119,7 @@ ohos_shared_library("btpan") {
     "dhcp:dhcp_sdk",
   ]
 
-  if (bluetooth_service_override_ffrt_enable) {
+  if (bluetooth_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]
   }
 
@@ -199,7 +199,7 @@ ohos_static_library("btpan_static") {
     "${bluetooth_config_path}:feature_flags",
   ]
 
-  if (bluetooth_service_override_pan_feature_switch) {
+  if (bluetooth_pan_feature_switch) {
     sources = [
       "pan_service_impl.cpp",
       "pan_network_manager.cpp",
@@ -228,7 +228,7 @@ ohos_static_library("btpan_static") {
     "dhcp:dhcp_sdk",
   ]
 
-  if (bluetooth_service_override_ffrt_enable) {
+  if (bluetooth_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]
   }
 

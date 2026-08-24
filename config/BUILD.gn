@@ -44,148 +44,148 @@ config("feature_flags") {
 
     defines = []
 
-    if (bluetooth_service_override_hfp_hf_feature_switch) {
+    if (bluetooth_hfp_hf_feature_switch) {
         defines += ["BLUETOOTH_HFP_HF_ENABLE"]
     }
 
-    if (bluetooth_service_override_hfp_ag_feature_switch) {
+    if (bluetooth_hfp_ag_feature_switch) {
         defines += ["BLUETOOTH_HFP_AG_ENABLE"]
     }
 
-    if (bluetooth_service_override_a2dp_sink_feature_switch) {
+    if (bluetooth_a2dp_sink_feature_switch) {
         defines += ["BLUETOOTH_A2DP_SINK_ENABLE"]
     }
 
-    if (bluetooth_service_override_pan_feature_switch) {
+    if (bluetooth_pan_feature_switch) {
         defines += ["BLUETOOTH_PAN_FEATURE_ENABLE"]
     }
 
-    if (bluetooth_service_override_avrcp_ct_feature_switch) {
+    if (bluetooth_avrcp_ct_feature_switch) {
         defines += ["BLUETOOTH_AVRCP_CT_FEATURE_ENABLE"]
     }
 
-    if (bluetooth_service_override_avrcp_avsession) {
+    if (bluetooth_avrcp_avsession) {
         defines += ["AVRCP_AVSESSION"]
     }
 
-    if (bluetooth_service_override_audio_framwwork) {
+    if (bluetooth_audio_framwwork) {
         defines += ["AUDIO_FRAMEWORK"]
     }
 
-    if (bluetooth_service_override_device_manager) {
+    if (bluetooth_device_manager) {
         defines += ["DEVICE_MANAGER"]
     }
 
-    if (bluetooth_service_override_bt_chr_switch) {
+    if (bluetooth_bt_chr_switch) {
         defines += ["BLUETOOTH_CHR_FEATURE_ENABLE"]
     }
 
-    if (bluetooth_service_override_contexthub_ble) {
+    if (bluetooth_contexthub_ble) {
         defines += ["CONTEXTHUB_BLE"]
         defines += ["CONTEXTHUB_BLE_V3"]
     }
 
-    if (bluetooth_service_override_pbap_pse_feature_switch) {
+    if (bluetooth_pbap_pse_feature_switch) {
         defines += ["BLUETOOTH_PBAP_PSE_FEATURE_ENABLE"]
     }
 
-    if (bluetooth_service_override_map_mse_feature_switch) {
+    if (bluetooth_map_mse_feature_switch) {
         defines += ["BLUETOOTH_MAP_MSE_FEATURE_ENABLE"]
     }
 
-    if (bluetooth_service_override_sco_normalized_feature_switch) {
+    if (bluetooth_sco_normalized_feature_switch) {
         defines += ["BLUETOOTH_SCO_NORMALIZED_FEATURE_ENABLE"]
     }
 
-    if (bluetooth_service_override_os_account) {
+    if (bluetooth_os_account) {
         defines += ["BLUETOOTH_OS_ACCOUNT"]
     }
 
-    if (bluetooth_service_override_pc_ability_enhance) {
+    if (bluetooth_pc_ability_enhance) {
         defines += ["MEDIA_AND_CALL_VOLUME_INTEGRATION"]
         defines += ["PC_FEATURE_FORCESLEEP_SUPPORT"]
         defines += ["BLUETOOTH_PC_ENABLE"]
     }
 
-    if (bluetooth_service_override_local_ble_conn_public_address_enable) {
+    if (bluetooth_local_ble_conn_public_address_enable) {
         defines += ["BLUETOOTH_PUBLIC_BLE_SUPPORT"]
     }
 
-    if (bluetooth_service_override_ble_mouse_fast) {
+    if (bluetooth_ble_mouse_fast) {
         defines += ["FEATURE_MOUSE_FAST_CONNECTION"]
         defines += ["BLUETOOTH_BLE_MOUSE_FAST"]
     }
 
-    if (bluetooth_service_override_opp_feature_switch) {
+    if (bluetooth_opp_feature_switch) {
         defines += ["BLUETOOTH_OPP_FEATURE_ENABLE"]
     }
 
-    if (bluetooth_service_override_edm_service_enable) {
+    if (bluetooth_edm_service_enable) {
         defines += [ "EDM_SERVICE_ENABLE" ]
     }
 
-    if (bluetooth_service_override_kia_enable) {
+    if (bluetooth_kia_enable) {
         defines += [ "BLUETOOTH_KIA_ENABLE" ]
     }
 
-    if (bluetooth_service_override_highpowerv1_feature_switch) {
+    if (bluetooth_highpowerv1_feature_switch) {
         defines += ["BLUETOOTH_HIGHPOWERV1_ENABLE"]
     }
 
-    if (bluetooth_service_override_fastscan_feature_switch) {
+    if (bluetooth_fastscan_feature_switch) {
         defines += ["BLUETOOTH_FASTSCAN_ENABLE"]
     }
 
-    if (bluetooth_service_override_app_manager_enable) {
+    if (bluetooth_app_manager_enable) {
         defines += [ "APP_MANAGER_ENABLE" ]
     }
 
-    if (bluetooth_service_override_watch_feature) {
+    if (bluetooth_watch_feature) {
         defines += ["BLUETOOTH_WATCH_ENABLE"]
     }
 
-    if (bluetooth_service_override_oobe_dialog_feature) {
+    if (bluetooth_oobe_dialog_feature) {
         defines += ["BLUETOOTH_OOBE_DIALOG"]
     }
  
-    if (bluetooth_service_override_io_cap_none_feature) {
+    if (bluetooth_io_cap_none_feature) {
         defines += ["BLUETOOTH_IO_CAP_NONE"]
     }
  
-    if (bluetooth_service_override_intercept_peripheral_first_pair_dialog) {
+    if (bluetooth_intercept_peripheral_first_pair_dialog) {
         defines += ["BLUETOOTH_INTERCEPT_PERIPHERAL_FIRST_PAIR_DIALOG"]
     }
 
     defines += ["BT_TRACE_TAG = HITRACE_TAG_OHOS"]
 
-    if (bluetooth_service_override_ffrt_enable) {
+    if (bluetooth_ffrt_enable) {
         defines += [ "RESOURCESCHEDULE_FFRT_ENABLE" ]
         defines += [ "BtRecursiveMutex = ffrt::recursive_mutex" ]
     } else {
         defines += [ "BtRecursiveMutex = std::recursive_mutex" ]
     }
 
-    if (bluetooth_service_override_comm_protocol_resource_manager) {
+    if (bluetooth_comm_protocol_resource_manager) {
         defines += [ "COMM_PROTOCOL_RESOURCE_MGR_ENABLE" ]
     }
 
-    if (bluetooth_service_override_resourceschedule) {
+    if (bluetooth_resourceschedule) {
         defines += [ "RES_SCHED_SUPPORT" ]
     }
 
-    if (bluetooth_service_override_qos_manager_enable) {
+    if (bluetooth_qos_manager_enable) {
         defines += [ "QOS_MANAGER_ENABLE" ]
     }
 
-    if (bluetooth_service_override_ddm_voice_combine_feature) {
+    if (bluetooth_ddm_voice_combine_feature) {
         defines += [ "BLUETOOTH_VOICE_COMBINE_FEATURE_ENABLE" ]
     }
 
-    if (bluetooth_service_override_disable_bt_supported) {
+    if (bluetooth_disable_bt_supported) {
         defines += [ "DISABLE_BT_SUPPORTED" ]
     }
 
-    if (bluetooth_service_override_mmi_not_discover_ble) {
+    if (bluetooth_mmi_not_discover_ble) {
         defines += [ "MMI_NOT_DISCOVER_BLE" ]
     }
 
@@ -199,7 +199,7 @@ config("feature_flags") {
         defines += [ "BLUETOOTH_TV_ENABLE" ]
     }
 
-    if (bluetooth_service_override_hid_host_feature) {
+    if (bluetooth_hid_host_feature) {
         defines += [ "BLUETOOTH_HID_HOST_FEATURE_ENABLE" ]
     }
 
@@ -207,47 +207,43 @@ config("feature_flags") {
         defines += [ "BLUETOOTH_FACTORY_MODE" ]
     }
 
-    if (bluetooth_service_override_audio_deadline) {
+    if (bluetooth_audio_deadline) {
         defines += [ "AUDIO_DEADLINE_ENABLE" ]
     }
 
-    if (bluetooth_service_override_hearingaid_feature_switch) {
+    if (bluetooth_hearingaid_feature_switch) {
         defines += ["BLUETOOTH_HEARINGAID_FEATURE_ENABLE"]
     }
 
-    if (bluetooth_service_override_hid_device_feature_switch) {
+    if (bluetooth_hid_device_feature_switch) {
         defines += ["BLUETOOTH_HIDDEVICE_FEATURE_ENABLE"]
     }
 
-    if (bluetooth_service_override_audio_codec_aac_support) {
+    if (bluetooth_audio_codec_aac_support) {
         defines += ["BLUETOOTH_AUDIO_CODEC_AAC_SUPPORT"]
     }
 
-    if (bluetooth_service_override_fusion_connectivity_support) {
+    if (bluetooth_fusion_connectivity_support) {
         defines += ["FUSION_CONNECTIVITY_SUPPORTED"]
     }
 
-    if (bluetooth_service_override_audio_collaboration_enable) {
+    if (bluetooth_audio_collaboration_enable) {
         defines += ["BLUETOOTH_AUDIO_COLLABORATION_SUPPORT"]
     }
 
-    if (bluetooth_service_override_power_on_reconnect_feature) {
+    if (bluetooth_power_on_reconnect_feature) {
         defines += ["BLUETOOTH_POWER_ON_RECONNECT_FEATURE"]
     }
 
-    if (bluetooth_service_override_pluggable_supported) {
+    if (bluetooth_pluggable_supported) {
         defines += ["BLUETOOTH_PLUGGABLE_SUPPORTED"]
     }
 
-    if (bluetooth_service_override_ble_range_feature) {
+    if (bluetooth_ble_range_feature) {
         defines += ["BLUETOOTH_BLE_RANGE_FEATURE"]
     }
 
-    if (bluetooth_use_open_stack) {
-        defines += ["BT_USE_OPEN_STACK"]
-    }
-
-    if (bluetooth_service_override_bas_feature) {
+    if (bluetooth_bas_feature) {
         defines += ["BLUETOOTH_BAS_FEATURE_ENABLE"]
     }
 }
