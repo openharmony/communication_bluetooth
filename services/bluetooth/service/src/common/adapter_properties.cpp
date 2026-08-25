@@ -243,7 +243,10 @@ bool AdapterProperties::SetBroadcastName(std::string deviceName)
 #if (defined(DEVICE_MANAGER) && !defined(BLUETOOTH_WATCH_ENABLE))
     int32_t ret = DistributedHardware::DeviceManagerMini::GetInstance().GetLocalDisplayDeviceName(
         "bluetooth_service", MAX_LOC_BT_NAME_LEN, name);
-    CHECK_AND_RETURN_LOG_RET(ret == DM_OK, false, "GetLocalDisplayDeviceName error: %{public}d", ret);
+    if (ret != DM_OK) {
+        HILOGW("GetLocalDisplayDeviceName error: %{public}d, fallback to deviceName", ret);
+        name = GetTruncationName(deviceName);
+    }
 #else
     name = GetTruncationName(deviceName);
 #endif
