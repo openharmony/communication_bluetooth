@@ -317,6 +317,14 @@ void AvrcpTgAvsessionMediaLoader::StartSocketListener(void)
 void AvrcpTgAvsessionMediaLoader::SetBipObserverImpl(
     const std::shared_ptr<MediaInterfaceAdapter> avrcpMediaInterfaceImpl)
 {
+    // socketObserver_ 只在 StartSocketListener 中初始化，若 LoadMediaInterfaceLib 先于其执行
+    // （Init 中 StartSocketListener 尚未在 BIP 线程排队完成），对空指针 static_pointer_cast 会崩溃。
+    // 本函数运行在 BIP 线程上，StartSocketListener 幂等（obexServerSocket_ 已存在则直接返回），
+    // 因此这里兜底先确保 listener 已启动，既防崩溃又保证 BIP observer 正确设置。
+    if (socketObserver_ == nullptr) {
+        HILOGW("socketObserver_ is nullptr, start socket listener first");
+        StartSocketListener();
+    }
     auto observer = std::static_pointer_cast<BipSocketObserver>(socketObserver_);
     observer->SetImpl(avrcpMediaInterfaceImpl);
 }
