@@ -54,6 +54,7 @@ enum NapiAsyncType : int {
 
 static constexpr bool ASYNC_WORK_NEED_CALLBACK = true;
 static constexpr bool ASYNC_WORK_NO_NEED_CALLBACK = false;
+static constexpr int NAPI_QOS_USER_INTERACTIVE = 5;
 
 struct NapiAsyncWorkRet {
     NapiAsyncWorkRet(int errCode) : errCode(errCode) {}
@@ -78,6 +79,7 @@ public:
     ~NapiAsyncWork() = default;
 
     void Run(void);
+    void SetQos(int qos);
     void CallFunction(int errorCode, std::shared_ptr<NapiNativeObject> object);
     napi_value GetRet(void);
     std::shared_ptr<NapiHaEventUtils> GetHaUtilsPtr(void) const;
@@ -107,6 +109,7 @@ private:
     std::atomic_bool triggered_ = false; // Indicates whether the asynchronous callback is called.
     std::shared_ptr<NapiHaEventUtils> haUtils_; // HA report tool, which is transferred fron the original API interface
     std::vector<int32_t> validErrCodes_ {}; // Indicates valid error codes.
+    int qos_ = -1;
 };
 
 class NapiAsyncWorkFactory {

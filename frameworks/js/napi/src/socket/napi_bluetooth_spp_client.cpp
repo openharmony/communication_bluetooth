@@ -677,6 +677,7 @@ napi_value NapiSppClient::SppReadAsync(napi_env env, napi_callback_info info)
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->SetQos(NAPI_QOS_USER_INTERACTIVE);
     asyncWork->Run();
     return asyncWork->GetRet();
 }
