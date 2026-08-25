@@ -448,6 +448,9 @@ bool PairRequestReply(const BdAddr *bdAddr, int transport, bool accept)
     string strAddress;
     ConvertAddr(bdAddr->addr, strAddress);
     HILOGI("device: %{public}s", GetEncryptAddr(strAddress).c_str());
+    if (g_BluetoothHost == nullptr) {
+        g_BluetoothHost = &BluetoothHost::GetDefaultHost();
+    }
     BluetoothRemoteDevice remoteDevice;
     if (transport == OHOS_BT_TRANSPORT_BR_EDR) {
         remoteDevice = g_BluetoothHost->GetRemoteDevice(strAddress, BT_TRANSPORT_BREDR);
@@ -467,6 +470,9 @@ bool SetDevicePairingConfirmation(const BdAddr *bdAddr, int transport, bool acce
     string strAddress;
     ConvertAddr(bdAddr->addr, strAddress);
     HILOGI("device: %{public}s, accept: %{public}d", GetEncryptAddr(strAddress).c_str(), accept);
+    if (g_BluetoothHost == nullptr) {
+        g_BluetoothHost = &BluetoothHost::GetDefaultHost();
+    }
     BluetoothRemoteDevice remoteDevice;
     if (transport == OHOS_BT_TRANSPORT_BR_EDR) {
         remoteDevice = g_BluetoothHost->GetRemoteDevice(strAddress, BT_TRANSPORT_BREDR);

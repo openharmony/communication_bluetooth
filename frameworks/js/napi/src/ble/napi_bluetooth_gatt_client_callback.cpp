@@ -150,6 +150,7 @@ void NapiGattClientCallback::OnMtuUpdate(int mtu, int ret)
     HILOGI("ret: %{public}d, mtu: %{public}d", ret, mtu);
     auto nativeObject = std::make_shared<NapiNativeInt>(mtu);
     eventSubscribe_.PublishEvent(STR_BT_GATT_CLIENT_CALLBACK_BLE_MTU_CHANGE, nativeObject);
+    AsyncWorkCallFunction(asyncWorkMap_, NapiAsyncType::GATT_CLIENT_MTU_CHANGED, nativeObject, ret);
 #endif
 }
 

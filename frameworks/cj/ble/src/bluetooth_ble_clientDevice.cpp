@@ -26,10 +26,14 @@ namespace CJSystemapi {
 namespace CJBluetoothBle {
 using Bluetooth::BluetoothHost;
 using Bluetooth::BT_ERR_INTERNAL_ERROR;
+using Bluetooth::BT_ERR_INVALID_PARAM;
 using Bluetooth::BT_NO_ERROR;
 using Bluetooth::BT_TRANSPORT_BLE;
 using Bluetooth::GATT_TRANSPORT_TYPE_LE;
 using Bluetooth::UUID;
+
+static constexpr int32_t GATT_DEF_BLE_MTU_SIZE = 23;
+static constexpr int32_t GATT_MAX_MTU_SIZE = 517;
 
 int32_t FfiClientDevice::Connect()
 {
@@ -212,6 +216,10 @@ int32_t FfiClientDevice::SetBLEMtuSize(int32_t mut)
     if (client_ == nullptr) {
         HILOGE("gattClient is nullptr");
         return BT_ERR_INTERNAL_ERROR;
+    }
+    if (mut < GATT_DEF_BLE_MTU_SIZE || mut > GATT_MAX_MTU_SIZE) {
+        HILOGE("invalid mtu size: %{public}d", mut);
+        return BT_ERR_INVALID_PARAM;
     }
     return client_->RequestBleMtuSize(mut);
 }

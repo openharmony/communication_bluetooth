@@ -230,30 +230,40 @@ struct HandsFreeUnit::impl {
         return false;
     }
 
-    bool Connect(const BluetoothRemoteDevice &device)
+    int Connect(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         bool isDiscovering = false;
         BluetoothHost::GetDefaultHost().IsBtDiscovering(isDiscovering);
         sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
-        int ret = BT_ERR_INTERNAL_ERROR;
-        if (proxy != nullptr && !isDiscovering && device.IsValidBluetoothRemoteDevice()) {
-            ret = proxy->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_SERVICE_DISCONNECTED, "failed: no proxy");
+
+        if (isDiscovering) {
+            HILOGI("discovering, not allowed to connection");
+            return BT_ERR_IS_DISCOVERING;
         }
+        if (!device.IsValidBluetoothRemoteDevice()) {
+            return BT_ERR_ADDRESS_OR_TRANSPORT_ERROR;
+        }
+
+        int ret = proxy->Connect(BluetoothRawAddress(device.GetDeviceAddr()));
         HILOGI("ret: %{public}d", ret);
-        return ret == BT_NO_ERROR;
+        return ret;
     }
 
-    bool Disconnect(const BluetoothRemoteDevice &device)
+    int Disconnect(const BluetoothRemoteDevice &device)
     {
         HILOGI("enter, device: %{public}s", GET_ENCRYPT_ADDR(device));
         sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
-        int ret = BT_ERR_INTERNAL_ERROR;
-        if (proxy != nullptr && device.IsValidBluetoothRemoteDevice()) {
-            ret = proxy->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
+        CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_SERVICE_DISCONNECTED, "failed: no proxy");
+
+        if (!device.IsValidBluetoothRemoteDevice()) {
+            return BT_ERR_ADDRESS_OR_TRANSPORT_ERROR;
         }
+
+        int ret = proxy->Disconnect(BluetoothRawAddress(device.GetDeviceAddr()));
         HILOGI("ret: %{public}d", ret);
-        return ret == BT_NO_ERROR;
+        return ret;
     }
 
     bool OpenVoiceRecognition(const BluetoothRemoteDevice &device)
@@ -585,28 +595,22 @@ bool HandsFreeUnit::SendDTMFTone(const BluetoothRemoteDevice &device, uint8_t co
     return pimpl->SendDTMFTone(device, code);
 }
 
-bool HandsFreeUnit::Connect(const BluetoothRemoteDevice &device)
+int HandsFreeUnit::Connect(const BluetoothRemoteDevice &device)
 {
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return false;
+        return BT_ERR_INVALID_STATE;
     }
-
-    sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
 
     return pimpl->Connect(device);
 }
 
-bool HandsFreeUnit::Disconnect(const BluetoothRemoteDevice &device)
+int HandsFreeUnit::Disconnect(const BluetoothRemoteDevice &device)
 {
     if (!IS_BT_ENABLED()) {
         HILOGE("bluetooth is off.");
-        return false;
+        return BT_ERR_INVALID_STATE;
     }
-
-    sptr<IBluetoothHfpHf> proxy = GetRemoteProxy<IBluetoothHfpHf>(PROFILE_HFP_HF);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, false, "failed: no proxy");
 
     return pimpl->Disconnect(device);
 }

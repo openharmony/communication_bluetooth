@@ -51,6 +51,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getBtConnectionState", GetBtConnectionState),
         DECLARE_NAPI_FUNCTION("pairDevice", PairDeviceAsync),
         DECLARE_NAPI_FUNCTION("pairDeviceOutOfBand", PairDeviceOutOfBand),
+        DECLARE_NAPI_FUNCTION("startPairOutOfBand", StartPairOutOfBand),
         DECLARE_NAPI_FUNCTION("generateLocalOobData", GenerateLocalOobData),
         DECLARE_NAPI_FUNCTION("cancelPairedDevice", CancelPairedDeviceAsync),
         DECLARE_NAPI_FUNCTION("getProfileConnectionState", GetProfileConnectionStateEx),
@@ -362,13 +363,18 @@ napi_value GetBtConnectionState(napi_env env, napi_callback_info info)
 napi_value PairDevice(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "connection.PairDevice", validErrCodes);
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     bool checkRet = CheckDeivceIdParam(env, info, remoteAddr);
     NAPI_BT_ASSERT_RETURN_FALSE(env, checkRet, BT_ERR_INVALID_PARAM);
 
     BluetoothRemoteDevice remoteDevice = BluetoothRemoteDevice(remoteAddr);
     int32_t ret = remoteDevice.StartPair();
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_RETURN_FALSE_VERIFY(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
 
@@ -629,9 +635,14 @@ napi_value GetBluetoothScanMode(napi_env env, napi_callback_info info)
 napi_value StartBluetoothDiscovery(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "connection.StartBluetoothDiscovery", validErrCodes);
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int ret = host->StartBtDiscovery();
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_RETURN_FALSE_VERIFY(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
 
@@ -733,7 +744,11 @@ napi_status CheckDeviceAsyncParam(napi_env env, napi_callback_info info, std::st
 napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "connection.PairDeviceAsync");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "connection.PairDeviceAsync", validErrCodes);
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     int32_t addressType = AddressType::UNSET_ADDRESS;
     auto checkRet = CheckDeviceAsyncParam(env, info, remoteAddr, addressType);
@@ -744,7 +759,7 @@ napi_value PairDeviceAsync(napi_env env, napi_callback_info info)
         HILOGI("err: %{public}d", err);
         return NapiAsyncWorkRet(err);
     };
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
@@ -800,6 +815,70 @@ napi_value PairDeviceOutOfBand(napi_env env, napi_callback_info info)
     };
     auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
+    asyncWork->Run();
+    return asyncWork->GetRet();
+}
+
+napi_status CheckStartPairDeviceOobParam(napi_env env, napi_callback_info info, std::string &deviceId,
+    AddressInfo &addressInfo, int32_t &transport, OobData &oobData)
+{
+    constexpr int32_t PARAM_DEVICE_ID = 0;
+    constexpr int32_t PARAM_TRANSPORT = 1;
+    constexpr int32_t PARAM_P192 = 2;
+    constexpr int32_t PARAM_P256 = 3;
+
+    size_t argc = ARGS_SIZE_FOUR;
+    napi_value argv[ARGS_SIZE_FOUR] = {nullptr};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc < ARGS_SIZE_TWO || argc > ARGS_SIZE_FOUR, "Requires 2 to 4 arguments", napi_invalid_arg);
+
+    NAPI_BT_RETURN_IF(NapiParseBdAddr(env, argv[PARAM_DEVICE_ID], deviceId) != napi_ok,
+        "Parse deviceId failed", napi_invalid_arg);
+
+    NAPI_BT_RETURN_IF(!ParseInt32(env, transport, argv[PARAM_TRANSPORT]), "Parse transport failed", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!IsValidTransport(transport), "invalid transport", napi_invalid_arg);
+
+    bool hasP192 = false;
+    bool hasP256 = false;
+    if (argc >= ARGS_SIZE_THREE && NapiIsUndefined(env, argv[PARAM_P192]) != napi_ok) {
+        hasP192 = true;
+    }
+    if (argc == ARGS_SIZE_FOUR && NapiIsUndefined(env, argv[PARAM_P256]) != napi_ok) {
+        hasP256 = true;
+    }
+    NAPI_BT_RETURN_IF(!hasP192 && !hasP256, "At least one oobData should be given", napi_invalid_arg);
+
+    if (hasP256) {
+        NAPI_BT_CALL_RETURN(ParseOobDataParam(env, argv[PARAM_P256], transport, addressInfo, oobData));
+        oobData.SetOobDataType(OobDataType::P256);
+        return napi_ok;
+    }
+    NAPI_BT_CALL_RETURN(ParseOobDataParam(env, argv[PARAM_P192], transport, addressInfo, oobData));
+    oobData.SetOobDataType(OobDataType::P192);
+    return napi_ok;
+}
+
+napi_value StartPairOutOfBand(napi_env env, napi_callback_info info)
+{
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_INVALID_PARAM,
+        BT_ERR_API_NOT_SUPPORT, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "connection.StartPairOutOfBand", validErrCodes);
+    std::string deviceId = INVALID_MAC_ADDRESS;
+    AddressInfo addressInfo;
+    OobData oobData;
+    int32_t transport = BT_TRANSPORT_NONE;
+    auto checkRet = CheckStartPairDeviceOobParam(env, info, deviceId, addressInfo, transport, oobData);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, checkRet == napi_ok, BT_ERR_INVALID_PARAM);
+    auto func = [deviceId, transport, oobData]() {
+        BluetoothRemoteDevice remoteDevice(deviceId, transport);
+        int32_t err = remoteDevice.StartPairOutOfBand(oobData);
+        HILOGI("startPairOutOfBand err: %{public}d", err);
+        return NapiAsyncWorkRet(err);
+    };
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();
 }
@@ -891,8 +970,11 @@ napi_status CheckPairCredibleDeviceParam(napi_env env, napi_callback_info info, 
 napi_value PairCredibleDevice(napi_env env, napi_callback_info info)
 {
     HILOGD("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils =
-        std::make_shared<NapiHaEventUtils>(env, "connection.PairCredibleDevice");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR,
+    };
+    NAPI_BT_CONTEXT(env, "connection.PairCredibleDevice", validErrCodes);
     std::string remoteAddr = INVALID_MAC_ADDRESS;
     int transport = BT_TRANSPORT_NONE;
     auto status = CheckPairCredibleDeviceParam(env, info, remoteAddr, transport);
@@ -904,7 +986,7 @@ napi_value PairCredibleDevice(napi_env env, napi_callback_info info)
         HILOGI("err: %{public}d", err);
         return NapiAsyncWorkRet(err);
     };
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK, haUtils);
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();

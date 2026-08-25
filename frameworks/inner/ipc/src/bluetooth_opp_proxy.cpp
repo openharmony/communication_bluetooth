@@ -128,10 +128,12 @@ int32_t BluetoothOppProxy::SetLastReceivedFileUri(const std::string &uri)
 
     auto remote = Remote();
     CHECK_AND_RETURN_LOG_RET((remote != nullptr), BT_ERR_INTERNAL_ERROR, "get remote fail");
+    HILOGI("setLastReceivedFileUri proxy send code");
     int error = remote->SendRequest(
         static_cast<uint32_t>(BluetoothOppInterfaceCode::COMMAND_SET_LAST_RECEIVED_URI), data, reply, option);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     int32_t ret = reply.ReadInt32();
+    HILOGI("setLastReceivedFileUri proxy get reply");
     CHECK_AND_RETURN_LOG_RET((ret == BT_NO_ERROR), ret, "reply errCode: %{public}d", ret);
     return BT_NO_ERROR;
 }

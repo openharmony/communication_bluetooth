@@ -195,7 +195,7 @@ public:
         if (appCallback != nullptr && appCallback->lpDeviceInfoCb != nullptr) {
             BtUuid retUuid;
             string strUuid = btUuid.ToString();
-            retUuid.uuid = (char *)strUuid.c_str();
+            retUuid.uuid = const_cast<char*>(strUuid.c_str());
             retUuid.uuidLen = strUuid.size();
             appCallback->lpDeviceInfoCb(&retUuid, msgType, const_cast<uint8_t*>(value.data()), value.size());
         }
@@ -847,14 +847,14 @@ static bool SetServiceUuidParameter(BleScanFilter &scanFilter, BleScanNativeFilt
             HILOGE("match the UUID faild.");
             return false;
         }
-        UUID serviceUuid = UUID::FromString((char *)nativeScanFilter->serviceUuid);
+        UUID serviceUuid = UUID::FromString(reinterpret_cast<char *>(nativeScanFilter->serviceUuid));
         scanFilter.SetServiceUuid(serviceUuid);
         if (nativeScanFilter->serviceUuidMask != nullptr) {
             if (!IsValidUuid(std::string(reinterpret_cast<char *>(nativeScanFilter->serviceUuidMask)))) {
                 HILOGE("match the UUID faild.");
                 return false;
             }
-            UUID serviceUuidMask = UUID::FromString((char *)nativeScanFilter->serviceUuidMask);
+            UUID serviceUuidMask = UUID::FromString(reinterpret_cast<char *>(nativeScanFilter->serviceUuidMask));
             scanFilter.SetServiceUuidMask(serviceUuidMask);
         }
     }

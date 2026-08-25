@@ -287,7 +287,14 @@ napi_value NapiSppServer::SppAccept(napi_env env, napi_callback_info info)
             }
 
             if (callbackInfo->callback_) {
-                result[PARAM0] = GetCallbackErrorValue(callbackInfo->env_, callbackInfo->errorCode_);
+                if (callbackInfo->errorCode_ != CODE_SUCCESS) {
+                    callbackInfo->errorCode_ = BT_ERR_INTERNAL_ERROR;
+                    std::string errMsg =
+                        "Operation failed. Please wait for SPP connection before other API calls.";
+                    result[PARAM0] = GetCallbackErrorValue(callbackInfo->env_, callbackInfo->errorCode_, errMsg);
+                } else {
+                    result[PARAM0] = GetCallbackErrorValue(callbackInfo->env_, callbackInfo->errorCode_);
+                }
                 napi_get_reference_value(env, callbackInfo->callback_, &callback);
                 napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, result, &callResult);
                 napi_delete_reference(env, callbackInfo->callback_);

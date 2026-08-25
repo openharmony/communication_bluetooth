@@ -1891,7 +1891,8 @@ enum DeviceInfoType {
     DEVICE_PRODUCT_ID = 1,
     DEVICE_MODEL_ID = 2,
     DEVICE_CUSTOM_TYPE = 3,
-    DEVICE_DEVICE_OF_TYPE = 4
+    DEVICE_DEVICE_OF_TYPE = 4,
+    DEVICE_MANUFACTURER_DATA = 5
 };
 
 enum BluetoothSensingEventId : uint8_t {
@@ -2026,6 +2027,12 @@ typedef enum {
     /** Nearby Discovery Bussiness */
     INNER_BLE_RANGING_APPROACH = 0X02,
 } BleAppType;
+
+enum ChannelScanInterval : uint32_t {
+    CHANNEL_SCAN_INTERVAL_100MS = 0x000000A0,
+    CHANNEL_SCAN_INTERVAL_1000MS = 0x00000640,
+    CHANNEL_SCAN_INTERVAL_BYPASS = 0xFFFFFFFF,
+};
 
 #define INNER_BLE_RANGING_INVALID_ADVPOWER 127
 

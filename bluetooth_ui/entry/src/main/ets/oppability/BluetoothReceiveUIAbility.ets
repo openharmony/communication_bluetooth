@@ -29,14 +29,15 @@ import type { BusinessError } from '@ohos.base';
 import fileUri from '@ohos.file.fileuri';
 import rpc from '@ohos.rpc';
 import { DrawableDescriptor } from '@ohos.arkui.drawableDescriptor';
-import backgroundTaskManager from '@ohos.backgroundTaskManager';
+import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
 import systemParameterEnhance from '@ohos.systemParameterEnhance';
 import PermissionUtils from 'common/PermissionUtils';
 import CommonUtils from 'common/CommonUtils';
+import { btTransactionStatisticsType, btTransactionStatisticsResult,
+    btTransactionStatisticsSceneCode } from 'common/CommonUtils';
 
 const TAG: string = '[BT_RECEIVE_SERVICE]==>'
 const EVENT_TYPE_TRANSACTION: number = 6;
-const BT_TRANSACTION_EVENT: string = 'usual.event.bluetooth.REPORT.TRANSACTION';
 
 const RESULT_SUCCESS: number = 0;
 const RESULT_ERROR_UNSUPPORTED_TYPE: number = 1;
@@ -48,43 +49,16 @@ const RESULT_ERROR_TRANSFER_FAILED: number = 6;
 const RESULT_ERROR_UNKNOWN: number = 7;
 const RESULT_SUCCESS_DISCONNECT: number = 9;
 
+const USER_CANCEL_REMOVE_NOTIFICATION: number = 1;
+const SYSTEM_CANCEL_REMOVE_NOTIFICATION: number = 2;
+const SYSTEM_CANCEL_NOT_USE_BLUETOOTH: number = 9;
+
 const STATUS_PENDING: number = 0;
 const STATUS_RUNNING: number = 1;
 const STATUS_FINISH: number = 2;
 const OPP_TRANSFER_USER_ACCEPT: number = 0;
 const OPP_TRANSFER_AUTO_ACCEPT: number = 1;
 const UNKNOWN_VALUE: number = -1;
-
-const btTransactionStatisticsType = {
-    TRANSACTION_TYPE_OPP_SEND : 1,
-    TRANSACTION_TYPE_OPP_RECEIVE : 2,
-};
-
-const btTransactionStatisticsResult = {
-    TRANSACTION_RESULT_TOTAL : 1,
-    TRANSACTION_RESULT_SUCCESS : 2,
-    TRANSACTION_RESULT_FAIL : 3,
-};
-
-const btTransactionStatisticsSceneCode = {
-    TRANSACTION_SCENECODE_NA : 0,
-    TRANSACTION_SCENECODE_1 : 1,
-    TRANSACTION_SCENECODE_2 : 2,
-    TRANSACTION_SCENECODE_3 : 3,
-    TRANSACTION_SCENECODE_4 : 4,
-    TRANSACTION_SCENECODE_5 : 5,
-    TRANSACTION_SCENECODE_6 : 6,
-    TRANSACTION_SCENECODE_7 : 7,
-    TRANSACTION_SCENECODE_8 : 8,
-    TRANSACTION_SCENECODE_9 : 9,
-    TRANSACTION_SCENECODE_10 : 10,
-    TRANSACTION_SCENECODE_11 : 11,
-    TRANSACTION_SCENECODE_12 : 12,
-    TRANSACTION_SCENECODE_13 : 13,
-    TRANSACTION_SCENECODE_14 : 14,
-    TRANSACTION_SCENECODE_15 : 15,
-    TRANSACTION_SCENECODE_16 : 16,
-};
 
 export default class BluetoothReceiveUIAbility extends UIAbility {
     private subscriber: commonEventManager.CommonEventSubscriber | null = null;
@@ -127,10 +101,30 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
         }
         console.info(TAG, 'BluetoothReceiveUIAbility onCreate');
         this.readyReceiveEvent();
+        this.setTransferStateChange();
         this.startContinuousTask();
+        try {
+            backgroundTaskManager.on('continuousTaskCancel',
+                (info: backgroundTaskManager.ContinuousTaskCancelInfo) => {
+                console.info('continuousTaskCancel callback id ' + info.id);
+                console.info('continuousTaskCancel callback reason ' + info.reason);
+                if (info.reason == USER_CANCEL_REMOVE_NOTIFICATION) {
+                    this.oppProfile.setIncomingFileConfirmation(false, -1);
+                    this.oppProfile.cancelTransfer();
+                    this.handleTerminate();
+                } else if (info.reason == SYSTEM_CANCEL_NOT_USE_BLUETOOTH ||
+                    info.reason == SYSTEM_CANCEL_REMOVE_NOTIFICATION) {
+                    this.startContinuousTask();
+                }
+            });
+        } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            console.error(`Operation onContinuousTaskCancel failed. code ${err.code}, message ${err.message}`);
+        }
         this.timerIdCreate = setTimeout(() => {
             console.info(TAG, 'onCreate 1 second but nothing received');
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
+            CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE,
+                btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
                 1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_1, 1);
             this.handleTerminate();
         }, 1000);
@@ -146,52 +140,14 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
 
     handleTerminate() {
         console.info(TAG, 'handleTerminate');
+        try {
+            backgroundTaskManager.off('continuousTaskCancel');
+        } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            console.error(`Operation offContinuousTaskCancel failed. code ${err.code}, message ${err.message}`);
+        }
         this.stopContinuousTask();
         this.context.terminateSelf();
-    }
-
-    reportBtChrDataByResult(dataResult: number) {
-        console.info(TAG, 'reportBtChrDataByResult dataResult ' + dataResult +
-            ' totalCount' + this.totalCount + ' successCount' + this.successCount);
-        if (dataResult == RESULT_SUCCESS) {
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_SUCCESS,
-                1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
-        } else if ((dataResult == RESULT_ERROR_NOT_ACCEPTABLE ||
-            dataResult == RESULT_ERROR_BAD_REQUEST) && this.totalCount > 0) {
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
-                this.totalCount, dataResult, this.totalCount);
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
-                this.totalCount - 1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
-        } else if ((dataResult == RESULT_ERROR_CANCELED || dataResult == RESULT_ERROR_TRANSFER_FAILED) &&
-            this.totalCount - this.successCount >= 1) {
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
-                this.totalCount - this.successCount, dataResult, this.totalCount - this.successCount);
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
-                this.totalCount - this.successCount -1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
-        } else if (dataResult == RESULT_ERROR_CONNECTION_FAILED) {
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL, 1, dataResult, 1);
-        }
-        this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
-            1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
-    }
-
-    reportBtTransactionChr(result: number, resultCount: number, sceneCode: number, sceneCodeCount: number) {
-        const options: commonEventManager.CommonEventPublishData = {
-            code: 0,
-            data: 'message',
-            subscriberPermissions: ['ohos.permission.MANAGE_BLUETOOTH'],
-            isOrdered: true,
-            isSticky: false,
-            parameters: { 'transactionType': btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE, 'result': result,
-                'resultCount': resultCount, 'sceneCode': sceneCode, 'sceneCodeCount': sceneCodeCount}
-        }
-        commonEventManager.publish(BT_TRANSACTION_EVENT, options, (err) => {
-            if (err) {
-            console.info(TAG, 'get bt transaction event publish failed.' + JSON.stringify(err));
-            } else {
-            console.info(TAG, 'get bt transaction event publish success.');
-            }
-        })
     }
 
     unlinkFile() {
@@ -200,7 +156,6 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
             console.info(TAG, `unlink file begin`);
             const uri = new fileUri.FileUri(this.receiveDirectory);
             let deleteSandBoxUri = uri.path;
-            console.info(TAG, `unlink file begin fileUri ${this.receiveDirectory} sandBoxUri ${deleteSandBoxUri}`);
             if (this.fileFd != -1) {
                 fs.close(this.fileFd);
                 this.fileFd = -1;
@@ -211,7 +166,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
             this.cancelSendProgressNotification();
             this.oppProfile.off('transferStateChange');
             let err: BusinessError = error as BusinessError;
-            console.error(TAG, `unlink failed, uri ${this.receiveDirectory} code ${err.code}, message ${err.message}`);
+            console.error(TAG, `unlink failed, code ${err.code}, message ${err.message}`);
             this.oppProfile.setLastReceivedFileUri('removeFile: ' + this.receiveDirectory);
         }
     }
@@ -276,9 +231,11 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
               clearTimeout(this.timerIdReceive);
               this.transfering = false;
               this.oppProfile.setIncomingFileConfirmation(false, -1);
-              this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
+              CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE,
+                  btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
                   this.totalCount, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_2, this.totalCount);
-              this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
+              CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE,
+                  btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
                   this.totalCount, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
               this.pullUpReceiveResultNotification();
               this.handleTerminate();
@@ -290,9 +247,11 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
               clearTimeout(this.timerIdReceive);
               this.transfering = false;
               this.oppProfile.setIncomingFileConfirmation(false, -1);
-              this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
+              CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE,
+                  btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
                   this.totalCount, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_5, this.totalCount);
-              this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
+              CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE,
+                  btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
                   this.totalCount, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
               this.tapEventIsAllowed = true;
               this.handleTerminate();
@@ -306,6 +265,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
           }
           case 'usual.event.bluetooth.OPP.FINISH.NOTIFICATION': {
               this.oppProfile.setLastReceivedFileUri(this.receiveDirectory);
+              this.tapEventIsAllowed = true;
               setTimeout(() => {
                   if (this.transfering) {
                       console.info(TAG, 'still transfering, do not terminate');
@@ -318,12 +278,18 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
           }
           case 'usual.event.bluetooth.OPP.FINISH.REMOVE': {
               console.info(TAG, 'user OPP.FINISH.REMOVE tapEventIsAllowed is ' + this.tapEventIsAllowed);
+              if (this.transfering) {
+                  console.info(TAG, 'still transfering, do not terminate');
+                  return;
+              }
               clearTimeout(this.timerIdReceive);
               this.transfering = false;
               this.oppProfile.setIncomingFileConfirmation(false, -1);
-              this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
+              CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE,
+                  btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
                   this.totalCount, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_5, this.totalCount);
-              this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
+              CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE,
+                  btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
                   this.totalCount, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
               this.tapEventIsAllowed = true;
               this.handleTerminate();
@@ -356,12 +322,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
         }
     }
 
-    async handleBtUri(data: commonEventManager.CommonEventData) {
-        if (data.parameters == undefined) {
-            console.error(TAG, 'data.parameters undefined');
-            return;
-        }
-
+    async setTransferStateChange() {
         this.oppProfile.off('transferStateChange');
         this.oppProfile.on('transferStateChange', (data: opp.OppTransferInformation) => {
             this.totalCount = data.totalCount;
@@ -372,7 +333,8 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
             } else if (data.status == STATUS_FINISH) {
                 if (data.result != RESULT_SUCCESS_DISCONNECT) {
                     data.result == RESULT_SUCCESS ? this.successCount++ : this.failedCount++;
-                    this.reportBtChrDataByResult(data.result);
+                    CommonUtils.reportBtReceiveChrDataByResult(data.result,
+                        this.totalCount, this.successCount);
                 }
                 if (data.result != RESULT_SUCCESS && data.filePath != undefined && data.filePath.trim().length > 0) {
                     this.unlinkFile();
@@ -380,6 +342,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
                 if (data.currentCount == data.totalCount || data.result == RESULT_ERROR_CANCELED ||
                     data.result == RESULT_ERROR_TRANSFER_FAILED) {
                     this.tapEventIsAllowed = true;
+                    this.cancelAllNotification();
                     this.cancelSendProgressNotification();
                     this.pullUpReceiveResultNotification();
                     this.oppProfile.off('transferStateChange');
@@ -391,7 +354,14 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
                 }
             }
         });
+    }
 
+    async handleBtUri(data: commonEventManager.CommonEventData) {
+        if (data.parameters == undefined) {
+            console.error(TAG, 'data.parameters undefined');
+            return;
+        }
+        this.setTransferStateChange();
         if ((data.parameters.uri == undefined) || (data.parameters.uri == null) ||
             (data.parameters.uri.length == 0)) {
             console.error(TAG, 'uri not right');
@@ -405,12 +375,17 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
                 return;
             }
             if (data.parameters.fileType == 'files') {
+                CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE_MEDIA_TYPE,
+                    btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
+                    1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_2, 1);
                 this.sandBoxUri = uri.path + '/' + this.fileName;
                 this.receiveDirectory = this.receiveDirectory + '/' + this.fileName;
             } else {
+                CommonUtils.reportBtTransactionChr(btTransactionStatisticsType.TRANSACTION_TYPE_OPP_RECEIVE_MEDIA_TYPE,
+                    btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
+                    1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_1, 1);
                 this.sandBoxUri = this.receiveDirectory;
             }
-            console.info(TAG, `openFile begin fileUri ${this.sandBoxUri}`);
             let file = fs.openSync(this.sandBoxUri, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
             this.fileFd = file.fd;
             await this.oppProfile.setIncomingFileConfirmation(true, file.fd);
@@ -489,7 +464,8 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
                 console.info(TAG, 'receive notification 50 seconds but no tap');
                 this.transfering = false;
                 this.oppProfile.setIncomingFileConfirmation(false, -1);
-                this.reportBtChrDataByResult(RESULT_ERROR_NOT_ACCEPTABLE);
+                CommonUtils.reportBtReceiveChrDataByResult(RESULT_ERROR_NOT_ACCEPTABLE,
+                    this.totalCount, this.successCount);
             }, waitTime);
         }).catch((err: Base.BusinessError) => {
             console.error(TAG, 'publishReceiveNotification fail');
@@ -641,6 +617,18 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
             wantAgentObjRemove, percent, name, this.currentCount, this.totalCount);
     }
 
+    cancelAllNotification() {
+        console.info(TAG, `cancelAllNotification begin.`);
+        let cancelAllCallback = (err: BusinessError): void => {
+            if (err) {
+                console.error(TAG, `Failed to cancel all notification. Code is ${err.code}, message ${err.message}`);
+            } else {
+                console.info(TAG, `Succeeded in canceling all notification.`);
+            }
+        }
+        notificationManager.cancelAll(cancelAllCallback);
+    }
+
     cancelSendProgressNotification() {
         console.info(TAG, 'cancelSendProgressNotification ready to cancel.');
         notificationManager.cancel(this.capsuleNotificationID).then(() => {
@@ -654,8 +642,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
             this.fileFd = -1;
         }
         if (this.successCount == 0) {
-            console.info(TAG, 'no success file, terminate it.');
-            this.handleTerminate();
+            console.info(TAG, 'no success file, cancelSendProgressNotification.');
         }
     }
 

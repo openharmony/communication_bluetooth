@@ -1454,6 +1454,7 @@ int32_t BluetoothHost::UpdateCloudBluetoothDevice(const std::vector<TrustPairDev
         trustPairDevice.SetBluetoothClass(devParam.bluetoothClass_);
         trustPairDevice.SetToken(devParam.token_);
         trustPairDevice.SetSecureAdvertisingInfo(devParam.secureAdvertisingInfo_);
+        trustPairDevice.SetProductId(devParam.productId_);
         HILOGI("[CLOUD_DEV] UpdateCloudBluetoothDevice add device: %{public}s",
             GetEncryptAddr(trustPairDevice.GetMacAddress()).c_str());
         cloudDevicesVec.emplace_back(trustPairDevice);
@@ -1546,6 +1547,25 @@ int32_t BluetoothHost::VerifyMultiPermissions(bool systemHapNeeded,
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
     return proxy->VerifyMultiPermissions(systemHapNeeded, permissions);
+}
+
+int BluetoothHost::UpdateSecondaryPhonePairMode(int32_t mode)
+{
+    HILOGI("enter");
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
+    return proxy->UpdateSecondaryPhonePairMode(mode);
+}
+
+int BluetoothHost::SetBtChannelScan(bool isEnable, uint32_t interval)
+{
+    HILOGI("isEnable: %{public}d, interval: %{public}u", isEnable, interval);
+    CHECK_AND_RETURN_LOG_RET(interval >= CHANNEL_SCAN_INTERVAL_100MS && interval <= CHANNEL_SCAN_INTERVAL_BYPASS,
+        BT_ERR_INVALID_PARAM, "invalid channel scan interval");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "pimpl or bluetooth host is nullptr");
+    return proxy->SetBtChannelScan(isEnable, interval);
 }
 } // namespace Bluetooth
 } // namespace OHOS

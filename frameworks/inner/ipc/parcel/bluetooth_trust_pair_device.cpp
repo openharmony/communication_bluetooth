@@ -41,6 +41,9 @@ bool BluetoothTrustPairDevice::Marshalling(Parcel &parcel) const
     if (!MarshallingVecSafe(parcel, secureAdvertisingInfo_)) {
         return false;
     }
+    if (!parcel.WriteString(productId_)) {
+        return false;
+    }
     return true;
 }
 
@@ -77,6 +80,9 @@ bool BluetoothTrustPairDevice::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!ReadParcelVecSafe(parcel, secureAdvertisingInfo_)) {
+        return false;
+    }
+    if (!parcel.ReadString(productId_)) {
         return false;
     }
     return true;

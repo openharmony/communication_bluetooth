@@ -82,6 +82,7 @@ ohos_shared_library("a2dp") {
     "ipc:ipc_single",
     "libuv:uv",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module/bluetooth"

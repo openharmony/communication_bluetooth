@@ -28,6 +28,8 @@ namespace CJBluetoothAccess {
 using Bluetooth::BluetoothHost;
 using Bluetooth::BluetoothState;
 using Bluetooth::BT_ERR_INTERNAL_ERROR;
+using Bluetooth::BT_ERR_INVALID_PARAM;
+using Bluetooth::BT_NO_ERROR;
 using Bluetooth::BT_TRANSPORT_BLE;
 using Bluetooth::BT_TRANSPORT_BREDR;
 using Bluetooth::BTStateID;
@@ -35,7 +37,7 @@ using Bluetooth::BTStateID;
 CjBluetoothAccessObserver::CjBluetoothAccessObserver() {}
 
 std::shared_ptr<CjBluetoothAccessObserver> g_bluetoothAccessObserver = std::make_shared<CjBluetoothAccessObserver>();
-bool g_flag = false;
+std::once_flag g_registerOnce;
 
 static void RegisterAccessObserverToHost()
 {
@@ -136,10 +138,7 @@ void CjBluetoothAccessObserver::RegisterStateChangeFunc(std::function<void(int32
 
 void AccessImpl::RegisterAccessObserver(int32_t callbackType, void (*callback)(), int32_t* errCode)
 {
-    if (!g_flag) {
-        RegisterAccessObserverToHost();
-        g_flag = true;
-    }
+    std::call_once(g_registerOnce, RegisterAccessObserverToHost);
 
     if (callbackType == REGISTER_STATE_CHANGE_TYPE) {
         auto AccessObserverFunc = CJLambda::Create(reinterpret_cast<void (*)(int32_t)>(callback));
@@ -149,7 +148,10 @@ void AccessImpl::RegisterAccessObserver(int32_t callbackType, void (*callback)()
             return;
         }
         g_bluetoothAccessObserver->RegisterStateChangeFunc(AccessObserverFunc);
+        *errCode = BT_NO_ERROR;
+        return;
     }
+    *errCode = BT_ERR_INVALID_PARAM;
     return;
 }
 

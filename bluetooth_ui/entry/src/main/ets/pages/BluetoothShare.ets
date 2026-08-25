@@ -181,7 +181,6 @@ export struct BtServicesComponent {
     let result: string[] = [];
     for (let i = 0; i < sysShareFilelength; i++) {
       let sandboxUri: string = new fileUri.FileUri(sysShareFileUris[i]).path;
-      console.log(`${TAG} dealSysFileUris sysShareUri : ${sysShareFileUris[i]} sandboxUri: ${sandboxUri}`);
       let isDirectory = fs.statSync(sandboxUri).isDirectory();
       if (isDirectory) {
         console.log(TAG, 'share file directory.');
@@ -214,10 +213,10 @@ export struct BtServicesComponent {
       let fileUris: string[] = this.dealSysFileUris(sysShareFileUris, sysShareFilelength);
       let fileUrisLength: number = (fileUris.length > MAX_FILE_NUM) ? MAX_FILE_NUM : fileUris.length;
       for (let i = 0; i < fileUrisLength; i++) {
-        console.log(`${TAG} openSync fileUris is : ${fileUris[i]}`);
+        console.log(`${TAG} openSync`);
         let file = fs.openSync(fileUris[i], fs.OpenMode.READ_ONLY);
         let filePath = decodeURIComponent(fileUris[i]);
-        console.log(`${TAG} deal file: ${file.fd} filePath: ${filePath}`);
+        console.log(`${TAG} deal file: ${file.fd}`);
         let stat: fs.Stat = fs.statSync(file.fd);
         let fileHolder: opp.FileHolder = {
           filePath: filePath,

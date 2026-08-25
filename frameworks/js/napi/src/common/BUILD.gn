@@ -97,6 +97,7 @@ ohos_shared_library("bt_napi_common") {
     "libuv:uv",
     "hiappevent:hiappevent_innerapi",
     "napi:ace_napi",
+    "node:node_header_notice",
     "samgr:samgr_proxy",
   ]
 
@@ -169,6 +170,7 @@ ohos_shared_library("common") {
     "ipc:ipc_single",
     "libuv:uv",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module/bluetooth"

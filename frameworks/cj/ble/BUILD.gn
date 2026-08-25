@@ -42,6 +42,7 @@ ohos_shared_library("cj_bluetooth_ble_ffi") {
     ubsan = true  # Enable some Ubsan options
     debug = false
   }
+  branch_protector_ret = "pac_ret"
 
   include_dirs = [
     "$BT_CJ_DIR/include",
@@ -72,9 +73,11 @@ ohos_shared_library("cj_bluetooth_ble_ffi") {
     "c_utils:utils",
     "hicollie:libhicollie",
     "hilog:libhilog",
+    "libuv:uv",
     "napi:ace_napi",
     "napi:cj_bind_ffi",
     "napi:cj_bind_native",
+    "node:node_header_notice",
   ]
 
   innerapi_tags = [ "platformsdk" ]

@@ -240,7 +240,7 @@ public:
      * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
      * @since 6
      */
-    bool Connect(const BluetoothRemoteDevice &device);
+    int Connect(const BluetoothRemoteDevice &device);
 
     /**
      * @brief Release the audio connection from remote AG device.
@@ -249,7 +249,7 @@ public:
      * @return Returns <b>true</b> if the operation is successful; returns <b>false</b> if the operation fails.
      * @since 6
      */
-    bool Disconnect(const BluetoothRemoteDevice &device);
+    int Disconnect(const BluetoothRemoteDevice &device);
 
     /**
      * @brief Open voice recognition.

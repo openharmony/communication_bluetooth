@@ -78,7 +78,8 @@ static std::map<int32_t, std::string> napiErrMsgMap {
 };
 
 static std::map<int32_t, int32_t> innerToBusinessErrCodeMap {
-    // inner error code -> business error code
+    // inner error code ->
+    // business error code (ARKTS API, file: bluetooth_errorcode.h, Common error codes + Customized error codes)
     // One inner error code maps to one business error code, business error code can have multiple inner error codes.
     { BtErrCode::BT_ERR_PEERS_MAC_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
     { BtErrCode::BT_ERR_MANAGE_ADV_NAME_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
@@ -91,6 +92,29 @@ static std::map<int32_t, int32_t> innerToBusinessErrCodeMap {
     { BtErrCode::BT_ERR_MULTI_PERMISSION_FAILED, BtErrCode::BT_ERR_PERMISSION_FAILED },
     { BtErrCode::BT_ERR_INVALID_PARAM_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
     { BtErrCode::BT_ERR_GATT_CHARACTER_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_ASYNCWORK_EXIST, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_ADDRESS_NOT_EXIST, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_BLUETOOTH_TURN_ON, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_BLUETOOTH_TURNING, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_RESTRICT_STATE, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_CLOUD_DEVICE_BONDING, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_DISCOVERY_STATE_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_BLE_SCAN_NO_RESOURCE, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_IS_DISCOVERING, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_ADDRESS_OR_TRANSPORT_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_IPC_TRANSACTION_FAILED, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_SERVICE_MAX_CONNECTION, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_DEVICE_HAS_CONNECTED, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_DEVICE_IS_NOT_CONNECTED, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_GATT_PREPARE_QUEUE_FULL, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_GATT_REMOTE_DEVICE_ERROR, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_CHARACTER_VALUE_ERROR, BtErrCode::BT_ERR_INVALID_PARAM },
+    { BtErrCode::BT_ERR_OBJECT_NULL, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_REQUEST_NOT_SUPPORT, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_REGISTER_APPLICATION_FAILED, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_BAS_NO_MATCH_OBSERVER, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_BAS_OBSERVER_EXCEEDS_LIMIT, BtErrCode::BT_ERR_INTERNAL_ERROR },
+    { BtErrCode::BT_ERR_BAS_REQUEST_BUSY, BtErrCode::BT_ERR_INTERNAL_ERROR },
 };
 
 static std::map<int32_t, std::string> innerErrMsgMap {
@@ -103,8 +127,35 @@ static std::map<int32_t, std::string> innerErrMsgMap {
     { BtErrCode::BT_ERR_AUDIO_SERVER_PERMISSION_FAILED, "Only for audio_server." },
     { BtErrCode::BT_ERR_API_PERMISSION_FAILED, "Api version is unsupported." },
     { BtErrCode::BT_ERR_MULTI_PERMISSION_FAILED, "Multiple permission denied." },
-    { BtErrCode::BT_ERR_INVALID_PARAM_ERROR, "Invalid parameter." },
-    { BtErrCode::BT_ERR_GATT_CHARACTER_ERROR, "GATT character is nullptr." },
+    { BtErrCode::BT_ERR_INVALID_PARAM_ERROR, "Operation failed. Invalid parameter." },
+    { BtErrCode::BT_ERR_GATT_CHARACTER_ERROR, "Operation failed. GATT character is nullptr." },
+    { BtErrCode::BT_ERR_ASYNCWORK_EXIST,
+        "Operation failed. Please call the interface only after the previous callback has been completed." },
+    { BtErrCode::BT_ERR_ADDRESS_NOT_EXIST, "Operation failed. Address has not been discovered or recorded." },
+    { BtErrCode::BT_ERR_BLUETOOTH_TURN_ON, "Operation failed. Bluetooth switch state is turn on." },
+    { BtErrCode::BT_ERR_BLUETOOTH_TURNING, "Operation failed. Bluetooth switch state is turning state." },
+    { BtErrCode::BT_ERR_RESTRICT_STATE, "Operation failed. In restrict bluetooth state." },
+    { BtErrCode::BT_ERR_CLOUD_DEVICE_BONDING, "Operation failed. Cloud device is bonding." },
+    { BtErrCode::BT_ERR_DISCOVERY_STATE_ERROR, "Operation failed. In DISCOVERYING or DISCOVERY_STARTED state." },
+    { BtErrCode::BT_ERR_CHARACTER_VALUE_ERROR,
+        "Invalid parameter. CharacteristicValue is not a valid arraybuffer." },
+    { BtErrCode::BT_ERR_BLE_SCAN_NO_RESOURCE,
+        "Operation failed. Fails to start scan as it is out of hardware resources."},
+    { BtErrCode::BT_ERR_GATT_CONNECT_STATE_ERROR, "Operation failed. GATT not in connected state." },
+    { BtErrCode::BT_ERR_IS_DISCOVERING, "Operation failed. Not allowed to connect during scanning." },
+    { BtErrCode::BT_ERR_ADDRESS_OR_TRANSPORT_ERROR, "Operation failed. Invalid bluetooth addr or transport type." },
+    { BtErrCode::BT_ERR_IPC_TRANSACTION_FAILED, "Operation failed. IPC trans failed." },
+    { BtErrCode::BT_ERR_SERVICE_MAX_CONNECTION, "Operation failed. Max connections has reached." },
+    { BtErrCode::BT_ERR_DEVICE_HAS_CONNECTED, "Operation failed. This device has connected." },
+    { BtErrCode::BT_ERR_DEVICE_IS_NOT_CONNECTED, "Operation failed. This device isn't connected." },
+    { BtErrCode::BT_ERR_GATT_PREPARE_QUEUE_FULL, "Operation failed. The prepare write queue of GATT server is full." },
+    { BtErrCode::BT_ERR_GATT_REMOTE_DEVICE_ERROR, "Operation failed. Remote device has an error." },
+    { BtErrCode::BT_ERR_OBJECT_NULL, "Operation failed. Judge object is null." },
+    { BtErrCode::BT_ERR_REQUEST_NOT_SUPPORT, "Operation failed. Unsupported request." },
+    { BtErrCode::BT_ERR_REGISTER_APPLICATION_FAILED, "Operation failed. Register Application failed." },
+    { BtErrCode::BT_ERR_BAS_NO_MATCH_OBSERVER, "Operation failed. Unregistered bas observer." },
+    { BtErrCode::BT_ERR_BAS_OBSERVER_EXCEEDS_LIMIT, "Operation failed. Bas observers exceeds the limit." },
+    { BtErrCode::BT_ERR_BAS_REQUEST_BUSY, "Operation failed. Bas request busy." },
 };
 
 bool IsInnerErrorCode(int32_t errCode)

@@ -85,6 +85,7 @@ ohos_shared_library("ble") {
     "ipc:ipc_single",
     "libuv:uv",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module/bluetooth"

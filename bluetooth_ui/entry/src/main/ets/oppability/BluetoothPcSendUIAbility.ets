@@ -28,11 +28,12 @@ import fs from '@ohos.file.fs';
 import systemParameterEnhance from '@ohos.systemParameterEnhance';
 import PermissionUtils from 'common/PermissionUtils';
 import CommonUtils from 'common/CommonUtils';
+import { btTransactionStatisticsType, btTransactionStatisticsResult,
+    btTransactionStatisticsSceneCode } from 'common/CommonUtils';
 
 const TAG: string = '[BT_SEND_SERVICE]==>'
 
 const EVENT_TYPE_TRANSACTION: number = 6;
-const BT_TRANSACTION_EVENT: string = 'usual.event.bluetooth.REPORT.TRANSACTION';
 const RESULT_SUCCESS: number = 0;
 const RESULT_ERROR_UNSUPPORTED_TYPE: number = 1;
 const RESULT_ERROR_BAD_REQUEST: number = 2;
@@ -45,37 +46,6 @@ const RESULT_ERROR_NO_MESSAGE: number = 8;
 const STATUS_PENDING: number = 0;
 const STATUS_RUNNING: number = 1;
 const STATUS_FINISH: number = 2;
-
-const btTransactionStatisticsType = {
-    TRANSACTION_TYPE_OPP_SEND : 1,
-    TRANSACTION_TYPE_OPP_RECEIVE : 2,
-};
-
-const btTransactionStatisticsResult = {
-    TRANSACTION_RESULT_TOTAL : 1,
-    TRANSACTION_RESULT_SUCCESS : 2,
-    TRANSACTION_RESULT_FAIL : 3,
-};
-
-const btTransactionStatisticsSceneCode = {
-    TRANSACTION_SCENECODE_NA : 0,
-    TRANSACTION_SCENECODE_1 : 1,
-    TRANSACTION_SCENECODE_2 : 2,
-    TRANSACTION_SCENECODE_3 : 3,
-    TRANSACTION_SCENECODE_4 : 4,
-    TRANSACTION_SCENECODE_5 : 5,
-    TRANSACTION_SCENECODE_6 : 6,
-    TRANSACTION_SCENECODE_7 : 7,
-    TRANSACTION_SCENECODE_8 : 8,
-    TRANSACTION_SCENECODE_9 : 9,
-    TRANSACTION_SCENECODE_10 : 10,
-    TRANSACTION_SCENECODE_11 : 11,
-    TRANSACTION_SCENECODE_12 : 12,
-    TRANSACTION_SCENECODE_13 : 13,
-    TRANSACTION_SCENECODE_14 : 14,
-    TRANSACTION_SCENECODE_15 : 15,
-    TRANSACTION_SCENECODE_16 : 16,
-};
 
 export default class BluetoothSendUIAbility extends UIAbility {
     private oppProfile = opp.createOppServerProfile();
@@ -106,7 +76,8 @@ export default class BluetoothSendUIAbility extends UIAbility {
         console.info(TAG, 'BluetoothSendUIAbility onCreate');
         this.timerIdCreate = setTimeout(() => {
             console.info(TAG, 'onCreate 51 seconds but nothing received');
-            this.reportBtChrDataByResult(RESULT_ERROR_NO_MESSAGE);
+            CommonUtils.reportBtSendChrDataByResult(RESULT_ERROR_NO_MESSAGE,
+                this.totalCount, this.successCount);
             this.handleTerminate();
         }, (this.userReceiveTimeout + 1) * 1000);
         this.timerIdCreated = true;
@@ -131,48 +102,6 @@ export default class BluetoothSendUIAbility extends UIAbility {
         this.stopContinuousTask();
         commonEventManager.unsubscribe(this.subscriber);
         this.context.terminateSelf();
-    }
-
-    reportBtChrDataByResult(dataResult: number) {
-        if (this.successCount + this.failedCount > this.totalCount) {
-            return;
-        }
-        if (dataResult == RESULT_SUCCESS) {
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_SUCCESS,
-                1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
-        } else if ((dataResult == RESULT_ERROR_UNSUPPORTED_TYPE ||
-            dataResult == RESULT_ERROR_BAD_REQUEST) && this.totalCount > 0) {
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL,
-                this.totalCount, dataResult, this.totalCount);
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
-                this.totalCount - 1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
-        } else if (dataResult == RESULT_ERROR_CANCELED ||
-            dataResult == RESULT_ERROR_TRANSFER_FAILED) {
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL, 1, dataResult, 1);
-        } else {
-            this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_FAIL, 1, dataResult, 1);
-        }
-        this.reportBtTransactionChr(btTransactionStatisticsResult.TRANSACTION_RESULT_TOTAL,
-            1, btTransactionStatisticsSceneCode.TRANSACTION_SCENECODE_NA, 0);
-    }
-
-    reportBtTransactionChr(result: number, resultCount: number, sceneCode: number, sceneCodeCount: number) {
-        const options: commonEventManager.CommonEventPublishData = {
-            code: 0,
-            data: 'message',
-            subscriberPermissions: ['ohos.permission.MANAGE_BLUETOOTH'],
-            isOrdered: true,
-            isSticky: false,
-            parameters: { 'transactionType': btTransactionStatisticsType.TRANSACTION_TYPE_OPP_SEND, 'result': result,
-                'resultCount': resultCount, 'sceneCode': sceneCode, 'sceneCodeCount': sceneCodeCount}
-        }
-        commonEventManager.publish(BT_TRANSACTION_EVENT, options, (err) => {
-            if (err) {
-            console.info(TAG, 'get bt transaction event publish failed.' + JSON.stringify(err));
-            } else {
-            console.info(TAG, 'get bt transaction event publish success.');
-            }
-        })
     }
 
     readyReceiveEvent() {
@@ -231,7 +160,8 @@ export default class BluetoothSendUIAbility extends UIAbility {
                     this.currentCount = data.currentCount;
                 } else if (data.status == STATUS_FINISH && data.totalCount > 0) {
                     data.result == RESULT_SUCCESS ? this.successCount++ : this.failedCount++;
-                    this.reportBtChrDataByResult(data.result);
+                    CommonUtils.reportBtSendChrDataByResult(data.result,
+                        this.totalCount, this.successCount);
                     if (data.currentCount == data.totalCount || data.result == RESULT_ERROR_UNSUPPORTED_TYPE) {
                         this.currentCount++;
                         this.cancelSendProgressNotification();

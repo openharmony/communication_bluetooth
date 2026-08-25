@@ -144,7 +144,7 @@ ErrCode BluetoothHfpHfObserverStub::OnRegistrationStatusChangedInner(
         return TRANSACTION_ERR;
     }
     int status = data.ReadInt32();
-    stub->OnSignalStrengthChanged(*device, status);
+    stub->OnRegistrationStatusChanged(*device, status);
     return NO_ERROR;
 }
 

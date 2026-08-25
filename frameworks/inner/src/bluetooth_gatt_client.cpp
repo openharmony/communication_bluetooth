@@ -652,31 +652,31 @@ int GattClient::Connect(std::weak_ptr<GattClientCallback> callback, bool isAutoC
     }
     if (pimpl == nullptr || !pimpl->Init(weak_from_this())) {
         HILOGE("pimpl or gatt client proxy is nullptr");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_OBJECT_NULL;
     }
     std::lock_guard<std::mutex> lock(pimpl->connStateMutex_);
     if (pimpl->connectionState_ == static_cast<int>(BTConnectState::CONNECTED)) {
         HILOGE("Already connected");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_DEVICE_HAS_CONNECTED;
     }
     HILOGI("isRegisterSucceeded: %{public}d", pimpl->isRegisterSucceeded_);
     sptr<IBluetoothGattClient> proxy = GetRemoteProxy<IBluetoothGattClient>(PROFILE_GATT_CLIENT);
-    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "failed: no proxy");
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_OBJECT_NULL, "failed: no proxy");
     if (pimpl->isRegisterSucceeded_) {
         return proxy->Connect(pimpl->applicationId_, isAutoConnect);
     }
     pimpl->callback_ = callback;
-    if ((transport == bluetooth::GATT_TRANSPORT_TYPE_CLASSIC && !IS_BT_ENABLED()) ||
-        (transport == bluetooth::GATT_TRANSPORT_TYPE_INVALID)) {
+    if ((transport == bluetooth::GATT_TRANSPORT_TYPE_LE && !IS_BLE_ENABLED()) ||
+        (transport == bluetooth::GATT_TRANSPORT_TYPE_CLASSIC && !IS_BT_ENABLED())) {
         HILOGE("Unsupported transport mode");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_ADDRESS_OR_TRANSPORT_ERROR;
     }
-    if (transport != bluetooth::GATT_TRANSPORT_TYPE_LE && isAutoConnect) {
+    if (transport == bluetooth::GATT_TRANSPORT_TYPE_CLASSIC && isAutoConnect) {
         HILOGE("Unsupported auto-connect mode");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_ADDRESS_OR_TRANSPORT_ERROR;
     }
     if (!pimpl->device_.IsValidBluetoothRemoteDevice()) {
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_ADDRESS_OR_TRANSPORT_ERROR;
     }
     int appId = 0;
     int32_t result = proxy->RegisterApplication(
@@ -761,7 +761,7 @@ int GattClient::DiscoverServices()
     std::lock_guard<std::mutex> lck(pimpl->connStateMutex_);
     if (pimpl->connectionState_ != static_cast<int>(BTConnectState::CONNECTED)) {
         HILOGE("Request not supported");
-        return BT_ERR_INTERNAL_ERROR;
+        return BT_ERR_GATT_CONNECT_STATE_ERROR;
     }
     return pimpl->DiscoverStart();
 }

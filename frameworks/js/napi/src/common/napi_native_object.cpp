@@ -123,7 +123,7 @@ void ConvertUint8VectorToJsUint8Array(napi_env env, napi_value &result, const st
     const uint8_t *valueData = data.data();
     napi_value buffer = nullptr;
     uint8_t *bufferData = nullptr;
-    napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &buffer);
+    napi_create_arraybuffer(env, valueSize, reinterpret_cast<void**>(&bufferData), &buffer);
     if (valueSize > 0 && memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
         HILOGE("memcpy_s error");
     }
@@ -353,7 +353,7 @@ napi_value NapiNativeArrayBuffer::ToNapiValue(napi_env env) const
 {
     napi_value object = nullptr;
     uint8_t* bufferData = nullptr;
-    napi_create_arraybuffer(env, sppBuffer_.len_, (void**)&bufferData, &object);
+    napi_create_arraybuffer(env, sppBuffer_.len_, reinterpret_cast<void**>(&bufferData), &object);
     if (sppBuffer_.len_ <= 0) {
         HILOGE("bufferSize_ < 0, bufferSize_: %{public}zu", sppBuffer_.len_);
         return object;
@@ -415,7 +415,7 @@ napi_value NapiNativeHIDInterruptData::ToNapiValue(napi_env env) const
     const uint8_t *valueData = data_.data();
     napi_value buffer = nullptr;
     uint8_t *bufferData = nullptr;
-    napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &buffer);
+    napi_create_arraybuffer(env, valueSize, reinterpret_cast<void**>(&bufferData), &buffer);
     if (valueSize > 0 && memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
         HILOGE("memcpy_s error");
     }
@@ -440,7 +440,7 @@ napi_value NapiNativeHIDSetReportData::ToNapiValue(napi_env env) const
     const uint8_t *valueData = data_.data();
     napi_value buffer = nullptr;
     uint8_t *bufferData = nullptr;
-    napi_create_arraybuffer(env, valueSize, (void**)&bufferData, &buffer);
+    napi_create_arraybuffer(env, valueSize, reinterpret_cast<void**>(&bufferData), &buffer);
     if (valueSize > 0 && memcpy_s(bufferData, valueSize, valueData, valueSize) != EOK) {
         HILOGE("memcpy_s error");
     }

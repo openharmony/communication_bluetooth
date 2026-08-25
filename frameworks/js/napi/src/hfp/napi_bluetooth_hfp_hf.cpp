@@ -23,6 +23,7 @@
 #include "napi_bluetooth_error.h"
 #include "napi_bluetooth_event.h"
 #include "napi_event_subscribe_module.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -31,15 +32,20 @@ using namespace std;
 std::shared_ptr<NapiHandsFreeUnitObserver> NapiHandsFreeUnit::observer_ =
     std::make_shared<NapiHandsFreeUnitObserver>();
 bool NapiHandsFreeUnit::isRegistered_ = false;
+thread_local napi_ref NapiHandsFreeUnit::consRef_ = nullptr;
 
-void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env)
+void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env, napi_value exports)
 {
     napi_value constructor;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
+#ifdef BLUETOOTH_API_SINCE_10
+        DECLARE_NAPI_FUNCTION("getConnectionState", GetDeviceState),
+#else
         DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
+#endif
         DECLARE_NAPI_FUNCTION("getScoState", GetScoState),
         DECLARE_NAPI_FUNCTION("connect", Connect),
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
@@ -51,9 +57,42 @@ void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env)
     napi_define_class(env, "HandsFreeUnit", NAPI_AUTO_LENGTH, HandsFreeUnitConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
 
+#ifdef BLUETOOTH_API_SINCE_10
+    DefineCreateProfile(env, exports);
+    napi_create_reference(env, constructor, 1, &consRef_);
+#else
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_HANDS_FREE_UNIT, napiProfile);
+#endif
+}
+
+napi_value NapiHandsFreeUnit::DefineCreateProfile(napi_env env, napi_value exports)
+{
+    napi_property_descriptor properties[] = {
+        DECLARE_NAPI_FUNCTION("createHfpHfProfile", CreateHfpHfProfile),
+    };
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "hfphf:napi_define_properties");
+    napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties);
+    return exports;
+}
+
+napi_value NapiHandsFreeUnit::CreateHfpHfProfile(napi_env env, napi_callback_info info)
+{
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT
+    };
+    NAPI_BT_CONTEXT(env, "CreateHfpHfProfile", validErrCodes);
+    napi_value napiProfile;
+    napi_value constructor = nullptr;
+    napi_get_reference_value(env, consRef_, &constructor);
+    napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
+#ifdef BLUETOOTH_HFP_HF_FEATURE_ENABLE
+    NapiProfile::SetProfile(env, ProfileId::PROFILE_HANDS_FREE_UNIT, napiProfile);
+#else
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, false, BT_ERR_API_NOT_SUPPORT);
+#endif
+    return napiProfile;
 }
 
 napi_value NapiHandsFreeUnit::HandsFreeUnitConstructor(napi_env env, napi_callback_info info)
@@ -169,63 +208,61 @@ napi_value NapiHandsFreeUnit::GetScoState(napi_env env, napi_callback_info info)
 napi_value NapiHandsFreeUnit::Connect(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_PROFILE_DISABLED, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "hfp.hf.Connect", validErrCodes);
+#ifdef BLUETOOTH_HFP_HF_FEATURE_ENABLE
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
     napi_value thisVar = nullptr;
 
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, argc == expectedArgsCount, BT_ERR_INVALID_PARAM);
+
     string deviceId;
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, ParseString(env, deviceId, argv[PARAM0]), BT_ERR_INVALID_PARAM);
 
     HandsFreeUnit *profile = HandsFreeUnit::GetProfile();
     BluetoothRemoteDevice device(deviceId, 1);
-    bool isOK = profile->Connect(device);
-    napi_value result = nullptr;
-    napi_get_boolean(env, isOK, &result);
-    HILOGI("res: %{public}d", isOK);
-    return result;
+    int ret = profile->Connect(device);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, ret == BT_NO_ERROR, ret);
+#else
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, false, BT_ERR_API_NOT_SUPPORT);
+#endif
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiHandsFreeUnit::Disconnect(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INVALID_STATE, BT_ERR_PROFILE_DISABLED, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "hfp.hf.Disconnect", validErrCodes);
+#ifdef BLUETOOTH_HFP_HF_FEATURE_ENABLE
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = {0};
     napi_value thisVar = nullptr;
 
-    napi_value ret = nullptr;
-    napi_get_undefined(env, &ret);
-
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgsCount) {
-        HILOGE("Requires 1 argument.");
-        return ret;
-    }
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, argc == expectedArgsCount, BT_ERR_INVALID_PARAM);
+
     string deviceId;
-    if (!ParseString(env, deviceId, argv[PARAM0])) {
-        HILOGE("string expected.");
-        return ret;
-    }
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, ParseString(env, deviceId, argv[PARAM0]), BT_ERR_INVALID_PARAM);
 
     HandsFreeUnit *profile = HandsFreeUnit::GetProfile();
     BluetoothRemoteDevice device(deviceId, 1);
-    bool isOK = profile->Disconnect(device);
-    napi_value result = nullptr;
-    napi_get_boolean(env, isOK, &result);
-    HILOGI("res: %{public}d", isOK);
-    return result;
+    int ret = profile->Disconnect(device);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, ret == BT_NO_ERROR, ret);
+#else
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, false, BT_ERR_API_NOT_SUPPORT);
+#endif
+    return NapiGetUndefinedRet(env);
 }
 
 napi_value NapiHandsFreeUnit::ConnectSco(napi_env env, napi_callback_info info)

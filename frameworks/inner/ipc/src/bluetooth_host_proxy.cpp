@@ -38,7 +38,7 @@ void BluetoothHostProxy::RegisterObserver(const sptr<IBluetoothHostObserver> &ob
         return;
     }
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
+    MessageOption option = { MessageOption::TF_SYNC | MessageOption::TF_IMAGE };
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::RegisterObserver done fail, error: %{public}d", error);
@@ -739,7 +739,7 @@ void BluetoothHostProxy::RegisterRemoteDeviceObserver(const sptr<IBluetoothRemot
         return;
     }
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
+    MessageOption option = { MessageOption::TF_SYNC | MessageOption::TF_IMAGE };
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_REMOTE_DEVICE_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::GetBtConnectionState done fail, error: %{public}d", error);
@@ -1522,7 +1522,7 @@ void BluetoothHostProxy::RegisterBleAdapterObserver(const sptr<IBluetoothHostObs
         return;
     }
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
+    MessageOption option = { MessageOption::TF_SYNC | MessageOption::TF_IMAGE };
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_BLE_ADAPTER_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::RegisterBleAdapterObserver done fail, error: %{public}d", error);
@@ -1565,7 +1565,7 @@ void BluetoothHostProxy::RegisterBlePeripheralCallback(const sptr<IBluetoothBleP
         return;
     }
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
+    MessageOption option = { MessageOption::TF_SYNC | MessageOption::TF_IMAGE };
     int32_t error = InnerTransact(BluetoothHostInterfaceCode::BT_REGISTER_BLE_PERIPHERAL_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
         HILOGE("BluetoothHostProxy::RegisterBlePeripheralCallback done fail, error: %{public}d", error);
@@ -1792,7 +1792,7 @@ void BluetoothHostProxy::RegisterBtResourceManagerObserver(const sptr<IBluetooth
         return;
     }
     MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
+    MessageOption option = { MessageOption::TF_SYNC | MessageOption::TF_IMAGE };
     int32_t error = InnerTransact(
         BluetoothHostInterfaceCode::BT_REGISTER_RESOURCE_MANAGER_OBSERVER, option, data, reply);
     if (error != NO_ERROR) {
@@ -2286,6 +2286,39 @@ int32_t BluetoothHostProxy::VerifyMultiPermissions(bool systemHapNeeded,
         HILOGE("fail error: %{public}d", error);
         return error;
     }
+    return reply.ReadInt32();
+}
+
+int32_t BluetoothHostProxy::UpdateSecondaryPhonePairMode(int32_t mode)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor())) {
+        HILOGE("BluetoothHostProxy::UpdateSecondaryPhonePairMode WriteInterfaceToken error");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint32(mode), BT_ERR_IPC_TRANS_FAILED, "write mode error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::BT_UPDATE_PHONE_TYPE, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("BluetoothHostProxy::UpdateSecondaryPhonePairMode done fail error: %{public}d", error);
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return reply.ReadInt32();
+}
+
+int32_t BluetoothHostProxy::SetBtChannelScan(bool isEnable, uint32_t interval)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), BT_ERR_IPC_TRANS_FAILED,
+        "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteBool(isEnable), BT_ERR_IPC_TRANS_FAILED, "Write isEnable error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteUint32(interval), BT_ERR_IPC_TRANS_FAILED, "Write interval error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::SET_BT_CHANNEL_SCAN, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     return reply.ReadInt32();
 }
 }  // namespace Bluetooth

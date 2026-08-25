@@ -76,13 +76,18 @@ void NapiAccess::RegisterAccessObserverToHost()
 napi_value NapiAccess::EnableBluetooth(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SERVICE_DISCONNECTED, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "access.EnableBluetooth", validErrCodes);
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t ret = host->EnableBle();
     // if return value is a specified error code, sync interface does not process.
     if (ret == BT_ERR_DIALOG_FOR_USER_CONFIRM) {
         ret = BT_NO_ERROR;
     }
-    NAPI_BT_ASSERT_RETURN_FALSE(env, ret == BT_NO_ERROR, ret);
+    NAPI_BT_ASSERT_RETURN_FALSE_VERIFY(env, ret == BT_NO_ERROR, ret);
     return NapiGetBooleanTrue(env);
 }
 
@@ -311,13 +316,18 @@ napi_value NapiAccess::isValidRandomDeviceId(napi_env env, napi_callback_info in
 napi_value NapiAccess::EnableBluetoothAsync(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT, BT_ERR_SERVICE_DISCONNECTED,
+        BT_ERR_DIALOG_FOR_USER_NOT_RESPOND, BT_ERR_DIALOG_FOR_USER_REFUSE, BT_ERR_INTERNAL_ERROR
+    };
+    NAPI_BT_CONTEXT(env, "access.EnableBluetoothAsync", validErrCodes);
     auto func = []() {
         bool isAsync = true;
         int32_t ret = BluetoothHost::GetDefaultHost().EnableBle("", isAsync);
         HILOGI("EnableBluetoothAsync ret: %{public}d", ret);
         return NapiAsyncWorkRet(ret);
     };
-    auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
+    auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NO_NEED_CALLBACK);
     NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
     asyncWork->Run();
     return asyncWork->GetRet();

@@ -82,3 +82,5 @@ function GetLocalAddress(): String;
 @gen_async("factoryReset")
 @gen_promise("factoryReset")
 function FactoryResetSync(): void;
+
+function ConvertUuid(uuid: String): String;

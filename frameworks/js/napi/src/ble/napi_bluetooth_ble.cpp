@@ -1097,7 +1097,11 @@ napi_status CheckAdvertisingData(napi_env env, napi_callback_info info, BleAdver
 napi_value StartAdvertising(napi_env env, napi_callback_info info)
 {
     HILOGI("enter");
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env, "ble.StartAdvertising");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT, BT_ERR_SERVICE_DISCONNECTED,
+        BT_ERR_INVALID_STATE, BT_ERR_MAX_RESOURCES, BT_ERR_INTERNAL_ERROR, BT_ERR_BLE_ADV_DATA_EXCEED_LIMIT
+    };
+    NAPI_BT_CONTEXT(env, "ble.StartAdvertising", validErrCodes);
     size_t argc = ARGS_SIZE_THREE;
     napi_value argv[ARGS_SIZE_THREE] = {nullptr};
     napi_value thisVar = nullptr;
@@ -1122,7 +1126,7 @@ napi_value StartAdvertising(napi_env env, napi_callback_info info)
             return NapiAsyncWorkRet(ret);
         };
 
-        auto asyncWork = NapiAsyncWorkFactory::CreateAsyncWork(env, info, func, ASYNC_WORK_NEED_CALLBACK, haUtils);
+        auto asyncWork = CREATE_ASYNC_WORK_WITH_CONTEXT(env, info, func, ASYNC_WORK_NEED_CALLBACK);
         NAPI_BT_ASSERT_RETURN_UNDEF(env, asyncWork, BT_ERR_INTERNAL_ERROR);
         bool success = callback->asyncWorkMap_.TryPush(
             NapiAsyncType::GET_ADVERTISING_HANDLE, asyncWork);
@@ -1135,7 +1139,7 @@ napi_value StartAdvertising(napi_env env, napi_callback_info info)
         NAPI_BT_ASSERT_RETURN_UNDEF(env, status == napi_ok, BT_ERR_INVALID_PARAM);
         int ret = bleAdvertiser->StartAdvertising(
             settings, advData, rspData, 0, NapiBluetoothBleAdvertiseCallback::GetInstance());
-        NAPI_BT_ASSERT_RETURN_UNDEF(env, ret == BT_NO_ERROR, ret);
+        NAPI_BT_ASSERT_ERR_RETURN_VERIFY(env, ret == BT_NO_ERROR, ret);
         return NapiGetUndefinedRet(env);
     }
 }
