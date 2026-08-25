@@ -167,6 +167,8 @@ public:
     int32_t GetRemoteServices(const std::string &address) override;
     int32_t SetConnectionPriority(const std::string &address, int32_t priority) override;
     int32_t VerifyMultiPermissions(bool systemHapNeeded, const std::set<std::string> &permissions) override;
+    int32_t UpdateSecondaryPhonePairMode(int32_t mode) override;
+    int32_t SetBtChannelScan(bool isEnable, uint32_t interval) override;
 private:
     bool Init();
     bool IsBtEnabled();
