@@ -13,6 +13,15 @@
 
 构建命令从 OpenHarmony 源码根目录执行，不在本子目录执行。
 
+单模块编译
+
+```bash
+# 注意：-T 传的是 gn target 名（如 btframework）或完整 label（路径:target），
+# 组件名（bluetooth）不是 ninja target，会报 unknown target！
+hb build -T btframework -T btcommon -T bluetooth_hap
+hb build -T foundation/communication/bluetooth/frameworks/js/napi:bluetooth
+```
+
 优先使用独立编译命令：
 
 ```bash

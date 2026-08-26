@@ -108,7 +108,6 @@ ohos_shared_library("btpan") {
   external_deps = [
     "hilog:libhilog",
     "c_utils:utils",
-    "bluetooth_service:btstack",
     "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "samgr:samgr_proxy",
@@ -217,7 +216,6 @@ ohos_static_library("btpan_static") {
   external_deps = [
     "hilog:libhilog",
     "c_utils:utils",
-    "bluetooth_service:btstack",
     "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "samgr:samgr_proxy",

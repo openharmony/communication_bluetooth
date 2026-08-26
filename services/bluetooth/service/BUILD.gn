@@ -173,6 +173,7 @@ config("btservice_public_config") {
     "$PART_DIR/common",
     "$PART_DIR/common/include",
     "$PART_DIR/ipc/common",
+    "$PART_DIR/stack_adapter/include",
     "$BT_SERVICE_DIR/src/common",
   ]
 }
@@ -208,6 +209,7 @@ config("btservice_config") {
     "$PART_DIR/btchr/include",
     "$PART_DIR/common",
     "$PART_DIR/common/include",
+    "$PART_DIR/stack_adapter/include",
   ]
 
   defines = [
@@ -421,7 +423,6 @@ btservice_external_deps = [
   "hitrace:hitrace_meter",
   "cJSON:cjson",
   "bounds_checking_function:libsec_shared",
-  "bluetooth_service:btstack",
   "openssl:libcrypto_shared",
 ]
 
@@ -580,7 +581,6 @@ if (bluetooth_fastscan_feature_switch) {
     "ability_runtime:app_manager",
     "wifi:wifi_sdk",
     "power_manager:powermgr_client",
-    "bluetooth_service:btstack",
   ]
 
   if (bluetooth_ffrt_enable) {
@@ -694,7 +694,7 @@ ohos_shared_library("btavrcp_media") {
   ]
 
   if (bluetooth_avrcp_avsession) {
-    deps += [ 
+    deps += [
       "$BT_SERVICE_DIR/src/obex:bt_obex",
     ]
   }
@@ -708,7 +708,6 @@ ohos_shared_library("btavrcp_media") {
     "ipc:ipc_single",
     "samgr:samgr_proxy",
     "hitrace:hitrace_meter",
-    "bluetooth_service:btstack",
   ]
 
   if (bluetooth_avrcp_avsession) {
@@ -774,7 +773,6 @@ if (bluetooth_pbap_pse_feature_switch) {
     "hitrace:hitrace_meter",
     "common_event_service:cesfwk_innerkits",
     "ability_base:want",
-    "bluetooth_service:btstack",
   ]
 
   if (bluetooth_ffrt_enable) {
@@ -860,7 +858,6 @@ if (bluetooth_bas_feature) {
   btbas_external_deps = [
     "hilog:libhilog",
     "c_utils:utils",
-    "bluetooth_service:btstack",
     "hitrace:hitrace_meter",
     "ffrt:libffrt"
   ]
@@ -976,7 +973,6 @@ btmap_mse_external_deps += [
   "samgr:samgr_proxy",
   "sms_mms:tel_sms_mms_api",
   "hitrace:hitrace_meter",
-  "bluetooth_service:btstack",
 ]
 
 if (bluetooth_ffrt_enable) {
@@ -1084,7 +1080,6 @@ ohos_shared_library("btopp") {
     "cJSON:cjson",
     "common_event_service:cesfwk_innerkits",
     "samgr:samgr_proxy",
-    "bluetooth_service:btstack",
   ]
 
   if (bluetooth_ffrt_enable) {
@@ -1120,6 +1115,7 @@ ohos_shared_library("bthearing_aid_impl") {
     "$PART_DIR/btchr/include",
     "$PART_DIR/common",
     "$PART_DIR/common/include",
+    "$PART_DIR/stack_adapter/include",
   ]
 
   defines = [
@@ -1186,7 +1182,6 @@ ohos_shared_library("bthearing_aid_impl") {
     "audio_framework:audio_foundation",
     "audio_framework:audio_renderer",
     "audio_framework:audio_manager_client",
-    "bluetooth_service:btstack",
   ]
 
   if (bluetooth_ffrt_enable) {
@@ -1283,7 +1278,6 @@ ohos_shared_library("bthiddevice") {
     "ipc:ipc_single",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
-    "bluetooth_service:btstack",
   ]
   if (bluetooth_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]
@@ -1371,7 +1365,6 @@ ohos_static_library("bthiddevice_static") {
     "ipc:ipc_single",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
-    "bluetooth_service:btstack",
   ]
   if (bluetooth_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]
