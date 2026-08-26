@@ -82,6 +82,8 @@ ohos_shared_library("cj_bluetooth_hfp_ffi") {
     defines += [ "WINDOWS_PLATFORM" ]
   }
 
+  version_script = "../libcj_bluetooth_ffi.map"
+
   innerapi_tags = [ "platformsdk" ]
 
   part_name = "bluetooth"
