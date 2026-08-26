@@ -1274,8 +1274,11 @@ void ClassicAdapter::SspRequestInner(BLUEDROID::RawAddress remote_bd_addr, bt_bd
         HILOGI("confirm credible device pair");
         return;
     }
-    /* Headset / Just-Works: auto-confirm so pairing does not hang waiting for UI. */
-    if (pinType == PIN_TYPE_CONFIRM_PASSKEY || pinType == PIN_TYPE_NO_PASSKEY_CONSENT) {
+    /* Headset / Just-Works (no passkey): auto-confirm so pairing does not hang
+     * waiting for UI. PIN_TYPE_CONFIRM_PASSKEY (6-digit passkey confirmation)
+     * must go through SendPairConfirmed so the UI shows the 6-digit code and
+     * waits for user confirmation -- auto-confirming it hides the dialog. */
+    if (pinType == PIN_TYPE_NO_PASSKEY_CONSENT) {
         HILOGI("auto confirm SSP pinType=%{public}d", pinType);
         SetDevicePairingConfirmation(device, true);
         return;

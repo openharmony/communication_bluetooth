@@ -818,19 +818,21 @@ int32_t BluetoothHostStub::GetPairedDevicesInner(MessageParcel &data, MessagePar
 {
     std::vector<BluetoothRawAddress> pairDevice;
     int32_t result = GetPairedDevices(pairDevice);
-    bool ret = true;
-    if (!reply.WriteInt32(pairDevice.size())) {
-        HILOGE("pairDevice size writing failed.");
-        return BT_ERR_IPC_TRANS_FAILED;
-    } else {
-        for (auto device : pairDevice) {
-            reply.WriteParcelable(&device);
-        }
-    }
-    ret = reply.WriteInt32(result);
+    /* Write result (exception) first, then size and devices. Proxy reads the
+     * first int32 as the exception code (BT_ERR_INVALID_STATE etc.), so writing
+     * size first caused the proxy to misread the device count as an error
+     * (GetPairedDevices exception:1) and return an empty list. */
+    bool ret = reply.WriteInt32(result);
     if (!ret) {
         HILOGE("result writing failed.");
         return BT_ERR_IPC_TRANS_FAILED;
+    }
+    if (!reply.WriteInt32(pairDevice.size())) {
+        HILOGE("pairDevice size writing failed.");
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    for (auto device : pairDevice) {
+        reply.WriteParcelable(&device);
     }
     return BT_NO_ERROR;
 }
