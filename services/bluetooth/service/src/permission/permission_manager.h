@@ -49,12 +49,14 @@ do {                                                                            
         HILOGE("memberFunc is nullptr. code(%{public}d)", code);                    \
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);           \
     }                                                                               \
-    int errCode = PermissionManager::VerifyMultiPermissions(itFunc->second.second); \
-    if (errCode != BT_NO_ERROR) {                                                   \
-        HILOGE("[PERMISSION] failed. code(%{public}d), callingName(%{public}s)",    \
-            code, PermissionManager::GetCallingName().c_str());                     \
-        reply.WriteInt32(errCode);                                                  \
-        return BT_NO_ERROR;                                                         \
+    if (itFunc->second.second != nullptr) {                                         \
+        int errCode = PermissionManager::VerifyMultiPermissions(itFunc->second.second); \
+        if (errCode != BT_NO_ERROR) {                                               \
+            HILOGE("[PERMISSION] failed. code(%{public}d), callingName(%{public}s)", \
+                code, PermissionManager::GetCallingName().c_str());                 \
+            reply.WriteInt32(errCode);                                              \
+            return BT_NO_ERROR;                                                     \
+        }                                                                           \
     }                                                                               \
     return memberFunc(this, data, reply);                                           \
 } while (0)
