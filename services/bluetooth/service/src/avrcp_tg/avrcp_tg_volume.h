@@ -22,7 +22,6 @@
 
 #include <unordered_map>
 #include "bluetooth.h"
-#include "base/callback.h"
 #include "service_util.h"
 #include "log.h"
 #include "interface_adapter_classic.h"

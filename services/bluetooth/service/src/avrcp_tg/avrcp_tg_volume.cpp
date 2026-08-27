@@ -221,7 +221,7 @@ void AvrcpVolumeInterfaceImpl::SendVolumeChanged(const STACK::RawAddress &addr, 
         addr.ToStringForLogging().c_str());
     std::lock_guard<std::mutex> lock(volumeCallbackMapLock_);
     for (const auto &cb : volumeCallbackMap_) {
-        cb.second.Run(addr, avrcpVolume & 0x7F);
+        cb.second(addr, avrcpVolume & 0x7F);
     }
 }
 
@@ -267,7 +267,7 @@ void AvrcpVolumeInterfaceImpl::SwitchAbsVolumeDevice(const STACK::RawAddress &ad
     {
         std::lock_guard<std::mutex> lock(volumeCallbackMapLock_);
         for (const auto &cb : volumeCallbackMap_) {
-            cb.second.Run(addr, avrcpVolume & 0x7F);
+            cb.second(addr, avrcpVolume & 0x7F);
         }
     }
     ret = BluetoothAudioFrameworkAdapter::BtSetDeviceAbsVolumeSupported(macAddr, true, storedVolume);

@@ -114,7 +114,7 @@ void AvrcpTgAvsessionMediaLoader::GetPlayStatus(PlayStatusCallback cb)
         HILOGE("avrcpMediaInterfaceImpl is nullptr, reply PlayStatus error");
         PlayStatus status;
         status.state = ERROR;
-        cb.Run(status);
+        cb(status);
         return;
     }
     avrcpMediaInterfaceImpl->GetPlayStatus(cb);

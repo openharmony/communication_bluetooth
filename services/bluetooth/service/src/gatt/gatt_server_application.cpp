@@ -32,7 +32,6 @@
 #include "thread_util.h"
 #include "bluetooth_resource_manager.h"
 #include "bluetooth_state_manager.h"
-#include "base/bind.h"
 #include "control_intercept_plugin.h"
 #include "ipc_skeleton.h"
 
@@ -843,7 +842,7 @@ void GattServerApplication::ReadPhy(const RawAddress &addr)
  
     if (btIfGattServer_) {
         int ret = btIfGattServer_->read_phy(ServiceUtil::AddrToStack(addr),
-            base::Bind(&GattServerApplication::ReadPhyCallback, base::Unretained(this)));
+            [this](uint8_t txPhy, uint8_t rxPhy, uint8_t status) { ReadPhyCallback(txPhy, rxPhy, status); });
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnBlePhyRead, 0, 0, GattStatus::GATT_FAILURE);

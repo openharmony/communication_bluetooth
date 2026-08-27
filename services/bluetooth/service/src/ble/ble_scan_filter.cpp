@@ -21,9 +21,6 @@
 #include <future>
 #include <sstream>
 
-#include "base/bind.h"
-#include "base/bind_helpers.h"
-#include "base/callback.h"
 #include "bt_gatt.h"
 #include "btm_ble_api_types.h"
 #include "log.h"
@@ -67,9 +64,8 @@ bool BleScanFilter::SendScanFilterParam(uint8_t action, int filterIndex,
     auto promise = std::make_shared<std::promise<uint8_t>>();
     auto future = promise->get_future();
 
-    btifBleScanner_->ScanFilterParamSetup(scannerId_, action, filterIndex, std::move(filtParam), base::Bind(
-        [](std::weak_ptr<std::promise<uint8_t>> promiseWpr, uint8_t availableSpace, uint8_t actionType,
-            uint8_t btmStatus) {
+    btifBleScanner_->ScanFilterParamSetup(scannerId_, action, filterIndex, std::move(filtParam),
+        [promise](uint8_t availableSpace, uint8_t actionType, uint8_t btmStatus) {
             HITRACE_METER_NAME(BT_TRACE_TAG, "ScanFilterParamCb");
             if (btmStatus != BTM_SUCCESS) {
                 HILOGI("availableSpace: %{public}u, actionType: %{public}u, btmStatus: %{public}u",
@@ -79,12 +75,10 @@ bool BleScanFilter::SendScanFilterParam(uint8_t action, int filterIndex,
                 HILOGD("availableSpace: %{public}u, actionType: %{public}u, btmStatus: %{public}u",
                     availableSpace, actionType, btmStatus);
             }
-            auto promise(promiseWpr.lock()); // Check whether the object exists.
             if (promise) {
                 promise->set_value(btmStatus);
             }
-        },
-        promise));
+        });
 
     if (future.wait_for(std::chrono::milliseconds(WAIT_TIMEOUT)) != std::future_status::ready) {
         HILOGE("ScanFilterParamSetup timeout");
@@ -108,21 +102,18 @@ bool BleScanFilter::SendScanFilter(int filterIndex, std::vector<ApcfCommand> cmd
     auto promise = std::make_shared<std::promise<bool>>();
     auto future = promise->get_future();
 
-    btifBleScanner_->ScanFilterAdd(filterIndex, std::move(cmds), base::Bind(
-        [](std::weak_ptr<std::promise<bool>> promiseWpr, uint8_t filterType, uint8_t availableSpace, uint8_t action,
-            uint8_t btmStatus) {
+    btifBleScanner_->ScanFilterAdd(filterIndex, std::move(cmds),
+        [promise](uint8_t filterType, uint8_t availableSpace, uint8_t action, uint8_t btmStatus) {
             HILOGD("ScanFilterAdd: filterType: %{public}u, availableSpace: %{public}u, action: %{public}u,"
                 "btmStatus: %{public}u", filterType, availableSpace, action, btmStatus);
             if (btmStatus != BTM_SUCCESS) {
                 BtChrBtExcpEvent("", BTOPT_BLE_SCAN_FILTER_FAIL, btmStatus);
             }
-            auto promise(promiseWpr.lock()); // Check whether the object exists.
             if (promise) {
                 bool ok = (btmStatus == BTM_SUCCESS);
                 promise->set_value(ok);
             }
-        },
-        promise));
+        });
 
     if (future.wait_for(std::chrono::milliseconds(WAIT_TIMEOUT)) != std::future_status::ready) {
         HILOGE("ScanFilterAdd timeout");

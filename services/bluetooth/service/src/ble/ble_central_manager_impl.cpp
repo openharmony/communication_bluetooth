@@ -22,8 +22,6 @@
 #include <future>
 #include <sstream>
 
-#include "base/bind.h"
-#include "base/callback.h"
 #include "gatt/bluetooth_gatt_interface.h"
 #include "common/bluetooth_hw_interface.h"
 #include "common/bluetooth_channel_rssi_manager.h"
@@ -167,7 +165,7 @@ void BleCentralManagerImpl::SetScanParameters(uint16_t intervalMSecs, uint16_t w
     int window = windowMSecs / BLE_SCAN_UNIT_TIME;
     if (btifBleScanner_) {
         btifBleScanner_->SetScanParameters(interval, window, legacy, phy,
-            base::Bind(&BleCentralManagerImpl::SetScanParametersCallback, base::Unretained(this)));
+            [this](uint8_t status) { SetScanParametersCallback(status); });
     }
 }
 
@@ -201,7 +199,7 @@ void BleCentralManagerImpl::BatchscanConfigStorage(int clientIf, int batchScanFu
 {
     InitializeBatchScanOperation();
     btifBleScanner_->BatchscanConfigStorage(clientIf, batchScanFullMax, batchScanTruncMax, batchScanNotifyThreshold,
-        base::Bind(PromiseCallback, g_promise));
+        [](uint8_t btmStatus) { PromiseCallback(g_promise, btmStatus); });
     WaitForBatchScanOperationEnd();
 }
 
@@ -210,14 +208,15 @@ void BleCentralManagerImpl::BatchscanEnable(int scanMode, int scanInterval, int 
 {
     InitializeBatchScanOperation();
     btifBleScanner_->BatchscanEnable(scanMode, scanInterval, scanWindow, addrType, discardRule,
-        base::Bind(PromiseCallback, g_promise));
+        [](uint8_t btmStatus) { PromiseCallback(g_promise, btmStatus); });
     WaitForBatchScanOperationEnd();
 }
 
 void BleCentralManagerImpl::BatchscanDisable()
 {
     InitializeBatchScanOperation();
-    btifBleScanner_->BatchscanDisable(base::Bind(PromiseCallback, g_promise));
+    btifBleScanner_->BatchscanDisable(
+        [](uint8_t btmStatus) { PromiseCallback(g_promise, btmStatus); });
     WaitForBatchScanOperationEnd();
 }
 
@@ -552,15 +551,14 @@ int32_t BleCentralManagerImpl::ConfigScanFilter(int32_t scannerId, const BleScan
 
     // Enable scan filter if not
     if (!scanFilterEnabled_.load() && btifBleScanner_) {
-        btifBleScanner_->ScanFilterEnable(true, base::Bind(
-            [](BleCentralManagerImpl *self, uint8_t action, uint8_t btmStatus) {
+        btifBleScanner_->ScanFilterEnable(true,
+            [this](uint8_t action, uint8_t btmStatus) {
                 HILOGI("ScanFilterEnable: action: %{public}u, btmStatus: %{public}u", action, btmStatus);
-                self->scanFilterEnabled_ = true;
+                scanFilterEnabled_ = true;
                 if (btmStatus != BTM_SUCCESS) {
                     BtChrBtExcpEvent("", BTOPT_BLE_SCAN_FILTER_FAIL, btmStatus);
                 }
-            },
-            base::Unretained(this)));
+            });
     }
 
     return GATT_SUCCESS;

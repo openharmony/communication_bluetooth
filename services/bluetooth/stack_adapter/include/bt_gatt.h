@@ -23,12 +23,12 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <vector>
 
 #include "bt_types.h"
 #include "btm_ble_api_types.h"
 #include "gatt_api.h"
-#include "base/callback.h"
 
 #define BLE_GATT_MAX_ATTR_NUM 1000
 #define BLE_GATT_ATTR_HANDLE_START 0x0001
@@ -269,7 +269,7 @@ typedef struct {
     bt_status_t (*set_preferred_phy)(const RawAddress &bd_addr, uint8_t tx_phy, uint8_t rx_phy,
         uint16_t phy_options);
     bt_status_t (*read_phy)(const RawAddress &bd_addr,
-        base::Callback<void(uint8_t tx_phy, uint8_t rx_phy, uint8_t status)> cb);
+        std::function<void(uint8_t tx_phy, uint8_t rx_phy, uint8_t status)> cb);
 } btgatt_client_interface_t;
 
 /* Null-initialized instance: the service layer detects the empty table and
@@ -293,7 +293,7 @@ typedef struct {
     bt_status_t (*set_preferred_phy)(const RawAddress &bd_addr, uint8_t tx_phy, uint8_t rx_phy,
         uint16_t phy_options);
     bt_status_t (*read_phy)(const RawAddress &bd_addr,
-        base::Callback<void(uint8_t tx_phy, uint8_t rx_phy, uint8_t status)> cb);
+        std::function<void(uint8_t tx_phy, uint8_t rx_phy, uint8_t status)> cb);
 } btgatt_server_interface_t;
 
 /* Null-initialized instance; gatt_server_service.cpp checks register_server

@@ -40,7 +40,6 @@
 #include "watch_service.h"
 #endif
 #include "bluetooth_state_manager.h"
-#include "base/bind.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -814,7 +813,7 @@ void GattClientApplication::ReadPhy(void)
 {
     if (btIfGattClient_) {
         int ret = btIfGattClient_->read_phy(ServiceUtil::AddrToStack(addr_),
-                base::Bind(&GattClientApplication::ReadPhyCallback, base::Unretained(this)));
+                [this](uint8_t txPhy, uint8_t rxPhy, uint8_t status) { ReadPhyCallback(txPhy, rxPhy, status); });
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnBlePhyRead, 0, 0, GattStatus::GATT_FAILURE);

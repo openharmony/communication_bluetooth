@@ -18,7 +18,6 @@
 
 #include "bluetooth_audio_manager/bluetooth_audio_manager_interface.h"
 #include "bluetooth.h"
-#include "base/callback.h"
 #include "base_def.h"
 #include "service_util.h"
 #include "gavdp/a2dp_service.h"

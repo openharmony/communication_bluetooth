@@ -30,7 +30,6 @@
 #include "common_util.h"
 #include "avrc_defs.h"
 #include <unordered_map>
-#include <base/bind.h>
 #include "bluetooth.h"
 #include "hal_util.h"
 #include "btif_config.h"
@@ -419,7 +418,8 @@ void BluetoothAudioManager::UpdateDeviceWearStateIfSupport(const std::string &ad
         }
         bool isActiveDevWill = false;
         BluetoothAudioManagerInfo wdi;
-        AvrcpMediaInterfaceImpl::PlayStatusCallback cb = base::Bind(&BluetoothAudioManager::GetAudioManagerPlayState);
+        AvrcpMediaInterfaceImpl::PlayStatusCallback cb =
+            [](::bluetooth::avrcp::PlayStatus status) { BluetoothAudioManager::GetAudioManagerPlayState(status); };
         AvrcpServiceManager::GetInstance().GetAvrcpMediaLoader()->GetPlayStatus(cb);
         ChangeActiveDeviceIfNeeded(addr, isLeftIn, isRightIn, isActiveDevWill);
         ChangePlayStateIfNeeded(addr, wdi.GetWearAction(recordbak, isLeftIn, isRightIn), recordbak,

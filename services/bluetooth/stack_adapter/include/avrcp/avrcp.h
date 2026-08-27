@@ -23,6 +23,7 @@
 #define AVRCP_AVRCP_H
 
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <set>
 #include <string>
@@ -30,7 +31,6 @@
 #include <vector>
 
 #include "bt_types.h"
-#include "base/callback.h"
 
 /*
  * Forward declarations of service layer types referenced by the media
@@ -134,21 +134,21 @@ public:
     virtual void SendAddressedPlayerUpdate() {}
 };
 
-using SongInfoCallback = base::Callback<void(SongInfo)>;
-using PlayStatusCallback = base::Callback<void(PlayStatus)>;
-using NowPlayingCallback = base::Callback<void(std::string, std::vector<SongInfo>)>;
-using MediaListCallback = base::Callback<void(uint16_t, std::vector<MediaPlayerInfo>)>;
-using FolderItemsCallback = base::Callback<void(std::vector<ListItem>)>;
-using SetBrowsedPlayerCallback = base::Callback<void(bool, std::string, uint16_t)>;
-using AppSettingsCallback = base::Callback<void(uint8_t, uint8_t)>;
-using VolumeChangedCb = base::Callback<void(const RawAddress &, int32_t)>;
+using SongInfoCallback = std::function<void(SongInfo)>;
+using PlayStatusCallback = std::function<void(PlayStatus)>;
+using NowPlayingCallback = std::function<void(std::string, std::vector<SongInfo>)>;
+using MediaListCallback = std::function<void(uint16_t, std::vector<MediaPlayerInfo>)>;
+using FolderItemsCallback = std::function<void(std::vector<ListItem>)>;
+using SetBrowsedPlayerCallback = std::function<void(bool, std::string, uint16_t)>;
+using AppSettingsCallback = std::function<void(uint8_t, uint8_t)>;
+using VolumeChangedCb = std::function<void(const RawAddress &, int32_t)>;
 
 class MediaInterface {
 public:
     virtual ~MediaInterface() = default;
     /* Nested alias so the service layer can spell
      * AvrcpMediaInterfaceImpl::PlayStatusCallback. */
-    using PlayStatusCallback = base::Callback<void(PlayStatus)>;
+    using PlayStatusCallback = std::function<void(PlayStatus)>;
     virtual void SendKeyEvent(uint8_t key, KeyState state) {}
     virtual void GetSongInfo(SongInfoCallback cb) {}
     virtual void GetPlayStatus(PlayStatusCallback cb) {}

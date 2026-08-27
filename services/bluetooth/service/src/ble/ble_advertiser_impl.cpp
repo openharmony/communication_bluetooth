@@ -24,8 +24,6 @@
 #include <sstream>
 #include <vector>
 
-#include "base/bind.h"
-#include "base/callback.h"
 #include "ble_adapter.h"
 #include "ble_defs.h"
 #include "btif_gatt.h"
@@ -64,10 +62,9 @@ uint8_t BleAdvertiserImpl::CreateAdvertiserSetHandle(int &advStatus)
         auto promise = std::make_shared<std::promise<AdvInfo>>();
         std::future<AdvInfo> future = promise->get_future();
         std::weak_ptr<std::promise<AdvInfo>> promiseWptr(promise);
-        btifBleAdvertiser_->RegisterAdvertiser(base::Bind(
+        btifBleAdvertiser_->RegisterAdvertiser(
             // callback in other thread
-            [](std::weak_ptr<std::promise<AdvInfo>> promiseWptr, BleAdvertiserInterface* btifBleAdvertiser,
-                    uint8_t advertiserId, uint8_t status) {
+            [promiseWptr, btifBleAdvertiser = btifBleAdvertiser_](uint8_t advertiserId, uint8_t status) {
                 // status code see: bluedroid/system/stack/include/ble_advertiser.h - BTM_BLE_MULTI_ADV_SUCCESS
                 HILOGI("advHandle: %{public}u, status: %{public}u", advertiserId, status);
                 AdvInfo res;
@@ -80,8 +77,7 @@ uint8_t BleAdvertiserImpl::CreateAdvertiserSetHandle(int &advStatus)
                     HILOGE("advHandle timeout: %{public}u", advertiserId);
                     btifBleAdvertiser->Unregister(advertiserId);
                 }
-            },
-            promiseWptr, btifBleAdvertiser_));
+            });
 
         // wait for callback
         using namespace std::chrono_literals;
@@ -347,10 +343,10 @@ void BleAdvertiserImpl::StartAdvertising(const BleAdvertiserSettingsImpl &settin
     if (btifBleAdvertiser_) {
         btifBleAdvertiser_->StartAdvertising(
             advHandle,
-            base::Bind(&BleAdvertiserImpl::OnAdvStartedEventFromStack, base::Unretained(this), advHandle),
+            [this, advHandle](uint8_t status) { OnAdvStartedEventFromStack(advHandle, status); },
             std::move(params), std::move(advertiseData), std::move(scanResponseData),
             duration,
-            base::Bind(&BleAdvertiserImpl::OnAdvDisabledEventFromStack, base::Unretained(this), advHandle));
+            [this, advHandle](uint8_t status) { OnAdvDisabledEventFromStack(advHandle, status); });
     }
 }
 
@@ -373,9 +369,9 @@ void BleAdvertiserImpl::EnableAdvertising(uint8_t advHandle, uint16_t duration)
 
     if (btifBleAdvertiser_) {
         btifBleAdvertiser_->Enable(advHandle, true,
-            base::Bind(&BleAdvertiserImpl::OnAdvEnabledEventFromStack, base::Unretained(this), advHandle),
+            [this, advHandle](uint8_t status) { OnAdvEnabledEventFromStack(advHandle, status); },
             duration, 0,
-            base::Bind(&BleAdvertiserImpl::OnAdvDisabledEventFromStack, base::Unretained(this), advHandle));
+            [this, advHandle](uint8_t status) { OnAdvDisabledEventFromStack(advHandle, status); });
     }
 }
 
@@ -398,9 +394,9 @@ void BleAdvertiserImpl::DisableAdvertising(uint8_t advHandle)
 
     if (btifBleAdvertiser_) {
         btifBleAdvertiser_->Enable(advHandle, false,
-            base::Bind(&BleAdvertiserImpl::OnAdvDisabledEventFromStack, base::Unretained(this), advHandle),
+            [this, advHandle](uint8_t status) { OnAdvDisabledEventFromStack(advHandle, status); },
             0, 0,
-            base::Bind([](uint8_t status) {}));
+            [](uint8_t status) {});
     }
 }
 
@@ -469,12 +465,10 @@ void BleAdvertiserImpl::OnSetAdvertisingDataEvent(uint8_t advHandle, SetAdvDataS
     }
 
     if (state == SetAdvDataState::SCAN_RSP && btifBleAdvertiser_) {
-        btifBleAdvertiser_->SetData(advHandle, true, std::move(rspData), base::Bind(
-            &BleAdvertiserImpl::OnSetAdvertisingDataEvent,
-            base::Unretained(this),
-            advHandle,
-            SetAdvDataState::COMPLETE,
-            std::vector<uint8_t>{}));
+        btifBleAdvertiser_->SetData(advHandle, true, std::move(rspData),
+            [this, advHandle](uint8_t status) {
+                OnSetAdvertisingDataEvent(advHandle, SetAdvDataState::COMPLETE, {}, status);
+            });
     }
 
     if (state == SetAdvDataState::COMPLETE) {
@@ -512,12 +506,10 @@ void BleAdvertiserImpl::SetAdvertisingData(const BleAdvertiserDataImpl &advData,
     auto [advertiseData, scanResponseData] = ConvertAndLogData(advData, scanResponse);
 
     if (btifBleAdvertiser_) {
-        btifBleAdvertiser_->SetData(advHandle, false, std::move(advertiseData), base::Bind(
-            &BleAdvertiserImpl::OnSetAdvertisingDataEvent,
-            base::Unretained(this),
-            advHandle,
-            SetAdvDataState::SCAN_RSP,
-            std::move(scanResponseData)));
+        btifBleAdvertiser_->SetData(advHandle, false, std::move(advertiseData),
+            [this, advHandle, scanResponseData = std::move(scanResponseData)](uint8_t status) {
+                OnSetAdvertisingDataEvent(advHandle, SetAdvDataState::SCAN_RSP, scanResponseData, status);
+            });
     }
 }
 
@@ -550,8 +542,8 @@ void BleAdvertiserImpl::SetAdvOrRspData(const BleAdvertiserDataImpl &data,
     }
     if (btifBleAdvertiser_) {
         HILOGI("advHandle: %{public}d, type: %{public}d.", advHandle, type);
-        btifBleAdvertiser_->SetData(advHandle, !isAdv, std::move(sendData), base::Bind(
-            &BleAdvertiserImpl::OnSetAdvDataEventByType, base::Unretained(this), advHandle, type));
+        btifBleAdvertiser_->SetData(advHandle, !isAdv, std::move(sendData),
+            [this, advHandle, type](uint8_t status) { OnSetAdvDataEventByType(advHandle, type, status); });
     }
 }
 
@@ -594,7 +586,9 @@ void BleAdvertiserImpl::ChangeAdvertisingParams(uint8_t advHandle, const BleAdve
     ParseSettings(settings, false, &params);
     if (btifBleAdvertiser_ != nullptr) {
         btifBleAdvertiser_->SetParameters(advHandle, std::move(params),
-            base::Bind(&BleAdvertiserImpl::OnAdvChangeParamsEventFromStack, base::Unretained(this), advHandle));
+            [this, advHandle](uint8_t status, int8_t txPower) {
+                OnAdvChangeParamsEventFromStack(advHandle, status, txPower);
+            });
     } else {
         OnAdvChangeParamsEventFromStack(advHandle, ADVERTISE_FAILED_INTERNAL_ERROR, 0);
     }

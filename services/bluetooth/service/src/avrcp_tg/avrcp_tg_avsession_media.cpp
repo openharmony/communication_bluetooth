@@ -357,11 +357,11 @@ void AvrcpMediaInterfaceImpl::impl::OnPlaybackStateChange(const AVSession::AVPla
             serviceCallback_->SendMediaUpdate(trackChanged, playStateChanged, false);
         }
     }
-    if (loopModeChanged && !appSettingsCallback_.is_null()) {
+    if (loopModeChanged && appSettingsCallback_) {
         uint8_t shuffleMode;
         uint8_t repeatMode;
         ConvertAvSessionLoopModeToStack(state, shuffleMode, repeatMode);
-        appSettingsCallback_.Run(shuffleMode, repeatMode);
+        appSettingsCallback_(shuffleMode, repeatMode);
     }
     if (audioManager_ && state.GetState() == OHOS::AVSession::AVPlaybackState::PLAYBACK_STATE_PLAY) {
         audioManager_->DealWithNewPlayingStatus();
@@ -379,7 +379,7 @@ void AvrcpMediaInterfaceImpl::impl::GetSongInfo(SongInfoCallback cb)
     if (!GetCurrSongInfo(song)) {
         HILOGE("GetCurrSongInfo failed");
     }
-    cb.Run(song);
+    cb(song);
 }
 static bool IsNeedChangePlayState(int32_t avState, int a2dpPlayState, bool isInBlackList)
 {
@@ -409,12 +409,12 @@ void AvrcpMediaInterfaceImpl::impl::GetPlayStatus(PlayStatusCallback cb)
     }
     if (!valid) {
         HILOGI_TIME_LIMIT(__func__, "GetPlayStatus: avsession not ok");
-        cb.Run(status);
+        cb(status);
         return;
     }
     if (a2dpService_ == nullptr) {
         HILOGE("a2dpService_ is nullptr");
-        cb.Run(status);
+        cb(status);
         return;
     }
     bool isInBlackList = a2dpService_->IsActiveDeviceInPlayToPauseBlackList();
@@ -429,7 +429,7 @@ void AvrcpMediaInterfaceImpl::impl::GetPlayStatus(PlayStatusCallback cb)
     HILOGD("avsession state %{public}d. convert state %{public}d.", avState, status.state);
     status.duration = data.GetDuration();
     status.position = static_cast<uint32_t>(position);
-    cb.Run(status);
+    cb(status);
 }
 void AvrcpMediaInterfaceImpl::impl::GetNowPlayingList(NowPlayingCallback cb)
 {
@@ -442,7 +442,7 @@ void AvrcpMediaInterfaceImpl::impl::GetNowPlayingList(NowPlayingCallback cb)
     mediaId = song.media_id;
     songs.emplace_back(song);
 
-    cb.Run(mediaId, std::move(songs));
+    cb(mediaId, std::move(songs));
 }
 void AvrcpMediaInterfaceImpl::impl::GetMediaPlayerList(MediaListCallback cb)
 {
@@ -453,18 +453,18 @@ void AvrcpMediaInterfaceImpl::impl::GetMediaPlayerList(MediaListCallback cb)
     player.browsing_supported = false;
     players.emplace_back(player);
     HILOGI("players size: %{public}d.", players.size());
-    cb.Run(0, std::move(players));
+    cb(0, std::move(players));
 }
 void AvrcpMediaInterfaceImpl::impl::GetFolderItems(uint16_t playerId, std::string mediaId, FolderItemsCallback folderCb)
 {
     HILOGI("playerId: %{public}d. mediaId: %{public}s.", playerId, mediaId.c_str());
     std::vector<ListItem> listItems;
-    folderCb.Run(std::move(listItems));
+    folderCb(std::move(listItems));
 }
 void AvrcpMediaInterfaceImpl::impl::SetBrowsedPlayer(uint16_t playerId, SetBrowsedPlayerCallback browseCb)
 {
     HILOGI("playerId: %{public}u.", playerId);
-    browseCb.Run(true, "", 0);
+    browseCb(true, "", 0);
 }
 void AvrcpMediaInterfaceImpl::impl::RegisterUpdateCallback(MediaCallbacks *callback)
 {
@@ -845,7 +845,7 @@ PlayState AvrcpMediaInterfaceImpl::impl::ConvertAvSessionStateToStack(int32_t st
 void AvrcpMediaInterfaceImpl::impl::QueryAppSettingsMode()
 {
     HITRACE_METER(BT_TRACE_TAG);
-    if (appSettingsCallback_.is_null()) {
+    if (!appSettingsCallback_) {
         HILOGE("appSettingsCallback in null");
         return;
     }
@@ -867,11 +867,11 @@ void AvrcpMediaInterfaceImpl::impl::QueryAppSettingsMode()
         }
     }
     if (!vaild) {
-        appSettingsCallback_.Run(shuffleMode, repeatMode);
+        appSettingsCallback_(shuffleMode, repeatMode);
         return;
     }
     ConvertAvSessionLoopModeToStack(state, shuffleMode, repeatMode);
-    appSettingsCallback_.Run(shuffleMode, repeatMode);
+    appSettingsCallback_(shuffleMode, repeatMode);
 }
 
 void AvrcpMediaInterfaceImpl::impl::ConvertAvSessionLoopModeToStack(AVSession::AVPlaybackState &state,
