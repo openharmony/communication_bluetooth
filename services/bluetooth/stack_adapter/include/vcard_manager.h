@@ -15,18 +15,40 @@
 
 /*
  * Stub of the removed stack layer vCard manager (vcard_manager.h).
+ * The service layer references it through the Telephony namespace.
  */
 
 #ifndef VCARD_MANAGER_H
 #define VCARD_MANAGER_H
 
+#include <memory>
 #include <string>
 
-namespace OHOS {
-namespace bluetooth {
+#include "datashare_helper.h"
+#include "datashare_predicates.h"
+
+namespace Telephony {
 class VCardManager {
 public:
+    static VCardManager &GetInstance()
+    {
+        static VCardManager instance;
+        return instance;
+    }
+
     virtual ~VCardManager() = default;
+
+    void SetDataHelper(std::shared_ptr<OHOS::DataShare::DataShareHelper> dataHelper)
+    {
+        (void)dataHelper;
+    }
+
+    void ExportToStr(std::string &vcard, OHOS::DataShare::DataSharePredicates &predicates, int32_t vcardType)
+    {
+        (void)vcard;
+        (void)predicates;
+        (void)vcardType;
+    }
 
     virtual int GetVCardCount() const
     {
@@ -39,7 +61,6 @@ public:
         return "";
     }
 };
-}  // namespace bluetooth
-}  // namespace OHOS
+}  // namespace Telephony
 
 #endif  // VCARD_MANAGER_H

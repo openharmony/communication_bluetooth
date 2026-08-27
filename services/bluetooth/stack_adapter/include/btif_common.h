@@ -27,8 +27,9 @@ typedef enum {
     BTIF_CTRL_STATE_OFF,
 } btif_ctrl_state_t;
 
-inline int btif_get_address_type(const RawAddress *bd_addr, int *addr_type)
+inline int btif_get_address_type(const RawAddress &bd_addr, uint8_t *addr_type)
 {
+    (void)bd_addr;
     if (addr_type != nullptr) {
         *addr_type = BLE_ADDR_PUBLIC;
     }

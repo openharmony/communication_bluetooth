@@ -15,12 +15,13 @@
 
 /*
  * Stub of the removed stack layer raw address helper
- * (common/raw_address.h).
+ * (common/raw_address.h). Forward to the service layer RawAddress so all
+ * translation units resolve the same OHOS::bluetooth::RawAddress type.
  */
 
 #ifndef COMMON_RAW_ADDRESS_H
 #define COMMON_RAW_ADDRESS_H
 
-#include "bt_types.h"
+#include "raw_address.h"
 
 #endif  // COMMON_RAW_ADDRESS_H

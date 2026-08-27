@@ -45,6 +45,7 @@
 #include "bluetooth_headset_callbacks.h"
 #include "bluetooth_headset_interface.h"
 #include "bluetooth_phone_state.h"
+#include "bt_config.h"
 #include "bt_hf.h"
 #include "context.h"
 #include "hfp_ag_defines.h"

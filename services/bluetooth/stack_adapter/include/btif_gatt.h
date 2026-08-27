@@ -25,6 +25,7 @@
 
 #include "bt_types.h"
 #include "bt_gatt.h"
+#include "btif_common.h"
 
 class BleScannerInterface {
 public:
@@ -66,6 +67,29 @@ public:
     {
     }
 };
+
+/* Advertising parameters consumed by the ble advertiser service; the layout
+ * mirrors the removed stack layer HAL (hardware/ble_advertiser.h) with the
+ * own-address fields the service layer fills in. */
+struct AdvertiseParameters {
+    uint16_t advertising_event_properties = 0;
+    uint32_t min_interval = 0;
+    uint32_t max_interval = 0;
+    uint8_t channel_map = 0;
+    int8_t tx_power = 0;
+    uint8_t primary_advertising_phy = 0;
+    uint8_t secondary_advertising_phy = 0;
+    uint8_t scan_request_notification_enable = 0;
+    uint8_t own_addr[6] = { 0 };
+    uint8_t own_addr_type = 0;
+};
+
+/* Timeout (seconds) of the create-advertising future used by the service.
+ * Guarded to stay consistent with config/bt_config.h, which may be included
+ * first by the same translation unit. */
+#ifndef BLUETOOTH_BLE_CREATE_ADV_TIMEOUT
+#define BLUETOOTH_BLE_CREATE_ADV_TIMEOUT 2 // 2s
+#endif  // BLUETOOTH_BLE_CREATE_ADV_TIMEOUT
 
 class BleAdvertiserInterface {
 public:

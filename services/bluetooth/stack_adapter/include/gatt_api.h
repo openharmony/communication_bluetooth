@@ -22,48 +22,88 @@
 #define GATT_API_H
 
 #include <cstdint>
+#include <set>
 
 #include "bt_types.h"
+#include "bt_gatt.h"
 
 typedef uint16_t tGATT_STATUS;
 
-/* constexpr instead of a macro: the service layer declares an enumerator
- * named GATT_SUCCESS (bluetooth_def.h) and a macro would clobber it. */
-static constexpr tGATT_STATUS GATT_SUCCESS = 0x0000;
-#define GATT_INVALID_HANDLE 0x0001
-#define GATT_READ_NOT_PERMIT 0x0002
-#define GATT_WRITE_NOT_PERMIT 0x0003
-#define GATT_INVALID_PDU 0x0004
-#define GATT_INSUF_AUTHENTICATION 0x0005
-#define GATT_REQ_NOT_SUPPORTED 0x0006
-#define GATT_INVALID_OFFSET 0x0007
-#define GATT_INSUF_AUTHORIZATION 0x0008
-#define GATT_PREPARE_Q_FULL 0x0009
-#define GATT_NOT_FOUND 0x000a
-#define GATT_NOT_LONG 0x000b
-#define GATT_INSUF_KEY_SIZE 0x000c
-#define GATT_INVALID_ATTR_LEN 0x000d
-#define GATT_ERR_UNLIKELY 0x000e
-#define GATT_INSUF_ENCRYPTION 0x000f
-#define GATT_UNSUPPORT_GRP_TYPE 0x0010
-#define GATT_INSUF_RESOURCE 0x0011
-#define GATT_ILLEGAL_PARAMETER 0x0087
-#define GATT_NO_RESOURCES 0x0088
-#define GATT_INTERNAL_ERROR 0x0089
-#define GATT_WRONG_STATE 0x008a
-#define GATT_DB_FULL 0x008b
-#define GATT_BUSY 0x008c
-#define GATT_ERROR 0x008d
-#define GATT_CMD_STARTED 0x008e
-#define GATT_ILLEGAL_PARAMETER_2 0x008f
-#define GATT_PENDING 0x0090
-#define GATT_AUTH_FAIL 0x0091
-#define GATT_MORE 0x0092
-#define GATT_INVALID_CFG 0x0093
-#define GATT_SERVICE_STARTED 0x0094
-#define GATT_ENCRYPED_NO_MITM 0x0095
-#define GATT_NOT_ENCRYPTED 0x0096
-#define GATT_CONGESTED 0x0097
+/* GATT status codes of the removed stack layer (tGATT_STATUS in bluedroid
+ * stack/include/gatt_api.h). A plain enum instead of macros: the service
+ * layer references these through the BLUEDROID:: alias, and a #define would
+ * expand BLUEDROID::GATT_XXX into an illegal "::0x0006" token. */
+enum {
+    GATT_SUCCESS = 0x0000,
+    GATT_INVALID_HANDLE = 0x0001,
+    GATT_READ_NOT_PERMIT = 0x0002,
+    GATT_WRITE_NOT_PERMIT = 0x0003,
+    GATT_INVALID_PDU = 0x0004,
+    GATT_INSUF_AUTHENTICATION = 0x0005,
+    GATT_REQ_NOT_SUPPORTED = 0x0006,
+    GATT_INVALID_OFFSET = 0x0007,
+    GATT_INSUF_AUTHORIZATION = 0x0008,
+    GATT_PREPARE_Q_FULL = 0x0009,
+    GATT_NOT_FOUND = 0x000a,
+    GATT_NOT_LONG = 0x000b,
+    GATT_INSUF_KEY_SIZE = 0x000c,
+    GATT_INVALID_ATTR_LEN = 0x000d,
+    GATT_ERR_UNLIKELY = 0x000e,
+    GATT_INSUF_ENCRYPTION = 0x000f,
+    GATT_UNSUPPORT_GRP_TYPE = 0x0010,
+    GATT_INSUF_RESOURCE = 0x0011,
+    GATT_DATABASE_OUT_OF_SYNC = 0x0012,
+    GATT_VALUE_NOT_ALLOWED = 0x0013,
+    GATT_NO_RESOURCES = 0x0080,
+    GATT_INTERNAL_ERROR = 0x0081,
+    GATT_WRONG_STATE = 0x0082,
+    GATT_DB_FULL = 0x0083,
+    GATT_BUSY = 0x0084,
+    GATT_ERROR = 0x0085,
+    GATT_CMD_STARTED = 0x0086,
+    GATT_ILLEGAL_PARAMETER = 0x0087,
+    GATT_PENDING = 0x0088,
+    GATT_AUTH_FAIL = 0x0089,
+    GATT_INVALID_CFG = 0x008b,
+    GATT_SERVICE_STARTED = 0x008c,
+    GATT_ENCRYPED_NO_MITM = 0x008d,
+    GATT_NOT_ENCRYPTED = 0x008e,
+    GATT_CONGESTED = 0x008f,
+    GATT_DUP_REG = 0x0090,
+    GATT_ALREADY_OPEN = 0x0091,
+    GATT_CANCEL = 0x0092,
+    /* Service-layer extensions of the status table (gatt_service_base.cpp),
+     * not part of the bluedroid tGATT_STATUS set. */
+    GATT_MORE = 0x0098,
+    GATT_TOO_SHORT = 0x00a0,
+    GATT_CCC_CFG_ERR = 0x00fd,
+    GATT_PRC_IN_PROGRESS = 0x00fe,
+    GATT_OUT_OF_RANGE = 0x00ff,
+};
+
+/* Invalid connection id, see gatt_client_application.h. */
+#define GATT_INVALID_CONN_ID 0xFFFF
+
+/* Authentication requirements of a remote operation, tGATT_AUTH_REQ in
+ * bluedroid stack/include/gatt_api.h. */
+enum {
+    GATT_AUTH_REQ_NONE = 0,
+    GATT_AUTH_REQ_NO_MITM = 1,
+    GATT_AUTH_REQ_MITM = 2,
+    GATT_AUTH_REQ_SIGNED_NO_MITM = 3,
+    GATT_AUTH_REQ_SIGNED_MITM = 4,
+};
+
+/* Write operation type, tGATT_WRITE_TYPE in bluedroid. */
+typedef enum {
+    GATT_WRITE_NO_RSP = 1,
+    GATT_WRITE = 2,
+    GATT_WRITE_PREPARE = 3,
+} tGATT_WRITE_TYPE;
+
+/* GATT server role of a remote device; MASTER/SLAVE/INVALID live in
+ * frameworks bt_def.h. */
+constexpr uint8_t GATT_ROLE_SECONDARY = 0x02;
 
 /* Client characteristic configuration descriptor value bits */
 #define GATT_CH_CLIENT_CONFIG_NONE 0x0000
@@ -82,13 +122,18 @@ typedef enum {
     GATTS_CHAR_DESCR_ATTR,
 } tGATT_ATTR_TYPE;
 
-typedef enum {
-    GATT_CLOSE_GRP_ATTR = 0,
-    GATT_REMOVE_ATTR,
-    GATT_CHAR_ATTR_READ,
-    GATT_CHAR_ATTR_WRITE,
-    GATT_CHAR_ATTR_UPDATE,
-    GATT_DELETE_ATTR,
+/* Connection termination reason reported by the disconnect callback
+ * (bluedroid stack/include/gatt_api.h); HCI error code values. */
+typedef enum : uint16_t {
+    GATT_CONN_OK = 0,
+    GATT_CONN_L2C_FAILURE = 1,        /* general L2cap failure */
+    GATT_CONN_TIMEOUT = 0x08,         /* connection timeout */
+    GATT_CONN_TERMINATE_PEER_USER = 0x13,      /* terminated by peer user */
+    GATT_CONN_TERMINATE_LOCAL_HOST = 0x16,     /* terminated by local host */
+    GATT_CONN_LMP_TIMEOUT = 0x22,     /* LMP response timeout */
+    GATT_CONN_FAILED_ESTABLISHMENT = 0x3e,     /* connection failed to establish */
+    GATT_CONN_TERMINATED_POWER_OFF = 0x05,     /* remote power off */
+    BTA_GATT_CONN_NONE = 0x0101,      /* no connection to cancel */
 } tGATT_DISCONN_REASON;
 
 typedef enum {

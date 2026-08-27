@@ -15,11 +15,15 @@
 
 /*
  * Stub of the removed stack layer raw address header (types/raw_address.h).
+ * The global ::RawAddress (BLUEDROID::RawAddress) comes from bt_types.h;
+ * the OHOS::bluetooth::RawAddress from frameworks/inner/ipc/common/
+ * raw_address.h is kept visible as well.
  */
 
 #ifndef TYPES_RAW_ADDRESS_H
 #define TYPES_RAW_ADDRESS_H
 
 #include "bt_types.h"
+#include "raw_address.h"
 
 #endif  // TYPES_RAW_ADDRESS_H

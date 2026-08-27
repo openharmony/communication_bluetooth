@@ -26,4 +26,27 @@
 #define BT_SOCK_MAX_CLIENTS 16
 #define BT_SOCK_INVALID_FD (-1)
 
+/* Socket option flags of the removed stack layer (bluedroid
+ * system/include/hardware/bt_sock.h). */
+#define BTSOCK_FLAG_ENCRYPT 1
+#define BTSOCK_FLAG_AUTH (1 << 1)
+#define BTSOCK_FLAG_NO_SDP (1 << 2)
+#define BTSOCK_FLAG_AUTH_MITM (1 << 3)
+#define BTSOCK_FLAG_AUTH_16_DIGIT (1 << 4)
+#define BTSOCK_FLAG_LE_COC (1 << 5)
+
+/* Connect signal exchanged over the accept fd (bluedroid
+ * system/include/hardware/bt_sock.h). */
+typedef struct {
+    int16_t size;
+    RawAddress bd_addr;
+    int channel;
+    int status;
+    uint16_t max_tx_packet_size;
+    uint16_t max_rx_packet_size;
+    uint64_t conn_uuid_lsb;
+    uint64_t conn_uuid_msb;
+    uint64_t socket_id;
+} __attribute__((packed)) sock_connect_signal_t;
+
 #endif  // BT_SOCK_H

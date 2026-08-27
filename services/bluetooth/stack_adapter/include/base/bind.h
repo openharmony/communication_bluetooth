@@ -119,20 +119,14 @@ struct MemberBinder<R (C::*)(MArgs...)> {
         return Callback<R(std::tuple_element_t<sizeof...(BArgs) - 1 + I, std::tuple<MArgs...>>...)>(
             [f, bound = std::move(bound)](
                 std::tuple_element_t<sizeof...(BArgs) - 1 + I, std::tuple<MArgs...>>... args) mutable -> R {
-                if constexpr (sizeof...(BArgs) == 1) {
-                    return std::apply(
-                        [f, &args...](auto &&obj) -> R {
-                            return (obj->*f)(args...);
-                        },
-                        bound);
-                } else {
-                    return std::apply(
-                        [f, &args...](auto &&...bargs) -> R {
-                            auto b = std::forward_as_tuple(bargs...);
-                            return (std::get<0>(b)->*f)(std::get<I + 1>(b)..., args...);
-                        },
-                        bound);
-                }
+                /* Unpack the bound tuple as (object, leading args) and append
+                 * the callback args; keeps the index space of I confined to
+                 * the callback signature. */
+                return std::apply(
+                    [f, &args...](auto &&obj, auto &&...bargs) -> R {
+                        return (obj->*f)(bargs..., args...);
+                    },
+                    bound);
             });
     }
 };
@@ -146,20 +140,11 @@ struct MemberBinder<R (C::*)(MArgs...) const> {
         return Callback<R(std::tuple_element_t<sizeof...(BArgs) - 1 + I, std::tuple<MArgs...>>...)>(
             [f, bound = std::move(bound)](
                 std::tuple_element_t<sizeof...(BArgs) - 1 + I, std::tuple<MArgs...>>... args) mutable -> R {
-                if constexpr (sizeof...(BArgs) == 1) {
-                    return std::apply(
-                        [f, &args...](auto &&obj) -> R {
-                            return (obj->*f)(args...);
-                        },
-                        bound);
-                } else {
-                    return std::apply(
-                        [f, &args...](auto &&...bargs) -> R {
-                            auto b = std::forward_as_tuple(bargs...);
-                            return (std::get<0>(b)->*f)(std::get<I + 1>(b)..., args...);
-                        },
-                        bound);
-                }
+                return std::apply(
+                    [f, &args...](auto &&obj, auto &&...bargs) -> R {
+                        return (obj->*f)(bargs..., args...);
+                    },
+                    bound);
             });
     }
 };

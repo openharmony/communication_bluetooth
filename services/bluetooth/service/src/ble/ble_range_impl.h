@@ -25,6 +25,7 @@
 #include "cJSON.h"
 #include "bt_types.h"
 #include "bt_def.h"
+#include "bluetooth.h"
 #include "satellite_manager.h"
 
 namespace OHOS {
@@ -56,7 +57,7 @@ public:
         uint8_t macID;
         uint8_t antID;
     };
-    
+
     AntSwitchInfo GetRangingAntSwitchInfo() const;
 
 private:

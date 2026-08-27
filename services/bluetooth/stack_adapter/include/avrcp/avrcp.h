@@ -32,6 +32,21 @@
 #include "bt_types.h"
 #include "base/callback.h"
 
+/*
+ * Forward declarations of service layer types referenced by the media
+ * interface below; they live in the global OHOS namespace. They must be
+ * declared here (outside bluetooth::avrcp) so that unqualified OHOS::
+ * references inside bluetooth::avrcp resolve to the global namespace
+ * instead of an ambiguous nested one.
+ */
+namespace OHOS {
+namespace bluetooth {
+class IProfileA2dp;
+class IProfileAudioManager;
+struct ObexSocketDevice;
+}  // namespace bluetooth
+}  // namespace OHOS
+
 namespace bluetooth {
 namespace avrcp {
 
@@ -128,23 +143,12 @@ using SetBrowsedPlayerCallback = base::Callback<void(bool, std::string, uint16_t
 using AppSettingsCallback = base::Callback<void(uint8_t, uint8_t)>;
 using VolumeChangedCb = base::Callback<void(const RawAddress &, int32_t)>;
 
-/*
- * Forward declarations of OHOS service types referenced by the media
- * interface below; they are defined by the service layer headers.
- */
-namespace OHOS {
-namespace bluetooth {
-class IProfileA2dp;
-class IProfileAudioManager;
-class ObexSocketDevice;
-}  // namespace bluetooth
-}  // namespace OHOS
-
 class MediaInterface {
 public:
     virtual ~MediaInterface() = default;
-    virtual void Init() {}
-    virtual void Cleanup() {}
+    /* Nested alias so the service layer can spell
+     * AvrcpMediaInterfaceImpl::PlayStatusCallback. */
+    using PlayStatusCallback = base::Callback<void(PlayStatus)>;
     virtual void SendKeyEvent(uint8_t key, KeyState state) {}
     virtual void GetSongInfo(SongInfoCallback cb) {}
     virtual void GetPlayStatus(PlayStatusCallback cb) {}

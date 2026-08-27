@@ -48,4 +48,21 @@ typedef enum {
     BLE_HCI_LE_ADV_NONCONN_IND = 0x03,
 } tBLE_ADV_TYPE;
 
+/* BTM command success status; the service layer compares the uint8_t status
+ * reported by the scan-filter callbacks against it. */
+#define BTM_SUCCESS 0
+
+/* Scan filter content types of the removed stack layer (btm_ble_api_types.h),
+ * used as the ApcfCommand.type values of the scan filter. */
+#define BTM_BLE_PF_ADDR_FILTER 0
+#define BTM_BLE_PF_SRVC_DATA 1
+#define BTM_BLE_PF_SRVC_UUID 2
+#define BTM_BLE_PF_SRVC_SOL_UUID 3
+#define BTM_BLE_PF_LOCAL_NAME 4
+#define BTM_BLE_PF_MANU_DATA 5
+#define BTM_BLE_PF_SRVC_DATA_PATTERN 6
+
+/* HCI error code returned for a repeated (duplicate) scan filter entry. */
+#define HCI_ERR_REPEATED_ATTEMPTS 0x17
+
 #endif  // BTM_BLE_API_TYPES_H

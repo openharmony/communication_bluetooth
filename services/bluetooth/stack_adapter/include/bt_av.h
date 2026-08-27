@@ -21,6 +21,7 @@
 #define BT_AV_H
 
 #include <cstdint>
+#include <vector>
 
 #include "bt_types.h"
 
@@ -30,6 +31,24 @@ typedef enum {
     BTAV_A2DP_SRC_STATE_CONNECTED,
     BTAV_A2DP_SRC_STATE_PLAYING,
 } btav_source_state_t;
+
+/* Connection state reported by the A2DP connection callback (bluedroid
+ * system/include/hardware/bt_av.h). */
+typedef enum {
+    BTAV_CONNECTION_STATE_DISCONNECTED = 0,
+    BTAV_CONNECTION_STATE_CONNECTING,
+    BTAV_CONNECTION_STATE_CONNECTED,
+    BTAV_CONNECTION_STATE_DISCONNECTING,
+} btav_connection_state_t;
+
+/* Audio datapath state reported by the A2DP audio callback; LATENCY_CHANGED
+ * is a service-layer extension of the bluedroid set. */
+typedef enum {
+    BTAV_AUDIO_STATE_REMOTE_SUSPEND = 0,
+    BTAV_AUDIO_STATE_STOPPED,
+    BTAV_AUDIO_STATE_STARTED,
+    BTAV_AUDIO_STATE_LATENCY_CHANGED,
+} btav_audio_state_t;
 
 typedef enum {
     BTAV_A2DP_CODEC_INDEX_SOURCE_SBC = 0,
@@ -90,12 +109,34 @@ typedef struct {
     uint64_t codec_specific_4;
 } btav_a2dp_codec_config_t;
 
+/* A2DP source callbacks (bluedroid system/btif/include/btif_av.h). */
+typedef void (*btav_connection_state_callback)(const RawAddress &bd_addr, btav_connection_state_t state);
+typedef void (*btav_audio_state_callback)(const RawAddress &bd_addr, btav_audio_state_t state);
+typedef void (*btav_audio_source_config_callback)(const RawAddress &bd_addr, btav_a2dp_codec_config_t codec_config,
+    std::vector<btav_a2dp_codec_config_t> codecs_local_capabilities,
+    std::vector<btav_a2dp_codec_config_t> codecs_selectable_capabilities);
+typedef bool (*btav_mandatory_codec_preferred_callback)(const RawAddress &bd_addr);
+
 typedef struct {
     size_t size;
-    int (*init)(...);
-    void (*cleanup)(...);
-    int (*config_codec)(...);
-    int (*set_active_device)(...);
+    btav_connection_state_callback connection_state_cb;
+    btav_audio_state_callback audio_state_cb;
+    btav_audio_source_config_callback audio_config_cb;
+    btav_mandatory_codec_preferred_callback mandatory_codec_preferred_cb;
+} btav_source_callbacks_t;
+
+/* A2DP source interface consumed by the service layer (a2dp_service.cpp);
+ * bluedroid reference is system/btif/include/btif_av.h. */
+typedef struct {
+    size_t size;
+    bt_status_t (*init)(btav_source_callbacks_t *callbacks, int max_connected_audio_devices,
+        const std::vector<btav_a2dp_codec_config_t> &codec_priorities,
+        const std::vector<btav_a2dp_codec_config_t> &offloading_preference);
+    void (*cleanup)(void);
+    bt_status_t (*connect)(const RawAddress &bd_addr);
+    bt_status_t (*disconnect)(const RawAddress &bd_addr);
+    bt_status_t (*set_active_device)(const RawAddress &bd_addr);
+    bt_status_t (*config_codec)(const RawAddress &bd_addr, std::vector<btav_a2dp_codec_config_t> codec_preferences);
 } btav_source_interface_t;
 
 typedef struct {

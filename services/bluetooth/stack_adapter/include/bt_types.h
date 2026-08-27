@@ -30,6 +30,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <functional>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -59,12 +60,15 @@ typedef enum {
     BT_STATUS_NOT_READY,
     BT_STATUS_NOMEM,
     BT_STATUS_BUSY,
+    BT_STATUS_DONE,
     BT_STATUS_UNSUPPORTED = 0xFE,
     BT_STATUS_PARM_INVALID,
     BT_STATUS_UNHANDLED,
     BT_STATUS_AUTH_FAILURE,
     BT_STATUS_RMT_DEV_DOWN,
     BT_STATUS_AUTH_REJECTED,
+    BT_STATUS_JNI_ENVIRONMENT_ERROR,
+    BT_STATUS_JNI_THREAD_ATTACH_ERROR,
     BT_STATUS_INVALID_STATIC_RAND_ADDR,
     BT_STATUS_PENDING,
     BT_STATUS_UNACCEPT_CONN_INTERVAL,
@@ -74,6 +78,27 @@ typedef enum {
     BT_STATUS_AGAIN,
     BT_STATUS_WAKELOCK_ERROR,
 } bt_status_t;
+
+/* Human readable form of a bt_status_t, used by the service layer logging. */
+inline std::string bt_status_text(const bt_status_t status)
+{
+    switch (status) {
+        case BT_STATUS_SUCCESS:
+            return "success";
+        case BT_STATUS_FAIL:
+            return "failed";
+        case BT_STATUS_NOT_READY:
+            return "not ready";
+        case BT_STATUS_NOMEM:
+            return "no memory";
+        case BT_STATUS_BUSY:
+            return "busy";
+        case BT_STATUS_DONE:
+            return "done";
+        default:
+            return "unknown";
+    }
+}
 
 typedef enum {
     BT_PROPERTY_BDNAME = 0x1,
@@ -124,6 +149,7 @@ typedef enum {
     BT_TRANSPORT_AUTO = 0,
     BT_TRANSPORT_BR_EDR = 1,
     BT_TRANSPORT_LE = 2,
+    BT_TRANSPORT_UNKNOWN = 3,
     BT_TRANSPORT_INVALID = 255,
 } tBT_TRANSPORT;
 
@@ -337,7 +363,16 @@ public:
         return std::any_of(std::begin(address), std::end(address), [](uint8_t b) { return b != 0; });
     }
 
-    static RawAddress kEmpty;
+    /* True when this is the empty (all-zero) address; mirrors the removed
+     * stack layer RawAddress::IsEmpty(). */
+    bool IsEmpty() const
+    {
+        return *this == kEmpty;
+    }
+
+    /* All-zero address constant. Declared here and defined (inline, C++17)
+     * after the class because constexpr needs a complete literal type. */
+    static const RawAddress kEmpty;
 
     uint8_t address[kLength] = { 0 };
 
@@ -357,6 +392,20 @@ public:
             std::end(rhs.address));
     }
 };
+
+inline const RawAddress RawAddress::kEmpty{};
+
+/* The removed stack layer provided this specialization (via its raw_address.h);
+ * service code keeps RawAddress in std::unordered_map, so stub it here too. */
+namespace std {
+template <>
+struct hash<RawAddress> {
+    size_t operator()(const RawAddress &addr) const noexcept
+    {
+        return std::hash<std::string>{}(addr.GetAddress());
+    }
+};
+}  // namespace std
 
 /*
  * Stub Uuid of the removed stack layer. BLUEDROID::bluetooth::Uuid expands to
@@ -383,6 +432,28 @@ public:
         return Uuid(uuid);
     }
 
+    /* RFC 4122 base UUID, also used as the prefix of short (16/32 bit) uuids. */
+    static constexpr std::array<uint8_t, kNumBytes128> kBase = {
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB};
+
+    static Uuid From16Bit(uint16_t uuid16bit)
+    {
+        Uuid tmp(kBase);
+        tmp.uu[2] = static_cast<uint8_t>((uuid16bit >> 8) & 0xFF);
+        tmp.uu[3] = static_cast<uint8_t>(uuid16bit & 0xFF);
+        return tmp;
+    }
+
+    static Uuid From32Bit(uint32_t uuid32bit)
+    {
+        Uuid tmp(kBase);
+        tmp.uu[0] = static_cast<uint8_t>((uuid32bit >> 24) & 0xFF);
+        tmp.uu[1] = static_cast<uint8_t>((uuid32bit >> 16) & 0xFF);
+        tmp.uu[2] = static_cast<uint8_t>((uuid32bit >> 8) & 0xFF);
+        tmp.uu[3] = static_cast<uint8_t>(uuid32bit & 0xFF);
+        return tmp;
+    }
+
     static Uuid FromString(const std::string &uuid)
     {
         Uuid tmp;
@@ -399,6 +470,17 @@ public:
         for (size_t i = 0; i < 4; ++i) {
             tmp.uu[12 + i] = static_cast<uint8_t>(
                 strtoul(uuid.substr(14 + i * 2, 2).c_str(), nullptr, 16));
+        }
+        return tmp;
+    }
+
+    /* Random 128-bit uuid, used by the service layer to register a gatt
+     * client application with the (stubbed) stack. */
+    static Uuid GetRandom()
+    {
+        Uuid tmp;
+        for (auto &b : tmp.uu) {
+            b = static_cast<uint8_t>(std::rand());
         }
         return tmp;
     }
@@ -430,5 +512,16 @@ typedef struct {
     uint32_t resourceId;
     uint16_t interval;
 } bt_sensing_info_t;
+
+/* Stream accessors of the removed stack layer packet.h, reading big-endian
+ * fields from a byte stream and advancing the cursor. */
+#define STREAM_TO_UINT8(p, s) \
+    { (p) = static_cast<uint8_t>(*(s)); (s)++; }
+#define STREAM_TO_INT8(p, s) \
+    { (p) = static_cast<int8_t>(*(s)); (s)++; }
+#define STREAM_TO_UINT16(p, s) \
+    { (p) = static_cast<uint16_t>(static_cast<uint16_t>(*(s)) << 8 | static_cast<uint16_t>(*((s) + 1))); (s) += 2; }
+#define STREAM_TO_BDADDR(p, s) \
+    { memcpy((p).address, (s), BLUEDROID::RawAddress::kLength); (s) += BLUEDROID::RawAddress::kLength; }
 
 #endif  // BT_TYPES_H

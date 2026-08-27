@@ -24,7 +24,7 @@
 
 #include "bt_types.h"
 
-inline int btif_storage_get_remote_addr_type(const RawAddress *remote_bd_addr, int *addr_type)
+inline int btif_storage_get_remote_addr_type(const RawAddress *remote_bd_addr, uint8_t *addr_type)
 {
     if (addr_type != nullptr) {
         *addr_type = BLE_ADDR_PUBLIC;

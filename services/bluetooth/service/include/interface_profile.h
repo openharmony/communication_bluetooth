@@ -36,7 +36,7 @@
 #include <list>
 
 #include "bt_def.h"
-#include "common/raw_address.h"
+#include "raw_address.h"
 
 /**
  * @brief forward declaration for class Context in namespace utility

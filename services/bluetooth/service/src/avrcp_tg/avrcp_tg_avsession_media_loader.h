@@ -66,11 +66,11 @@ public:
      * @param state pushed or released.
      * @return void
      */
-    void SendKeyEventByWearDetection(uint8_t key, KeyState state);
+    void SendKeyEventByWearDetection(uint8_t key, KeyState state) override;
 
-    void SendCtrlCommandToAvSession(uint8_t key);
+    void SendCtrlCommandToAvSession(uint8_t key) override;
 
-    void NotifyA2dpPlayStateChange(void);
+    void NotifyA2dpPlayStateChange(void) override;
 
     bool IsLibraryLoaded(void);
 
@@ -82,7 +82,7 @@ public:
 
     void DisableBipService(void);
 private:
-    void PlaySilenceSound(void);
+    void PlaySilenceSound(void) override;
     void ProcessPushedToPlayHelper(bool isPushed);
     bool NeedDropPlayAfterScoEnd(bool isPushed);
     void SavePauseTimeToHelper();

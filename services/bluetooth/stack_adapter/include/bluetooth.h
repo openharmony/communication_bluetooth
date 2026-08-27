@@ -23,5 +23,6 @@
 
 #include "bt_types.h"
 #include "hardware/bluetooth.h"
+#include "avrcp/avrcp.h"
 
 #endif  // BLUETOOTH_H

@@ -24,6 +24,15 @@
 
 #include "bt_types.h"
 
+/* Socket option flags of the removed stack layer (bluedroid
+ * system/include/hardware/bt_sock.h). */
+#define BTSOCK_FLAG_ENCRYPT 1
+#define BTSOCK_FLAG_AUTH (1 << 1)
+#define BTSOCK_FLAG_NO_SDP (1 << 2)
+#define BTSOCK_FLAG_AUTH_MITM (1 << 3)
+#define BTSOCK_FLAG_AUTH_16_DIGIT (1 << 4)
+#define BTSOCK_FLAG_LE_COC (1 << 5)
+
 typedef enum {
     BTSOCK_RFCOMM = 1,
     BTSOCK_SCO = 2,
