@@ -562,7 +562,7 @@ std::vector<std::string> ClassicAdapter::GetDeviceUuids(const RawAddress &device
     std::vector<Uuid> uuids = remoteDeviceProperties_->GetDeviceUuids(device);
     std::vector<std::string> res;
     for (auto uuid : uuids) {
-        res.push_back(ServiceUtil::UuidToStack(uuid).ToString());
+        res.push_back(uuid.ToString());
     }
     return res;
 }
@@ -572,7 +572,7 @@ std::vector<std::string> ClassicAdapter::GetLocalProfileUuids() const
     std::vector<Uuid> uuids = adapterProperties_->GetServiceUuids();
     std::vector<std::string> res;
     for (auto uuid : uuids) {
-        res.push_back(ServiceUtil::UuidToStack(uuid).ToString());
+        res.push_back(uuid.ToString());
     }
     return res;
 }

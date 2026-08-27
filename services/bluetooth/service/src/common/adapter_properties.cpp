@@ -18,6 +18,8 @@
 
 #include "adapter_properties.h"
 
+#include <algorithm>
+
 #include "bluetooth_common_event_helper.h"
 #include "bluetooth_datashare_utils.h"
 #include "bluetooth_os_account.h"
@@ -535,14 +537,17 @@ std::vector<Uuid> AdapterProperties::ParseDeviceUuid(bt_property_t* property)
         HILOGE("Negative length on BT_PROPERTY_UUIDS");
         return serviceUuids;
     }
-    if (property->len % sizeof(STACK::bluetooth::Uuid) != 0) {
+    constexpr size_t uuidBytesLen = Uuid::UUID128_BYTES_TYPE;
+    if (property->len % uuidBytesLen != 0) {
         HILOGE("Trailing bytes on BT_PROPERTY_UUIDS");
         return serviceUuids;
     }
-    auto bluedriodUuids = static_cast<const STACK::bluetooth::Uuid*>(property->val);
+    auto uuidBytes = static_cast<const uint8_t*>(property->val);
 
-    for (size_t i = 0; i < property->len / sizeof(STACK::bluetooth::Uuid); ++i) {
-        Uuid uuid = ServiceUtil::UuidFromStack(bluedriodUuids[i]);
+    for (size_t i = 0; i < property->len / uuidBytesLen; ++i) {
+        Uuid::UUID128Bit uuid128;
+        std::copy(uuidBytes + i * uuidBytesLen, uuidBytes + (i + 1) * uuidBytesLen, uuid128.begin());
+        Uuid uuid = Uuid::ConvertFrom128Bits(uuid128);
         serviceUuids.push_back(uuid);
         HILOGI("uuid_%{public}d: %{public}s", i, uuid.ToString().c_str());
     }

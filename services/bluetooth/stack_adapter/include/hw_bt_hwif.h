@@ -237,10 +237,10 @@ typedef struct {
     void (*hwSetLeConnectionScanToFast)(bool enable);
     /* Register connection observer. */
     void (*registerConnection)(const STACK::RawAddress &addr,
-                               const ::bluetooth::Uuid &uuid);
+                               const OHOS::bluetooth::Uuid &uuid);
     /* Unregister connection observer. */
     void (*unRegisterConnection)(const STACK::RawAddress &addr,
-                                 const ::bluetooth::Uuid &uuid);
+                                 const OHOS::bluetooth::Uuid &uuid);
     /* Update CoC connection parameters. */
     void (*updateCocConnectionParams)(const STACK::RawAddress &addr,
                                       const uint16_t *params, int len);

@@ -69,7 +69,7 @@ public:
     ~GattClientServiceRegisterObserver() override
     {}
 
-    void RegisterClientCallback(int status, int clientIf, const STACK::bluetooth::Uuid &appUuid) override
+    void RegisterClientCallback(int status, int clientIf, const Uuid &appUuid) override
     {
         DoInGattThread([status, clientIf, callback = this->callback_, context = std::ref(this->context_)]() {
             callback(status, clientIf, context);
@@ -302,7 +302,7 @@ void GattClientService::impl::RegisterApplication(std::weak_ptr<IGattClientCallb
     std::swap(registerObserver, observer);
 
     // not support eatt transport now
-    int ret = btIfGattClient->register_client(STACK::bluetooth::Uuid::GetRandom(), false);
+    int ret = btIfGattClient->register_client(Uuid::Random(), false);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("Register client failed, ret: %{public}d", ret);
         // Release and delete the observer.

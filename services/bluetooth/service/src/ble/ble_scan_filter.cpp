@@ -269,12 +269,12 @@ ApcfCommand BleScanFilter::GetCommand(uint8_t cmdType, const BleScanFilterImpl &
             }
             break;
         case BTM_BLE_PF_SRVC_UUID:
-            cmd.uuid = ServiceUtil::UuidToStack(filter.GetServiceUuid());
-            cmd.uuid_mask = ServiceUtil::UuidToStack(filter.GetServiceUuidMask());
+            cmd.uuid = filter.GetServiceUuid();
+            cmd.uuid_mask = filter.GetServiceUuidMask();
             break;
         case BTM_BLE_PF_SRVC_SOL_UUID:
-            cmd.uuid = ServiceUtil::UuidToStack(filter.GetServiceSolicitationUuid());
-            cmd.uuid_mask = ServiceUtil::UuidToStack(filter.GetServiceSolicitationUuidMask());
+            cmd.uuid = filter.GetServiceSolicitationUuid();
+            cmd.uuid_mask = filter.GetServiceSolicitationUuidMask();
             break;
         case BTM_BLE_PF_LOCAL_NAME: {
             std::string name = filter.GetName();

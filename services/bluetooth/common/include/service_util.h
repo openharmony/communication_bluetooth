@@ -20,7 +20,6 @@
 #include "bt_uuid.h"
 #include "raw_address.h"
 // Bluedroid
-#include "bluetooth/uuid.h"
 #include "types/bt_transport.h"
 #include "types/raw_address.h"
 
@@ -38,16 +37,6 @@ namespace bluetooth {
 class ServiceUtil final {
 public:
     // UUID
-    static Uuid UuidFromStack(const STACK::bluetooth::Uuid &uuid)
-    {
-        return Uuid::ConvertFromString(uuid.ToString());
-    }
-
-    static STACK::bluetooth::Uuid UuidToStack(const Uuid &uuid)
-    {
-        return STACK::bluetooth::Uuid::From128BitBE(uuid.ConvertTo128Bits());
-    }
-
     static std::vector<std::string> UuidsToUuidStrs(const std::vector<Uuid> &uuids)
     {
         std::vector<std::string> uuidStrs;

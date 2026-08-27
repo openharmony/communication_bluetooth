@@ -302,8 +302,8 @@ int SocketService::Connect(const std::string &addr, const Uuid &uuid, int securi
     }
     BluetoothHwInterface::GetInstance()->KeepBleScanInConn(callingName, uid,
         (type == SOCK_L2CAP_LE) ? BT_TRANSPORT_LE : BT_TRANSPORT_BR_EDR, rawAddr);
-    const STACK::bluetooth::Uuid temp = ServiceUtil::UuidToStack(uuid);
-    int result = sBluetoothSocketInterface->connect(&rawAddr, ConvertBtSockType(type), &temp, psm, &socketFd,
+    // uuid is of the same type used by the stack interface.
+    int result = sBluetoothSocketInterface->connect(&rawAddr, ConvertBtSockType(type), &uuid, psm, &socketFd,
         GetSecurityFlags(securityFlag, type), uid);
     if (result != RET_NO_ERROR) {
         HILOGE("[SocketService] connect failed");
@@ -334,10 +334,8 @@ int SocketService::Listen(const std::string &name, const Uuid &uuid, int securit
     std::string callingName = PermissionManager::GetCallingName();
     BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_SOCKET_SERVER_CONN, RawAddress(""), -1,
         uuid.ToString(), callingName);
-    // convert uuid to bluedroid type
-    const STACK::bluetooth::Uuid temp = ServiceUtil::UuidToStack(uuid);
     int ret = sBluetoothSocketInterface->listen(ConvertBtSockType(type), name.c_str(),
-        &temp, channel, &socketFd, GetSecurityFlags(securityFlag, type), uid);
+        &uuid, channel, &socketFd, GetSecurityFlags(securityFlag, type), uid);
     if (ret != RET_NO_ERROR) {
         HILOGD("[SocketService] listen failed, ret=%{public}d", ret);
         socketFd = SOCK_INVALID_FD;
@@ -403,8 +401,6 @@ int SocketService::RegisterConnectionObserver(const std::string &addr, const Uui
         return BT_ERR_INTERNAL_ERROR;
     }
 
-    const STACK::bluetooth::Uuid tempUuid = ServiceUtil::UuidToStack(uuid);
-
     DoInSocketThread(std::bind(
         [](const std::string addr, const Uuid uuid, std::shared_ptr<IBtClientSocketCallback> callback) {
             // Remove register that are not cleaned up when Bluetooth is turned off.
@@ -428,7 +424,7 @@ int SocketService::RegisterConnectionObserver(const std::string &addr, const Uui
         HILOGE("Get bthwif_interface_t fail");
         return BT_ERR_INTERNAL_ERROR;
     }
-    bthwif->registerConnection(rawAddr, tempUuid);
+    bthwif->registerConnection(rawAddr, uuid);
     return BT_NO_ERROR;
 }
 
@@ -459,8 +455,7 @@ int SocketService::UnregisterConnectionObserver(const std::string &addr, const U
         HILOGE("Get bthwif_interface_t fail");
         return BT_ERR_INTERNAL_ERROR;
     }
-    const STACK::bluetooth::Uuid uuidTemp = ServiceUtil::UuidToStack(uuid);
-    bthwif->unRegisterConnection(address, uuidTemp);
+    bthwif->unRegisterConnection(address, uuid);
     return BT_NO_ERROR;
 }
 

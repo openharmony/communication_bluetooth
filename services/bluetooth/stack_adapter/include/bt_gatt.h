@@ -28,6 +28,7 @@
 
 #include "bt_types.h"
 #include "btm_ble_api_types.h"
+#include "bt_uuid.h"
 #include "gatt_api.h"
 
 #define BLE_GATT_MAX_ATTR_NUM 1000
@@ -125,7 +126,7 @@ typedef union {
 } btgatt_response_t;
 
 typedef struct {
-    bluetooth::Uuid uuid;
+    OHOS::bluetooth::Uuid uuid;
     uint8_t type;
     uint16_t attribute_handle;
     uint16_t start_handle;
@@ -188,7 +189,7 @@ typedef struct btgatt_scanner_callbacks_t {
 } btgatt_scanner_callbacks_t;
 
 typedef struct btgatt_server_callbacks_t {
-    void (*register_server_cb)(int status, int serverIf, const bluetooth::Uuid &appUuid);
+    void (*register_server_cb)(int status, int serverIf, const OHOS::bluetooth::Uuid &appUuid);
     void (*connection_cb)(int connId, int serverIf, int connected, const RawAddress &bda, int reason);
     void (*service_added_cb)(int status, int serverIf, std::vector<btgatt_db_element_t> service);
     void (*service_stopped_cb)(int status, int serverIf, int serviceHandle);
@@ -211,7 +212,7 @@ typedef struct btgatt_server_callbacks_t {
 } btgatt_server_callbacks_t;
 
 typedef struct btgatt_client_callbacks_t {
-    void (*register_client_cb)(int status, int clientIf, const bluetooth::Uuid &appUuid);
+    void (*register_client_cb)(int status, int clientIf, const OHOS::bluetooth::Uuid &appUuid);
     void (*connect_cb)(int connId, int status, int clientIf, const RawAddress &bda);
     void (*disconnect_cb)(int connId, int status, int clientIf, const RawAddress &bda, int reason);
     void (*cancel_open_cb)(int connId, int status, int clientIf, const RawAddress &bda);
@@ -245,15 +246,15 @@ typedef struct {
  * system/include/hardware/bt_gatt_client.h. */
 typedef struct {
     size_t size;
-    bt_status_t (*register_client)(const bluetooth::Uuid &app_uuid, bool eatt_support);
+    bt_status_t (*register_client)(const OHOS::bluetooth::Uuid &app_uuid, bool eatt_support);
     bt_status_t (*unregister_client)(int client_if);
     bt_status_t (*connect)(int client_if, const RawAddress &bd_addr, bool is_direct, int transport,
         bool opportunistic, int phy);
     bt_status_t (*disconnect)(int client_if, const RawAddress &bd_addr, int conn_id);
-    bt_status_t (*search_service)(int conn_id, const bluetooth::Uuid *filter_uuid);
+    bt_status_t (*search_service)(int conn_id, const OHOS::bluetooth::Uuid *filter_uuid);
     bt_status_t (*get_gatt_db)(int conn_id);
     bt_status_t (*read_characteristic)(int conn_id, int handle, int auth_req);
-    bt_status_t (*read_using_characteristic_uuid)(int conn_id, const bluetooth::Uuid &uuid,
+    bt_status_t (*read_using_characteristic_uuid)(int conn_id, const OHOS::bluetooth::Uuid &uuid,
         int start_handle, int end_handle, int auth_req);
     bt_status_t (*write_characteristic)(int conn_id, int handle, int write_type, int auth_req,
         std::vector<uint8_t> value);
@@ -280,7 +281,7 @@ inline btgatt_client_interface_t btgattClientInterface {};
  * reference is system/include/hardware/bt_gatt_server.h. */
 typedef struct {
     size_t size;
-    bt_status_t (*register_server)(const bluetooth::Uuid &uuid, bool eatt_support);
+    bt_status_t (*register_server)(const OHOS::bluetooth::Uuid &uuid, bool eatt_support);
     bt_status_t (*unregister_server)(int server_if);
     bt_status_t (*connect)(int server_if, const RawAddress &bd_addr, bool is_direct, int transport);
     bt_status_t (*disconnect)(int server_if, const RawAddress &bd_addr, int conn_id);
@@ -320,8 +321,8 @@ typedef struct {
     RawAddress address;
     uint8_t addr_type;
     std::array<uint8_t, 16> irk;
-    bluetooth::Uuid uuid;
-    bluetooth::Uuid uuid_mask;
+    OHOS::bluetooth::Uuid uuid;
+    OHOS::bluetooth::Uuid uuid_mask;
     std::vector<uint8_t> name;
     uint16_t company;
     uint16_t company_mask;

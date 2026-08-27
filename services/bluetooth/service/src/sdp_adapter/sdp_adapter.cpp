@@ -26,9 +26,9 @@
 
 namespace OHOS {
 namespace bluetooth {
-const STACK::bluetooth::Uuid UUID_MAP_MAS = STACK::bluetooth::Uuid::From16Bit(0x1132);
-const STACK::bluetooth::Uuid UUID_MAP_MNS = STACK::bluetooth::Uuid::From16Bit(0x1133);
-const STACK::bluetooth::Uuid UUID_OBEX_OBJECT_PUSH = STACK::bluetooth::Uuid::From16Bit(0x1105);
+const Uuid UUID_MAP_MAS = Uuid::ConvertFrom16Bits(0x1132);
+const Uuid UUID_MAP_MNS = Uuid::ConvertFrom16Bits(0x1133);
+const Uuid UUID_OBEX_OBJECT_PUSH = Uuid::ConvertFrom16Bits(0x1105);
 static BtRecursiveMutex sdpGetInstanceMutex_ {};
 
 SdpAdapter &SdpAdapter::GetInstance()
@@ -38,7 +38,7 @@ SdpAdapter &SdpAdapter::GetInstance()
     return instance;
 }
 static void sdp_search_callback(bt_status_t status, const STACK::RawAddress &bd_addr,
-    const STACK::bluetooth::Uuid &uuid_in, int count, bluetooth_sdp_record *records)
+    const Uuid &uuid_in, int count, bluetooth_sdp_record *records)
 {
     for (int i = 0; i < count || i == 0; i++) {
         // when status = 1 (BTA_SDP_FAILURE), records is defult(not null), count = 0.
@@ -185,7 +185,7 @@ bool SdpAdapter::StartRemoteSdpSearch(const std::string &address, const std::str
     }
     STACK::RawAddress rawAddress;
     STACK::RawAddress::FromString(address, rawAddress);
-    int32_t ret = bluetoothSdpInterface_->sdp_search(&rawAddress, STACK::bluetooth::Uuid::FromString(uuid));
+    int32_t ret = bluetoothSdpInterface_->sdp_search(&rawAddress, Uuid::ConvertFromString(uuid));
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("sdp_search error");
         return false;

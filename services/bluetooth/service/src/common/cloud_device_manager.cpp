@@ -275,15 +275,16 @@ void CloudDeviceManager::SetDeviceUuidsProp(
         return;
     }
     device->SetDeviceUuids(uuids);
-    std::vector<STACK::bluetooth::Uuid> uuidsBlueDroid;
+    std::vector<uint8_t> uuidsData;
     for (auto &uuid : uuids) {
-        uuidsBlueDroid.push_back(ServiceUtil::UuidToStack(uuid));
+        Uuid::UUID128Bit uuid128 = uuid.ConvertTo128Bits();
+        uuidsData.insert(uuidsData.end(), uuid128.begin(), uuid128.end());
     }
     bt_property_t prop;
     prop.type = static_cast<bt_property_type_t>(BT_PROPERTY_UUIDS);
-    int32_t len = static_cast<int32_t>(uuidsBlueDroid.size() * sizeof(STACK::bluetooth::Uuid));
+    int32_t len = static_cast<int32_t>(uuidsData.size());
     prop.len = len;
-    prop.val = const_cast<void *>(static_cast<const void *>(uuidsBlueDroid.data()));
+    prop.val = const_cast<void *>(static_cast<const void *>(uuidsData.data()));
     STACK::RawAddress addr = ServiceUtil::AddrToStack(RawAddress(device->GetAddress()));
     RemoteDeviceProperties::GetInstance()->SetRemoteDeviceProperty(addr, prop);
 }

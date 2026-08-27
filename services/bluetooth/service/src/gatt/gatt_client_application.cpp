@@ -281,7 +281,7 @@ void GattClientApplication::GetGattDbCallback(int connId, const btgatt_db_elemen
     const btgatt_db_element_t *p = db;
     const btgatt_db_element_t *end = db + count;
     while (p < end) {
-        Uuid uuid = ServiceUtil::UuidFromStack(p->uuid);
+        Uuid uuid = p->uuid;
         int perm = p->permissions;
 #ifdef BLUETOOTH_WATCH_ENABLE
         if (uuid.ToString().compare(CONTROL_POINT_UUID) == 0) {
@@ -368,7 +368,7 @@ void GattClientApplication::ReadCharacteristic(uint16_t handle)
 void GattClientApplication::ReadCharacteristicByUuid(const Uuid &uuid, int32_t startHandle, int32_t endHandle)
 {
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->read_using_characteristic_uuid(connId_, ServiceUtil::UuidToStack(uuid),
+        int ret = btIfGattClient_->read_using_characteristic_uuid(connId_, uuid,
             startHandle, endHandle, GATT_AUTH_REQ_NONE);
         if (ret != BT_STATUS_SUCCESS) {
             WPTR_CBACK(callback_, OnCharacteristicRead, GattStatus::GATT_FAILURE,

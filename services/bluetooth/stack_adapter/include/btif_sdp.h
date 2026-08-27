@@ -38,7 +38,7 @@ typedef enum {
 
 typedef struct _bluetooth_sdp_hdr_overlay {
     bluetooth_sdp_types type;
-    bluetooth::Uuid uuid;
+    OHOS::bluetooth::Uuid uuid;
     uint32_t service_name_length;
     const char *service_name;
     int32_t rfcomm_channel_number;
@@ -114,7 +114,7 @@ typedef struct {
 
 /* Callback invoked when an SDP search completes. */
 typedef void (*btsdp_search_callback)(bt_status_t status, const RawAddress &bd_addr,
-    const bluetooth::Uuid &uuid, int num_records, bluetooth_sdp_record *records);
+    const OHOS::bluetooth::Uuid &uuid, int num_records, bluetooth_sdp_record *records);
 
 typedef struct {
     size_t size;
@@ -127,7 +127,7 @@ typedef struct {
     size_t size;
     bt_status_t (*init)(btsdp_callbacks_t *callbacks);
     bt_status_t (*deinit)();
-    bt_status_t (*sdp_search)(RawAddress *bd_addr, const bluetooth::Uuid &uuid);
+    bt_status_t (*sdp_search)(RawAddress *bd_addr, const OHOS::bluetooth::Uuid &uuid);
     bt_status_t (*create_sdp_record)(bluetooth_sdp_record *record, int *record_handle);
     bt_status_t (*remove_sdp_record)(int sdp_handle);
 } btsdp_interface_t;

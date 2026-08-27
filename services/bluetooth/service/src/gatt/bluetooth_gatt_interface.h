@@ -50,7 +50,7 @@ public:
     public:
         virtual ~GattServerObserver() = default;
         // status is tGATT_STATUS in gatt_api.h
-        virtual void RegisterServerCallback(int status, int serverIf, const STACK::bluetooth::Uuid &appUuid) {}
+        virtual void RegisterServerCallback(int status, int serverIf, const Uuid &appUuid) {}
         // connId is a logic connection id (index + serverIf), ervey application has it's own connId
         virtual void ConnectionCallback(
             int connId, int serverIf, int connected, const STACK::RawAddress &bda, int reason) {}
@@ -82,7 +82,7 @@ public:
     public:
         virtual ~GattClientObserver() = default;
         // status is tGATT_STATUS in gatt_api.h
-        virtual void RegisterClientCallback(int status, int clientIf, const STACK::bluetooth::Uuid &appUuid) {}
+        virtual void RegisterClientCallback(int status, int clientIf, const Uuid &appUuid) {}
         virtual void ConnectCallback(
             int connId, int status, int clientIf, const STACK::RawAddress &bda) {}
         virtual void DisconnectCallback(

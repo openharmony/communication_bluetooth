@@ -34,6 +34,7 @@
 #include <string>
 #include <vector>
 #include "types/raw_address.h"
+#include "bt_uuid.h"
 
 /* STACK::Xxx references resolve to the global ::Xxx symbols. */
 #ifndef STACK
@@ -275,107 +276,15 @@ typedef enum {
 
 
 /*
- * Stub Uuid of the removed stack layer. STACK::bluetooth::Uuid expands to
- * bluetooth::Uuid after the macro, so it lives in the global bluetooth
- * namespace, distinct from OHOS::bluetooth::Uuid.
- */
-namespace bluetooth {
-class Uuid {
-public:
-    static constexpr size_t kNumBytes128 = 16;
-
-    Uuid() { uu.fill(0); }
-    explicit Uuid(const std::array<uint8_t, kNumBytes128> &uuid) : uu(uuid) {}
-
-    static Uuid From128BitBE(const uint8_t *uuid)
-    {
-        std::array<uint8_t, kNumBytes128> tmp;
-        std::copy(uuid, uuid + kNumBytes128, tmp.begin());
-        return Uuid(tmp);
-    }
-
-    static Uuid From128BitBE(const std::array<uint8_t, kNumBytes128> &uuid)
-    {
-        return Uuid(uuid);
-    }
-
-    /* RFC 4122 base UUID, also used as the prefix of short (16/32 bit) uuids. */
-    static constexpr std::array<uint8_t, kNumBytes128> kBase = {
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB};
-
-    static Uuid From16Bit(uint16_t uuid16bit)
-    {
-        Uuid tmp(kBase);
-        tmp.uu[2] = static_cast<uint8_t>((uuid16bit >> 8) & 0xFF);
-        tmp.uu[3] = static_cast<uint8_t>(uuid16bit & 0xFF);
-        return tmp;
-    }
-
-    static Uuid From32Bit(uint32_t uuid32bit)
-    {
-        Uuid tmp(kBase);
-        tmp.uu[0] = static_cast<uint8_t>((uuid32bit >> 24) & 0xFF);
-        tmp.uu[1] = static_cast<uint8_t>((uuid32bit >> 16) & 0xFF);
-        tmp.uu[2] = static_cast<uint8_t>((uuid32bit >> 8) & 0xFF);
-        tmp.uu[3] = static_cast<uint8_t>(uuid32bit & 0xFF);
-        return tmp;
-    }
-
-    static Uuid FromString(const std::string &uuid)
-    {
-        Uuid tmp;
-        if (uuid.length() < 36) {
-            return tmp;
-        }
-        for (size_t i = 0; i < 8; ++i) {
-            tmp.uu[i] = static_cast<uint8_t>(strtoul(uuid.substr(i * 2, 2).c_str(), nullptr, 16));
-        }
-        for (size_t i = 0; i < 4; ++i) {
-            tmp.uu[8 + i] = static_cast<uint8_t>(
-                strtoul(uuid.substr(9 + i * 2, 2).c_str(), nullptr, 16));
-        }
-        for (size_t i = 0; i < 4; ++i) {
-            tmp.uu[12 + i] = static_cast<uint8_t>(
-                strtoul(uuid.substr(14 + i * 2, 2).c_str(), nullptr, 16));
-        }
-        return tmp;
-    }
-
-    /* Random 128-bit uuid, used by the service layer to register a gatt
-     * client application with the (stubbed) stack. */
-    static Uuid GetRandom()
-    {
-        Uuid tmp;
-        for (auto &b : tmp.uu) {
-            b = static_cast<uint8_t>(std::rand());
-        }
-        return tmp;
-    }
-
-    std::string ToString() const
-    {
-        char buf[37] = { 0 };
-        snprintf(buf, sizeof(buf),
-            "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-            uu[0], uu[1], uu[2], uu[3], uu[4], uu[5], uu[6], uu[7], uu[8], uu[9],
-            uu[10], uu[11], uu[12], uu[13], uu[14], uu[15]);
-        return std::string(buf);
-    }
-
-    std::array<uint8_t, kNumBytes128> uu;
-};
-}  // namespace bluetooth
-
-/*
  * Sensing info reported by the stubbed stack. Defined after RawAddress and
- * bluetooth::Uuid since it embeds them by value.
+ * OHOS::bluetooth::Uuid since it embeds them by value.
  */
 typedef struct {
     uint8_t sensing_state;
     uint8_t event_type;
     uint32_t timestamp;
     RawAddress addr;
-    bluetooth::Uuid uuid;
+    OHOS::bluetooth::Uuid uuid;
     uint32_t resourceId;
     uint16_t interval;
 } bt_sensing_info_t;

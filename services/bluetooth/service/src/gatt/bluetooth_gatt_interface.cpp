@@ -211,7 +211,7 @@ static void TrackAdvEventCallback(btgatt_track_adv_info_t *advTrackInfo)
     }
 }
 
-static void RegisterServerCallback(int status, int serverIf, const STACK::bluetooth::Uuid &appUuid)
+static void RegisterServerCallback(int status, int serverIf, const Uuid &appUuid)
 {
     g_gattServerObservers.ForEach([status, serverIf, appUuid](std::weak_ptr<GattServerObserver> observer) {
         WPTR_CBACK_GATT_SERVER_OBSERVER(observer, RegisterServerCallback, status, serverIf, appUuid);
@@ -361,7 +361,7 @@ static void ServerConnUpdatedCallback(int connId, uint16_t interval, uint16_t la
         });
 }
 
-static void RegisterClientCallback(int status, int clientIf, const STACK::bluetooth::Uuid &appUuid)
+static void RegisterClientCallback(int status, int clientIf, const Uuid &appUuid)
 {
     g_gattClientObservers.ForEach([status, clientIf, appUuid](std::weak_ptr<GattClientObserver> observer) {
         WPTR_CBACK_GATT_THREAD_CLIENT_OBSERVER(observer, RegisterClientCallback, status, clientIf, appUuid);

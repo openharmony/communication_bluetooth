@@ -130,7 +130,7 @@ std::string PropertiesLog(uint8_t properties)
 void GattServerApplication::BuildGattService(const std::vector<btgatt_db_element_t> &svc, Service &service)
 {
     for (auto iter = svc.begin(); iter != svc.end(); iter++) {
-        Uuid uuid = ServiceUtil::UuidFromStack(iter->uuid);
+        Uuid uuid = iter->uuid;
         switch (iter->type) {
             case BTGATT_DB_PRIMARY_SERVICE:
             case BTGATT_DB_SECONDARY_SERVICE: {
@@ -203,19 +203,19 @@ void GattServerApplication::AddService(const Service &service)
 {
     std::vector<btgatt_db_element_t> svc;
     svc.push_back({
-        .uuid = ServiceUtil::UuidToStack(service.uuid_),
+        .uuid = service.uuid_,
         .type = (service.isPrimary_ ? BTGATT_DB_PRIMARY_SERVICE : BTGATT_DB_SECONDARY_SERVICE),
     });
     for (const auto &characteristic : service.characteristics_) {
         svc.push_back({
-            .uuid = ServiceUtil::UuidToStack(characteristic.uuid_),
+            .uuid = characteristic.uuid_,
             .type = BTGATT_DB_CHARACTERISTIC,
             .properties = static_cast<uint8_t>(characteristic.properties_),
             .permissions = static_cast<uint16_t>(characteristic.permissions_),
         });
         for (const auto &descriptor : characteristic.descriptors_) {
             svc.push_back({
-                .uuid = ServiceUtil::UuidToStack(descriptor.uuid_),
+                .uuid = descriptor.uuid_,
                 .type = BTGATT_DB_DESCRIPTOR,
                 .permissions = static_cast<uint16_t>(characteristic.permissions_),
             });
