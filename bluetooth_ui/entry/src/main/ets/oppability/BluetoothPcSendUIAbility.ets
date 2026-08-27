@@ -78,6 +78,7 @@ export default class BluetoothSendUIAbility extends UIAbility {
             console.info(TAG, 'onCreate 51 seconds but nothing received');
             CommonUtils.reportBtSendChrDataByResult(RESULT_ERROR_NO_MESSAGE,
                 this.totalCount, this.successCount);
+            this.cancelSendProgressNotification();
             this.handleTerminate();
         }, (this.userReceiveTimeout + 1) * 1000);
         this.timerIdCreated = true;
@@ -99,6 +100,7 @@ export default class BluetoothSendUIAbility extends UIAbility {
     }
 
     handleTerminate() {
+        console.info(TAG, 'handleTerminate');
         this.stopContinuousTask();
         commonEventManager.unsubscribe(this.subscriber);
         this.context.terminateSelf();
@@ -215,7 +217,7 @@ export default class BluetoothSendUIAbility extends UIAbility {
             wantAgent: wantAgentObj,
             tapDismissed: true,
         };
-        notificationManager.publish(notificationRequest).then(() => {
+        return notificationManager.publish(notificationRequest).then(() => {
             console.info(TAG, 'publishFinishNotification success');
         }).catch((err: BusinessError) => {
             console.error(TAG, 'publishFinishNotification fail');
@@ -302,7 +304,7 @@ export default class BluetoothSendUIAbility extends UIAbility {
             }
         };
 
-        notificationManager.publish(notificationRequest).then(() => {
+        return notificationManager.publish(notificationRequest).then(() => {
             console.info(TAG, 'createSendProgressNotification success');
             if (progress == 100 && this.currentCount > this.totalCount) {
                 this.cancelSendProgressNotification();

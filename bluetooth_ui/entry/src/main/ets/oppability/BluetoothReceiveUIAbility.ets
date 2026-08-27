@@ -59,6 +59,7 @@ const STATUS_FINISH: number = 2;
 const OPP_TRANSFER_USER_ACCEPT: number = 0;
 const OPP_TRANSFER_AUTO_ACCEPT: number = 1;
 const UNKNOWN_VALUE: number = -1;
+const CONTINUOUS_TASK_MAX_RETRY_TIMES: number = 4;
 
 export default class BluetoothReceiveUIAbility extends UIAbility {
     private subscriber: commonEventManager.CommonEventSubscriber | null = null;
@@ -93,6 +94,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
     private successCount: number = 0;
     private failedCount: number = 0;
     private isEnabledLive2: boolean = false;
+    private continuousTaskRetryTimes: number = 0;
 
     onCreate(want: Want): void {
         if (!PermissionUtils.checkBluetoothShareCallerBluetoothPermission(want)) {
@@ -106,20 +108,27 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
         try {
             backgroundTaskManager.on('continuousTaskCancel',
                 (info: backgroundTaskManager.ContinuousTaskCancelInfo) => {
-                console.info('continuousTaskCancel callback id ' + info.id);
-                console.info('continuousTaskCancel callback reason ' + info.reason);
+                console.info(TAG, 'continuousTaskCancel callback id ' + info.id);
+                console.info(TAG, 'continuousTaskCancel callback reason ' + info.reason);
                 if (info.reason == USER_CANCEL_REMOVE_NOTIFICATION) {
                     this.oppProfile.setIncomingFileConfirmation(false, -1);
                     this.oppProfile.cancelTransfer();
                     this.handleTerminate();
                 } else if (info.reason == SYSTEM_CANCEL_NOT_USE_BLUETOOTH ||
                     info.reason == SYSTEM_CANCEL_REMOVE_NOTIFICATION) {
-                    this.startContinuousTask();
+                    this.continuousTaskRetryTimes++;
+                    console.info(TAG, 'continuousTaskCancel continuousTaskRetryTimes ' + this.continuousTaskRetryTimes);
+                    console.info(TAG, 'continuousTaskCancel transfering ' + this.transfering);
+                    if (this.continuousTaskRetryTimes < CONTINUOUS_TASK_MAX_RETRY_TIMES && this.transfering) {
+                        this.startContinuousTask();
+                    } else {
+                        this.handleTerminate();
+                    }
                 }
             });
         } catch (error) {
             let err: BusinessError = error as BusinessError;
-            console.error(`Operation onContinuousTaskCancel failed. code ${err.code}, message ${err.message}`);
+            console.error(TAG, `Operation onContinuousTaskCancel failed. code ${err.code}, message ${err.message}`);
         }
         this.timerIdCreate = setTimeout(() => {
             console.info(TAG, 'onCreate 1 second but nothing received');
@@ -144,7 +153,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
             backgroundTaskManager.off('continuousTaskCancel');
         } catch (error) {
             let err: BusinessError = error as BusinessError;
-            console.error(`Operation offContinuousTaskCancel failed. code ${err.code}, message ${err.message}`);
+            console.error(TAG, `Operation offContinuousTaskCancel failed. code ${err.code}, message ${err.message}`);
         }
         this.stopContinuousTask();
         this.context.terminateSelf();
@@ -479,6 +488,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
         this.currentCount = 0;
         this.successCount = 0;
         this.failedCount = 0;
+        this.continuousTaskRetryTimes = 0;
     }
 
     async publishFinishNotification(wantAgentObj: WantAgent, wantAgentObjRemove: WantAgent,
@@ -526,6 +536,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
         wantAgentObj = await this.getNotificationWantAgent('ohos.event.notification.BT.FINISH_NOTIFICATION');
         wantAgentObjRemove = await this.getNotificationWantAgent('ohos.event.notification.BT.FINISH_REMOVE');
         await this.publishFinishNotification(wantAgentObj, wantAgentObjRemove, this.successCount, this.failedCount);
+        this.transfering = false;
     }
 
     async publishTransProgessNotification(imagePixelMapButton: image.PixelMap, imagePixelMapCapsule: image.PixelMap,
