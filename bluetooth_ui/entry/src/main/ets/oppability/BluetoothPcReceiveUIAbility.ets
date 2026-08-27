@@ -121,7 +121,7 @@ export default class BluetoothReceiveUIAbility extends UIAbility {
                     if (this.continuousTaskRetryTimes < CONTINUOUS_TASK_MAX_RETRY_TIMES && this.transfering) {
                         this.startContinuousTask();
                     } else {
-                        this.stopContinuousTask();
+                        this.handleTerminate();
                     }
                 }
             });
