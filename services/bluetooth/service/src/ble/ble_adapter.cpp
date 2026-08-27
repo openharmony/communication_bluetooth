@@ -295,10 +295,10 @@ int BleAdapter::GetPeerDeviceAddrType(const RawAddress &device) const
 {
     int ret = BLE_ADDR_TYPE_UNKNOWN;
 
-    auto remoteAddr = ServiceUtil::AddrToBluedroid(device);
+    auto remoteAddr = ServiceUtil::AddrToStack(device);
     uint8_t remoteAddrType;
     if (btif_storage_get_remote_addr_type(&remoteAddr, &remoteAddrType) == BT_STATUS_SUCCESS) {
-        ret = ServiceUtil::AddrTypeFromBluedroid(remoteAddrType);
+        ret = ServiceUtil::AddrTypeFromStack(remoteAddrType);
     }
 
     return ret;

@@ -113,11 +113,11 @@ bool HearingAidDisconnectedState::Dispatch(const utility::Message &msg)
 {
     HearingAidMessage &event = reinterpret_cast<HearingAidMessage &>(const_cast<utility::Message &>(msg));
     HILOGI("%{public}s:[%{public}s]", title_, HearingAidServiceImpl::GetHearingAidEventName(event.what_));
-    BLUEDROID::RawAddress rawAddr;
+    STACK::RawAddress rawAddr;
     RawAddress addr;
     if (event.msgAddr.length() != 0) {
         addr = RawAddress(event.msgAddr);
-        rawAddr = ServiceUtil::AddrToBluedroid(addr);
+        rawAddr = ServiceUtil::AddrToStack(addr);
     }
     ::bluetooth::hearing_aid::HearingAidInterface* bluetoothHearingAidInterface = GetInterface();
     CHECK_AND_RETURN_LOG_RET(bluetoothHearingAidInterface != nullptr, false, "%{public}s:interface is null", title_);
@@ -151,7 +151,7 @@ void HearingAidDisconnectedState::ProcessStackEvent(std::string address, int sta
                 HILOGI("%{public}s:incoming connection accepted %{public}s", title_, GetEncryptAddr(address).c_str());
                 Transition(HearingAidStateMachine::CONNECTING);
             } else {
-                bluetoothHearingAidInterface->Disconnect(ServiceUtil::AddrToBluedroid(RawAddress(address)));
+                bluetoothHearingAidInterface->Disconnect(ServiceUtil::AddrToStack(RawAddress(address)));
             }
             break;
         case BTHEARING_AID_STATE_CONNECTED:
@@ -159,7 +159,7 @@ void HearingAidDisconnectedState::ProcessStackEvent(std::string address, int sta
                 HILOGI("%{public}s:connected from stack %{public}s", title_, GetEncryptAddr(address).c_str());
                 Transition(HearingAidStateMachine::CONNECTED);
             } else {
-                bluetoothHearingAidInterface->Disconnect(ServiceUtil::AddrToBluedroid(RawAddress(address)));
+                bluetoothHearingAidInterface->Disconnect(ServiceUtil::AddrToStack(RawAddress(address)));
             }
             break;
         default:
@@ -182,11 +182,11 @@ bool HearingAidConnectingState::Dispatch(const utility::Message &msg)
 {
     HearingAidMessage &event = reinterpret_cast<HearingAidMessage &>(const_cast<utility::Message &>(msg));
     HILOGI("%{public}s:[%{public}s]", title_, HearingAidServiceImpl::GetHearingAidEventName(event.what_));
-    BLUEDROID::RawAddress rawAddr;
+    STACK::RawAddress rawAddr;
     RawAddress addr;
     if (event.msgAddr.length() != 0) {
         addr = RawAddress(event.msgAddr);
-        rawAddr = ServiceUtil::AddrToBluedroid(addr);
+        rawAddr = ServiceUtil::AddrToStack(addr);
     }
     ::bluetooth::hearing_aid::HearingAidInterface* bluetoothHearingAidInterface = GetInterface();
     CHECK_AND_RETURN_LOG_RET(bluetoothHearingAidInterface != nullptr, false, "%{public}s:interface is null", title_);
@@ -260,13 +260,13 @@ bool HearingAidDisconnectingState::Dispatch(const utility::Message &msg)
 {
     HearingAidMessage &event = reinterpret_cast<HearingAidMessage &>(const_cast<utility::Message &>(msg));
     HILOGI("%{public}s:[%{public}s]", title_, HearingAidServiceImpl::GetHearingAidEventName(event.what_));
-    BLUEDROID::RawAddress rawAddr;
+    STACK::RawAddress rawAddr;
     RawAddress addr;
     ::bluetooth::hearing_aid::HearingAidInterface* bluetoothHearingAidInterface = GetInterface();
     CHECK_AND_RETURN_LOG_RET(bluetoothHearingAidInterface != nullptr, false, "%{public}s:interface is null", title_);
     if (event.msgAddr.length() != 0) {
         addr = RawAddress(event.msgAddr);
-        rawAddr = ServiceUtil::AddrToBluedroid(addr);
+        rawAddr = ServiceUtil::AddrToStack(addr);
     }
     switch (event.what_) {
         case HEARING_AID_DISCONNECT_EVT:
@@ -289,7 +289,7 @@ bool HearingAidDisconnectingState::Dispatch(const utility::Message &msg)
 
 void HearingAidDisconnectingState::ProcessStackEvent(std::string address, int stackState)
 {
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(RawAddress(address));
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(RawAddress(address));
     ::bluetooth::hearing_aid::HearingAidInterface* bluetoothHearingAidInterface = GetInterface();
     CHECK_AND_RETURN_LOG(bluetoothHearingAidInterface != nullptr, "%{public}s:interface is null", title_);
     switch (stackState) {
@@ -333,11 +333,11 @@ bool HearingAidConnectedState::Dispatch(const utility::Message &msg)
 {
     HearingAidMessage &event = reinterpret_cast<HearingAidMessage &>(const_cast<utility::Message &>(msg));
     HILOGI("%{public}s:[%{public}s]", title_, HearingAidServiceImpl::GetHearingAidEventName(event.what_));
-    BLUEDROID::RawAddress rawAddr;
+    STACK::RawAddress rawAddr;
     RawAddress addr;
     if (event.msgAddr.length() != 0) {
         addr = RawAddress(event.msgAddr);
-        rawAddr = ServiceUtil::AddrToBluedroid(addr);
+        rawAddr = ServiceUtil::AddrToStack(addr);
     }
     ::bluetooth::hearing_aid::HearingAidInterface* bluetoothHearingAidInterface = GetInterface();
     CHECK_AND_RETURN_LOG_RET(bluetoothHearingAidInterface != nullptr, false, "%{public}s:interface is null", title_);

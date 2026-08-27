@@ -198,7 +198,7 @@ static void CheckHdiServiceLoaded()
     }
     HILOGE("hdi service not loaded");
     BtChrDftEventWriteInt(CHR_A2DP_CONNECT_EXCEPTION,
-        ServiceUtil::AddrFromBluedroid(BLUEDROID::RawAddress::kEmpty).GetAddress(),
+        ServiceUtil::AddrFromStack(STACK::RawAddress::kEmpty).GetAddress(),
         CHR_ERRCODE,
         HDI_SERVICE_NOT_LOADED);
     auto devmgr = OHOS::HDI::DeviceManager::V1_0::IDeviceManager::Get();
@@ -234,10 +234,10 @@ static void OnServiceStatusReceived(struct ServiceStatusListener *listener, stru
     }
     if (serviceStatus->status == SERVIE_STATUS_STOP) {
         HILOGI("Bluetooth hdi service stoped");
-        service->UpdateActiveDevice(ServiceUtil::AddrFromBluedroid(BLUEDROID::RawAddress::kEmpty));
+        service->UpdateActiveDevice(ServiceUtil::AddrFromStack(STACK::RawAddress::kEmpty));
         btav_source_interface_t *bluetoothA2dpSrcInterface = service->getBluetoothA2dpSrcInterface();
         if (bluetoothA2dpSrcInterface != nullptr) {
-            bluetoothA2dpSrcInterface->set_active_device(BLUEDROID::RawAddress::kEmpty);
+            bluetoothA2dpSrcInterface->set_active_device(STACK::RawAddress::kEmpty);
         }
     }
 }
@@ -283,7 +283,7 @@ void A2dpService::ProcessA2dpHdfLoad(int state, const RawAddress &rawAddr)
     if (hdfLoadedDevice_.Empty()) {
         HILOGI("all device disconnect, set empty device to stack");
         if (sBluetoothA2dpSrcInterface != nullptr) {
-            sBluetoothA2dpSrcInterface->set_active_device(BLUEDROID::RawAddress::kEmpty);
+            sBluetoothA2dpSrcInterface->set_active_device(STACK::RawAddress::kEmpty);
         }
     }
 }
@@ -330,14 +330,14 @@ static void HandleNotFindDeviceInfoEvent(A2dpService* service, RawAddress& rawAd
     service->ConnectManager().AddDevice(rawAddr, status);
 }
 
-static void bta2dp_connection_state_callback(const BLUEDROID::RawAddress& bd_addr, btav_connection_state_t state)
+static void bta2dp_connection_state_callback(const STACK::RawAddress& bd_addr, btav_connection_state_t state)
 {
     HITRACE_METER(BT_TRACE_TAG);
-    HILOGI("device[%{public}s] state[%{public}d]\n", bd_addr.ToLogString().c_str(), state);
+    HILOGI("device[%{public}s] state[%{public}d]\n", bd_addr.ToStringForLogging().c_str(), state);
 
     A2dpService *service = GetServiceInstance(A2DP_ROLE_SOURCE);
     CHECK_AND_RETURN_LOG(service, "Can't get the instance of service");
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(bd_addr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bd_addr);
     int connectPolicy = service->GetConnectStrategy(rawAddr);
     btav_source_interface_t* bluetoothA2dpSrcInterface = service->getBluetoothA2dpSrcInterface();
     if (state == BTAV_CONNECTION_STATE_CONNECTING
@@ -391,12 +391,12 @@ static void bta2dp_connection_state_callback(const BLUEDROID::RawAddress& bd_add
     service->CheckDisable();
 }
 
-static void bta2dp_audio_state_callback(const BLUEDROID::RawAddress& bd_addr, btav_audio_state_t state)
+static void bta2dp_audio_state_callback(const STACK::RawAddress& bd_addr, btav_audio_state_t state)
 {
     HITRACE_METER(BT_TRACE_TAG);
-    HILOGI("device[%{public}s] state[%{public}d]\n", bd_addr.ToLogString().c_str(), state);
+    HILOGI("device[%{public}s] state[%{public}d]\n", bd_addr.ToStringForLogging().c_str(), state);
     A2dpService *service = GetServiceInstance(A2DP_ROLE_SOURCE);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(bd_addr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bd_addr);
     int error = RET_NO_ERROR;
 
     if (service == nullptr) {
@@ -438,7 +438,7 @@ static void bta2dp_audio_state_callback(const BLUEDROID::RawAddress& bd_addr, bt
 }
 
 static void bta2dp_audio_config_callback(
-    const BLUEDROID::RawAddress& bd_addr, btav_a2dp_codec_config_t codec_config,
+    const STACK::RawAddress& bd_addr, btav_a2dp_codec_config_t codec_config,
     std::vector<btav_a2dp_codec_config_t> codecs_local_capabilities,
     std::vector<btav_a2dp_codec_config_t> codecs_selectable_capabilities)
 {
@@ -447,7 +447,7 @@ static void bta2dp_audio_config_callback(
     // 当蓝牙开关不为开时，不允许HandleNotFindDeviceInfoEvent设置connecting
     int status = AdapterManager::GetInstance()->GetState(BTTransport::ADAPTER_BREDR);
     CHECK_AND_RETURN_LOG(status == BTStateID::STATE_TURN_ON, "don't allow to config a2dp");
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(bd_addr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bd_addr);
     A2dpService *service = GetServiceInstance(A2DP_ROLE_SOURCE);
     int error = RET_NO_ERROR;
     CHECK_AND_RETURN_LOG(service != nullptr, "Can't get the instance of service");
@@ -492,7 +492,7 @@ static void bta2dp_audio_config_callback(
     service->ProcessCodecFrameworkCallback(codecStatus.codecInfo, error, rawAddr);
 }
 
-static bool bta2dp_mandatory_codec_preferred_callback(const BLUEDROID::RawAddress& bd_addr)
+static bool bta2dp_mandatory_codec_preferred_callback(const STACK::RawAddress& bd_addr)
 {
     HILOGE("enter");
     // 目前没有setmandatorycodec接口,改为false，否则无法根据优先级选择编码器
@@ -683,7 +683,7 @@ void A2dpService::NotifyCaptureConnStateChangedInner(const RawAddress &device)
         NotifyCaptureConnStateChanged(hdapDevice, static_cast<int>(BTHdapConnectState::DISCONNECTED),
             hdapDeviceInfo->GetCodecInfo());
         const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
-        BLUEDROID::RawAddress bdAddr = ServiceUtil::AddrToBluedroid(device);
+        STACK::RawAddress bdAddr = ServiceUtil::AddrToStack(device);
         bluetoothHwSrcInterface->setHdapActive(bdAddr);
     }
 }
@@ -1017,7 +1017,7 @@ void A2dpService::ForceStopOffloadPlaying(const RawAddress &device)
     const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
 
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     bool isRunning = bluetoothHwSrcInterface->a2dpOffloadIsRunning(rawAddr);
     HILOGI("offload running is %{public}d", isRunning);
     if (isRunning) {
@@ -1233,7 +1233,7 @@ int A2dpService::SetActiveSinkDevice(const RawAddress &device)
     HILOG_COMM_INFO("SetActiveSinkDevice: enter");
     A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
 
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     btav_source_interface_t* bluetoothA2dpSrcInterface = getBluetoothA2dpSrcInterface();
     RawAddress preDevice = activeDevice_;
     std::string callingName = PermissionManager::GetCallingName();
@@ -1451,7 +1451,7 @@ int A2dpService::SetCodecPreference(const RawAddress &device, const A2dpSrcCodec
     ConvertCodecConfig(codec_config, info);
     std::vector<btav_a2dp_codec_config_t> codec_preferences;
     codec_preferences.push_back(codec_config);
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     bt_status_t status = sBluetoothA2dpSrcInterface->config_codec(rawAddr, codec_preferences);
     CHECK_AND_RETURN_LOG_RET(status == BT_STATUS_SUCCESS, Bluetooth::BT_ERR_INVALID_PARAM,
         "Failed codec configuration");
@@ -1605,7 +1605,7 @@ void A2dpService::HwSetActiveMode()
     if (deviceInfo && (deviceInfo->GetPlayingState() == false)) {
         const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
         CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
-        BLUEDROID::RawAddress rawAddress = ServiceUtil::AddrToBluedroid(addr);
+        STACK::RawAddress rawAddress = ServiceUtil::AddrToStack(addr);
         HILOGD("HwSetActiveMode");
         bluetoothHwSrcInterface->hwSetActiveMode(rawAddress);
     }
@@ -1671,7 +1671,7 @@ int A2dpService::A2dpOffloadSessionPathRequest(const RawAddress &device,
         return ret;
     }
     if (streamsInfo.size() == 0) {
-        BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+        STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
         ret = bluetoothHwSrcInterface->a2dpOffloadGetSinkStreamEncodingPath(rawAddr, a2dpStreamSessions_, false);
         return ret;
     }
@@ -1691,13 +1691,13 @@ int A2dpService::A2dpOffloadSessionPathRequest(const RawAddress &device,
     }
     const HfpAgSystemInterface &systemInterface = HfpAgSystemInterface::GetInstance();
     if (!systemInterface.IsCallIdle()) {
-        BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+        STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
         ret = bluetoothHwSrcInterface->a2dpOffloadGetSinkStreamEncodingPath(rawAddr, a2dpStreamSessions_, false);
         HILOGI("audio mode not idle and ret: %{public}d", ret);
         return ret;
     }
     A2dpOffloadAddRequestSessions(streamsInfo);
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     ret = bluetoothHwSrcInterface->a2dpOffloadGetSinkStreamEncodingPath(rawAddr, a2dpStreamSessions_, true);
     if (ret != HW_A2DP_OFFLOAD_HARDWARE_ENCODING) {
         bool hasSessionPlaying = A2dpOffloadIsSessionOnPlaying();
@@ -1951,7 +1951,7 @@ void A2dpService::A2dpOffloadHandleDelayStop(const RawAddress &device)
         /* session stop, should request path again to judge whether reserved streams need to swith encode path */
         const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
         CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
-        BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+        STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
         bluetoothHwSrcInterface->a2dpOffloadGetSinkStreamEncodingPath(rawAddr, a2dpStreamSessions_, true);
     }
 }
@@ -2251,7 +2251,7 @@ void A2dpService::ChangeCodecWithSceneSwitch()
 
     // Offload场景，不切采样率
     auto device = GetActiveSinkDevice();
-    if (bluetoothHwSrcInterface->a2dpOffloadIsRunning(ServiceUtil::AddrToBluedroid(device))) {
+    if (bluetoothHwSrcInterface->a2dpOffloadIsRunning(ServiceUtil::AddrToStack(device))) {
         return;
     }
     {

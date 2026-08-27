@@ -203,7 +203,7 @@ bool BluetoothHwInterface::GetSha256EncryptHwHashAccount(uint8_t *outHashArray, 
 bool BluetoothHwInterface::InteropMatch(const uint16_t feature, const RawAddress &device)
 {
     HILOGI("feature: %{public}d, device: %{public}s", feature, GET_ENCRYPT_ADDR(device));
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     CHECK_AND_RETURN_LOG_RET(bthwInterface_ != nullptr, false, "bthwInterface_ is null");
     CHECK_AND_RETURN_LOG_RET(bthwInterface_->interopMatch != nullptr, false, "interopMatch is null");
     return bthwInterface_->interopMatch(feature, rawAddr);
@@ -211,7 +211,7 @@ bool BluetoothHwInterface::InteropMatch(const uint16_t feature, const RawAddress
 
 void BluetoothHwInterface::CleanHfpScoOccupied(const RawAddress &device)
 {
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     CHECK_AND_RETURN_LOG(bthwInterface_ != nullptr, "bthwInterface_ is null");
     CHECK_AND_RETURN_LOG(bthwInterface_->hwBtifHfpScoOccupiedClean != nullptr, "hwBtifHfpScoOccupiedClean is null");
     bthwInterface_->hwBtifHfpScoOccupiedClean(rawAddr);
@@ -219,7 +219,7 @@ void BluetoothHwInterface::CleanHfpScoOccupied(const RawAddress &device)
 
 __attribute__((no_sanitize("cfi")))
 void BluetoothHwInterface::KeepBleScanInConn(const std::string &pkgName, int uid,
-    uint8_t transport, const BLUEDROID::RawAddress &addr)
+    uint8_t transport, const STACK::RawAddress &addr)
 {
     /* pkgName, bundleId */
     const std::vector<std::pair<std::string, int>> keepBleScanCallers = {
@@ -258,7 +258,7 @@ void BluetoothHwInterface::KeepBleScanInConn(const std::string &pkgName, int uid
     HwConnAttr attr = { .type = HW_CONN_ATTR_TYPE_KEEP_BLE_SCAN_IN_CONN, .keepBleScanInConn = true };
     bthwInterface_->hwConnAttrSet(transport, addr, &attr);
     BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_KEEP_BLE_SCAN_IN_CONNECTION,
-        ServiceUtil::AddrFromBluedroid(addr), (uid == bundleId) ? 0 : 1, pkgName);
+        ServiceUtil::AddrFromStack(addr), (uid == bundleId) ? 0 : 1, pkgName);
 }
 
 BluetoothHwInterface* BluetoothHwInterface::GetInstance(void)
@@ -508,10 +508,10 @@ void NotifyAudioManagerShowCapsule(const RawAddress &addr, const uint8_t a2dpSta
     }
 }
 
-void HwProfileStateCallback(BLUEDROID::RawAddress *addr, uint8_t a2dpState,
+void HwProfileStateCallback(STACK::RawAddress *addr, uint8_t a2dpState,
     uint8_t hfpState, std::string targetBtDevice, uint8_t a2dpServiceType)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*addr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*addr);
 
     BluetoothAudioManager &bluetoothAudioManager = BluetoothAudioManager::GetInstance();
     uint8_t preA2dpState = static_cast<uint8_t>(A2DP_STATUS_ENABLE);
@@ -649,20 +649,20 @@ void BluetoothHwInterface::HwHiechoDeviceCtrl(uint8_t *remoteAddr, uint32_t cont
     BluetoothHwInterface::GetInstance()->HwHiechoCombRepData(DEVICE_CTRL, mode, DEVICE_CTRL_REQ_LEN, remoteAddr);
 }
 
-void HwA2dpOffloadStateCallback(BLUEDROID::RawAddress *addr, bool isOffload) {}
+void HwA2dpOffloadStateCallback(STACK::RawAddress *addr, bool isOffload) {}
 
-void HwDeviceCallback(BLUEDROID::RawAddress *addr, int deviceType)
+void HwDeviceCallback(STACK::RawAddress *addr, int deviceType)
 {
     HILOGI("HwDeviceCallback deviceType is %{public}d", deviceType);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*addr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*addr);
     RemoteDeviceProperties::GetInstance()->UpdateRemoteHwDeviceType(rawAddr, deviceType);
 }
 
-void HwHdapConnectCallback(BLUEDROID::RawAddress *bdAddr, bool isConnected, uint8_t featureBit,
+void HwHdapConnectCallback(STACK::RawAddress *bdAddr, bool isConnected, uint8_t featureBit,
     HdapConfigCallback config)
 {
     HILOGI("hdap isConnected %{public}d", isConnected);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     A2dpService *service = GetServiceInstance(A2DP_ROLE_SOURCE);
     CHECK_AND_RETURN_LOG(service != nullptr, "Not find source service");
     std::shared_ptr<A2dpDeviceInfo> hdapDeviceInfo = service->GetHdapDeviceInfo();
@@ -707,9 +707,9 @@ void HwHdapConnectCallback(BLUEDROID::RawAddress *bdAddr, bool isConnected, uint
     service->NotifyCaptureConnStateChanged(rawAddr, connectState, info);
 }
 
-void HwA2dpOffloadCodecConfigCallback(BLUEDROID::RawAddress *bdAddr, A2dpOffloadConfigCallback config)
+void HwA2dpOffloadCodecConfigCallback(STACK::RawAddress *bdAddr, A2dpOffloadConfigCallback config)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     A2dpService *service = GetServiceInstance(A2DP_ROLE_SOURCE);
     CHECK_AND_RETURN_LOG(service != nullptr, "Not find source service");
     std::shared_ptr<A2dpDeviceInfo> deviceInfo = service->GetDeviceFromList(rawAddr);
@@ -743,7 +743,7 @@ void HwA2dpOffloadCodecConfigCallback(BLUEDROID::RawAddress *bdAddr, A2dpOffload
         offloadStatus.codecInfo.mtu, offloadStatus.codecInfo.encodedAudioBitrate);
 }
 
-void HwHiechoSendPerServiceCapReqData(uint8_t cap, const BLUEDROID::RawAddress &remoteAddr)
+void HwHiechoSendPerServiceCapReqData(uint8_t cap, const STACK::RawAddress &remoteAddr)
 {
     uint8_t addrBuf[BD_ADDR_LEN];
     uint8_t *addrStream = addrBuf;
@@ -776,7 +776,7 @@ bool HwIsSupportMlinkDevice()
     return isSupport;
 }
 
-void HwHiechoSendHwAccountHashToTwsCb(const BLUEDROID::RawAddress &remoteAddr)
+void HwHiechoSendHwAccountHashToTwsCb(const STACK::RawAddress &remoteAddr)
 {
     HITRACE_METER(BT_TRACE_TAG);
     HILOGI("%{public}s", __func__);
@@ -817,7 +817,7 @@ static void HwSensorhubCollaborationCb(const std::vector<uint8_t> &notifyValue)
 }
 #endif
 
-void HwHiechoDeviceAclEncryptionChangedCb(const BLUEDROID::RawAddress &remoteAddr)
+void HwHiechoDeviceAclEncryptionChangedCb(const STACK::RawAddress &remoteAddr)
 {
     HwHiechoSendHwAccountHashToTwsCb(remoteAddr); /* 发送echo5,D */
 
@@ -825,11 +825,11 @@ void HwHiechoDeviceAclEncryptionChangedCb(const BLUEDROID::RawAddress &remoteAdd
     HwHiechoSendPerServiceCapReqData(cap, remoteAddr); /* 发送echo9,1 */
 }
 
-void HwReportA2dpAbnormalStatusCb(const BLUEDROID::RawAddress &remoteAddr, int32_t errCode)
+void HwReportA2dpAbnormalStatusCb(const STACK::RawAddress &remoteAddr, int32_t errCode)
 {
     A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
     CHECK_AND_RETURN_LOG(a2dpService != nullptr, "a2dpService nullptr");
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(remoteAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(remoteAddr);
     a2dpService->ConnectManager().ReceiveA2dpAbnormalError(rawAddr, errCode);
 }
 
@@ -1071,15 +1071,15 @@ void HwBluetoothConnCb(const StackCallbackParam &param)
     });
 }
 
-void StackErrnoCallback(bt_status_t status, BLUEDROID::RawAddress *addr, BtStackErrno state)
+void StackErrnoCallback(bt_status_t status, STACK::RawAddress *addr, BtStackErrno state)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*addr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*addr);
     RemoteDeviceProperties::GetInstance()->StackErrnoCallback(rawAddr, status, state);
 }
 
-void HwAclDisconnReasonCb(BLUEDROID::RawAddress *addr, int reason)
+void HwAclDisconnReasonCb(STACK::RawAddress *addr, int reason)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*addr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*addr);
     OnAclDisconnectReasonHook(rawAddr, reason);
 }
 
@@ -1114,7 +1114,7 @@ void BluetoothHwInterface::UpdateA2dpOffloadCodecStatus(const RawAddress &addr)
 {
     CHECK_AND_RETURN_LOG(bthwInterface_ != nullptr, "bthwInterface_ nullptr");
     A2dpOffloadConfigCallback config;
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(addr);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(addr);
     CHECK_AND_RETURN_LOG(bthwInterface_->getA2dpOffloadCodecConfig != nullptr, "getA2dpOffloadCodecConfig nullptr");
     bool ret = bthwInterface_->getA2dpOffloadCodecConfig(rawAddr, config);
     CHECK_AND_RETURN_LOG(ret, "get a2dp offload config fail");
@@ -1141,28 +1141,28 @@ void BluetoothHwInterface::HwSetAdvKey(const RawAddress &addr, const char &irk, 
     const char &feature)
 {
     CHECK_AND_RETURN_LOG(bthwInterface_ != nullptr, "bthwInterface_ nullptr");
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(addr);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(addr);
     bthwInterface_->hwSetAdvKey(rawAddr, irk, hbk, version, feature);
 }
 
 void BluetoothHwInterface::HwRemoveAdvKey(const RawAddress &addr)
 {
     CHECK_AND_RETURN_LOG(bthwInterface_ != nullptr, "bthwInterface_ nullptr");
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(addr);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(addr);
     bthwInterface_->hwRemoveAdvKey(rawAddr);
 }
 
 void BluetoothHwInterface::HwGetAdvIrk(const RawAddress &addr, std::vector<uint8_t>& irk)
 {
     CHECK_AND_RETURN_LOG(bthwInterface_ != nullptr, "bthwInterface_ nullptr");
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(addr);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(addr);
     bthwInterface_->hwGetAdvIrk(rawAddr, irk);
 }
 
 bool BluetoothHwInterface::CheckDeviceBonded(const RawAddress &addr)
 {
     CHECK_AND_RETURN_LOG_RET(bthwInterface_ != nullptr, false, "bthwInterface_ is null");
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(addr);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(addr);
     return bthwInterface_->checkRemoteDeviceBonded(rawAddr);
 }
 }  // namespace bluetooth

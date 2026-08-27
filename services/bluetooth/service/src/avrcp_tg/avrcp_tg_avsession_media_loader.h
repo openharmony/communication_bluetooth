@@ -48,7 +48,7 @@ public:
     void RegisterUpdateCallback(MediaCallbacks *callback) override;
     void UnregisterUpdateCallback(MediaCallbacks *callback) override;
     void PlayItem(uint16_t playerId, bool nowPlaying, std::string mediaId) override;
-    void SetActiveDevice(const BLUEDROID::RawAddress &address) override;
+    void SetActiveDevice(const STACK::RawAddress &address) override;
     void AppSettingsSupport(AppSettingsCallback appCb) override;
     void SetAppSettingsMode(uint8_t shuffleMode, uint8_t repeatMode) override;
 

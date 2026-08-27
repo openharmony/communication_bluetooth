@@ -120,7 +120,7 @@ public:
     void OnStartAdvertisingEvt() const;
     void OnStopAdvertisingEvt() const;
 
-    void BondStateChanged(bt_status_t status, BLUEDROID::RawAddress* bd_addr, bt_bond_state_t state);
+    void BondStateChanged(bt_status_t status, STACK::RawAddress* bd_addr, bt_bond_state_t state);
     void BondStateChangedInner(bt_status_t status, RawAddress bd_addr, bt_bond_state_t state);
     void SendPairStatusChanged(const BTTransport transport, const RawAddress &device, int status) const;
     void SendAclStateChanged(const RawAddress &device, int state, unsigned int reason, int pairStatus) const;

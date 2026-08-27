@@ -57,12 +57,12 @@ struct BleCentralManagerImpl::impl :
 
     void CreateBlePeripheralDevice(BlePeripheralDevice &outDevice,
         uint16_t eventType, uint8_t addrType, const RawAddress &addr, int8_t rssi);
-    void ScanResultCallback(uint16_t eventType, uint8_t addrType, const BLUEDROID::RawAddress *addr, int8_t rssi,
+    void ScanResultCallback(uint16_t eventType, uint8_t addrType, const STACK::RawAddress *addr, int8_t rssi,
         std::vector<uint8_t> advData) override;
     void BatchScanReportCallback(int clientIf, int status, int reportFormat, int numRecords,
             std::vector<uint8_t> data) override;
     void BatchScanThresholdCallback(int clientIf) override;
-    void TrackAdvFoundLostCallback(const TrackAdvBaseInfo &info, const BLUEDROID::RawAddress &addr,
+    void TrackAdvFoundLostCallback(const TrackAdvBaseInfo &info, const STACK::RawAddress &addr,
         std::vector<uint8_t> advData) override;
     void SensorhubDevInfoCallback(uint8_t *buffer, int length) override;
     void SensorhubResetCallback(uint32_t state) override;
@@ -353,7 +353,7 @@ void BleCentralManagerImpl::impl::CreateBlePeripheralDevice(BlePeripheralDevice 
 
 // called in jni thread
 void BleCentralManagerImpl::impl::ScanResultCallback(uint16_t eventType, uint8_t addrType,
-    const BLUEDROID::RawAddress *addr, int8_t rssi, std::vector<uint8_t> advData)
+    const STACK::RawAddress *addr, int8_t rssi, std::vector<uint8_t> advData)
 {
     if (addr == nullptr) {
         HILOGE("addr is empty");
@@ -362,7 +362,7 @@ void BleCentralManagerImpl::impl::ScanResultCallback(uint16_t eventType, uint8_t
 
     // Bluedroid has combined advertising and scanning packages.
     DoInBleThread([this, eventType, addrType, rssi, advDataMove = std::move(advData),
-        addr = ServiceUtil::AddrFromBluedroid(*addr)]() {
+        addr = ServiceUtil::AddrFromStack(*addr)]() {
             BlePeripheralDevice device;
             CreateBlePeripheralDevice(device, eventType, addrType, addr, rssi);
             if (advDataMove.size() > 0) {
@@ -384,9 +384,9 @@ void BleCentralManagerImpl::impl::ScanResultCallback(uint16_t eventType, uint8_t
 void ParseBatchScanFullModeHead(RawAddress &address, uint8_t &addrType, int8_t &rssi,
     uint16_t &timestamp, uint8_t* &pos)
 {
-    BLUEDROID::RawAddress addr;
-    STREAM_TO_BDADDR(addr, pos);
-    address = ServiceUtil::AddrFromBluedroid(addr);
+    STACK::RawAddress addr;
+    STREAM_TO_BDADDR(addr, const_cast<const uint8_t *&>(pos));
+    address = ServiceUtil::AddrFromStack(addr);
     STREAM_TO_UINT8(addrType, pos);
     pos++; // Tx_power
     STREAM_TO_INT8(rssi, pos);
@@ -496,10 +496,10 @@ void BleCentralManagerImpl::impl::BatchScanThresholdCallback(int clientIf)
 }
 
 void BleCentralManagerImpl::impl::TrackAdvFoundLostCallback(const TrackAdvBaseInfo &info,
-    const BLUEDROID::RawAddress &addr, std::vector<uint8_t> advData)
+    const STACK::RawAddress &addr, std::vector<uint8_t> advData)
 {
     DoInBleThread([this, advDataMove = std::move(advData), scanId = info.scanId, advertiserState = info.advertiserState,
-        addrType = info.addrType, rssi = info.rssi, addr = ServiceUtil::AddrFromBluedroid(addr)]() {
+        addrType = info.addrType, rssi = info.rssi, addr = ServiceUtil::AddrFromStack(addr)]() {
             BlePeripheralDevice device;
             CreateBlePeripheralDevice(device, 0, addrType, addr, rssi);
             if (advDataMove.size() > 0) {
@@ -723,7 +723,7 @@ void BleCentralManagerImpl::impl::AppendDeviceAddressToByteArray(const std::vect
             HILOGD("addr is empty.");
             continue;
         }
-        BLUEDROID::RawAddress rawAddress = ServiceUtil::AddrToBluedroid(RawAddress(addr));
+        STACK::RawAddress rawAddress = ServiceUtil::AddrToStack(RawAddress(addr));
         if (rawAddress.IsEmpty()) {
             HILOGI("rawAddress is empty.");
             continue;

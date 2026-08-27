@@ -196,8 +196,8 @@ bool RemoteDeviceProperties::CancelPairing(const RawAddress &device) const
     }
 
     it->second->SetPairedStatus(PAIR_CANCELING);
-    BLUEDROID::RawAddress btAddr = ServiceUtil::AddrToBluedroid(device);
-    HILOGI("btAddr: %{public}s", GetEncryptAddr(btAddr.ToLogString()).c_str());
+    STACK::RawAddress btAddr = ServiceUtil::AddrToStack(device);
+    HILOGI("btAddr: %{public}s", GetEncryptAddr(btAddr.ToStringForLogging()).c_str());
     bool ret = (btInterface->cancel_bond(&btAddr) == BT_STATUS_SUCCESS);
     if (ret) {
         BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_CANCEL_PAIR, device, UE_COMMON_SCENE_CASE1, callingName);
@@ -209,7 +209,7 @@ bool RemoteDeviceProperties::CancelPairing(const RawAddress &device) const
 
 bool RemoteDeviceProperties::RemovePair(const RawAddress &device)
 {
-    BLUEDROID::RawAddress btAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress btAddr = ServiceUtil::AddrToStack(device);
     const bt_interface_t *btInterface = nullptr;
     std::string callingName = PermissionManager::GetCallingName();
     BtChrEventWriteStr(CHR_BT_WATCH_REMOVE_PAIR, device.GetAddress(), "PKGNAME", callingName);
@@ -284,7 +284,7 @@ std::vector<RawAddress> RemoteDeviceProperties::removeAllDevicesFromMap()
             adapterProperties_->RemovePairedDeviceList(it->second->GetAddress());
             RawAddress device = RawAddress(it->second->GetAddress());
             it = remoteDevicesMap_.erase(it);
-            BLUEDROID::RawAddress btAddr = ServiceUtil::AddrToBluedroid(device);
+            STACK::RawAddress btAddr = ServiceUtil::AddrToStack(device);
             removeDevices.push_back(device);
             btInterface->remove_bond(&btAddr);
             removeAddrs.push_back(btAddr.ToString());
@@ -332,7 +332,7 @@ bool RemoteDeviceProperties::SetDevicePairingConfirmation(const RawAddress &devi
 
     int passKey = it->second->GetPasskey();
     bt_ssp_variant_t pairingVariant = static_cast<bt_ssp_variant_t> (it->second->GetSspVariant());
-    BLUEDROID::RawAddress address = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress address = ServiceUtil::AddrToStack(device);
 
     if (it->second->GetPairedStatus() == PAIR_CANCELING || accept == false) {
         ret = (btInterface->ssp_reply(&address, pairingVariant, PAIR_REJECT, passKey) == BT_STATUS_SUCCESS);
@@ -419,8 +419,8 @@ bool RemoteDeviceProperties::SetAliasName(const RawAddress &device, const std::s
     size_t size = static_cast<size_t>(len);
     prop.len = size;
     prop.val = const_cast<void*>(static_cast<const void*>(saveName.c_str()));
-    BLUEDROID::RawAddress addr;
-    BLUEDROID::RawAddress::FromString(device.GetAddress(), addr);
+    STACK::RawAddress addr;
+    STACK::RawAddress::FromString(device.GetAddress(), addr);
     SetRemoteDeviceProperty(addr, prop);
     BluetoothHelper::BluetoothCommonEventHelper::PublishRemoteNameChangedEvent(device.GetAddress(), name);
     return ret;
@@ -617,7 +617,7 @@ void RemoteDeviceProperties::StackErrnoCallback(const RawAddress &device, int st
     remoteDevice->SetAutoConnSwitch(errNum);
 }
 
-void RemoteDeviceProperties::GetRemoteDevicePropsCallBack(bt_status_t status, BLUEDROID::RawAddress* bd_addr,
+void RemoteDeviceProperties::GetRemoteDevicePropsCallBack(bt_status_t status, STACK::RawAddress* bd_addr,
     int numProperties, bt_property_t* properties)
 {
     if (bd_addr == nullptr) {
@@ -638,7 +638,7 @@ void RemoteDeviceProperties::GetRemoteDevicePropsCallBack(bt_status_t status, BL
     }
 
     DoInAdapterManagerThread(std::bind(
-        [this](BLUEDROID::RawAddress addr, int numProperties, bt_property_t* prop) {
+        [this](STACK::RawAddress addr, int numProperties, bt_property_t* prop) {
             GetRemoteDevicePropsCallbackInner(addr, numProperties, prop);
             if (prop) {
                 free(prop);
@@ -658,7 +658,7 @@ void RemoteDeviceProperties::HandlePropertyByType(bt_property_t* property, const
         case BT_PROPERTY_UUIDS:
             HandlePropertyRemoteDeviceUuid(property, remoteDevice);
             break;
-        case BLUEDROID::BT_PROPERTY_CLASS_OF_DEVICE:
+        case STACK::BT_PROPERTY_CLASS_OF_DEVICE:
             HandlePropertyRemoteDeviceCod(property, device);
             break;
         case BT_PROPERTY_TYPE_OF_DEVICE:
@@ -697,11 +697,11 @@ void RemoteDeviceProperties::HandlePropertyByType(bt_property_t* property, const
     }
 }
 
-void RemoteDeviceProperties::GetRemoteDevicePropsCallbackInner(BLUEDROID::RawAddress bd_addr,
+void RemoteDeviceProperties::GetRemoteDevicePropsCallbackInner(STACK::RawAddress bd_addr,
     int numProperties, bt_property_t* properties)
 {
     CHECK_AND_RETURN_LOG(properties != nullptr, "Wrong pointer !");
-    RawAddress device = ServiceUtil::AddrFromBluedroid(bd_addr);
+    RawAddress device = ServiceUtil::AddrFromStack(bd_addr);
     std::shared_ptr<BluetoothDevice> remoteDevice = FindRemoteDevice(device);
     
     for (int i = 0; i < numProperties; i++) {
@@ -746,7 +746,7 @@ void RemoteDeviceProperties::DeviceFoundInner(int numProperties, bt_property_t* 
         HILOGE("Invaild addr");
         return;
     }
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(address);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(address);
     GetRemoteDevicePropsCallbackInner(rawAddr, numProperties, properties);
     std::shared_ptr<BluetoothDevice> remoteDevice = FindRemoteDevice(address);
     if (remoteDevice == nullptr) {
@@ -828,7 +828,7 @@ bool RemoteDeviceProperties::SetDevicePin(const RawAddress &device, const std::s
 
     it->second->SetPairConfirmState(PAIR_CONFIRM_STATE_USER_CONFIRM_REPLY);
     it->second->SetPairConfirmType(PAIR_CONFIRM_TYPE_INVALID);
-    BLUEDROID::RawAddress address = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress address = ServiceUtil::AddrToStack(device);
     bt_pin_code_t code;
     uint8_t pinLen = pinCode.length();
     if (pinLen > MAX_PIN_CODE_LENGTH) {
@@ -909,7 +909,7 @@ int32_t RemoteDeviceProperties::GetDeviceAbsVolumeAbility(const RawAddress &devi
     }
 }
 
-int32_t RemoteDeviceProperties::GetRemoteDeviceProperty(const BLUEDROID::RawAddress &addr, bt_property_type_t type)
+int32_t RemoteDeviceProperties::GetRemoteDeviceProperty(const STACK::RawAddress &addr, bt_property_type_t type)
 {
     const bt_interface_t *btInterface = nullptr;
     int32_t status = hal_util_load_bt_library(&btInterface);
@@ -926,7 +926,7 @@ int32_t RemoteDeviceProperties::GetRemoteDeviceProperty(const BLUEDROID::RawAddr
     return BT_STATUS_SUCCESS;
 }
 
-void RemoteDeviceProperties::SetRemoteDeviceProperty(const BLUEDROID::RawAddress &addr, const bt_property_t &prop)
+void RemoteDeviceProperties::SetRemoteDeviceProperty(const STACK::RawAddress &addr, const bt_property_t &prop)
 {
     const bt_interface_t *btInterface = nullptr;
     int32_t status = hal_util_load_bt_library(&btInterface);
@@ -1008,8 +1008,8 @@ int32_t RemoteDeviceProperties::SetCustomType(const RawAddress &device, int32_t 
     prop.type = static_cast<bt_property_type_t>(HW_BT_PROPERTY_CUSTOM_TYPE);
     prop.len = sizeof(customType);
     prop.val = type;
-    BLUEDROID::RawAddress addr;
-    BLUEDROID::RawAddress::FromString(device.GetAddress(), addr);
+    STACK::RawAddress addr;
+    STACK::RawAddress::FromString(device.GetAddress(), addr);
     SetRemoteDeviceProperty(addr, prop);
     BtChrUeManager::GetInstance()->WriteCustomTypeChangeUe(device, deviceName, preCustomType, customType);
     return BT_NO_ERROR;
@@ -1200,7 +1200,7 @@ bool RemoteDeviceProperties::SetDeviceProperty(const RawAddress &device, bt_prop
         property.len = static_cast<int>(propertyValue.size());
         property.val = const_cast<void*>(static_cast<const void*>(propertyValue.c_str()));
     }
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     SetRemoteDeviceProperty(rawAddr, property);
     return true;
 }
@@ -1250,7 +1250,7 @@ int32_t RemoteDeviceProperties::SetConnectionTime(const RawAddress &device, int6
     prop.type = static_cast<bt_property_type_t>(BT_PROPERTY_CONNECTION_TIME);
     prop.len = sizeof(connectionTime);
     prop.val = type;
-	BLUEDROID::RawAddress addr = ServiceUtil::AddrToBluedroid(device);
+	STACK::RawAddress addr = ServiceUtil::AddrToStack(device);
     SetRemoteDeviceProperty(addr, prop);
     HILOGI("RemoteDeviceProperties SetConnectionTime: addr: %{public}s connectionTime:%{public}ld",
         GET_ENCRYPT_ADDR(device), connectionTime);

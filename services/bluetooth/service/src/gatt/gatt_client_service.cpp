@@ -69,7 +69,7 @@ public:
     ~GattClientServiceRegisterObserver() override
     {}
 
-    void RegisterClientCallback(int status, int clientIf, const BLUEDROID::bluetooth::Uuid &appUuid) override
+    void RegisterClientCallback(int status, int clientIf, const STACK::bluetooth::Uuid &appUuid) override
     {
         DoInGattThread([status, clientIf, callback = this->callback_, context = std::ref(this->context_)]() {
             callback(status, clientIf, context);
@@ -302,7 +302,7 @@ void GattClientService::impl::RegisterApplication(std::weak_ptr<IGattClientCallb
     std::swap(registerObserver, observer);
 
     // not support eatt transport now
-    int ret = btIfGattClient->register_client(BLUEDROID::bluetooth::Uuid::GetRandom(), false);
+    int ret = btIfGattClient->register_client(STACK::bluetooth::Uuid::GetRandom(), false);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("Register client failed, ret: %{public}d", ret);
         // Release and delete the observer.
@@ -671,8 +671,8 @@ std::vector<GattDevice> GattClientService::GetAllDevice()
 
             for (auto iter = pimpl->clients.begin(); iter != pimpl->clients.end(); iter++) {
                 uint8_t addrType;
-                btif_get_address_type(ServiceUtil::AddrToBluedroid((*iter)->GetAddress()), &addrType);
-                set.emplace((*iter)->GetAddress(), ServiceUtil::AddrTypeFromBluedroid(addrType),
+                btif_get_address_type(ServiceUtil::AddrToStack((*iter)->GetAddress()), &addrType);
+                set.emplace((*iter)->GetAddress(), ServiceUtil::AddrTypeFromStack(addrType),
                     (*iter)->GetTransport(), (*iter)->GetConnState());
             }
             std::vector<GattDevice> v(set.begin(), set.end());
@@ -734,7 +734,7 @@ int GattClientService::RequestFastestConn(const RawAddress &addr)
             HILOGE("bthwif is null");
             return;
         }
-        bthwif->leConnectFastest(ServiceUtil::AddrToBluedroid(addr));
+        bthwif->leConnectFastest(ServiceUtil::AddrToStack(addr));
     });
     return GattStatus::GATT_SUCCESS;
 }

@@ -26,9 +26,9 @@
 
 namespace OHOS {
 namespace bluetooth {
-const BLUEDROID::bluetooth::Uuid UUID_MAP_MAS = BLUEDROID::bluetooth::Uuid::From16Bit(0x1132);
-const BLUEDROID::bluetooth::Uuid UUID_MAP_MNS = BLUEDROID::bluetooth::Uuid::From16Bit(0x1133);
-const BLUEDROID::bluetooth::Uuid UUID_OBEX_OBJECT_PUSH = BLUEDROID::bluetooth::Uuid::From16Bit(0x1105);
+const STACK::bluetooth::Uuid UUID_MAP_MAS = STACK::bluetooth::Uuid::From16Bit(0x1132);
+const STACK::bluetooth::Uuid UUID_MAP_MNS = STACK::bluetooth::Uuid::From16Bit(0x1133);
+const STACK::bluetooth::Uuid UUID_OBEX_OBJECT_PUSH = STACK::bluetooth::Uuid::From16Bit(0x1105);
 static BtRecursiveMutex sdpGetInstanceMutex_ {};
 
 SdpAdapter &SdpAdapter::GetInstance()
@@ -37,8 +37,8 @@ SdpAdapter &SdpAdapter::GetInstance()
     static SdpAdapter instance;
     return instance;
 }
-static void sdp_search_callback(bt_status_t status, const BLUEDROID::RawAddress &bd_addr,
-    const BLUEDROID::bluetooth::Uuid &uuid_in, int count, bluetooth_sdp_record *records)
+static void sdp_search_callback(bt_status_t status, const STACK::RawAddress &bd_addr,
+    const STACK::bluetooth::Uuid &uuid_in, int count, bluetooth_sdp_record *records)
 {
     for (int i = 0; i < count || i == 0; i++) {
         // when status = 1 (BTA_SDP_FAILURE), records is defult(not null), count = 0.
@@ -67,7 +67,7 @@ static void sdp_search_callback(bt_status_t status, const BLUEDROID::RawAddress 
                 record->ops.hdr.rfcomm_channel_number,
                 record->ops.hdr.l2cap_psm,
                 record->ops.hdr.profile_version,
-                ServiceUtil::AddrFromBluedroid(bd_addr).GetAddress(),
+                ServiceUtil::AddrFromStack(bd_addr).GetAddress(),
                 UUID_OBEX_OBJECT_PUSH.ToString(),
                 record->ops.hdr.service_name_length > 0 ? record->ops.hdr.service_name : "",
                 i < (count - 1) ? true : false};
@@ -183,9 +183,9 @@ bool SdpAdapter::StartRemoteSdpSearch(const std::string &address, const std::str
     if (!bluetoothSdpInterface_) {
         return false;
     }
-    BLUEDROID::RawAddress rawAddress;
-    BLUEDROID::RawAddress::FromString(address, rawAddress);
-    int32_t ret = bluetoothSdpInterface_->sdp_search(&rawAddress, BLUEDROID::bluetooth::Uuid::FromString(uuid));
+    STACK::RawAddress rawAddress;
+    STACK::RawAddress::FromString(address, rawAddress);
+    int32_t ret = bluetoothSdpInterface_->sdp_search(&rawAddress, STACK::bluetooth::Uuid::FromString(uuid));
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("sdp_search error");
         return false;

@@ -96,8 +96,8 @@ public:
     void SetAppState(bool isForeground);
     bool GetAppState();
 
-    static void OnAppStatusChanged(BLUEDROID::RawAddress* bd_addr, bthd_application_state_t state);
-    static void OnConnectionStateChanged(BLUEDROID::RawAddress* bd_addr, bthd_connection_state_t state);
+    static void OnAppStatusChanged(STACK::RawAddress* bd_addr, bthd_application_state_t state);
+    static void OnConnectionStateChanged(STACK::RawAddress* bd_addr, bthd_connection_state_t state);
     static void OnGetReport(uint8_t type, uint8_t id, uint16_t buffer_size);
     static void OnInterruptDataReceived(uint8_t report_id, uint16_t len, uint8_t* p_data);
     static void OnSetProtocol(uint8_t protocol);
@@ -106,8 +106,8 @@ public:
 
 private:
 
-    static int ConvertAppStatusChangedFromBluedroid(bthd_application_state_t status);
-    static int ConvertConnectStateFromBluedroid(bthd_connection_state_t state);
+    static int ConvertAppStatusChangedFromStack(bthd_application_state_t status);
+    static int ConvertConnectStateFromStack(bthd_connection_state_t state);
     void OnAppStatusChangedInner(int state);
     void OnConnectionStateChangedInner(bluetooth::RawAddress rawAddr, int state);
     void OnGetReportInner(int type, int id, uint16_t buffer_size);

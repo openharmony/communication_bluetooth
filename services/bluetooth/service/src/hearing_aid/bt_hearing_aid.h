@@ -20,8 +20,8 @@
 
 #include "types/raw_address.h"
 
-#ifndef BLUEDROID
-#define BLUEDROID
+#ifndef STACK
+#define STACK
 #endif
 
 namespace bluetooth {
@@ -41,9 +41,9 @@ public:
     virtual ~HearingAidCallbacks() = default;
 
     virtual void OnConnectionState(ConnectionState state,
-                                   const BLUEDROID::RawAddress& address) = 0;
+                                   const STACK::RawAddress& address) = 0;
     virtual void OnDeviceAvailable(uint8_t capabilities, uint64_t hiSyncId,
-                                   const BLUEDROID::RawAddress& address) = 0;
+                                   const STACK::RawAddress& address) = 0;
 };
 
 /* Interface exposed by the hearing aid profile. */
@@ -53,12 +53,12 @@ public:
 
     virtual void Init(HearingAidCallbacks* callbacks) = 0;
     virtual void Cleanup() = 0;
-    virtual void Connect(const BLUEDROID::RawAddress& address) = 0;
-    virtual void Disconnect(const BLUEDROID::RawAddress& address) = 0;
-    virtual void AddToAcceptlist(const BLUEDROID::RawAddress& address) = 0;
-    virtual void SetVolumeByAddr(const BLUEDROID::RawAddress& address,
+    virtual void Connect(const STACK::RawAddress& address) = 0;
+    virtual void Disconnect(const STACK::RawAddress& address) = 0;
+    virtual void AddToAcceptlist(const STACK::RawAddress& address) = 0;
+    virtual void SetVolumeByAddr(const STACK::RawAddress& address,
                                  int volume) = 0;
-    virtual void StartSendingAudio(const BLUEDROID::RawAddress& address) = 0;
+    virtual void StartSendingAudio(const STACK::RawAddress& address) = 0;
 };
 
 }  // namespace hearing_aid

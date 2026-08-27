@@ -131,7 +131,7 @@ std::string PropertiesLog(uint8_t properties)
 void GattServerApplication::BuildGattService(const std::vector<btgatt_db_element_t> &svc, Service &service)
 {
     for (auto iter = svc.begin(); iter != svc.end(); iter++) {
-        Uuid uuid = ServiceUtil::UuidFromBluedroid(iter->uuid);
+        Uuid uuid = ServiceUtil::UuidFromStack(iter->uuid);
         switch (iter->type) {
             case BTGATT_DB_PRIMARY_SERVICE:
             case BTGATT_DB_SECONDARY_SERVICE: {
@@ -204,19 +204,19 @@ void GattServerApplication::AddService(const Service &service)
 {
     std::vector<btgatt_db_element_t> svc;
     svc.push_back({
-        .uuid = ServiceUtil::UuidToBluedroid(service.uuid_),
+        .uuid = ServiceUtil::UuidToStack(service.uuid_),
         .type = (service.isPrimary_ ? BTGATT_DB_PRIMARY_SERVICE : BTGATT_DB_SECONDARY_SERVICE),
     });
     for (const auto &characteristic : service.characteristics_) {
         svc.push_back({
-            .uuid = ServiceUtil::UuidToBluedroid(characteristic.uuid_),
+            .uuid = ServiceUtil::UuidToStack(characteristic.uuid_),
             .type = BTGATT_DB_CHARACTERISTIC,
             .properties = static_cast<uint8_t>(characteristic.properties_),
             .permissions = static_cast<uint16_t>(characteristic.permissions_),
         });
         for (const auto &descriptor : characteristic.descriptors_) {
             svc.push_back({
-                .uuid = ServiceUtil::UuidToBluedroid(descriptor.uuid_),
+                .uuid = ServiceUtil::UuidToStack(descriptor.uuid_),
                 .type = BTGATT_DB_DESCRIPTOR,
                 .permissions = static_cast<uint16_t>(characteristic.permissions_),
             });
@@ -284,13 +284,13 @@ void GattServerApplication::ClearServices(void)
 }
 
 void GattServerApplication::ConnectionCallback(int connId, int serverIf, int connected,
-    const BLUEDROID::RawAddress &bda, int reason)
+    const STACK::RawAddress &bda, int reason)
 {
     if (serverIf != serverIf_) {
         return;
     }
     HILOGI("connId: %{public}d, serverIf: %{public}d, connected: %{public}d, address: %{public}s",
-        connId, serverIf, connected, bda.ToLogString().c_str());
+        connId, serverIf, connected, bda.ToStringForLogging().c_str());
 
     int convertReason = static_cast<int>(GattDisconnectReason::CONN_UNKNOWN);
     std::string reasonMessage = "";
@@ -301,7 +301,7 @@ void GattServerApplication::ConnectionCallback(int connId, int serverIf, int con
         resourceMgr->SendSensingStateChanged(eventId, SensingInfo(bda.ToString(), static_cast<uint32_t>(serverIf)));
     }
     // to support other transport, or detect transport
-    GattDevice device(ServiceUtil::AddrFromBluedroid(bda), GATT_TRANSPORT_TYPE_LE, GATT_ROLE_SECONDARY);
+    GattDevice device(ServiceUtil::AddrFromStack(bda), GATT_TRANSPORT_TYPE_LE, GATT_ROLE_SECONDARY);
     int state = 0;
     if (connected) {
         state = static_cast<int>(BTConnectState::CONNECTED);
@@ -353,7 +353,7 @@ void GattServerApplication::RequestReadCallback(const RequestReadCallbackContext
     }
 }
 
-void GattServerApplication::RequestReadCharacteristicCallback(int connId, int transId, const BLUEDROID::RawAddress &bda,
+void GattServerApplication::RequestReadCharacteristicCallback(int connId, int transId, const STACK::RawAddress &bda,
     int attrHandle, int offset, bool isLong)
 {
     if (!IsValidConnId(connId)) {
@@ -361,9 +361,9 @@ void GattServerApplication::RequestReadCharacteristicCallback(int connId, int tr
     }
     HILOGI("connId: %{public}d, transId: %{public}d, address: %{public}s, attrHandle: %{public}#x, offset: %{public}d,"
         "isLong: %{public}d",
-        connId, transId, bda.ToLogString().c_str(), attrHandle, offset, isLong);
+        connId, transId, bda.ToStringForLogging().c_str(), attrHandle, offset, isLong);
 
-    RequestReadCallbackContext ctx = {connId, transId, ServiceUtil::AddrFromBluedroid(bda), attrHandle, offset, isLong};
+    RequestReadCallbackContext ctx = {connId, transId, ServiceUtil::AddrFromStack(bda), attrHandle, offset, isLong};
     RequestReadCallback(ctx, GattElement::CHARACTERISTIC);
 }
 
@@ -384,7 +384,7 @@ void GattServerApplication::RespondCharacteristicRead(const RawAddress &addr, ui
     }
 }
 
-void GattServerApplication::RequestReadDescriptorCallback(int connId, int transId, const BLUEDROID::RawAddress &bda,
+void GattServerApplication::RequestReadDescriptorCallback(int connId, int transId, const STACK::RawAddress &bda,
     int attrHandle, int offset, bool isLong)
 {
     if (!IsValidConnId(connId)) {
@@ -392,9 +392,9 @@ void GattServerApplication::RequestReadDescriptorCallback(int connId, int transI
     }
     HILOGI("connId: %{public}d, transId: %{public}d, address: %{public}s, attrHandle: %{public}#x, offset: %{public}d,"
         "isLong: %{public}d",
-        connId, transId, bda.ToLogString().c_str(), attrHandle, offset, isLong);
+        connId, transId, bda.ToStringForLogging().c_str(), attrHandle, offset, isLong);
 
-    RequestReadCallbackContext ctx = {connId, transId, ServiceUtil::AddrFromBluedroid(bda), attrHandle, offset, isLong};
+    RequestReadCallbackContext ctx = {connId, transId, ServiceUtil::AddrFromStack(bda), attrHandle, offset, isLong};
     RequestReadCallback(ctx, GattElement::DESCRIPTOR);
 }
 
@@ -459,15 +459,15 @@ void GattServerApplication::RequestWriteCallback(const RequestWriteCallbackConte
 }
 
 void GattServerApplication::RequestWriteCharacteristicCallback(int connId, int transId,
-    const BLUEDROID::RawAddress &bda, int attrHandle, int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value)
+    const STACK::RawAddress &bda, int attrHandle, int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value)
 {
     if (!IsValidConnId(connId)) {
         return;
     }
     HILOGI("connId: %{public}d, transId: %{public}d, address: %{public}s, attrHandle: %{public}#x, offset: %{public}d,"
         "needRsp: %{public}d, isPrep: %{public}d",
-        connId, transId, bda.ToLogString().c_str(), attrHandle, offset, needRsp, isPrep);
-    RequestWriteCallbackContext ctx = {connId, transId, ServiceUtil::AddrFromBluedroid(bda), attrHandle, offset,
+        connId, transId, bda.ToStringForLogging().c_str(), attrHandle, offset, needRsp, isPrep);
+    RequestWriteCallbackContext ctx = {connId, transId, ServiceUtil::AddrFromStack(bda), attrHandle, offset,
         needRsp, isPrep, std::move(value)};
     RequestWriteCallback(ctx, GattElement::CHARACTERISTIC);
 }
@@ -482,7 +482,7 @@ void GattServerApplication::RespondCharacteristicWrite(const RawAddress &addr, u
     SendResponse(iter->first, iter->second.transId, ToValueHandle(handle), ret);
 }
 
-void GattServerApplication::RequestWriteDescriptorCallback(int connId, int transId, const BLUEDROID::RawAddress &bda,
+void GattServerApplication::RequestWriteDescriptorCallback(int connId, int transId, const STACK::RawAddress &bda,
     int attrHandle, int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value)
 {
     if (!IsValidConnId(connId)) {
@@ -490,9 +490,9 @@ void GattServerApplication::RequestWriteDescriptorCallback(int connId, int trans
     }
     HILOGI("connId: %{public}d, transId: %{public}d, address: %{public}s, attrHandle: %{public}#x, offset: %{public}d,"
         "needRsp: %{public}d, isPrep: %{public}d",
-        connId, transId, bda.ToLogString().c_str(), attrHandle, offset, needRsp, isPrep);
+        connId, transId, bda.ToStringForLogging().c_str(), attrHandle, offset, needRsp, isPrep);
 
-    RequestWriteCallbackContext ctx = {connId, transId, ServiceUtil::AddrFromBluedroid(bda), attrHandle, offset,
+    RequestWriteCallbackContext ctx = {connId, transId, ServiceUtil::AddrFromStack(bda), attrHandle, offset,
         needRsp, isPrep, std::move(value)};
     RequestWriteCallback(ctx, GattElement::DESCRIPTOR);
 }
@@ -564,14 +564,14 @@ void GattServerApplication::ProcessLongValueWrite(const RequestWriteCallbackCont
     SendResponse(rspContext, ctx.value, ctx.offset);
 }
 
-void GattServerApplication::RequestExecWriteCallback(int connId, int transId, const BLUEDROID::RawAddress &bda,
+void GattServerApplication::RequestExecWriteCallback(int connId, int transId, const STACK::RawAddress &bda,
     int execWrite)
 {
     if (!IsValidConnId(connId)) {
         return;
     }
     HILOGI("connId: %{public}d, transId: %{public}d, address: %{public}s, execWrite: %{public}d",
-        connId, transId, bda.ToLogString().c_str(), execWrite);
+        connId, transId, bda.ToStringForLogging().c_str(), execWrite);
     auto connIter = connIdMap_.find(connId);
     if (connIter == connIdMap_.end()) {
         HILOGE("Invalid connId: %{public}d", connId);
@@ -591,7 +591,7 @@ void GattServerApplication::RequestExecWriteCallback(int connId, int transId, co
         SendResponse(connId, transId, 0, GattStatus::REQUEST_NOT_SUPPORT);
         return;
     }
-    // Expect the upper-layer application to respond to the request  ServiceUtil::AddrFromBluedroid(bda)
+    // Expect the upper-layer application to respond to the request  ServiceUtil::AddrFromStack(bda)
     connIter->second.transId = transId;
     ReportWriteRequest(connIter->second.device, prep.handle, prep.value, true, prep.type);
 
@@ -625,7 +625,7 @@ void GattServerApplication::SendResponse(const SendResponseContext &ctx, const s
         rsp.attr_value.len = value.size();
     }
 
-    int status = GattServiceBase::GattStatusToBluedroid(ctx.ret);
+    int status = GattServiceBase::GattStatusToStack(ctx.ret);
     if (btIfGattServer_) {
         result = btIfGattServer_->send_response(ctx.connId, ctx.transId, status, rsp);
         if (result != BT_STATUS_SUCCESS) {
@@ -652,7 +652,7 @@ void GattServerApplication::IndicationSentCallback(int connId, int status)
         connIter->second.notifyNoCfmSem = nullptr;
     }
 
-    int ret = GattServiceBase::GattStatusFromBluedroid(status);
+    int ret = GattServiceBase::GattStatusFromStack(status);
     uint16_t characteristicHandle = FromValueHandle(connIter->second.notifyHandle);
     WPTR_CBACK(callback_, OnNotifyConfirm, connIter->second.device, Characteristic(characteristicHandle), ret);
 }
@@ -722,9 +722,9 @@ void GattServerApplication::MtuChangedCallback(int connId, int mtu)
     // Update connection mtu
     connIter->second.mtu = static_cast<size_t>(mtu);
     WPTR_CBACK(callback_, OnMtuChanged, connIter->second.device, mtu);
-    BtChrEventWriteInt(CHR_BLE_DISCONNECT, ServiceUtil::AddrToBluedroid(connIter->second.device.addr_).ToString(),
+    BtChrEventWriteInt(CHR_BLE_DISCONNECT, ServiceUtil::AddrToStack(connIter->second.device.addr_).ToString(),
         "BTCONMTUINITIATOR", 1);
-    BtChrEventWriteInt(CHR_BLE_DISCONNECT, ServiceUtil::AddrToBluedroid(connIter->second.device.addr_).ToString(),
+    BtChrEventWriteInt(CHR_BLE_DISCONNECT, ServiceUtil::AddrToStack(connIter->second.device.addr_).ToString(),
         "BTCONMTURESULT", mtu);
 }
 
@@ -756,7 +756,7 @@ void GattServerApplication::Connect(const RawAddress &addr, bool isDirect)
     if (btIfGattServer_) {
         std::string callingName = PermissionManager::GetCallingName();
         BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_BLE_SERVER_CONN, addr.GetAddress(), serverIf_, callingName);
-        int ret = btIfGattServer_->connect(serverIf_, ServiceUtil::AddrToBluedroid(addr), isDirect, GATT_TRANSPORT_LE);
+        int ret = btIfGattServer_->connect(serverIf_, ServiceUtil::AddrToStack(addr), isDirect, GATT_TRANSPORT_LE);
         CHECK_AND_RETURN_LOG(ret == BT_STATUS_SUCCESS, "failed, ret: %{public}d", ret);
     }
 }
@@ -779,7 +779,7 @@ void GattServerApplication::CancelConnection(const RawAddress &addr)
         std::string callingName = PermissionManager::GetCallingName();
         BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_BLE_SERVER_DISCONN, addr.GetAddress(),
             serverIf_, callingName);
-        int ret = btIfGattServer_->disconnect(serverIf_, ServiceUtil::AddrToBluedroid(addr), iter->first);
+        int ret = btIfGattServer_->disconnect(serverIf_, ServiceUtil::AddrToStack(addr), iter->first);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnConnectionStateChanged, iter->second.device, GattStatus::GATT_FAILURE,
@@ -802,7 +802,7 @@ void GattServerApplication::PhyUpdatedCallback(int connId, uint8_t txPhy, uint8_
         HILOGE("Invalid connId: %{public}d", connId);
         return;
     }
-    int ret = GattServiceBase::GattStatusFromBluedroid(status);
+    int ret = GattServiceBase::GattStatusFromStack(status);
     WPTR_CBACK(callback_, OnBlePhyUpdate, connIter->second.device, txPhy, rxPhy, ret);
 }
  
@@ -818,7 +818,7 @@ void GattServerApplication::SetPhy(const RawAddress &addr, int32_t txPhy, int32_
 
     if (btIfGattServer_) {
         int ret = btIfGattServer_->set_preferred_phy(
-            ServiceUtil::AddrToBluedroid(addr), txPhyMask, rxPhyMask, phyOptions);
+            ServiceUtil::AddrToStack(addr), txPhyMask, rxPhyMask, phyOptions);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnBlePhyUpdate, iter->second.device, 0, 0, GattStatus::GATT_FAILURE);
@@ -829,7 +829,7 @@ void GattServerApplication::SetPhy(const RawAddress &addr, int32_t txPhy, int32_
 void GattServerApplication::ReadPhyCallback(uint8_t txPhy, uint8_t rxPhy, uint8_t status)
 {
     HILOGI("txPhy: %{public}d, rxPhy: %{public}d, rxPhy: %{public}d", txPhy, rxPhy, status);
-    int ret = GattServiceBase::GattStatusFromBluedroid(status);
+    int ret = GattServiceBase::GattStatusFromStack(status);
     WPTR_CBACK(callback_, OnBlePhyRead, txPhy, rxPhy, ret);
 }
  
@@ -842,7 +842,7 @@ void GattServerApplication::ReadPhy(const RawAddress &addr)
     }
  
     if (btIfGattServer_) {
-        int ret = btIfGattServer_->read_phy(ServiceUtil::AddrToBluedroid(addr),
+        int ret = btIfGattServer_->read_phy(ServiceUtil::AddrToStack(addr),
             base::Bind(&GattServerApplication::ReadPhyCallback, base::Unretained(this)));
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);

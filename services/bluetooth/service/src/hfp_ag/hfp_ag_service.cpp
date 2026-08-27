@@ -1621,7 +1621,7 @@ bool HfpAgService::OpenVoiceRecognition(const RawAddress &device)
 
 bool HfpAgService::SetActiveDeviceToStack(const RawAddress &device)
 {
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     if (bluetoothHfpInterface == nullptr) {
         HILOGE("bluetoothHfpInterface is null");
         return false;
@@ -2127,7 +2127,7 @@ void HfpAgService::StopVoiceRecognitionToStack(const std::string &address)
 {
     HILOGI("Hfp device address[%{public}s]", GetEncryptAddr(address).c_str());
     RawAddress device(address);
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     auto hfpAgService = HfpAgService::GetService();
     if (hfpAgService == nullptr) {
         return;
@@ -2168,7 +2168,7 @@ void HfpAgService::ScoStateChanged(const std::string &address, int toState)
         if (IsActiveDevice(address) && toState == HFP_AG_AUDIO_STATE_CONNECTING) {
             auto* bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
             CHECK_AND_RETURN_LOG(bthwif != nullptr, "bthwInterface_ is null");
-            BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(RawAddress(address));
+            STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(RawAddress(address));
             bool voiceCombineAbility = bthwif->hwGetRemoteVoiceCombineAbility(rawAddr);
             BluetoothAudioFrameworkAdapter::GetInstance().SetActiveDeviceVoiceCombineAbility(voiceCombineAbility);
         }
@@ -2187,7 +2187,7 @@ void HfpAgService::SetInbandRing(bool action)
     return bluetoothHfpInterface;
 }
 
-int HfpAgService::CovertConnectStateFromBluedroid(::bluetooth::headset::bthf_connection_state_t state)
+int HfpAgService::CovertConnectStateFromStack(::bluetooth::headset::bthf_connection_state_t state)
 {
     if (state == ::bluetooth::headset::BTHF_CONNECTION_STATE_DISCONNECTING) {
         return HFP_AG_STATE_DISCONNECTING;
@@ -2205,14 +2205,14 @@ int HfpAgService::CovertConnectStateFromBluedroid(::bluetooth::headset::bthf_con
 }
 
 void HfpAgService::HfpAgServiceCallbacks::ConnectionStateCallback(::bluetooth::headset::bthf_connection_state_t state,
-    BLUEDROID::RawAddress* bdAddr)
+    STACK::RawAddress* bdAddr)
 {
     HILOGI("ConnectState=%{public}d", state);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     if (state == ::bluetooth::headset::BTHF_CONNECTION_STATE_DISCONNECTED) {
         BtChrEventWriteTime(CHR_USER_DISCONNECT, rawAddr.GetAddress(), "HFPDISCONNECTTIME");
     }
-    int connectState = HfpAgService::CovertConnectStateFromBluedroid(state);
+    int connectState = HfpAgService::CovertConnectStateFromStack(state);
     HfpAgService *service = HfpAgService::GetService();
     CHECK_AND_RETURN_LOG(service != nullptr, "service is null");
     service->ConnectionStateCallbackInner(rawAddr, connectState);
@@ -2245,7 +2245,7 @@ void HfpAgService::ConnectionStateCallbackInner(RawAddress rawAddr, int state)
 {
     if (!IsAcceptConnection(rawAddr, state)) {
         if (bluetoothHfpInterface != nullptr) {
-            BLUEDROID::RawAddress device = ServiceUtil::AddrToBluedroid(rawAddr);
+            STACK::RawAddress device = ServiceUtil::AddrToStack(rawAddr);
             bluetoothHfpInterface->Disconnect(&device);
         }
         return;
@@ -2266,7 +2266,7 @@ bool HfpAgService::IsAcceptConnection(RawAddress &rawAddr, int state)
     return true;
 }
 
-int HfpAgService::CovertAudioStateFromBluedroid(::bluetooth::headset::bthf_audio_state_t state)
+int HfpAgService::CovertAudioStateFromStack(::bluetooth::headset::bthf_audio_state_t state)
 {
     if (state == ::bluetooth::headset::BTHF_AUDIO_STATE_CONNECTING) {
         return HFP_AG_AUDIO_STATE_CONNECTING;
@@ -2281,11 +2281,11 @@ int HfpAgService::CovertAudioStateFromBluedroid(::bluetooth::headset::bthf_audio
 }
 
 void HfpAgService::HfpAgServiceCallbacks::AudioStateCallback(::bluetooth::headset::bthf_audio_state_t state,
-    BLUEDROID::RawAddress* bdAddr)
+    STACK::RawAddress* bdAddr)
 {
-    HILOGI("AudioState=%{public}d for %{public}s", state, GetEncryptAddr(bdAddr->ToLogString()).c_str());
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
-    int audioState = HfpAgService::CovertAudioStateFromBluedroid(state);
+    HILOGI("AudioState=%{public}d for %{public}s", state, GetEncryptAddr(bdAddr->ToStringForLogging()).c_str());
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    int audioState = HfpAgService::CovertAudioStateFromStack(state);
     HfpAgMessage event(HFP_AG_AUDIO_STATE_CHANGED_EVT, audioState);
     event.dev_ = rawAddr.GetAddress();
     auto hfpAgService = HfpAgService::GetService();
@@ -2295,7 +2295,7 @@ void HfpAgService::HfpAgServiceCallbacks::AudioStateCallback(::bluetooth::headse
     hfpAgService->PostEvent(event);
 }
 
-int HfpAgService::CovertVRStateFromBluedroid(::bluetooth::headset::bthf_vr_state_t state)
+int HfpAgService::CovertVRStateFromStack(::bluetooth::headset::bthf_vr_state_t state)
 {
     if (state == ::bluetooth::headset::BTHF_VR_STATE_STOPPED) {
         return HFP_AG_HF_VR_ClOSED;
@@ -2307,13 +2307,13 @@ int HfpAgService::CovertVRStateFromBluedroid(::bluetooth::headset::bthf_vr_state
 }
 
 void HfpAgService::HfpAgServiceCallbacks::VoiceRecognitionCallback(::bluetooth::headset::bthf_vr_state_t state,
-    BLUEDROID::RawAddress* bdAddr)
+    STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_VR_CHANGED;
-    event.arg1_ = CovertVRStateFromBluedroid(state);
+    event.arg1_ = CovertVRStateFromStack(state);
     auto hfpAgService = HfpAgService::GetService();
     if (hfpAgService == nullptr) {
         return;
@@ -2321,9 +2321,9 @@ void HfpAgService::HfpAgServiceCallbacks::VoiceRecognitionCallback(::bluetooth::
     hfpAgService->PostEvent(event);
 }
 
-void HfpAgService::HfpAgServiceCallbacks::AnswerCallCallback(BLUEDROID::RawAddress* bdAddr)
+void HfpAgService::HfpAgServiceCallbacks::AnswerCallCallback(STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_ANSWER_CALL;
@@ -2334,9 +2334,9 @@ void HfpAgService::HfpAgServiceCallbacks::AnswerCallCallback(BLUEDROID::RawAddre
     hfpAgService->PostEvent(event);
 }
 
-void HfpAgService::HfpAgServiceCallbacks::HangupCallCallback(BLUEDROID::RawAddress* bdAddr)
+void HfpAgService::HfpAgServiceCallbacks::HangupCallCallback(STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_HANGUP_CALL;
@@ -2347,7 +2347,7 @@ void HfpAgService::HfpAgServiceCallbacks::HangupCallCallback(BLUEDROID::RawAddre
     hfpAgService->PostEvent(event);
 }
 
-int HfpAgService::CovertVolumeControlTypeFromBluedroid(::bluetooth::headset::bthf_volume_type_t type)
+int HfpAgService::CovertVolumeControlTypeFromStack(::bluetooth::headset::bthf_volume_type_t type)
 {
     if (type == ::bluetooth::headset::BTHF_VOLUME_TYPE_SPK) {
         return HFP_AG_VOLUME_TYPE_SPK;
@@ -2359,10 +2359,10 @@ int HfpAgService::CovertVolumeControlTypeFromBluedroid(::bluetooth::headset::bth
 }
 
 void HfpAgService::HfpAgServiceCallbacks::VolumeControlCallback(::bluetooth::headset::bthf_volume_type_t type,
-    int volume, BLUEDROID::RawAddress* bdAddr)
+    int volume, STACK::RawAddress* bdAddr)
 {
-    int volumeControleType = CovertVolumeControlTypeFromBluedroid(type);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    int volumeControleType = CovertVolumeControlTypeFromStack(type);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT, volumeControleType);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_VOLUME_CHANGED;
@@ -2374,10 +2374,10 @@ void HfpAgService::HfpAgServiceCallbacks::VolumeControlCallback(::bluetooth::hea
     hfpAgService->PostEvent(event);
 }
 
-void HfpAgService::HfpAgServiceCallbacks::DialCallCallback(char* number, BLUEDROID::RawAddress* bdAddr)
+void HfpAgService::HfpAgServiceCallbacks::DialCallCallback(char* number, STACK::RawAddress* bdAddr)
 {
     CHECK_AND_RETURN_LOG(number != nullptr, "number is nullptr.");
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_DIAL_CALL;
@@ -2390,9 +2390,9 @@ void HfpAgService::HfpAgServiceCallbacks::DialCallCallback(char* number, BLUEDRO
     hfpAgService->PostEvent(event);
 }
 
-void HfpAgService::HfpAgServiceCallbacks::DtmfCmdCallback(char dtmf, BLUEDROID::RawAddress* bdAddr)
+void HfpAgService::HfpAgServiceCallbacks::DtmfCmdCallback(char dtmf, STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_SEND_DTMF;
@@ -2404,7 +2404,7 @@ void HfpAgService::HfpAgServiceCallbacks::DtmfCmdCallback(char dtmf, BLUEDROID::
     hfpAgService->PostEvent(event);
 }
 
-bool HfpAgService::CovertNoiseReductionFromBluedroid(::bluetooth::headset::bthf_nrec_t nrec)
+bool HfpAgService::CovertNoiseReductionFromStack(::bluetooth::headset::bthf_nrec_t nrec)
 {
     if (nrec == ::bluetooth::headset::BTHF_NREC_START) {
         return true;
@@ -2413,14 +2413,14 @@ bool HfpAgService::CovertNoiseReductionFromBluedroid(::bluetooth::headset::bthf_
 }
 
 void HfpAgService::HfpAgServiceCallbacks::NoiseReductionCallback(::bluetooth::headset::bthf_nrec_t nrec,
-    BLUEDROID::RawAddress* bdAddr)
+    STACK::RawAddress* bdAddr)
 {
-    HILOGI("Nrec=%{public}d for %{public}s", nrec, GET_ENCRYPT_STR_ADDR(bdAddr->ToLogString()));
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    HILOGI("Nrec=%{public}d for %{public}s", nrec, GET_ENCRYPT_STR_ADDR(bdAddr->ToStringForLogging()));
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_NOISE_REDUCTION;
-    event.arg1_ = CovertNoiseReductionFromBluedroid(nrec) ? 1 : 0;
+    event.arg1_ = CovertNoiseReductionFromStack(nrec) ? 1 : 0;
     auto hfpAgService = HfpAgService::GetService();
     if (hfpAgService == nullptr) {
         return;
@@ -2428,7 +2428,7 @@ void HfpAgService::HfpAgServiceCallbacks::NoiseReductionCallback(::bluetooth::he
     hfpAgService->PostEvent(event);
 }
 
-int HfpAgService::ConvetWbsConfigFromBluedroid(::bluetooth::headset::bthf_wbs_config_t wbsConfig)
+int HfpAgService::ConvetWbsConfigFromStack(::bluetooth::headset::bthf_wbs_config_t wbsConfig)
 {
     if (wbsConfig == ::bluetooth::headset::BTHF_WBS_NO) {
         return HFP_AG_WBS_NO;
@@ -2443,13 +2443,13 @@ int HfpAgService::ConvetWbsConfigFromBluedroid(::bluetooth::headset::bthf_wbs_co
 }
 
 void HfpAgService::HfpAgServiceCallbacks::WbsCallback(::bluetooth::headset::bthf_wbs_config_t wbsConfig,
-    BLUEDROID::RawAddress* bdAddr)
+    STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_AT_WBS;
-    event.arg1_ = ConvetWbsConfigFromBluedroid(wbsConfig);
+    event.arg1_ = ConvetWbsConfigFromStack(wbsConfig);
     auto hfpAgService = HfpAgService::GetService();
     if (hfpAgService == nullptr) {
         return;
@@ -2458,9 +2458,9 @@ void HfpAgService::HfpAgServiceCallbacks::WbsCallback(::bluetooth::headset::bthf
 }
 
 void HfpAgService::HfpAgServiceCallbacks::AtChldCallback(::bluetooth::headset::bthf_chld_type_t chld,
-    BLUEDROID::RawAddress* bdAddr)
+    STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_AT_CHLD;
@@ -2472,9 +2472,9 @@ void HfpAgService::HfpAgServiceCallbacks::AtChldCallback(::bluetooth::headset::b
     hfpAgService->PostEvent(event);
 }
 
-void HfpAgService::HfpAgServiceCallbacks::AtCnumCallback(BLUEDROID::RawAddress* bdAddr)
+void HfpAgService::HfpAgServiceCallbacks::AtCnumCallback(STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_SUBSCRIBER_NUMBER_REQUEST;
@@ -2485,9 +2485,9 @@ void HfpAgService::HfpAgServiceCallbacks::AtCnumCallback(BLUEDROID::RawAddress* 
     hfpAgService->PostEvent(event);
 }
 
-void HfpAgService::HfpAgServiceCallbacks::AtCindCallback(BLUEDROID::RawAddress* bdAddr)
+void HfpAgService::HfpAgServiceCallbacks::AtCindCallback(STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_AT_CIND;
@@ -2498,9 +2498,9 @@ void HfpAgService::HfpAgServiceCallbacks::AtCindCallback(BLUEDROID::RawAddress* 
     hfpAgService->PostEvent(event);
 }
 
-void HfpAgService::HfpAgServiceCallbacks::AtCopsCallback(BLUEDROID::RawAddress* bdAddr)
+void HfpAgService::HfpAgServiceCallbacks::AtCopsCallback(STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_AT_COPS;
@@ -2511,9 +2511,9 @@ void HfpAgService::HfpAgServiceCallbacks::AtCopsCallback(BLUEDROID::RawAddress* 
     hfpAgService->PostEvent(event);
 }
 
-void HfpAgService::HfpAgServiceCallbacks::AtClccCallback(BLUEDROID::RawAddress* bdAddr)
+void HfpAgService::HfpAgServiceCallbacks::AtClccCallback(STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_AT_CLCC;
@@ -2524,9 +2524,9 @@ void HfpAgService::HfpAgServiceCallbacks::AtClccCallback(BLUEDROID::RawAddress* 
     hfpAgService->PostEvent(event);
 }
 
-void HfpAgService::HfpAgServiceCallbacks::UnknownAtCallback(char* atString, BLUEDROID::RawAddress* bdAddr)
+void HfpAgService::HfpAgServiceCallbacks::UnknownAtCallback(char* atString, STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_AT_UNKNOWN;
@@ -2539,17 +2539,17 @@ void HfpAgService::HfpAgServiceCallbacks::UnknownAtCallback(char* atString, BLUE
     hfpAgService->PostEvent(event);
 }
 
-void HfpAgService::HfpAgServiceCallbacks::KeyPressedCallback(BLUEDROID::RawAddress* bdAddr)
+void HfpAgService::HfpAgServiceCallbacks::KeyPressedCallback(STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_KEY_PRESSED;
 }
 
-void HfpAgService::HfpAgServiceCallbacks::AtBindCallback(char* atString, BLUEDROID::RawAddress* bdAddr)
+void HfpAgService::HfpAgServiceCallbacks::AtBindCallback(char* atString, STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_AT_BIND;
@@ -2563,10 +2563,10 @@ void HfpAgService::HfpAgServiceCallbacks::AtBindCallback(char* atString, BLUEDRO
 }
 
 #ifdef BLUETOOTH_SCO_NORMALIZED_FEATURE_ENABLE
-void HfpAgService::HfpAgServiceCallbacks::AtBccCallback(BLUEDROID::RawAddress* bdAddr)
+void HfpAgService::HfpAgServiceCallbacks::AtBccCallback(STACK::RawAddress* bdAddr)
 {
     CHECK_AND_RETURN_LOG(bdAddr != nullptr, "HfpAgServiceCallbacks::AtBccCallback bdAddr is null.");
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_AT_BCC;
@@ -2579,9 +2579,9 @@ void HfpAgService::HfpAgServiceCallbacks::AtBccCallback(BLUEDROID::RawAddress* b
 #endif
 
 #ifdef COMMUNICATION_L2
-void HfpAgService::HfpAgServiceCallbacks::AtBrsfCallback(uint32_t features, BLUEDROID::RawAddress* bdAddr)
+void HfpAgService::HfpAgServiceCallbacks::AtBrsfCallback(uint32_t features, STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_AT_BRSF;
@@ -2594,7 +2594,7 @@ void HfpAgService::HfpAgServiceCallbacks::AtBrsfCallback(uint32_t features, BLUE
 }
 #endif
 
-int HfpAgService::CovertBievValueFromBluedroid(::bluetooth::headset::bthf_hf_ind_type_t indId)
+int HfpAgService::CovertBievValueFromStack(::bluetooth::headset::bthf_hf_ind_type_t indId)
 {
     if (indId == ::bluetooth::headset::BTHF_HF_IND_ENHANCED_DRIVER_SAFETY) {
         return HFP_AG_HF_INDICATOR_ENHANCED_DRIVER_SAFETY_ID;
@@ -2606,10 +2606,10 @@ int HfpAgService::CovertBievValueFromBluedroid(::bluetooth::headset::bthf_hf_ind
 }
 
 void HfpAgService::HfpAgServiceCallbacks::AtBievCallback(::bluetooth::headset::bthf_hf_ind_type_t indId,
-    int indValue, BLUEDROID::RawAddress* bdAddr)
+    int indValue, STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
-    int bievValue = CovertBievValueFromBluedroid(indId);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    int bievValue = CovertBievValueFromStack(indId);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT, bievValue);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_AT_BIEV;
@@ -2622,9 +2622,9 @@ void HfpAgService::HfpAgServiceCallbacks::AtBievCallback(::bluetooth::headset::b
 }
 
 void HfpAgService::HfpAgServiceCallbacks::AtBiaCallback(bool service, bool roam, bool signal, bool battery,
-    BLUEDROID::RawAddress* bdAddr)
+    STACK::RawAddress* bdAddr)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpAgMessage event(HFP_AG_CONTROL_OTHER_MODULES_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_AG_MSG_TYPE_AT_BIA;
@@ -2775,7 +2775,7 @@ void HfpAgService::UpdateLocalVoiceCombineStateForScoStateChanged(const std::str
     HILOGI("voiceCombineState=%{public}d, isCall=%{public}d", voiceCombineState, isCall);
     // Ensure that the voice combine cap read from audio fwk is enabled.
     if (voiceCombineState > 0) {
-        BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(RawAddress(address));
+        STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(RawAddress(address));
         bthwif->hwSetVoiceCombineScenarioEnabled(rawAddr, isCall);
     }
 }
@@ -2858,7 +2858,7 @@ void HfpAgService::BccBlockTimerTimeout()
 
 int HfpAgService::IsVoiceRecognitionSupported(const RawAddress &device,  bool &isSupported)
 {
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     CHECK_AND_RETURN_LOG_RET(bluetoothHfpInterface != nullptr, false, "BluetoothHfpInterface is null.");
     bt_status_t status = bluetoothHfpInterface->isVoiceRecognitionSupported(&rawAddr);
     if (status != BT_STATUS_SUCCESS) {

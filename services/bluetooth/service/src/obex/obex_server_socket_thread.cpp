@@ -195,15 +195,15 @@ void ObexServerSocketThread::SetPoll(PollSlot* pPollSlot, int fd, int type, int 
     pPollSlot->pfd.revents = 0;
 }
 
-RawAddress ConvertRfcommAddr(BLUEDROID::RawAddress &addr)
+RawAddress ConvertRfcommAddr(STACK::RawAddress &addr)
 {
-    BLUEDROID::RawAddress newAddr;
+    STACK::RawAddress newAddr;
 
     for (int i = 0; i < MAC_ADDR_LEN; i++) {
         newAddr.address[i] = addr.address[MAC_ADDR_LEN - 1 - i];
     }
 
-    return ServiceUtil::AddrFromBluedroid(newAddr);
+    return ServiceUtil::AddrFromStack(newAddr);
 }
 
 std::shared_ptr<ObexSocketDevice> ObexServerSocketThread::RecvSocketDevice(int fd, SocketType socketType)

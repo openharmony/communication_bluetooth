@@ -783,7 +783,7 @@ void HfpAgAtPhonebook::GetValue(std::shared_ptr<DataShare::DataShareResultSet> &
 void HfpAgAtPhonebook::ProcessAtResponseCodeEvent(int responseCode, int errorCode) const
 {
     RawAddress device(address_);
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     auto hfpAgService = HfpAgService::GetService();
     if (hfpAgService == nullptr) {
         return;
@@ -805,7 +805,7 @@ void HfpAgAtPhonebook::ProcessAtResponseCodeEvent(int responseCode, int errorCod
 void HfpAgAtPhonebook::ProcessAtResponseStringEvent(const std::string &response) const
 {
     RawAddress device(address_);
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     auto hfpAgService = HfpAgService::GetService();
     if (hfpAgService == nullptr) {
         return;

@@ -265,7 +265,7 @@ void HidDeviceServiceImpl::DeregisterObserver(std::shared_ptr<IHidDeviceObserver
 int HidDeviceServiceImpl::Connect(const RawAddress &device)
 {
     RawAddress hidDevice(device);
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     if (bluetoothHidDeviceInterface == nullptr) {
         return BT_ERR_INTERNAL_ERROR;
     }
@@ -380,7 +380,7 @@ void HidDeviceServiceImpl::SetAppState(bool isForeground)
     IsAppForeground_.store(isForeground);
 }
 
-int HidDeviceServiceImpl::ConvertAppStatusChangedFromBluedroid(bthd_application_state_t state)
+int HidDeviceServiceImpl::ConvertAppStatusChangedFromStack(bthd_application_state_t state)
 {
     if (state == BTHD_APP_STATE_NOT_REGISTERED) {
         return HID_DEVICE_APP_STATE_NOT_REGISTERED;
@@ -391,7 +391,7 @@ int HidDeviceServiceImpl::ConvertAppStatusChangedFromBluedroid(bthd_application_
     return HID_DEVICE_APP_STATE_NOT_REGISTERED;
 }
 
-int HidDeviceServiceImpl::ConvertConnectStateFromBluedroid(bthd_connection_state_t state)
+int HidDeviceServiceImpl::ConvertConnectStateFromStack(bthd_connection_state_t state)
 {
     if (state == BTHD_CONN_STATE_CONNECTING) {
         return static_cast<int>(BTConnectState::CONNECTING);
@@ -454,7 +454,7 @@ void HidDeviceServiceImpl::OnVirtualCableUnplugInner()
     }
 }
 
-void HidDeviceServiceImpl::OnAppStatusChanged(BLUEDROID::RawAddress* bd_addr, bthd_application_state_t state)
+void HidDeviceServiceImpl::OnAppStatusChanged(STACK::RawAddress* bd_addr, bthd_application_state_t state)
 {
     HidDeviceServiceImpl *hidDeviceServiceImpl = HidDeviceServiceImpl::GetServiceImpl();
     if (hidDeviceServiceImpl == nullptr) {
@@ -468,7 +468,7 @@ void HidDeviceServiceImpl::OnAppStatusChanged(BLUEDROID::RawAddress* bd_addr, bt
     hidDeviceServiceImpl->OnAppStatusChangedInner(connectState);
 }
 
-void HidDeviceServiceImpl::OnConnectionStateChanged(BLUEDROID::RawAddress* bd_addr, bthd_connection_state_t state)
+void HidDeviceServiceImpl::OnConnectionStateChanged(STACK::RawAddress* bd_addr, bthd_connection_state_t state)
 {
     HidDeviceServiceImpl *hidDeviceServiceImpl = HidDeviceServiceImpl::GetServiceImpl();
     if (hidDeviceServiceImpl == nullptr) {
@@ -480,8 +480,8 @@ void HidDeviceServiceImpl::OnConnectionStateChanged(BLUEDROID::RawAddress* bd_ad
         HILOGE("bd_addr == nullptr");
         return;
     }
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bd_addr);
-    int connectState = HidDeviceServiceImpl::ConvertConnectStateFromBluedroid(state);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bd_addr);
+    int connectState = HidDeviceServiceImpl::ConvertConnectStateFromStack(state);
     HILOGI("OnConnectionStateChanged state = %{public}d", connectState);
     hidDeviceServiceImpl->OnConnectionStateChangedInner(rawAddr, connectState);
 }

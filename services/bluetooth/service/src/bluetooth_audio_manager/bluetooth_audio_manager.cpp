@@ -573,7 +573,7 @@ int BluetoothAudioManager::SendDeviceSelection(const RawAddress &address, int us
 
     StopOffloadWhenA2dpReleased(address, useA2dp);
     ProcessAudioRenderListenerWhenUserSelect(useA2dp);
-    BLUEDROID::RawAddress device = ServiceUtil::AddrToBluedroid(address);
+    STACK::RawAddress device = ServiceUtil::AddrToStack(address);
     const bthwif_interface_t *bthwif =
         reinterpret_cast<const bthwif_interface_t*>(btInterface->get_profile_interface(BT_VENDER_INTERFACE_ID));
     if (bthwif == nullptr) {

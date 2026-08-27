@@ -22,8 +22,8 @@
 #include "hardware/bluetooth.h"
 #include "types/raw_address.h"
 
-#ifndef BLUEDROID
-#define BLUEDROID
+#ifndef STACK
+#define STACK
 #endif
 
 namespace OHOS {
@@ -32,12 +32,12 @@ namespace bluetooth {
 /* Watch callbacks dispatched from the closed-source HAL. */
 typedef struct {
     size_t size;
-    void (*disconnect_rssi_cb)(const BLUEDROID::RawAddress *bdAddr, int rssi);
-    void (*sais_connection_state_cb)(const BLUEDROID::RawAddress *bdAddr,
+    void (*disconnect_rssi_cb)(const STACK::RawAddress *bdAddr, int rssi);
+    void (*sais_connection_state_cb)(const STACK::RawAddress *bdAddr,
                                      bool isSaisConnected);
     void (*a2dp_ofld_play_state_cb)(uint8_t playState);
     void (*sais_server_added_cb)(void);
-    void (*le_sais_enable_cb)(const BLUEDROID::RawAddress *bdAddr);
+    void (*le_sais_enable_cb)(const STACK::RawAddress *bdAddr);
     void (*br_hid_ctrl_cb)(uint8_t act);
     void (*link_loss_notify_cb)(void);
 } BtWatchCallbacks;
@@ -48,16 +48,16 @@ public:
     virtual ~BtHwWatchInterface() = default;
 
     virtual bt_status_t init(BtWatchCallbacks *callbacks) = 0;
-    virtual void updateReconnectState(const BLUEDROID::RawAddress &device,
+    virtual void updateReconnectState(const STACK::RawAddress &device,
                                       bool isBtOn) = 0;
-    virtual void updateDevice(const BLUEDROID::RawAddress &device,
+    virtual void updateDevice(const STACK::RawAddress &device,
                               bool isSaisDevice) = 0;
     virtual void sendIsSecondPhonePair(bool isSecondaryPair) = 0;
-    virtual void sendHfpState2Hisi(const BLUEDROID::RawAddress &device,
+    virtual void sendHfpState2Hisi(const STACK::RawAddress &device,
                                    bool isBtOn) = 0;
-    virtual bool isPhoneMajorClass(const BLUEDROID::RawAddress &device) = 0;
+    virtual bool isPhoneMajorClass(const STACK::RawAddress &device) = 0;
     virtual void sendScreenOn2Mcu() = 0;
-    virtual void sendTbsr(const BLUEDROID::RawAddress &device, uint16_t mode) = 0;
+    virtual void sendTbsr(const STACK::RawAddress &device, uint16_t mode) = 0;
 };
 
 }  // namespace bluetooth

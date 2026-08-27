@@ -76,30 +76,30 @@ void AvrcpServiceManager::Connect(const RawAddress &rawAddr)
     };
     CHECK_AND_RETURN_LOG(ControlInterceptIsAllowedAvrcpConn(msg), "Restricted by control intercept");
     if (avrcpServiceInterface_) {
-        avrcpServiceInterface_->ConnectDevice(ServiceUtil::AddrToBluedroid(rawAddr));
+        avrcpServiceInterface_->ConnectDevice(ServiceUtil::AddrToStack(rawAddr));
     }
 }
 void AvrcpServiceManager::DisConnect(const RawAddress &rawAddr)
 {
     if (avrcpServiceInterface_) {
-        avrcpServiceInterface_->DisconnectDevice(ServiceUtil::AddrToBluedroid(rawAddr));
+        avrcpServiceInterface_->DisconnectDevice(ServiceUtil::AddrToStack(rawAddr));
     }
 }
 void AvrcpServiceManager::SwitchAbsVolumeDevice(const RawAddress &rawAddr)
 {
-    g_volumeInterface.SwitchAbsVolumeDevice(ServiceUtil::AddrToBluedroid(rawAddr));
+    g_volumeInterface.SwitchAbsVolumeDevice(ServiceUtil::AddrToStack(rawAddr));
 }
 void AvrcpServiceManager::SetDeviceAbsVolumeAbility(const RawAddress &rawAddr, int32_t ability)
 {
-    g_volumeInterface.SetDeviceAbsVolumeAbility(ServiceUtil::AddrToBluedroid(rawAddr), ability);
+    g_volumeInterface.SetDeviceAbsVolumeAbility(ServiceUtil::AddrToStack(rawAddr), ability);
 }
 void AvrcpServiceManager::SetDeviceAbsoluteVolume(const RawAddress &rawAddr, int32_t volumeLevel)
 {
-    g_volumeInterface.SetDeviceAbsoluteVolume(ServiceUtil::AddrToBluedroid(rawAddr), volumeLevel);
+    g_volumeInterface.SetDeviceAbsoluteVolume(ServiceUtil::AddrToStack(rawAddr), volumeLevel);
 }
 int32_t AvrcpServiceManager::GetDeviceAbsVolumeAbility(const RawAddress &rawAddr)
 {
-    return g_volumeInterface.GetDeviceAbsVolumeAbility(ServiceUtil::AddrToBluedroid(rawAddr));
+    return g_volumeInterface.GetDeviceAbsVolumeAbility(ServiceUtil::AddrToStack(rawAddr));
 }
 
 void AvrcpServiceManager::NotifyAudioVolumeEvent(int32_t streamType, int32_t volume)
@@ -107,7 +107,7 @@ void AvrcpServiceManager::NotifyAudioVolumeEvent(int32_t streamType, int32_t vol
     return g_volumeInterface.NotifyAudioVolumeEvent(streamType, volume);
 }
 
-void AvrcpServiceManager::SetDeviceAbsVolumeProperty(const BLUEDROID::RawAddress &rawAddr, int32_t ability)
+void AvrcpServiceManager::SetDeviceAbsVolumeProperty(const STACK::RawAddress &rawAddr, int32_t ability)
 {
     return g_volumeInterface.SetDeviceAbsVolumeProperty(rawAddr, ability);
 }
@@ -116,7 +116,7 @@ void AvrcpServiceManager::SetActiveDevice(const RawAddress &rawAddr)
 {
     if (avrcpServiceInterface_ != nullptr && mediaLoader_ != nullptr) {
         HILOGI("set avrcp active device: %{public}s", GetEncryptAddr(rawAddr.GetAddress()).c_str());
-        mediaLoader_->SetActiveDevice(ServiceUtil::AddrToBluedroid(rawAddr));
+        mediaLoader_->SetActiveDevice(ServiceUtil::AddrToStack(rawAddr));
     } else {
         HILOGE("avrcp service is nullptr");
     }

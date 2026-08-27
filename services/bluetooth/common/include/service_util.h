@@ -33,19 +33,19 @@
 
 namespace OHOS {
 namespace bluetooth {
-#define BLUEDROID
+#define STACK
 
 class ServiceUtil final {
 public:
     // UUID
-    static Uuid UuidFromBluedroid(const BLUEDROID::bluetooth::Uuid &uuid)
+    static Uuid UuidFromStack(const STACK::bluetooth::Uuid &uuid)
     {
         return Uuid::ConvertFromString(uuid.ToString());
     }
 
-    static BLUEDROID::bluetooth::Uuid UuidToBluedroid(const Uuid &uuid)
+    static STACK::bluetooth::Uuid UuidToStack(const Uuid &uuid)
     {
-        return BLUEDROID::bluetooth::Uuid::From128BitBE(uuid.ConvertTo128Bits());
+        return STACK::bluetooth::Uuid::From128BitBE(uuid.ConvertTo128Bits());
     }
 
     static std::vector<std::string> UuidsToUuidStrs(const std::vector<Uuid> &uuids)
@@ -58,7 +58,7 @@ public:
     }
 
     // RawAddress
-    static RawAddress AddrFromBluedroid(const BLUEDROID::RawAddress &addr)
+    static RawAddress AddrFromStack(const STACK::RawAddress &addr)
     {
         std::string tmp = addr.ToString();
         // BlueH need upper address, but bluedroid use lower address
@@ -66,17 +66,17 @@ public:
         return RawAddress(tmp);
     }
 
-    static BLUEDROID::RawAddress AddrToBluedroid(const RawAddress &addr)
+    static STACK::RawAddress AddrToStack(const RawAddress &addr)
     {
-        BLUEDROID::RawAddress dst;
-        if (!BLUEDROID::RawAddress::FromString(addr.GetAddress(), dst)) {
-            return BLUEDROID::RawAddress::kEmpty;
+        STACK::RawAddress dst;
+        if (!STACK::RawAddress::FromString(addr.GetAddress(), dst)) {
+            return STACK::RawAddress::kEmpty;
         }
         return dst;
     }
 
     // Address type
-    static int AddrTypeFromBluedroid(uint8_t type)
+    static int AddrTypeFromStack(uint8_t type)
     {
         int ret = BLE_BT_DEVICE_TYPE_UNKNOWN;
         switch (type) {
@@ -98,7 +98,7 @@ public:
         return ret;
     }
     // Transport
-    static int TransportToBlueroid(const int32_t transport)
+    static int TransportToStack(const int32_t transport)
     {
         int ret = BT_TRANSPORT_INVALID;
         switch (transport) {
@@ -115,7 +115,7 @@ public:
         return ret;
     }
 
-    static int TransportFromBluedroid(const tBT_TRANSPORT transport)
+    static int TransportFromStack(const tBT_TRANSPORT transport)
     {
         int ret = BT_TRANSPORT_NONE;
         switch (transport) {
@@ -133,7 +133,7 @@ public:
     }
 
     // stack transport type to service link type.
-    static int LinkTypeFromBluedroid(tBT_TRANSPORT transport)
+    static int LinkTypeFromStack(tBT_TRANSPORT transport)
     {
         switch (transport) {
             case BT_TRANSPORT_BR_EDR:

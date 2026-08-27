@@ -102,7 +102,7 @@ public:
     void PostEvent(const PanMessage &event);
 
     static void ConnectionStateCallback(btpan_connection_state_t state,
-        bt_status_t error, const BLUEDROID::RawAddress* addr, int localRole, int remoteRole);
+        bt_status_t error, const STACK::RawAddress* addr, int localRole, int remoteRole);
 
     static void ControlStateCallback(btpan_control_state_t state,
         int localRole, bt_status_t error, const char* ifname);

@@ -51,7 +51,7 @@ void SetLpDeviceBleBufferSizeAndCount()
 
     HILOGD("start to set buffer size and count of lp device");
     HwConnAttr attr = { .type = HW_CONN_ATTR_TYPE_SET_LP_DEVICE_BUFFER_SIZE_AND_COUNT };
-    hwif->hwConnAttrSet(BT_TRANSPORT_LE, BLUEDROID::RawAddress::kEmpty, &attr);
+    hwif->hwConnAttrSet(BT_TRANSPORT_LE, STACK::RawAddress::kEmpty, &attr);
 }
 
 bool SendParamsToLpDevice(const std::vector<uint8_t> &dataValue, int32_t type)

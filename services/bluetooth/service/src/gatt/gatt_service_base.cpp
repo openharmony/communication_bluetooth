@@ -41,52 +41,52 @@ GattValue GattServiceBase::BuildGattValue(const uint8_t *value, size_t length)
 }
 
 const std::vector<std::pair<int, int>> GattServiceBase::g_gattStatusCode = {
-    { GATT_SUCCESS,                      BLUEDROID::GATT_SUCCESS },
-    { INVALID_HANDLE,                    BLUEDROID::GATT_INVALID_HANDLE },
-    { READ_NOT_PERMITTED,                BLUEDROID::GATT_READ_NOT_PERMIT },
-    { WRITE_NOT_PERMITTED,               BLUEDROID::GATT_WRITE_NOT_PERMIT },
-    { INVALID_PDU,                       BLUEDROID::GATT_INVALID_PDU },
-    { INSUFFICIENT_AUTHENTICATION,       BLUEDROID::GATT_INSUF_AUTHENTICATION },
-    { REQUEST_NOT_SUPPORT,               BLUEDROID::GATT_REQ_NOT_SUPPORTED },
-    { INVALID_OFFSET,                    BLUEDROID::GATT_INVALID_OFFSET },
-    { INSUFFICIENT_AUTHORIZATION,        BLUEDROID::GATT_INSUF_AUTHORIZATION },
-    { PREPARE_QUEUE_FULL,                BLUEDROID::GATT_PREPARE_Q_FULL },
-    { HANDLE_NOT_FOUND,                  BLUEDROID::GATT_NOT_FOUND },
-    { ATTRIBUTE_NOT_LONG,                BLUEDROID::GATT_NOT_LONG },
-    { INSUFFICIENT_ENCRYPTION_KEY_SIZE,  BLUEDROID::GATT_INSUF_KEY_SIZE },
-    { INVALID_ATTRIBUTE_VALUE_LENGTH,    BLUEDROID::GATT_INVALID_ATTR_LEN },
-    { ERR_UNLIKELY,                      BLUEDROID::GATT_ERR_UNLIKELY },
-    { INSUFFICIENT_ENCRYPTION,           BLUEDROID::GATT_INSUF_ENCRYPTION },
-    { UNSUPPORT_GRP_TYPE,                BLUEDROID::GATT_UNSUPPORT_GRP_TYPE },
-    { INSUF_RESOURCE,                    BLUEDROID::GATT_INSUF_RESOURCE },
-    { DATABASE_OUT_OF_SYNC,              BLUEDROID::GATT_DATABASE_OUT_OF_SYNC },
-    { VALUE_NOT_ALLOWED,                 BLUEDROID::GATT_VALUE_NOT_ALLOWED },
-    { INVALID_PARAMETER,                 BLUEDROID::GATT_ILLEGAL_PARAMETER },
-    { TOO_SHORT,                         BLUEDROID::GATT_TOO_SHORT },
-    { NO_RESOURCES,                      BLUEDROID::GATT_NO_RESOURCES },
-    { INTERNAL_ERROR,                    BLUEDROID::GATT_INTERNAL_ERROR },
-    { WRONG_STATE,                       BLUEDROID::GATT_WRONG_STATE },
-    { DB_FULL,                           BLUEDROID::GATT_DB_FULL },
-    { REMOTE_DEVICE_BUSY,                BLUEDROID::GATT_BUSY },
-    { REMOTE_DEVICE_ERROR,               BLUEDROID::GATT_ERROR },
-    { CMD_STARTED,                       BLUEDROID::GATT_CMD_STARTED },
-    { REMOTE_DEVICE_PENDING,             BLUEDROID::GATT_PENDING},
-    { AUTHENTICATION_FAILED,             BLUEDROID::GATT_AUTH_FAIL},
-    { GATT_MORE_REASON,                  BLUEDROID::GATT_MORE},
-    { INVALID_CFG,                       BLUEDROID::GATT_INVALID_CFG},
-    { SERVICE_STARTED,                   BLUEDROID::GATT_SERVICE_STARTED},
-    { ENCRYPED_NO_MITM,                  BLUEDROID::GATT_ENCRYPED_NO_MITM},
-    { NOT_ENCRYPTED,                     BLUEDROID::GATT_NOT_ENCRYPTED},
-    { GATT_CONGESTION,                   BLUEDROID::GATT_CONGESTED},
-    { DUP_REG,                           BLUEDROID::GATT_DUP_REG},
-    { ALREADY_OPEN,                      BLUEDROID::GATT_ALREADY_OPEN},
-    { GATT_DIS_CANCEL,                   BLUEDROID::GATT_CANCEL},
-    { CCC_CFG_ERR,                       BLUEDROID::GATT_CCC_CFG_ERR},
-    { PRC_IN_PROGRESS,                   BLUEDROID::GATT_PRC_IN_PROGRESS},
-    { OUT_OF_RANGE,                      BLUEDROID::GATT_OUT_OF_RANGE},
+    { GATT_SUCCESS,                      STACK::GATT_SUCCESS },
+    { INVALID_HANDLE,                    STACK::GATT_INVALID_HANDLE },
+    { READ_NOT_PERMITTED,                STACK::GATT_READ_NOT_PERMIT },
+    { WRITE_NOT_PERMITTED,               STACK::GATT_WRITE_NOT_PERMIT },
+    { INVALID_PDU,                       STACK::GATT_INVALID_PDU },
+    { INSUFFICIENT_AUTHENTICATION,       STACK::GATT_INSUF_AUTHENTICATION },
+    { REQUEST_NOT_SUPPORT,               STACK::GATT_REQ_NOT_SUPPORTED },
+    { INVALID_OFFSET,                    STACK::GATT_INVALID_OFFSET },
+    { INSUFFICIENT_AUTHORIZATION,        STACK::GATT_INSUF_AUTHORIZATION },
+    { PREPARE_QUEUE_FULL,                STACK::GATT_PREPARE_Q_FULL },
+    { HANDLE_NOT_FOUND,                  STACK::GATT_NOT_FOUND },
+    { ATTRIBUTE_NOT_LONG,                STACK::GATT_NOT_LONG },
+    { INSUFFICIENT_ENCRYPTION_KEY_SIZE,  STACK::GATT_INSUF_KEY_SIZE },
+    { INVALID_ATTRIBUTE_VALUE_LENGTH,    STACK::GATT_INVALID_ATTR_LEN },
+    { ERR_UNLIKELY,                      STACK::GATT_ERR_UNLIKELY },
+    { INSUFFICIENT_ENCRYPTION,           STACK::GATT_INSUF_ENCRYPTION },
+    { UNSUPPORT_GRP_TYPE,                STACK::GATT_UNSUPPORT_GRP_TYPE },
+    { INSUF_RESOURCE,                    STACK::GATT_INSUF_RESOURCE },
+    { DATABASE_OUT_OF_SYNC,              STACK::GATT_DATABASE_OUT_OF_SYNC },
+    { VALUE_NOT_ALLOWED,                 STACK::GATT_VALUE_NOT_ALLOWED },
+    { INVALID_PARAMETER,                 STACK::GATT_ILLEGAL_PARAMETER },
+    { TOO_SHORT,                         STACK::GATT_TOO_SHORT },
+    { NO_RESOURCES,                      STACK::GATT_NO_RESOURCES },
+    { INTERNAL_ERROR,                    STACK::GATT_INTERNAL_ERROR },
+    { WRONG_STATE,                       STACK::GATT_WRONG_STATE },
+    { DB_FULL,                           STACK::GATT_DB_FULL },
+    { REMOTE_DEVICE_BUSY,                STACK::GATT_BUSY },
+    { REMOTE_DEVICE_ERROR,               STACK::GATT_ERROR },
+    { CMD_STARTED,                       STACK::GATT_CMD_STARTED },
+    { REMOTE_DEVICE_PENDING,             STACK::GATT_PENDING},
+    { AUTHENTICATION_FAILED,             STACK::GATT_AUTH_FAIL},
+    { GATT_MORE_REASON,                  STACK::GATT_MORE},
+    { INVALID_CFG,                       STACK::GATT_INVALID_CFG},
+    { SERVICE_STARTED,                   STACK::GATT_SERVICE_STARTED},
+    { ENCRYPED_NO_MITM,                  STACK::GATT_ENCRYPED_NO_MITM},
+    { NOT_ENCRYPTED,                     STACK::GATT_NOT_ENCRYPTED},
+    { GATT_CONGESTION,                   STACK::GATT_CONGESTED},
+    { DUP_REG,                           STACK::GATT_DUP_REG},
+    { ALREADY_OPEN,                      STACK::GATT_ALREADY_OPEN},
+    { GATT_DIS_CANCEL,                   STACK::GATT_CANCEL},
+    { CCC_CFG_ERR,                       STACK::GATT_CCC_CFG_ERR},
+    { PRC_IN_PROGRESS,                   STACK::GATT_PRC_IN_PROGRESS},
+    { OUT_OF_RANGE,                      STACK::GATT_OUT_OF_RANGE},
 };
 
-int GattServiceBase::GattStatusFromBluedroid(int status)
+int GattServiceBase::GattStatusFromStack(int status)
 {
     int ret = GATT_FAILURE;
     // statusCode bluedroid -> srv
@@ -104,9 +104,9 @@ int GattServiceBase::GattStatusFromBluedroid(int status)
     return ret;
 }
 
-int GattServiceBase::GattStatusToBluedroid(int status)
+int GattServiceBase::GattStatusToStack(int status)
 {
-    int ret = BLUEDROID::GATT_REQ_NOT_SUPPORTED;
+    int ret = STACK::GATT_REQ_NOT_SUPPORTED;
     auto iter = g_gattStatusCode.begin();
     for (; iter != g_gattStatusCode.end(); iter++) {
         if (iter->first == status) {
@@ -127,7 +127,7 @@ const std::vector<std::pair<int, int>> GattServiceBase::g_gattTransport = {
     { GATT_TRANSPORT_TYPE_CLASSIC,  GATT_TRANSPORT_BR_EDR },
 };
 
-int GattServiceBase::GattTransportFromBluedroid(int transport)
+int GattServiceBase::GattTransportFromStack(int transport)
 {
     int ret = GATT_TRANSPORT_TYPE_AUTO;
     auto iter = g_gattTransport.begin();
@@ -140,7 +140,7 @@ int GattServiceBase::GattTransportFromBluedroid(int transport)
     return ret;
 }
 
-int GattServiceBase::GattTransportToBluedroid(int transport)
+int GattServiceBase::GattTransportToStack(int transport)
 {
     int ret = GATT_TRANSPORT_INVALID;
     auto iter = g_gattTransport.begin();

@@ -14,10 +14,9 @@
  */
 
 /*
- * Stub of the stack (Bluedroid-style) common type definitions.
- * The original stack layer was removed from this repository, service code
- * still refers to these types, so they are stubbed in the global namespace
- * (AOSP style) to keep the service layer compilable.
+ * Common type definitions of the ported stack layer (originally from
+ * Bluedroid). Types are kept in the global namespace (AOSP style);
+ * STACK::Xxx references resolve to the global ::Xxx symbols.
  */
 
 #ifndef BT_TYPES_H
@@ -34,11 +33,14 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include "types/raw_address.h"
 
-/* BLUEDROID::Xxx references resolve to the global ::Xxx symbols. */
-#ifndef BLUEDROID
-#define BLUEDROID
+/* STACK::Xxx references resolve to the global ::Xxx symbols. */
+#ifndef STACK
+#define STACK
 #endif
+
+/* RawAddress is provided by the ported stack layer, see types/raw_address.h. */
 
 /* INVALID_MAC_ADDRESS is provided by frameworks/inner/ipc/common/bt_def.h
  * as a constexpr, do not redefine it as a macro here. */
@@ -236,8 +238,6 @@ typedef enum {
 #define BT_DEVICE_TYPE_BLE 2
 #define BT_DEVICE_TYPE_DUMO 3
 
-/* Length of a BD address in bytes. */
-#define BD_ADDR_LEN 6
 
 typedef struct {
     uint8_t le_features[8];
@@ -273,142 +273,9 @@ typedef enum {
     BT_PIN_ENTERED,
 } bt_pin_state_t;
 
-/*
- * Stub RawAddress of the removed stack layer. Resolves to the global symbol
- * after the BLUEDROID macro expansion, keep it in the global namespace.
- */
-class RawAddress {
-public:
-    static constexpr size_t kLength = 6;
-
-    RawAddress() = default;
-    RawAddress(const uint8_t (&addr)[kLength])
-    {
-        std::copy(std::begin(addr), std::end(addr), std::begin(address));
-    }
-    explicit RawAddress(const std::string &addr)
-    {
-        FromString(addr, *this);
-    }
-
-    static bool IsValidAddress(const std::string &addr)
-    {
-        if (addr.length() != (kLength * 3 - 1)) {
-            return false;
-        }
-        for (size_t i = 0; i < addr.length(); ++i) {
-            char c = addr[i];
-            if (i % 3 == 2) {
-                if (c != ':') {
-                    return false;
-                }
-            } else {
-                bool isDigit = (c >= '0' && c <= '9');
-                bool isUpperHex = (c >= 'A' && c <= 'F');
-                bool isLowerHex = (c >= 'a' && c <= 'f');
-                if (!isDigit && !isUpperHex && !isLowerHex) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    static bool FromString(const std::string &addr, RawAddress &out)
-    {
-        if (!IsValidAddress(addr)) {
-            return false;
-        }
-        uint8_t index = 0;
-        for (size_t i = 0; i < addr.length(); i += 3) {
-            out.address[index++] = static_cast<uint8_t>(strtoul(addr.substr(i, 2).c_str(), nullptr, 16));
-        }
-        return true;
-    }
-
-    std::string ToString() const
-    {
-        char buf[kLength * 3] = { 0 };
-        snprintf(buf, sizeof(buf), "%02X:%02X:%02X:%02X:%02X:%02X", address[0], address[1], address[2],
-            address[3], address[4], address[5]);
-        return std::string(buf);
-    }
-
-    std::string GetAddress() const
-    {
-        return ToString();
-    }
-
-    /* Compile-time byte length, used by service code as a template argument. */
-    static constexpr size_t BT_ADDRESS_BYTE_LEN = kLength;
-
-    /* Build a RawAddress from a raw 6-byte buffer (service code passes
-     * std::vector<uint8_t>::data() here). */
-    static RawAddress ConvertToString(const uint8_t *addr)
-    {
-        RawAddress out;
-        if (addr != nullptr) {
-            std::copy(addr, addr + kLength, std::begin(out.address));
-        }
-        return out;
-    }
-
-    std::string ToLogString() const
-    {
-        return ToString();
-    }
-
-    bool IsValid() const
-    {
-        return std::any_of(std::begin(address), std::end(address), [](uint8_t b) { return b != 0; });
-    }
-
-    /* True when this is the empty (all-zero) address; mirrors the removed
-     * stack layer RawAddress::IsEmpty(). */
-    bool IsEmpty() const
-    {
-        return *this == kEmpty;
-    }
-
-    /* All-zero address constant. Declared here and defined (inline, C++17)
-     * after the class because constexpr needs a complete literal type. */
-    static const RawAddress kEmpty;
-
-    uint8_t address[kLength] = { 0 };
-
-    bool operator==(const RawAddress &rhs) const
-    {
-        return std::equal(std::begin(address), std::end(address), std::begin(rhs.address));
-    }
-
-    bool operator!=(const RawAddress &rhs) const
-    {
-        return !(*this == rhs);
-    }
-
-    bool operator<(const RawAddress &rhs) const
-    {
-        return std::lexicographical_compare(std::begin(address), std::end(address), std::begin(rhs.address),
-            std::end(rhs.address));
-    }
-};
-
-inline const RawAddress RawAddress::kEmpty{};
-
-/* The removed stack layer provided this specialization (via its raw_address.h);
- * service code keeps RawAddress in std::unordered_map, so stub it here too. */
-namespace std {
-template <>
-struct hash<RawAddress> {
-    size_t operator()(const RawAddress &addr) const noexcept
-    {
-        return std::hash<std::string>{}(addr.GetAddress());
-    }
-};
-}  // namespace std
 
 /*
- * Stub Uuid of the removed stack layer. BLUEDROID::bluetooth::Uuid expands to
+ * Stub Uuid of the removed stack layer. STACK::bluetooth::Uuid expands to
  * bluetooth::Uuid after the macro, so it lives in the global bluetooth
  * namespace, distinct from OHOS::bluetooth::Uuid.
  */
@@ -521,7 +388,5 @@ typedef struct {
     { (p) = static_cast<int8_t>(*(s)); (s)++; }
 #define STREAM_TO_UINT16(p, s) \
     { (p) = static_cast<uint16_t>(static_cast<uint16_t>(*(s)) << 8 | static_cast<uint16_t>(*((s) + 1))); (s) += 2; }
-#define STREAM_TO_BDADDR(p, s) \
-    { memcpy((p).address, (s), BLUEDROID::RawAddress::kLength); (s) += BLUEDROID::RawAddress::kLength; }
 
 #endif  // BT_TYPES_H

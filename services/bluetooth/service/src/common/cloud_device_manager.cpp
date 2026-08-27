@@ -241,7 +241,7 @@ void CloudDeviceManager::SetDeviceNameProp(std::shared_ptr<BluetoothDevice> devi
     std::string saveName = deviceName;
     prop.len = static_cast<int32_t>(deviceName.size());
     prop.val = const_cast<void *>(static_cast<const void *>(saveName.c_str()));
-    BLUEDROID::RawAddress addr = ServiceUtil::AddrToBluedroid(RawAddress(device->GetAddress()));
+    STACK::RawAddress addr = ServiceUtil::AddrToStack(RawAddress(device->GetAddress()));
     RemoteDeviceProperties::GetInstance()->SetRemoteDeviceProperty(addr, prop);
 }
 
@@ -275,16 +275,16 @@ void CloudDeviceManager::SetDeviceUuidsProp(
         return;
     }
     device->SetDeviceUuids(uuids);
-    std::vector<BLUEDROID::bluetooth::Uuid> uuidsBlueDroid;
+    std::vector<STACK::bluetooth::Uuid> uuidsBlueDroid;
     for (auto &uuid : uuids) {
-        uuidsBlueDroid.push_back(ServiceUtil::UuidToBluedroid(uuid));
+        uuidsBlueDroid.push_back(ServiceUtil::UuidToStack(uuid));
     }
     bt_property_t prop;
     prop.type = static_cast<bt_property_type_t>(BT_PROPERTY_UUIDS);
-    int32_t len = static_cast<int32_t>(uuidsBlueDroid.size() * sizeof(BLUEDROID::bluetooth::Uuid));
+    int32_t len = static_cast<int32_t>(uuidsBlueDroid.size() * sizeof(STACK::bluetooth::Uuid));
     prop.len = len;
     prop.val = const_cast<void *>(static_cast<const void *>(uuidsBlueDroid.data()));
-    BLUEDROID::RawAddress addr = ServiceUtil::AddrToBluedroid(RawAddress(device->GetAddress()));
+    STACK::RawAddress addr = ServiceUtil::AddrToStack(RawAddress(device->GetAddress()));
     RemoteDeviceProperties::GetInstance()->SetRemoteDeviceProperty(addr, prop);
 }
 
@@ -295,7 +295,7 @@ void CloudDeviceManager::SetRemoteDevicePropertyInt(const RawAddress &device, bt
     prop.type = type;
     prop.len = sizeof(value);
     prop.val = val;
-    BLUEDROID::RawAddress addr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress addr = ServiceUtil::AddrToStack(device);
     RemoteDeviceProperties::GetInstance()->SetRemoteDeviceProperty(addr, prop);
 }
 
@@ -340,9 +340,9 @@ void CloudDeviceManager::SendCloudDevState(const RawAddress &device)
 {
     auto classicAdapter = AdapterManager::GetInstance()->GetClassicAdapter();
     if (classicAdapter != nullptr) {
-        BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+        STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
         classicAdapter->SetBondState(BT_STATUS_SUCCESS, rawAddr, BT_BOND_STATE_BONDED);
-        HILOGI("%{public}s, set to bonded", rawAddr.ToLogString().c_str());
+        HILOGI("%{public}s, set to bonded", rawAddr.ToStringForLogging().c_str());
     }
 }
  

@@ -24,6 +24,7 @@ config("btservice_common_config") {
         ".",
         "$BT_SERVICE_DIR/src",
         "$BT_SERVICE_DIR/src/base",
+        "$PART_DIR/stack_adapter/include",
         "$SUBSYSTEM_DIR/bluetooth/frameworks/inner/ipc/common",
     ]
 
@@ -50,6 +51,7 @@ config("btservice_common_public_config") {
 }
 
 btservice_common_sources = [
+    "$PART_DIR/stack_adapter/src/raw_address.cpp",
     "src/adapter_device_config.cpp",
     "src/bluetooth_code_convert_utils.cpp",
     "src/common_util.cpp",

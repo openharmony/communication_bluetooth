@@ -93,7 +93,7 @@ void HidHostService::ConnectionStateCallbackInner(RawAddress rawAddr, int state)
 {
     if (!IsAcceptConnection(rawAddr, state)) {
         if (bluetoothHidInterface != nullptr) {
-            BLUEDROID::RawAddress device = ServiceUtil::AddrToBluedroid(rawAddr);
+            STACK::RawAddress device = ServiceUtil::AddrToStack(rawAddr);
             bluetoothHidInterface->disconnect(&device, BLE_ADDR_PUBLIC, BT_TRANSPORT_BR_EDR, false);
         }
         return;
@@ -104,7 +104,7 @@ void HidHostService::ConnectionStateCallbackInner(RawAddress rawAddr, int state)
     PostEvent(event);
 }
 
-uint8_t HidHostService::CovertConnectStateFromBluedroid(bthh_connection_state_t state)
+uint8_t HidHostService::CovertConnectStateFromStack(bthh_connection_state_t state)
 {
     if (state == BTHH_CONN_STATE_CONNECTING) {
         return HID_HOST_STATE_CONNECTING;
@@ -133,12 +133,12 @@ void HidHostService::HidProcessBtChrEvent(const std::string& addr, int toState)
     }
 }
 
-void HidHostService::ConnectionStateCallback(BLUEDROID::RawAddress* bd_addr, tBLE_ADDR_TYPE addrType,
+void HidHostService::ConnectionStateCallback(STACK::RawAddress* bd_addr, tBLE_ADDR_TYPE addrType,
     tBT_TRANSPORT transport, bthh_connection_state_t state)
 {
     HILOGI("[HID_SERVICE]HidConnectState = %{public}d", state);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bd_addr);
-    int connectState = HidHostService::CovertConnectStateFromBluedroid(state);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bd_addr);
+    int connectState = HidHostService::CovertConnectStateFromStack(state);
     HidHostService *hidHostService = HidHostService::GetService();
     if (hidHostService == nullptr) {
         HILOGE("hidHostService is null");
@@ -159,27 +159,27 @@ bool HidHostService::IsAcceptConnection(RawAddress &rawAddr, int state)
     return true;
 }
 
-void HidHostService::GetProtocolModeCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+void HidHostService::GetProtocolModeCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
     tBT_TRANSPORT transport, bthh_status_t hhStatus, bthh_protocol_mode_t mode)
 {
 }
 
-void HidHostService::GetIdleTimeCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+void HidHostService::GetIdleTimeCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
     tBT_TRANSPORT transport, bthh_status_t hhStatus, int idleTime)
 {
 }
 
-void HidHostService::GetReportCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+void HidHostService::GetReportCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
     tBT_TRANSPORT transport, bthh_status_t hhStatus, uint8_t* rptData, int rptSize)
 {
 }
 
-void HidHostService::VirtualUnplugCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+void HidHostService::VirtualUnplugCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
     tBT_TRANSPORT transport, bthh_status_t hhStatus)
 {
 }
 
-void HidHostService::HandshakeCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+void HidHostService::HandshakeCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
     tBT_TRANSPORT transport, bthh_status_t hhStatus)
 {
 }
@@ -446,7 +446,7 @@ int HidHostService::Connect(const RawAddress &device)
                 "classicAdapter is null");
             classicAdapter->AddPendingConnectDevice(device, PROFILE_ID_HID_HOST);
             // 避免ble设备首次配对场景下service没有拿到RemoteUuid导致连接被阻塞，这里主动去获取一次服务
-            BLUEDROID::RawAddress bdaddr = ServiceUtil::AddrToBluedroid(device);
+            STACK::RawAddress bdaddr = ServiceUtil::AddrToStack(device);
             bt_interface_t* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
             CHECK_AND_RETURN_LOG_RET(bluetoothInterface != nullptr, Bluetooth::BT_ERR_INTERNAL_ERROR,
                 "bluetoothInterface is null");

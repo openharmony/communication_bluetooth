@@ -31,8 +31,8 @@ typedef uint16_t tGATT_STATUS;
 
 /* GATT status codes of the removed stack layer (tGATT_STATUS in bluedroid
  * stack/include/gatt_api.h). A plain enum instead of macros: the service
- * layer references these through the BLUEDROID:: alias, and a #define would
- * expand BLUEDROID::GATT_XXX into an illegal "::0x0006" token. */
+ * layer references these through the STACK:: alias, and a #define would
+ * expand STACK::GATT_XXX into an illegal "::0x0006" token. */
 enum {
     GATT_SUCCESS = 0x0000,
     GATT_INVALID_HANDLE = 0x0001,

@@ -222,7 +222,7 @@ int BluetoothResourceManager::StartBleScanEnhanceMode(const BleScanEnhanceModeIm
     if (action.isBrLinkSniffMode) {
         std::vector<std::string> brLinks = BluetoothConnectionManager::GetInstance()->brLinks_.GetVector();
         for (auto it = brLinks.begin(); it != brLinks.end(); it++) {
-            bthwifInterface->hwSetBrLinkSniffMode(true, ServiceUtil::AddrToBluedroid(RawAddress(*it)),
+            bthwifInterface->hwSetBrLinkSniffMode(true, ServiceUtil::AddrToStack(RawAddress(*it)),
                 BR_SNIFF_MODE_250_MS);
         }
     }
@@ -244,7 +244,7 @@ int BluetoothResourceManager::StopBleScanEnhanceMode()
         BR_TRANS_CONTROL_DEFAULT_PENDING_INTERVAL_MS, BR_TRANS_CONTROL_DEFAULT_SLEEPING_INTERVAL_MS);
     std::vector<std::string> brLinks = BluetoothConnectionManager::GetInstance()->brLinks_.GetVector();
     for (auto it = brLinks.begin(); it != brLinks.end(); it++) {
-        bthwifInterface->hwSetBrLinkSniffMode(false, ServiceUtil::AddrToBluedroid(RawAddress(*it)),
+        bthwifInterface->hwSetBrLinkSniffMode(false, ServiceUtil::AddrToStack(RawAddress(*it)),
             BR_SNIFF_MODE_INVALID);
     }
     return BT_NO_ERROR;

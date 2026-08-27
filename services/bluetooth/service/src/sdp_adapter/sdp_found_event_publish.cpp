@@ -44,12 +44,12 @@ static const int MAX_RAW_DATA_BUF = 4096;
 static const int MAX_FORMATS_LENGTH = 15;
 static const int MAX_SERVICE_NAME_LEN = 21;
 
-static const BLUEDROID::bluetooth::Uuid UUID_MAP_MAS = BLUEDROID::bluetooth::Uuid::From16Bit(0x1132);
-static const BLUEDROID::bluetooth::Uuid UUID_MAP_MNS = BLUEDROID::bluetooth::Uuid::From16Bit(0x1133);
-static const BLUEDROID::bluetooth::Uuid UUID_PBAP_PSE = BLUEDROID::bluetooth::Uuid::From16Bit(0x112F);
-static const BLUEDROID::bluetooth::Uuid UUID_OBEX_OBJECT_PUSH = BLUEDROID::bluetooth::Uuid::From16Bit(0x1105);
-static const BLUEDROID::bluetooth::Uuid UUID_SAP = BLUEDROID::bluetooth::Uuid::From16Bit(0x112D);
-static const BLUEDROID::bluetooth::Uuid UUID_DIP = BLUEDROID::bluetooth::Uuid::From16Bit(0x1200);
+static const STACK::bluetooth::Uuid UUID_MAP_MAS = STACK::bluetooth::Uuid::From16Bit(0x1132);
+static const STACK::bluetooth::Uuid UUID_MAP_MNS = STACK::bluetooth::Uuid::From16Bit(0x1133);
+static const STACK::bluetooth::Uuid UUID_PBAP_PSE = STACK::bluetooth::Uuid::From16Bit(0x112F);
+static const STACK::bluetooth::Uuid UUID_OBEX_OBJECT_PUSH = STACK::bluetooth::Uuid::From16Bit(0x1105);
+static const STACK::bluetooth::Uuid UUID_SAP = STACK::bluetooth::Uuid::From16Bit(0x112D);
+static const STACK::bluetooth::Uuid UUID_DIP = STACK::bluetooth::Uuid::From16Bit(0x1200);
 static const std::unordered_map<std::string, std::function<bool(int32_t, const std::string &,
     const std::string &, bool, bluetooth_sdp_record *)>> g_handleMap = {
     {UUID_MAP_MAS.ToString(), SdpFoundEventPublishHelper::PublishMapMasSdpFoundEvent},

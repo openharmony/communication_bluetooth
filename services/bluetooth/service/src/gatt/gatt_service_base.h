@@ -91,13 +91,13 @@ public:
 
     // BlueH (first) <-> bluedroid (second)
     static const std::vector<std::pair<int, int>> g_gattStatusCode;
-    static int GattStatusFromBluedroid(int status);
-    static int GattStatusToBluedroid(int status);
+    static int GattStatusFromStack(int status);
+    static int GattStatusToStack(int status);
 
     // BlueH (first) <-> bluedroid (second)
     static const std::vector<std::pair<int, int>> g_gattTransport;
-    static int GattTransportFromBluedroid(int transport);
-    static int GattTransportToBluedroid(int transport);
+    static int GattTransportFromStack(int transport);
+    static int GattTransportToStack(int transport);
     
     static void ConvertDisconnectReason(int &convertReason, int reason, std::string &reasonMessage);
 

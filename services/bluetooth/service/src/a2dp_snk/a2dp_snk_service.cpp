@@ -86,7 +86,7 @@ void A2dpSnkService::DeregisterObserver(IA2dpSnkObserver *observer)
     a2dpSnkFwObservers_.Deregister(*observer);
 }
 
-static int CovertConnectStateFromBluedroid(btav_connection_state_t state)
+static int CovertConnectStateFromStack(btav_connection_state_t state)
 {
     switch (state) {
         case BTAV_CONNECTION_STATE_DISCONNECTED:
@@ -118,7 +118,7 @@ void A2dpSnkService::OnNativeConnectionStateChanged(const RawAddress &device, bt
 {
     HILOGI("[a2dpSnkStack] OnNativeConnectionStateChanged: address=[%{public}s], state:%{public}d",
         GetEncryptedLogAddr(device).c_str(), state);
-    A2dpSnkMessage event(CovertConnectStateFromBluedroid(state));
+    A2dpSnkMessage event(CovertConnectStateFromStack(state));
     event.addr_ = device.GetAddress();
     PostEvent(event);
 }

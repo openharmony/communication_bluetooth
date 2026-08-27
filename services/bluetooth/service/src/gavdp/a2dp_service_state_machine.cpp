@@ -78,7 +78,7 @@ bool A2dpDisconnected::Dispatch(const utility::Message &msg)
 
     int ret = BT_STATUS_SUCCESS;
     RawAddress device = *(static_cast<RawAddress *>(msg.arg2_));
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     std::shared_ptr<BluetoothDevice> bluetoothDevice = RemoteDeviceProperties::GetInstance()->FindRemoteDevice(device);
     A2dpService *service = GetServiceInstance(msg.arg1_);
     if (service == nullptr) {
@@ -132,7 +132,7 @@ bool A2dpDisconnecting::Dispatch(const utility::Message &msg)
 
     int ret = BT_STATUS_SUCCESS;
     RawAddress device = *(static_cast<RawAddress *>(msg.arg2_));
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     A2dpService *service = GetServiceInstance(msg.arg1_);
     if (service == nullptr) {
         HILOGE("[A2dpDisconnecting] service is null");
@@ -168,7 +168,7 @@ bool A2dpConnected::Dispatch(const utility::Message &msg)
     int ret = BT_STATUS_SUCCESS;
     uint8_t role = msg.arg1_;
     RawAddress device = *(static_cast<RawAddress *>(msg.arg2_));
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
 
     A2dpService *service = GetServiceInstance(role);
     if (service == nullptr) {
@@ -259,7 +259,7 @@ bool A2dpConnecting::Dispatch(const utility::Message &msg)
     int ret = BT_STATUS_SUCCESS;
     uint8_t role = msg.arg1_;
     RawAddress device = *(static_cast<RawAddress *>(msg.arg2_));
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     A2dpService *service = GetServiceInstance(role);
     if (service == nullptr) {
         HILOGE("[A2dpConnected] Can't get the service of a2dp");

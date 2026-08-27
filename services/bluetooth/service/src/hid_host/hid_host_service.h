@@ -101,17 +101,17 @@ public:
     int GetConnectStrategy(const RawAddress &device) override;
     bthh_interface_t* getBluetoothHidInterface() const;
 
-    static void ConnectionStateCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+    static void ConnectionStateCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
         tBT_TRANSPORT transport, bthh_connection_state_t state);
-    static void GetProtocolModeCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+    static void GetProtocolModeCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
         tBT_TRANSPORT transport, bthh_status_t hhStatus, bthh_protocol_mode_t mode);
-    static void GetIdleTimeCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+    static void GetIdleTimeCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
         tBT_TRANSPORT transport, bthh_status_t hhStatus, int idleTime);
-    static void GetReportCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+    static void GetReportCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
         tBT_TRANSPORT transport, bthh_status_t hhStatus, uint8_t* rptData, int rptSize);
-    static void VirtualUnplugCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+    static void VirtualUnplugCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
         tBT_TRANSPORT transport, bthh_status_t hhStatus);
-    static void HandshakeCallback(BLUEDROID::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
+    static void HandshakeCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
         tBT_TRANSPORT transport, bthh_status_t hhStatus);
 
 private:
@@ -131,7 +131,7 @@ private:
     void ConnectionStateCallbackInner(RawAddress rawAddr, int state);
     void NotifyConnStateChangedInner(const RawAddress &device, int state, int cause);
     std::string GetEventName(int what);
-    static uint8_t CovertConnectStateFromBluedroid(bthh_connection_state_t state);
+    static uint8_t CovertConnectStateFromStack(bthh_connection_state_t state);
     /**
      * @brief check is accept connection
      *

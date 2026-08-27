@@ -378,7 +378,7 @@ void PanStateMachine::ProcessConnectReqEvent(const PanMessage &msg)
         return;
     }
     bluetooth::RawAddress device(address_);
-    BLUEDROID::RawAddress rawAddr = bluetooth::ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = bluetooth::ServiceUtil::AddrToStack(device);
     HILOGI("Connect address[%{public}s]", bluetooth::GetEncryptAddr(address_).c_str());
     bt_status_t status = panInterface->connect(&rawAddr, LOCAL_PANU_ROLE, REMOTE_NAP_ROLE);
     if (status != BT_STATUS_SUCCESS && status != BT_STATUS_BUSY) {
@@ -396,7 +396,7 @@ void PanStateMachine::ProcessCloseReqEvent(const PanMessage &msg)
         return;
     }
     bluetooth::RawAddress device(address_);
-    BLUEDROID::RawAddress rawAddr = bluetooth::ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = bluetooth::ServiceUtil::AddrToStack(device);
     HILOGI("Disconnect address[%{public}s]", bluetooth::GetEncryptAddr(address_).c_str());
     bt_status_t status = panInterface->disconnect(&rawAddr);
     if (status != BT_STATUS_SUCCESS && status != BT_STATUS_BUSY) {

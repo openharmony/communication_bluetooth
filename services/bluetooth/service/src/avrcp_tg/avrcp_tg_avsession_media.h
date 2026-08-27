@@ -121,7 +121,7 @@ public:
      * @brief callback method.
      * Set active device.
      */
-    void SetActiveDevice(const BLUEDROID::RawAddress &address) override;
+    void SetActiveDevice(const STACK::RawAddress &address) override;
 
     /**
      * @brief callback method.

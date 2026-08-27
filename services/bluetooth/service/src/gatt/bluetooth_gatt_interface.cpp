@@ -151,7 +151,7 @@ void BluetoothGattInterface::ClearGattClientInValidObserver()
 }
 
 static void ScanResultCallback(
-    uint16_t bleEvtType, uint8_t addrType, BLUEDROID::RawAddress *bda,
+    uint16_t bleEvtType, uint8_t addrType, STACK::RawAddress *bda,
     uint8_t blePrimaryPhy, uint8_t bleSecondaryPhy,
     uint8_t bleAdvertisingSid, int8_t bleTxPower, int8_t rssi,
     uint16_t blePeriodicAdvInt,
@@ -211,7 +211,7 @@ static void TrackAdvEventCallback(btgatt_track_adv_info_t *advTrackInfo)
     }
 }
 
-static void RegisterServerCallback(int status, int serverIf, const BLUEDROID::bluetooth::Uuid &appUuid)
+static void RegisterServerCallback(int status, int serverIf, const STACK::bluetooth::Uuid &appUuid)
 {
     g_gattServerObservers.ForEach([status, serverIf, appUuid](std::weak_ptr<GattServerObserver> observer) {
         WPTR_CBACK_GATT_SERVER_OBSERVER(observer, RegisterServerCallback, status, serverIf, appUuid);
@@ -234,7 +234,7 @@ static void ReportDataToRss(const std::string &address, int state, const std::st
 #endif
 }
 
-static void ConnectionCallback(int connId, int serverIf, int connected, const BLUEDROID::RawAddress &bda, int reason)
+static void ConnectionCallback(int connId, int serverIf, int connected, const STACK::RawAddress &bda, int reason)
 {
     HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BT_SERVICE, "GATT_CONNECT_STATE",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ADDRESS", GetEncryptAddr(bda.ToString()),
@@ -269,7 +269,7 @@ static void ServiceDeletedCallback(int status, int serverIf, int serviceHandle)
     });
 }
 
-static void RequestReadCharacteristicCallback(int connId, int transId, const BLUEDROID::RawAddress &bda, int attrHandle,
+static void RequestReadCharacteristicCallback(int connId, int transId, const STACK::RawAddress &bda, int attrHandle,
     int offset, bool isLong)
 {
     g_gattServerObservers.ForEach(
@@ -279,7 +279,7 @@ static void RequestReadCharacteristicCallback(int connId, int transId, const BLU
     });
 }
 
-static void RequestReadDescriptorCallback(int connId, int transId, const BLUEDROID::RawAddress &bda, int attrHandle,
+static void RequestReadDescriptorCallback(int connId, int transId, const STACK::RawAddress &bda, int attrHandle,
     int offset, bool isLong)
 {
     g_gattServerObservers.ForEach(
@@ -289,7 +289,7 @@ static void RequestReadDescriptorCallback(int connId, int transId, const BLUEDRO
     });
 }
 
-static void RequestWriteCharacteristicCallback(int connId, int transId, const BLUEDROID::RawAddress &bda,
+static void RequestWriteCharacteristicCallback(int connId, int transId, const STACK::RawAddress &bda,
     int attrHandle, int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value)
 {
     g_gattServerObservers.ForEach(
@@ -299,7 +299,7 @@ static void RequestWriteCharacteristicCallback(int connId, int transId, const BL
     });
 }
 
-static void RequestWriteDescriptorCallback(int connId, int transId, const BLUEDROID::RawAddress &bda, int attrHandle,
+static void RequestWriteDescriptorCallback(int connId, int transId, const STACK::RawAddress &bda, int attrHandle,
     int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value)
 {
     g_gattServerObservers.ForEach(
@@ -309,7 +309,7 @@ static void RequestWriteDescriptorCallback(int connId, int transId, const BLUEDR
     });
 }
 
-static void RequestExecWriteCallback(int connId, int transId, const BLUEDROID::RawAddress &bda, int execWrite)
+static void RequestExecWriteCallback(int connId, int transId, const STACK::RawAddress &bda, int execWrite)
 {
     g_gattServerObservers.ForEach([connId, transId, bda, execWrite](std::weak_ptr<GattServerObserver> observer) {
         WPTR_CBACK_GATT_THREAD_SERVER_OBSERVER(observer, RequestExecWriteCallback,
@@ -361,14 +361,14 @@ static void ServerConnUpdatedCallback(int connId, uint16_t interval, uint16_t la
         });
 }
 
-static void RegisterClientCallback(int status, int clientIf, const BLUEDROID::bluetooth::Uuid &appUuid)
+static void RegisterClientCallback(int status, int clientIf, const STACK::bluetooth::Uuid &appUuid)
 {
     g_gattClientObservers.ForEach([status, clientIf, appUuid](std::weak_ptr<GattClientObserver> observer) {
         WPTR_CBACK_GATT_THREAD_CLIENT_OBSERVER(observer, RegisterClientCallback, status, clientIf, appUuid);
     });
 }
 
-static void ConnectCallback(int connId, int status, int clientIf, const BLUEDROID::RawAddress &bda)
+static void ConnectCallback(int connId, int status, int clientIf, const STACK::RawAddress &bda)
 {
     HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BT_SERVICE, "GATT_CONNECT_STATE",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ADDRESS", GetEncryptAddr(bda.ToString()),
@@ -381,7 +381,7 @@ static void ConnectCallback(int connId, int status, int clientIf, const BLUEDROI
     });
 }
 
-static void DisconnectCallback(int connId, int status, int clientIf, const BLUEDROID::RawAddress &bda, int reason)
+static void DisconnectCallback(int connId, int status, int clientIf, const STACK::RawAddress &bda, int reason)
 {
     HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BT_SERVICE, "GATT_CONNECT_STATE",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ADDRESS", GetEncryptAddr(bda.ToString()),
@@ -394,7 +394,7 @@ static void DisconnectCallback(int connId, int status, int clientIf, const BLUED
     });
 }
 
-static void CancelOpenCallback(int connId, int status, int clientIf, const BLUEDROID::RawAddress &bda)
+static void CancelOpenCallback(int connId, int status, int clientIf, const STACK::RawAddress &bda)
 {
     g_gattClientObservers.ForEach([connId, status, clientIf, bda](std::weak_ptr<GattClientObserver> observer) {
         WPTR_CBACK_GATT_THREAD_CLIENT_OBSERVER(observer, CancelOpenCallback, connId, status, clientIf, bda);
@@ -468,7 +468,7 @@ static void ConfigureMtuCallback(int connId, int status, int mtu)
     });
 }
 
-static void ReadRemoteRssiValueCallback(int clientIf, const BLUEDROID::RawAddress &bda, int rssi, int status)
+static void ReadRemoteRssiValueCallback(int clientIf, const STACK::RawAddress &bda, int rssi, int status)
 {
     g_gattClientObservers.ForEach([clientIf, bda, rssi, status](std::weak_ptr<GattClientObserver> observer) {
         WPTR_CBACK_GATT_THREAD_CLIENT_OBSERVER(observer, ReadRemoteRssiValueCallback, clientIf, bda, rssi, status);

@@ -61,10 +61,10 @@ void AvrcpCtService::RegisterObserver(IObserver *observer)
 void AvrcpCtService::UnregisterObserver(void)
 {}
 
-static void PassThroughResCallback(const BLUEDROID::RawAddress &bdAddr, int id, int keyState)
+static void PassThroughResCallback(const STACK::RawAddress &bdAddr, int id, int keyState)
 {
     HILOGD("passthrough response received as: key:%{public}d, state:%{public}d, address:%{public}s",
-        id, keyState, bdAddr.ToLogString().c_str());
+        id, keyState, bdAddr.ToStringForLogging().c_str());
 }
 
 static void GroupNavigationResCallback(int id, int keyState)
@@ -72,10 +72,10 @@ static void GroupNavigationResCallback(int id, int keyState)
     HILOGD("navigation response received as: key:%{public}d, state:%{public}d", id, keyState);
 }
 
-static void ConnectionStateCallback(bool rcConnect, bool btConnect, const BLUEDROID::RawAddress &bdAddr)
+static void ConnectionStateCallback(bool rcConnect, bool btConnect, const STACK::RawAddress &bdAddr)
 {
     HILOGI("callback from stack: rcConnect:%{public}d, btConnect:%{public}d", rcConnect, btConnect);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
     AvrcpCtMessage event(AVRCP_CT_CONNECT_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.connectFlag_.remoteCtlConnected = rcConnect;
@@ -83,46 +83,46 @@ static void ConnectionStateCallback(bool rcConnect, bool btConnect, const BLUEDR
     AvrcpCtService::GetService()->PostEvent(event);
 }
 
-static void GetRcFeaturesCallback(const BLUEDROID::RawAddress &bdAddr, int features)
+static void GetRcFeaturesCallback(const STACK::RawAddress &bdAddr, int features)
 {
     HILOGI("do nothing!");
 }
 
-static void SetAbsVolCmdCallback(const BLUEDROID::RawAddress &bdAddr, uint8_t absVol, uint8_t label)
+static void SetAbsVolCmdCallback(const STACK::RawAddress &bdAddr, uint8_t absVol, uint8_t label)
 {
     HILOGI("SetAbsVolCmdCallback: absVol=%{public}d, label=%{public}d", absVol, label);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
     AvrcpCtMessage event(AVRCP_CT_MSG_PROCESS_SET_ABS_VOL_CMD, absVol);
     event.dev_ = rawAddr.GetAddress();
     event.eventThreeParameter_ = label;
     AvrcpCtService::GetService()->PostEvent(event);
 }
 
-static void RegisterNotificationAbsVolCallback(const BLUEDROID::RawAddress &bdAddr, uint8_t label)
+static void RegisterNotificationAbsVolCallback(const STACK::RawAddress &bdAddr, uint8_t label)
 {
     HILOGI("RegisterNotificationAbsVolCallback: label=%{public}d", label);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
     AvrcpCtMessage event(AVRCP_CT_MSG_PROCESS_REGISTER_ABS_VOL_NOTIFICATION, label);
     event.dev_ = rawAddr.GetAddress();
     AvrcpCtService::GetService()->PostEvent(event);
 }
 
-static void SetPlayerApplicationSettingRspCallback(const BLUEDROID::RawAddress &bdAddr, uint8_t accepted)
+static void SetPlayerApplicationSettingRspCallback(const STACK::RawAddress &bdAddr, uint8_t accepted)
 {
     HILOGI("do nothing!");
 }
 
-static void PlayerApplicationSettingCallback(const BLUEDROID::RawAddress &bdAddr, uint8_t numAttr,
+static void PlayerApplicationSettingCallback(const STACK::RawAddress &bdAddr, uint8_t numAttr,
     btrc_player_app_attr_t *appAttrs, uint8_t numExtAttr, btrc_player_app_ext_attr_t *extAttrs)
 {
     HILOGI("player_application_setting_callback");
 }
 
 static void PlayerApplicationSettingChangedCallback(
-    const BLUEDROID::RawAddress &bdAddr, const btrc_player_settings_t &vals)
+    const STACK::RawAddress &bdAddr, const btrc_player_settings_t &vals)
 {
     HILOGI("PlayerApplicationSettingChangedCallback: num_attr=%{public}d", vals.num_attr);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
     auto service = AvrcpCtService::GetService();
     if (!service) {
         return;
@@ -143,10 +143,10 @@ static void PlayerApplicationSettingChangedCallback(
     }
 }
 
-static void TrackChangedCallback(const BLUEDROID::RawAddress &bdAddr, uint8_t numAttr, btrc_element_attr_val_t *pAttrs)
+static void TrackChangedCallback(const STACK::RawAddress &bdAddr, uint8_t numAttr, btrc_element_attr_val_t *pAttrs)
 {
     HILOGI("TrackChangedCallback: numAttr=%{public}d", numAttr);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
     AvrcpCtMessage event(AVRCP_CT_MSG_PROCESS_TRACK_CHANGED, numAttr);
     event.dev_ = rawAddr.GetAddress();
 
@@ -178,67 +178,67 @@ static void TrackChangedCallback(const BLUEDROID::RawAddress &bdAddr, uint8_t nu
     }
 }
 
-static void PlayPositionChangedCallback(const BLUEDROID::RawAddress &bdAddr, uint32_t songLen, uint32_t songPos)
+static void PlayPositionChangedCallback(const STACK::RawAddress &bdAddr, uint32_t songLen, uint32_t songPos)
 {
     HILOGI("PlayPositionChangedCallback: songPos=%{public}u", songPos);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
     AvrcpCtMessage event(AVRCP_CT_MSG_PROCESS_PLAY_POS_CHANGED, songPos);
     event.dev_ = rawAddr.GetAddress();
     AvrcpCtService::GetService()->PostEvent(event);
 }
 
-static void PlayStatusChangedCallback(const BLUEDROID::RawAddress &bdAddr, btrc_play_status_t playStatus)
+static void PlayStatusChangedCallback(const STACK::RawAddress &bdAddr, btrc_play_status_t playStatus)
 {
     HILOGI("PlayStatusChangedCallback: playStatus=%{public}d", playStatus);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
     AvrcpCtMessage event(AVRCP_CT_MSG_PROCESS_PLAY_STATUS_CHANGED, playStatus);
     event.dev_ = rawAddr.GetAddress();
     AvrcpCtService::GetService()->PostEvent(event);
 }
 
 static void GetFolderItemsCallback(
-    const BLUEDROID::RawAddress &bdAddr, btrc_status_t status, const btrc_folder_items_t *folderItems, uint8_t count)
+    const STACK::RawAddress &bdAddr, btrc_status_t status, const btrc_folder_items_t *folderItems, uint8_t count)
 {
     HILOGI("[BIP_NOT_SUPPORT] Browse channel not supported, GetFolderItemsCallback ignored");
 }
 
-static void ChangePathCallback(const BLUEDROID::RawAddress &bdAddr, uint32_t count)
+static void ChangePathCallback(const STACK::RawAddress &bdAddr, uint32_t count)
 {
     HILOGI("[BIP_NOT_SUPPORT] Browse channel not supported, ChangePathCallback ignored");
 }
 
-static void SetBrowsedPlayerCallback(const BLUEDROID::RawAddress &bdAddr, uint8_t numItems, uint8_t depth)
+static void SetBrowsedPlayerCallback(const STACK::RawAddress &bdAddr, uint8_t numItems, uint8_t depth)
 {
     HILOGI("[BIP_NOT_SUPPORT] Browse channel not supported, SetBrowsedPlayerCallback ignored");
 }
 
-static void SetAddressedPlayerCallback(const BLUEDROID::RawAddress &bdAddr, uint8_t status)
+static void SetAddressedPlayerCallback(const STACK::RawAddress &bdAddr, uint8_t status)
 {
     HILOGI("SetAddressedPlayerCallback: status=%{public}d", status);
 }
 
-static void AddressedPlayerChangedCallback(const BLUEDROID::RawAddress &bdAddr, uint16_t id)
+static void AddressedPlayerChangedCallback(const STACK::RawAddress &bdAddr, uint16_t id)
 {
     HILOGI("AddressedPlayerChangedCallback: id=%{public}d", id);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
     AvrcpCtMessage event(AVRCP_CT_MSG_PROCESS_ADDRESSED_PLAYER_CHANGED, id);
     event.dev_ = rawAddr.GetAddress();
     AvrcpCtService::GetService()->PostEvent(event);
 }
 
-static void NowPlayingContentsChangedCallback(const BLUEDROID::RawAddress &bdAddr)
+static void NowPlayingContentsChangedCallback(const STACK::RawAddress &bdAddr)
 {
     HILOGI("[BIP_NOT_SUPPORT] Browse channel not supported, NowPlayingContentsChangedCallback ignored");
 }
 
-static void AvailablePlayerChangedCallback(const BLUEDROID::RawAddress &bdAddr)
+static void AvailablePlayerChangedCallback(const STACK::RawAddress &bdAddr)
 {}
 
-static void GetCoverArtPsmCallback(const BLUEDROID::RawAddress &bdAddr, const uint16_t psm)
+static void GetCoverArtPsmCallback(const STACK::RawAddress &bdAddr, const uint16_t psm)
 {
     HILOGI("GetCoverArtPsmCallback: bdAddr=%{public}s, psm=%{public}d",
-           ServiceUtil::AddrFromBluedroid(bdAddr).GetAddress().c_str(), psm);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(bdAddr);
+           ServiceUtil::AddrFromStack(bdAddr).GetAddress().c_str(), psm);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
     AvrcpCtMessage event(AVRCP_CT_GET_COVER_ART_PSM_EVT, psm);
     event.dev_ = rawAddr.GetAddress();
     AvrcpCtService::GetService()->PostEvent(event);
@@ -509,7 +509,7 @@ bool AvrcpCtService::SetActiveDevice(const std::string &dev)
 bool AvrcpCtService::SendPassThroughCommand(const RawAddress &rawAddr, uint8_t keyCode, uint8_t keyState)
 {
     CHECK_AND_RETURN_LOG_RET(btAvrcpInterface_, false, "bluetoothAvrcpInterface is nullptr");
-    BLUEDROID::RawAddress btRawAddr = ServiceUtil::AddrToBluedroid(rawAddr);
+    STACK::RawAddress btRawAddr = ServiceUtil::AddrToStack(rawAddr);
     bt_status_t status = btAvrcpInterface_->send_pass_through_cmd(btRawAddr, keyCode, keyState);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("Failed sending passthrough cmd, status:%{public}d", status);
@@ -528,7 +528,7 @@ void AvrcpCtService::SendAbsVolumeResponse(const RawAddress &rawAddr, int absVol
         HILOGE("Invalid absVol or label value");
         return;
     }
-    BLUEDROID::RawAddress btRawAddr = ServiceUtil::AddrToBluedroid(rawAddr);
+    STACK::RawAddress btRawAddr = ServiceUtil::AddrToStack(rawAddr);
     btAvrcpInterface_->set_volume_rsp(btRawAddr, static_cast<uint8_t>(absVol), static_cast<uint8_t>(label));
 }
 
@@ -538,7 +538,7 @@ void AvrcpCtService::SendRegisterAbsVolResponse(
     HILOGI("SendRegisterAbsVolResponse: addr=%{public}s, rspType=%{public}d, absVol=%{public}d, label=%{public}d",
            GET_ENCRYPT_STR_ADDR(rawAddr.GetAddress()), rspType, absVol, label);
     CHECK_AND_RETURN_LOG(btAvrcpInterface_, "bluetoothAvrcpInterface is nullptr");
-    BLUEDROID::RawAddress btRawAddr = ServiceUtil::AddrToBluedroid(rawAddr);
+    STACK::RawAddress btRawAddr = ServiceUtil::AddrToStack(rawAddr);
     btAvrcpInterface_->register_abs_vol_rsp(
         btRawAddr, static_cast<btrc_notification_type_t>(rspType),
         static_cast<uint8_t>(absVol), static_cast<uint8_t>(label));
@@ -548,7 +548,7 @@ void AvrcpCtService::RequestCurrentMetadata(const RawAddress &rawAddr)
 {
     HILOGI("RequestCurrentMetadata: addr=%{public}s", GET_ENCRYPT_STR_ADDR(rawAddr.GetAddress()));
     CHECK_AND_RETURN_LOG(btAvrcpInterface_, "bluetoothAvrcpInterface is nullptr");
-    BLUEDROID::RawAddress btRawAddr = ServiceUtil::AddrToBluedroid(rawAddr);
+    STACK::RawAddress btRawAddr = ServiceUtil::AddrToStack(rawAddr);
     btAvrcpInterface_->get_current_metadata_cmd(btRawAddr);
 }
 
@@ -556,7 +556,7 @@ void AvrcpCtService::RequestPlaybackState(const RawAddress &rawAddr)
 {
     HILOGI("RequestPlaybackState: addr=%{public}s", GET_ENCRYPT_STR_ADDR(rawAddr.GetAddress()));
     CHECK_AND_RETURN_LOG(btAvrcpInterface_, "bluetoothAvrcpInterface is nullptr");
-    BLUEDROID::RawAddress btRawAddr = ServiceUtil::AddrToBluedroid(rawAddr);
+    STACK::RawAddress btRawAddr = ServiceUtil::AddrToStack(rawAddr);
     btAvrcpInterface_->get_playback_state_cmd(btRawAddr);
 }
 
@@ -766,7 +766,7 @@ int AvrcpCtService::SetPlayerAppSettingCurrentValue(
     const RawAddress &rawAddr, const std::vector<uint8_t> &attributes, const std::vector<uint8_t> &values)
 {
     CHECK_AND_RETURN_LOG_RET(btAvrcpInterface_, false, "bluetoothAvrcpInterface is nullptr");
-    BLUEDROID::RawAddress btRawAddr = ServiceUtil::AddrToBluedroid(rawAddr);
+    STACK::RawAddress btRawAddr = ServiceUtil::AddrToStack(rawAddr);
     std::vector<uint8_t> attributesCopy(attributes.begin(), attributes.end());
     std::vector<uint8_t> valuesCopy(values.begin(), values.end());
     bt_status_t status = btAvrcpInterface_->set_player_app_setting_cmd(
@@ -887,7 +887,7 @@ int AvrcpCtService::SetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume)
     HILOGI("SetAbsoluteVolume: addr=%{public}s, volume=%{public}d",
            GET_ENCRYPT_STR_ADDR(rawAddr.GetAddress()), volume);
     CHECK_AND_RETURN_LOG_RET(btAvrcpInterface_, RET_BAD_STATUS, "bluetoothAvrcpInterface is nullptr");
-    BLUEDROID::RawAddress btRawAddr = ServiceUtil::AddrToBluedroid(rawAddr);
+    STACK::RawAddress btRawAddr = ServiceUtil::AddrToStack(rawAddr);
     bt_status_t status = btAvrcpInterface_->set_volume_rsp(btRawAddr, volume, 0);
     return (status == BT_STATUS_SUCCESS) ? RET_NO_ERROR : RET_BAD_STATUS;
 }

@@ -169,13 +169,13 @@ bool MapMseMnsClient::IsConnect()
     return connected_.load();
 }
 
-static RawAddress ConvertRfcommAddr(BLUEDROID::RawAddress &addr)
+static RawAddress ConvertRfcommAddr(STACK::RawAddress &addr)
 {
-    BLUEDROID::RawAddress newAddr;
+    STACK::RawAddress newAddr;
     for (int i = 0; i < MAC_ADDR_LEN; i++) {
         newAddr.address[i] = addr.address[MAC_ADDR_LEN - 1 - i];
     }
-    return ServiceUtil::AddrFromBluedroid(newAddr);
+    return ServiceUtil::AddrFromStack(newAddr);
 }
 
 std::shared_ptr<ObexSocketDevice> MapMseMnsClient::RecvSocketDevice(SocketType socketType)

@@ -62,7 +62,7 @@ utility::Context *HfpHfService::GetContext()
     return this;
 }
 
-static int CovertConnectStateFromBluedroid(bthf_client_connection_state_t state)
+static int CovertConnectStateFromStack(bthf_client_connection_state_t state)
 {
     if (state == BTHF_CLIENT_CONNECTION_STATE_SLC_CONNECTED) {
         return HFP_HF_SLC_ESTABLISHED_EVT;
@@ -76,12 +76,12 @@ static int CovertConnectStateFromBluedroid(bthf_client_connection_state_t state)
     return HFP_HF_DISCONNECTING_EVT;
 }
 
-static void BtHfConnectionStateCb(const BLUEDROID::RawAddress* bdAddr,
+static void BtHfConnectionStateCb(const STACK::RawAddress* bdAddr,
     bthf_client_connection_state_t state, unsigned int peerFeat, unsigned int chldFeat)
 {
     HILOGI("[HFP HF]ConnectState=%{public}d", state);
-    int connectState = CovertConnectStateFromBluedroid(state);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    int connectState = CovertConnectStateFromStack(state);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(connectState, peerFeat);
     event.dev_ = rawAddr.GetAddress();
     event.arg3_ = static_cast<int>(chldFeat);
@@ -90,7 +90,7 @@ static void BtHfConnectionStateCb(const BLUEDROID::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static int CovertAudioStateFromBluedroid(bthf_client_audio_state_t state)
+static int CovertAudioStateFromStack(bthf_client_audio_state_t state)
 {
     if (state == BTHF_CLIENT_AUDIO_STATE_DISCONNECTED) {
         return HFP_HF_AUDIO_DISCONNECTED_EVT;
@@ -102,12 +102,12 @@ static int CovertAudioStateFromBluedroid(bthf_client_audio_state_t state)
     return HFP_HF_AUDIO_CONNECTED_MSBC_EVT;
 }
 
-static void BtHfAudioStateCb(const BLUEDROID::RawAddress* bdAddr,
+static void BtHfAudioStateCb(const STACK::RawAddress* bdAddr,
     bthf_client_audio_state_t state)
 {
     HILOGI("[HFP HF]AudioState=%{public}d", state);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
-    int audioState = CovertAudioStateFromBluedroid(state);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    int audioState = CovertAudioStateFromStack(state);
     HfpHfMessage event(audioState);
     event.dev_ = rawAddr.GetAddress();
     HfpHfService* service = HfpHfService::GetService();
@@ -115,10 +115,10 @@ static void BtHfAudioStateCb(const BLUEDROID::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfVrCmdCb(const BLUEDROID::RawAddress* bdAddr, bthf_client_vr_state_t state)
+static void BtHfVrCmdCb(const STACK::RawAddress* bdAddr, bthf_client_vr_state_t state)
 {
     HILOGI("[HFP HF]VRState=%{public}d", state);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_TYPE_VOICE_RECOGNITION_CHANGED, state);
     event.dev_ = rawAddr.GetAddress();
     HfpHfService* service = HfpHfService::GetService();
@@ -126,11 +126,11 @@ static void BtHfVrCmdCb(const BLUEDROID::RawAddress* bdAddr, bthf_client_vr_stat
     service->PostEvent(event);
 }
 
-static void BtHfNetworkStateCb(const BLUEDROID::RawAddress* bdAddr,
+static void BtHfNetworkStateCb(const STACK::RawAddress* bdAddr,
     bthf_client_network_state_t state)
 {
     HILOGI("[HFP HF]networkState=%{public}d", state);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, state);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_NETWORK_STATE;
@@ -139,11 +139,11 @@ static void BtHfNetworkStateCb(const BLUEDROID::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfNetworkRoamingCb(const BLUEDROID::RawAddress* bdAddr,
+static void BtHfNetworkRoamingCb(const STACK::RawAddress* bdAddr,
     bthf_client_service_type_t type)
 {
     HILOGI("[HFP HF]networkType=%{public}d", type);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, type);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_NETWORK_ROAM;
@@ -152,10 +152,10 @@ static void BtHfNetworkRoamingCb(const BLUEDROID::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfNetworkSignalCb(const BLUEDROID::RawAddress* bdAddr, int signal)
+static void BtHfNetworkSignalCb(const STACK::RawAddress* bdAddr, int signal)
 {
     HILOGI("[HFP HF]networkSignal=%{public}d", signal);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, signal);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_NETWORK_SIGNAL;
@@ -164,10 +164,10 @@ static void BtHfNetworkSignalCb(const BLUEDROID::RawAddress* bdAddr, int signal)
     service->PostEvent(event);
 }
 
-static void BtHfBatteryLevelCb(const BLUEDROID::RawAddress* bdAddr, int level)
+static void BtHfBatteryLevelCb(const STACK::RawAddress* bdAddr, int level)
 {
     HILOGI("[HFP HF]batteryLevel=%{public}d", level);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, level);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_BATTERY_LEVEL;
@@ -176,10 +176,10 @@ static void BtHfBatteryLevelCb(const BLUEDROID::RawAddress* bdAddr, int level)
     service->PostEvent(event);
 }
 
-static void BtHfCurrentOperatorCb(const BLUEDROID::RawAddress* bdAddr, const char* name)
+static void BtHfCurrentOperatorCb(const STACK::RawAddress* bdAddr, const char* name)
 {
     HILOGI("[HFP HF]BtHfCurrentOperatorCb");
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_CURRENT_OPERATOR;
@@ -191,10 +191,10 @@ static void BtHfCurrentOperatorCb(const BLUEDROID::RawAddress* bdAddr, const cha
     service->PostEvent(event);
 }
 
-static void BtHfCallCb(const BLUEDROID::RawAddress* bdAddr, bthf_client_call_t call)
+static void BtHfCallCb(const STACK::RawAddress* bdAddr, bthf_client_call_t call)
 {
     HILOGI("[HFP HF]call=%{public}d", call);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, call);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_CALL_STATE;
@@ -203,11 +203,11 @@ static void BtHfCallCb(const BLUEDROID::RawAddress* bdAddr, bthf_client_call_t c
     service->PostEvent(event);
 }
 
-static void BtHfCallSetupCb(const BLUEDROID::RawAddress* bdAddr,
+static void BtHfCallSetupCb(const STACK::RawAddress* bdAddr,
     bthf_client_callsetup_t callsetup)
 {
     HILOGI("[HFP HF]callsetup=%{public}d", callsetup);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_CALL_SETUP_STATE;
@@ -217,11 +217,11 @@ static void BtHfCallSetupCb(const BLUEDROID::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfCallHeldCb(const BLUEDROID::RawAddress* bdAddr,
+static void BtHfCallHeldCb(const STACK::RawAddress* bdAddr,
     bthf_client_callheld_t callheld)
 {
     HILOGI("[HFP HF]callheld=%{public}d", callheld);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, callheld);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_CALL_HELD_STATE;
@@ -230,11 +230,11 @@ static void BtHfCallHeldCb(const BLUEDROID::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfRespAndHoldCb(const BLUEDROID::RawAddress* bdAddr,
+static void BtHfRespAndHoldCb(const STACK::RawAddress* bdAddr,
     bthf_client_resp_and_hold_t resp_and_hold)
 {
     HILOGI("[HFP HF]respAndHold=%{public}d", resp_and_hold);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, resp_and_hold);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_HOLD_RESULT;
@@ -243,10 +243,10 @@ static void BtHfRespAndHoldCb(const BLUEDROID::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfClipCb(const BLUEDROID::RawAddress* bdAddr, const char* number)
+static void BtHfClipCb(const STACK::RawAddress* bdAddr, const char* number)
 {
     HILOGI("[HFP HF]bthf_clip_cb");
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_CALLING_LINE_IDENTIFICATION;
@@ -258,10 +258,10 @@ static void BtHfClipCb(const BLUEDROID::RawAddress* bdAddr, const char* number)
     service->PostEvent(event);
 }
 
-static void BtHfCallWaitingCb(const BLUEDROID::RawAddress* bdAddr, const char* number)
+static void BtHfCallWaitingCb(const STACK::RawAddress* bdAddr, const char* number)
 {
     HILOGI("[HFP HF]bthf_call_waiting_cb");
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_CALL_WAITING;
@@ -273,12 +273,12 @@ static void BtHfCallWaitingCb(const BLUEDROID::RawAddress* bdAddr, const char* n
     service->PostEvent(event);
 }
 
-static void BtHfCurrentCallsCb(const BLUEDROID::RawAddress* bdAddr, int index,
+static void BtHfCurrentCallsCb(const STACK::RawAddress* bdAddr, int index,
     bthf_client_call_direction_t dir, bthf_client_call_state_t state,
     bthf_client_call_mpty_type_t mpty, const char* number)
 {
     HILOGI("[HFP HF]callstate=%{public}d", state);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_CURRENT_CALLS;
@@ -294,11 +294,11 @@ static void BtHfCurrentCallsCb(const BLUEDROID::RawAddress* bdAddr, int index,
     service->PostEvent(event);
 }
 
-static void BtHfVolumeChangeCb(const BLUEDROID::RawAddress* bdAddr,
+static void BtHfVolumeChangeCb(const STACK::RawAddress* bdAddr,
     bthf_client_volume_type_t type, int volume)
 {
     HILOGI("[HFP HF]change volume=%{public}d, volume type=%{public}d", volume, type);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, type);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_SET_VOLUME;
@@ -308,11 +308,11 @@ static void BtHfVolumeChangeCb(const BLUEDROID::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfCmdCompleteCb(const BLUEDROID::RawAddress* bdAddr,
+static void BtHfCmdCompleteCb(const STACK::RawAddress* bdAddr,
     bthf_client_cmd_complete_t type, int cme)
 {
     HILOGI("[HFP HF]bthf_cmd_complete_cb=%{public}d", type);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, type);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_AT_CMD_RESULT;
@@ -321,11 +321,11 @@ static void BtHfCmdCompleteCb(const BLUEDROID::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfSubscriberInfoCb(const BLUEDROID::RawAddress* bdAddr, const char* name,
+static void BtHfSubscriberInfoCb(const STACK::RawAddress* bdAddr, const char* name,
     bthf_client_subscriber_service_type_t type)
 {
     HILOGI("[HFP HF]bthf_client_subscriber_service_type_t=%{public}d", type);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, type);
     event.dev_ = rawAddr.GetAddress();
     CHECK_AND_RETURN_LOG(name != nullptr, "[HFP HF]BtHfSubscriberInfoCb name is null");
@@ -337,11 +337,11 @@ static void BtHfSubscriberInfoCb(const BLUEDROID::RawAddress* bdAddr, const char
     service->PostEvent(event);
 }
 
-static void BtHfInBandRingCb(const BLUEDROID::RawAddress* bdAddr,
+static void BtHfInBandRingCb(const STACK::RawAddress* bdAddr,
     bthf_client_in_band_ring_state_t inBand)
 {
     HILOGI("[HFP HF]bthf_client_in_band_ring_state_t=%{public}d", inBand);
-    RawAddress rawAddr = ServiceUtil::AddrFromBluedroid(*bdAddr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, inBand);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_INBAND_RING;
@@ -350,20 +350,20 @@ static void BtHfInBandRingCb(const BLUEDROID::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfLastVoiceTagNumberCb(const BLUEDROID::RawAddress* bdAddr,
+static void BtHfLastVoiceTagNumberCb(const STACK::RawAddress* bdAddr,
     const char* number)
 {
     HILOGI("[HFP HF]last voice tag number not supported");
 }
 
-static void BtHfRingIndicationCb(const BLUEDROID::RawAddress* bdAddr)
+static void BtHfRingIndicationCb(const STACK::RawAddress* bdAddr)
 {
     /* Ringing is not handled at this indication and rather should be
        implemented (by the client of this service). Use the
        CALL_STATE_INCOMING (and similar) handle ringing. */
 }
 
-static void BtHfUnknownEventCb(const BLUEDROID::RawAddress* bdAddr,
+static void BtHfUnknownEventCb(const STACK::RawAddress* bdAddr,
     const char* eventString)
 {
     HILOGI("[HFP HF]BtHfUnknownEventCb");

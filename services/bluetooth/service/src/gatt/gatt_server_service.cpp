@@ -57,7 +57,7 @@ public:
     {
     }
 
-    void RegisterServerCallback(int status, int serverIf, const BLUEDROID::bluetooth::Uuid &appUuid) override
+    void RegisterServerCallback(int status, int serverIf, const STACK::bluetooth::Uuid &appUuid) override
     {
         callback_(status, serverIf);
     }
@@ -260,7 +260,7 @@ int GattServerService::RegisterApplication(std::weak_ptr<IGattServerCallback> ca
             [this](int status, int serverIf) { pimpl->RegisterServerCallback(status, serverIf); });
         BluetoothGattInterface::GetInstance()->AddGattServerObserver(obs);
 
-        auto appUuid = BLUEDROID::bluetooth::Uuid::GetRandom();
+        auto appUuid = STACK::bluetooth::Uuid::GetRandom();
         int ret = btIfGattServer_->register_server(appUuid, false);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("register server failed, ret: %{public}d", ret);

@@ -160,20 +160,20 @@ void AvrcpTgAvsessionMediaLoader::PlayItem(uint16_t playerId, bool nowPlaying, s
 {
     CALL_FUNC_IF_AVSESSION_MEDIA_LIB_LOADED(PlayItem, playerId, nowPlaying, mediaId);
 }
-void AvrcpTgAvsessionMediaLoader::SetActiveDevice(const BLUEDROID::RawAddress &address)
+void AvrcpTgAvsessionMediaLoader::SetActiveDevice(const STACK::RawAddress &address)
 {
     HfpAgService *hfp = HfpAgService::GetService();
     if (hfp != nullptr && hfp->IsAudioConnected(hfp->GetActiveDevice())) {
-        HILOGW("ignore set active device[%{public}s] during sco", address.ToLogString().c_str());
+        HILOGW("ignore set active device[%{public}s] during sco", address.ToStringForLogging().c_str());
         BtChrA2dpAudioExcpEvent(address.ToString(), CHR_A2DP_ERR_TYPE_SET_A2DP_DEV, CHR_SUB_ERRCODE_CASE2);
         return;
     }
     if (RefusePlayHelper::GetInstance()->NeedIgnoreSetActive()) {
-        HILOGW("ignore set active device[%{public}s] after sco", address.ToLogString().c_str());
+        HILOGW("ignore set active device[%{public}s] after sco", address.ToStringForLogging().c_str());
         BtChrA2dpAudioExcpEvent(address.ToString(), CHR_A2DP_ERR_TYPE_SET_A2DP_DEV, CHR_SUB_ERRCODE_CASE1);
         return;
     }
-    HILOGI("avrcp tg set active device %{public}s", address.ToLogString().c_str());
+    HILOGI("avrcp tg set active device %{public}s", address.ToStringForLogging().c_str());
     CALL_FUNC_IF_AVSESSION_MEDIA_LIB_LOADED(SetActiveDevice, address);
 }
 

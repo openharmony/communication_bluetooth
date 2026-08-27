@@ -43,14 +43,14 @@ namespace OHOS {
 namespace bluetooth {
 using namespace OHOS::Bluetooth;
 const int HW_BT_PROPERTY_ABS_VOLUM_KEY = 0x211;
-BLUEDROID::RawAddress GetA2dpActiveDevice()
+STACK::RawAddress GetA2dpActiveDevice()
 {
     A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
     if (a2dpService == nullptr) {
-        return BLUEDROID::RawAddress::kEmpty;
+        return STACK::RawAddress::kEmpty;
     }
     auto device = a2dpService->GetActiveSinkDevice();
-    BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(device);
+    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
 
     return rawAddr;
 }
@@ -64,26 +64,26 @@ void AvrcpVolumeInterfaceImpl::Init()
 void AvrcpVolumeInterfaceImpl::Cleanup()
 {}
 
-void AvrcpVolumeInterfaceImpl::DeviceConnected(const BLUEDROID::RawAddress &bdaddr)
+void AvrcpVolumeInterfaceImpl::DeviceConnected(const STACK::RawAddress &bdaddr)
 {
     RemoteDeviceProperties::GetInstance()->GetRemoteDeviceProperty(
         bdaddr, static_cast<bt_property_type_t>(HW_BT_PROPERTY_ABS_VOLUM_KEY));
     PreferencesManager::Save(bdaddr.ToString(), false, PreferencesManagerType::ABS_VOLUME_SWITCH);
     SwitchAbsVolumeDevice(bdaddr, false);
-    RefusePlayHelper::GetInstance()->SetLastAvrcpConnectTime(ServiceUtil::AddrFromBluedroid(bdaddr).GetAddress());
+    RefusePlayHelper::GetInstance()->SetLastAvrcpConnectTime(ServiceUtil::AddrFromStack(bdaddr).GetAddress());
     BluetoothHelper::BluetoothCommonEventHelper::PublishAvrcpConnectStateUpdateEvent(bdaddr.ToString(),
         static_cast<int32_t>(BTConnectState::CONNECTED));
     DoInA2dpThread([bdaddr]() {
         A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
         CHECK_AND_RETURN_LOG(a2dpService, "a2dp service is nullptr");
         a2dpService->ProcessAvrcpDynamicLoad(
-            static_cast<int>(BTConnectState::CONNECTED), ServiceUtil::AddrFromBluedroid(bdaddr), "avrcp");
+            static_cast<int>(BTConnectState::CONNECTED), ServiceUtil::AddrFromStack(bdaddr), "avrcp");
     });
 }
 
-void AvrcpVolumeInterfaceImpl::DeviceConnected(const BLUEDROID::RawAddress &bdaddr, VolumeChangedCb cb)
+void AvrcpVolumeInterfaceImpl::DeviceConnected(const STACK::RawAddress &bdaddr, VolumeChangedCb cb)
 {
-    HILOGI("support absolute volume %{public}s.", bdaddr.ToLogString().c_str());
+    HILOGI("support absolute volume %{public}s.", bdaddr.ToStringForLogging().c_str());
     RemoteDeviceProperties::GetInstance()->GetRemoteDeviceProperty(
         bdaddr, static_cast<bt_property_type_t>(HW_BT_PROPERTY_ABS_VOLUM_KEY));
     {
@@ -93,35 +93,35 @@ void AvrcpVolumeInterfaceImpl::DeviceConnected(const BLUEDROID::RawAddress &bdad
 
     PreferencesManager::Save(bdaddr.ToString(), true, PreferencesManagerType::ABS_VOLUME_SWITCH);
     SwitchAbsVolumeDevice(bdaddr, false);
-    RefusePlayHelper::GetInstance()->SetLastAvrcpConnectTime(ServiceUtil::AddrFromBluedroid(bdaddr).GetAddress());
+    RefusePlayHelper::GetInstance()->SetLastAvrcpConnectTime(ServiceUtil::AddrFromStack(bdaddr).GetAddress());
     BluetoothHelper::BluetoothCommonEventHelper::PublishAvrcpConnectStateUpdateEvent(bdaddr.ToString(),
         static_cast<int32_t>(BTConnectState::CONNECTED));
     DoInA2dpThread([bdaddr]() {
         A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
         CHECK_AND_RETURN_LOG(a2dpService, "a2dp service is nullptr");
         a2dpService->ProcessAvrcpDynamicLoad(
-            static_cast<int>(BTConnectState::CONNECTED), ServiceUtil::AddrFromBluedroid(bdaddr), "avrcp");
+            static_cast<int>(BTConnectState::CONNECTED), ServiceUtil::AddrFromStack(bdaddr), "avrcp");
     });
 }
 
-void AvrcpVolumeInterfaceImpl::DeviceEmplaceSetVolume(const BLUEDROID::RawAddress &bdaddr, VolumeChangedCb cb)
+void AvrcpVolumeInterfaceImpl::DeviceEmplaceSetVolume(const STACK::RawAddress &bdaddr, VolumeChangedCb cb)
 {
     std::lock_guard<std::mutex> lock(volumeCallbackMapLock_);
     volumeCallbackMap_.emplace(bdaddr, cb);
 }
 
-void AvrcpVolumeInterfaceImpl::DeviceDisconnected(const BLUEDROID::RawAddress &bdaddr)
+void AvrcpVolumeInterfaceImpl::DeviceDisconnected(const STACK::RawAddress &bdaddr)
 {
     std::lock_guard<std::mutex> lock(volumeCallbackMapLock_);
     volumeCallbackMap_.erase(bdaddr);
-    RefusePlayHelper::GetInstance()->ClearRecord(ServiceUtil::AddrFromBluedroid(bdaddr).GetAddress());
+    RefusePlayHelper::GetInstance()->ClearRecord(ServiceUtil::AddrFromStack(bdaddr).GetAddress());
     BluetoothHelper::BluetoothCommonEventHelper::PublishAvrcpConnectStateUpdateEvent(bdaddr.ToString(),
         static_cast<int32_t>(BTConnectState::DISCONNECTED));
     DoInA2dpThread([bdaddr]() {
         A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
         CHECK_AND_RETURN_LOG(a2dpService, "a2dp service is nullptr");
         a2dpService->ProcessAvrcpDynamicLoad(
-            static_cast<int>(BTConnectState::DISCONNECTED), ServiceUtil::AddrFromBluedroid(bdaddr), "avrcp");
+            static_cast<int>(BTConnectState::DISCONNECTED), ServiceUtil::AddrFromStack(bdaddr), "avrcp");
     });
 }
 
@@ -136,19 +136,19 @@ void AvrcpVolumeInterfaceImpl::SetVolume(int8_t volume)
     int32_t storeVolume = PreferencesManager::Get(device.ToString(), GetDefaultVolume(),
         PreferencesManagerType::ABS_VOLUME);
     if (deviceVolume == storeVolume) {
-        HILOGW("device %{public}s Skipping SetVolume to same as current %{public}d.", device.ToLogString().c_str(),
+        HILOGW("device %{public}s Skipping SetVolume to same as current %{public}d.", device.ToStringForLogging().c_str(),
             deviceVolume);
         return;
     }
     PreferencesManager::Save(device.ToString(), deviceVolume, PreferencesManagerType::ABS_VOLUME);
 
-    std::string macAddr = ServiceUtil::AddrFromBluedroid(device).GetAddress();
+    std::string macAddr = ServiceUtil::AddrFromStack(device).GetAddress();
     const HfpAgSystemInterface &systemInterface = HfpAgSystemInterface::GetInstance();
     bool updateUi = systemInterface.IsCallIdle();
     // If in call, not update ui for music volume
     int32_t result = BluetoothAudioFrameworkAdapter::BtSetA2dpDeviceVolume(macAddr, deviceVolume, updateUi);
     BtChrBusinessEvent::GetInstance().SetVolumeParams(0, static_cast<int>(volume));
-    HILOGI("device %{public}s SetVolume status %{public}d. volume: %{public}d.", device.ToLogString().c_str(),
+    HILOGI("device %{public}s SetVolume status %{public}d. volume: %{public}d.", device.ToStringForLogging().c_str(),
         result, volume);
 
     if (result != AVRCP_SUCCESS) {
@@ -157,7 +157,7 @@ void AvrcpVolumeInterfaceImpl::SetVolume(int8_t volume)
     }
 }
 
-void AvrcpVolumeInterfaceImpl::setVolumeOfDevice(int8_t volume, const BLUEDROID::RawAddress &bdaddr)
+void AvrcpVolumeInterfaceImpl::setVolumeOfDevice(int8_t volume, const STACK::RawAddress &bdaddr)
 {
     int32_t deviceVolume = AvrcpToSystemVolume(volume);
     HILOGD("SetVolume avrcpVolume: %{public}d. musicMaxVolume: %{public}d. deviceVolume: %{public}d.",
@@ -167,19 +167,19 @@ void AvrcpVolumeInterfaceImpl::setVolumeOfDevice(int8_t volume, const BLUEDROID:
     int32_t storeVolume = PreferencesManager::Get(bdaddr.ToString(), GetDefaultVolume(),
         PreferencesManagerType::ABS_VOLUME);
     if (deviceVolume == storeVolume) {
-        HILOGW("device %{public}s Skipping SetVolume to same as current %{public}d.", bdaddr.ToLogString().c_str(),
+        HILOGW("device %{public}s Skipping SetVolume to same as current %{public}d.", bdaddr.ToStringForLogging().c_str(),
             deviceVolume);
         return;
     }
     PreferencesManager::Save(bdaddr.ToString(), deviceVolume, PreferencesManagerType::ABS_VOLUME);
 
-    std::string macAddr = ServiceUtil::AddrFromBluedroid(bdaddr).GetAddress();
+    std::string macAddr = ServiceUtil::AddrFromStack(bdaddr).GetAddress();
     const HfpAgSystemInterface &systemInterface = HfpAgSystemInterface::GetInstance();
     bool updateUi = systemInterface.IsCallIdle();
     // If in call, not update ui for music volume
     int32_t result = BluetoothAudioFrameworkAdapter::BtSetA2dpDeviceVolume(macAddr, deviceVolume, updateUi);
     BtChrBusinessEvent::GetInstance().SetVolumeParams(0, static_cast<int>(volume));
-    HILOGI("device %{public}s SetA2dpDeviceVolume status %{public}d. volume: %{public}d", bdaddr.ToLogString().c_str(),
+    HILOGI("device %{public}s SetA2dpDeviceVolume status %{public}d. volume: %{public}d", bdaddr.ToStringForLogging().c_str(),
         result, volume);
 
     if (result != AVRCP_SUCCESS) {
@@ -188,7 +188,7 @@ void AvrcpVolumeInterfaceImpl::setVolumeOfDevice(int8_t volume, const BLUEDROID:
     }
 }
 
-void AvrcpVolumeInterfaceImpl::SendVolumeChanged(const BLUEDROID::RawAddress &addr, int32_t volume)
+void AvrcpVolumeInterfaceImpl::SendVolumeChanged(const STACK::RawAddress &addr, int32_t volume)
 {
     if ((volume < 0) || (volume > musicMaxVolumeLevel_)) {
         HILOGE("Invalid volume %{public}d.", volume);
@@ -196,13 +196,13 @@ void AvrcpVolumeInterfaceImpl::SendVolumeChanged(const BLUEDROID::RawAddress &ad
     }
 
     if (!PreferencesManager::Get(addr.ToString(), false, PreferencesManagerType::ABS_VOLUME_SWITCH)) {
-        HILOGW("device not support abs volume %{public}s.", addr.ToLogString().c_str());
+        HILOGW("device not support abs volume %{public}s.", addr.ToStringForLogging().c_str());
         return;
     }
     int32_t storeVolume = PreferencesManager::Get(addr.ToString(), GetDefaultVolume(),
         PreferencesManagerType::ABS_VOLUME);
     if (volume == storeVolume) {
-        HILOGW("%{public}s Skipping update volume to same as current %{public}d.", addr.ToLogString().c_str(), volume);
+        HILOGW("%{public}s Skipping update volume to same as current %{public}d.", addr.ToStringForLogging().c_str(), volume);
         return;
     }
     PreferencesManager::Save(addr.ToString(), volume, PreferencesManagerType::ABS_VOLUME);
@@ -218,7 +218,7 @@ void AvrcpVolumeInterfaceImpl::SendVolumeChanged(const BLUEDROID::RawAddress &ad
         musicMaxVolumeLevel_,
         avrcpVolume,
         avrcpVolume & 0x7F,
-        addr.ToLogString().c_str());
+        addr.ToStringForLogging().c_str());
     std::lock_guard<std::mutex> lock(volumeCallbackMapLock_);
     for (const auto &cb : volumeCallbackMap_) {
         cb.second.Run(addr, avrcpVolume & 0x7F);
@@ -226,15 +226,15 @@ void AvrcpVolumeInterfaceImpl::SendVolumeChanged(const BLUEDROID::RawAddress &ad
 }
 
 // actice device changed, restore the volume saved last time.
-void AvrcpVolumeInterfaceImpl::SwitchAbsVolumeDevice(const BLUEDROID::RawAddress &addr, bool isNeedSetVolume)
+void AvrcpVolumeInterfaceImpl::SwitchAbsVolumeDevice(const STACK::RawAddress &addr, bool isNeedSetVolume)
 {
     if (addr != GetA2dpActiveDevice()) {
-        HILOGW("Not current active device, skip %{public}s.", addr.ToLogString().c_str());
+        HILOGW("Not current active device, skip %{public}s.", addr.ToStringForLogging().c_str());
         return;
     }
 
     int32_t ret;
-    auto rawAddr = ServiceUtil::AddrFromBluedroid(addr);
+    auto rawAddr = ServiceUtil::AddrFromStack(addr);
     std::string macAddr = rawAddr.GetAddress();
     int32_t absVolumeAbility =
         RemoteDeviceProperties::GetInstance()->GetDeviceAbsVolumeAbility(rawAddr);
@@ -246,7 +246,7 @@ void AvrcpVolumeInterfaceImpl::SwitchAbsVolumeDevice(const BLUEDROID::RawAddress
             BluetoothAudioFrameworkAdapter::SetStreamVolume(STREAM_MUSIC, volume, 1);
         }
         HILOGI("device %{public}s not support abs volume status %{public}d, volume %{public}d.",
-            addr.ToLogString().c_str(), ret, volume);
+            addr.ToStringForLogging().c_str(), ret, volume);
         return;
     }
 
@@ -256,7 +256,7 @@ void AvrcpVolumeInterfaceImpl::SwitchAbsVolumeDevice(const BLUEDROID::RawAddress
     HILOGI("device store volume %{public}d.", storedVolume);
     if (!PreferencesManager::Get(addr.ToString(), false, PreferencesManagerType::ABS_VOLUME_SWITCH)) {
         ret = BluetoothAudioFrameworkAdapter::BtSetDeviceAbsVolumeSupported(macAddr, false);
-        HILOGI("device %{public}s abs volume switch is false, status %{public}d.", addr.ToLogString().c_str(), ret);
+        HILOGI("device %{public}s abs volume switch is false, status %{public}d.", addr.ToStringForLogging().c_str(), ret);
         if (isNeedSetVolume) {
             BluetoothAudioFrameworkAdapter::SetStreamVolume(STREAM_MUSIC, storedVolume, 1);
         }
@@ -271,26 +271,26 @@ void AvrcpVolumeInterfaceImpl::SwitchAbsVolumeDevice(const BLUEDROID::RawAddress
         }
     }
     ret = BluetoothAudioFrameworkAdapter::BtSetDeviceAbsVolumeSupported(macAddr, true, storedVolume);
-    HILOGI("set device %{public}s support abs volume status %{public}d.", addr.ToLogString().c_str(), ret);
+    HILOGI("set device %{public}s support abs volume status %{public}d.", addr.ToStringForLogging().c_str(), ret);
     if (isNeedSetVolume) {
         ret = BluetoothAudioFrameworkAdapter::BtSetA2dpDeviceVolume(macAddr, storedVolume, false);
     }
-    HILOGI("set device %{public}s abs volume level status %{public}d.", addr.ToLogString().c_str(), ret);
+    HILOGI("set device %{public}s abs volume level status %{public}d.", addr.ToStringForLogging().c_str(), ret);
 }
 
-void AvrcpVolumeInterfaceImpl::SetDeviceAbsVolumeAbility(const BLUEDROID::RawAddress &rawAddr, int32_t ability)
+void AvrcpVolumeInterfaceImpl::SetDeviceAbsVolumeAbility(const STACK::RawAddress &rawAddr, int32_t ability)
 {
-    auto device = ServiceUtil::AddrFromBluedroid(rawAddr);
+    auto device = ServiceUtil::AddrFromStack(rawAddr);
     int32_t absVolumeAbility = RemoteDeviceProperties::GetInstance()->GetDeviceAbsVolumeAbility(device);
     if (absVolumeAbility == DeviceAbsVolumeAbility::DEVICE_ABSVOL_UNSUPPORT) {
-        HILOGE("device %{public}s has no abs ability, can not enable or disbale.", rawAddr.ToLogString().c_str());
+        HILOGE("device %{public}s has no abs ability, can not enable or disbale.", rawAddr.ToStringForLogging().c_str());
         BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_BT_UI_SWITCH_CHANGE, device, UE_COMMON_SCENE_CASE0,
             UE_COMMON_SCENE_CASE2);
         return;
     }
 
     SetDeviceAbsVolumeProperty(rawAddr, ability);
-    HILOGI("device %{public}s, abs status = %{public}d. ", rawAddr.ToLogString().c_str(), ability);
+    HILOGI("device %{public}s, abs status = %{public}d. ", rawAddr.ToStringForLogging().c_str(), ability);
     if (ability == DeviceAbsVolumeAbility::DEVICE_ABSVOL_OPEN) {
         PreferencesManager::Save(rawAddr.ToString(), true, PreferencesManagerType::ABS_VOLUME_SWITCH);
         BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_BT_UI_SWITCH_CHANGE, device, UE_COMMON_SCENE_CASE0,
@@ -303,16 +303,16 @@ void AvrcpVolumeInterfaceImpl::SetDeviceAbsVolumeAbility(const BLUEDROID::RawAdd
     SwitchAbsVolumeDevice(rawAddr);
 }
 
-int32_t AvrcpVolumeInterfaceImpl::GetDeviceAbsVolumeAbility(const BLUEDROID::RawAddress &rawAddr)
+int32_t AvrcpVolumeInterfaceImpl::GetDeviceAbsVolumeAbility(const STACK::RawAddress &rawAddr)
 {
-    auto device = ServiceUtil::AddrFromBluedroid(rawAddr);
+    auto device = ServiceUtil::AddrFromStack(rawAddr);
     int32_t absVolumeAbility = RemoteDeviceProperties::GetInstance()->GetDeviceAbsVolumeAbility(device);
-    HILOGI("device %{public}s, abs ability = %{public}d. ", rawAddr.ToLogString().c_str(), absVolumeAbility);
+    HILOGI("device %{public}s, abs ability = %{public}d. ", rawAddr.ToStringForLogging().c_str(), absVolumeAbility);
     return absVolumeAbility;
 }
 
 // if absolute volume support, audio set device volume by this interface
-void AvrcpVolumeInterfaceImpl::SetDeviceAbsoluteVolume(const BLUEDROID::RawAddress &rawAddr, int32_t volumeLevel)
+void AvrcpVolumeInterfaceImpl::SetDeviceAbsoluteVolume(const STACK::RawAddress &rawAddr, int32_t volumeLevel)
 {
     SendVolumeChanged(rawAddr, volumeLevel);
 }
@@ -321,12 +321,12 @@ void AvrcpVolumeInterfaceImpl::NotifyAudioVolumeEvent(int32_t streamType, int32_
 {
     HILOGD("streamType: %{public}d, volume: %{public}d.", streamType, volume);
     auto device = GetA2dpActiveDevice();
-    CHECK_AND_RETURN_LOG(device != BLUEDROID::RawAddress::kEmpty, "not found active device.");
+    CHECK_AND_RETURN_LOG(device != STACK::RawAddress::kEmpty, "not found active device.");
     CHECK_AND_RETURN_LOG(BluetoothAudioFrameworkAdapter::IsAudioOutputToBluetoothA2dp(), "not output to a2dp.");
     int32_t absVolumeAbility =
-        RemoteDeviceProperties::GetInstance()->GetDeviceAbsVolumeAbility(ServiceUtil::AddrFromBluedroid(device));
+        RemoteDeviceProperties::GetInstance()->GetDeviceAbsVolumeAbility(ServiceUtil::AddrFromStack(device));
     if (absVolumeAbility == DeviceAbsVolumeAbility::DEVICE_ABSVOL_UNSUPPORT) {
-        HILOGE("device %{public}s has no abs ability, volume: %{public}d.", device.ToLogString().c_str(), volume);
+        HILOGE("device %{public}s has no abs ability, volume: %{public}d.", device.ToStringForLogging().c_str(), volume);
         PreferencesManager::Save(device.ToString(), volume, PreferencesManagerType::NON_ABS_VOLUME);
         return;
     }
@@ -339,7 +339,7 @@ void AvrcpVolumeInterfaceImpl::NotifyAudioVolumeEvent(int32_t streamType, int32_
     PreferencesManager::Save(device.ToString(), volume, PreferencesManagerType::ABS_VOLUME);
 }
 
-void AvrcpVolumeInterfaceImpl::SetDeviceAbsVolumeProperty(const BLUEDROID::RawAddress &rawAddr, int32_t ability)
+void AvrcpVolumeInterfaceImpl::SetDeviceAbsVolumeProperty(const STACK::RawAddress &rawAddr, int32_t ability)
 {
     bt_property_t prop;
     prop.type = static_cast<bt_property_type_t>(HW_BT_PROPERTY_ABS_VOLUM_KEY);

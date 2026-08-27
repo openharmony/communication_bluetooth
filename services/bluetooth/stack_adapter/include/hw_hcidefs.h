@@ -20,8 +20,8 @@
 
 #include "types/raw_address.h"
 
-#ifndef BLUEDROID
-#define BLUEDROID
+#ifndef STACK
+#define STACK
 #endif
 
 namespace OHOS {
@@ -38,7 +38,7 @@ constexpr uint32_t COD_HID_KEYBOARD = 0x0540;
 struct ForceSleepFilterHidData {
     bool enabled;
     uint8_t transport;
-    BLUEDROID::RawAddress rawAddr;
+    STACK::RawAddress rawAddr;
 };
 
 union UnionCmdToHisi {

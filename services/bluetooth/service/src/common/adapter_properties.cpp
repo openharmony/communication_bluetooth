@@ -252,7 +252,7 @@ bool AdapterProperties::SetBroadcastName(std::string deviceName)
 #endif
     unsigned int length = name.length();
     bt_property_t property;
-    property.type = static_cast<bt_property_type_t>(BLUEDROID::BT_PROPERTY_BDNAME);
+    property.type = static_cast<bt_property_type_t>(STACK::BT_PROPERTY_BDNAME);
     property.len = static_cast<int>(length);
     property.val = name.data();
     const bt_interface_t *btInterface = nullptr;
@@ -304,7 +304,7 @@ bool AdapterProperties::SetDeviceClass(int deviceClass)
 {
     bt_property_t property;
     property.len = sizeof(int);
-    property.type = (bt_property_type_t)BLUEDROID::BT_PROPERTY_CLASS_OF_DEVICE;
+    property.type = (bt_property_type_t)STACK::BT_PROPERTY_CLASS_OF_DEVICE;
     property.val = &deviceClass;
     HILOGI("deviceClass = %d", deviceClass);
     const bt_interface_t *btInterface = nullptr;
@@ -370,7 +370,7 @@ bool AdapterProperties::SetIoCapability(int ioCapability)
 {
     bt_property_t property;
     property.len = sizeof(int);
-    property.type = (bt_property_type_t)BLUEDROID::BT_PROPERTY_LOCAL_IO_CAPS;
+    property.type = (bt_property_type_t)STACK::BT_PROPERTY_LOCAL_IO_CAPS;
     property.val = &ioCapability;
     HILOGI("ioCapability: %{public}d", ioCapability);
     const bt_interface_t *btInterface = nullptr;
@@ -460,7 +460,7 @@ void AdapterProperties::ParseAdapterProps(bt_status_t status, int numProperties,
                 }
                 break;
             }
-            case BLUEDROID::BT_PROPERTY_CLASS_OF_DEVICE: {
+            case STACK::BT_PROPERTY_CLASS_OF_DEVICE: {
                 cod_.store((int)ParseDeviceCod(property));
                 break;
             }
@@ -511,12 +511,12 @@ std::string AdapterProperties::ParseDeviceName(bt_property_t* property)
 
 RawAddress AdapterProperties::ParseDeviceAddr(bt_property_t* property)
 {
-    if (property->len != sizeof(BLUEDROID::RawAddress)) {
+    if (property->len != sizeof(STACK::RawAddress)) {
         HILOGE("Invalid length for BT_PROPERTY_BDADDR");
         return RawAddress(INVALID_MAC_ADDRESS);
     }
     if (property->val != nullptr) {
-        RawAddress address =  ServiceUtil::AddrFromBluedroid(*reinterpret_cast<BLUEDROID::RawAddress*>(property->val));
+        RawAddress address =  ServiceUtil::AddrFromStack(*reinterpret_cast<STACK::RawAddress*>(property->val));
         return address;
     } else {
         HILOGE("Invalid pointer");
@@ -535,14 +535,14 @@ std::vector<Uuid> AdapterProperties::ParseDeviceUuid(bt_property_t* property)
         HILOGE("Negative length on BT_PROPERTY_UUIDS");
         return serviceUuids;
     }
-    if (property->len % sizeof(BLUEDROID::bluetooth::Uuid) != 0) {
+    if (property->len % sizeof(STACK::bluetooth::Uuid) != 0) {
         HILOGE("Trailing bytes on BT_PROPERTY_UUIDS");
         return serviceUuids;
     }
-    auto bluedriodUuids = static_cast<const BLUEDROID::bluetooth::Uuid*>(property->val);
+    auto bluedriodUuids = static_cast<const STACK::bluetooth::Uuid*>(property->val);
 
-    for (size_t i = 0; i < property->len / sizeof(BLUEDROID::bluetooth::Uuid); ++i) {
-        Uuid uuid = ServiceUtil::UuidFromBluedroid(bluedriodUuids[i]);
+    for (size_t i = 0; i < property->len / sizeof(STACK::bluetooth::Uuid); ++i) {
+        Uuid uuid = ServiceUtil::UuidFromStack(bluedriodUuids[i]);
         serviceUuids.push_back(uuid);
         HILOGI("uuid_%{public}d: %{public}s", i, uuid.ToString().c_str());
     }
@@ -655,7 +655,7 @@ std::vector<std::string> AdapterProperties::ParseBondedDevices(bt_property_t* pr
         return pairedAddrList_;
     }
     int num = property->len / BD_ADDR_LEN;
-    auto addr = reinterpret_cast<const BLUEDROID::RawAddress*>(property->val);
+    auto addr = reinterpret_cast<const STACK::RawAddress*>(property->val);
     std::vector<std::string> pairedAddrList;
 
     if (property->val == nullptr) {
@@ -663,7 +663,7 @@ std::vector<std::string> AdapterProperties::ParseBondedDevices(bt_property_t* pr
         return pairedAddrList_;
     }
     for (int i = 0; i < num; ++i) {
-        RawAddress address = ServiceUtil::AddrFromBluedroid(addr[i]);
+        RawAddress address = ServiceUtil::AddrFromStack(addr[i]);
         HILOGD("BondedDevices = %{public}s", GetEncryptAddr(address.GetAddress()).c_str());
         pairedAddrList.push_back(address.GetAddress());
     }

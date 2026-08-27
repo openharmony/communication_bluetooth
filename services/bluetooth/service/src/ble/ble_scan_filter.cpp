@@ -231,7 +231,7 @@ void BleScanFilter::ApcfCommandLog(const std::vector<ApcfCommand> &cmds) const
     for (const auto &cmd : cmds) {
         switch (cmd.type) {
             case BTM_BLE_PF_ADDR_FILTER:
-                HILOGI("Address: %{public}s, AddrType: %{public}d, Irk: %{public}s", cmd.address.ToLogString().c_str(),
+                HILOGI("Address: %{public}s, AddrType: %{public}d, Irk: %{public}s", cmd.address.ToStringForLogging().c_str(),
                     cmd.addr_type, GetEncryptIrk(cmd.irk).c_str());
                 break;
             case BTM_BLE_PF_SRVC_UUID:
@@ -267,7 +267,7 @@ ApcfCommand BleScanFilter::GetCommand(uint8_t cmdType, const BleScanFilterImpl &
 
     switch (cmdType) {
         case BTM_BLE_PF_ADDR_FILTER:
-            cmd.address = ServiceUtil::AddrToBluedroid(RawAddress(filter.GetDeviceId()));
+            cmd.address = ServiceUtil::AddrToStack(RawAddress(filter.GetDeviceId()));
             if (filter.GetRawAddressType() == RawAddressType::RANDOM_ADDRESS) {
                 cmd.addr_type = BLE_ADDR_RANDOM;
             } else if (filter.GetRawAddressType() == RawAddressType::PUBLIC_ADDRESS) {
@@ -278,12 +278,12 @@ ApcfCommand BleScanFilter::GetCommand(uint8_t cmdType, const BleScanFilterImpl &
             }
             break;
         case BTM_BLE_PF_SRVC_UUID:
-            cmd.uuid = ServiceUtil::UuidToBluedroid(filter.GetServiceUuid());
-            cmd.uuid_mask = ServiceUtil::UuidToBluedroid(filter.GetServiceUuidMask());
+            cmd.uuid = ServiceUtil::UuidToStack(filter.GetServiceUuid());
+            cmd.uuid_mask = ServiceUtil::UuidToStack(filter.GetServiceUuidMask());
             break;
         case BTM_BLE_PF_SRVC_SOL_UUID:
-            cmd.uuid = ServiceUtil::UuidToBluedroid(filter.GetServiceSolicitationUuid());
-            cmd.uuid_mask = ServiceUtil::UuidToBluedroid(filter.GetServiceSolicitationUuidMask());
+            cmd.uuid = ServiceUtil::UuidToStack(filter.GetServiceSolicitationUuid());
+            cmd.uuid_mask = ServiceUtil::UuidToStack(filter.GetServiceSolicitationUuidMask());
             break;
         case BTM_BLE_PF_LOCAL_NAME: {
             std::string name = filter.GetName();

@@ -360,7 +360,7 @@ void IPowerState::CmdFilterHdiToHisi(const uint8_t &enabled)
         }
         const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
         CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
-        BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(realAddr);
+        STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(realAddr);
         ForceSleepFilterHidData filterHidData = {enabled, transport, rawAddr};
         UnionCmdToHisi unionCmd;
         unionCmd.hidData = filterHidData;

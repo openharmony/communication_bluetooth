@@ -60,7 +60,7 @@ GattClientApplication::GattClientApplication(
       authRetryState_(AUTH_RETRY_STATE_IDLE),
       cacheValue_()
 {
-    transport_ = GattServiceBase::GattTransportToBluedroid(device.transport_);
+    transport_ = GattServiceBase::GattTransportToStack(device.transport_);
 }
 
 GattClientApplication::~GattClientApplication()
@@ -75,13 +75,13 @@ GattClientApplication::~GattClientApplication()
 }
 
 void GattClientApplication::ConnectCallback(
-    int connId, int status, int clientIf, const BLUEDROID::RawAddress &bda)
+    int connId, int status, int clientIf, const STACK::RawAddress &bda)
 {
     if (clientIf_ != clientIf) {
         return;
     }
     HILOGI("connId: %{public}d, status: %{public}d, clientIf: %{public}d, address: %{public}s",
-        connId, status, clientIf, bda.ToLogString().c_str());
+        connId, status, clientIf, bda.ToStringForLogging().c_str());
     auto resourceMgr = BluetoothResourceManager::GetInstance();
     if (resourceMgr) {
         resourceMgr->SendSensingStateChanged(GATT_CLIENT_CONNECT_DONE,
@@ -106,13 +106,13 @@ void GattClientApplication::ConnectCallback(
     BluetoothStateManager::GetInstance()->AddDeviceProfileConnectState(
         PROFILE_NAME_GATT_CLIENT, bda.ToString(), BTConnectState::CONNECTED);
     WPTR_CBACK(callback_, OnConnectionStateChanged, GattStatus::GATT_SUCCESS, connState_,
-        ServiceUtil::AddrFromBluedroid(bda));
+        ServiceUtil::AddrFromStack(bda));
 }
 
 void GattClientApplication::KeepBleScan(const std::string &pkgName, int uid)
 {
     if (!IsConnected()) {
-        BLUEDROID::RawAddress rawAddr = ServiceUtil::AddrToBluedroid(addr_);
+        STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(addr_);
         BluetoothHwInterface::GetInstance()->KeepBleScanInConn(pkgName, uid, BT_TRANSPORT_LE, rawAddr);
     }
 }
@@ -132,7 +132,7 @@ void GattClientApplication::Connect(bool autoConnect)
     if (btIfGattClient_) {
         // direct, not opportunistic
         int ret = btIfGattClient_->connect(
-            clientIf_, ServiceUtil::AddrToBluedroid(addr_), !autoConnect, transport_, false, BTM_PHY_LE_1M);
+            clientIf_, ServiceUtil::AddrToStack(addr_), !autoConnect, transport_, false, BTM_PHY_LE_1M);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             int disconnectReason = static_cast<int>(GattDisconnectReason::CONN_UNKNOWN);
@@ -146,13 +146,13 @@ void GattClientApplication::Connect(bool autoConnect)
 }
 
 void GattClientApplication::DisconnectCallback(
-    int connId, int status, int clientIf, const BLUEDROID::RawAddress &bda, int reason)
+    int connId, int status, int clientIf, const STACK::RawAddress &bda, int reason)
 {
     if (clientIf_ != clientIf) {
         return;
     }
     HILOGI("connId: %{public}d, status: %{public}d, clientIf: %{public}d, address: %{public}s",
-        connId, status, clientIf, bda.ToLogString().c_str());
+        connId, status, clientIf, bda.ToStringForLogging().c_str());
 
     auto resourceMgr = BluetoothResourceManager::GetInstance();
     if (resourceMgr) {
@@ -166,7 +166,7 @@ void GattClientApplication::DisconnectCallback(
         HILOGE("failed, status: %{public}d", status);
         connState_ = static_cast<int>(BTConnectState::CONNECTED);
         WPTR_CBACK(callback_, OnConnectionStateChanged, GattStatus::GATT_FAILURE, connState_,
-            ServiceUtil::AddrFromBluedroid(bda), convertReason, reasonMessage);
+            ServiceUtil::AddrFromStack(bda), convertReason, reasonMessage);
         return;
     }
     BtChrEventWriteTime(CHR_BLE_DISCONNECT, bda.ToString(),
@@ -174,16 +174,16 @@ void GattClientApplication::DisconnectCallback(
     connId_ = GATT_INVALID_CONN_ID;
     connState_ = static_cast<int>(BTConnectState::DISCONNECTED);
     WPTR_CBACK(callback_, OnConnectionStateChanged, GattStatus::GATT_SUCCESS, connState_,
-        ServiceUtil::AddrFromBluedroid(bda), convertReason, reasonMessage);
+        ServiceUtil::AddrFromStack(bda), convertReason, reasonMessage);
 }
 
-void GattClientApplication::CancelOpenCallback(int connId, int status, int clientIf, const BLUEDROID::RawAddress &bda)
+void GattClientApplication::CancelOpenCallback(int connId, int status, int clientIf, const STACK::RawAddress &bda)
 {
     if (clientIf_ != clientIf) {
         return;
     }
     HILOGI("connId: %{public}d, status: %{public}d, clientIf: %{public}d, address: %{public}s",
-        connId, status, clientIf, bda.ToLogString().c_str());
+        connId, status, clientIf, bda.ToStringForLogging().c_str());
     // When status is ERROR, do not handle.
     if (status != GATT_SUCCESS) {
         HILOGE("failed, status: %{public}d", status);
@@ -192,7 +192,7 @@ void GattClientApplication::CancelOpenCallback(int connId, int status, int clien
     connId_ = GATT_INVALID_CONN_ID;
     connState_ = static_cast<int>(BTConnectState::DISCONNECTED);
     WPTR_CBACK(callback_, OnConnectionStateChanged, GattStatus::GATT_SUCCESS, connState_,
-        ServiceUtil::AddrFromBluedroid(bda));
+        ServiceUtil::AddrFromStack(bda));
 }
 
 void GattClientApplication::Disconnect(void)
@@ -214,7 +214,7 @@ void GattClientApplication::Disconnect(void)
         std::string callingName = PermissionManager::GetCallingName();
         BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_BLE_CLIENT_DISCONN, addr_.GetAddress(), clientIf_,
             callingName);
-        int ret = btIfGattClient_->disconnect(clientIf_, ServiceUtil::AddrToBluedroid(addr_), connId_);
+        int ret = btIfGattClient_->disconnect(clientIf_, ServiceUtil::AddrToStack(addr_), connId_);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnConnectionStateChanged, GattStatus::GATT_FAILURE, connState_, addr_, convertReason,
@@ -282,7 +282,7 @@ void GattClientApplication::GetGattDbCallback(int connId, const btgatt_db_elemen
     const btgatt_db_element_t *p = db;
     const btgatt_db_element_t *end = db + count;
     while (p < end) {
-        Uuid uuid = ServiceUtil::UuidFromBluedroid(p->uuid);
+        Uuid uuid = ServiceUtil::UuidFromStack(p->uuid);
         int perm = p->permissions;
 #ifdef BLUETOOTH_WATCH_ENABLE
         if (uuid.ToString().compare(CONTROL_POINT_UUID) == 0) {
@@ -350,7 +350,7 @@ void GattClientApplication::ReadCharacteristicCallback(int connId, int status, b
         Characteristic characteristic(handle);
         characteristic.value_ = std::move(*value);
         characteristic.length_ = len;
-        int ret = GattServiceBase::GattStatusFromBluedroid(status);
+        int ret = GattServiceBase::GattStatusFromStack(status);
         WPTR_CBACK(applicationPtr->callback_, OnCharacteristicRead, ret, characteristic);
     });
 }
@@ -369,7 +369,7 @@ void GattClientApplication::ReadCharacteristic(uint16_t handle)
 void GattClientApplication::ReadCharacteristicByUuid(const Uuid &uuid, int32_t startHandle, int32_t endHandle)
 {
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->read_using_characteristic_uuid(connId_, ServiceUtil::UuidToBluedroid(uuid),
+        int ret = btIfGattClient_->read_using_characteristic_uuid(connId_, ServiceUtil::UuidToStack(uuid),
             startHandle, endHandle, GATT_AUTH_REQ_NONE);
         if (ret != BT_STATUS_SUCCESS) {
             WPTR_CBACK(callback_, OnCharacteristicRead, GattStatus::GATT_FAILURE,
@@ -397,7 +397,7 @@ void GattClientApplication::WriteCharacteristicCallback(int connId, int status, 
         return;
     }
     Characteristic characteristic(handle);
-    int ret = GattServiceBase::GattStatusFromBluedroid(status);
+    int ret = GattServiceBase::GattStatusFromStack(status);
     // int64_t is enough for microseconds timeStamp till the year of 2262
     BluetoothGattRspContext context(static_cast<int64_t>(rspContext.timeStamp));
     WPTR_CBACK(callback_, OnCharacteristicWrite, ret, characteristic, context);
@@ -424,14 +424,14 @@ bool GattClientApplication::WriteCharacteristicInner(uint16_t handle, int writeT
 void GattClientApplication::WriteCharacteristic(uint16_t handle, std::vector<uint8_t> value)
 {
     // bluedroid inner support "write long characteristic value procedure"
-    WriteCharacteristicInner(handle, BLUEDROID::GATT_WRITE, GATT_AUTH_REQ_NONE, std::move(value));
+    WriteCharacteristicInner(handle, STACK::GATT_WRITE, GATT_AUTH_REQ_NONE, std::move(value));
 }
 
 void GattClientApplication::WriteCharacteristicNoRespond(uint16_t handle, std::vector<uint8_t> value,
     std::shared_ptr<utility::Semaphore> semaphore)
 {
     writeNoRespondSem_ = semaphore;
-    bool ok = WriteCharacteristicInner(handle, BLUEDROID::GATT_WRITE_NO_RSP, GATT_AUTH_REQ_NONE, std::move(value));
+    bool ok = WriteCharacteristicInner(handle, STACK::GATT_WRITE_NO_RSP, GATT_AUTH_REQ_NONE, std::move(value));
     if (!ok) {
         semaphore->Post();
         writeNoRespondSem_ = nullptr;
@@ -458,7 +458,7 @@ void GattClientApplication::ReadDescriptorCallback(int connId, int status, const
         Descriptor descriptor(handle);
         descriptor.value_ = std::move(*value);
         descriptor.length_ = len;
-        int ret = GattServiceBase::GattStatusFromBluedroid(status);
+        int ret = GattServiceBase::GattStatusFromStack(status);
         WPTR_CBACK(applicationPtr->callback_, OnDescriptorRead, ret, descriptor);
     });
 }
@@ -485,13 +485,13 @@ void GattClientApplication::WriteDescriptorCallback(int connId, int status, uint
         return;
     }
     Descriptor descriptor(handle);
-    int ret = GattServiceBase::GattStatusFromBluedroid(status);
+    int ret = GattServiceBase::GattStatusFromStack(status);
     WPTR_CBACK(callback_, OnDescriptorWrite, ret, descriptor);
 }
 
 bool GattClientApplication::HandleWriteCharacteristic(int ret, int connId, uint16_t handle, int authReq)
 {
-    ret = btIfGattClient_->write_characteristic(connId, handle, BLUEDROID::GATT_WRITE, authReq, cacheValue_);
+    ret = btIfGattClient_->write_characteristic(connId, handle, STACK::GATT_WRITE, authReq, cacheValue_);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("failed, ret: %{public}d", ret);
         WPTR_CBACK(callback_, OnCharacteristicWrite, GattStatus::GATT_FAILURE, Characteristic(handle),
@@ -575,10 +575,10 @@ int GattClientApplication::RequestNotification(uint16_t characteristicHandle, bo
     if (btIfGattClient_) {
         if (enable) {
             ret = btIfGattClient_->register_for_notification(
-                clientIf_, ServiceUtil::AddrToBluedroid(addr_), characteristicHandle);
+                clientIf_, ServiceUtil::AddrToStack(addr_), characteristicHandle);
         } else {
             ret = btIfGattClient_->deregister_for_notification(
-                clientIf_, ServiceUtil::AddrToBluedroid(addr_), characteristicHandle);
+                clientIf_, ServiceUtil::AddrToStack(addr_), characteristicHandle);
         }
     }
     return ret;
@@ -590,12 +590,12 @@ void GattClientApplication::ConfigureMtuCallback(int connId, int status, int mtu
         return;
     }
     HILOGI("connId: %{public}d, status: %{public}d, mtu: %{public}d", connId, status, mtu);
-    BtChrEventWriteInt(CHR_BLE_DISCONNECT, ServiceUtil::AddrToBluedroid(GetAddress()).ToString(),
+    BtChrEventWriteInt(CHR_BLE_DISCONNECT, ServiceUtil::AddrToStack(GetAddress()).ToString(),
         "BTCONMTUINITIATOR", 0);
-    BtChrEventWriteInt(CHR_BLE_DISCONNECT, ServiceUtil::AddrToBluedroid(GetAddress()).ToString(),
+    BtChrEventWriteInt(CHR_BLE_DISCONNECT, ServiceUtil::AddrToStack(GetAddress()).ToString(),
         "BTCONMTURESULT", mtu);
 
-    int ret = GattServiceBase::GattStatusFromBluedroid(status);
+    int ret = GattServiceBase::GattStatusFromStack(status);
     WPTR_CBACK(callback_, OnMtuChanged, ret, mtu);
 }
 
@@ -615,7 +615,7 @@ void GattClientApplication::NotifyCallback(int connId, const btgatt_notify_param
         return;
     }
     HILOGD("connId: %{public}d, addr: %{public}s, handle: %{public}#x",
-        connId, data.bda.ToLogString().c_str(), data.handle);
+        connId, data.bda.ToStringForLogging().c_str(), data.handle);
 
     auto value = GattServiceBase::BuildGattValue(data.value, data.len);
     std::shared_ptr<GattClientApplication> applicationPtr = shared_from_this();
@@ -636,7 +636,7 @@ void GattClientApplication::ConnUpdatedCallback(int connId, uint16_t interval, u
     HILOGI("connId: %{public}d, interval: %{public}u, latency: %{public}u, timeout: %{public}u, status: %{public}u",
         connId, interval, latency, timeout, status);
 
-    int ret = GattServiceBase::GattStatusFromBluedroid(status);
+    int ret = GattServiceBase::GattStatusFromStack(status);
     WPTR_CBACK(callback_, OnConnectionParameterChanged, interval, latency, timeout, ret);
 }
 
@@ -659,7 +659,7 @@ void GattClientApplication::RequestConnectionPriority(int connPriority)
 
     if (btIfGattClient_) {
         int ret = btIfGattClient_->conn_parameter_update(
-            ServiceUtil::AddrToBluedroid(addr_),
+            ServiceUtil::AddrToStack(addr_),
             GetBleMinConnectionInterval(connPriority),
             GetBleMaxConnectionInterval(connPriority),
             GetBleConnectionLatency(connPriority),
@@ -756,7 +756,7 @@ int GattClientApplication::GetBleConnectionSupervisionTimeout(int connPriority)
 void GattClientApplication::ReadRemoteRssiValue(int appId)
 {
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->read_remote_rssi(appId, ServiceUtil::AddrToBluedroid(addr_));
+        int ret = btIfGattClient_->read_remote_rssi(appId, ServiceUtil::AddrToStack(addr_));
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnReadRemoteRssiValue, addr_, 0, GattStatus::GATT_FAILURE);
@@ -764,16 +764,16 @@ void GattClientApplication::ReadRemoteRssiValue(int appId)
     }
 }
 
-void GattClientApplication::ReadRemoteRssiValueCallback(int clientIf, const BLUEDROID::RawAddress &bda,
+void GattClientApplication::ReadRemoteRssiValueCallback(int clientIf, const STACK::RawAddress &bda,
     int rssi, int status)
 {
     if (clientIf_ != clientIf) {
         return;
     }
     HILOGI("rssi: %{public}d, status: %{public}d, clientIf: %{public}d, address: %{public}s",
-        rssi, status, clientIf, bda.ToLogString().c_str());
-    int ret = GattServiceBase::GattStatusFromBluedroid(status);
-    WPTR_CBACK(callback_, OnReadRemoteRssiValue, ServiceUtil::AddrFromBluedroid(bda), rssi, ret);
+        rssi, status, clientIf, bda.ToStringForLogging().c_str());
+    int ret = GattServiceBase::GattStatusFromStack(status);
+    WPTR_CBACK(callback_, OnReadRemoteRssiValue, ServiceUtil::AddrFromStack(bda), rssi, ret);
 }
 
 void GattClientApplication::PhyUpdatedCallback(int connId, uint8_t txPhy, uint8_t rxPhy, uint8_t status)
@@ -784,7 +784,7 @@ void GattClientApplication::PhyUpdatedCallback(int connId, uint8_t txPhy, uint8_
     HILOGI("connId: %{public}d, txPhy: %{public}u, rxPhy: %{public}u, status: %{public}u",
         connId, txPhy, rxPhy, status);
  
-    int ret = GattServiceBase::GattStatusFromBluedroid(status);
+    int ret = GattServiceBase::GattStatusFromStack(status);
     WPTR_CBACK(callback_, OnBlePhyUpdate, txPhy, rxPhy, ret);
 }
  
@@ -795,7 +795,7 @@ void GattClientApplication::SetPhy(int32_t txPhy, int32_t rxPhy, int32_t phyOpti
 
     if (btIfGattClient_) {
         int ret = btIfGattClient_->set_preferred_phy(
-            ServiceUtil::AddrToBluedroid(addr_), txPhyMask, rxPhyMask, phyOptions);
+            ServiceUtil::AddrToStack(addr_), txPhyMask, rxPhyMask, phyOptions);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnBlePhyUpdate, 0, 0, GattStatus::GATT_FAILURE);
@@ -806,14 +806,14 @@ void GattClientApplication::SetPhy(int32_t txPhy, int32_t rxPhy, int32_t phyOpti
 void GattClientApplication::ReadPhyCallback(uint8_t txPhy, uint8_t rxPhy, uint8_t status)
 {
     HILOGI("txPhy: %{public}d, rxPhy: %{public}d, status: %{public}d", txPhy, rxPhy, status);
-    int ret = GattServiceBase::GattStatusFromBluedroid(status);
+    int ret = GattServiceBase::GattStatusFromStack(status);
     WPTR_CBACK(callback_, OnBlePhyRead, txPhy, rxPhy, ret);
 }
  
 void GattClientApplication::ReadPhy(void)
 {
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->read_phy(ServiceUtil::AddrToBluedroid(addr_),
+        int ret = btIfGattClient_->read_phy(ServiceUtil::AddrToStack(addr_),
                 base::Bind(&GattClientApplication::ReadPhyCallback, base::Unretained(this)));
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);

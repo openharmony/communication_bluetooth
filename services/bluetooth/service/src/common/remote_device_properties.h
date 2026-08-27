@@ -50,7 +50,7 @@ public:
     static RemoteDeviceProperties *GetInstance(void);
 
     bt_property_t* PropertyDeepCopy(int numProperties, bt_property_t* properties);
-    void GetRemoteDevicePropsCallBack(bt_status_t status, BLUEDROID::RawAddress* bd_addr, int numProperties,
+    void GetRemoteDevicePropsCallBack(bt_status_t status, STACK::RawAddress* bd_addr, int numProperties,
         bt_property_t* properties);
     void DeviceFoundCallBack(int numProperties, bt_property_t* properties);
 
@@ -80,8 +80,8 @@ public:
     void RemovePairWhiteList(const RawAddress &device);
     int32_t GetDeviceAbsVolumeAbility(const RawAddress &device);
     // get device property from stack, result will return in GetRemoteDevicePropsCallbackInner
-    int32_t GetRemoteDeviceProperty(const BLUEDROID::RawAddress &addr, bt_property_type_t type);
-    void SetRemoteDeviceProperty(const BLUEDROID::RawAddress &addr, const bt_property_t &prop);
+    int32_t GetRemoteDeviceProperty(const STACK::RawAddress &addr, bt_property_type_t type);
+    void SetRemoteDeviceProperty(const STACK::RawAddress &addr, const bt_property_t &prop);
     bool IsAclConnected(const RawAddress &device);
     bool IsAclEncrypted(const RawAddress &device);
     std::vector<std::string> GetNotPairNoneDevices() const;
@@ -114,7 +114,7 @@ private:
     RemoteDeviceProperties();
     ~RemoteDeviceProperties();
 
-    void GetRemoteDevicePropsCallbackInner(BLUEDROID::RawAddress bd_addr, int numProperties,
+    void GetRemoteDevicePropsCallbackInner(STACK::RawAddress bd_addr, int numProperties,
         bt_property_t* properties);
     void DeviceFoundInner(int numProperties, bt_property_t* properties);
     void WhiltListCallTimeOut(const RawAddress &device);
