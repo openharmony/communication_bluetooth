@@ -50,6 +50,11 @@ enum class AclConnectionState {
     STATE_DISCONNECTED = 1,
 };
 
+enum class CarKeyActionType {
+    CAR_KEY_ACTION_ADD = 0,
+    CAR_KEY_ACTION_DELETE = 1,
+};
+
 const char * const REGISTER_DEVICE_FIND_TYPE = "bluetoothDeviceFind";
 const char * const REGISTER_DISCOVERY_RESULT_TYPE = "discoveryResult";
 const char * const REGISTER_PIN_REQUEST_TYPE = "pinRequired";
@@ -117,6 +122,7 @@ napi_value BondStateInit(napi_env env);
 napi_value UnbondCauseInit(napi_env env);
 napi_value HashAlgorithmTypeInit(napi_env env);
 napi_value AclStateInit(napi_env env);
+napi_value CarKeyActionTypeInit(napi_env env);
 #ifdef BLUETOOTH_API_SINCE_10
 napi_value BluetoothTransportInit(napi_env env);
 napi_value PinTypeInit(napi_env env);
