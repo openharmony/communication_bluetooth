@@ -1554,5 +1554,13 @@ int BluetoothHost::SetBtChannelScan(bool isEnable, uint32_t interval)
     CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "pimpl or bluetooth host is nullptr");
     return proxy->SetBtChannelScan(isEnable, interval);
 }
+
+int BluetoothHost::GetBrAddressByBleAddress(const std::string &bleAddr, std::string &brAddr)
+{
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
+    sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
+    CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_UNAVAILABLE_PROXY, "proxy is nullptr");
+    return proxy->GetBrAddressByBleAddress(bleAddr, brAddr);
+}
 } // namespace Bluetooth
 } // namespace OHOS

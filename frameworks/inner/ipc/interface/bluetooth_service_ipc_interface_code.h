@@ -351,6 +351,7 @@ enum BluetoothHostInterfaceCode {
     BT_VERIFY_MULTI_PERMISSIONS,
     BT_UPDATE_PHONE_TYPE,
     SET_BT_CHANNEL_SCAN,
+    GET_BR_ADDRESS_BY_BLE_ADDRESS,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };

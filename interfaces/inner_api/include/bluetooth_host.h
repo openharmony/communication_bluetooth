@@ -1033,6 +1033,17 @@ public:
      * @since 26
      */
     int SetBtChannelScan(bool isEnable, uint32_t interval);
+
+    /**
+     * @brief Get BR/EDR address by BLE address.
+     *
+     * @param bleAddr BLE address of the device.
+     * @param[out] brAddr BR/EDR address of the device.
+     * @return Returns {@link BT_NO_ERROR} if get BR/EDR address is successfully;
+     *         returns an error code defined in {@link BtErrCode} otherwise.
+     * @since 26
+     */
+    int GetBrAddressByBleAddress(const std::string &bleAddr, std::string &brAddr);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
