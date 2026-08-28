@@ -45,12 +45,20 @@ typedef enum {
     BTSOCK_OPT_ENCRYPT,
 } btsock_opt_t;
 
+/* Socket interface consumed by the service layer (socket_service.cpp); the
+ * signatures follow the legacy bluedroid layout, which the removed stack
+ * library implements (7-parameter listen/connect). */
 typedef struct {
     size_t size;
-    int (*listen)(...);
-    int (*connect)(...);
-    int (*close)(...);
-    int (*disconnect)(...);
+    bt_status_t (*listen)(btsock_type_t type, const char *service_name,
+        const OHOS::bluetooth::Uuid *service_uuid, int channel, int *sock_fd, int flags,
+        int callingUid);
+    bt_status_t (*connect)(const RawAddress *bd_addr, btsock_type_t type,
+        const OHOS::bluetooth::Uuid *uuid, int channel, int *sock_fd, int flags,
+        int callingUid);
+    bt_status_t (*close)(int fd);
+    bt_status_t (*disconnect)(const RawAddress *bd_addr, btsock_type_t type, int channel,
+        int flags, int callingUid);
 } btsock_interface_t;
 
 inline void btif_sock_cleanup(void)

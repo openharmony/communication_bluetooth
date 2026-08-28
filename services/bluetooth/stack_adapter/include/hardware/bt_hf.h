@@ -27,15 +27,16 @@
 
 typedef struct {
     size_t size;
-    int (*init)(...);
-    void (*cleanup)(...);
-    int (*connect)(...);
-    int (*disconnect)(...);
-    int (*audio_connect)(...);
-    int (*audio_disconnect)(...);
-    int (*start_voice_recognition)(...);
-    int (*stop_voice_recognition)(...);
-    int (*volume_control)(...);
+    bt_status_t (*init)(bthf_callbacks_t *callbacks);
+    void (*cleanup)(void);
+    bt_status_t (*connect)(const RawAddress *bd_addr);
+    bt_status_t (*disconnect)(const RawAddress *bd_addr);
+    bt_status_t (*audio_connect)(const RawAddress *bd_addr);
+    bt_status_t (*audio_disconnect)(const RawAddress *bd_addr);
+    bt_status_t (*start_voice_recognition)(const RawAddress *bd_addr);
+    bt_status_t (*stop_voice_recognition)(const RawAddress *bd_addr);
+    bt_status_t (*volume_control)(const RawAddress *bd_addr,
+                                  bthf_volume_type_t type, int volume);
 } bthf_hal_interface_t;
 
 #endif  // HARDWARE_BT_HF_H

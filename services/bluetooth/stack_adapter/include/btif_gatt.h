@@ -15,13 +15,20 @@
 
 /*
  * Stub of the removed stack layer btif gatt glue (btif_gatt.h).
- * The scanner/advertiser interfaces accept any argument list so that every
- * service layer call site compiles; the real stack is dlopened at runtime
- * and the instances stay null in the stub world.
+ * The scanner/advertiser interfaces mirror bluedroid
+ * system/include/hardware/ble_scanner.h and ble_advertiser.h with
+ * std::function callbacks; SetScanParameters is the 5-arg vendor variant
+ * consumed by the service layer. The real stack is dlopened at runtime and
+ * the instances stay null in the stub world.
  */
 
 #ifndef BTIF_GATT_H
 #define BTIF_GATT_H
+
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <vector>
 
 #include "bt_types.h"
 #include "bt_gatt.h"
@@ -30,42 +37,24 @@
 class BleScannerInterface {
 public:
     virtual ~BleScannerInterface() = default;
-    template <typename... Args>
-    void Scan(Args &&...args)
-    {
-    }
-    template <typename... Args>
-    void ScanFilterEnable(Args &&...args)
-    {
-    }
-    template <typename... Args>
-    void ScanFilterParamSetup(Args &&...args)
-    {
-    }
-    template <typename... Args>
-    void ScanFilterAdd(Args &&...args)
-    {
-    }
-    template <typename... Args>
-    void BatchscanEnable(Args &&...args)
-    {
-    }
-    template <typename... Args>
-    void BatchscanDisable(Args &&...args)
-    {
-    }
-    template <typename... Args>
-    void BatchscanConfigStorage(Args &&...args)
-    {
-    }
-    template <typename... Args>
-    void BatchscanReadReports(Args &&...args)
-    {
-    }
-    template <typename... Args>
-    void SetScanParameters(Args &&...args)
-    {
-    }
+    virtual void Scan(bool start) = 0;
+    virtual void ScanFilterEnable(bool enable,
+        std::function<void(uint8_t action, uint8_t btm_status)> cb) = 0;
+    virtual void ScanFilterParamSetup(int client_if, uint8_t action, int filt_index,
+        std::unique_ptr<btgatt_filt_param_setup_t> filt_param,
+        std::function<void(uint8_t avbl_space, uint8_t action_type, uint8_t btm_status)> cb) = 0;
+    virtual void ScanFilterAdd(int filter_index, std::vector<ApcfCommand> filters,
+        std::function<void(uint8_t filt_type, uint8_t avbl_space, uint8_t action,
+            uint8_t btm_status)> cb) = 0;
+    virtual void BatchscanEnable(int scan_mode, int scan_interval, int scan_window, int addr_type,
+        int discard_rule, std::function<void(uint8_t btm_status)> cb) = 0;
+    virtual void BatchscanDisable(std::function<void(uint8_t btm_status)> cb) = 0;
+    virtual void BatchscanConfigStorage(int client_if, int batch_scan_full_max,
+        int batch_scan_trunc_max, int batch_scan_notify_threshold,
+        std::function<void(uint8_t btm_status)> cb) = 0;
+    virtual void BatchscanReadReports(int client_if, int scan_mode) = 0;
+    virtual void SetScanParameters(int scan_interval, int scan_window, bool legacy, int scan_phy,
+        std::function<void(uint8_t btm_status)> cb) = 0;
 };
 
 /* Advertising parameters consumed by the ble advertiser service; the layout
@@ -94,30 +83,20 @@ struct AdvertiseParameters {
 class BleAdvertiserInterface {
 public:
     virtual ~BleAdvertiserInterface() = default;
-    template <typename... Args>
-    void RegisterAdvertiser(Args &&...args)
-    {
-    }
-    template <typename... Args>
-    void Unregister(Args &&...args)
-    {
-    }
-    template <typename... Args>
-    void SetData(Args &&...args)
-    {
-    }
-    template <typename... Args>
-    void SetParameters(Args &&...args)
-    {
-    }
-    template <typename... Args>
-    void StartAdvertising(Args &&...args)
-    {
-    }
-    template <typename... Args>
-    void Enable(Args &&...args)
-    {
-    }
+    virtual void RegisterAdvertiser(
+        std::function<void(uint8_t advertiser_id, uint8_t status)> cb) = 0;
+    virtual void Unregister(uint8_t advertiser_id) = 0;
+    virtual void SetData(int advertiser_id, bool set_scan_rsp, std::vector<uint8_t> data,
+        std::function<void(uint8_t status)> cb) = 0;
+    virtual void SetParameters(uint8_t advertiser_id, AdvertiseParameters params,
+        std::function<void(uint8_t status, int8_t tx_power)> cb) = 0;
+    virtual void StartAdvertising(uint8_t advertiser_id,
+        std::function<void(uint8_t status)> cb, AdvertiseParameters params,
+        std::vector<uint8_t> advertise_data, std::vector<uint8_t> scan_response_data,
+        int timeout_s, std::function<void(uint8_t status)> timeout_cb) = 0;
+    virtual void Enable(uint8_t advertiser_id, bool enable,
+        std::function<void(uint8_t status)> cb, uint16_t duration, uint8_t max_ext_adv_events,
+        std::function<void(uint8_t status)> timeout_cb) = 0;
 };
 
 inline BleScannerInterface *get_ble_scanner_instance()

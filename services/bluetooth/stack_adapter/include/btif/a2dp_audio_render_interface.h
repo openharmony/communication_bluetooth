@@ -22,16 +22,38 @@
 #define BTIF_A2DP_AUDIO_RENDER_INTERFACE_H
 
 #include <cstddef>
+#include <cstdint>
+#include <memory>
 
 #include "bt_types.h"
 
+/* Abstract audio render sink consumed by the A2DP sink profile; the service
+ * layer registers an AudioRenderer backed implementation (A2dpSnkAudioRender)
+ * through SetInstance, the removed stack layer drives it through the virtual
+ * methods while streaming. */
+class IA2dpAudioRender {
+public:
+    IA2dpAudioRender() = default;
+    virtual ~IA2dpAudioRender() = default;
+
+    virtual bool CreateRender(int freq, int bits, int channels) = 0;
+    virtual bool StartRender() = 0;
+    virtual bool StopRender() = 0;
+    virtual bool PauseRender() = 0;
+    virtual bool ReleaseRender() = 0;
+    virtual bool WriteStream(uint8_t *buffer, size_t size) = 0;
+
+    static void SetInstance(std::shared_ptr<IA2dpAudioRender> instance);
+    static std::shared_ptr<IA2dpAudioRender> GetInstance();
+};
+
 typedef struct {
     size_t size;
-    int (*init)(...);
-    void (*cleanup)(...);
-    int (*start)(...);
-    int (*stop)(...);
-    int (*write_data)(...);
+    int (*init)(int freq, int bits, int channels);
+    void (*cleanup)(void);
+    int (*start)(void);
+    int (*stop)(void);
+    int (*write_data)(uint8_t *buffer, size_t size);
 } btav_a2dp_audio_render_interface_t;
 
 #endif  // BTIF_A2DP_AUDIO_RENDER_INTERFACE_H

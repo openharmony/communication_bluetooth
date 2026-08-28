@@ -15,6 +15,8 @@
 
 /*
  * Stub of the removed stack layer HFP HF profile interface (bt_hf_client.h).
+ * Interface table layout and signatures mirror bluedroid
+ * system/include/hardware/bt_hf_client.h.
  */
 
 #ifndef BT_HF_CLIENT_H
@@ -176,15 +178,28 @@ typedef struct {
 
 typedef struct {
     size_t size;
-    int (*init)(...);
-    void (*cleanup)(...);
-    int (*connect)(...);
-    int (*disconnect)(...);
-    int (*audio_connect)(...);
-    int (*audio_disconnect)(...);
-    int (*start_voice_recognition)(...);
-    int (*stop_voice_recognition)(...);
-    int (*volume_control)(...);
+    bt_status_t (*init)(bthf_client_callbacks_t *callbacks);
+    bt_status_t (*connect)(const RawAddress *bd_addr);
+    bt_status_t (*disconnect)(const RawAddress *bd_addr);
+    bt_status_t (*connect_audio)(const RawAddress *bd_addr);
+    bt_status_t (*disconnect_audio)(const RawAddress *bd_addr);
+    bt_status_t (*start_voice_recognition)(const RawAddress *bd_addr);
+    bt_status_t (*stop_voice_recognition)(const RawAddress *bd_addr);
+    bt_status_t (*volume_control)(const RawAddress *bd_addr, bthf_client_volume_type_t type,
+        int volume);
+    bt_status_t (*dial)(const RawAddress *bd_addr, const char *number);
+    bt_status_t (*dial_memory)(const RawAddress *bd_addr, int location);
+    bt_status_t (*handle_call_action)(const RawAddress *bd_addr, bthf_client_call_action_t action,
+        int idx);
+    bt_status_t (*query_current_calls)(const RawAddress *bd_addr);
+    bt_status_t (*query_current_operator_name)(const RawAddress *bd_addr);
+    bt_status_t (*retrieve_subscriber_info)(const RawAddress *bd_addr);
+    bt_status_t (*send_dtmf)(const RawAddress *bd_addr, char code);
+    bt_status_t (*request_last_voice_tag_number)(const RawAddress *bd_addr);
+    void (*cleanup)(void);
+    bt_status_t (*send_at_cmd)(const RawAddress *bd_addr, int cmd, int val1, int val2,
+        const char *arg);
+    bt_status_t (*send_android_at)(const RawAddress *bd_addr, const char *arg);
 } bthf_client_interface_t;
 
 #endif  // BT_HF_CLIENT_H

@@ -124,17 +124,51 @@ typedef enum {
 
 typedef struct {
     size_t size;
-    int (*init)(...);
-    void (*cleanup)(...);
-    int (*connect)(...);
-    int (*disconnect)(...);
-    int (*audio_connect)(...);
-    int (*audio_disconnect)(...);
-    int (*start_voice_recognition)(...);
-    int (*stop_voice_recognition)(...);
-    int (*volume_control)(...);
-    int (*notify_battery_level)(...);
-    int (*set_sco_allowed)(...);
+    bt_status_t (*connection_state_cb)(bthf_connection_state_t state,
+                                       const RawAddress *bd_addr);
+    bt_status_t (*audio_state_cb)(bthf_audio_state_t state,
+                                  const RawAddress *bd_addr);
+    bt_status_t (*vr_cb)(bthf_vr_state_t state, const RawAddress *bd_addr);
+    bt_status_t (*answer_call_cb)(const RawAddress *bd_addr);
+    bt_status_t (*hangup_call_cb)(const RawAddress *bd_addr);
+    bt_status_t (*volume_cb)(bthf_volume_type_t type, int volume,
+                             const RawAddress *bd_addr);
+    bt_status_t (*dial_call_cb)(char *number, const RawAddress *bd_addr);
+    bt_status_t (*send_dtmf_cb)(char tone, const RawAddress *bd_addr);
+    bt_status_t (*noise_reduction_cb)(bthf_nrec_t nrec,
+                                      const RawAddress *bd_addr);
+    bt_status_t (*at_response_cb)(const RawAddress *bd_addr);
+    bt_status_t (*cw_cb)(bthf_call_state_t state, const RawAddress *bd_addr);
+    bt_status_t (*call_ind_cb)(bthf_call_state_t state,
+                               const RawAddress *bd_addr);
+    bt_status_t (*call_setup_ind_cb)(bthf_call_state_t state,
+                                     const RawAddress *bd_addr);
+    bt_status_t (*call_held_ind_cb)(bthf_call_state_t state,
+                                    const RawAddress *bd_addr);
+    bt_status_t (*net_state_cb)(bthf_network_state_t state,
+                                const RawAddress *bd_addr);
+    bt_status_t (*call_ind_net_cb)(const RawAddress *bd_addr);
+    bt_status_t (*signal_cb)(int signal, const RawAddress *bd_addr);
+    bt_status_t (*roaming_cb)(int roaming, const RawAddress *bd_addr);
+    bt_status_t (*battery_cb)(int battery, const RawAddress *bd_addr);
+    bt_status_t (*call_volume_cb)(bthf_volume_type_t type, int volume,
+                                  const RawAddress *bd_addr);
+} bthf_callbacks_t;
+
+typedef struct {
+    size_t size;
+    bt_status_t (*init)(bthf_callbacks_t *callbacks);
+    void (*cleanup)(void);
+    bt_status_t (*connect)(const RawAddress *bd_addr);
+    bt_status_t (*disconnect)(const RawAddress *bd_addr);
+    bt_status_t (*audio_connect)(const RawAddress *bd_addr);
+    bt_status_t (*audio_disconnect)(const RawAddress *bd_addr);
+    bt_status_t (*start_voice_recognition)(const RawAddress *bd_addr);
+    bt_status_t (*stop_voice_recognition)(const RawAddress *bd_addr);
+    bt_status_t (*volume_control)(const RawAddress *bd_addr,
+                                  bthf_volume_type_t type, int volume);
+    bt_status_t (*notify_battery_level)(const RawAddress *bd_addr, int level);
+    bt_status_t (*set_sco_allowed)(const RawAddress *bd_addr, bool value);
 } bthf_interface_t;
 
 /*

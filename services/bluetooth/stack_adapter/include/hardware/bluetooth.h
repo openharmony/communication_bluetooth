@@ -91,33 +91,37 @@ class ServiceInterface;
 
 typedef struct {
     size_t size;
-    int (*init)(...);
-    int (*enable)(...);
-    int (*disable)(...);
+    int (*init)(bt_callbacks_t *callbacks, bool startRestricted, bool isCommonCriteriaMode,
+        int configCompareResult, void *reserved, bool isAtv);
+    int (*enable)(void);
+    int (*disable)(void);
     void (*cleanup)(void);
     int (*set_os_callouts)(void *callouts);
     const void *(*get_profile_interface)(const char *profileId);
     bluetooth::avrcp::ServiceInterface *(*get_avrcp_service)(void);
-    int (*get_remote_services)(...);
-    int (*enable_bluetooth_highpower)(...);
-    int (*enable_fast_scan)(...);
-    int (*setFastScan)(...);
-    int (*send_antenna_status_msg)(...);
-    int (*send_ble_scan_msg)(...);
-    int (*config_clear)(...);
-    int (*create_bond)(...);
-    int (*create_bond_out_of_band)(...);
-    int (*cancel_bond)(...);
-    int (*remove_bond)(...);
-    int (*pin_reply)(...);
-    int (*ssp_reply)(...);
-    int (*get_remote_device_properties)(...);
-    int (*get_remote_device_property)(...);
-    int (*set_remote_device_property)(...);
-    int (*set_adapter_property)(...);
-    int (*start_discovery)(...);
-    int (*cancel_discovery)(...);
-    int (*generate_local_oob_data)(...);
+    int (*get_remote_services)(RawAddress *bd_addr);
+    int (*enable_bluetooth_highpower)(bool enable);
+    int (*enable_fast_scan)(bool isEnable);
+    int (*setFastScan)(int level);
+    int (*send_antenna_status_msg)(bool isFixed);
+    int (*send_ble_scan_msg)(bool isStarted);
+    int (*config_clear)(void);
+    int (*create_bond)(const RawAddress *bd_addr, int transport);
+    int (*create_bond_out_of_band)(const RawAddress *bd_addr, int transport,
+        const bt_oob_data_t *p192_data, const bt_oob_data_t *p256_data);
+    int (*cancel_bond)(const RawAddress *bd_addr);
+    int (*remove_bond)(const RawAddress *bd_addr);
+    int (*pin_reply)(const RawAddress *bd_addr, bool accept, uint8_t pin_len,
+        bt_pin_code_t *pin_code);
+    int (*ssp_reply)(const RawAddress *bd_addr, bt_ssp_variant_t variant, bool accept,
+        uint32_t passkey);
+    int (*get_remote_device_properties)(RawAddress *bd_addr);
+    int (*get_remote_device_property)(RawAddress *bd_addr, bt_property_type_t type);
+    int (*set_remote_device_property)(RawAddress *bd_addr, const bt_property_t *property);
+    int (*set_adapter_property)(bt_property_t *property);
+    int (*start_discovery)(void);
+    int (*cancel_discovery)(void);
+    int (*generate_local_oob_data)(int transport);
     void (*create_acl_connection)(RawAddress *addr);
     /* Ranging antenna switch support consumed by BleRangeImpl; the callback
      * reports the MAC/antenna ids selected by the stack. */
