@@ -69,7 +69,7 @@ void SatelliteManager::Init(void)
 int32_t SatelliteManager::ProcessControlAntennaEvent(int state)
 {
     HILOGI("antenna sate is %{public}d", state);
-    const bthwif_interface_t *bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG_RET(bthwif != nullptr, BT_ERR_INTERNAL_ERROR, "Failed to get bthwif interface handle.");
     bthwif->hwSatelliteModeSwitch(state);
     return BT_NO_ERROR;
@@ -123,7 +123,7 @@ void SatelliteManager::DeleteSatelliteControlConfig(void)
 int32_t SatelliteManager::ProcessSetMacIdEvent(int state)
 {
     HILOGI("Process SetMacId Event, state:%{public}d", state);
-    const bthwif_interface_t *bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG_RET(bthwif != nullptr, BT_ERR_INTERNAL_ERROR, "Failed to get bthwif interface handle.");
     bthwif->hwSetMacId(state);
     return BT_NO_ERROR;

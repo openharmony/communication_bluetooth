@@ -49,10 +49,10 @@ public:
 
     static RemoteDeviceProperties *GetInstance(void);
 
-    bt_property_t* PropertyDeepCopy(int numProperties, bt_property_t* properties);
-    void GetRemoteDevicePropsCallBack(bt_status_t status, STACK::RawAddress* bd_addr, int numProperties,
-        bt_property_t* properties);
-    void DeviceFoundCallBack(int numProperties, bt_property_t* properties);
+    BtProperty* PropertyDeepCopy(int numProperties, BtProperty* properties);
+    void GetRemoteDevicePropsCallBack(BtStackStatus status, STACK::RawAddress* bdAddr, int numProperties,
+        BtProperty* properties);
+    void DeviceFoundCallBack(int numProperties, BtProperty* properties);
 
     std::shared_ptr<BluetoothDevice> FindRemoteDevice(const RawAddress &device);
     void FreeMemory();
@@ -80,8 +80,8 @@ public:
     void RemovePairWhiteList(const RawAddress &device);
     int32_t GetDeviceAbsVolumeAbility(const RawAddress &device);
     // get device property from stack, result will return in GetRemoteDevicePropsCallbackInner
-    int32_t GetRemoteDeviceProperty(const STACK::RawAddress &addr, bt_property_type_t type);
-    void SetRemoteDeviceProperty(const STACK::RawAddress &addr, const bt_property_t &prop);
+    int32_t GetRemoteDeviceProperty(const STACK::RawAddress &addr, BtPropertyType type);
+    void SetRemoteDeviceProperty(const STACK::RawAddress &addr, const BtProperty &prop);
     bool IsAclConnected(const RawAddress &device);
     bool IsAclEncrypted(const RawAddress &device);
     std::vector<std::string> GetNotPairNoneDevices() const;
@@ -93,13 +93,13 @@ public:
     void SetDevProactiveDisconnectFlag(const std::string &addr, uint32_t profileId, bool isProactive);
     bool IsDevProactiveDisconnect(const std::string &addr, uint32_t profileId) const;
     int GetDevConnStateChangeCause(const RawAddress &device, uint32_t profileId, int state);
-    bool SetRemoteDevicePropertyInfo(const RawAddress &device, bt_property_type_t type,
+    bool SetRemoteDevicePropertyInfo(const RawAddress &device, BtPropertyType type,
         const std::string &propertyValue);
     void UpdateRemoteHwDeviceType(const RawAddress &device, int newDeviceType);
     void StackErrnoCallback(const RawAddress &device, int status, int errNum);
     bool IsNeedDelayConnect(const RawAddress &device);
 
-    void HandlePropertyRemoteDeviceConnectionTime(bt_property_t* property,
+    void HandlePropertyRemoteDeviceConnectionTime(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice);
  
     int64_t GetLastConnectionTime(const RawAddress &device) const;
@@ -114,33 +114,33 @@ private:
     RemoteDeviceProperties();
     ~RemoteDeviceProperties();
 
-    void GetRemoteDevicePropsCallbackInner(STACK::RawAddress bd_addr, int numProperties,
-        bt_property_t* properties);
-    void DeviceFoundInner(int numProperties, bt_property_t* properties);
+    void GetRemoteDevicePropsCallbackInner(STACK::RawAddress bdAddr, int numProperties,
+        BtProperty* properties);
+    void DeviceFoundInner(int numProperties, BtProperty* properties);
     void WhiltListCallTimeOut(const RawAddress &device);
     void UpdateRemoteDeviceCod(const RawAddress &device, int newCod);
     void UpdateRemoteDeviceName(const RawAddress &device, std::string newRemoteName);
-    void HandlePropertyRemoteDeviceName(bt_property_t* property, RawAddress device);
-    void HandlePropertyRemoteDeviceUuid(bt_property_t* property, std::shared_ptr<BluetoothDevice> remoteDevice);
-    void HandlePropertyRemoteDeviceCod(bt_property_t* property, RawAddress device);
-    void HandlePropertyRemoteDeviceType(bt_property_t* property, std::shared_ptr<BluetoothDevice> remoteDevice);
-    void HandlePropertyRemoteDeviceAbsVolumKey(bt_property_t* property, std::shared_ptr<BluetoothDevice> remoteDevice);
-    void HandlePropertyRemoteDeviceRssi(bt_property_t* property, std::shared_ptr<BluetoothDevice> remoteDevice);
-    void HandlePropertyRemoteDeviceAlias(bt_property_t* property, std::shared_ptr<BluetoothDevice> remoteDevice);
-    void HandlePropertyRemoteDeviceCustomType(bt_property_t* property, std::shared_ptr<BluetoothDevice> remoteDevice);
-    void HandlePropertyRemoteDeviceIoCapability(bt_property_t* property, std::shared_ptr<BluetoothDevice> remoteDevice);
-    void HandlePropertyRemoteDeviceVendorId(bt_property_t* property, std::shared_ptr<BluetoothDevice> remoteDevice);
-    void HandlePropertyRemoteDeviceProductId(bt_property_t* property, std::shared_ptr<BluetoothDevice> remoteDevice);
-    void HandlePropertyRemoteDeviceManuSpecData(bt_property_t* property, std::shared_ptr<BluetoothDevice> remoteDevice);
-    void HandlePropertyRemoteDeviceChipInfo(bt_property_t* property, std::shared_ptr<BluetoothDevice> remoteDevice);
-    void HandlePropertyRemoteDeviceAutoConnSwitch(bt_property_t* property,
+    void HandlePropertyRemoteDeviceName(BtProperty* property, RawAddress device);
+    void HandlePropertyRemoteDeviceUuid(BtProperty* property, std::shared_ptr<BluetoothDevice> remoteDevice);
+    void HandlePropertyRemoteDeviceCod(BtProperty* property, RawAddress device);
+    void HandlePropertyRemoteDeviceType(BtProperty* property, std::shared_ptr<BluetoothDevice> remoteDevice);
+    void HandlePropertyRemoteDeviceAbsVolumKey(BtProperty* property, std::shared_ptr<BluetoothDevice> remoteDevice);
+    void HandlePropertyRemoteDeviceRssi(BtProperty* property, std::shared_ptr<BluetoothDevice> remoteDevice);
+    void HandlePropertyRemoteDeviceAlias(BtProperty* property, std::shared_ptr<BluetoothDevice> remoteDevice);
+    void HandlePropertyRemoteDeviceCustomType(BtProperty* property, std::shared_ptr<BluetoothDevice> remoteDevice);
+    void HandlePropertyRemoteDeviceIoCapability(BtProperty* property, std::shared_ptr<BluetoothDevice> remoteDevice);
+    void HandlePropertyRemoteDeviceVendorId(BtProperty* property, std::shared_ptr<BluetoothDevice> remoteDevice);
+    void HandlePropertyRemoteDeviceProductId(BtProperty* property, std::shared_ptr<BluetoothDevice> remoteDevice);
+    void HandlePropertyRemoteDeviceManuSpecData(BtProperty* property, std::shared_ptr<BluetoothDevice> remoteDevice);
+    void HandlePropertyRemoteDeviceChipInfo(BtProperty* property, std::shared_ptr<BluetoothDevice> remoteDevice);
+    void HandlePropertyRemoteDeviceAutoConnSwitch(BtProperty* property,
         std::shared_ptr<BluetoothDevice> remoteDevice);
-    void HandlePropertyRemoteDeviceMessage(bt_property_t* property, std::shared_ptr<BluetoothDevice> remoteDevice);
-    bool SetDeviceProperty(const RawAddress &device, bt_property_type_t type, const std::string &propertyValue,
+    void HandlePropertyRemoteDeviceMessage(BtProperty* property, std::shared_ptr<BluetoothDevice> remoteDevice);
+    bool SetDeviceProperty(const RawAddress &device, BtPropertyType type, const std::string &propertyValue,
         bool isIntProperty, int32_t intPropertyValue);
-    bool SetOtherPropertyInfo(const RawAddress &device, bt_property_type_t type, const std::string &propertyValue);
-    void HandlePropertyRemoteDeviceCloudCap(bt_property_t* property, std::shared_ptr<BluetoothDevice> remoteDevice);
-    void HandlePropertyByType(bt_property_t* property, const RawAddress &device,
+    bool SetOtherPropertyInfo(const RawAddress &device, BtPropertyType type, const std::string &propertyValue);
+    void HandlePropertyRemoteDeviceCloudCap(BtProperty* property, std::shared_ptr<BluetoothDevice> remoteDevice);
+    void HandlePropertyByType(BtProperty* property, const RawAddress &device,
         std::shared_ptr<BluetoothDevice> remoteDevice);
     // properties mutex
     std::mutex mutex_ {};

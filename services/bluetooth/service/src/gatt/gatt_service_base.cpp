@@ -156,32 +156,32 @@ int GattServiceBase::GattTransportToStack(int transport)
 void GattServiceBase::ConvertDisconnectReason(int &convertReason, int reason, std::string &reasonMessage)
 {
     switch (reason) {
-        case tGATT_DISCONN_REASON::GATT_CONN_TIMEOUT:
+        case GattDisconnReason::GATT_CONN_TIMEOUT:
             convertReason = static_cast<int>(GattDisconnectReason::CONN_TIMEOUT);
             reasonMessage = GATT_DIS_MSG_0X08_CONN_TIMEOUT;
             break;
-        case tGATT_DISCONN_REASON::GATT_CONN_TERMINATE_PEER_USER:
+        case GattDisconnReason::GATT_CONN_TERMINATE_PEER_USER:
             convertReason = static_cast<int>(GattDisconnectReason::CONN_TERMINATE_PEER_USER);
             reasonMessage = GATT_DIS_MSG_0X13_PEER_USER;
             break;
         // When local host call disconnect, the reason of disconnectCallback is GATT_CONN_OK.
-        case tGATT_DISCONN_REASON::GATT_CONN_OK:
+        case GattDisconnReason::GATT_CONN_OK:
             convertReason = static_cast<int>(GattDisconnectReason::CONN_TERMINATE_LOCAL_HOST);
             reasonMessage = GATT_DIS_MSG_0X16_LOCAL_HOST;
             break;
-        case tGATT_DISCONN_REASON::GATT_CONN_TERMINATE_LOCAL_HOST:
+        case GattDisconnReason::GATT_CONN_TERMINATE_LOCAL_HOST:
             convertReason = static_cast<int>(GattDisconnectReason::CONN_TERMINATE_LOCAL_HOST);
             reasonMessage = GATT_DIS_MSG_0X16_LOCAL_HOST;
             break;
-        case tGATT_DISCONN_REASON::GATT_CONN_L2C_FAILURE:
+        case GattDisconnReason::GATT_CONN_L2C_FAILURE:
             convertReason = static_cast<int>(GattDisconnectReason::CONN_UNKNOWN);
             reasonMessage = GATT_DIS_MSG_L2C_FAILURE;
             break;
-        case tGATT_DISCONN_REASON::GATT_CONN_LMP_TIMEOUT:
+        case GattDisconnReason::GATT_CONN_LMP_TIMEOUT:
             convertReason = static_cast<int>(GattDisconnectReason::CONN_UNKNOWN);
             reasonMessage = GATT_DIS_MSG_0X22_LMP_TIMEOUT;
             break;
-        case tGATT_DISCONN_REASON::BTA_GATT_CONN_NONE:
+        case GattDisconnReason::BTA_GATT_CONN_NONE:
             convertReason = static_cast<int>(GattDisconnectReason::CONN_UNKNOWN);
             reasonMessage = GATT_DIS_MSG_NO_CONN_TO_CANCEL;
             break;

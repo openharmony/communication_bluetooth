@@ -39,7 +39,7 @@ BleAdvertiserImpl::BleAdvertiserImpl(IBleAdvertiserCallback &callback, IAdapterB
       callback_(&callback),
       bleAdapter_(&bleAdapter)
 {
-    btifBleAdvertiser_ = get_ble_advertiser_instance();
+    btifBleAdvertiser_ = GetBleAdvertiserInstance();
 }
 
 BleAdvertiserImpl::~BleAdvertiserImpl()
@@ -228,32 +228,32 @@ void BleAdvertiserImpl::ChangeAdvStatus(uint8_t advHandle, int advStatus)
 void BleAdvertiserImpl::ParseSettings(const BleAdvertiserSettingsImpl &settings, bool hasScanRsp,
     AdvertiseParameters *outParams)  const
 {
-    outParams->min_interval = settings.GetInterval();
-    outParams->max_interval = settings.GetInterval();
+    outParams->minInterval = settings.GetInterval();
+    outParams->maxInterval = settings.GetInterval();
 
     bool isLegacyMode = settings.IsLegacyMode();
     bool isConnectable = settings.IsConnectable();
     bool isScannable = hasScanRsp;
 
     if (isConnectable) {
-        outParams->advertising_event_properties = isLegacyMode ?
+        outParams->advertisingEventProperties = isLegacyMode ?
             ADVERTISING_EVENT_PROP_LEGACY_CONNECTABLE : ADVERTISING_EVENT_PROP_EXTENDED_CONNECTABLE;
     } else if (isScannable) {
-        outParams->advertising_event_properties = isLegacyMode ?
+        outParams->advertisingEventProperties = isLegacyMode ?
             ADVERTISING_EVENT_PROP_LEGACY_SCANNABLE : ADVERTISING_EVENT_PROP_EXTENDED_SCANNABLE;
     } else {
-        outParams->advertising_event_properties = isLegacyMode ?
+        outParams->advertisingEventProperties = isLegacyMode ?
             ADVERTISING_EVENT_PROP_LEGACY_NON_CONNECTABLE : ADVERTISING_EVENT_PROP_EXTENDED_NON_CONNECTABLE;
     }
 
-    outParams->channel_map = ADV_CHNL_ALL;
-    outParams->tx_power = static_cast<int8_t>(settings.GetTxPower());
-    outParams->primary_advertising_phy = settings.GetPrimaryPhy();
-    outParams->secondary_advertising_phy = settings.GetSecondaryPhy();
-    outParams->scan_request_notification_enable = 0;
+    outParams->channelMap = ADV_CHNL_ALL;
+    outParams->txPower = static_cast<int8_t>(settings.GetTxPower());
+    outParams->primaryAdvertisingPhy = settings.GetPrimaryPhy();
+    outParams->secondaryAdvertisingPhy = settings.GetSecondaryPhy();
+    outParams->scanRequestNotificationEnable = 0;
     std::array<uint8_t, RawAddress::BT_ADDRESS_BYTE_LEN> addr = settings.GetOwnAddr();
-    std::copy(addr.begin(), addr.end(), outParams->own_addr);
-    outParams->own_addr_type = settings.GetOwnAddrType();
+    std::copy(addr.begin(), addr.end(), outParams->ownAddr);
+    outParams->ownAddrType = settings.GetOwnAddrType();
 }
 
 static std::string StringToHex(const std::string &str)

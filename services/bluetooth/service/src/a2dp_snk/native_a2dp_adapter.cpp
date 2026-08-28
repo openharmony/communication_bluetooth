@@ -25,8 +25,8 @@ namespace OHOS {
 namespace bluetooth {
 
 // Bluedroid 回调表 — 指向 static 函数
-btav_sink_callbacks_t NativeA2dpAdapter::s_callbacks_ = {
-    sizeof(btav_sink_callbacks_t),
+BtavSinkCallbacks NativeA2dpAdapter::s_callbacks_ = {
+    sizeof(BtavSinkCallbacks),
     BtavConnectionState,
     BtavAudioState,
     BtavAudioConfig
@@ -34,7 +34,7 @@ btav_sink_callbacks_t NativeA2dpAdapter::s_callbacks_ = {
 
 NativeA2dpAdapter *NativeA2dpAdapter::s_instance_ = nullptr;
 
-NativeA2dpAdapter::NativeA2dpAdapter(btav_sink_interface_t* iface) : iface_(iface)
+NativeA2dpAdapter::NativeA2dpAdapter(BtavSinkInterface* iface) : iface_(iface)
 {
     s_instance_ = this;
 }
@@ -46,7 +46,7 @@ NativeA2dpAdapter::~NativeA2dpAdapter()
     }
 }
 
-bt_status_t NativeA2dpAdapter::Init(INativeA2dpSinkCallback *callback, int maxDevices)
+BtStackStatus NativeA2dpAdapter::Init(INativeA2dpSinkCallback *callback, int maxDevices)
 {
     if (!iface_ || !iface_->init) {
         HILOGE("interface or init is null");
@@ -56,7 +56,7 @@ bt_status_t NativeA2dpAdapter::Init(INativeA2dpSinkCallback *callback, int maxDe
     return iface_->init(&s_callbacks_, maxDevices);
 }
 
-bt_status_t NativeA2dpAdapter::Connect(const RawAddress& bdAddr)
+BtStackStatus NativeA2dpAdapter::Connect(const RawAddress& bdAddr)
 {
     if (!iface_ || !iface_->connect) {
         HILOGE("interface or connect is null");
@@ -66,7 +66,7 @@ bt_status_t NativeA2dpAdapter::Connect(const RawAddress& bdAddr)
     return iface_->connect(rawAddr);
 }
 
-bt_status_t NativeA2dpAdapter::Disconnect(const RawAddress& bdAddr)
+BtStackStatus NativeA2dpAdapter::Disconnect(const RawAddress& bdAddr)
 {
     if (!iface_ || !iface_->disconnect) {
         HILOGE("interface or disconnect is null");
@@ -87,31 +87,31 @@ void NativeA2dpAdapter::Cleanup()
 
 void NativeA2dpAdapter::SetAudioFocusState(int focusState)
 {
-    if (iface_ && iface_->set_audio_focus_state) {
-        iface_->set_audio_focus_state(focusState);
+    if (iface_ && iface_->setAudioFocusState) {
+        iface_->setAudioFocusState(focusState);
     }
 }
 
 void NativeA2dpAdapter::SetAudioTrackGain(float gain)
 {
-    if (iface_ && iface_->set_audio_track_gain) {
-        iface_->set_audio_track_gain(gain);
+    if (iface_ && iface_->setAudioTrackGain) {
+        iface_->setAudioTrackGain(gain);
     }
 }
 
-bt_status_t NativeA2dpAdapter::SetActiveDevice(const RawAddress& bdAddr)
+BtStackStatus NativeA2dpAdapter::SetActiveDevice(const RawAddress& bdAddr)
 {
-    if (!iface_ || !iface_->set_active_device) {
+    if (!iface_ || !iface_->setActiveDevice) {
         HILOGE("interface or set_active_device is null");
         return BT_STATUS_FAIL;
     }
     STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(bdAddr);
-    return iface_->set_active_device(rawAddr);
+    return iface_->setActiveDevice(rawAddr);
 }
 
 // --- trampoline 实现 ---
 
-void NativeA2dpAdapter::BtavConnectionState(const STACK::RawAddress &bdAddr, btav_connection_state_t state)
+void NativeA2dpAdapter::BtavConnectionState(const STACK::RawAddress &bdAddr, BtavConnectionState state)
 {
     if (s_instance_ && s_instance_->callback_) {
         RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
@@ -119,7 +119,7 @@ void NativeA2dpAdapter::BtavConnectionState(const STACK::RawAddress &bdAddr, bta
     }
 }
 
-void NativeA2dpAdapter::BtavAudioState(const STACK::RawAddress &bdAddr, btav_audio_state_t state)
+void NativeA2dpAdapter::BtavAudioState(const STACK::RawAddress &bdAddr, BtavAudioState state)
 {
     if (s_instance_ && s_instance_->callback_) {
         RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);

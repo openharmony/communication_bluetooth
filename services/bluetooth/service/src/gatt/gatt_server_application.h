@@ -43,7 +43,7 @@ public:
 
     static constexpr int LE_DEFAULT_ATT_MTU = 22;
 
-    GattServerApplication(int appId, const btgatt_server_interface_t *interface, uint32_t tokenId,
+    GattServerApplication(int appId, const BtgattServerInterface *interface, uint32_t tokenId,
         std::weak_ptr<IGattServerCallback> callback, NotifyServiceChangedFunc func);
     ~GattServerApplication() override;
 
@@ -97,7 +97,7 @@ public:
 
     void ConnectionCallback(
         int connId, int serverIf, int connected, const STACK::RawAddress &bda, int reason) override;
-    void ServiceAddedCallback(int status, int serverIf, std::vector<btgatt_db_element_t> service) override;
+    void ServiceAddedCallback(int status, int serverIf, std::vector<BtgattDbElement> service) override;
     void ServiceDeletedCallback(int status, int serverIf, int serviceHandle) override;
     void RequestReadCharacteristicCallback(int connId, int transId, const STACK::RawAddress &bda, int attrHandle,
         int offset, bool isLong) override;
@@ -175,7 +175,7 @@ private:
             [addr](auto &pair) { return pair.second.device.addr_ == addr; });
     }
 
-    void BuildGattService(const std::vector<btgatt_db_element_t> &svc, Service &service);
+    void BuildGattService(const std::vector<BtgattDbElement> &svc, Service &service);
     void ReportAddService(int ret, const Service &service);
     uint16_t PermissionToStack(int perm);
 
@@ -197,7 +197,7 @@ private:
     // service handle <-> characteristic and descriptor handles
     std::map<uint16_t, std::set<uint16_t>> serviceHandles_ {};
 
-    const btgatt_server_interface_t *btIfGattServer_ = nullptr;
+    const BtgattServerInterface *btIfGattServer_ = nullptr;
     std::weak_ptr<IGattServerCallback> callback_;
     // Notify other application service has changed.
     NotifyServiceChangedFunc notifyServiceChanged_ {};

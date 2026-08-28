@@ -52,14 +52,14 @@ extern "C" void DestroyPanServiceImplInterface(PanServiceImpl *interface)
 
 PanServiceImpl::PanServiceImpl()
 {
-    bt_interface_t* bluetoothInterface = nullptr;
-    int status = hal_util_load_bt_library((const bt_interface_t**)&(bluetoothInterface));
+    BtInterface* bluetoothInterface = nullptr;
+    int status = hal_util_load_bt_library((const BtInterface**)&(bluetoothInterface));
     if (status) {
         HILOGE("Failed to open the Bluetooth stack");
         return;
     }
-    panInterface_ = reinterpret_cast<btpan_interface_t*>(
-        const_cast<void *>(bluetoothInterface->get_profile_interface(BT_PROFILE_PAN_ID)));
+    panInterface_ = reinterpret_cast<BtpanInterface*>(
+        const_cast<void *>(bluetoothInterface->getProfileInterface(BT_PROFILE_PAN_ID)));
 }
 
 PanServiceImpl::~PanServiceImpl()
@@ -169,7 +169,7 @@ void PanServiceImpl::ClearStatemachine()
     stateMachines_.Clear();
 }
 
-btpan_interface_t* PanServiceImpl::GetPanInterface()
+BtpanInterface* PanServiceImpl::GetPanInterface()
 {
     return panInterface_;
 }

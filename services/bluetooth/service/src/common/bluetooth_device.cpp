@@ -473,7 +473,7 @@ int BluetoothDevice::GetPasskey() const
     return passkey_;
 }
 
-void BluetoothDevice::SetSspVariant(bt_ssp_variant_t pairingVariant)
+void BluetoothDevice::SetSspVariant(BtSspVariant pairingVariant)
 {
     pairingVariant_ = static_cast<int>(pairingVariant);
 }

@@ -119,7 +119,7 @@ private:
     void ApcfCommandLog(const std::vector<ApcfCommand> &cmds) const;
 
     bool SendScanFilterParam(uint8_t action, int filterIndex,
-        std::unique_ptr<btgatt_filt_param_setup_t> filtParam) const;
+        std::unique_ptr<BtgattFiltParamSetup> filtParam) const;
     bool SendScanFilter(int filterIndex, std::vector<ApcfCommand> cmds) const;
     std::pair<int8_t, int8_t> GetRssiThres(uint8_t sensitivityMode, bool onFound) const;
     uint16_t GetOnFoundOrLostTimeout(uint8_t sensitivityMode, bool onFound) const;

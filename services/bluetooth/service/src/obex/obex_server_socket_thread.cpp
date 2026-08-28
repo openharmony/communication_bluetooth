@@ -208,7 +208,7 @@ RawAddress ConvertRfcommAddr(STACK::RawAddress &addr)
 
 std::shared_ptr<ObexSocketDevice> ObexServerSocketThread::RecvSocketDevice(int fd, SocketType socketType)
 {
-    char buffer[sizeof(sock_connect_signal_t)] = {0};
+    char buffer[sizeof(SockConnectSignal)] = {0};
     char msgCtrlBuff[CMSG_SPACE(1)] = {0};
     struct iovec iv = {.iov_base = buffer, .iov_len = sizeof(buffer)};
     struct msghdr msg;
@@ -231,17 +231,17 @@ std::shared_ptr<ObexSocketDevice> ObexServerSocketThread::RecvSocketDevice(int f
     int acceptFd = *(reinterpret_cast<int *>(CMSG_DATA(cmsg)));
 
     std::shared_ptr<ObexSocketDevice> socketDevice = nullptr;
-    sock_connect_signal_t *info = static_cast<sock_connect_signal_t *>(msg.msg_iov->iov_base);
+    SockConnectSignal *info = static_cast<SockConnectSignal *>(msg.msg_iov->iov_base);
     if (info == nullptr) {
         HILOGE("[sock] recvmsg error cs nullptr");
         return nullptr;
     }
-    RawAddress newAddr = ConvertRfcommAddr(info->bd_addr);
+    RawAddress newAddr = ConvertRfcommAddr(info->bdAddr);
 
     if (socketType == SocketType::TYPE_L2CAP) {
-        HILOGD("[sock] socketfd %{public}d. max_rx_packet_size %{public}d.", acceptFd, info->max_rx_packet_size);
+        HILOGD("[sock] socketfd %{public}d. maxRxPacketSize %{public}d.", acceptFd, info->maxRxPacketSize);
         socketDevice = std::make_shared<ObexSocketDevice>(
-            acceptFd, info->max_tx_packet_size, info->max_rx_packet_size, SocketType::TYPE_L2CAP, newAddr.GetAddress());
+            acceptFd, info->maxTxPacketSize, info->maxRxPacketSize, SocketType::TYPE_L2CAP, newAddr.GetAddress());
     } else if (socketType == SocketType::TYPE_RFCOMM) {
         socketDevice = std::make_shared<ObexSocketDevice>(
             acceptFd, MAX_PACKET_SIZE, MAX_PACKET_SIZE, SocketType::TYPE_RFCOMM, newAddr.GetAddress());

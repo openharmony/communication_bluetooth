@@ -65,13 +65,13 @@ public:
 private:
     BT_DISALLOW_COPY_AND_ASSIGN(BluetoothResourceManager);
     DECLARE_IMPL();
-    const bthwif_interface_t* GetBtHwInterface();
+    const BthwifInterface* GetBtHwInterface();
     bool IsValidBleScanEnhanceMode(const BleScanEnhanceModeImpl &enhanceMode);
     bool IsBleScanEnhanceModeSupported();
     void UpdateBleScanEnhanceModeTimer(int64_t timeout);
     void SendBleScanEnhanceModeEvent(const BleScanEnhanceModeImpl &enhanceMode);
 
-    const bthwif_interface_t *bthwInterface_ = nullptr;
+    const BthwifInterface *bthwInterface_ = nullptr;
     SafeMap<uint8_t, std::shared_ptr<SensingInfo>> advMap_;
     ScanMsg scanMsg_;
     std::shared_ptr<utility::Timer> enhanceModeTimer_ = nullptr;

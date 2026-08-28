@@ -113,24 +113,24 @@ static void SetPlayerApplicationSettingRspCallback(const STACK::RawAddress &bdAd
 }
 
 static void PlayerApplicationSettingCallback(const STACK::RawAddress &bdAddr, uint8_t numAttr,
-    btrc_player_app_attr_t *appAttrs, uint8_t numExtAttr, btrc_player_app_ext_attr_t *extAttrs)
+    BtrcPlayerAppAttr *appAttrs, uint8_t numExtAttr, BtrcPlayerAppExtAttr *extAttrs)
 {
     HILOGI("player_application_setting_callback");
 }
 
 static void PlayerApplicationSettingChangedCallback(
-    const STACK::RawAddress &bdAddr, const btrc_player_settings_t &vals)
+    const STACK::RawAddress &bdAddr, const BtrcPlayerSettings &vals)
 {
-    HILOGI("PlayerApplicationSettingChangedCallback: num_attr=%{public}d", vals.num_attr);
+    HILOGI("PlayerApplicationSettingChangedCallback: numAttr=%{public}d", vals.numAttr);
     RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
     auto service = AvrcpCtService::GetService();
     if (!service) {
         return;
     }
     // 遍历变更的属性，对 REPEAT/SHUFFLE 分别投递消息（对齐双框架 onPlayerAppSettingChanged）
-    for (uint8_t i = 0; i < vals.num_attr && i < BTRC_MAX_APP_SETTINGS; i++) {
-        uint8_t attrId = vals.attr_ids[i];
-        uint8_t attrVal = vals.attr_values[i];
+    for (uint8_t i = 0; i < vals.numAttr && i < BTRC_MAX_APP_SETTINGS; i++) {
+        uint8_t attrId = vals.attrIds[i];
+        uint8_t attrVal = vals.attrValues[i];
         HILOGI("  attr[%{public}d]: id=%{public}d, val=%{public}d", i, attrId, attrVal);
         if (attrId != AVRCP_REPEAT_STATUS && attrId != AVRCP_SHUFFLE_STATUS) {
             continue;
@@ -143,7 +143,7 @@ static void PlayerApplicationSettingChangedCallback(
     }
 }
 
-static void TrackChangedCallback(const STACK::RawAddress &bdAddr, uint8_t numAttr, btrc_element_attr_val_t *pAttrs)
+static void TrackChangedCallback(const STACK::RawAddress &bdAddr, uint8_t numAttr, BtrcElementAttrVal *pAttrs)
 {
     HILOGI("TrackChangedCallback: numAttr=%{public}d", numAttr);
     RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
@@ -155,8 +155,9 @@ static void TrackChangedCallback(const STACK::RawAddress &bdAddr, uint8_t numAtt
         std::vector<uint32_t> attrIds;
         std::vector<std::string> attrVals;
         for (int i = 0; i < numAttr; i++) {
-            HILOGI("TrackChangedCallback i %{public}d, attr_id %{public}d, textPtr %{public}s", i, pAttrs[i].attr_id, pAttrs[i].text);
-            attrIds.push_back(static_cast<uint32_t>(pAttrs[i].attr_id));
+            HILOGI("TrackChangedCallback i %{public}d, attrId %{public}d, textPtr %{public}s",
+                i, pAttrs[i].attrId, pAttrs[i].text);
+            attrIds.push_back(static_cast<uint32_t>(pAttrs[i].attrId));
             const char* textPtr = reinterpret_cast<const char*>(pAttrs[i].text);
             attrVals.push_back(textPtr != nullptr ? std::string(textPtr) : std::string());
         }
@@ -187,7 +188,7 @@ static void PlayPositionChangedCallback(const STACK::RawAddress &bdAddr, uint32_
     AvrcpCtService::GetService()->PostEvent(event);
 }
 
-static void PlayStatusChangedCallback(const STACK::RawAddress &bdAddr, btrc_play_status_t playStatus)
+static void PlayStatusChangedCallback(const STACK::RawAddress &bdAddr, BtrcPlayStatus playStatus)
 {
     HILOGI("PlayStatusChangedCallback: playStatus=%{public}d", playStatus);
     RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
@@ -197,7 +198,7 @@ static void PlayStatusChangedCallback(const STACK::RawAddress &bdAddr, btrc_play
 }
 
 static void GetFolderItemsCallback(
-    const STACK::RawAddress &bdAddr, btrc_status_t status, const btrc_folder_items_t *folderItems, uint8_t count)
+    const STACK::RawAddress &bdAddr, BtrcStatus status, const BtrcFolderItems *folderItems, uint8_t count)
 {
     HILOGI("[BIP_NOT_SUPPORT] Browse channel not supported, GetFolderItemsCallback ignored");
 }
@@ -244,7 +245,7 @@ static void GetCoverArtPsmCallback(const STACK::RawAddress &bdAddr, const uint16
     AvrcpCtService::GetService()->PostEvent(event);
 }
 
-static btrc_ctrl_callbacks_t g_btAvrcpCallbacks = {
+static BtrcCtrlCallbacks g_btAvrcpCallbacks = {
     sizeof(g_btAvrcpCallbacks),
     PassThroughResCallback,
     GroupNavigationResCallback,
@@ -294,19 +295,19 @@ void AvrcpCtService::StartUp()
         HILOGW("AvrcpCtService has already been started before.");
         return;
     }
-    bt_interface_t *btInterface = AdapterManager::GetInstance()->getBluetoothInterface();
+    BtInterface *btInterface = AdapterManager::GetInstance()->getBluetoothInterface();
     if (!btInterface) {
         HILOGE("btInterface is nullptr");
         return;
     }
 
-    btAvrcpInterface_ = (btrc_ctrl_interface_t *)btInterface->get_profile_interface(BT_PROFILE_AV_RC_CTRL_ID);
+    btAvrcpInterface_ = (BtrcCtrlInterface *)btInterface->getProfileInterface(BT_PROFILE_AV_RC_CTRL_ID);
     if (!btAvrcpInterface_) {
         HILOGE("btAvrcpInterface is nullptr");
         return;
     }
 
-    bt_status_t status = btAvrcpInterface_->init(&g_btAvrcpCallbacks);
+    BtStackStatus status = btAvrcpInterface_->init(&g_btAvrcpCallbacks);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("Failed to initialize Bluetooth Avrcp Controller, status: %{public}d", status);
         btAvrcpInterface_ = nullptr;
@@ -510,7 +511,7 @@ bool AvrcpCtService::SendPassThroughCommand(const RawAddress &rawAddr, uint8_t k
 {
     CHECK_AND_RETURN_LOG_RET(btAvrcpInterface_, false, "bluetoothAvrcpInterface is nullptr");
     STACK::RawAddress btRawAddr = ServiceUtil::AddrToStack(rawAddr);
-    bt_status_t status = btAvrcpInterface_->send_pass_through_cmd(btRawAddr, keyCode, keyState);
+    BtStackStatus status = btAvrcpInterface_->sendPassThroughCmd(btRawAddr, keyCode, keyState);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("Failed sending passthrough cmd, status:%{public}d", status);
         return false;
@@ -529,7 +530,7 @@ void AvrcpCtService::SendAbsVolumeResponse(const RawAddress &rawAddr, int absVol
         return;
     }
     STACK::RawAddress btRawAddr = ServiceUtil::AddrToStack(rawAddr);
-    btAvrcpInterface_->set_volume_rsp(btRawAddr, static_cast<uint8_t>(absVol), static_cast<uint8_t>(label));
+    btAvrcpInterface_->setVolumeRsp(btRawAddr, static_cast<uint8_t>(absVol), static_cast<uint8_t>(label));
 }
 
 void AvrcpCtService::SendRegisterAbsVolResponse(
@@ -539,8 +540,8 @@ void AvrcpCtService::SendRegisterAbsVolResponse(
            GET_ENCRYPT_STR_ADDR(rawAddr.GetAddress()), rspType, absVol, label);
     CHECK_AND_RETURN_LOG(btAvrcpInterface_, "bluetoothAvrcpInterface is nullptr");
     STACK::RawAddress btRawAddr = ServiceUtil::AddrToStack(rawAddr);
-    btAvrcpInterface_->register_abs_vol_rsp(
-        btRawAddr, static_cast<btrc_notification_type_t>(rspType),
+    btAvrcpInterface_->registerAbsVolRsp(
+        btRawAddr, static_cast<BtrcNotificationType>(rspType),
         static_cast<uint8_t>(absVol), static_cast<uint8_t>(label));
 }
 
@@ -549,7 +550,7 @@ void AvrcpCtService::RequestCurrentMetadata(const RawAddress &rawAddr)
     HILOGI("RequestCurrentMetadata: addr=%{public}s", GET_ENCRYPT_STR_ADDR(rawAddr.GetAddress()));
     CHECK_AND_RETURN_LOG(btAvrcpInterface_, "bluetoothAvrcpInterface is nullptr");
     STACK::RawAddress btRawAddr = ServiceUtil::AddrToStack(rawAddr);
-    btAvrcpInterface_->get_current_metadata_cmd(btRawAddr);
+    btAvrcpInterface_->getCurrentMetadataCmd(btRawAddr);
 }
 
 void AvrcpCtService::RequestPlaybackState(const RawAddress &rawAddr)
@@ -557,7 +558,7 @@ void AvrcpCtService::RequestPlaybackState(const RawAddress &rawAddr)
     HILOGI("RequestPlaybackState: addr=%{public}s", GET_ENCRYPT_STR_ADDR(rawAddr.GetAddress()));
     CHECK_AND_RETURN_LOG(btAvrcpInterface_, "bluetoothAvrcpInterface is nullptr");
     STACK::RawAddress btRawAddr = ServiceUtil::AddrToStack(rawAddr);
-    btAvrcpInterface_->get_playback_state_cmd(btRawAddr);
+    btAvrcpInterface_->getPlaybackStateCmd(btRawAddr);
 }
 
 void AvrcpCtService::RequestRemotePlay(const RawAddress &rawAddr)
@@ -769,7 +770,7 @@ int AvrcpCtService::SetPlayerAppSettingCurrentValue(
     STACK::RawAddress btRawAddr = ServiceUtil::AddrToStack(rawAddr);
     std::vector<uint8_t> attributesCopy(attributes.begin(), attributes.end());
     std::vector<uint8_t> valuesCopy(values.begin(), values.end());
-    bt_status_t status = btAvrcpInterface_->set_player_app_setting_cmd(
+    BtStackStatus status = btAvrcpInterface_->setPlayerAppSettingCmd(
         btRawAddr, static_cast<uint8_t>(attributesCopy.size()), attributesCopy.data(), valuesCopy.data());
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("Failed sending setRepeatMode cmd, status:%{public}d", status);
@@ -888,7 +889,7 @@ int AvrcpCtService::SetAbsoluteVolume(const RawAddress &rawAddr, uint8_t volume)
            GET_ENCRYPT_STR_ADDR(rawAddr.GetAddress()), volume);
     CHECK_AND_RETURN_LOG_RET(btAvrcpInterface_, RET_BAD_STATUS, "bluetoothAvrcpInterface is nullptr");
     STACK::RawAddress btRawAddr = ServiceUtil::AddrToStack(rawAddr);
-    bt_status_t status = btAvrcpInterface_->set_volume_rsp(btRawAddr, volume, 0);
+    BtStackStatus status = btAvrcpInterface_->setVolumeRsp(btRawAddr, volume, 0);
     return (status == BT_STATUS_SUCCESS) ? RET_NO_ERROR : RET_BAD_STATUS;
 }
 

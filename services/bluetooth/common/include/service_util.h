@@ -104,7 +104,7 @@ public:
         return ret;
     }
 
-    static int TransportFromStack(const tBT_TRANSPORT transport)
+    static int TransportFromStack(const BtTransport transport)
     {
         int ret = BT_TRANSPORT_NONE;
         switch (transport) {
@@ -122,7 +122,7 @@ public:
     }
 
     // stack transport type to service link type.
-    static int LinkTypeFromStack(tBT_TRANSPORT transport)
+    static int LinkTypeFromStack(BtTransport transport)
     {
         switch (transport) {
             case BT_TRANSPORT_BR_EDR:

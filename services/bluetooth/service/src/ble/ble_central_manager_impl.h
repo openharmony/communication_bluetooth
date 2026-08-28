@@ -177,7 +177,7 @@ private:
     std::pair<FilterIdxInfo, bool> GetShFilterIdx(uint8_t idx);
     void ReleaseShFilterIdx(uint8_t idx);
     void ClearShFilterIdx();
-    const bthwif_interface_t* GetBtHwInterface();
+    const BthwifInterface* GetBtHwInterface();
     uint8_t GetDeliveryMode(const BleScanSettingsImpl &settings) const;
     uint16_t GetNumOfTrackAdvs(uint8_t matchTrackAdvType) const;
     int RemoveScanFilterInner(int32_t scannerId, const BleScanSettingsImpl &settings,
@@ -186,7 +186,7 @@ private:
         const std::vector<BleScanFilterImpl> &filters);
     IBleCentralManagerCallback *callback_ = nullptr;
     BleScannerInterface *btifBleScanner_ = nullptr;
-    const bthwif_interface_t *bthwInterface_ = nullptr;
+    const BthwifInterface *bthwInterface_ = nullptr;
     // scan status
     std::atomic_int status_ {SCAN_NOT_STARTED};
 

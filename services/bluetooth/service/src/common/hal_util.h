@@ -18,7 +18,7 @@
 
 #include "hardware/bluetooth.h"
 
-/* Load the Bluetooth HAL library and return the bt_interface_t handle. */
-int hal_util_load_bt_library(const bt_interface_t **btInterface);
+/* Load the Bluetooth HAL library and return the BtInterface handle. */
+int hal_util_load_bt_library(const BtInterface **btInterface);
 
 #endif  // BLUETOOTH_HAL_UTIL_H

@@ -104,7 +104,7 @@ BleCentralManagerImpl::BleCentralManagerImpl(IBleCentralManagerCallback &callbac
     : callback_(&callback), status_(SCAN_NOT_STARTED),
       pimpl(std::make_unique<BleCentralManagerImpl::impl>(*this))
 {
-    btifBleScanner_ = get_ble_scanner_instance();
+    btifBleScanner_ = GetBleScannerInstance();
     bthwInterface_ = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     currentUsedTrackAdvs_ = 0;
 }
@@ -112,7 +112,7 @@ BleCentralManagerImpl::BleCentralManagerImpl(IBleCentralManagerCallback &callbac
 BleCentralManagerImpl::~BleCentralManagerImpl()
 {}
 
-const bthwif_interface_t* BleCentralManagerImpl::GetBtHwInterface()
+const BthwifInterface* BleCentralManagerImpl::GetBtHwInterface()
 {
     if (bthwInterface_ != nullptr) {
         return bthwInterface_;
@@ -384,7 +384,7 @@ void ParseBatchScanFullModeHead(RawAddress &address, uint8_t &addrType, int8_t &
     uint16_t &timestamp, uint8_t* &pos)
 {
     STACK::RawAddress addr;
-    STREAM_TO_BDADDR(addr, const_cast<const uint8_t *&>(pos));
+    StreamToBdaddr(addr, const_cast<const uint8_t *&>(pos));
     address = ServiceUtil::AddrFromStack(addr);
     STREAM_TO_UINT8(addrType, pos);
     pos++; // Tx_power
@@ -905,7 +905,7 @@ std::vector<uint8_t> BleCentralManagerImpl::impl::GetSoftFilterMsgData(uint8_t i
     std::vector<uint8_t> retValue {};
     AppendUuidToByteArray(uuid, retValue);
     retValue.push_back(0x01); // 1 byte filter item num. default value 1
-    retValue.push_back(idx); // 1 byte filter_index
+    retValue.push_back(idx); // 1 byte filterIndex
     AppendDataToByteArray(0x1000, BLE_DATA_LEN_2, retValue); // 2 bytes apcf_feature_selection
     AppendDataToByteArray(0, BLE_DATA_LEN_2, retValue); // 2 bytes apcf_list_logic_type mScanSettings.getListLogicType()
     retValue.push_back(0); // 1 byte apcf_logic_type  mScanSettings.getFilterLogicType()
@@ -915,7 +915,7 @@ std::vector<uint8_t> BleCentralManagerImpl::impl::GetSoftFilterMsgData(uint8_t i
     retValue.push_back(0); // 1 byte onfound_timeout_cnt
     retValue.push_back(0); // 1 byte rssi_low_thresh
     AppendDataToByteArray(0, BLE_DATA_LEN_2, retValue); // 2 bytes onlost_timeout
-    AppendDataToByteArray(0, BLE_DATA_LEN_2, retValue); // 2 bytes num_of_tracking_entries
+    AppendDataToByteArray(0, BLE_DATA_LEN_2, retValue); // 2 bytes numOfTrackingEntries
     AppendDeviceAddressToByteArray(filters, retValue);
     AppendSrvUuidListToByteArray(filters, retValue);
     AppendSolicUuidListToByteArray(filters, retValue);
@@ -931,7 +931,7 @@ std::vector<uint8_t> BleCentralManagerImpl::impl::GetAdvParamMsgData(uint8_t idx
     std::vector<uint8_t> retValue {};
     AppendUuidToByteArray(uuid, retValue);
     retValue.push_back(0x01); // 1 byte filter item num. default value 1
-    retValue.push_back(idx); // 1 byte filter_index
+    retValue.push_back(idx); // 1 byte filterIndex
     retValue.push_back(advHandle);  // 1 byte advertising handle
     short advEvtProp = 0;
     if (settings.IsConnectable()) {
@@ -943,7 +943,7 @@ std::vector<uint8_t> BleCentralManagerImpl::impl::GetAdvParamMsgData(uint8_t idx
     if (settings.GetTxPower()) {
         advEvtProp |= 0x40;
     }
-    AppendDataToByteArray(advEvtProp, BLE_DATA_LEN_2, retValue); // advertising_event_properties
+    AppendDataToByteArray(advEvtProp, BLE_DATA_LEN_2, retValue); // advertisingEventProperties
     AppendDataToByteArray(settings.GetInterval(), BLE_DATA_LEN_3, retValue); // min
     AppendDataToByteArray(settings.GetInterval(), BLE_DATA_LEN_3, retValue); // max is same as min
     retValue.push_back(0x07); // primary_advertising_channel_map 0x07-all channels
@@ -952,11 +952,11 @@ std::vector<uint8_t> BleCentralManagerImpl::impl::GetAdvParamMsgData(uint8_t idx
     retValue.insert(retValue.end(), BLE_DEVICE_ADDR_LEN, 0x00); // peer_address
     retValue.push_back(0x00); // advertising_filter_poliy
     retValue.push_back(settings.GetTxPower()); // advertising_tx_power
-    retValue.push_back(settings.GetPrimaryPhy()); // primary_advertising_phy
+    retValue.push_back(settings.GetPrimaryPhy()); // primaryAdvertisingPhy
     retValue.push_back(0x00); // secondary_advertising_max_skip
-    retValue.push_back(settings.GetSecondaryPhy()); // secondary_advertising_phy
+    retValue.push_back(settings.GetSecondaryPhy()); // secondaryAdvertisingPhy
     retValue.push_back(0x01); // advertising_sid
-    retValue.push_back(0x00); // scan_request_notification_enable
+    retValue.push_back(0x00); // scanRequestNotificationEnable
     AppendDataToByteArray(duration, BLE_DATA_LEN_2, retValue);
     return retValue;
 }
@@ -967,7 +967,7 @@ std::vector<uint8_t> BleCentralManagerImpl::impl::GetAdvDataMsgData(uint8_t idx,
     std::vector<uint8_t> retValue {};
     AppendUuidToByteArray(uuid, retValue);
     retValue.push_back(0x01); // 1 byte filter item num. default value 1
-    retValue.push_back(idx); // 1 byte filter_index
+    retValue.push_back(idx); // 1 byte filterIndex
     retValue.push_back(advHandle); // 1 byte advertising handle
     retValue.push_back(0x03); // operation 3--COMPLETE
     retValue.push_back(0x01); // fragmen_preference,
@@ -990,7 +990,7 @@ std::vector<uint8_t> BleCentralManagerImpl::impl::GetRespDataMsgData(uint8_t idx
     std::vector<uint8_t> retValue {};
     AppendUuidToByteArray(uuid, retValue);
     retValue.push_back(0x01); // 1 byte filter item num. default value 1
-    retValue.push_back(idx); // 1 byte filter_index
+    retValue.push_back(idx); // 1 byte filterIndex
     retValue.push_back(advHandle); // 1 byte advertising handle
     retValue.push_back(0x03); // operation 3--COMPLETE
     retValue.push_back(0x01); // fragmen_preference,
@@ -1004,7 +1004,7 @@ std::vector<uint8_t> BleCentralManagerImpl::impl::GetUuidDataMsgData(uint8_t idx
 {
     std::vector<uint8_t> retValue {};
     AppendUuidToByteArray(uuid, retValue);
-    retValue.push_back(idx); // 1 byte filter_index
+    retValue.push_back(idx); // 1 byte filterIndex
     return retValue;
 }
 
@@ -1013,7 +1013,7 @@ std::vector<uint8_t> BleCentralManagerImpl::impl::GetAdvDeviceInfoMsgData(uint8_
 {
     std::vector<uint8_t> retValue {};
     retValue.push_back(0x01); // 1 byte filter item num. default value 1
-    retValue.push_back(idx); // 1 byte filter_index
+    retValue.push_back(idx); // 1 byte filterIndex
     retValue.push_back(infoImpls.size());
     for (auto info : infoImpls) {
         retValue.insert(retValue.end(), info.deviceId.begin(), info.deviceId.end());

@@ -372,7 +372,7 @@ PanNetworkManager &PanStateMachine::GetPanNetworkManager()
 void PanStateMachine::ProcessConnectReqEvent(const PanMessage &msg)
 {
     CHECK_AND_RETURN_LOG(panServiceImpl_, "panServiceImpl_ is nullptr");
-    btpan_interface_t* panInterface = panServiceImpl_->GetPanInterface();
+    BtpanInterface* panInterface = panServiceImpl_->GetPanInterface();
     if (panInterface == nullptr) {
         HILOGE("panInterface is nullptr.");
         return;
@@ -380,7 +380,7 @@ void PanStateMachine::ProcessConnectReqEvent(const PanMessage &msg)
     bluetooth::RawAddress device(address_);
     STACK::RawAddress rawAddr = bluetooth::ServiceUtil::AddrToStack(device);
     HILOGI("Connect address[%{public}s]", bluetooth::GetEncryptAddr(address_).c_str());
-    bt_status_t status = panInterface->connect(&rawAddr, LOCAL_PANU_ROLE, REMOTE_NAP_ROLE);
+    BtStackStatus status = panInterface->connect(&rawAddr, LOCAL_PANU_ROLE, REMOTE_NAP_ROLE);
     if (status != BT_STATUS_SUCCESS && status != BT_STATUS_BUSY) {
         HILOGE("Failed connect pan channel, status: %{public}d", status);
         return;
@@ -390,7 +390,7 @@ void PanStateMachine::ProcessConnectReqEvent(const PanMessage &msg)
 void PanStateMachine::ProcessCloseReqEvent(const PanMessage &msg)
 {
     CHECK_AND_RETURN_LOG(panServiceImpl_, "panServiceImpl_ is nullptr");
-    btpan_interface_t* panInterface = panServiceImpl_->GetPanInterface();
+    BtpanInterface* panInterface = panServiceImpl_->GetPanInterface();
     if (panInterface == nullptr) {
         HILOGE("panInterface is nullptr.");
         return;
@@ -398,7 +398,7 @@ void PanStateMachine::ProcessCloseReqEvent(const PanMessage &msg)
     bluetooth::RawAddress device(address_);
     STACK::RawAddress rawAddr = bluetooth::ServiceUtil::AddrToStack(device);
     HILOGI("Disconnect address[%{public}s]", bluetooth::GetEncryptAddr(address_).c_str());
-    bt_status_t status = panInterface->disconnect(&rawAddr);
+    BtStackStatus status = panInterface->disconnect(&rawAddr);
     if (status != BT_STATUS_SUCCESS && status != BT_STATUS_BUSY) {
         HILOGE("Failed disconnect pan channel, status: %{public}d", status);
         return;

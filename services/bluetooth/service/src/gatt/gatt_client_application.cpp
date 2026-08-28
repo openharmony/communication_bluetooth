@@ -46,7 +46,7 @@ namespace bluetooth {
 using namespace OHOS::Bluetooth;
 
 GattClientApplication::GattClientApplication(
-    int clientIf, const btgatt_client_interface_t *interface, const GattDevice &device,
+    int clientIf, const BtgattClientInterface *interface, const GattDevice &device,
     std::weak_ptr<IGattClientCallback> callback)
     : clientIf_(clientIf),
       connState_(static_cast<int>(BTConnectState::DISCONNECTED)),
@@ -66,7 +66,7 @@ GattClientApplication::~GattClientApplication()
 {
     HILOGI("~GattClientApplication");
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->unregister_client(clientIf_);
+        int ret = btIfGattClient_->unregisterClient(clientIf_);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("unregister client failed, ret: %{public}d", ret);
         }
@@ -255,7 +255,7 @@ void GattClientApplication::DiscoveryServices(void)
     }
 
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->search_service(connId_, nullptr);
+        int ret = btIfGattClient_->searchService(connId_, nullptr);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnServicesDiscovered, GattStatus::GATT_FAILURE);
@@ -263,7 +263,7 @@ void GattClientApplication::DiscoveryServices(void)
     }
 }
 
-void GattClientApplication::GetGattDbCallback(int connId, const btgatt_db_element_t *db, int count)
+void GattClientApplication::GetGattDbCallback(int connId, const BtgattDbElement *db, int count)
 {
     if (connId != connId_) {
         return;
@@ -278,30 +278,30 @@ void GattClientApplication::GetGattDbCallback(int connId, const btgatt_db_elemen
     }
     // Convert db to gatt services
     std::vector<Service> svc;
-    const btgatt_db_element_t *p = db;
-    const btgatt_db_element_t *end = db + count;
+    const BtgattDbElement *p = db;
+    const BtgattDbElement *end = db + count;
     while (p < end) {
         Uuid uuid = p->uuid;
         int perm = p->permissions;
 #ifdef BLUETOOTH_WATCH_ENABLE
         if (uuid.ToString().compare(CONTROL_POINT_UUID) == 0) {
-            std::string handle = std::to_string(p->attribute_handle);
+            std::string handle = std::to_string(p->attributeHandle);
             WatchService::GetInstance()->BluetoothDataShareUpdate(STATUS_SETTING_MODE_URI, CONTROL_POINT_KEY, handle);
         } else if (uuid.ToString().compare(NOTIFICATION_SOURCE_UUID) == 0) {
-            std::string handle = std::to_string(p->attribute_handle);
+            std::string handle = std::to_string(p->attributeHandle);
             WatchService::GetInstance()->BluetoothDataShareUpdate(STATUS_SETTING_MODE_URI,
                 NOTIFICATION_SOURCE_KEY, handle);
         } else if (uuid.ToString().compare(DATA_SOURCE_UUID) == 0) {
-            std::string handle = std::to_string(p->attribute_handle);
+            std::string handle = std::to_string(p->attributeHandle);
             WatchService::GetInstance()->BluetoothDataShareUpdate(STATUS_SETTING_MODE_URI, DATA_SOURCE_KEY, handle);
         }
 #endif
         if ((p->type == BTGATT_DB_PRIMARY_SERVICE) || (p->type == BTGATT_DB_SECONDARY_SERVICE)) {
-            svc.push_back({uuid, p->attribute_handle, p->start_handle, p->end_handle});
+            svc.push_back({uuid, p->attributeHandle, p->startHandle, p->endHandle});
         } else if (p->type == BTGATT_DB_CHARACTERISTIC) {
-            svc.back().characteristics_.push_back({uuid, p->attribute_handle, p->properties, perm, nullptr, 0});
+            svc.back().characteristics_.push_back({uuid, p->attributeHandle, p->properties, perm, nullptr, 0});
         } else if (p->type == BTGATT_DB_DESCRIPTOR) {
-            svc.back().characteristics_.back().descriptors_.push_back({uuid, p->attribute_handle, perm, nullptr, 0});
+            svc.back().characteristics_.back().descriptors_.push_back({uuid, p->attributeHandle, perm, nullptr, 0});
         } else if (p->type == BTGATT_DB_INCLUDED_SERVICE) {
             HILOGE("Unsupported now");
         }
@@ -316,7 +316,7 @@ void GattClientApplication::GetGattDbCallback(int connId, const btgatt_db_elemen
 void GattClientApplication::GetGattDatabase(int connId)
 {
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->get_gatt_db(connId);
+        int ret = btIfGattClient_->getGattDb(connId);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed to get gatt db, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnServicesDiscovered, GattStatus::GATT_FAILURE);
@@ -330,14 +330,14 @@ std::vector<Service> GattClientApplication::GetServices(void)
     return gattDb_;
 }
 
-void GattClientApplication::ReadCharacteristicCallback(int connId, int status, btgatt_read_params_t *pData)
+void GattClientApplication::ReadCharacteristicCallback(int connId, int status, BtgattReadParams *pData)
 {
     if (connId != connId_) {
         return;
     }
-    HILOGI("connId: %{public}d, status: %{public}d, handle: %{public}#x, value_type: %{public}u,"
+    HILOGI("connId: %{public}d, status: %{public}d, handle: %{public}#x, valueType: %{public}u,"
         "value_status: %{public}u, value_len: %{public}u",
-        connId, status, pData->handle, pData->value_type, pData->status, pData->value.len);
+        connId, status, pData->handle, pData->valueType, pData->status, pData->value.len);
 
     auto value = GattServiceBase::BuildGattValue(pData->value.value, pData->value.len);
     std::shared_ptr<GattClientApplication> applicationPtr = shared_from_this();
@@ -357,7 +357,7 @@ void GattClientApplication::ReadCharacteristicCallback(int connId, int status, b
 void GattClientApplication::ReadCharacteristic(uint16_t handle)
 {
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->read_characteristic(connId_, handle, GATT_AUTH_REQ_NONE);
+        int ret = btIfGattClient_->readCharacteristic(connId_, handle, GATT_AUTH_REQ_NONE);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnCharacteristicRead, GattStatus::GATT_FAILURE, Characteristic(handle));
@@ -368,7 +368,7 @@ void GattClientApplication::ReadCharacteristic(uint16_t handle)
 void GattClientApplication::ReadCharacteristicByUuid(const Uuid &uuid, int32_t startHandle, int32_t endHandle)
 {
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->read_using_characteristic_uuid(connId_, uuid,
+        int ret = btIfGattClient_->readUsingCharacteristicUuid(connId_, uuid,
             startHandle, endHandle, GATT_AUTH_REQ_NONE);
         if (ret != BT_STATUS_SUCCESS) {
             WPTR_CBACK(callback_, OnCharacteristicRead, GattStatus::GATT_FAILURE,
@@ -379,7 +379,7 @@ void GattClientApplication::ReadCharacteristicByUuid(const Uuid &uuid, int32_t s
 }
 
 void GattClientApplication::WriteCharacteristicCallback(int connId, int status, uint16_t handle,
-    const btgatt_rsp_params_t &rspContext)
+    const BtgattRspParams &rspContext)
 {
     if (connId != connId_) {
         return;
@@ -408,7 +408,7 @@ bool GattClientApplication::WriteCharacteristicInner(uint16_t handle, int writeT
     bool ok = true;
     cacheValue_ = value;
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->write_characteristic(connId_, handle, writeType, authReq, std::move(value));
+        int ret = btIfGattClient_->writeCharacteristic(connId_, handle, writeType, authReq, std::move(value));
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnCharacteristicWrite, GattStatus::GATT_FAILURE, Characteristic(handle),
@@ -438,14 +438,14 @@ void GattClientApplication::WriteCharacteristicNoRespond(uint16_t handle, std::v
     }
 }
 
-void GattClientApplication::ReadDescriptorCallback(int connId, int status, const btgatt_read_params_t &data)
+void GattClientApplication::ReadDescriptorCallback(int connId, int status, const BtgattReadParams &data)
 {
     if (connId != connId_) {
         return;
     }
-    HILOGI("connId: %{public}d, status: %{public}d, handle: %{public}#x, value_type: %{public}u,"
+    HILOGI("connId: %{public}d, status: %{public}d, handle: %{public}#x, valueType: %{public}u,"
         "value_status: %{public}u, value_len: %{public}u",
-        connId, status, data.handle, data.value_type, data.status, data.value.len);
+        connId, status, data.handle, data.valueType, data.status, data.value.len);
 
     auto value = GattServiceBase::BuildGattValue(data.value.value, data.value.len);
     std::shared_ptr<GattClientApplication> applicationPtr = shared_from_this();
@@ -465,7 +465,7 @@ void GattClientApplication::ReadDescriptorCallback(int connId, int status, const
 void GattClientApplication::ReadDescriptor(uint16_t handle)
 {
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->read_descriptor(connId_, handle, GATT_AUTH_REQ_NONE);
+        int ret = btIfGattClient_->readDescriptor(connId_, handle, GATT_AUTH_REQ_NONE);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnDescriptorRead, GattStatus::GATT_FAILURE, Descriptor(handle));
@@ -490,7 +490,7 @@ void GattClientApplication::WriteDescriptorCallback(int connId, int status, uint
 
 bool GattClientApplication::HandleWriteCharacteristic(int ret, int connId, uint16_t handle, int authReq)
 {
-    ret = btIfGattClient_->write_characteristic(connId, handle, STACK::GATT_WRITE, authReq, cacheValue_);
+    ret = btIfGattClient_->writeCharacteristic(connId, handle, STACK::GATT_WRITE, authReq, cacheValue_);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("failed, ret: %{public}d", ret);
         WPTR_CBACK(callback_, OnCharacteristicWrite, GattStatus::GATT_FAILURE, Characteristic(handle),
@@ -509,7 +509,7 @@ bool GattClientApplication::CheckAuthentication(int connId, int status, uint16_t
         int ret = BT_STATUS_NOT_READY;
         switch (gattType) {
             case GATT_TYPE_READ_CHARACTERISTIC:
-                ret = btIfGattClient_->read_characteristic(connId, handle, authReq);
+                ret = btIfGattClient_->readCharacteristic(connId, handle, authReq);
                 if (ret != BT_STATUS_SUCCESS) {
                     HILOGE("failed, ret: %{public}d", ret);
                     WPTR_CBACK(callback_, OnCharacteristicRead, GattStatus::GATT_FAILURE, Characteristic(handle));
@@ -517,7 +517,7 @@ bool GattClientApplication::CheckAuthentication(int connId, int status, uint16_t
                 }
                 break;
             case GATT_TYPE_READ_DESCRIPTOR:
-                ret = btIfGattClient_->read_descriptor(connId, handle, authReq);
+                ret = btIfGattClient_->readDescriptor(connId, handle, authReq);
                 if (ret != BT_STATUS_SUCCESS) {
                     HILOGE("failed, ret: %{public}d", ret);
                     WPTR_CBACK(callback_, OnDescriptorRead, GattStatus::GATT_FAILURE, Descriptor(handle));
@@ -530,7 +530,7 @@ bool GattClientApplication::CheckAuthentication(int connId, int status, uint16_t
                 }
                 break;
             case GATT_TYPE_WRITE_DESCRIPTOR:
-                ret = btIfGattClient_->write_descriptor(connId, handle, authReq, cacheValue_);
+                ret = btIfGattClient_->writeDescriptor(connId, handle, authReq, cacheValue_);
                 if (ret != BT_STATUS_SUCCESS) {
                     HILOGE("failed, ret: %{public}d", ret);
                     WPTR_CBACK(callback_, OnDescriptorWrite, GattStatus::GATT_FAILURE, Descriptor(handle));
@@ -554,7 +554,7 @@ void GattClientApplication::WriteDescriptor(uint16_t handle, const std::vector<u
     cacheValue_ = value;
     // Send write descriptor packet to the peer device.
     if (btIfGattClient_) {
-        ret = btIfGattClient_->write_descriptor(connId_, handle, GATT_AUTH_REQ_NONE, value);
+        ret = btIfGattClient_->writeDescriptor(connId_, handle, GATT_AUTH_REQ_NONE, value);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnDescriptorWrite, GattStatus::GATT_FAILURE, Descriptor(handle));
@@ -573,10 +573,10 @@ int GattClientApplication::RequestNotification(uint16_t characteristicHandle, bo
     int ret = BT_STATUS_FAIL;
     if (btIfGattClient_) {
         if (enable) {
-            ret = btIfGattClient_->register_for_notification(
+            ret = btIfGattClient_->registerForNotification(
                 clientIf_, ServiceUtil::AddrToStack(addr_), characteristicHandle);
         } else {
-            ret = btIfGattClient_->deregister_for_notification(
+            ret = btIfGattClient_->deregisterForNotification(
                 clientIf_, ServiceUtil::AddrToStack(addr_), characteristicHandle);
         }
     }
@@ -601,14 +601,14 @@ void GattClientApplication::ConfigureMtuCallback(int connId, int status, int mtu
 void GattClientApplication::RequestExchangeMtu(int mtu)
 {
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->configure_mtu(connId_, mtu);
+        int ret = btIfGattClient_->configureMtu(connId_, mtu);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
         }
     }
 }
 
-void GattClientApplication::NotifyCallback(int connId, const btgatt_notify_params_t &data)
+void GattClientApplication::NotifyCallback(int connId, const BtgattNotifyParams &data)
 {
     if (connId != connId_) {
         return;
@@ -657,7 +657,7 @@ void GattClientApplication::RequestConnectionPriority(int connPriority)
     }
 
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->conn_parameter_update(
+        int ret = btIfGattClient_->connParameterUpdate(
             ServiceUtil::AddrToStack(addr_),
             GetBleMinConnectionInterval(connPriority),
             GetBleMaxConnectionInterval(connPriority),
@@ -755,7 +755,7 @@ int GattClientApplication::GetBleConnectionSupervisionTimeout(int connPriority)
 void GattClientApplication::ReadRemoteRssiValue(int appId)
 {
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->read_remote_rssi(appId, ServiceUtil::AddrToStack(addr_));
+        int ret = btIfGattClient_->readRemoteRssi(appId, ServiceUtil::AddrToStack(addr_));
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnReadRemoteRssiValue, addr_, 0, GattStatus::GATT_FAILURE);
@@ -793,7 +793,7 @@ void GattClientApplication::SetPhy(int32_t txPhy, int32_t rxPhy, int32_t phyOpti
     int rxPhyMask = ConvertToBlePhyMask(rxPhy);
 
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->set_preferred_phy(
+        int ret = btIfGattClient_->setPreferredPhy(
             ServiceUtil::AddrToStack(addr_), txPhyMask, rxPhyMask, phyOptions);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
@@ -812,7 +812,7 @@ void GattClientApplication::ReadPhyCallback(uint8_t txPhy, uint8_t rxPhy, uint8_
 void GattClientApplication::ReadPhy(void)
 {
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->read_phy(ServiceUtil::AddrToStack(addr_),
+        int ret = btIfGattClient_->readPhy(ServiceUtil::AddrToStack(addr_),
                 [this](uint8_t txPhy, uint8_t rxPhy, uint8_t status) { ReadPhyCallback(txPhy, rxPhy, status); });
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);

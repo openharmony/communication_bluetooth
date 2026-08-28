@@ -356,14 +356,14 @@ void BluetoothFastScanManager::OnForegroundApplicationChanged(const AppExecFwk::
     isWhiteApp_ = isWhiteApp;
     UpdateFastScanMode();
 
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int status = hal_util_load_bt_library(&btInterface);
     if (status || btInterface == nullptr) {
         HILOGE("Failed to open the Bluetooth module, status = %{public}d. ", status);
         return;
     }
-    const bthwif_interface_t *bthwif =
-        reinterpret_cast<const bthwif_interface_t*>(btInterface->get_profile_interface(BT_VENDER_INTERFACE_ID));
+    const BthwifInterface *bthwif =
+        reinterpret_cast<const BthwifInterface*>(btInterface->getProfileInterface(BT_VENDER_INTERFACE_ID));
     if (bthwif == nullptr) {
         HILOGE("bthwif is nullptr");
         return;
@@ -397,14 +397,14 @@ void BluetoothFastScanManager::HandleForegroundAppInfoAfterBtOn()
 
     AppCategory type = GetForegroundAppType(apps[0].bundleName, apps);
     HILOGE("foreground app:%{public}s type:%{public}d", apps[0].bundleName.c_str(), static_cast<int>(type));
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int status = hal_util_load_bt_library(&btInterface);
     if (status || btInterface == nullptr) {
         HILOGE("Failed to open the Bluetooth module, status = %{public}d. ", status);
         return;
     }
-    const bthwif_interface_t *bthwif =
-        reinterpret_cast<const bthwif_interface_t*>(btInterface->get_profile_interface(BT_VENDER_INTERFACE_ID));
+    const BthwifInterface *bthwif =
+        reinterpret_cast<const BthwifInterface*>(btInterface->getProfileInterface(BT_VENDER_INTERFACE_ID));
     if (bthwif == nullptr) {
         HILOGE("bthwif is nullptr");
         return;
@@ -570,7 +570,7 @@ void BluetoothFastScanManager::SetFastScan(bool isEnable)
     }
 
     HILOGD("isEnable: %{public}d. ", isEnable);
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int status = hal_util_load_bt_library(&btInterface);
     if (status) {
         HILOGE("Failed to open the Bluetooth module, status = %{public}d. ", status);
@@ -580,7 +580,7 @@ void BluetoothFastScanManager::SetFastScan(bool isEnable)
         HILOGE("get btInterface failed!");
         return;
     }
-    btInterface->enable_fast_scan(isEnable);
+    btInterface->enableFastScan(isEnable);
     isFastScanEnabled_ = isEnable;
 }
 

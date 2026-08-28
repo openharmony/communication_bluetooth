@@ -184,28 +184,28 @@ static void BatchScanThresholdCallback(int clientIf)
     }
 }
 
-static void TrackAdvEventCallback(btgatt_track_adv_info_t *advTrackInfo)
+static void TrackAdvEventCallback(BtgattTrackAdvInfo *advTrackInfo)
 {
     std::vector<uint8_t> advData{};
-    if (advTrackInfo->adv_pkt_len > 0) {
-        advData.insert(advData.begin(), advTrackInfo->p_adv_pkt_data,
-            advTrackInfo->p_adv_pkt_data + advTrackInfo->adv_pkt_len);
+    if (advTrackInfo->advPktLen > 0) {
+        advData.insert(advData.begin(), advTrackInfo->pAdvPktData,
+            advTrackInfo->pAdvPktData + advTrackInfo->advPktLen);
     }
-    if (advTrackInfo->scan_rsp_len > 0) {
-        advData.insert(advData.begin() + advTrackInfo->adv_pkt_len, advTrackInfo->p_scan_rsp_data,
-            advTrackInfo->p_scan_rsp_data + advTrackInfo->scan_rsp_len);
+    if (advTrackInfo->scanRspLen > 0) {
+        advData.insert(advData.begin() + advTrackInfo->advPktLen, advTrackInfo->pScanRspData,
+            advTrackInfo->pScanRspData + advTrackInfo->scanRspLen);
     }
 
     TrackAdvBaseInfo info{
-        advTrackInfo->client_if,
-        advTrackInfo->advertiser_state,
-        advTrackInfo->addr_type,
-        advTrackInfo->rssi_value,
+        advTrackInfo->clientIf,
+        advTrackInfo->advertiserState,
+        advTrackInfo->addrType,
+        advTrackInfo->rssiValue,
     };
 
     if (g_scannerObservers) {
         g_scannerObservers->ForEach(
-            [info, addr = advTrackInfo->bd_addr, advData](ScannerObserver &observer) {
+            [info, addr = advTrackInfo->bdAddr, advData](ScannerObserver &observer) {
             observer.TrackAdvFoundLostCallback(info, addr, advData);
         });
     }
@@ -248,7 +248,7 @@ static void ConnectionCallback(int connId, int serverIf, int connected, const ST
         });
 }
 
-static void ServiceAddedCallback(int status, int serverIf, std::vector<btgatt_db_element_t> service)
+static void ServiceAddedCallback(int status, int serverIf, std::vector<BtgattDbElement> service)
 {
     g_gattServerObservers.ForEach([status, serverIf, service](std::weak_ptr<GattServerObserver> observer) {
         WPTR_CBACK_GATT_THREAD_SERVER_OBSERVER(observer, ServiceAddedCallback, status, serverIf, service);
@@ -418,21 +418,21 @@ static void RegisterForNotificationCallback(int connId, int registered, int stat
         });
 }
 
-static void NotifyCallback(int connId, const btgatt_notify_params_t &data)
+static void NotifyCallback(int connId, const BtgattNotifyParams &data)
 {
     g_gattClientObservers.ForEach([connId, data](std::weak_ptr<GattClientObserver> observer) {
         WPTR_CBACK_GATT_CLIENT_OBSERVER(observer, NotifyCallback, connId, data);
     });
 }
 
-static void ReadCharacteristicCallback(int connId, int status, btgatt_read_params_t *pData)
+static void ReadCharacteristicCallback(int connId, int status, BtgattReadParams *pData)
 {
     g_gattClientObservers.ForEach([connId, status, pData](std::weak_ptr<GattClientObserver> observer) {
         WPTR_CBACK_GATT_CLIENT_OBSERVER(observer, ReadCharacteristicCallback, connId, status, pData);
     });
 }
 
-static void WriteCharacteristicCallback(int connId, int status, uint16_t handle, const btgatt_rsp_params_t &rspContext)
+static void WriteCharacteristicCallback(int connId, int status, uint16_t handle, const BtgattRspParams &rspContext)
 {
     g_gattClientObservers.ForEach([connId, status, handle, rspContext](std::weak_ptr<GattClientObserver> observer) {
         WPTR_CBACK_GATT_THREAD_CLIENT_OBSERVER(observer, WriteCharacteristicCallback, connId, status, handle,
@@ -440,7 +440,7 @@ static void WriteCharacteristicCallback(int connId, int status, uint16_t handle,
     });
 }
 
-static void ReadDescriptorCallback(int connId, int status, const btgatt_read_params_t &data)
+static void ReadDescriptorCallback(int connId, int status, const BtgattReadParams &data)
 {
     g_gattClientObservers.ForEach([connId, status, data](std::weak_ptr<GattClientObserver> observer) {
         WPTR_CBACK_GATT_CLIENT_OBSERVER(observer, ReadDescriptorCallback, connId, status, data);
@@ -475,7 +475,7 @@ static void ReadRemoteRssiValueCallback(int clientIf, const STACK::RawAddress &b
     });
 }
 
-static void GetGattDbCallback(int connId, const btgatt_db_element_t *db, int count)
+static void GetGattDbCallback(int connId, const BtgattDbElement *db, int count)
 {
     g_gattClientObservers.ForEach([connId, db, count](std::weak_ptr<GattClientObserver> observer) {
         WPTR_CBACK_GATT_CLIENT_OBSERVER(observer, GetGattDbCallback, connId, db, count);
@@ -489,7 +489,7 @@ static void ServicesRemovedCallback(int connId, uint16_t startHandle, uint16_t e
     });
 }
 
-static void ServicesAddedCallback(int connId, const btgatt_db_element_t &added, int addedCount)
+static void ServicesAddedCallback(int connId, const BtgattDbElement &added, int addedCount)
 {
     g_gattClientObservers.ForEach([connId, added, addedCount](std::weak_ptr<GattClientObserver> observer) {
         WPTR_CBACK_GATT_CLIENT_OBSERVER(observer, ServicesAddedCallback, connId, added, addedCount);
@@ -522,14 +522,14 @@ static void ClientPhyUpdatedCallback(int connId, uint8_t txPhy, uint8_t rxPhy, u
         });
 }
 
-static const btgatt_scanner_callbacks_t g_gattScannerCallbacks = {
+static const BtgattScannerCallbacks g_gattScannerCallbacks = {
     ScanResultCallback,
     BatchScanReportCallback,  // batchscan_reports_cb
     BatchScanThresholdCallback,  // batchscan_threshold_cb
     TrackAdvEventCallback,  // track_adv_event_cb
 };
 
-static const btgatt_server_callbacks_t g_gattServerCallbacks = {
+static const BtgattServerCallbacks g_gattServerCallbacks = {
     RegisterServerCallback,
     ConnectionCallback,
     ServiceAddedCallback,
@@ -548,7 +548,7 @@ static const btgatt_server_callbacks_t g_gattServerCallbacks = {
     ServerConnUpdatedCallback,
 };
 
-static const btgatt_client_callbacks_t g_gattClientCallbacks = {
+static const BtgattClientCallbacks g_gattClientCallbacks = {
     RegisterClientCallback,
     ConnectCallback,
     DisconnectCallback,
@@ -572,20 +572,20 @@ static const btgatt_client_callbacks_t g_gattClientCallbacks = {
     ServicesChangedCallback,  // service_changed_cb
 };
 
-static const btgatt_callbacks_t g_GattCallbacks = {
-    sizeof(btgatt_callbacks_t), &g_gattClientCallbacks, &g_gattServerCallbacks,
+static const BtgattCallbacks g_GattCallbacks = {
+    sizeof(BtgattCallbacks), &g_gattClientCallbacks, &g_gattServerCallbacks,
     &g_gattScannerCallbacks,
 };
 
-bool BluetoothGattInterface::Initialize(const btgatt_interface_t *gattInterface)
+bool BluetoothGattInterface::Initialize(const BtgattInterface *gattInterface)
 {
     if (!gattInterface) {
         HILOGE("gattInterface is nullptr");
         return false;
     }
-    bt_status_t status = gattInterface->init(&g_GattCallbacks);
+    BtStackStatus status = gattInterface->init(&g_GattCallbacks);
     if (status != BT_STATUS_SUCCESS) {
-        HILOGE("Failed to init gatt interface, (%{public}s)", bt_status_text(status).c_str());
+        HILOGE("Failed to init gatt interface, (%{public}s)", BtStatusText(status).c_str());
         return false;
     }
 

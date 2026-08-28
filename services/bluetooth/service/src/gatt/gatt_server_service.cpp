@@ -118,7 +118,7 @@ GattServerService::GattServerService()
 GattServerService::~GattServerService()
 {}
 
-void GattServerService::SetBtifInterface(const btgatt_server_interface_t *interface)
+void GattServerService::SetBtifInterface(const BtgattServerInterface *interface)
 {
     btIfGattServer_ = interface;
 }
@@ -232,7 +232,7 @@ int GattServerService::RegisterApplication(std::weak_ptr<IGattServerCallback> ca
     }
     // Open stack currently exports an empty btgattServerInterface (all nullptrs).
     // SoftBus/others register immediately after BLE ON; calling null register_server SEGV.
-    if (btIfGattServer_ == nullptr || btIfGattServer_->register_server == nullptr) {
+    if (btIfGattServer_ == nullptr || btIfGattServer_->registerServer == nullptr) {
         HILOGE("GATT server interface unavailable");
         return GattStatus::REQUEST_NOT_SUPPORT;
     }
@@ -251,7 +251,7 @@ int GattServerService::RegisterApplication(std::weak_ptr<IGattServerCallback> ca
         // enter inner thread
         using std::placeholders::_1;
         using std::placeholders::_2;
-        if (btIfGattServer_ == nullptr || btIfGattServer_->register_server == nullptr) {
+        if (btIfGattServer_ == nullptr || btIfGattServer_->registerServer == nullptr) {
             HILOGE("GATT server interface unavailable");
             promise->set_value(GattStatus::REQUEST_NOT_SUPPORT);
             return;
@@ -261,7 +261,7 @@ int GattServerService::RegisterApplication(std::weak_ptr<IGattServerCallback> ca
         BluetoothGattInterface::GetInstance()->AddGattServerObserver(obs);
 
         auto appUuid = Uuid::Random();
-        int ret = btIfGattServer_->register_server(appUuid, false);
+        int ret = btIfGattServer_->registerServer(appUuid, false);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("register server failed, ret: %{public}d", ret);
             promise->set_value(GattStatus::GATT_FAILURE);

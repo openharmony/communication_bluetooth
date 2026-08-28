@@ -203,7 +203,7 @@ void BtChrUpdateChipInfo(const std::string& peerAddr, int btVersion, int btSubVe
     deviceInfo.btSubVersion = btSubVersion;
     deviceInfo.chipCompanyId = chipCompanyId;
     g_btChrDeviceInfoMap.EnsureInsert(addr, deviceInfo);
-    HILOGD("peerAddr: %{public}s version %{public}d sub_ver %{public}d manufacturer %{public}d",
+    HILOGD("peerAddr: %{public}s version %{public}d subVer %{public}d manufacturer %{public}d",
         GET_ENCRYPT_ADDR(peerAddr), btVersion, btSubVersion, chipCompanyId);
 }
 

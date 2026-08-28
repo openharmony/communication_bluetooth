@@ -43,7 +43,7 @@ static const uint32_t LPDEVICE_CAPABILITY_GATT_COLLABORATION_ENABLED = 0x0000000
 
 void SetLpDeviceBleBufferSizeAndCount()
 {
-    const bthwif_interface_t *hwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *hwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     if (hwif == nullptr) {
         HILOGE("bthwif is null");
         return;
@@ -56,7 +56,7 @@ void SetLpDeviceBleBufferSizeAndCount()
 
 bool SendParamsToLpDevice(const std::vector<uint8_t> &dataValue, int32_t type)
 {
-    const bthwif_interface_t *hwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *hwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     if (hwif == nullptr) {
         HILOGE("bthwInterface_ is null.");
         return false;

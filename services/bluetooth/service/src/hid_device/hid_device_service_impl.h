@@ -96,8 +96,8 @@ public:
     void SetAppState(bool isForeground);
     bool GetAppState();
 
-    static void OnAppStatusChanged(STACK::RawAddress* bd_addr, bthd_application_state_t state);
-    static void OnConnectionStateChanged(STACK::RawAddress* bd_addr, bthd_connection_state_t state);
+    static void OnAppStatusChanged(STACK::RawAddress* bdAddr, BthdApplicationState state);
+    static void OnConnectionStateChanged(STACK::RawAddress* bdAddr, BthdConnectionState state);
     static void OnGetReport(uint8_t type, uint8_t id, uint16_t buffer_size);
     static void OnInterruptDataReceived(uint8_t report_id, uint16_t len, uint8_t* p_data);
     static void OnSetProtocol(uint8_t protocol);
@@ -106,8 +106,8 @@ public:
 
 private:
 
-    static int ConvertAppStatusChangedFromStack(bthd_application_state_t status);
-    static int ConvertConnectStateFromStack(bthd_connection_state_t state);
+    static int ConvertAppStatusChangedFromStack(BthdApplicationState status);
+    static int ConvertConnectStateFromStack(BthdConnectionState state);
     void OnAppStatusChangedInner(int state);
     void OnConnectionStateChangedInner(bluetooth::RawAddress rawAddr, int state);
     void OnGetReportInner(int type, int id, uint16_t buffer_size);
@@ -122,7 +122,7 @@ private:
     std::shared_ptr<IHidDeviceObserver> hidDeviceObserver_ = nullptr;
     std::shared_ptr<HidAppStateObserver> hidAppStateObserver_ = nullptr;
     std::atomic<bool> IsAppForeground_ {true};
-    bthd_interface_t* bluetoothHidDeviceInterface = nullptr;
+    BthdInterface* bluetoothHidDeviceInterface = nullptr;
 };
 
 }  // namespace Bluetooth

@@ -32,7 +32,7 @@ using namespace OHOS::bluetooth;
 
 static HidDeviceServiceImpl *g_serviceImpl = nullptr;
 
-bthd_callbacks_t sBluetoothHidDeviceCallbacks = {
+BthdCallbacks sBluetoothHidDeviceCallbacks = {
     sizeof(sBluetoothHidDeviceCallbacks),
     HidDeviceServiceImpl::OnAppStatusChanged,
     HidDeviceServiceImpl::OnConnectionStateChanged,
@@ -199,16 +199,16 @@ HidDeviceServiceImpl::HidDeviceServiceImpl()
     if (hidAppStateObserver_ != nullptr) {
         hidAppStateObserver_->SubscribeHidAppState();
     }
-    bt_interface_t* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
+    BtInterface* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
     if (bluetoothInterface == nullptr) {
         return;
     }
-    bluetoothHidDeviceInterface = reinterpret_cast<bthd_interface_t*>(
-        const_cast<void *>(bluetoothInterface->get_profile_interface(BT_PROFILE_HIDDEV_ID)));
+    bluetoothHidDeviceInterface = reinterpret_cast<BthdInterface*>(
+        const_cast<void *>(bluetoothInterface->getProfileInterface(BT_PROFILE_HIDDEV_ID)));
     if (bluetoothHidDeviceInterface == nullptr) {
         return;
     }
-    bt_status_t status = bluetoothHidDeviceInterface->init(&sBluetoothHidDeviceCallbacks);
+    BtStackStatus status = bluetoothHidDeviceInterface->init(&sBluetoothHidDeviceCallbacks);
     if (status != BT_STATUS_SUCCESS) {
         HILOGI("[HID_SERVICE]Failed to initialize Bluetooth HID Device, status: %{public}d", status);
         return;
@@ -307,7 +307,7 @@ int HidDeviceServiceImpl::UnregisterHidDevice()
         HILOGE("HidDeviceServiceImpl: bluetoothHidInterface is null");
         return BT_ERR_INTERNAL_ERROR;
     }
-    bt_status_t ret = bluetoothHidDeviceInterface->unregister_app();
+    BtStackStatus ret = bluetoothHidDeviceInterface->unregisterApp();
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("Failed to UnregisterHidDevice, status: %{public}d", ret);
     }
@@ -322,7 +322,7 @@ int32_t HidDeviceServiceImpl::SendReport(int id, const std::vector<uint8_t> &dat
     }
     uint16_t length = static_cast<uint16_t>(data.size());
     uint8_t *pData = const_cast<uint8_t*>(data.data());
-    bt_status_t ret = bluetoothHidDeviceInterface->send_report(BTHD_REPORT_TYPE_INTRDATA, id, length, pData);
+    BtStackStatus ret = bluetoothHidDeviceInterface->sendReport(BTHD_REPORT_TYPE_INTRDATA, id, length, pData);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("Failed to SendReport, status: %{public}d", ret);
     }
@@ -338,8 +338,8 @@ int32_t HidDeviceServiceImpl::ReplyReport(uint8_t type, int id, const std::vecto
 
     uint16_t length = static_cast<uint16_t>(data.size());
     uint8_t *pData = const_cast<uint8_t*>(data.data());
-    bt_status_t ret = bluetoothHidDeviceInterface->send_report(
-        static_cast<bthd_report_type_t>(type), id, length, pData);
+    BtStackStatus ret = bluetoothHidDeviceInterface->sendReport(
+        static_cast<BthdReportType>(type), id, length, pData);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("Failed to ReplyReport, status: %{public}d", ret);
     }
@@ -352,7 +352,7 @@ int32_t HidDeviceServiceImpl::ReportError(uint8_t type)
         HILOGE("HidDeviceServiceImpl: bluetoothHidInterface is null");
         return BT_ERR_INTERNAL_ERROR;
     }
-    bt_status_t ret = bluetoothHidDeviceInterface->report_error(type);
+    BtStackStatus ret = bluetoothHidDeviceInterface->reportError(type);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("Failed to ReportError, status: %{public}d", ret);
     }
@@ -380,7 +380,7 @@ void HidDeviceServiceImpl::SetAppState(bool isForeground)
     IsAppForeground_.store(isForeground);
 }
 
-int HidDeviceServiceImpl::ConvertAppStatusChangedFromStack(bthd_application_state_t state)
+int HidDeviceServiceImpl::ConvertAppStatusChangedFromStack(BthdApplicationState state)
 {
     if (state == BTHD_APP_STATE_NOT_REGISTERED) {
         return HID_DEVICE_APP_STATE_NOT_REGISTERED;
@@ -391,7 +391,7 @@ int HidDeviceServiceImpl::ConvertAppStatusChangedFromStack(bthd_application_stat
     return HID_DEVICE_APP_STATE_NOT_REGISTERED;
 }
 
-int HidDeviceServiceImpl::ConvertConnectStateFromStack(bthd_connection_state_t state)
+int HidDeviceServiceImpl::ConvertConnectStateFromStack(BthdConnectionState state)
 {
     if (state == BTHD_CONN_STATE_CONNECTING) {
         return static_cast<int>(BTConnectState::CONNECTING);
@@ -454,21 +454,21 @@ void HidDeviceServiceImpl::OnVirtualCableUnplugInner()
     }
 }
 
-void HidDeviceServiceImpl::OnAppStatusChanged(STACK::RawAddress* bd_addr, bthd_application_state_t state)
+void HidDeviceServiceImpl::OnAppStatusChanged(STACK::RawAddress* bdAddr, BthdApplicationState state)
 {
     HidDeviceServiceImpl *hidDeviceServiceImpl = HidDeviceServiceImpl::GetServiceImpl();
     if (hidDeviceServiceImpl == nullptr) {
         HILOGE("hidDeviceService is null");
         return;
     }
-    if (bd_addr == nullptr) {
-        HILOGI("bd_addr is nullptr");
+    if (bdAddr == nullptr) {
+        HILOGI("bdAddr is nullptr");
     }
     int connectState = static_cast<int>(state);
     hidDeviceServiceImpl->OnAppStatusChangedInner(connectState);
 }
 
-void HidDeviceServiceImpl::OnConnectionStateChanged(STACK::RawAddress* bd_addr, bthd_connection_state_t state)
+void HidDeviceServiceImpl::OnConnectionStateChanged(STACK::RawAddress* bdAddr, BthdConnectionState state)
 {
     HidDeviceServiceImpl *hidDeviceServiceImpl = HidDeviceServiceImpl::GetServiceImpl();
     if (hidDeviceServiceImpl == nullptr) {
@@ -476,11 +476,11 @@ void HidDeviceServiceImpl::OnConnectionStateChanged(STACK::RawAddress* bd_addr, 
         return;
     }
     HILOGI("[HID_SERVICE]HidConnectState = %{public}d", state);
-    if (bd_addr == nullptr) {
-        HILOGE("bd_addr == nullptr");
+    if (bdAddr == nullptr) {
+        HILOGE("bdAddr == nullptr");
         return;
     }
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bd_addr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     int connectState = HidDeviceServiceImpl::ConvertConnectStateFromStack(state);
     HILOGI("OnConnectionStateChanged state = %{public}d", connectState);
     hidDeviceServiceImpl->OnConnectionStateChangedInner(rawAddr, connectState);
@@ -541,30 +541,30 @@ void HidDeviceServiceImpl::OnVirtualCableUnplug()
 void HidDeviceServiceImpl::ProcessRegisterHIdDeviceEvent(BluetoothHidDeviceSdp sdp,
     BluetoothHidDeviceQos inQos, BluetoothHidDeviceQos outQos)
 {
-    bthd_app_param_t appParam;
-    bthd_qos_param_t inQosParam;
-    bthd_qos_param_t outQosParam;
+    BthdAppParam appParam;
+    BthdQosParam inQosParam;
+    BthdQosParam outQosParam;
     appParam.name = sdp.name_.c_str();
     appParam.description = sdp.description_.c_str();
     appParam.provider = sdp.provider_.c_str();
     appParam.subclass = static_cast<uint8_t>(sdp.subclass_);
-    appParam.desc_list = sdp.sdpSettings_.data();
-    appParam.desc_list_len = static_cast<int>(sdp.sdpSettings_.size());
+    appParam.descList = sdp.sdpSettings_.data();
+    appParam.descListLen = static_cast<int>(sdp.sdpSettings_.size());
 
-    inQosParam.service_type = static_cast<uint8_t>(inQos.serviceType_);
-    inQosParam.token_rate = static_cast<uint32_t>(inQos.tokenRate_);
-    inQosParam.access_latency = static_cast<uint32_t>(inQos.latency_);
-    inQosParam.delay_variation = static_cast<uint32_t>(inQos.delayVariation_);
-    inQosParam.peak_bandwidth = static_cast<uint32_t>(inQos.peakBandwidth_);
-    inQosParam.token_bucket_size = static_cast<uint32_t>(inQos.tokenBucketSize_);
+    inQosParam.serviceType = static_cast<uint8_t>(inQos.serviceType_);
+    inQosParam.tokenRate = static_cast<uint32_t>(inQos.tokenRate_);
+    inQosParam.accessLatency = static_cast<uint32_t>(inQos.latency_);
+    inQosParam.delayVariation = static_cast<uint32_t>(inQos.delayVariation_);
+    inQosParam.peakBandwidth = static_cast<uint32_t>(inQos.peakBandwidth_);
+    inQosParam.tokenBucketSize = static_cast<uint32_t>(inQos.tokenBucketSize_);
 
-    outQosParam.service_type = static_cast<uint8_t>(outQos.serviceType_);
-    outQosParam.token_rate = static_cast<uint32_t>(outQos.tokenRate_);
-    outQosParam.access_latency = static_cast<uint32_t>(outQos.latency_);
-    outQosParam.delay_variation = static_cast<uint32_t>(outQos.delayVariation_);
-    outQosParam.peak_bandwidth = static_cast<uint32_t>(outQos.peakBandwidth_);
-    outQosParam.token_bucket_size = static_cast<uint32_t>(outQos.tokenBucketSize_);
-    bt_status_t ret = bluetoothHidDeviceInterface->register_app(&appParam, &inQosParam, &outQosParam);
+    outQosParam.serviceType = static_cast<uint8_t>(outQos.serviceType_);
+    outQosParam.tokenRate = static_cast<uint32_t>(outQos.tokenRate_);
+    outQosParam.accessLatency = static_cast<uint32_t>(outQos.latency_);
+    outQosParam.delayVariation = static_cast<uint32_t>(outQos.delayVariation_);
+    outQosParam.peakBandwidth = static_cast<uint32_t>(outQos.peakBandwidth_);
+    outQosParam.tokenBucketSize = static_cast<uint32_t>(outQos.tokenBucketSize_);
+    BtStackStatus ret = bluetoothHidDeviceInterface->registerApp(&appParam, &inQosParam, &outQosParam);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("Failed to initialize Bluetooth hd register, status: %{public}d", ret);
     } else {

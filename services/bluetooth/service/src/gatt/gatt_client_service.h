@@ -72,7 +72,7 @@ public:
     std::list<RawAddress> GetConnectDevices() override;
 
     // Only used in test
-    void SetBtifInterface(const btgatt_client_interface_t *interface);
+    void SetBtifInterface(const BtgattClientInterface *interface);
 
     BT_DISALLOW_COPY_AND_ASSIGN(GattClientService);
 

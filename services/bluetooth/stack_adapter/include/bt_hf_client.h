@@ -26,27 +26,27 @@
 
 #include "bt_types.h"
 
-typedef enum {
+enum BthfClientConnectionState {
     BTHF_CLIENT_CONNECTION_STATE_DISCONNECTED = 0,
     BTHF_CLIENT_CONNECTION_STATE_CONNECTING,
     BTHF_CLIENT_CONNECTION_STATE_CONNECTED,
     BTHF_CLIENT_CONNECTION_STATE_SLC_CONNECTED,
     BTHF_CLIENT_CONNECTION_STATE_DISCONNECTING,
-} bthf_client_connection_state_t;
+};
 
-typedef enum {
+enum BthfClientAudioState {
     BTHF_CLIENT_AUDIO_STATE_DISCONNECTED = 0,
     BTHF_CLIENT_AUDIO_STATE_CONNECTING,
     BTHF_CLIENT_AUDIO_STATE_CONNECTED,
     BTHF_CLIENT_AUDIO_STATE_DISCONNECTING,
-} bthf_client_audio_state_t;
+};
 
-typedef enum {
+enum BthfClientVrState {
     BTHF_CLIENT_VR_STATE_STOPPED = 0,
     BTHF_CLIENT_VR_STATE_STARTED,
-} bthf_client_vr_state_t;
+};
 
-typedef enum {
+enum BthfClientCallState {
     BTHF_CLIENT_CALL_STATE_ACTIVE = 0,
     BTHF_CLIENT_CALL_STATE_HELD,
     BTHF_CLIENT_CALL_STATE_DIALING,
@@ -54,9 +54,9 @@ typedef enum {
     BTHF_CLIENT_CALL_STATE_INCOMING,
     BTHF_CLIENT_CALL_STATE_WAITING,
     BTHF_CLIENT_CALL_STATE_HELD_BY_RESP_HOLD,
-} bthf_client_call_state_t;
+};
 
-typedef enum {
+enum BthfClientCallAction {
     BTHF_CLIENT_CALL_ACTION_CHLD_0 = 0,
     BTHF_CLIENT_CALL_ACTION_CHLD_1,
     BTHF_CLIENT_CALL_ACTION_CHLD_2,
@@ -66,25 +66,25 @@ typedef enum {
     BTHF_CLIENT_CALL_ACTION_BTRH_0,
     BTHF_CLIENT_CALL_ACTION_BTRH_1,
     BTHF_CLIENT_CALL_ACTION_BTRH_2,
-} bthf_client_call_action_t;
+};
 
-typedef enum {
+enum BthfClientCmdComplete {
     BTHF_CLIENT_CMD_COMPLETE_OK = 0,
     BTHF_CLIENT_CMD_COMPLETE_ERROR,
     BTHF_CLIENT_CMD_COMPLETE_ERROR_CME,
-} bthf_client_cmd_complete_t;
+};
 
-typedef enum {
+enum BthfClientNetworkState {
     BTHF_CLIENT_NETWORK_STATE_NOT_AVAILABLE = 0,
     BTHF_CLIENT_NETWORK_STATE_AVAILABLE,
-} bthf_client_network_state_t;
+};
 
-typedef enum {
+enum BthfClientServiceType {
     BTHF_CLIENT_SERVICE_TYPE_HOME = 0,
     BTHF_CLIENT_SERVICE_TYPE_ROAMING,
-} bthf_client_service_type_t;
+};
 
-typedef enum {
+enum BthfClientCall {
     BTHF_CLIENT_CALL_NONE = 0,
     BTHF_CLIENT_CALL_ACTIVE,
     BTHF_CLIENT_CALL_HELD,
@@ -93,113 +93,113 @@ typedef enum {
     BTHF_CLIENT_CALL_INCOMING,
     BTHF_CLIENT_CALL_WAITING,
     BTHF_CLIENT_CALL_HELD_BY_RESP_HOLD,
-} bthf_client_call_t;
+};
 
-typedef enum {
+enum BthfClientCallsetup {
     BTHF_CLIENT_CALLSETUP_NONE = 0,
     BTHF_CLIENT_CALLSETUP_INCOMING,
     BTHF_CLIENT_CALLSETUP_DIALING,
     BTHF_CLIENT_CALLSETUP_ALERTING,
-} bthf_client_callsetup_t;
+};
 
-typedef enum {
+enum BthfClientCallheld {
     BTHF_CLIENT_CALLHELD_NONE = 0,
     BTHF_CLIENT_CALLHELD_HOLD_AND_ACTIVE,
     BTHF_CLIENT_CALLHELD_HOLD,
-} bthf_client_callheld_t;
+};
 
-typedef enum {
+enum BthfClientRespAndHold {
     BTHF_CLIENT_RESP_AND_HOLD_HELD = 0,
     BTHF_CLIENT_RESP_AND_HOLD_ACCEPT,
     BTHF_CLIENT_RESP_AND_HOLD_REJECT,
-} bthf_client_resp_and_hold_t;
+};
 
-typedef enum {
+enum BthfClientCallDirection {
     BTHF_CLIENT_CALL_DIR_INCOMING = 0,
     BTHF_CLIENT_CALL_DIR_OUTGOING,
-} bthf_client_call_direction_t;
+};
 
-typedef enum {
+enum BthfClientCallMptyType {
     BTHF_CLIENT_CALL_MPTY_TYPE_SINGLE = 0,
     BTHF_CLIENT_CALL_MPTY_TYPE_MULTI,
-} bthf_client_call_mpty_type_t;
+};
 
-typedef enum {
+enum BthfClientVolumeType {
     BTHF_CLIENT_VOLUME_TYPE_SPK = 0,
     BTHF_CLIENT_VOLUME_TYPE_MIC,
-} bthf_client_volume_type_t;
+};
 
-typedef enum {
+enum BthfClientSubscriberServiceType {
     BTHF_CLIENT_SUBSCRIBER_SERVICE_TYPE_UNKNOWN = 0,
     BTHF_CLIENT_SUBSCRIBER_SERVICE_TYPE_VOICE,
     BTHF_CLIENT_SUBSCRIBER_SERVICE_TYPE_FAX,
-} bthf_client_subscriber_service_type_t;
+};
 
-typedef enum {
+enum BthfClientInBandRingState {
     BTHF_CLIENT_IN_BAND_RING_NOT_PROVIDED = 0,
     BTHF_CLIENT_IN_BAND_RING_PROVIDED,
-} bthf_client_in_band_ring_state_t;
+};
 
-typedef struct {
+struct BthfClientCallbacks {
     size_t size;
-    void (*connection_state_cb)(const RawAddress *bd_addr,
-                                bthf_client_connection_state_t state,
-                                unsigned int peer_feat, unsigned int chld_feat);
-    void (*audio_state_cb)(const RawAddress *bd_addr, bthf_client_audio_state_t state);
-    void (*vr_cmd_cb)(const RawAddress *bd_addr, bthf_client_vr_state_t state);
-    void (*network_state_cb)(const RawAddress *bd_addr, bthf_client_network_state_t state);
-    void (*network_roaming_cb)(const RawAddress *bd_addr, bthf_client_service_type_t type);
-    void (*network_signal_cb)(const RawAddress *bd_addr, int signal);
-    void (*battery_level_cb)(const RawAddress *bd_addr, int level);
-    void (*current_operator_cb)(const RawAddress *bd_addr, const char *name);
-    void (*call_cb)(const RawAddress *bd_addr, bthf_client_call_t call);
-    void (*callsetup_cb)(const RawAddress *bd_addr, bthf_client_callsetup_t callsetup);
-    void (*callheld_cb)(const RawAddress *bd_addr, bthf_client_callheld_t callheld);
-    void (*resp_and_hold_cb)(const RawAddress *bd_addr,
-                             bthf_client_resp_and_hold_t resp_and_hold);
-    void (*clip_cb)(const RawAddress *bd_addr, const char *number);
-    void (*call_waiting_cb)(const RawAddress *bd_addr, const char *number);
-    void (*current_calls_cb)(const RawAddress *bd_addr, int index,
-                             bthf_client_call_direction_t dir,
-                             bthf_client_call_state_t state,
-                             bthf_client_call_mpty_type_t mpty, const char *number);
-    void (*volume_change_cb)(const RawAddress *bd_addr, bthf_client_volume_type_t type,
+    void (*connectionStateCb)(const RawAddress *bdAddr,
+                                BthfClientConnectionState state,
+                                unsigned int peerFeat, unsigned int chldFeat);
+    void (*audioStateCb)(const RawAddress *bdAddr, BthfClientAudioState state);
+    void (*vrCmdCb)(const RawAddress *bdAddr, BthfClientVrState state);
+    void (*networkStateCb)(const RawAddress *bdAddr, BthfClientNetworkState state);
+    void (*networkRoamingCb)(const RawAddress *bdAddr, BthfClientServiceType type);
+    void (*networkSignalCb)(const RawAddress *bdAddr, int signal);
+    void (*batteryLevelCb)(const RawAddress *bdAddr, int level);
+    void (*currentOperatorCb)(const RawAddress *bdAddr, const char *name);
+    void (*callCb)(const RawAddress *bdAddr, BthfClientCall call);
+    void (*callsetupCb)(const RawAddress *bdAddr, BthfClientCallsetup callsetup);
+    void (*callheldCb)(const RawAddress *bdAddr, BthfClientCallheld callheld);
+    void (*respAndHoldCb)(const RawAddress *bdAddr,
+                             BthfClientRespAndHold respAndHold);
+    void (*clipCb)(const RawAddress *bdAddr, const char *number);
+    void (*callWaitingCb)(const RawAddress *bdAddr, const char *number);
+    void (*currentCallsCb)(const RawAddress *bdAddr, int index,
+                             BthfClientCallDirection dir,
+                             BthfClientCallState state,
+                             BthfClientCallMptyType mpty, const char *number);
+    void (*volumeChangeCb)(const RawAddress *bdAddr, BthfClientVolumeType type,
                              int volume);
-    void (*cmd_complete_cb)(const RawAddress *bd_addr, bthf_client_cmd_complete_t type,
+    void (*cmdCompleteCb)(const RawAddress *bdAddr, BthfClientCmdComplete type,
                             int cme);
-    void (*subscriber_info_cb)(const RawAddress *bd_addr, const char *name,
-                               bthf_client_subscriber_service_type_t type);
-    void (*in_band_ring_cb)(const RawAddress *bd_addr,
-                            bthf_client_in_band_ring_state_t in_band);
-    void (*last_voice_tag_number_cb)(const RawAddress *bd_addr, const char *number);
-    void (*ring_indication_cb)(const RawAddress *bd_addr);
-    void (*unknown_event_cb)(const RawAddress *bd_addr, const char *event_string);
-} bthf_client_callbacks_t;
+    void (*subscriberInfoCb)(const RawAddress *bdAddr, const char *name,
+                               BthfClientSubscriberServiceType type);
+    void (*inBandRingCb)(const RawAddress *bdAddr,
+                            BthfClientInBandRingState inBand);
+    void (*lastVoiceTagNumberCb)(const RawAddress *bdAddr, const char *number);
+    void (*ringIndicationCb)(const RawAddress *bdAddr);
+    void (*unknownEventCb)(const RawAddress *bdAddr, const char *eventString);
+};
 
-typedef struct {
+struct BthfClientInterface {
     size_t size;
-    bt_status_t (*init)(bthf_client_callbacks_t *callbacks);
-    bt_status_t (*connect)(const RawAddress *bd_addr);
-    bt_status_t (*disconnect)(const RawAddress *bd_addr);
-    bt_status_t (*connect_audio)(const RawAddress *bd_addr);
-    bt_status_t (*disconnect_audio)(const RawAddress *bd_addr);
-    bt_status_t (*start_voice_recognition)(const RawAddress *bd_addr);
-    bt_status_t (*stop_voice_recognition)(const RawAddress *bd_addr);
-    bt_status_t (*volume_control)(const RawAddress *bd_addr, bthf_client_volume_type_t type,
+    BtStackStatus (*init)(BthfClientCallbacks *callbacks);
+    BtStackStatus (*connect)(const RawAddress *bdAddr);
+    BtStackStatus (*disconnect)(const RawAddress *bdAddr);
+    BtStackStatus (*connectAudio)(const RawAddress *bdAddr);
+    BtStackStatus (*disconnectAudio)(const RawAddress *bdAddr);
+    BtStackStatus (*startVoiceRecognition)(const RawAddress *bdAddr);
+    BtStackStatus (*stopVoiceRecognition)(const RawAddress *bdAddr);
+    BtStackStatus (*volumeControl)(const RawAddress *bdAddr, BthfClientVolumeType type,
         int volume);
-    bt_status_t (*dial)(const RawAddress *bd_addr, const char *number);
-    bt_status_t (*dial_memory)(const RawAddress *bd_addr, int location);
-    bt_status_t (*handle_call_action)(const RawAddress *bd_addr, bthf_client_call_action_t action,
+    BtStackStatus (*dial)(const RawAddress *bdAddr, const char *number);
+    BtStackStatus (*dialMemory)(const RawAddress *bdAddr, int location);
+    BtStackStatus (*handleCallAction)(const RawAddress *bdAddr, BthfClientCallAction action,
         int idx);
-    bt_status_t (*query_current_calls)(const RawAddress *bd_addr);
-    bt_status_t (*query_current_operator_name)(const RawAddress *bd_addr);
-    bt_status_t (*retrieve_subscriber_info)(const RawAddress *bd_addr);
-    bt_status_t (*send_dtmf)(const RawAddress *bd_addr, char code);
-    bt_status_t (*request_last_voice_tag_number)(const RawAddress *bd_addr);
+    BtStackStatus (*queryCurrentCalls)(const RawAddress *bdAddr);
+    BtStackStatus (*queryCurrentOperatorName)(const RawAddress *bdAddr);
+    BtStackStatus (*retrieveSubscriberInfo)(const RawAddress *bdAddr);
+    BtStackStatus (*sendDtmf)(const RawAddress *bdAddr, char code);
+    BtStackStatus (*requestLastVoiceTagNumber)(const RawAddress *bdAddr);
     void (*cleanup)(void);
-    bt_status_t (*send_at_cmd)(const RawAddress *bd_addr, int cmd, int val1, int val2,
+    BtStackStatus (*sendAtCmd)(const RawAddress *bdAddr, int cmd, int val1, int val2,
         const char *arg);
-    bt_status_t (*send_android_at)(const RawAddress *bd_addr, const char *arg);
-} bthf_client_interface_t;
+    BtStackStatus (*sendAndroidAt)(const RawAddress *bdAddr, const char *arg);
+};
 
 #endif  // BT_HF_CLIENT_H

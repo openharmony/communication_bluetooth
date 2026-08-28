@@ -622,21 +622,21 @@ private:
 
     class HfpAgServiceCallbacks : ::bluetooth::headset::Callbacks {
     public:
-        void ConnectionStateCallback(::bluetooth::headset::bthf_connection_state_t state,
+        void ConnectionStateCallback(::bluetooth::headset::BthfConnectionState state,
             STACK::RawAddress* bdAddr) override;
-        void AudioStateCallback(::bluetooth::headset::bthf_audio_state_t state,
+        void AudioStateCallback(::bluetooth::headset::BthfAudioState state,
             STACK::RawAddress* bdAddr) override;
-        void VoiceRecognitionCallback(::bluetooth::headset::bthf_vr_state_t state,
+        void VoiceRecognitionCallback(::bluetooth::headset::BthfVrState state,
             STACK::RawAddress* bdAddr) override;
         void AnswerCallCallback(STACK::RawAddress* bdAddr) override;
         void HangupCallCallback(STACK::RawAddress* bdAddr) override;
-        void VolumeControlCallback(::bluetooth::headset::bthf_volume_type_t type,
+        void VolumeControlCallback(::bluetooth::headset::BthfVolumeType type,
             int volume, STACK::RawAddress* bdAddr) override;
         void DialCallCallback(char* number, STACK::RawAddress* bdAddr) override;
         void DtmfCmdCallback(char dtmf, STACK::RawAddress* bdAddr) override;
-        void NoiseReductionCallback(::bluetooth::headset::bthf_nrec_t nrec, STACK::RawAddress* bdAddr) override;
-        void WbsCallback(::bluetooth::headset::bthf_wbs_config_t wbsConfig, STACK::RawAddress* bdAddr) override;
-        void AtChldCallback(::bluetooth::headset::bthf_chld_type_t chld, STACK::RawAddress* bdAddr) override;
+        void NoiseReductionCallback(::bluetooth::headset::BthfNrec nrec, STACK::RawAddress* bdAddr) override;
+        void WbsCallback(::bluetooth::headset::BthfWbsConfig wbsConfig, STACK::RawAddress* bdAddr) override;
+        void AtChldCallback(::bluetooth::headset::BthfChldType chld, STACK::RawAddress* bdAddr) override;
         void AtCnumCallback(STACK::RawAddress* bdAddr) override;
         void AtCindCallback(STACK::RawAddress* bdAddr) override;
         void AtCopsCallback(STACK::RawAddress* bdAddr) override;
@@ -644,7 +644,7 @@ private:
         void UnknownAtCallback(char* atString, STACK::RawAddress* bdAddr) override;
         void KeyPressedCallback(STACK::RawAddress* bdAddr) override;
         void AtBindCallback(char* atString, STACK::RawAddress* bdAddr) override;
-        void AtBievCallback(::bluetooth::headset::bthf_hf_ind_type_t indId, int indValue,
+        void AtBievCallback(::bluetooth::headset::BthfHfIndType indId, int indValue,
             STACK::RawAddress* bdAddr) override;
         void AtBiaCallback(bool service, bool roam, bool signal, bool battery,
             STACK::RawAddress* bdAddr) override;
@@ -666,13 +666,13 @@ private:
     int GetMaxConnectionDevicesNum() const;
     void ProcessDefaultEvent(const HfpAgMessage &event);
     int GetProcessingDeviceNum();
-    static int CovertConnectStateFromStack(::bluetooth::headset::bthf_connection_state_t state);
-    static int CovertAudioStateFromStack(::bluetooth::headset::bthf_audio_state_t state);
-    static int CovertVRStateFromStack(::bluetooth::headset::bthf_vr_state_t state);
-    static int CovertVolumeControlTypeFromStack(::bluetooth::headset::bthf_volume_type_t type);
-    static bool CovertNoiseReductionFromStack(::bluetooth::headset::bthf_nrec_t nrec);
-    static int CovertBievValueFromStack(::bluetooth::headset::bthf_hf_ind_type_t indId);
-    static int ConvetWbsConfigFromStack(::bluetooth::headset::bthf_wbs_config_t wbsConfig);
+    static int CovertConnectStateFromStack(::bluetooth::headset::BthfConnectionState state);
+    static int CovertAudioStateFromStack(::bluetooth::headset::BthfAudioState state);
+    static int CovertVRStateFromStack(::bluetooth::headset::BthfVrState state);
+    static int CovertVolumeControlTypeFromStack(::bluetooth::headset::BthfVolumeType type);
+    static bool CovertNoiseReductionFromStack(::bluetooth::headset::BthfNrec nrec);
+    static int CovertBievValueFromStack(::bluetooth::headset::BthfHfIndType indId);
+    static int ConvetWbsConfigFromStack(::bluetooth::headset::BthfWbsConfig wbsConfig);
     void SendEventToEachStateMachine(const HfpAgMessage &event);
     void postHfpConnectEvent(bool isReachMaxConnect, const std::string address);
     bool IsActiveDevice(const std::string &address);

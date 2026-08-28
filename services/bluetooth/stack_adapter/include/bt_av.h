@@ -20,37 +20,38 @@
 #ifndef BT_AV_H
 #define BT_AV_H
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 
 #include "bt_types.h"
 
-typedef enum {
+enum BtavSourceState {
     BTAV_A2DP_SRC_STATE_DISCONNECTED = 0,
     BTAV_A2DP_SRC_STATE_CONNECTING,
     BTAV_A2DP_SRC_STATE_CONNECTED,
     BTAV_A2DP_SRC_STATE_PLAYING,
-} btav_source_state_t;
+};
 
 /* Connection state reported by the A2DP connection callback (bluedroid
  * system/include/hardware/bt_av.h). */
-typedef enum {
+enum BtavConnectionState {
     BTAV_CONNECTION_STATE_DISCONNECTED = 0,
     BTAV_CONNECTION_STATE_CONNECTING,
     BTAV_CONNECTION_STATE_CONNECTED,
     BTAV_CONNECTION_STATE_DISCONNECTING,
-} btav_connection_state_t;
+};
 
 /* Audio datapath state reported by the A2DP audio callback; LATENCY_CHANGED
  * is a service-layer extension of the bluedroid set. */
-typedef enum {
+enum BtavAudioState {
     BTAV_AUDIO_STATE_REMOTE_SUSPEND = 0,
     BTAV_AUDIO_STATE_STOPPED,
     BTAV_AUDIO_STATE_STARTED,
     BTAV_AUDIO_STATE_LATENCY_CHANGED,
-} btav_audio_state_t;
+};
 
-typedef enum {
+enum BtavA2dpCodecIndex {
     BTAV_A2DP_CODEC_INDEX_SOURCE_SBC = 0,
     BTAV_A2DP_CODEC_INDEX_SOURCE_AAC,
     BTAV_A2DP_CODEC_INDEX_SOURCE_APTX,
@@ -60,15 +61,15 @@ typedef enum {
     BTAV_A2DP_CODEC_INDEX_SINK_MAX,
     BTAV_A2DP_CODEC_INDEX_SOURCE_L2HC_V2,
     BTAV_A2DP_CODEC_INDEX_SOURCE_L2HC_ST,
-} btav_a2dp_codec_index_t;
+};
 
-typedef enum {
+enum BtavA2dpCodecPriority {
     BTAV_A2DP_CODEC_PRIORITY_DISABLED = -1,
     BTAV_A2DP_CODEC_PRIORITY_DEFAULT = 0,
     BTAV_A2DP_CODEC_PRIORITY_HIGHEST = 1000 * 1000,
-} btav_a2dp_codec_priority_t;
+};
 
-typedef enum {
+enum BtavA2dpCodecSampleRate {
     BTAV_A2DP_CODEC_SAMPLE_RATE_NONE = 0x0,
     BTAV_A2DP_CODEC_SAMPLE_RATE_44100 = 0x1 << 0,
     BTAV_A2DP_CODEC_SAMPLE_RATE_48000 = 0x1 << 1,
@@ -82,88 +83,88 @@ typedef enum {
     BTAV_A2DP_CODEC_SAMPLE_RATE_44100_48000_96000 =
         BTAV_A2DP_CODEC_SAMPLE_RATE_44100 | BTAV_A2DP_CODEC_SAMPLE_RATE_48000 |
         BTAV_A2DP_CODEC_SAMPLE_RATE_96000,
-} btav_a2dp_codec_sample_rate_t;
+};
 
-typedef enum {
+enum BtavA2dpCodecBitsPerSample {
     BTAV_A2DP_CODEC_BITS_PER_SAMPLE_NONE = 0x0,
     BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16 = 0x1 << 0,
     BTAV_A2DP_CODEC_BITS_PER_SAMPLE_24 = 0x1 << 1,
     BTAV_A2DP_CODEC_BITS_PER_SAMPLE_32 = 0x1 << 2,
-} btav_a2dp_codec_bits_per_sample_t;
+};
 
-typedef enum {
+enum BtavA2dpCodecChannelMode {
     BTAV_A2DP_CODEC_CHANNEL_MODE_NONE = 0x0,
     BTAV_A2DP_CODEC_CHANNEL_MODE_MONO = 0x1 << 0,
     BTAV_A2DP_CODEC_CHANNEL_MODE_STEREO = 0x1 << 1,
-} btav_a2dp_codec_channel_mode_t;
+};
 
-typedef struct {
-    btav_a2dp_codec_index_t codec_type;
-    btav_a2dp_codec_priority_t codec_priority;
-    btav_a2dp_codec_sample_rate_t sample_rate;
-    btav_a2dp_codec_bits_per_sample_t bits_per_sample;
-    btav_a2dp_codec_channel_mode_t channel_mode;
-    uint64_t codec_specific_1;
-    uint64_t codec_specific_2;
-    uint64_t codec_specific_3;
-    uint64_t codec_specific_4;
-} btav_a2dp_codec_config_t;
+struct BtavA2dpCodecConfig {
+    BtavA2dpCodecIndex codecType;
+    BtavA2dpCodecPriority codecPriority;
+    BtavA2dpCodecSampleRate sampleRate;
+    BtavA2dpCodecBitsPerSample bitsPerSample;
+    BtavA2dpCodecChannelMode channelMode;
+    uint64_t codecSpecific1;
+    uint64_t codecSpecific2;
+    uint64_t codecSpecific3;
+    uint64_t codecSpecific4;
+};
 
 /* A2DP source callbacks (bluedroid system/btif/include/btif_av.h). */
-typedef void (*btav_connection_state_callback)(const RawAddress &bd_addr, btav_connection_state_t state);
-typedef void (*btav_audio_state_callback)(const RawAddress &bd_addr, btav_audio_state_t state);
-typedef void (*btav_audio_source_config_callback)(const RawAddress &bd_addr, btav_a2dp_codec_config_t codec_config,
-    std::vector<btav_a2dp_codec_config_t> codecs_local_capabilities,
-    std::vector<btav_a2dp_codec_config_t> codecs_selectable_capabilities);
-typedef bool (*btav_mandatory_codec_preferred_callback)(const RawAddress &bd_addr);
+typedef void (*BtavConnectionStateCallback)(const RawAddress &bdAddr, BtavConnectionState state);
+typedef void (*BtavAudioStateCallback)(const RawAddress &bdAddr, BtavAudioState state);
+typedef void (*BtavAudioSourceConfigCallback)(const RawAddress &bdAddr, BtavA2dpCodecConfig codecConfig,
+    std::vector<BtavA2dpCodecConfig> codecsLocalCapabilities,
+    std::vector<BtavA2dpCodecConfig> codecsSelectableCapabilities);
+typedef bool (*BtavMandatoryCodecPreferredCallback)(const RawAddress &bdAddr);
 
 /* Audio configuration callback of the A2DP sink profile (bluedroid
- * system/btif/include/btif_av.h); sample_rate in Hz, channel_count 1 for
+ * system/btif/include/btif_av.h); sampleRate in Hz, channelCount 1 for
  * mono and 2 for stereo. */
-typedef void (*btav_audio_sink_config_callback)(const RawAddress &bd_addr, uint32_t sample_rate,
-    uint8_t channel_count);
+typedef void (*BtavAudioSinkConfigCallback)(const RawAddress &bdAddr, uint32_t sampleRate,
+    uint8_t channelCount);
 
-typedef struct {
+struct BtavSourceCallbacks {
     size_t size;
-    btav_connection_state_callback connection_state_cb;
-    btav_audio_state_callback audio_state_cb;
-    btav_audio_source_config_callback audio_config_cb;
-    btav_mandatory_codec_preferred_callback mandatory_codec_preferred_cb;
-} btav_source_callbacks_t;
+    BtavConnectionStateCallback connectionStateCb;
+    BtavAudioStateCallback audioStateCb;
+    BtavAudioSourceConfigCallback audioConfigCb;
+    BtavMandatoryCodecPreferredCallback mandatoryCodecPreferredCb;
+};
 
 /* A2DP source interface consumed by the service layer (a2dp_service.cpp);
  * bluedroid reference is system/btif/include/btif_av.h. */
-typedef struct {
+struct BtavSourceInterface {
     size_t size;
-    bt_status_t (*init)(btav_source_callbacks_t *callbacks, int max_connected_audio_devices,
-        const std::vector<btav_a2dp_codec_config_t> &codec_priorities,
-        const std::vector<btav_a2dp_codec_config_t> &offloading_preference);
+    BtStackStatus (*init)(BtavSourceCallbacks *callbacks, int maxConnectedAudioDevices,
+        const std::vector<BtavA2dpCodecConfig> &codecPriorities,
+        const std::vector<BtavA2dpCodecConfig> &offloadingPreference);
     void (*cleanup)(void);
-    bt_status_t (*connect)(const RawAddress &bd_addr);
-    bt_status_t (*disconnect)(const RawAddress &bd_addr);
-    bt_status_t (*set_active_device)(const RawAddress &bd_addr);
-    bt_status_t (*config_codec)(const RawAddress &bd_addr, std::vector<btav_a2dp_codec_config_t> codec_preferences);
-} btav_source_interface_t;
+    BtStackStatus (*connect)(const RawAddress &bdAddr);
+    BtStackStatus (*disconnect)(const RawAddress &bdAddr);
+    BtStackStatus (*setActiveDevice)(const RawAddress &bdAddr);
+    BtStackStatus (*configCodec)(const RawAddress &bdAddr, std::vector<BtavA2dpCodecConfig> codecPreferences);
+};
 
 /* A2DP sink callbacks and interface consumed by the service layer
  * (native_a2dp_adapter.cpp); the interface members mirror the bluedroid
  * btif_av_sink_* entry points (system/btif/include/btif_av.h). */
-typedef struct {
+struct BtavSinkCallbacks {
     size_t size;
-    btav_connection_state_callback connection_state_cb;
-    btav_audio_state_callback audio_state_cb;
-    btav_audio_sink_config_callback audio_config_cb;
-} btav_sink_callbacks_t;
+    BtavConnectionStateCallback connectionStateCb;
+    BtavAudioStateCallback audioStateCb;
+    BtavAudioSinkConfigCallback audioConfigCb;
+};
 
-typedef struct {
+struct BtavSinkInterface {
     size_t size;
-    bt_status_t (*init)(btav_sink_callbacks_t *callbacks, int max_connected_audio_devices);
-    bt_status_t (*connect)(const RawAddress &bd_addr);
-    bt_status_t (*disconnect)(const RawAddress &bd_addr);
+    BtStackStatus (*init)(BtavSinkCallbacks *callbacks, int maxConnectedAudioDevices);
+    BtStackStatus (*connect)(const RawAddress &bdAddr);
+    BtStackStatus (*disconnect)(const RawAddress &bdAddr);
     void (*cleanup)(void);
-    void (*set_audio_focus_state)(int focus_state);
-    void (*set_audio_track_gain)(float gain);
-    bt_status_t (*set_active_device)(const RawAddress &bd_addr);
-} btav_sink_interface_t;
+    void (*setAudioFocusState)(int focusState);
+    void (*setAudioTrackGain)(float gain);
+    BtStackStatus (*setActiveDevice)(const RawAddress &bdAddr);
+};
 
 #endif  // BT_AV_H

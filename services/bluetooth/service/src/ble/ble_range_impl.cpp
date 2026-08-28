@@ -93,8 +93,8 @@ BleRangeImpl::~BleRangeImpl()
     std::lock_guard<std::mutex> lock(rangingMutex_);
     rangingPromise_ = nullptr;
 
-    if (btInterface_ != nullptr && btInterface_->unregister_ranging_ant_switch_callback != nullptr) {
-        btInterface_->unregister_ranging_ant_switch_callback();
+    if (btInterface_ != nullptr && btInterface_->unregisterRangingAntSwitchCallback != nullptr) {
+        btInterface_->unregisterRangingAntSwitchCallback();
     }
 
     {
@@ -328,11 +328,11 @@ int BleRangeImpl::HandleNonRangingAppType(bluetooth::BleAppType appType, int adv
 
 void BleRangeImpl::RegisterAntSwitchCallback()
 {
-    if (btInterface_ == nullptr || btInterface_->register_ranging_ant_switch_callback == nullptr) {
+    if (btInterface_ == nullptr || btInterface_->registerRangingAntSwitchCallback == nullptr) {
         HILOGE("btInterface_ or register_ranging_ant_switch_callback is null");
         return;
     }
-    int result = btInterface_->register_ranging_ant_switch_callback(OnRangingAntSwitchCallbackStatic);
+    int result = btInterface_->registerRangingAntSwitchCallback(OnRangingAntSwitchCallbackStatic);
 
     if (result != 0) {
         HILOGE("Failed to register ant switch callback, result=%{public}d", result);
@@ -342,8 +342,8 @@ void BleRangeImpl::RegisterAntSwitchCallback()
 
 bool BleRangeImpl::SendBleAdvStartMsg()
 {
-    if (btInterface_ != nullptr && btInterface_->sendbleadvstartmsg != nullptr) {
-        btInterface_->sendbleadvstartmsg(configMac_, configAnt_);
+    if (btInterface_ != nullptr && btInterface_->sendBleAdvStartMsg != nullptr) {
+        btInterface_->sendBleAdvStartMsg(configMac_, configAnt_);
         return true;
     }
     HILOGE("btInterface_ or sendbleadvstartmsg is null");
@@ -352,8 +352,8 @@ bool BleRangeImpl::SendBleAdvStartMsg()
 
 void BleRangeImpl::SendAntennaInfoQueryMsg()
 {
-    if (btInterface_ != nullptr && btInterface_->send_antenna_info_query_msg != nullptr) {
-        btInterface_->send_antenna_info_query_msg();
+    if (btInterface_ != nullptr && btInterface_->sendAntennaInfoQueryMsg != nullptr) {
+        btInterface_->sendAntennaInfoQueryMsg();
         return;
     }
     HILOGE("btInterface_ or send_antenna_info_query_msg is null");
@@ -430,8 +430,8 @@ int BleRangeImpl::BleRestoreRangingAntSwitch(bluetooth::BleAppType appType)
     uint8_t antID = 0;
     StoreRangingAntSwitchInfo(defaultMacId, antID);
 
-    if (btInterface_ != nullptr && btInterface_->sendbleadvstopmsg != nullptr) {
-        btInterface_->sendbleadvstopmsg();
+    if (btInterface_ != nullptr && btInterface_->sendBleAdvStopMsg != nullptr) {
+        btInterface_->sendBleAdvStopMsg();
     } else {
         HILOGE("btInterface_ or sendbleadvstopmsg is null");
         return -1;

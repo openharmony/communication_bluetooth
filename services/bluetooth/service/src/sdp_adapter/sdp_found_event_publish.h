@@ -23,21 +23,21 @@ namespace bluetooth {
 class SdpFoundEventPublishHelper {
 public:
 	static bool PublishSdpFoundEvent(int32_t status, const std::string &address,
-    	const std::string &uuid, bool more_results, bluetooth_sdp_record *record);
+    	const std::string &uuid, bool more_results, BluetoothSdpRecord *record);
     static bool PublishMapMasSdpFoundEvent(int32_t status, const std::string &address,
-    	const std::string &uuid, bool more_results, bluetooth_sdp_record* record);
+    	const std::string &uuid, bool more_results, BluetoothSdpRecord* record);
     static bool PublishMapMnsSdpFoundEvent(int32_t status, const std::string &address,
-    	const std::string &uuid, bool more_results, bluetooth_sdp_record* record);
+    	const std::string &uuid, bool more_results, BluetoothSdpRecord* record);
     static bool PublishPbapPseSdpFoundEvent(int32_t status, const std::string &address,
-    	const std::string &uuid, bool more_results, bluetooth_sdp_record* record);
+    	const std::string &uuid, bool more_results, BluetoothSdpRecord* record);
     static bool PublishObexObjectPushSdpFoundEvent(int32_t status, const std::string &address,
-    	const std::string &uuid, bool more_results, bluetooth_sdp_record* record);
+    	const std::string &uuid, bool more_results, BluetoothSdpRecord* record);
     static bool PublishSapSdpFoundEvent(int32_t status, const std::string &address,
-    	const std::string &uuid, bool more_results, bluetooth_sdp_record* record);
+    	const std::string &uuid, bool more_results, BluetoothSdpRecord* record);
     static bool PublishDipSdpFoundEvent(int32_t status, const std::string &address,
-    	const std::string &uuid, bool more_results, bluetooth_sdp_record* record);
+    	const std::string &uuid, bool more_results, BluetoothSdpRecord* record);
     static bool PublishCommonSdpFoundEvent(int32_t status, const std::string &address,
-    	const std::string &uuid, bool more_results, bluetooth_sdp_record* record);
+    	const std::string &uuid, bool more_results, BluetoothSdpRecord* record);
 };
 }  // namespace bluetooth
 }  // namespace OHOS

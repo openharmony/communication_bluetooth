@@ -423,7 +423,7 @@ public:
     bool CheckCod(uint32_t cod) const;
     void SetPasskey(uint32_t passKey);
     int GetPasskey() const;
-    void SetSspVariant(bt_ssp_variant_t pairingVariant);
+    void SetSspVariant(BtSspVariant pairingVariant);
     int GetSspVariant() const;
     bool IsPairNone() const;
     void SetDeviceAbsVolumeAbility(int32_t ability);

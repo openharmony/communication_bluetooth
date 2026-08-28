@@ -389,7 +389,7 @@ private:
     bool isOnClcc_{false};
 
     std::queue<int> queuedActions;
-    bthf_client_interface_t* bluetoothHfInterface = nullptr;
+    BthfClientInterface* bluetoothHfInterface = nullptr;
 
     void ProcessCurrentCallEvent(const HfpHfMessage &event) const;
     void ProcessNetworkStateEvent(const HfpHfMessage &event);

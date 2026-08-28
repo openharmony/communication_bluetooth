@@ -253,17 +253,17 @@ bool AdapterProperties::SetBroadcastName(std::string deviceName)
     name = GetTruncationName(deviceName);
 #endif
     unsigned int length = name.length();
-    bt_property_t property;
-    property.type = static_cast<bt_property_type_t>(STACK::BT_PROPERTY_BDNAME);
+    BtProperty property;
+    property.type = static_cast<BtPropertyType>(STACK::BT_PROPERTY_BDNAME);
     property.len = static_cast<int>(length);
     property.val = name.data();
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int status = hal_util_load_bt_library(&btInterface);
     if (status) {
         HILOGE("[ClassicAdapter] Failed to open the Bluetooth module");
         return false;
     }
-    int result = btInterface->set_adapter_property(&property);
+    int result = btInterface->setAdapterProperty(&property);
     if (result != BT_STATUS_SUCCESS) {
         HILOGE("SetBroadcastName fail");
         return false;
@@ -304,18 +304,18 @@ std::vector<Uuid> AdapterProperties::GetServiceUuids(void) const
 
 bool AdapterProperties::SetDeviceClass(int deviceClass)
 {
-    bt_property_t property;
+    BtProperty property;
     property.len = sizeof(int);
-    property.type = (bt_property_type_t)STACK::BT_PROPERTY_CLASS_OF_DEVICE;
+    property.type = (BtPropertyType)STACK::BT_PROPERTY_CLASS_OF_DEVICE;
     property.val = &deviceClass;
     HILOGI("deviceClass = %d", deviceClass);
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int status = hal_util_load_bt_library(&btInterface);
     if (status) {
         HILOGE("[ClassicAdapterProperties] Failed to open the Bluetooth module");
         return false;
     }
-    int result = btInterface->set_adapter_property(&property);
+    int result = btInterface->setAdapterProperty(&property);
     if (result != BT_STATUS_SUCCESS) {
         HILOGE("SetLocalDeviceClass fail");
         return false;
@@ -370,18 +370,18 @@ void AdapterProperties::RemovePairedDeviceList(std::string addr)
 
 bool AdapterProperties::SetIoCapability(int ioCapability)
 {
-    bt_property_t property;
+    BtProperty property;
     property.len = sizeof(int);
-    property.type = (bt_property_type_t)STACK::BT_PROPERTY_LOCAL_IO_CAPS;
+    property.type = (BtPropertyType)STACK::BT_PROPERTY_LOCAL_IO_CAPS;
     property.val = &ioCapability;
     HILOGI("ioCapability: %{public}d", ioCapability);
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int status = hal_util_load_bt_library(&btInterface);
     if (status) {
         HILOGE("[ClassicAdapterProperties] Failed to open the Bluetooth module");
         return false;
     }
-    int result = btInterface->set_adapter_property(&property);
+    int result = btInterface->setAdapterProperty(&property);
     if (result != BT_STATUS_SUCCESS) {
         HILOGE("SetBtScanMode fail");
         return false;
@@ -398,28 +398,28 @@ uint8_t AdapterProperties::GetIoCapability(void) const
 uint16_t AdapterProperties::GetTotalNumOfTrackableAdvertisements(void) const
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    return localLeFeatures_.total_trackable_advertisers;
+    return localLeFeatures_.totalTrackableAdvertisers;
 }
 
 uint16_t AdapterProperties::GetBleMaxAdvertisingDataLength(void) const
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    return localLeFeatures_.le_maximum_advertising_data_length;
+    return localLeFeatures_.leMaximumAdvertisingDataLength;
 }
 
 bool AdapterProperties::GetLeExtendedAdvertisingSupported(void) const
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    return localLeFeatures_.le_extended_advertising_supported;
+    return localLeFeatures_.leExtendedAdvertisingSupported;
 }
 
 bool AdapterProperties::GetLe2mPhySupported(void) const
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    return localLeFeatures_.le_2m_phy_supported;
+    return localLeFeatures_.le2mPhySupported;
 }
 
-void AdapterProperties::HandlePropertyLocalAddress(bt_property_t* property)
+void AdapterProperties::HandlePropertyLocalAddress(BtProperty* property)
 {
     RawAddress address = ParseDeviceAddr(property);
     std::string localAddress = address.GetAddress();
@@ -428,7 +428,7 @@ void AdapterProperties::HandlePropertyLocalAddress(bt_property_t* property)
     macAddr_ = localAddress;
 }
 
-void AdapterProperties::HandlePropertyScanMode(bt_property_t* property)
+void AdapterProperties::HandlePropertyScanMode(BtProperty* property)
 {
     int curScanMode = static_cast<int>(BT_SCAN_MODE_NONE);
     if (ParseScanMode(property, curScanMode)) {
@@ -441,7 +441,7 @@ void AdapterProperties::HandlePropertyScanMode(bt_property_t* property)
     }
 }
 
-void AdapterProperties::ParseAdapterProps(bt_status_t status, int numProperties, bt_property_t* properties)
+void AdapterProperties::ParseAdapterProps(BtStackStatus status, int numProperties, BtProperty* properties)
 {
     if (status != BT_STATUS_SUCCESS || properties == nullptr) {
         HILOGE("ParseAdapterProps fail, status is %{public}d", status);
@@ -449,7 +449,7 @@ void AdapterProperties::ParseAdapterProps(bt_status_t status, int numProperties,
     }
 
     for (int i = 0; i < numProperties; i++) {
-        bt_property_t* property = properties + i;
+        BtProperty* property = properties + i;
         switch (property->type) {
             case BT_PROPERTY_BDADDR: {
                 HandlePropertyLocalAddress(property);
@@ -491,7 +491,7 @@ void AdapterProperties::ParseAdapterProps(bt_status_t status, int numProperties,
     }
 }
 
-std::string AdapterProperties::ParseDeviceName(bt_property_t* property)
+std::string AdapterProperties::ParseDeviceName(BtProperty* property)
 {
     if (property->len < 0) {
         HILOGE("invalid name");
@@ -506,12 +506,12 @@ std::string AdapterProperties::ParseDeviceName(bt_property_t* property)
         HILOGI("name is too long");
         len = MAX_REMOTE_BT_NAME_LEN;
     }
-    bt_bdname_t* hal_name = reinterpret_cast<bt_bdname_t*>(property->val);
+    BtBdname* hal_name = reinterpret_cast<BtBdname*>(property->val);
     std::string name(hal_name->name, hal_name->name + len);
     return name;
 }
 
-RawAddress AdapterProperties::ParseDeviceAddr(bt_property_t* property)
+RawAddress AdapterProperties::ParseDeviceAddr(BtProperty* property)
 {
     if (property->len != sizeof(STACK::RawAddress)) {
         HILOGE("Invalid length for BT_PROPERTY_BDADDR");
@@ -526,7 +526,7 @@ RawAddress AdapterProperties::ParseDeviceAddr(bt_property_t* property)
     }
 }
 
-std::vector<Uuid> AdapterProperties::ParseDeviceUuid(bt_property_t* property)
+std::vector<Uuid> AdapterProperties::ParseDeviceUuid(BtProperty* property)
 {
     std::vector<Uuid> serviceUuids;
     if (property->val == nullptr) {
@@ -568,7 +568,7 @@ uint32_t AdapterProperties::ConvertDeviceTypeFromBluetdroid(uint32_t deviceType)
     return DEVICE_TYPE_UNKNOWN;
 }
 
-uint32_t AdapterProperties::ParseDeviceType(bt_property_t* property)
+uint32_t AdapterProperties::ParseDeviceType(BtProperty* property)
 {
     if (property->len != sizeof(uint32_t)) {
         HILOGE("Invalid length for BT_PROPERTY_TYPE_OF_DEVICE");
@@ -584,7 +584,7 @@ uint32_t AdapterProperties::ParseDeviceType(bt_property_t* property)
     }
 }
 
-uint32_t AdapterProperties::ParseDeviceCod(bt_property_t* property)
+uint32_t AdapterProperties::ParseDeviceCod(BtProperty* property)
 {
     if (property->len != sizeof(uint32_t)) {
         HILOGE("Invalid length for BT_PROPERTY_CLASS_OF_DEVICE");
@@ -599,7 +599,7 @@ uint32_t AdapterProperties::ParseDeviceCod(bt_property_t* property)
     }
 }
 
-int8_t AdapterProperties::ParseDeviceRssi(bt_property_t* property)
+int8_t AdapterProperties::ParseDeviceRssi(BtProperty* property)
 {
     if (property->len != sizeof(int8_t) && property->len != sizeof(uint8_t)) {
         HILOGE("Invalid length %{public}d for BT_PROPERTY_REMOTE_RSSI", property->len);
@@ -614,7 +614,7 @@ int8_t AdapterProperties::ParseDeviceRssi(bt_property_t* property)
     }
 }
 
-int AdapterProperties::ParseDeviceIoCapability(bt_property_t* property)
+int AdapterProperties::ParseDeviceIoCapability(BtProperty* property)
 {
     if (property->len != sizeof(int)) {
         HILOGE("Invalid length for BT_PROPERTY_CLBT_PROPERTY_REMOTE_RSSIASS_OF_DEVICE");
@@ -629,9 +629,9 @@ int AdapterProperties::ParseDeviceIoCapability(bt_property_t* property)
     }
 }
 
-bool AdapterProperties::ParseScanMode(bt_property_t* property, int &scanMode)
+bool AdapterProperties::ParseScanMode(BtProperty* property, int &scanMode)
 {
-    if (property->len != sizeof(bt_scan_mode_t) || property->val == nullptr) {
+    if (property->len != sizeof(BtScanMode) || property->val == nullptr) {
         HILOGE("Invalid length or value for BT_PROPERTY_ADAPTER_SCAN_MODE");
         return false;
     }
@@ -652,7 +652,7 @@ bool AdapterProperties::ParseScanMode(bt_property_t* property, int &scanMode)
     return true;
 }
 
-std::vector<std::string> AdapterProperties::ParseBondedDevices(bt_property_t* property)
+std::vector<std::string> AdapterProperties::ParseBondedDevices(BtProperty* property)
 {
     HILOGD("BT_PROPERTY_ADAPTER_BONDED_DEVICES");
     if (property->len < 0 || property->len % BD_ADDR_LEN != 0) {
@@ -675,7 +675,7 @@ std::vector<std::string> AdapterProperties::ParseBondedDevices(bt_property_t* pr
     return pairedAddrList;
 }
 
-int32_t AdapterProperties::ParseAbsVolumeAbility(bt_property_t* property)
+int32_t AdapterProperties::ParseAbsVolumeAbility(BtProperty* property)
 {
     if (property->len < static_cast<int>(sizeof(int32_t))) {
         HILOGE("Invalid length %{public}d for HW_BT_PROPERTY_ABS_VOLUM_KEY", property->len);
@@ -694,7 +694,7 @@ int32_t AdapterProperties::ParseAbsVolumeAbility(bt_property_t* property)
     return absVolumeAbility;
 }
 
-int32_t AdapterProperties::ParseDeviceCustomType(bt_property_t* property)
+int32_t AdapterProperties::ParseDeviceCustomType(BtProperty* property)
 {
     if (property->len < static_cast<int>(sizeof(int32_t))) {
         HILOGE("Invalid length %{public}d for DeviceCustomType", property->len);
@@ -709,7 +709,7 @@ int32_t AdapterProperties::ParseDeviceCustomType(bt_property_t* property)
     return customType;
 }
 
-int64_t AdapterProperties::ParseDeviceConnectionTime(bt_property_t* property)
+int64_t AdapterProperties::ParseDeviceConnectionTime(BtProperty* property)
 {
     if (property->len < INVALID_VALUE) {
         HILOGE("Invalid length for HW_BT_PROPERTY_RMT_IO_CAP_KEY");
@@ -724,13 +724,13 @@ int64_t AdapterProperties::ParseDeviceConnectionTime(bt_property_t* property)
     return connectionTime;
 }
 
-void AdapterProperties::ParseLocalLeFeatures(bt_property_t* property)
+void AdapterProperties::ParseLocalLeFeatures(BtProperty* property)
 {
-    if (property->len != sizeof(bt_local_le_features_t) || property->val == nullptr) {
+    if (property->len != sizeof(BtLocalLeFeatures) || property->val == nullptr) {
         HILOGW("Malformed value received for property: BT_PROPERTY_LOCAL_LE_FEATURES");
         return;
     }
-    bt_local_le_features_t* features = reinterpret_cast<bt_local_le_features_t*>(property->val);
+    BtLocalLeFeatures* features = reinterpret_cast<BtLocalLeFeatures*>(property->val);
     {
         std::lock_guard<std::mutex> lock(mutex_);
         memcpy_s(&localLeFeatures_, sizeof(localLeFeatures_), features, sizeof(*features));
@@ -738,7 +738,7 @@ void AdapterProperties::ParseLocalLeFeatures(bt_property_t* property)
     HILOGI("Supported LE features updated");
 }
 
-std::string AdapterProperties::ParseAlias(bt_property_t* property)
+std::string AdapterProperties::ParseAlias(BtProperty* property)
 {
     if (property->len < 0) {
         HILOGE("invalid name");
@@ -753,12 +753,12 @@ std::string AdapterProperties::ParseAlias(bt_property_t* property)
         HILOGI("name is too long");
         len = MAX_ALIAS_LENGTH;
     }
-    bt_bdname_t* hal_name = reinterpret_cast<bt_bdname_t*>(property->val);
+    BtBdname* hal_name = reinterpret_cast<BtBdname*>(property->val);
     std::string alias(hal_name->name, hal_name->name + len);
     return alias;
 }
 
-int32_t AdapterProperties::ParseRemoteDeviceIoCapability(bt_property_t* property)
+int32_t AdapterProperties::ParseRemoteDeviceIoCapability(BtProperty* property)
 {
     if (property->len < INVALID_VALUE) {
         HILOGE("Invalid length for HW_BT_PROPERTY_RMT_IO_CAP_KEY");
@@ -773,7 +773,7 @@ int32_t AdapterProperties::ParseRemoteDeviceIoCapability(bt_property_t* property
     }
 }
 
-int32_t AdapterProperties::ParseDeviceVendorId(bt_property_t* property)
+int32_t AdapterProperties::ParseDeviceVendorId(BtProperty* property)
 {
     if (property->len != sizeof(int32_t)) {
         HILOGE("Invalid length for BT_PROPERTY_VENDOR_ID");
@@ -788,7 +788,7 @@ int32_t AdapterProperties::ParseDeviceVendorId(bt_property_t* property)
     }
 }
 
-int32_t AdapterProperties::ParseDeviceProductId(bt_property_t* property)
+int32_t AdapterProperties::ParseDeviceProductId(BtProperty* property)
 {
     if (property->len != sizeof(int32_t)) {
         HILOGE("Invalid length for BT_PROPERTY_PRODUCT_ID");
@@ -803,7 +803,7 @@ int32_t AdapterProperties::ParseDeviceProductId(bt_property_t* property)
     }
 }
 
-int32_t AdapterProperties::ParseDeviceAutoConnSwitch(bt_property_t* property)
+int32_t AdapterProperties::ParseDeviceAutoConnSwitch(BtProperty* property)
 {
     if (property->len != sizeof(int32_t)) {
         HILOGE("Invalid length for BT_PROPERTY_AUTO_CONNECT_SWITCH");

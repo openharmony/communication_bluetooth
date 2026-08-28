@@ -565,7 +565,7 @@ public:
      */
     int GetConnectStrategy(const RawAddress &device) override;
 
-    bthf_client_interface_t* GetBluetoothHfInterface() const;
+    BthfClientInterface* GetBluetoothHfInterface() const;
 
 private:
     /**
@@ -588,7 +588,7 @@ private:
     bool IsConnected(const std::string &address);
     void ReportCallInfo(const HandsFreeUnitCalls &call, const RawAddress &device);
     bool IsRemoteHfpSupported(const RawAddress &device);
-    bthf_client_interface_t* bluetoothHfInterface = nullptr;
+    BthfClientInterface* bluetoothHfInterface = nullptr;
 
     bool isStarted_ {false};
     bool isShuttingDown_ {false};

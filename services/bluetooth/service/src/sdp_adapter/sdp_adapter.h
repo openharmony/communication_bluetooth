@@ -89,7 +89,7 @@ public:
 
 private:
     SdpAdapter();
-    btsdp_interface_t *bluetoothSdpInterface_ = nullptr;
+    BtsdpInterface *bluetoothSdpInterface_ = nullptr;
     MapMnsSdpFoundCallback mapMnsSdpFoundCallback_ = nullptr;
     OppSdpFoundCallback oppSdpFoundCallback_ = nullptr;
 };

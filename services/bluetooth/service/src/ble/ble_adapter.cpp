@@ -107,15 +107,15 @@ namespace {
 bool InitStackGattProfile(void)
 {
     // Init stack gatt profile.
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int ret = hal_util_load_bt_library(&btInterface);
     if (ret != 0 || btInterface == nullptr) {
         HILOGE("Load bluetooth library failed");
         return false;
     }
 
-    const btgatt_interface_t* gattInterface =
-        reinterpret_cast<const btgatt_interface_t*>(btInterface->get_profile_interface(BT_PROFILE_GATT_ID));
+    const BtgattInterface* gattInterface =
+        reinterpret_cast<const BtgattInterface*>(btInterface->getProfileInterface(BT_PROFILE_GATT_ID));
     if (gattInterface == nullptr) {
         HILOGE("Failed to get gatt interface handle");
         return false;
@@ -297,7 +297,7 @@ int BleAdapter::GetPeerDeviceAddrType(const RawAddress &device) const
 
     auto remoteAddr = ServiceUtil::AddrToStack(device);
     uint8_t remoteAddrType;
-    if (btif_storage_get_remote_addr_type(&remoteAddr, &remoteAddrType) == BT_STATUS_SUCCESS) {
+    if (BtifStorageGetRemoteAddrType(&remoteAddr, &remoteAddrType) == BT_STATUS_SUCCESS) {
         ret = ServiceUtil::AddrTypeFromStack(remoteAddrType);
     }
 
@@ -649,13 +649,13 @@ int BleAdapter::BleRestoreRangingAntSwitch(bluetooth::BleAppType appType)
 
 void BleAdapter::SendBleScanMsg(bool isStarted)
 {
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int status = hal_util_load_bt_library(&btInterface);
     if (status != 0) {
         HILOGE("Failed to open the Bluetooth module");
         return;
     }
-    btInterface->send_ble_scan_msg(isStarted);
+    btInterface->sendBleScanMsg(isStarted);
 }
 
 REGISTER_CLASS_CREATOR(BleAdapter);

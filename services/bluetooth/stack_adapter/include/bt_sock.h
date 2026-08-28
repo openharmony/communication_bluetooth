@@ -37,16 +37,16 @@
 
 /* Connect signal exchanged over the accept fd (bluedroid
  * system/include/hardware/bt_sock.h). */
-typedef struct {
+struct SockConnectSignal {
     int16_t size;
-    RawAddress bd_addr;
+    RawAddress bdAddr;
     int channel;
     int status;
-    uint16_t max_tx_packet_size;
-    uint16_t max_rx_packet_size;
-    uint64_t conn_uuid_lsb;
-    uint64_t conn_uuid_msb;
-    uint64_t socket_id;
-} __attribute__((packed)) sock_connect_signal_t;
+    uint16_t maxTxPacketSize;
+    uint16_t maxRxPacketSize;
+    uint64_t connUuidLsb;
+    uint64_t connUuidMsb;
+    uint64_t socketId;
+} __attribute__((packed));
 
 #endif  // BT_SOCK_H

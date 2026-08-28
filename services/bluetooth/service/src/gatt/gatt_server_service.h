@@ -78,7 +78,7 @@ public:
     int GetMaxConnectNum(void) override;
 
     // Only used in test
-    void SetBtifInterface(const btgatt_server_interface_t *interface);
+    void SetBtifInterface(const BtgattServerInterface *interface);
 
     BT_DISALLOW_COPY_AND_ASSIGN(GattServerService);
 
@@ -88,7 +88,7 @@ private:
     int Connect(const RawAddress &device) override;
     int Disconnect(const RawAddress &device) override;
 
-    const btgatt_server_interface_t *btIfGattServer_ = nullptr;
+    const BtgattServerInterface *btIfGattServer_ = nullptr;
 
     DECLARE_IMPL();
 };

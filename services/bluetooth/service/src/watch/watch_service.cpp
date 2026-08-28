@@ -203,7 +203,7 @@ static BtWatchCallbacks g_sBluetoothWatchCallbacks = {
     HwWatchLinkLossNotifyCb,
 };
 
-static void HidConnectionStateCb(STACK::RawAddress* bdAddr, bthd_connection_state_t state)
+static void HidConnectionStateCb(STACK::RawAddress* bdAddr, BthdConnectionState state)
 {
     RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
     auto deviceManager = GlobalDeviceManager::getInstance().GetSaisDevice();
@@ -239,7 +239,7 @@ static void HidVirtualCableUnplugCb()
     WatchService::GetInstance()->ProcessRemovePair();
 }
 
-static bthd_callbacks_t g_sBluetootHDCallbacks = {
+static BthdCallbacks g_sBluetootHDCallbacks = {
     sizeof(g_sBluetootHDCallbacks),
     nullptr,
     HidConnectionStateCb,
@@ -252,31 +252,31 @@ static bthd_callbacks_t g_sBluetootHDCallbacks = {
 
 void WatchService::RegisterHid()
 {
-    bthd_app_param_t appParam;
-    bthd_qos_param_t inQos;
-    bthd_qos_param_t outQos;
+    BthdAppParam appParam;
+    BthdQosParam inQos;
+    BthdQosParam outQos;
     appParam.name = NAME;
     appParam.description = DESCRIPTION;
     appParam.provider = PROVIDER;
     appParam.subclass = g_subclass;
-    appParam.desc_list = const_cast<uint8_t*>(g_hidData);
-    appParam.desc_list_len = sizeof(g_hidData);
-    inQos.service_type = 0x01;
-    inQos.token_rate = 0;
-    inQos.token_bucket_size = 0;
-    inQos.peak_bandwidth = 0;
-    inQos.access_latency = 0xffffffff;
-    inQos.delay_variation = 0xffffffff;
-    outQos.service_type = 0x02;
-    outQos.token_rate = 0;
-    outQos.token_bucket_size = 0;
-    outQos.peak_bandwidth = 0;
-    outQos.access_latency = g_accessLatency;
-    outQos.delay_variation = 0xffffffff;
+    appParam.descList = const_cast<uint8_t*>(g_hidData);
+    appParam.descListLen = sizeof(g_hidData);
+    inQos.serviceType = 0x01;
+    inQos.tokenRate = 0;
+    inQos.tokenBucketSize = 0;
+    inQos.peakBandwidth = 0;
+    inQos.accessLatency = 0xffffffff;
+    inQos.delayVariation = 0xffffffff;
+    outQos.serviceType = 0x02;
+    outQos.tokenRate = 0;
+    outQos.tokenBucketSize = 0;
+    outQos.peakBandwidth = 0;
+    outQos.accessLatency = g_accessLatency;
+    outQos.delayVariation = 0xffffffff;
 
     hidConnectionState_ = BTHD_CONN_STATE_DISCONNECTED;
     if (bluetoothHidInterface != nullptr) {
-        bt_status_t ret = bluetoothHidInterface->register_app(&appParam, &inQos, &outQos);
+        BtStackStatus ret = bluetoothHidInterface->registerApp(&appParam, &inQos, &outQos);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("Failed to initialize Bluetooth hd register fail, status: %{public}d", ret);
         }
@@ -297,19 +297,19 @@ void WatchService::Start()
     CHECK_AND_RETURN_LOG(bluetoothInterface != nullptr, "bluetoothInterface is null!");
 
     bluetoothWatchInterface =  reinterpret_cast<BtHwWatchInterface*>(
-        const_cast<void *>(bluetoothInterface->get_profile_interface(BT_VENDER_WATCH_ID)));
+        const_cast<void *>(bluetoothInterface->getProfileInterface(BT_VENDER_WATCH_ID)));
     CHECK_AND_RETURN_LOG(bluetoothWatchInterface != nullptr, "bluetoothWatchInterface is null!");
 
-    bluetoothHidInterface = reinterpret_cast<bthd_interface_t*>(
-        const_cast<void *>(bluetoothInterface->get_profile_interface(BT_PROFILE_HIDDEV_ID)));
+    bluetoothHidInterface = reinterpret_cast<BthdInterface*>(
+        const_cast<void *>(bluetoothInterface->getProfileInterface(BT_PROFILE_HIDDEV_ID)));
     CHECK_AND_RETURN_LOG(bluetoothHidInterface != nullptr, "bluetoothHidInterface is null!");
 
-    bt_status_t status = bluetoothWatchInterface->init(&g_sBluetoothWatchCallbacks);
+    BtStackStatus status = bluetoothWatchInterface->Init(&g_sBluetoothWatchCallbacks);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("Failed to initialize Bluetooth watch, status: %{public}d", status);
         return;
     }
-    bt_status_t hdStatus = bluetoothHidInterface->init(&g_sBluetootHDCallbacks);
+    BtStackStatus hdStatus = bluetoothHidInterface->init(&g_sBluetootHDCallbacks);
     if (hdStatus != BT_STATUS_SUCCESS) {
         HILOGE("Failed to initialize Bluetooth hd, status: %{public}d", hdStatus);
     }
@@ -452,7 +452,7 @@ void WatchService::Stop()
 {
     HILOGI("stop");
     if (bluetoothHidInterface) {
-        bluetoothHidInterface->unregister_app();
+        bluetoothHidInterface->unregisterApp();
     }
     auto classicAdapter = IAdapterManager::GetInstance()->GetClassicAdapterInterface();
     if (classicAdapter) {
@@ -1667,10 +1667,10 @@ void WatchService::UpdataHighPowerMode(bool enable)
     if (lastHighPowerEnable_ == enable) {
         return;
     }
-    if (bluetoothInterface->enable_bluetooth_highpower != nullptr) {
+    if (bluetoothInterface->enableBluetoothHighpower != nullptr) {
         HILOGI("UpdataHighPowerMode = %{public}d.", enable);
         lastHighPowerEnable_ = enable;
-        bluetoothInterface->enable_bluetooth_highpower(enable);
+        bluetoothInterface->enableBluetoothHighpower(enable);
     }
 }
 
@@ -1697,7 +1697,7 @@ void WatchService::HidUpdateMap()
         HILOGI("WatchService::HidUpdateMap map has updated");
         return;
     }
-    ret = bluetoothHidInterface->virtual_cable_unplug();
+    ret = bluetoothHidInterface->virtualCableUnplug();
     if (ret == BT_STATUS_SUCCESS) {
         isHidMapUpdateing_ = true;
         SetParameter(HID_MAP_UPDATE, g_stateOn);
@@ -1737,14 +1737,14 @@ void WatchService::HidVolumeIncrement()
     }
     HILOGI("WatchService::HidVolumeIncrement HidVolumeIncrementDataSize: %{public}d", sizeof(HidConsumerControlUsAge));
     HoldRunningLock(WAKE_TIME);
-    ret = bluetoothHidInterface->send_report(BTHD_REPORT_TYPE_INTRDATA, hidVolumeIncrementData.reportId,
+    ret = bluetoothHidInterface->sendReport(BTHD_REPORT_TYPE_INTRDATA, hidVolumeIncrementData.reportId,
         sizeof(HidConsumerControlUsAge), (uint8_t *)&hidVolumeIncrementData.hidConsumerControlUsAgeData);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("WatchService::HidVolumeIncrement send_report: %{public}d", ret);
     }
 
     hidVolumeIncrementData.hidConsumerControlUsAgeData.dataType = 0;
-    ret = bluetoothHidInterface->send_report(BTHD_REPORT_TYPE_INTRDATA, hidVolumeIncrementData.reportId,
+    ret = bluetoothHidInterface->sendReport(BTHD_REPORT_TYPE_INTRDATA, hidVolumeIncrementData.reportId,
         sizeof(HidConsumerControlUsAge), (uint8_t *)&hidVolumeIncrementData.hidConsumerControlUsAgeData);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("WatchService::HidVolumeIncrement send_report release: %{public}d", ret);
@@ -1771,14 +1771,14 @@ void WatchService::HidVolumeDecrement()
     }
     HILOGI("WatchService::HidVolumeDecrement HidVolumeDecrementDataSize: %{public}d", sizeof(HidConsumerControlUsAge));
     HoldRunningLock(WAKE_TIME);
-    ret = bluetoothHidInterface->send_report(BTHD_REPORT_TYPE_INTRDATA, hidVolumeDecrementlData.reportId,
+    ret = bluetoothHidInterface->sendReport(BTHD_REPORT_TYPE_INTRDATA, hidVolumeDecrementlData.reportId,
         sizeof(HidConsumerControlUsAge), (uint8_t *)&hidVolumeDecrementlData.hidConsumerControlUsAgeData);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("WatchService::HidVolumeDecrement send_report: %{public}d", ret);
     }
 
     hidVolumeDecrementlData.hidConsumerControlUsAgeData.dataType = 0;
-    ret = bluetoothHidInterface->send_report(BTHD_REPORT_TYPE_INTRDATA, hidVolumeDecrementlData.reportId,
+    ret = bluetoothHidInterface->sendReport(BTHD_REPORT_TYPE_INTRDATA, hidVolumeDecrementlData.reportId,
         sizeof(HidConsumerControlUsAge), (uint8_t *)&hidVolumeDecrementlData.hidConsumerControlUsAgeData);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("WatchService::HidVolumeDecrement send_report release: %{public}d", ret);
@@ -1812,7 +1812,7 @@ void WatchService::HidDoubleClick()
         hidClickData.hidTouchScreenUsAgeData.tipSwitch = 1;
         hidClickData.hidTouchScreenUsAgeData.x = HID_PLAY_PAUSE_AXIS;
         hidClickData.hidTouchScreenUsAgeData.y = HID_PLAY_PAUSE_AXIS;
-        ret = bluetoothHidInterface->send_report(BTHD_REPORT_TYPE_INTRDATA, hidClickData.reportId,
+        ret = bluetoothHidInterface->sendReport(BTHD_REPORT_TYPE_INTRDATA, hidClickData.reportId,
             sizeof(HidTouchScreenUsAge), (uint8_t *)&hidClickData.hidTouchScreenUsAgeData);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("WatchService::HidDoubleClick send_report: %{public}d", ret);
@@ -1820,7 +1820,7 @@ void WatchService::HidDoubleClick()
         hidClickData.hidTouchScreenUsAgeData.tipSwitch = 0;
         hidClickData.hidTouchScreenUsAgeData.x = 0;
         hidClickData.hidTouchScreenUsAgeData.y = 0;
-        ret = bluetoothHidInterface->send_report(BTHD_REPORT_TYPE_INTRDATA, hidClickData.reportId,
+        ret = bluetoothHidInterface->sendReport(BTHD_REPORT_TYPE_INTRDATA, hidClickData.reportId,
             sizeof(HidTouchScreenUsAge), (uint8_t *)&hidClickData.hidTouchScreenUsAgeData);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("WatchService::HidDoubleClick release send_report: %{public}d", ret);
@@ -1851,7 +1851,7 @@ void WatchService::HidSingleClick()
     }
     HILOGI("WatchService::HidSingleClick HidPlayPauseSendDataSize: %{public}d", sizeof(HidTouchScreenUsAge));
     HoldRunningLock(WAKE_TIME);
-    ret = bluetoothHidInterface->send_report(BTHD_REPORT_TYPE_INTRDATA, hidPlayPauseData.reportId,
+    ret = bluetoothHidInterface->sendReport(BTHD_REPORT_TYPE_INTRDATA, hidPlayPauseData.reportId,
         sizeof(HidTouchScreenUsAge), (uint8_t *)&hidPlayPauseData.hidTouchScreenUsAgeData);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("WatchService::HidSingleClick send_report: %{public}d", ret);
@@ -1859,7 +1859,7 @@ void WatchService::HidSingleClick()
     hidPlayPauseData.hidTouchScreenUsAgeData.tipSwitch = 0;
     hidPlayPauseData.hidTouchScreenUsAgeData.x = 0;
     hidPlayPauseData.hidTouchScreenUsAgeData.y = 0;
-    ret = bluetoothHidInterface->send_report(BTHD_REPORT_TYPE_INTRDATA, hidPlayPauseData.reportId,
+    ret = bluetoothHidInterface->sendReport(BTHD_REPORT_TYPE_INTRDATA, hidPlayPauseData.reportId,
         sizeof(HidTouchScreenUsAge), (uint8_t *)&hidPlayPauseData.hidTouchScreenUsAgeData);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("WatchService::HidSingleClick release send_report: %{public}d", ret);

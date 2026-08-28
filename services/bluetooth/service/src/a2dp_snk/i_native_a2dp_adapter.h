@@ -33,10 +33,10 @@ public:
     virtual ~INativeA2dpSinkCallback() = default;
 
     // 连接状态变化回调（来自 Bluedroid 协议栈）
-    virtual void OnNativeConnectionStateChanged(const RawAddress &device, btav_connection_state_t state) = 0;
+    virtual void OnNativeConnectionStateChanged(const RawAddress &device, BtavConnectionState state) = 0;
 
     // 音频流状态变化回调（来自 Bluedroid 协议栈）
-    virtual void OnNativeAudioStateChanged(const RawAddress &device, btav_audio_state_t state) = 0;
+    virtual void OnNativeAudioStateChanged(const RawAddress &device, BtavAudioState state) = 0;
 
     // 音频配置变化回调（来自 Bluedroid 协议栈）
     virtual void OnNativeAudioConfigChanged(const RawAddress &device, uint32_t sampleRate, uint8_t channelCount) = 0;
@@ -45,13 +45,13 @@ public:
 class INativeA2dpAdapter {
 public:
     virtual ~INativeA2dpAdapter() = default;
-    virtual bt_status_t Init(INativeA2dpSinkCallback *callback, int maxDevices) = 0;
-    virtual bt_status_t Connect(const RawAddress& bdAddr) = 0;
-    virtual bt_status_t Disconnect(const RawAddress& bdAddr) = 0;
+    virtual BtStackStatus Init(INativeA2dpSinkCallback *callback, int maxDevices) = 0;
+    virtual BtStackStatus Connect(const RawAddress& bdAddr) = 0;
+    virtual BtStackStatus Disconnect(const RawAddress& bdAddr) = 0;
     virtual void Cleanup() = 0;
     virtual void SetAudioFocusState(int focusState) = 0;
     virtual void SetAudioTrackGain(float gain) = 0;
-    virtual bt_status_t SetActiveDevice(const RawAddress& bdAddr) = 0;
+    virtual BtStackStatus SetActiveDevice(const RawAddress& bdAddr) = 0;
 };
 
 } // namespace bluetooth

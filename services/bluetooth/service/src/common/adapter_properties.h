@@ -58,24 +58,24 @@ public:
     void UnregisterNameChangeObserver();
     void HandleNameChange();
 
-    void ParseAdapterProps(bt_status_t status, int numProperties, bt_property_t *properties);
-    std::string ParseDeviceName(bt_property_t* property);
-    RawAddress ParseDeviceAddr(bt_property_t* property);
-    std::vector<Uuid> ParseDeviceUuid(bt_property_t* property);
-    uint32_t ParseDeviceType(bt_property_t* property);
-    uint32_t ParseDeviceCod(bt_property_t* property);
-    int8_t ParseDeviceRssi(bt_property_t* property);
-    int ParseDeviceIoCapability(bt_property_t* property);
-    bool ParseScanMode(bt_property_t* property, int &scanMode);
-    std::vector<std::string> ParseBondedDevices(bt_property_t* property);
-    void ParseLocalLeFeatures(bt_property_t* property);
-    int32_t ParseAbsVolumeAbility(bt_property_t* property);
-    std::string ParseAlias(bt_property_t* property);
-    int32_t ParseDeviceCustomType(bt_property_t* property);
-    int32_t ParseRemoteDeviceIoCapability(bt_property_t* property);
-    int32_t ParseDeviceVendorId(bt_property_t* property);
-    int32_t ParseDeviceProductId(bt_property_t* property);
-    int32_t ParseDeviceAutoConnSwitch(bt_property_t* property);
+    void ParseAdapterProps(BtStackStatus status, int numProperties, BtProperty *properties);
+    std::string ParseDeviceName(BtProperty* property);
+    RawAddress ParseDeviceAddr(BtProperty* property);
+    std::vector<Uuid> ParseDeviceUuid(BtProperty* property);
+    uint32_t ParseDeviceType(BtProperty* property);
+    uint32_t ParseDeviceCod(BtProperty* property);
+    int8_t ParseDeviceRssi(BtProperty* property);
+    int ParseDeviceIoCapability(BtProperty* property);
+    bool ParseScanMode(BtProperty* property, int &scanMode);
+    std::vector<std::string> ParseBondedDevices(BtProperty* property);
+    void ParseLocalLeFeatures(BtProperty* property);
+    int32_t ParseAbsVolumeAbility(BtProperty* property);
+    std::string ParseAlias(BtProperty* property);
+    int32_t ParseDeviceCustomType(BtProperty* property);
+    int32_t ParseRemoteDeviceIoCapability(BtProperty* property);
+    int32_t ParseDeviceVendorId(BtProperty* property);
+    int32_t ParseDeviceProductId(BtProperty* property);
+    int32_t ParseDeviceAutoConnSwitch(BtProperty* property);
     bool GetSettingDeviceName(std::string &value);
     bool SetDeviceName(std::string name);
     bool SetBroadcastName(std::string deviceName);
@@ -107,12 +107,12 @@ public:
     uint16_t GetBleMaxAdvertisingDataLength(void) const;
     bool GetLeExtendedAdvertisingSupported(void) const;
     bool GetLe2mPhySupported(void) const;
-    int64_t ParseDeviceConnectionTime(bt_property_t* property);
+    int64_t ParseDeviceConnectionTime(BtProperty* property);
 private:
 
     uint32_t ConvertDeviceTypeFromBluetdroid(uint32_t deviceType);
-    void HandlePropertyLocalAddress(bt_property_t* property);
-    void HandlePropertyScanMode(bt_property_t* property);
+    void HandlePropertyLocalAddress(BtProperty* property);
+    void HandlePropertyScanMode(BtProperty* property);
     std::string GetTruncationName(const std::string &deviceName);
     int GetUTF8StringLength(const char firstByte);
     int GetValidUTF8StringLength(const std::string &name);
@@ -137,7 +137,7 @@ private:
     // The current set of supported LE features as obtained from the stack. The
     // values here are all initially set to 0 and updated when the corresponding
     // adapter property has been received from the stack.
-    bt_local_le_features_t localLeFeatures_ {};
+    BtLocalLeFeatures localLeFeatures_ {};
     ClassicConfig &config_;
     std::shared_ptr<utility::Timer> queryDeviceNameTimeout_ = nullptr;
     int32_t delayQueryTime = 5000; // delay 5s

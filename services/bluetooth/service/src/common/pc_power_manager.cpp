@@ -185,7 +185,7 @@ void ForceSleep::SetLeConnectionScanToFast(bool enable)
 {
     HILOGI("SetLeConnectionScanToFast:%{public}d", enable);
     if (IsPairedMouseOrKeyboard()) {
-        const bthwif_interface_t *bthwifInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+        const BthwifInterface *bthwifInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
         CHECK_AND_RETURN_LOG(bthwifInterface != nullptr, "bthwifInterface nullptr");
         bthwifInterface->hwSetLeConnectionScanToFast(enable);
     }
@@ -358,7 +358,7 @@ void IPowerState::CmdFilterHdiToHisi(const uint8_t &enabled)
             HILOGE("Not mouse or keyboard device %{public}s", GetEncryptAddr(realAddr.GetAddress()).c_str());
             continue;
         }
-        const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+        const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
         CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
         STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(realAddr);
         ForceSleepFilterHidData filterHidData = {enabled, transport, rawAddr};

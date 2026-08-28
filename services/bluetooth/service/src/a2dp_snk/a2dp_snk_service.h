@@ -117,8 +117,8 @@ public:
     int GetMaxConnectNum() override;
 
     // --- INativeA2dpSinkCallback 实现 ---
-    void OnNativeConnectionStateChanged(const RawAddress &device, btav_connection_state_t state) override;
-    void OnNativeAudioStateChanged(const RawAddress &device, btav_audio_state_t state) override;
+    void OnNativeConnectionStateChanged(const RawAddress &device, BtavConnectionState state) override;
+    void OnNativeAudioStateChanged(const RawAddress &device, BtavAudioState state) override;
     void OnNativeAudioConfigChanged(const RawAddress &device, uint32_t sampleRate, uint8_t channelCount) override;
 
 private:
@@ -138,7 +138,7 @@ private:
     bool CheckDeviceNotConnected(const std::string &address);
 
     bool isStarted_{false};
-    btav_sink_interface_t *btAvSinkInterface_{nullptr};
+    BtavSinkInterface *btAvSinkInterface_{nullptr};
     int maxConnectAudioDevices_{A2DP_SNK_CONNECT_NUM_MAX};
     bool isShuttingDown_{false};
     BaseObserverList<IA2dpSnkObserver> a2dpSnkFwObservers_{};

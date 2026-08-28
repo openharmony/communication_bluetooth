@@ -51,7 +51,7 @@ public:
     void RemoveStateMachine(const std::string &device) override;
     bool IsStateMachineEmpty() override;
     void ClearStatemachine() override;
-    btpan_interface_t* GetPanInterface();
+    BtpanInterface* GetPanInterface();
     std::string GetIfname();
 
     void DllIsTetheringOnFunc(const std::function<bool()> IsTetheringOnFunc) override;
@@ -78,7 +78,7 @@ private:
 
     SafeMap<const std::string, std::shared_ptr<PanStateMachine>> stateMachines_ {};
     std::string ifname_ {"bt-pan"};
-    btpan_interface_t* panInterface_ = nullptr;
+    BtpanInterface* panInterface_ = nullptr;
     const std::map<const int, const int> stateMap_ = {
         {PAN_STATE_DISCONNECTED, static_cast<int>(bluetooth::BTConnectState::DISCONNECTED)},
         {PAN_STATE_CONNECTING, static_cast<int>(bluetooth::BTConnectState::CONNECTING)},

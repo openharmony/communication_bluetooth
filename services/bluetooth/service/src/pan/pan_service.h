@@ -86,7 +86,7 @@ public:
     void NotifyStateChanged(const bluetooth::RawAddress &device, int state, int role);
     void RemoveStateMachine(const std::string &device);
     
-    btpan_interface_t *getBluetoothPanInterface() const;
+    BtpanInterface *getBluetoothPanInterface() const;
 
     void ProcessEvent(const PanMessage &event);
 
@@ -101,13 +101,13 @@ public:
      */
     void PostEvent(const PanMessage &event);
 
-    static void ConnectionStateCallback(btpan_connection_state_t state,
-        bt_status_t error, const STACK::RawAddress* addr, int localRole, int remoteRole);
+    static void ConnectionStateCallback(BtpanConnectionState state,
+        BtStackStatus error, const STACK::RawAddress* addr, int localRole, int remoteRole);
 
-    static void ControlStateCallback(btpan_control_state_t state,
-        int localRole, bt_status_t error, const char* ifname);
+    static void ControlStateCallback(BtpanControlState state,
+        int localRole, BtStackStatus error, const char* ifname);
 private:
-    btpan_interface_t* bluetoothPanInterface_ = nullptr;
+    BtpanInterface* bluetoothPanInterface_ = nullptr;
 
     bool isStarted_ {false};
 

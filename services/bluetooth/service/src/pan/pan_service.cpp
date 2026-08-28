@@ -245,7 +245,7 @@ int PanService::GetMaxConnectNum(void)
     return maxConnectionsNum_;
 }
 
-btpan_interface_t* PanService::getBluetoothPanInterface() const
+BtpanInterface* PanService::getBluetoothPanInterface() const
 {
     return bluetoothPanInterface_;
 }
@@ -268,8 +268,8 @@ void PanService::NotifyStateChanged(const bluetooth::RawAddress &device, int sta
     });
 }
 
-void PanService::ConnectionStateCallback(btpan_connection_state_t state,
-    bt_status_t error, const STACK::RawAddress* addr, int localRole, int remoteRole)
+void PanService::ConnectionStateCallback(BtpanConnectionState state,
+    BtStackStatus error, const STACK::RawAddress* addr, int localRole, int remoteRole)
 {
     HILOGI("error=%{public}d, state=%{public}d, addr = %{public}s",
         error, state, GetEncryptAddr(addr->ToString()).c_str());
@@ -312,8 +312,8 @@ void PanService::ConnectionStateCallback(btpan_connection_state_t state,
     service->PostEvent(event);
 }
 
-void PanService::ControlStateCallback(btpan_control_state_t state, int localRole,
-    bt_status_t error, const char* ifname)
+void PanService::ControlStateCallback(BtpanControlState state, int localRole,
+    BtStackStatus error, const char* ifname)
 {
     HILOGI("ifname=%{public}s, error=%{public}d", ifname, error);
     if (error != BT_STATUS_SUCCESS) {
@@ -383,7 +383,7 @@ void PanService::ProcessEvent(const PanMessage &event)
     }
 }
 
-btpan_callbacks_t sBluetoothPanCallbacks = {
+BtpanCallbacks sBluetoothPanCallbacks = {
     sizeof(sBluetoothPanCallbacks),
     PanService::ControlStateCallback,
     PanService::ConnectionStateCallback,
@@ -400,16 +400,16 @@ void PanService::StartUp()
     }
 
     GetContext()->OnEnable(PROFILE_NAME_PAN, true);
-    bt_interface_t* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
+    BtInterface* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
     if (bluetoothInterface == nullptr) {
         return;
     }
-    bluetoothPanInterface_ = reinterpret_cast<btpan_interface_t*>(
-        const_cast<void *>(bluetoothInterface->get_profile_interface(BT_PROFILE_PAN_ID)));
+    bluetoothPanInterface_ = reinterpret_cast<BtpanInterface*>(
+        const_cast<void *>(bluetoothInterface->getProfileInterface(BT_PROFILE_PAN_ID)));
     if (bluetoothPanInterface_ == nullptr) {
         return;
     }
-    bt_status_t status = bluetoothPanInterface_->init(&sBluetoothPanCallbacks);
+    BtStackStatus status = bluetoothPanInterface_->init(&sBluetoothPanCallbacks);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("Failed to initialize Bluetooth PAN, status: %{public}d", status);
         return;

@@ -54,7 +54,7 @@ BleScanFilter::~BleScanFilter()
 }
 
 bool BleScanFilter::SendScanFilterParam(uint8_t action, int filterIndex,
-    std::unique_ptr<btgatt_filt_param_setup_t> filtParam) const
+    std::unique_ptr<BtgattFiltParamSetup> filtParam) const
 {
     if (!btifBleScanner_) {
         return false;
@@ -128,7 +128,7 @@ void BleScanFilter::DeleteScanFilters(void)
     std::lock_guard<std::mutex> lock(filterIndexsMutex_);
     for (int index : filterIndexSet_) {
         SendScanFilterParam(FILTER_ACTION_DELETE, index, nullptr);
-        const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+        const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
         if (bluetoothHwSrcInterface == nullptr) {
             HILOGE("interface nullptr");
             return;
@@ -172,20 +172,20 @@ bool BleScanFilter::SetScanFilterParameters(int filterIndex, const BleScanFilter
     uint8_t deliveryMode, uint8_t sensitivityMode, uint16_t trackAdvNum) const
 {
     bool onFound = (deliveryMode == DELIVERY_MODE_ON_FOUND);
-    auto param = std::make_unique<btgatt_filt_param_setup_t>();
+    auto param = std::make_unique<BtgattFiltParamSetup>();
     auto [highRssi, lowRssi] = GetRssiThres(sensitivityMode, onFound);
-    param->feat_seln = GetFeatureSelection(filter);
-    param->list_logic_type = LIST_LOGIC_TYPE;
-    param->filt_logic_type = LOGIC_AND;
+    param->featSeln = GetFeatureSelection(filter);
+    param->listLogicType = LIST_LOGIC_TYPE;
+    param->filtLogicType = LOGIC_AND;
     int32_t rssiThreshold = filter.HasRssiThreshold() ? filter.GetRssiThreshold() : BLE_SCAN_MIN_RSSI_THRESHOLD;
     // Set a value with a smaller absolute value
-    param->rssi_high_thres = static_cast<uint8_t>((rssiThreshold > highRssi) ? rssiThreshold : highRssi);
-    param->dely_mode = deliveryMode;
-    param->found_timeout = GetOnFoundOrLostTimeout(sensitivityMode, true);
-    param->lost_timeout = ON_LOST_IMEOUT_MS;
-    param->found_timeout_cnt = GetOnFoundCount(sensitivityMode);
-    param->rssi_low_thres = static_cast<uint8_t>(lowRssi);
-    param->num_of_tracking_entries = trackAdvNum;
+    param->rssiHighThres = static_cast<uint8_t>((rssiThreshold > highRssi) ? rssiThreshold : highRssi);
+    param->delyMode = deliveryMode;
+    param->foundTimeout = GetOnFoundOrLostTimeout(sensitivityMode, true);
+    param->lostTimeout = ON_LOST_IMEOUT_MS;
+    param->foundTimeoutCnt = GetOnFoundCount(sensitivityMode);
+    param->rssiLowThres = static_cast<uint8_t>(lowRssi);
+    param->numOfTrackingEntries = trackAdvNum;
 
     return SendScanFilterParam(FILTER_ACTION_ADD, filterIndex, std::move(param));
 }
@@ -222,16 +222,16 @@ void BleScanFilter::ApcfCommandLog(const std::vector<ApcfCommand> &cmds) const
     for (const auto &cmd : cmds) {
         switch (cmd.type) {
             case BTM_BLE_PF_ADDR_FILTER:
-                HILOGI("Address: %{public}s, AddrType: %{public}d, Irk: %{public}s", cmd.address.ToStringForLogging().c_str(),
-                    cmd.addr_type, GetEncryptIrk(cmd.irk).c_str());
+                HILOGI("Address: %{public}s, AddrType: %{public}d, Irk: %{public}s",
+                    cmd.address.ToStringForLogging().c_str(), cmd.addrType, GetEncryptIrk(cmd.irk).c_str());
                 break;
             case BTM_BLE_PF_SRVC_UUID:
                 HILOGI("ServiceUuid: %{public}s, mask: %{public}s",
-                    cmd.uuid.ToString().c_str(), cmd.uuid_mask.ToString().c_str());
+                    cmd.uuid.ToString().c_str(), cmd.uuidMask.ToString().c_str());
                 break;
             case BTM_BLE_PF_SRVC_SOL_UUID:
                 HILOGI("ServiceSoliUuid: %{public}s, mask: %{public}s",
-                    cmd.uuid.ToString().c_str(), cmd.uuid_mask.ToString().c_str());
+                    cmd.uuid.ToString().c_str(), cmd.uuidMask.ToString().c_str());
                 break;
             case BTM_BLE_PF_LOCAL_NAME:
                 HILOGI("Name: %{public}s", std::string(cmd.name.begin(), cmd.name.end()).c_str());
@@ -239,11 +239,11 @@ void BleScanFilter::ApcfCommandLog(const std::vector<ApcfCommand> &cmds) const
             case BTM_BLE_PF_MANU_DATA:
                 HILOGI_TIME_LIMIT(__func__,
                     "CompanyId:%{public}#x, CompanyMask:%{public}#x, ManuData:%{public}s, ManuMask:%{public}s",
-                    cmd.company, cmd.company_mask, ToHexString(cmd.data).c_str(), ToHexString(cmd.data_mask).c_str());
+                    cmd.company, cmd.companyMask, ToHexString(cmd.data).c_str(), ToHexString(cmd.dataMask).c_str());
                 break;
             case BTM_BLE_PF_SRVC_DATA_PATTERN:
                 HILOGD("ServiceData: %{public}s, mask: %{public}s",
-                    ToHexString(cmd.data).c_str(), ToHexString(cmd.data_mask).c_str());
+                    ToHexString(cmd.data).c_str(), ToHexString(cmd.dataMask).c_str());
                 break;
             default:
                 break;
@@ -260,21 +260,21 @@ ApcfCommand BleScanFilter::GetCommand(uint8_t cmdType, const BleScanFilterImpl &
         case BTM_BLE_PF_ADDR_FILTER:
             cmd.address = ServiceUtil::AddrToStack(RawAddress(filter.GetDeviceId()));
             if (filter.GetRawAddressType() == RawAddressType::RANDOM_ADDRESS) {
-                cmd.addr_type = BLE_ADDR_RANDOM;
+                cmd.addrType = BLE_ADDR_RANDOM;
             } else if (filter.GetRawAddressType() == RawAddressType::PUBLIC_ADDRESS) {
-                cmd.addr_type = BLE_ADDR_PUBLIC;
+                cmd.addrType = BLE_ADDR_PUBLIC;
             } else {
                 // 若应用没有设置ble扫描地址过滤器中的地址类型，BTC只过滤地址，不限制地址类型
-                cmd.addr_type = BLE_ADDR_ALL_TYPE;
+                cmd.addrType = BLE_ADDR_ALL_TYPE;
             }
             break;
         case BTM_BLE_PF_SRVC_UUID:
             cmd.uuid = filter.GetServiceUuid();
-            cmd.uuid_mask = filter.GetServiceUuidMask();
+            cmd.uuidMask = filter.GetServiceUuidMask();
             break;
         case BTM_BLE_PF_SRVC_SOL_UUID:
             cmd.uuid = filter.GetServiceSolicitationUuid();
-            cmd.uuid_mask = filter.GetServiceSolicitationUuidMask();
+            cmd.uuidMask = filter.GetServiceSolicitationUuidMask();
             break;
         case BTM_BLE_PF_LOCAL_NAME: {
             std::string name = filter.GetName();
@@ -283,13 +283,13 @@ ApcfCommand BleScanFilter::GetCommand(uint8_t cmdType, const BleScanFilterImpl &
         }
         case BTM_BLE_PF_MANU_DATA:
             cmd.company = filter.GetManufacturerId();
-            cmd.company_mask = 0xFFFF;  // default mask all
+            cmd.companyMask = 0xFFFF;  // default mask all
             cmd.data = filter.GetManufactureData();
-            cmd.data_mask = filter.GetManufactureDataMask();
+            cmd.dataMask = filter.GetManufactureDataMask();
             break;
         case BTM_BLE_PF_SRVC_DATA_PATTERN:
             cmd.data = filter.GetServiceData();
-            cmd.data_mask = filter.GetServiceDataMask();
+            cmd.dataMask = filter.GetServiceDataMask();
             break;
         default:
             HILOGE("Unknown command: %{public}u", cmdType);
@@ -341,7 +341,7 @@ bool BleScanFilter::AddScanFilter(int filterIndex, const BleScanFilterImpl &filt
     std::vector<ApcfCommand> cmds;
     SetApcfCommand(filter, cmds);
 
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     if (bluetoothHwSrcInterface == nullptr) {
         HILOGE("interface nullptr");
         return false;
@@ -437,7 +437,7 @@ int BleScanFilter::RemoveScanFilters(const std::vector<BleScanFilterImpl> &filte
         HILOGE("filters size 0");
         return removeSize;
     }
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     if (bluetoothHwSrcInterface == nullptr) {
         HILOGE("interface nullptr");
         return removeSize;

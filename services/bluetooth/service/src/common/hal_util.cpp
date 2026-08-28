@@ -27,7 +27,7 @@
 
 namespace {
 std::once_flag g_loadOnceFlag;
-const bt_interface_t *g_btInterface = nullptr;
+const BtInterface *g_btInterface = nullptr;
 int g_loadResult = 0;
 
 /* Stack library selection: both the closed-source and open stack expose the
@@ -38,7 +38,7 @@ const char *GetStackLibraryName()
 }
 
 /* Both stacks must export the same entry symbol (bluedroid HAL contract). */
-using GetInterfaceFn = const bt_interface_t *(*)();
+using GetInterfaceFn = const BtInterface *(*)();
 
 void LoadBluetoothLibrary()
 {
@@ -58,7 +58,7 @@ void LoadBluetoothLibrary()
     }
     g_btInterface = getter();
     if (g_btInterface == nullptr) {
-        HILOGE("%{public}s returned a null bt_interface_t", libName);
+        HILOGE("%{public}s returned a null BtInterface", libName);
         g_loadResult = -1;
         return;
     }
@@ -67,7 +67,7 @@ void LoadBluetoothLibrary()
 }
 }  // namespace
 
-int hal_util_load_bt_library(const bt_interface_t **btInterface)
+int hal_util_load_bt_library(const BtInterface **btInterface)
 {
     if (btInterface == nullptr) {
         return -1;

@@ -482,13 +482,13 @@ void HearingAidService::StartUp()
         return;
     }
 
-    bt_interface_t* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
+    BtInterface* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
     if (bluetoothInterface == nullptr) {
         HILOGE("Start up failed, bluetoothInterface is null.");
         return;
     }
     serviceData_.bluetoothHearingAidInterface_ = reinterpret_cast<::bluetooth::hearing_aid::HearingAidInterface*>(
-        const_cast<void *>(bluetoothInterface->get_profile_interface(BT_PROFILE_HEARING_AID_ID)));
+        const_cast<void *>(bluetoothInterface->getProfileInterface(BT_PROFILE_HEARING_AID_ID)));
     if (serviceData_.bluetoothHearingAidInterface_ == nullptr) {
         HILOGE("Start up failed, bluetoothHearingAidInterface is null.");
         return;

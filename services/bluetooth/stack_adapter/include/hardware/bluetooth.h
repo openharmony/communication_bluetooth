@@ -27,7 +27,7 @@
 
 #include "bt_types.h"
 
-/* Profile identifiers passed to bt_interface_t::get_profile_interface; the
+/* Profile identifiers passed to BtInterface::GetProfileInterface; the
  * values mirror the removed stack layer HAL (hardware/bluetooth.h). */
 #define BT_PROFILE_HANDSFREE_ID "handsfree"
 #define BT_PROFILE_HANDSFREE_CLIENT_ID "handsfree_client"
@@ -49,39 +49,41 @@
 #define OOB_R_SIZE 16
 #define OOB_NAME_MAX_SIZE 256
 
-/* Callbacks registered by the service layer via bt_interface_t::init; the
+/* Callbacks registered by the service layer via BtInterface::init; the
  * signatures mirror the AdapterManager static callbacks. */
-typedef struct {
+struct BtCallbacks {
     size_t size;
-    void (*adapter_state_changed_cb)(bt_state_t state);
-    void (*adapter_properties_cb)(bt_status_t status, int num_properties, bt_property_t* properties);
-    void (*remote_device_properties_cb)(bt_status_t status, RawAddress* bd_addr, int num_properties,
-        bt_property_t* properties);
-    void (*device_found_cb)(int num_properties, bt_property_t* properties);
-    void (*discovery_state_changed_cb)(bt_discovery_state_t state);
-    void (*pin_request_cb)(RawAddress* remote_bd_addr, bt_bdname_t* bd_name, uint32_t cod, bool min_16_digit);
-    void (*ssp_request_cb)(RawAddress* remote_bd_addr, bt_bdname_t* bd_name, uint32_t cod,
-        bt_ssp_variant_t pairing_variant, uint32_t pass_key);
-    void (*bond_state_changed_cb)(bt_status_t status, RawAddress* remote_bd_addr, bt_bond_state_t state);
-    void (*acl_state_changed_cb)(bt_status_t status, RawAddress* remote_bd_addr, bt_acl_state_t state,
-        bt_hci_error_code_t hci_reason, tBT_TRANSPORT link_type);
-    void (*thread_evt_cb)(bt_cb_thread_evt evt);
-    void (*dut_mode_recv_cb)(uint16_t opcode, uint8_t* buf, uint8_t len);
-    void (*energy_info_cb)(bt_activity_energy_info* energy_info, bt_uid_traffic_t* uid_data);
-    void (*generate_local_oob_data_cb)(tBT_TRANSPORT transport, bt_oob_data_t oob_data);
-    void (*sensing_state_changed_cb)(uint8_t event_id, bt_sensing_info_t* info);
-} bt_callbacks_t;
+    void (*adapterStateChangedCb)(BtState state);
+    void (*adapterPropertiesCb)(BtStackStatus status, int numProperties, BtProperty *properties);
+    void (*remoteDevicePropertiesCb)(BtStackStatus status, RawAddress *bdAddr, int numProperties,
+        BtProperty *properties);
+    void (*deviceFoundCb)(int numProperties, BtProperty *properties);
+    void (*discoveryStateChangedCb)(BtDiscoveryState state);
+    void (*pinRequestCb)(RawAddress *remoteBdAddr, BtBdname *bdName, uint32_t cod,
+        bool min16Digit);
+    void (*sspRequestCb)(RawAddress *remoteBdAddr, BtBdname *bdName, uint32_t cod,
+        BtSspVariant pairingVariant, uint32_t passKey);
+    void (*bondStateChangedCb)(BtStackStatus status, RawAddress *remoteBdAddr,
+        BtBondState state);
+    void (*aclStateChangedCb)(BtStackStatus status, RawAddress *remoteBdAddr,
+        BtAclState state, BtHciErrorCode hciReason, BtTransport linkType);
+    void (*threadEvtCb)(BtCbThreadEvt evt);
+    void (*dutModeRecvCb)(uint16_t opcode, uint8_t *buf, uint8_t len);
+    void (*energyInfoCb)(BtActivityEnergyInfo *energyInfo, BtUidTraffic *uidData);
+    void (*generateLocalOobDataCb)(BtTransport transport, BtStackOobData oobData);
+    void (*sensingStateChangedCb)(uint8_t eventId, BtSensingInfo *info);
+};
 
-/* OS callouts optionally registered via set_os_callouts. */
-typedef struct {
+/* OS callouts optionally registered via SetOsCallouts. */
+struct BtOsCallouts {
     size_t size;
-    int (*set_wake_alarm)(uint64_t alarm_time_millis, bool should_wake);
-    int (*acquire_wake_lock)(const char* lock_name);
-    int (*release_wake_lock)(const char* lock_name);
-} bt_os_callouts_t;
+    int (*setWakeAlarm)(uint64_t alarmTimeMillis, bool shouldWake);
+    int (*acquireWakeLock)(const char *lockName);
+    int (*releaseWakeLock)(const char *lockName);
+};
 
 /* Forward declaration of the stubbed AVRCP service interface so that the
- * get_avrcp_service entry point can return it directly (service code assigns
+ * GetAvrcpService entry point can return it directly (service code assigns
  * the result without a cast). */
 namespace bluetooth {
 namespace avrcp {
@@ -89,47 +91,47 @@ class ServiceInterface;
 }  // namespace avrcp
 }  // namespace bluetooth
 
-typedef struct {
+struct BtInterface {
     size_t size;
-    int (*init)(bt_callbacks_t *callbacks, bool startRestricted, bool isCommonCriteriaMode,
+    int (*init)(BtCallbacks *callbacks, bool startRestricted, bool isCommonCriteriaMode,
         int configCompareResult, void *reserved, bool isAtv);
     int (*enable)(void);
     int (*disable)(void);
     void (*cleanup)(void);
-    int (*set_os_callouts)(void *callouts);
-    const void *(*get_profile_interface)(const char *profileId);
-    bluetooth::avrcp::ServiceInterface *(*get_avrcp_service)(void);
-    int (*get_remote_services)(RawAddress *bd_addr);
-    int (*enable_bluetooth_highpower)(bool enable);
-    int (*enable_fast_scan)(bool isEnable);
+    int (*setOsCallouts)(void *callouts);
+    const void *(*getProfileInterface)(const char *profileId);
+    bluetooth::avrcp::ServiceInterface *(*getAvrcpService)(void);
+    int (*getRemoteServices)(RawAddress *bdAddr);
+    int (*enableBluetoothHighpower)(bool enable);
+    int (*enableFastScan)(bool isEnable);
     int (*setFastScan)(int level);
-    int (*send_antenna_status_msg)(bool isFixed);
-    int (*send_ble_scan_msg)(bool isStarted);
-    int (*config_clear)(void);
-    int (*create_bond)(const RawAddress *bd_addr, int transport);
-    int (*create_bond_out_of_band)(const RawAddress *bd_addr, int transport,
-        const bt_oob_data_t *p192_data, const bt_oob_data_t *p256_data);
-    int (*cancel_bond)(const RawAddress *bd_addr);
-    int (*remove_bond)(const RawAddress *bd_addr);
-    int (*pin_reply)(const RawAddress *bd_addr, bool accept, uint8_t pin_len,
-        bt_pin_code_t *pin_code);
-    int (*ssp_reply)(const RawAddress *bd_addr, bt_ssp_variant_t variant, bool accept,
+    int (*sendAntennaStatusMsg)(bool isFixed);
+    int (*sendBleScanMsg)(bool isStarted);
+    int (*configClear)(void);
+    int (*createBond)(const RawAddress *bdAddr, int transport);
+    int (*createBondOutOfBand)(const RawAddress *bdAddr, int transport,
+        const BtStackOobData *p192Data, const BtStackOobData *p256Data);
+    int (*cancelBond)(const RawAddress *bdAddr);
+    int (*removeBond)(const RawAddress *bdAddr);
+    int (*pinReply)(const RawAddress *bdAddr, bool accept, uint8_t pinLen,
+        BtPinCode *pinCode);
+    int (*sspReply)(const RawAddress *bdAddr, BtSspVariant variant, bool accept,
         uint32_t passkey);
-    int (*get_remote_device_properties)(RawAddress *bd_addr);
-    int (*get_remote_device_property)(RawAddress *bd_addr, bt_property_type_t type);
-    int (*set_remote_device_property)(RawAddress *bd_addr, const bt_property_t *property);
-    int (*set_adapter_property)(bt_property_t *property);
-    int (*start_discovery)(void);
-    int (*cancel_discovery)(void);
-    int (*generate_local_oob_data)(int transport);
-    void (*create_acl_connection)(RawAddress *addr);
+    int (*getRemoteDeviceProperties)(RawAddress *bdAddr);
+    int (*getRemoteDeviceProperty)(RawAddress *bdAddr, BtPropertyType type);
+    int (*setRemoteDeviceProperty)(RawAddress *bdAddr, const BtProperty *property);
+    int (*setAdapterProperty)(BtProperty *property);
+    int (*startDiscovery)(void);
+    int (*cancelDiscovery)(void);
+    int (*generateLocalOobData)(int transport);
+    void (*createAclConnection)(RawAddress *addr);
     /* Ranging antenna switch support consumed by BleRangeImpl; the callback
      * reports the MAC/antenna ids selected by the stack. */
-    int (*register_ranging_ant_switch_callback)(void (*callback)(uint8_t macID, uint8_t antID));
-    void (*unregister_ranging_ant_switch_callback)(void);
-    void (*sendbleadvstartmsg)(uint32_t mac, uint32_t ant);
-    void (*sendbleadvstopmsg)(void);
-    void (*send_antenna_info_query_msg)(void);
-} bt_interface_t;
+    int (*registerRangingAntSwitchCallback)(void (*callback)(uint8_t macID, uint8_t antID));
+    void (*unregisterRangingAntSwitchCallback)(void);
+    void (*sendBleAdvStartMsg)(uint32_t mac, uint32_t ant);
+    void (*sendBleAdvStopMsg)(void);
+    void (*sendAntennaInfoQueryMsg)(void);
+};
 
 #endif  // HARDWARE_BLUETOOTH_H

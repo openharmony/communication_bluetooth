@@ -43,11 +43,11 @@ namespace bluetooth {
 using namespace OHOS::Bluetooth;
 const std::string SPP_VERSION = "0.4.1";
 
-static const btsock_interface_t* sBluetoothSocketInterface = nullptr;
+static const BtsockInterface* sBluetoothSocketInterface = nullptr;
 
-static btsock_type_t ConvertBtSockType(int type)
+static BtsockType ConvertBtSockType(int type)
 {
-    btsock_type_t ret;
+    BtsockType ret;
     switch (type) {
         case SOCK_RFCOMM:
             ret = BTSOCK_RFCOMM;
@@ -157,14 +157,14 @@ void SocketService::Enable()
 void SocketService::EnableNative()
 {
     HILOGI("[SocketService] get_profile_interface");
-    const bt_interface_t* bt_interface = nullptr;
+    const BtInterface* bt_interface = nullptr;
     int status = hal_util_load_bt_library(&bt_interface);
     if (status || bt_interface == nullptr) {
         HILOGE("[SocketService] Failed to open the Bluetooth module");
         return;
     }
-    sBluetoothSocketInterface = static_cast<btsock_interface_t*>(
-        const_cast<void *>(bt_interface->get_profile_interface(BT_PROFILE_SOCKETS_ID)));
+    sBluetoothSocketInterface = static_cast<BtsockInterface*>(
+        const_cast<void *>(bt_interface->getProfileInterface(BT_PROFILE_SOCKETS_ID)));
     if (!sBluetoothSocketInterface) {
         HILOGE("Error getting socket BT_PROFILE_SOCKETS_ID interface");
         return;
@@ -353,7 +353,7 @@ int SocketService::Listen(const std::string &name, const Uuid &uuid, int securit
 
 void SocketService::ShutDownInternal()
 {
-    btif_sock_cleanup();
+    BtifSockCleanup();
     GetContext()->OnDisable(PROFILE_NAME_SPP, true);
     // Clear all resources
     if (serviceObservers.empty()) {
@@ -366,7 +366,7 @@ void SocketService::ShutDownInternal()
 
 void SocketService::UpdateCocConnectionParams(const Bluetooth::BluetoothSocketCocInfo &info)
 {
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     uint16_t params[COC_PARAMS_LEN] = {};
     int ret = hal_util_load_bt_library(&btInterface);
     if (ret != BT_STATUS_SUCCESS || btInterface == nullptr) {
@@ -374,8 +374,8 @@ void SocketService::UpdateCocConnectionParams(const Bluetooth::BluetoothSocketCo
         return;
     }
 
-    const bthwif_interface_t *bthwif =
-        reinterpret_cast<const bthwif_interface_t*>(btInterface->get_profile_interface(BT_VENDER_INTERFACE_ID));
+    const BthwifInterface *bthwif =
+        reinterpret_cast<const BthwifInterface*>(btInterface->getProfileInterface(BT_VENDER_INTERFACE_ID));
     if (bthwif == nullptr) {
         HILOGE("bthwif is null");
         return;
@@ -419,9 +419,9 @@ int SocketService::RegisterConnectionObserver(const std::string &addr, const Uui
         },
         addr, uuid, callback));
 
-    const bthwif_interface_t *bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     if (!bthwif) {
-        HILOGE("Get bthwif_interface_t fail");
+        HILOGE("Get BthwifInterface fail");
         return BT_ERR_INTERNAL_ERROR;
     }
     bthwif->registerConnection(rawAddr, uuid);
@@ -450,9 +450,9 @@ int SocketService::UnregisterConnectionObserver(const std::string &addr, const U
         },
         addr, uuid));
 
-    const bthwif_interface_t *bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     if (!bthwif) {
-        HILOGE("Get bthwif_interface_t fail");
+        HILOGE("Get BthwifInterface fail");
         return BT_ERR_INTERNAL_ERROR;
     }
     bthwif->unRegisterConnection(address, uuid);

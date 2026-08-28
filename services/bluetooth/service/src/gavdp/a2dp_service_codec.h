@@ -22,9 +22,9 @@
 namespace OHOS {
 namespace bluetooth {
 
-bool ConvertAudioConfigCodec(btav_a2dp_codec_config_t codec_config, A2dpSrcCodecInfo &codecInfo);
-bool ConvertL2hcV2Bitrate(btav_a2dp_codec_config_t &codec_config, const A2dpSrcCodecInfo &codecInfo);
-bool ConvertL2hcStBitrate(btav_a2dp_codec_config_t &codec_config, const A2dpSrcCodecInfo &codecInfo);
+bool ConvertAudioConfigCodec(BtavA2dpCodecConfig codecConfig, A2dpSrcCodecInfo &codecInfo);
+bool ConvertL2hcV2Bitrate(BtavA2dpCodecConfig &codecConfig, const A2dpSrcCodecInfo &codecInfo);
+bool ConvertL2hcStBitrate(BtavA2dpCodecConfig &codecConfig, const A2dpSrcCodecInfo &codecInfo);
 }  // namespace bluetooth
 }  // namespace OHOS
 #endif  // A2DP_SERVICE_CODEC_H

@@ -24,7 +24,7 @@
 
 /* SDP record types of the removed stack layer HAL (hardware/bt_sdp.h); only
  * the entries referenced by the service layer are kept. */
-typedef enum {
+enum BluetoothSdpTypes {
     SDP_TYPE_RAW = 0,
     SDP_TYPE_MAP_MAS,
     SDP_TYPE_MAP_MNS,
@@ -34,102 +34,102 @@ typedef enum {
     SDP_TYPE_SAP_SERVER,
     SDP_TYPE_DIP,
     SDP_TYPE_MPS,
-} bluetooth_sdp_types;
+};
 
-typedef struct _bluetooth_sdp_hdr_overlay {
-    bluetooth_sdp_types type;
+struct BluetoothSdpHdrOverlay {
+    BluetoothSdpTypes type;
     OHOS::bluetooth::Uuid uuid;
-    uint32_t service_name_length;
-    const char *service_name;
-    int32_t rfcomm_channel_number;
-    int32_t l2cap_psm;
-    int32_t profile_version;
+    uint32_t serviceNameLength;
+    const char *serviceName;
+    int32_t rfcommChannelNumber;
+    int32_t l2capPsm;
+    int32_t profileVersion;
 
     /* User pointers, only used for some signals (bluedroid bt_sdp.h). */
-    int user1_ptr_len;
-    const uint8_t *user1_ptr;
-    int user2_ptr_len;
-    const uint8_t *user2_ptr;
-} bluetooth_sdp_hdr_overlay;
+    int user1PtrLen;
+    const uint8_t *user1Ptr;
+    int user2PtrLen;
+    const uint8_t *user2Ptr;
+};
 
-typedef struct _bluetooth_sdp_mas_record {
-    bluetooth_sdp_hdr_overlay hdr;
-    uint32_t mas_instance_id;
-    uint32_t supported_features;
-    uint32_t supported_message_types;
-} bluetooth_sdp_mas_record;
+struct BluetoothSdpMasRecord {
+    BluetoothSdpHdrOverlay hdr;
+    uint32_t masInstanceId;
+    uint32_t supportedFeatures;
+    uint32_t supportedMessageTypes;
+};
 
-typedef struct _bluetooth_sdp_mns_record {
-    bluetooth_sdp_hdr_overlay hdr;
-    uint32_t supported_features;
-} bluetooth_sdp_mns_record;
+struct BluetoothSdpMnsRecord {
+    BluetoothSdpHdrOverlay hdr;
+    uint32_t supportedFeatures;
+};
 
-typedef struct _bluetooth_sdp_pse_record {
-    bluetooth_sdp_hdr_overlay hdr;
-    uint32_t supported_features;
-    uint32_t supported_repositories;
-} bluetooth_sdp_pse_record;
+struct BluetoothSdpPseRecord {
+    BluetoothSdpHdrOverlay hdr;
+    uint32_t supportedFeatures;
+    uint32_t supportedRepositories;
+};
 
 #define SDP_OPP_SUPPORTED_FORMATS_MAX_LENGTH 15
 
-typedef struct _bluetooth_sdp_ops_record {
-    bluetooth_sdp_hdr_overlay hdr;
-    int supported_formats_list_len;
-    uint8_t supported_formats_list[SDP_OPP_SUPPORTED_FORMATS_MAX_LENGTH];
-} bluetooth_sdp_ops_record;
+struct BluetoothSdpOpsRecord {
+    BluetoothSdpHdrOverlay hdr;
+    int supportedFormatsListLen;
+    uint8_t supportedFormatsList[SDP_OPP_SUPPORTED_FORMATS_MAX_LENGTH];
+};
 
-typedef struct _bluetooth_sdp_sap_record {
-    bluetooth_sdp_hdr_overlay hdr;
-} bluetooth_sdp_sap_record;
+struct BluetoothSdpSapRecord {
+    BluetoothSdpHdrOverlay hdr;
+};
 
-typedef struct _bluetooth_sdp_dip_record {
-    bluetooth_sdp_hdr_overlay hdr;
-    uint16_t spec_id;
+struct BluetoothSdpDipRecord {
+    BluetoothSdpHdrOverlay hdr;
+    uint16_t specId;
     uint16_t vendor;
-    uint16_t vendor_id_source;
+    uint16_t vendorIdSource;
     uint16_t product;
     uint16_t version;
-    bool primary_record;
-} bluetooth_sdp_dip_record;
+    bool primaryRecord;
+};
 
-typedef struct _bluetooth_sdp_mps_record {
-    bluetooth_sdp_hdr_overlay hdr;
-    uint8_t supported_scenarios_mpsd[8];
-    uint8_t supported_scenarios_mpmd[8];
-    uint8_t supported_dependencies[2];
-} bluetooth_sdp_mps_record;
+struct BluetoothSdpMpsRecord {
+    BluetoothSdpHdrOverlay hdr;
+    uint8_t supportedScenariosMpsd[8];
+    uint8_t supportedScenariosMpmd[8];
+    uint8_t supportedDependencies[2];
+};
 
-typedef struct {
-    bluetooth_sdp_hdr_overlay hdr;
+struct BluetoothSdpRecord {
+    BluetoothSdpHdrOverlay hdr;
     union {
-        bluetooth_sdp_mas_record mas;
-        bluetooth_sdp_mns_record mns;
-        bluetooth_sdp_pse_record pse;
-        bluetooth_sdp_ops_record ops;
-        bluetooth_sdp_sap_record sap;
-        bluetooth_sdp_dip_record dip;
-        bluetooth_sdp_mps_record mps;
+        BluetoothSdpMasRecord mas;
+        BluetoothSdpMnsRecord mns;
+        BluetoothSdpPseRecord pse;
+        BluetoothSdpOpsRecord ops;
+        BluetoothSdpSapRecord sap;
+        BluetoothSdpDipRecord dip;
+        BluetoothSdpMpsRecord mps;
     };
-} bluetooth_sdp_record;
+};
 
 /* Callback invoked when an SDP search completes. */
-typedef void (*btsdp_search_callback)(bt_status_t status, const RawAddress &bd_addr,
-    const OHOS::bluetooth::Uuid &uuid, int num_records, bluetooth_sdp_record *records);
+typedef void (*BtsdpSearchCallback)(BtStackStatus status, const RawAddress &bdAddr,
+    const OHOS::bluetooth::Uuid &uuid, int numRecords, BluetoothSdpRecord *records);
 
-typedef struct {
+struct BtsdpCallbacks {
     size_t size;
-    btsdp_search_callback sdp_search_cb;
-} btsdp_callbacks_t;
+    BtsdpSearchCallback sdpSearchCb;
+};
 
 /* SDP interface of the removed stack layer HAL (hardware/bt_sdp.h); only the
  * members referenced by the service layer are kept. */
-typedef struct {
+struct BtsdpInterface {
     size_t size;
-    bt_status_t (*init)(btsdp_callbacks_t *callbacks);
-    bt_status_t (*deinit)();
-    bt_status_t (*sdp_search)(RawAddress *bd_addr, const OHOS::bluetooth::Uuid &uuid);
-    bt_status_t (*create_sdp_record)(bluetooth_sdp_record *record, int *record_handle);
-    bt_status_t (*remove_sdp_record)(int sdp_handle);
-} btsdp_interface_t;
+    BtStackStatus (*init)(BtsdpCallbacks *callbacks);
+    BtStackStatus (*deinit)();
+    BtStackStatus (*sdpSearch)(RawAddress *bdAddr, const OHOS::bluetooth::Uuid &uuid);
+    BtStackStatus (*createSdpRecord)(BluetoothSdpRecord *record, int *recordHandle);
+    BtStackStatus (*removeSdpRecord)(int sdpHandle);
+};
 
 #endif  // BTIF_SDP_H

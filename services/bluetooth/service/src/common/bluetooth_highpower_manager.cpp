@@ -639,16 +639,16 @@ void BluetoothHighPowerManager::SetHighPowerModeEnable(bool enable)
         HILOGD("No change, ignore");
         return;
     }
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int status = hal_util_load_bt_library(&btInterface);
     if (status != 0 || btInterface == nullptr) {
         HILOGE("Failed to open the Bluetooth module, status = %{public}d.", status);
         return;
     }
-    if (btInterface->enable_bluetooth_highpower != nullptr) {
+    if (btInterface->enableBluetoothHighpower != nullptr) {
         lastHighPowerMode_ = enable;
         HILOGI("SetHighPowerModeEnable = %{public}d.", enable);
-        btInterface->enable_bluetooth_highpower(enable);
+        btInterface->enableBluetoothHighpower(enable);
     }
 }
 } //namespace bluetooth

@@ -24,24 +24,24 @@ namespace bluetooth {
 
 class NativeA2dpAdapter : public INativeA2dpAdapter {
 public:
-    explicit NativeA2dpAdapter(btav_sink_interface_t* iface);
+    explicit NativeA2dpAdapter(BtavSinkInterface* iface);
     ~NativeA2dpAdapter() override;
-    bt_status_t Init(INativeA2dpSinkCallback *callback, int maxDevices) override;
-    bt_status_t Connect(const RawAddress& bdAddr) override;
-    bt_status_t Disconnect(const RawAddress& bdAddr) override;
+    BtStackStatus Init(INativeA2dpSinkCallback *callback, int maxDevices) override;
+    BtStackStatus Connect(const RawAddress& bdAddr) override;
+    BtStackStatus Disconnect(const RawAddress& bdAddr) override;
     void Cleanup() override;
     void SetAudioFocusState(int focusState) override;
     void SetAudioTrackGain(float gain) override;
-    bt_status_t SetActiveDevice(const RawAddress& bdAddr) override;
+    BtStackStatus SetActiveDevice(const RawAddress& bdAddr) override;
 
 private:
     // Bluedroid C 回调 — 转发为 INativeA2dpSinkCallback 接口调用
-    static void BtavConnectionState(const STACK::RawAddress &bdAddr, btav_connection_state_t state);
-    static void BtavAudioState(const STACK::RawAddress &bdAddr, btav_audio_state_t state);
+    static void BtavConnectionState(const STACK::RawAddress &bdAddr, BtavConnectionState state);
+    static void BtavAudioState(const STACK::RawAddress &bdAddr, BtavAudioState state);
     static void BtavAudioConfig(const STACK::RawAddress &bdAddr, uint32_t sampleRate, uint8_t channelCount);
 
-    btav_sink_interface_t* iface_;
-    static btav_sink_callbacks_t s_callbacks_;
+    BtavSinkInterface* iface_;
+    static BtavSinkCallbacks s_callbacks_;
 
     INativeA2dpSinkCallback *callback_{nullptr};
     // Bluedroid 回调是 C 函数指针，无法携带实例上下文。

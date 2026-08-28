@@ -888,7 +888,7 @@ bool HfpAgStateMachine::ProcessConnectEvent()
         return false;
     }
     HILOGI("[HFP_STATE_MACHINE]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t status = bluetoothHfpInterface->Connect(&rawAddr);
+    BtStackStatus status = bluetoothHfpInterface->Connect(&rawAddr);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]Failed Connect, status: %{public}d", status);
         return false;
@@ -910,7 +910,7 @@ bool HfpAgStateMachine::ProcessDisConnectEvent()
         return false;
     }
     HILOGI("[HFP_STATE_MACHINE]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t status = bluetoothHfpInterface->Disconnect(&rawAddr);
+    BtStackStatus status = bluetoothHfpInterface->Disconnect(&rawAddr);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]Failed DisConnect, status: %{public}d", status);
         return false;
@@ -933,7 +933,7 @@ void HfpAgStateMachine::ProcessOpenRecognitionEvent(int requestSource)
         return;
     }
     HILOGI("[HFP_STATE_MACHINE]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t status = bluetoothHfpInterface->StartVoiceRecognition(&rawAddr);
+    BtStackStatus status = bluetoothHfpInterface->StartVoiceRecognition(&rawAddr);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]Fail open recognition, status: %{public}d", status);
         return;
@@ -967,7 +967,7 @@ void HfpAgStateMachine::ProcessCloseRecognitionEvent()
         return;
     }
     HILOGI("[HFP_STATE_MACHINE]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t status = bluetoothHfpInterface->StopVoiceRecognition(&rawAddr);
+    BtStackStatus status = bluetoothHfpInterface->StopVoiceRecognition(&rawAddr);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]Fail CloseRecognition, status: %{public}d", status);
         return;
@@ -998,9 +998,9 @@ bool HfpAgStateMachine::ProcessConnectAudioEvent()
         return false;
     }
     HILOGI("[HFP_STATE_MACHINE]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t status = bluetoothHfpInterface->ConnectAudio(&rawAddr);
+    BtStackStatus status = bluetoothHfpInterface->ConnectAudio(&rawAddr);
     if (status != BT_STATUS_SUCCESS) {
-        bt_status_t vrStatus = bluetoothHfpInterface->StopVoiceRecognition(&rawAddr);
+        BtStackStatus vrStatus = bluetoothHfpInterface->StopVoiceRecognition(&rawAddr);
         if (vrStatus != BT_STATUS_SUCCESS) {
             HILOGE("[HFP_STATE_MACHINE]Fail CloseRecognition, status: %{public}d", vrStatus);
         }
@@ -1027,7 +1027,7 @@ bool HfpAgStateMachine::ProcessDisconnectAudioEvent()
         return false;
     }
     HILOGI("[HFP_STATE_MACHINE]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t status = bluetoothHfpInterface->DisconnectAudio(&rawAddr);
+    BtStackStatus status = bluetoothHfpInterface->DisconnectAudio(&rawAddr);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]Failed DisconnectAudio, status: %{public}d", status);
         return false;

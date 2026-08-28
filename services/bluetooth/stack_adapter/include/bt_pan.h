@@ -26,35 +26,35 @@
 
 #include "bt_types.h"
 
-typedef enum {
+enum BtpanConnectionState {
     PAN_STATE_DISCONNECTED = 0,
     PAN_STATE_CONNECTED,
-} btpan_connection_state_t;
+};
 
-typedef enum {
+enum BtpanControlState {
     PAN_CONTROL_DISCONNECTED = 0,
     PAN_CONTROL_CONNECTED,
-} btpan_control_state_t;
+};
 
-typedef void (*btpan_connection_state_callback)(btpan_connection_state_t state,
-    bt_status_t error, const RawAddress *bd_addr, int local_role, int remote_role);
-typedef void (*btpan_control_state_callback)(btpan_control_state_t state, int local_role,
-    bt_status_t error, const char *ifname);
+typedef void (*BtpanConnectionStateCallback)(BtpanConnectionState state,
+    BtStackStatus error, const RawAddress *bdAddr, int localRole, int remoteRole);
+typedef void (*BtpanControlStateCallback)(BtpanControlState state, int localRole,
+    BtStackStatus error, const char *ifname);
 
-typedef struct {
+struct BtpanCallbacks {
     size_t size;
-    btpan_control_state_callback control_state_cb;
-    btpan_connection_state_callback connection_state_cb;
-} btpan_callbacks_t;
+    BtpanControlStateCallback controlStateCb;
+    BtpanConnectionStateCallback connectionStateCb;
+};
 
-typedef struct {
+struct BtpanInterface {
     size_t size;
-    bt_status_t (*init)(const btpan_callbacks_t *callbacks);
-    bt_status_t (*enable)(int local_role);
-    int (*get_local_role)(void);
-    bt_status_t (*connect)(const RawAddress *bd_addr, int local_role, int remote_role);
-    bt_status_t (*disconnect)(const RawAddress *bd_addr);
+    BtStackStatus (*init)(const BtpanCallbacks *callbacks);
+    BtStackStatus (*enable)(int localRole);
+    int (*getLocalRole)(void);
+    BtStackStatus (*connect)(const RawAddress *bdAddr, int localRole, int remoteRole);
+    BtStackStatus (*disconnect)(const RawAddress *bdAddr);
     void (*cleanup)(void);
-} btpan_interface_t;
+};
 
 #endif  // BT_PAN_H

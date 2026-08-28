@@ -67,7 +67,7 @@ void AvrcpVolumeInterfaceImpl::Cleanup()
 void AvrcpVolumeInterfaceImpl::DeviceConnected(const STACK::RawAddress &bdaddr)
 {
     RemoteDeviceProperties::GetInstance()->GetRemoteDeviceProperty(
-        bdaddr, static_cast<bt_property_type_t>(HW_BT_PROPERTY_ABS_VOLUM_KEY));
+        bdaddr, static_cast<BtPropertyType>(HW_BT_PROPERTY_ABS_VOLUM_KEY));
     PreferencesManager::Save(bdaddr.ToString(), false, PreferencesManagerType::ABS_VOLUME_SWITCH);
     SwitchAbsVolumeDevice(bdaddr, false);
     RefusePlayHelper::GetInstance()->SetLastAvrcpConnectTime(ServiceUtil::AddrFromStack(bdaddr).GetAddress());
@@ -85,7 +85,7 @@ void AvrcpVolumeInterfaceImpl::DeviceConnected(const STACK::RawAddress &bdaddr, 
 {
     HILOGI("support absolute volume %{public}s.", bdaddr.ToStringForLogging().c_str());
     RemoteDeviceProperties::GetInstance()->GetRemoteDeviceProperty(
-        bdaddr, static_cast<bt_property_type_t>(HW_BT_PROPERTY_ABS_VOLUM_KEY));
+        bdaddr, static_cast<BtPropertyType>(HW_BT_PROPERTY_ABS_VOLUM_KEY));
     {
         std::lock_guard<std::mutex> lock(volumeCallbackMapLock_);
         volumeCallbackMap_.insert_or_assign(bdaddr, cb);
@@ -136,8 +136,8 @@ void AvrcpVolumeInterfaceImpl::SetVolume(int8_t volume)
     int32_t storeVolume = PreferencesManager::Get(device.ToString(), GetDefaultVolume(),
         PreferencesManagerType::ABS_VOLUME);
     if (deviceVolume == storeVolume) {
-        HILOGW("device %{public}s Skipping SetVolume to same as current %{public}d.", device.ToStringForLogging().c_str(),
-            deviceVolume);
+        HILOGW("device %{public}s Skipping SetVolume to same as current %{public}d.",
+            device.ToStringForLogging().c_str(), deviceVolume);
         return;
     }
     PreferencesManager::Save(device.ToString(), deviceVolume, PreferencesManagerType::ABS_VOLUME);
@@ -167,8 +167,8 @@ void AvrcpVolumeInterfaceImpl::setVolumeOfDevice(int8_t volume, const STACK::Raw
     int32_t storeVolume = PreferencesManager::Get(bdaddr.ToString(), GetDefaultVolume(),
         PreferencesManagerType::ABS_VOLUME);
     if (deviceVolume == storeVolume) {
-        HILOGW("device %{public}s Skipping SetVolume to same as current %{public}d.", bdaddr.ToStringForLogging().c_str(),
-            deviceVolume);
+        HILOGW("device %{public}s Skipping SetVolume to same as current %{public}d.",
+            bdaddr.ToStringForLogging().c_str(), deviceVolume);
         return;
     }
     PreferencesManager::Save(bdaddr.ToString(), deviceVolume, PreferencesManagerType::ABS_VOLUME);
@@ -179,8 +179,8 @@ void AvrcpVolumeInterfaceImpl::setVolumeOfDevice(int8_t volume, const STACK::Raw
     // If in call, not update ui for music volume
     int32_t result = BluetoothAudioFrameworkAdapter::BtSetA2dpDeviceVolume(macAddr, deviceVolume, updateUi);
     BtChrBusinessEvent::GetInstance().SetVolumeParams(0, static_cast<int>(volume));
-    HILOGI("device %{public}s SetA2dpDeviceVolume status %{public}d. volume: %{public}d", bdaddr.ToStringForLogging().c_str(),
-        result, volume);
+    HILOGI("device %{public}s SetA2dpDeviceVolume status %{public}d. volume: %{public}d",
+        bdaddr.ToStringForLogging().c_str(), result, volume);
 
     if (result != AVRCP_SUCCESS) {
         HILOGE("excute SetVolume error restore device volume.");
@@ -202,7 +202,8 @@ void AvrcpVolumeInterfaceImpl::SendVolumeChanged(const STACK::RawAddress &addr, 
     int32_t storeVolume = PreferencesManager::Get(addr.ToString(), GetDefaultVolume(),
         PreferencesManagerType::ABS_VOLUME);
     if (volume == storeVolume) {
-        HILOGW("%{public}s Skipping update volume to same as current %{public}d.", addr.ToStringForLogging().c_str(), volume);
+        HILOGW("%{public}s Skipping update volume to same as current %{public}d.",
+            addr.ToStringForLogging().c_str(), volume);
         return;
     }
     PreferencesManager::Save(addr.ToString(), volume, PreferencesManagerType::ABS_VOLUME);
@@ -256,7 +257,8 @@ void AvrcpVolumeInterfaceImpl::SwitchAbsVolumeDevice(const STACK::RawAddress &ad
     HILOGI("device store volume %{public}d.", storedVolume);
     if (!PreferencesManager::Get(addr.ToString(), false, PreferencesManagerType::ABS_VOLUME_SWITCH)) {
         ret = BluetoothAudioFrameworkAdapter::BtSetDeviceAbsVolumeSupported(macAddr, false);
-        HILOGI("device %{public}s abs volume switch is false, status %{public}d.", addr.ToStringForLogging().c_str(), ret);
+        HILOGI("device %{public}s abs volume switch is false, status %{public}d.",
+            addr.ToStringForLogging().c_str(), ret);
         if (isNeedSetVolume) {
             BluetoothAudioFrameworkAdapter::SetStreamVolume(STREAM_MUSIC, storedVolume, 1);
         }
@@ -283,7 +285,8 @@ void AvrcpVolumeInterfaceImpl::SetDeviceAbsVolumeAbility(const STACK::RawAddress
     auto device = ServiceUtil::AddrFromStack(rawAddr);
     int32_t absVolumeAbility = RemoteDeviceProperties::GetInstance()->GetDeviceAbsVolumeAbility(device);
     if (absVolumeAbility == DeviceAbsVolumeAbility::DEVICE_ABSVOL_UNSUPPORT) {
-        HILOGE("device %{public}s has no abs ability, can not enable or disbale.", rawAddr.ToStringForLogging().c_str());
+        HILOGE("device %{public}s has no abs ability, can not enable or disbale.",
+            rawAddr.ToStringForLogging().c_str());
         BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_BT_UI_SWITCH_CHANGE, device, UE_COMMON_SCENE_CASE0,
             UE_COMMON_SCENE_CASE2);
         return;
@@ -326,7 +329,8 @@ void AvrcpVolumeInterfaceImpl::NotifyAudioVolumeEvent(int32_t streamType, int32_
     int32_t absVolumeAbility =
         RemoteDeviceProperties::GetInstance()->GetDeviceAbsVolumeAbility(ServiceUtil::AddrFromStack(device));
     if (absVolumeAbility == DeviceAbsVolumeAbility::DEVICE_ABSVOL_UNSUPPORT) {
-        HILOGE("device %{public}s has no abs ability, volume: %{public}d.", device.ToStringForLogging().c_str(), volume);
+        HILOGE("device %{public}s has no abs ability, volume: %{public}d.",
+            device.ToStringForLogging().c_str(), volume);
         PreferencesManager::Save(device.ToString(), volume, PreferencesManagerType::NON_ABS_VOLUME);
         return;
     }
@@ -341,8 +345,8 @@ void AvrcpVolumeInterfaceImpl::NotifyAudioVolumeEvent(int32_t streamType, int32_
 
 void AvrcpVolumeInterfaceImpl::SetDeviceAbsVolumeProperty(const STACK::RawAddress &rawAddr, int32_t ability)
 {
-    bt_property_t prop;
-    prop.type = static_cast<bt_property_type_t>(HW_BT_PROPERTY_ABS_VOLUM_KEY);
+    BtProperty prop;
+    prop.type = static_cast<BtPropertyType>(HW_BT_PROPERTY_ABS_VOLUM_KEY);
     prop.len = sizeof(ability);
     prop.val = &ability;
     RemoteDeviceProperties::GetInstance()->SetRemoteDeviceProperty(rawAddr, prop);

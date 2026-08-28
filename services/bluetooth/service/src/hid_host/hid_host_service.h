@@ -99,20 +99,20 @@ public:
     int HidHostGetReport(std::string device, uint8_t id, uint16_t size, uint8_t type) override;
     int SetConnectStrategy(const RawAddress &device, int strategy) override;
     int GetConnectStrategy(const RawAddress &device) override;
-    bthh_interface_t* getBluetoothHidInterface() const;
+    BthhInterface* getBluetoothHidInterface() const;
 
-    static void ConnectionStateCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
-        tBT_TRANSPORT transport, bthh_connection_state_t state);
-    static void GetProtocolModeCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
-        tBT_TRANSPORT transport, bthh_status_t hhStatus, bthh_protocol_mode_t mode);
-    static void GetIdleTimeCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
-        tBT_TRANSPORT transport, bthh_status_t hhStatus, int idleTime);
-    static void GetReportCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
-        tBT_TRANSPORT transport, bthh_status_t hhStatus, uint8_t* rptData, int rptSize);
-    static void VirtualUnplugCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
-        tBT_TRANSPORT transport, bthh_status_t hhStatus);
-    static void HandshakeCallback(STACK::RawAddress* bdAddr, tBLE_ADDR_TYPE addrType,
-        tBT_TRANSPORT transport, bthh_status_t hhStatus);
+    static void ConnectionStateCallback(STACK::RawAddress* bdAddr, BleAddrType addrType,
+        BtTransport transport, BthhConnectionState state);
+    static void GetProtocolModeCallback(STACK::RawAddress* bdAddr, BleAddrType addrType,
+        BtTransport transport, BthhStatus hhStatus, BthhProtocolMode mode);
+    static void GetIdleTimeCallback(STACK::RawAddress* bdAddr, BleAddrType addrType,
+        BtTransport transport, BthhStatus hhStatus, int idleTime);
+    static void GetReportCallback(STACK::RawAddress* bdAddr, BleAddrType addrType,
+        BtTransport transport, BthhStatus hhStatus, uint8_t* rptData, int rptSize);
+    static void VirtualUnplugCallback(STACK::RawAddress* bdAddr, BleAddrType addrType,
+        BtTransport transport, BthhStatus hhStatus);
+    static void HandshakeCallback(STACK::RawAddress* bdAddr, BleAddrType addrType,
+        BtTransport transport, BthhStatus hhStatus);
 
 private:
     /**
@@ -131,7 +131,7 @@ private:
     void ConnectionStateCallbackInner(RawAddress rawAddr, int state);
     void NotifyConnStateChangedInner(const RawAddress &device, int state, int cause);
     std::string GetEventName(int what);
-    static uint8_t CovertConnectStateFromStack(bthh_connection_state_t state);
+    static uint8_t CovertConnectStateFromStack(BthhConnectionState state);
     /**
      * @brief check is accept connection
      *
@@ -162,7 +162,7 @@ private:
         {HID_HOST_STATE_DISCONNECTING, static_cast<int>(BTConnectState::DISCONNECTING)},
         {HID_HOST_STATE_CONNECTED, static_cast<int>(BTConnectState::CONNECTED)}
     };
-    bthh_interface_t* bluetoothHidInterface = nullptr;
+    BthhInterface* bluetoothHidInterface = nullptr;
 };
 }  // namespace bluetooth
 }  // namespace OHOS

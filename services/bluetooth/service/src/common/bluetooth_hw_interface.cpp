@@ -267,13 +267,13 @@ BluetoothHwInterface* BluetoothHwInterface::GetInstance(void)
     return &singleton;
 }
 
-const bthwif_interface_t* BluetoothHwInterface::GetBtHwInterface(void)
+const BthwifInterface* BluetoothHwInterface::GetBtHwInterface(void)
 {
     return bthwInterface_;
 }
 
 // only used for TDD test case
-void BluetoothHwInterface::SetBtHwInterface(const bthwif_interface_t* interface)
+void BluetoothHwInterface::SetBtHwInterface(const BthwifInterface* interface)
 {
     bthwInterface_ = interface;
 }
@@ -565,13 +565,13 @@ void HwHiechoCombRspData(uint8_t msgType, uint8_t *data, uint16_t dataLen, uint8
 
     echoData.insert(echoData.end(), sourceData.begin(), sourceData.end());
 
-    bt_interface_t *btIf = AdapterManager::GetInstance()->getBluetoothInterface();
+    BtInterface *btIf = AdapterManager::GetInstance()->getBluetoothInterface();
     if (btIf == nullptr) {
         HILOGE("Failed to get btIf interface handle");
         return;
     }
-    const bthwif_interface_t *bthwif
-         = reinterpret_cast<const bthwif_interface_t*>(btIf->get_profile_interface(BT_VENDER_INTERFACE_ID));
+    const BthwifInterface *bthwif
+         = reinterpret_cast<const BthwifInterface*>(btIf->getProfileInterface(BT_VENDER_INTERFACE_ID));
     if (bthwif == nullptr) {
         HILOGE("Failed to get bthwif interface handle");
         return;
@@ -610,7 +610,7 @@ void BluetoothHwInterface::HwHiechoCombRepData(uint8_t msgType, uint8_t *data, i
     args[HIECHO_ARGS_ID_INDEX] = 0;
     args[HIECHO_ARGS_TRANS_INDEX] = 0;
 
-    const bthwif_interface_t *bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     if (bthwif == nullptr) {
         HILOGI("Failed to get bthwif interface handle");
         return;
@@ -694,7 +694,7 @@ void HwHdapConnectCallback(STACK::RawAddress *bdAddr, bool isConnected, uint8_t 
     if (isConnected) {
         HILOGI("load a2dp host");
         service->ProcessA2dpHdfLoad(static_cast<int>(BTConnectState::CONNECTED), rawAddr);
-        const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+        const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
         CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
         bluetoothHwSrcInterface->hdapStartSession(config.sampleRate, config.bitWidth, config.channel);
     }
@@ -715,29 +715,29 @@ void HwA2dpOffloadCodecConfigCallback(STACK::RawAddress *bdAddr, A2dpOffloadConf
     std::shared_ptr<A2dpDeviceInfo> deviceInfo = service->GetDeviceFromList(rawAddr);
     CHECK_AND_RETURN_LOG(deviceInfo != nullptr, "Not find the device");
     A2dpSrcOffloadCodecStatus offloadStatus;
-    offloadStatus.codecInfo.mediaPacketHeader = static_cast<uint16_t>(config.media_packet_header);
-    offloadStatus.codecInfo.mPt = static_cast<uint8_t>(config.m_pt);
+    offloadStatus.codecInfo.mediaPacketHeader = static_cast<uint16_t>(config.mediaPacketHeader);
+    offloadStatus.codecInfo.mPt = static_cast<uint8_t>(config.mPt);
     offloadStatus.codecInfo.ssrc = static_cast<uint32_t>(config.ssrc);
-    offloadStatus.codecInfo.boundaryFlag = static_cast<uint8_t>(config.boundary_flag);
-    offloadStatus.codecInfo.broadcastFlag = static_cast<uint8_t>(config.broadcast_flag);
-    offloadStatus.codecInfo.codecType = static_cast<uint32_t>(config.codec_type);
-    offloadStatus.codecInfo.maxLatency = static_cast<uint16_t>(config.max_latency);
-    offloadStatus.codecInfo.scmsTEnable = static_cast<uint16_t>(config.scms_t_enable);
-    offloadStatus.codecInfo.sampleRate = static_cast<uint32_t>(config.sample_rate);
-    offloadStatus.codecInfo.encodedAudioBitrate = static_cast<uint32_t>(config.encoded_audio_bitrate);
-    offloadStatus.codecInfo.bitsPerSample = static_cast<uint8_t>(config.bits_per_sample);
-    offloadStatus.codecInfo.chMode = static_cast<uint8_t>(config.ch_mode);
-    offloadStatus.codecInfo.aclHdl = static_cast<uint16_t>(config.acl_hdl);
-    offloadStatus.codecInfo.l2cRcid = static_cast<uint16_t>(config.l2c_rcid);
+    offloadStatus.codecInfo.boundaryFlag = static_cast<uint8_t>(config.boundaryFlag);
+    offloadStatus.codecInfo.broadcastFlag = static_cast<uint8_t>(config.broadcastFlag);
+    offloadStatus.codecInfo.codecType = static_cast<uint32_t>(config.codecType);
+    offloadStatus.codecInfo.maxLatency = static_cast<uint16_t>(config.maxLatency);
+    offloadStatus.codecInfo.scmsTEnable = static_cast<uint16_t>(config.scmsTEnable);
+    offloadStatus.codecInfo.sampleRate = static_cast<uint32_t>(config.sampleRate);
+    offloadStatus.codecInfo.encodedAudioBitrate = static_cast<uint32_t>(config.encodedAudioBitrate);
+    offloadStatus.codecInfo.bitsPerSample = static_cast<uint8_t>(config.bitsPerSample);
+    offloadStatus.codecInfo.chMode = static_cast<uint8_t>(config.chMode);
+    offloadStatus.codecInfo.aclHdl = static_cast<uint16_t>(config.aclHdl);
+    offloadStatus.codecInfo.l2cRcid = static_cast<uint16_t>(config.l2cRcid);
     offloadStatus.codecInfo.mtu = static_cast<uint16_t>(config.mtu);
-    offloadStatus.codecInfo.codecSpecific0 = static_cast<uint8_t>(config.codec_specific_0);
-    offloadStatus.codecInfo.codecSpecific1 = static_cast<uint8_t>(config.codec_specific_1);
-    offloadStatus.codecInfo.codecSpecific2 = static_cast<uint8_t>(config.codec_specific_2);
-    offloadStatus.codecInfo.codecSpecific3 = static_cast<uint8_t>(config.codec_specific_3);
-    offloadStatus.codecInfo.codecSpecific4 = static_cast<uint8_t>(config.codec_specific_4);
-    offloadStatus.codecInfo.codecSpecific5 = static_cast<uint8_t>(config.codec_specific_5);
-    offloadStatus.codecInfo.codecSpecific6 = static_cast<uint8_t>(config.codec_specific_6);
-    offloadStatus.codecInfo.codecSpecific7 = static_cast<uint8_t>(config.codec_specific_7);
+    offloadStatus.codecInfo.codecSpecific0 = static_cast<uint8_t>(config.codecSpecific0);
+    offloadStatus.codecInfo.codecSpecific1 = static_cast<uint8_t>(config.codecSpecific1);
+    offloadStatus.codecInfo.codecSpecific2 = static_cast<uint8_t>(config.codecSpecific2);
+    offloadStatus.codecInfo.codecSpecific3 = static_cast<uint8_t>(config.codecSpecific3);
+    offloadStatus.codecInfo.codecSpecific4 = static_cast<uint8_t>(config.codecSpecific4);
+    offloadStatus.codecInfo.codecSpecific5 = static_cast<uint8_t>(config.codecSpecific5);
+    offloadStatus.codecInfo.codecSpecific6 = static_cast<uint8_t>(config.codecSpecific6);
+    offloadStatus.codecInfo.codecSpecific7 = static_cast<uint8_t>(config.codecSpecific7);
     deviceInfo->SetOffloadCodecStatus(offloadStatus);
     HILOGI("codecType:%{public}x, mtu:%{public}d, bitRate:%{public}d", offloadStatus.codecInfo.codecType,
         offloadStatus.codecInfo.mtu, offloadStatus.codecInfo.encodedAudioBitrate);
@@ -1071,7 +1071,7 @@ void HwBluetoothConnCb(const StackCallbackParam &param)
     });
 }
 
-void StackErrnoCallback(bt_status_t status, STACK::RawAddress *addr, BtStackErrno state)
+void StackErrnoCallback(BtStackStatus status, STACK::RawAddress *addr, BtStackErrno state)
 {
     RawAddress rawAddr = ServiceUtil::AddrFromStack(*addr);
     RemoteDeviceProperties::GetInstance()->StackErrnoCallback(rawAddr, status, state);
@@ -1121,15 +1121,15 @@ void BluetoothHwInterface::UpdateA2dpOffloadCodecStatus(const RawAddress &addr)
     HwA2dpOffloadCodecConfigCallback(&rawAddr, config);
 }
 
-bool BluetoothHwInterface::InitBtHwInterface(const bthwif_interface_t *bthwif)
+bool BluetoothHwInterface::InitBtHwInterface(const BthwifInterface *bthwif)
 {
     if (!bthwif) {
         HILOGE("bthwif is nullptr");
         return false;
     }
-    bt_status_t status = bthwif->Init(&sBluetoothHWCallbacks);
+    BtStackStatus status = bthwif->init(&sBluetoothHWCallbacks);
     if (status != BT_STATUS_SUCCESS && status != BT_STATUS_DONE) {
-        HILOGE("Failed to init bthwif interface, (%{public}s)", bt_status_text(status).c_str());
+        HILOGE("Failed to init bthwif interface, (%{public}s)", BtStatusText(status).c_str());
         return false;
     }
 

@@ -86,7 +86,7 @@ void A2dpSnkService::DeregisterObserver(IA2dpSnkObserver *observer)
     a2dpSnkFwObservers_.Deregister(*observer);
 }
 
-static int CovertConnectStateFromStack(btav_connection_state_t state)
+static int CovertConnectStateFromStack(BtavConnectionState state)
 {
     switch (state) {
         case BTAV_CONNECTION_STATE_DISCONNECTED:
@@ -114,7 +114,7 @@ static std::string GetEncryptedLogAddr(const RawAddress &addr)
 
 // --- INativeA2dpSinkCallback 实现 ---
 
-void A2dpSnkService::OnNativeConnectionStateChanged(const RawAddress &device, btav_connection_state_t state)
+void A2dpSnkService::OnNativeConnectionStateChanged(const RawAddress &device, BtavConnectionState state)
 {
     HILOGI("[a2dpSnkStack] OnNativeConnectionStateChanged: address=[%{public}s], state:%{public}d",
         GetEncryptedLogAddr(device).c_str(), state);
@@ -123,7 +123,7 @@ void A2dpSnkService::OnNativeConnectionStateChanged(const RawAddress &device, bt
     PostEvent(event);
 }
 
-void A2dpSnkService::OnNativeAudioStateChanged(const RawAddress &device, btav_audio_state_t state)
+void A2dpSnkService::OnNativeAudioStateChanged(const RawAddress &device, BtavAudioState state)
 {
     HILOGI("[a2dpSnkStack] OnNativeAudioStateChanged: address=[%{public}s], state:%{public}d",
         GetEncryptedLogAddr(device).c_str(), state);
@@ -181,14 +181,14 @@ void A2dpSnkService::StartUp()
         HILOGW("A2dpSnkService has already been started before.");
         return;
     }
-    bt_interface_t *bt_interface = AdapterManager::GetInstance()->getBluetoothInterface();
+    BtInterface *bt_interface = AdapterManager::GetInstance()->getBluetoothInterface();
     if (!bt_interface) {
         HILOGE("Failed to open the bt_interface");
         return;
     }
 
     btAvSinkInterface_ =
-        (btav_sink_interface_t *)(bt_interface->get_profile_interface(BT_PROFILE_ADVANCED_AUDIO_SINK_ID));
+        (BtavSinkInterface *)(bt_interface->getProfileInterface(BT_PROFILE_ADVANCED_AUDIO_SINK_ID));
     if (!btAvSinkInterface_) {
         HILOGE("Failed to get btAvSinkInterface_");
         return;
@@ -515,7 +515,7 @@ bool A2dpSnkService::NativeConnect(const RawAddress &device)
 {
     if (nativeAdapter_) {
         HILOGI("connect addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
-        bt_status_t status = nativeAdapter_->Connect(device);
+        BtStackStatus status = nativeAdapter_->Connect(device);
         if (status != BT_STATUS_SUCCESS) {
             HILOGE("Failed connect! status=%{public}d", status);
             return false;
@@ -550,7 +550,7 @@ bool A2dpSnkService::NativeDisconnect(const RawAddress &device)
 {
     if (nativeAdapter_) {
         HILOGI("disconnect addr: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
-        bt_status_t status = nativeAdapter_->Disconnect(device);
+        BtStackStatus status = nativeAdapter_->Disconnect(device);
         if (status != BT_STATUS_SUCCESS) {
             HILOGE("Failed disconnected! status=%{public}d", status);
             return false;
@@ -775,7 +775,7 @@ int A2dpSnkService::GetConnectStrategy(const RawAddress &device)
 
 int A2dpSnkService::SendDelay(const RawAddress &device, int32_t delayValue)
 {
-    // 底层 btav_sink_interface_t 无 delay 接口，与 a2dp_src 侧保持一致返回成功。
+    // 底层 BtavSinkInterface 无 delay 接口，与 a2dp_src 侧保持一致返回成功。
     // 真正实现需扩展 INativeA2dpAdapter 和 Bluedroid 栈接口。
     return RET_NO_ERROR;
 }

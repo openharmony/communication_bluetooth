@@ -65,7 +65,7 @@ private:
     void RemoveAdvKey(std::shared_ptr<BluetoothDevice> device);
     void SendCloudUuidIntent(std::shared_ptr<BluetoothDevice> device);
     bool IsDeviceHasLinkkey(std::shared_ptr<BluetoothDevice> device);
-    void SetRemoteDevicePropertyInt(const RawAddress &device, bt_property_type_t type, int32_t value);
+    void SetRemoteDevicePropertyInt(const RawAddress &device, BtPropertyType type, int32_t value);
     void SetDeviceProductIdProp(std::shared_ptr<BluetoothDevice> device, const std::string &productId);
     bool IsValidAddress(const std::string &addr);
     std::shared_ptr<BluetoothDevice> GetCloudBluetoothDeviceFromMap(const RawAddress &device);

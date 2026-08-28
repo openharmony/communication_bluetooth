@@ -128,7 +128,7 @@ struct GattClientService::impl : public GattServiceBase {
     std::list<std::shared_ptr<GattClientApplication>> clients {};
     GattClientService &self;
     std::shared_ptr<GattClientServiceRegisterObserver> registerObserver = nullptr;
-    const btgatt_client_interface_t *btIfGattClient = nullptr;
+    const BtgattClientInterface *btIfGattClient = nullptr;
     // used in write no respond lock
     std::mutex writeMutex;
 };
@@ -194,7 +194,7 @@ int GattClientService::GetMaxConnectNum()
     return 0;
 }
 
-void GattClientService::SetBtifInterface(const btgatt_client_interface_t *interface)
+void GattClientService::SetBtifInterface(const BtgattClientInterface *interface)
 {
     pimpl->btIfGattClient = interface;
 }
@@ -235,7 +235,7 @@ void GattClientService::impl::RegisterClientCallback(int status, int clientIf,
     HILOGI("status: %{public}d, clientIf: %{public}d", status, clientIf);
     int ret = 0;
     if (registerObserver == nullptr || registerObserver->isRegsitedCallBackPromiseUsed) {
-        btIfGattClient->unregister_client(clientIf);
+        btIfGattClient->unregisterClient(clientIf);
         HILOGI("this promise is used status: %{public}d, clientIf: %{public}d", status, clientIf);
         return;
     }
@@ -291,7 +291,7 @@ void GattClientService::impl::RegisterApplication(std::weak_ptr<IGattClientCallb
         [this](int status, int clientIf, const GattClientServiceRegisterObserver::Context &context) {
             this->RegisterClientCallback(status, clientIf, context);
         });
-    if (btIfGattClient == nullptr || btIfGattClient->register_client == nullptr) {
+    if (btIfGattClient == nullptr || btIfGattClient->registerClient == nullptr) {
         // Open stack currently exports empty btgattClientInterface; avoid null call SEGV.
         HILOGE("GATT client interface unavailable");
         promise->set_value(GattStatus::REQUEST_NOT_SUPPORT);
@@ -302,7 +302,7 @@ void GattClientService::impl::RegisterApplication(std::weak_ptr<IGattClientCallb
     std::swap(registerObserver, observer);
 
     // not support eatt transport now
-    int ret = btIfGattClient->register_client(Uuid::Random(), false);
+    int ret = btIfGattClient->registerClient(Uuid::Random(), false);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("Register client failed, ret: %{public}d", ret);
         // Release and delete the observer.
@@ -671,7 +671,7 @@ std::vector<GattDevice> GattClientService::GetAllDevice()
 
             for (auto iter = pimpl->clients.begin(); iter != pimpl->clients.end(); iter++) {
                 uint8_t addrType;
-                btif_get_address_type(ServiceUtil::AddrToStack((*iter)->GetAddress()), &addrType);
+                BtifGetAddressType(ServiceUtil::AddrToStack((*iter)->GetAddress()), &addrType);
                 set.emplace((*iter)->GetAddress(), ServiceUtil::AddrTypeFromStack(addrType),
                     (*iter)->GetTransport(), (*iter)->GetConnState());
             }
@@ -721,15 +721,15 @@ int GattClientService::RequestFastestConn(const RawAddress &addr)
     }
 
     DoInGattThread([addr]() {
-        const bt_interface_t *btInterface = nullptr;
+        const BtInterface *btInterface = nullptr;
         int ret = hal_util_load_bt_library(&btInterface);
         if (ret != BT_STATUS_SUCCESS || btInterface == nullptr) {
             HILOGE("Load bluetooth library failed");
             return;
         }
 
-        const bthwif_interface_t *bthwif =
-            reinterpret_cast<const bthwif_interface_t*>(btInterface->get_profile_interface(BT_VENDER_INTERFACE_ID));
+        const BthwifInterface *bthwif =
+            reinterpret_cast<const BthwifInterface*>(btInterface->getProfileInterface(BT_VENDER_INTERFACE_ID));
         if (bthwif == nullptr) {
             HILOGE("bthwif is null");
             return;

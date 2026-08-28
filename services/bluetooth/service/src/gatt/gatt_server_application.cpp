@@ -38,7 +38,7 @@
 namespace OHOS {
 namespace bluetooth {
 using namespace OHOS::Bluetooth;
-GattServerApplication::GattServerApplication(int appId, const btgatt_server_interface_t *interface, uint32_t tokenId,
+GattServerApplication::GattServerApplication(int appId, const BtgattServerInterface *interface, uint32_t tokenId,
     std::weak_ptr<IGattServerCallback> callback, NotifyServiceChangedFunc func)
     : serverIf_(appId),
       connIdMap_(),
@@ -55,7 +55,7 @@ GattServerApplication::GattServerApplication(int appId, const btgatt_server_inte
 GattServerApplication::~GattServerApplication()
 {
     if (btIfGattServer_) {
-        int ret = btIfGattServer_->unregister_server(serverIf_);
+        int ret = btIfGattServer_->unregisterServer(serverIf_);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("unregister server failed, ret: %{public}d", ret);
         }
@@ -127,39 +127,39 @@ std::string PropertiesLog(uint8_t properties)
 }
 }
 
-void GattServerApplication::BuildGattService(const std::vector<btgatt_db_element_t> &svc, Service &service)
+void GattServerApplication::BuildGattService(const std::vector<BtgattDbElement> &svc, Service &service)
 {
     for (auto iter = svc.begin(); iter != svc.end(); iter++) {
         Uuid uuid = iter->uuid;
         switch (iter->type) {
             case BTGATT_DB_PRIMARY_SERVICE:
             case BTGATT_DB_SECONDARY_SERVICE: {
-                service.handle_ = iter->attribute_handle;
+                service.handle_ = iter->attributeHandle;
                 service.uuid_ = uuid;
                 service.isPrimary_ = (iter->type == BTGATT_DB_PRIMARY_SERVICE);
                 HILOGD("Service uuid: %{public}s, handle: %{public}#x, isPrimary: %{public}d",
-                    iter->uuid.ToString().c_str(), iter->attribute_handle, iter->type);
+                    iter->uuid.ToString().c_str(), iter->attributeHandle, iter->type);
                 break;
             }
             case BTGATT_DB_CHARACTERISTIC: {
-                uint16_t handle = FromValueHandle(iter->attribute_handle);  // Characteristic handle
+                uint16_t handle = FromValueHandle(iter->attributeHandle);  // Characteristic handle
                 Characteristic ccc(uuid, handle, iter->properties, iter->permissions, nullptr, 0);
                 service.characteristics_.push_back(std::move(ccc));
                 // Store attribute handles
                 serviceHandles_[service.handle_].insert(handle);
-                serviceHandles_[service.handle_].insert(iter->attribute_handle);
+                serviceHandles_[service.handle_].insert(iter->attributeHandle);
                 HILOGD("Character uuid: %{public}s, handle: %{public}#x, permissions: %{public}s, "
                     "properties: %{public}s", iter->uuid.ToString().c_str(), handle,
                     PermissionsLog(iter->permissions).c_str(), PropertiesLog(iter->properties).c_str());
                 break;
             }
             case BTGATT_DB_DESCRIPTOR: {
-                Descriptor descriptor(uuid, iter->attribute_handle, iter->permissions, nullptr, 0);
+                Descriptor descriptor(uuid, iter->attributeHandle, iter->permissions, nullptr, 0);
                 service.characteristics_.back().descriptors_.push_back(std::move(descriptor));
                 // Store attribute handles
-                serviceHandles_[service.handle_].insert(iter->attribute_handle);
+                serviceHandles_[service.handle_].insert(iter->attributeHandle);
                 HILOGD("Descriptor uuid: %{public}s, handle: %{public}#x, permissions: %{public}s",
-                    iter->uuid.ToString().c_str(), iter->attribute_handle, PermissionsLog(iter->permissions).c_str());
+                    iter->uuid.ToString().c_str(), iter->attributeHandle, PermissionsLog(iter->permissions).c_str());
                 break;
             }
             case BTGATT_DB_INCLUDED_SERVICE:
@@ -175,7 +175,7 @@ void GattServerApplication::ReportAddService(int ret, const Service &service)
     WPTR_CBACK(callback_, OnAddService, ret, service);
 }
 
-void GattServerApplication::ServiceAddedCallback(int status, int serverIf, std::vector<btgatt_db_element_t> svc)
+void GattServerApplication::ServiceAddedCallback(int status, int serverIf, std::vector<BtgattDbElement> svc)
 {
     if (serverIf != serverIf_) {
         return;
@@ -201,7 +201,7 @@ void GattServerApplication::ServiceAddedCallback(int status, int serverIf, std::
 
 void GattServerApplication::AddService(const Service &service)
 {
-    std::vector<btgatt_db_element_t> svc;
+    std::vector<BtgattDbElement> svc;
     svc.push_back({
         .uuid = service.uuid_,
         .type = (service.isPrimary_ ? BTGATT_DB_PRIMARY_SERVICE : BTGATT_DB_SECONDARY_SERVICE),
@@ -224,12 +224,12 @@ void GattServerApplication::AddService(const Service &service)
     for (const auto &include_svc : service.includeServices_) {
         svc.push_back({
             .type = BTGATT_DB_INCLUDED_SERVICE,
-            .attribute_handle = include_svc.startHandle_,
+            .attributeHandle = include_svc.startHandle_,
         });
     }
 
     if (btIfGattServer_) {
-        int ret = btIfGattServer_->add_service(serverIf_, std::move(svc));
+        int ret = btIfGattServer_->addService(serverIf_, std::move(svc));
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("Add service failed, ret: %{public}d", ret);
             return;
@@ -263,7 +263,7 @@ void GattServerApplication::ServiceDeletedCallback(int status, int serverIf, int
 void GattServerApplication::RemoveService(uint16_t handle)
 {
     if (btIfGattServer_) {
-        int ret = btIfGattServer_->delete_service(serverIf_, handle);
+        int ret = btIfGattServer_->deleteService(serverIf_, handle);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("Remove service failed, ret: %{public}d", ret);
             return;
@@ -608,25 +608,25 @@ void GattServerApplication::SendResponse(int connId, int transId, uint16_t handl
 void GattServerApplication::SendResponse(const SendResponseContext &ctx, const std::vector<uint8_t> &value, int offset)
 {
     // 600 bytes, could be too big for stacks
-    btgatt_response_t rsp;
+    BtgattResponse rsp;
     (void)memset_s(&rsp, sizeof(rsp), 0x0, sizeof(rsp));
     rsp.handle = ctx.handle;
-    rsp.attr_value.handle = ctx.handle;
-    rsp.attr_value.offset = offset;
+    rsp.attrValue.handle = ctx.handle;
+    rsp.attrValue.offset = offset;
 
     int result;
     if (value.size() > 0) {
-        result = memcpy_s(rsp.attr_value.value, BTGATT_MAX_ATTR_LEN, value.data(), value.size());
+        result = memcpy_s(rsp.attrValue.value, BTGATT_MAX_ATTR_LEN, value.data(), value.size());
         if (result != EOK) {
             HILOGE("memcpy_s failed, result: %{public}d", result);
             return;
         }
-        rsp.attr_value.len = value.size();
+        rsp.attrValue.len = value.size();
     }
 
     int status = GattServiceBase::GattStatusToStack(ctx.ret);
     if (btIfGattServer_) {
-        result = btIfGattServer_->send_response(ctx.connId, ctx.transId, status, rsp);
+        result = btIfGattServer_->sendResponse(ctx.connId, ctx.transId, status, rsp);
         if (result != BT_STATUS_SUCCESS) {
             HILOGE("failed, result: %{public}d", result);
         }
@@ -668,7 +668,7 @@ bool GattServerApplication::NotifyClientInner(const RawAddress &addr, uint16_t h
     uint16_t valueHandle = ToValueHandle(handle);
     iter->second.notifyHandle = valueHandle;
     if (btIfGattServer_) {
-        int ret = btIfGattServer_->send_indication(serverIf_, valueHandle, iter->first, needConfirm, std::move(value));
+        int ret = btIfGattServer_->sendIndication(serverIf_, valueHandle, iter->first, needConfirm, std::move(value));
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("Send indication failed, ret: %{public}d", ret);
             return false;
@@ -816,7 +816,7 @@ void GattServerApplication::SetPhy(const RawAddress &addr, int32_t txPhy, int32_
     int rxPhyMask = ConvertToBlePhyMask(rxPhy);
 
     if (btIfGattServer_) {
-        int ret = btIfGattServer_->set_preferred_phy(
+        int ret = btIfGattServer_->setPreferredPhy(
             ServiceUtil::AddrToStack(addr), txPhyMask, rxPhyMask, phyOptions);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
@@ -841,7 +841,7 @@ void GattServerApplication::ReadPhy(const RawAddress &addr)
     }
  
     if (btIfGattServer_) {
-        int ret = btIfGattServer_->read_phy(ServiceUtil::AddrToStack(addr),
+        int ret = btIfGattServer_->readPhy(ServiceUtil::AddrToStack(addr),
             [this](uint8_t txPhy, uint8_t rxPhy, uint8_t status) { ReadPhyCallback(txPhy, rxPhy, status); });
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);

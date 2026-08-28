@@ -24,87 +24,87 @@
 
 #include "bt_types.h"
 
-typedef enum {
+enum BthdConnectionState {
     BTHD_CONN_STATE_DISCONNECTED = 0,
     BTHD_CONN_STATE_CONNECTING,
     BTHD_CONN_STATE_CONNECTED,
     BTHD_CONN_STATE_DISCONNECTING,
-} bthd_connection_state_t;
+};
 
-/* Report types accepted by bthd_interface_t::send_report. */
-typedef enum {
+/* Report types accepted by BthdInterface::SendReport. */
+enum BthdReportType {
     BTHD_REPORT_TYPE_OTHER = 0,
     BTHD_REPORT_TYPE_INPUT,
     BTHD_REPORT_TYPE_OUTPUT,
     BTHD_REPORT_TYPE_FEATURE,
     /* Special value for reports sent on the interrupt channel (INPUT assumed). */
     BTHD_REPORT_TYPE_INTRDATA
-} bthd_report_type_t;
+};
 
 /* Application registration state reported by the application state callback. */
-typedef enum {
+enum BthdApplicationState {
     BTHD_APP_STATE_NOT_REGISTERED = 0,
     BTHD_APP_STATE_REGISTERED,
-} bthd_application_state_t;
+};
 
-/* HID device application parameters of bthd_interface_t::register_app. */
-typedef struct {
+/* HID device application parameters of BthdInterface::RegisterApp. */
+struct BthdAppParam {
     const char *name;
     const char *description;
     const char *provider;
     uint8_t subclass;
-    uint8_t *desc_list;
-    int desc_list_len;
-} bthd_app_param_t;
+    uint8_t *descList;
+    int descListLen;
+};
 
-/* HID device QoS parameters of bthd_interface_t::register_app. */
-typedef struct {
-    uint8_t service_type;
-    uint32_t token_rate;
-    uint32_t token_bucket_size;
-    uint32_t peak_bandwidth;
-    uint32_t access_latency;
-    uint32_t delay_variation;
-} bthd_qos_param_t;
+/* HID device QoS parameters of BthdInterface::RegisterApp. */
+struct BthdQosParam {
+    uint8_t serviceType;
+    uint32_t tokenRate;
+    uint32_t tokenBucketSize;
+    uint32_t peakBandwidth;
+    uint32_t accessLatency;
+    uint32_t delayVariation;
+};
 
 /* HID device callbacks (bluedroid system/include/hardware/bt_hd.h). */
-typedef void (*bthd_application_state_callback)(RawAddress *bd_addr,
-                                                bthd_application_state_t state);
-typedef void (*bthd_connection_state_callback)(RawAddress *bd_addr,
-                                               bthd_connection_state_t state);
-typedef void (*bthd_get_report_callback)(uint8_t type, uint8_t id, uint16_t buffer_size);
-typedef void (*bthd_set_report_callback)(uint8_t type, uint8_t id, uint16_t len,
-                                         uint8_t *p_data);
-typedef void (*bthd_set_protocol_callback)(uint8_t protocol);
-typedef void (*bthd_intr_data_callback)(uint8_t report_id, uint16_t len, uint8_t *p_data);
-typedef void (*bthd_vc_unplug_callback)(void);
+typedef void (*BthdApplicationStateCallback)(RawAddress *bdAddr,
+                                                BthdApplicationState state);
+typedef void (*BthdConnectionStateCallback)(RawAddress *bdAddr,
+                                               BthdConnectionState state);
+typedef void (*BthdGetReportCallback)(uint8_t type, uint8_t id, uint16_t bufferSize);
+typedef void (*BthdSetReportCallback)(uint8_t type, uint8_t id, uint16_t len,
+                                         uint8_t *pData);
+typedef void (*BthdSetProtocolCallback)(uint8_t protocol);
+typedef void (*BthdIntrDataCallback)(uint8_t reportId, uint16_t len, uint8_t *pData);
+typedef void (*BthdVcUnplugCallback)(void);
 
-typedef struct {
+struct BthdCallbacks {
     size_t size;
-    bthd_application_state_callback application_state_cb;
-    bthd_connection_state_callback connection_state_cb;
-    bthd_get_report_callback get_report_cb;
-    bthd_set_report_callback set_report_cb;
-    bthd_set_protocol_callback set_protocol_cb;
-    bthd_intr_data_callback intr_data_cb;
-    bthd_vc_unplug_callback vc_unplug_cb;
-} bthd_callbacks_t;
+    BthdApplicationStateCallback applicationStateCb;
+    BthdConnectionStateCallback connectionStateCb;
+    BthdGetReportCallback getReportCb;
+    BthdSetReportCallback setReportCb;
+    BthdSetProtocolCallback setProtocolCb;
+    BthdIntrDataCallback intrDataCb;
+    BthdVcUnplugCallback vcUnplugCb;
+};
 
 /* HID device interface consumed by hid_device and watch services; layout
  * mirrors bluedroid system/include/hardware/bt_hd.h. */
-typedef struct {
+struct BthdInterface {
     size_t size;
-    bt_status_t (*init)(bthd_callbacks_t *callbacks);
+    BtStackStatus (*init)(BthdCallbacks *callbacks);
     void (*cleanup)(void);
-    bt_status_t (*register_app)(bthd_app_param_t *app_param, bthd_qos_param_t *in_qos,
-                                bthd_qos_param_t *out_qos);
-    bt_status_t (*unregister_app)(void);
-    bt_status_t (*connect)(RawAddress *bd_addr);
-    bt_status_t (*disconnect)(void);
-    bt_status_t (*send_report)(bthd_report_type_t type, uint8_t id, uint16_t len,
-                               uint8_t *p_data);
-    bt_status_t (*report_error)(uint8_t error);
-    bt_status_t (*virtual_cable_unplug)(void);
-} bthd_interface_t;
+    BtStackStatus (*registerApp)(BthdAppParam *appParam, BthdQosParam *inQos,
+                                BthdQosParam *outQos);
+    BtStackStatus (*unregisterApp)(void);
+    BtStackStatus (*connect)(RawAddress *bdAddr);
+    BtStackStatus (*disconnect)(void);
+    BtStackStatus (*sendReport)(BthdReportType type, uint8_t id, uint16_t len,
+                               uint8_t *pData);
+    BtStackStatus (*reportError)(uint8_t error);
+    BtStackStatus (*virtualCableUnplug)(void);
+};
 
 #endif  // BT_HD_H

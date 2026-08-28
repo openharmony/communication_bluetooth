@@ -51,7 +51,7 @@ static const Uuid UUID_OBEX_OBJECT_PUSH = Uuid::ConvertFrom16Bits(0x1105);
 static const Uuid UUID_SAP = Uuid::ConvertFrom16Bits(0x112D);
 static const Uuid UUID_DIP = Uuid::ConvertFrom16Bits(0x1200);
 static const std::unordered_map<std::string, std::function<bool(int32_t, const std::string &,
-    const std::string &, bool, bluetooth_sdp_record *)>> g_handleMap = {
+    const std::string &, bool, BluetoothSdpRecord *)>> g_handleMap = {
     {UUID_MAP_MAS.ToString(), SdpFoundEventPublishHelper::PublishMapMasSdpFoundEvent},
     {UUID_MAP_MNS.ToString(), SdpFoundEventPublishHelper::PublishMapMnsSdpFoundEvent},
     {UUID_PBAP_PSE.ToString(), SdpFoundEventPublishHelper::PublishPbapPseSdpFoundEvent},
@@ -82,7 +82,7 @@ static void SetCommonParams(int32_t status, const std::string &address,
 }
 
 bool SdpFoundEventPublishHelper::PublishSdpFoundEvent(int32_t status, const std::string &address,
-    const std::string &uuid, bool moreResults, bluetooth_sdp_record *record)
+    const std::string &uuid, bool moreResults, BluetoothSdpRecord *record)
 {
     if (record == nullptr) {
         HILOGE("record is error");
@@ -97,119 +97,119 @@ bool SdpFoundEventPublishHelper::PublishSdpFoundEvent(int32_t status, const std:
 }
 
 bool SdpFoundEventPublishHelper::PublishMapMasSdpFoundEvent(int32_t status, const std::string &address,
-    const std::string &uuid, bool moreResults, bluetooth_sdp_record* record)
+    const std::string &uuid, bool moreResults, BluetoothSdpRecord* record)
 {
     HILOGD("PublishMapMasSdpFoundEvent");
     OHOS::AAFwk::Want want;
     want.SetAction(COMMON_EVENT_BLUETOOTH_MAPMAS_SDP_FOUND);
     SetCommonParams(status, address, uuid, want);
-    want.SetParam("instanceId", static_cast<int>(record->mas.mas_instance_id));
-    want.SetParam("l2capPsm", static_cast<int>(record->mas.hdr.l2cap_psm));
-    want.SetParam("channel", static_cast<int>(record->mas.hdr.rfcomm_channel_number));
-    want.SetParam("version", static_cast<int>(record->mas.hdr.profile_version));
-    want.SetParam("features", static_cast<int>(record->mas.supported_features));
-    want.SetParam("messageType", static_cast<int>(record->mas.supported_message_types));
-    want.SetParam("serviceName", CopyDataFromStack<std::string, char>(record->mas.hdr.service_name,
-        record->hdr.service_name_length, MAX_SERVICE_NAME_LEN));
+    want.SetParam("instanceId", static_cast<int>(record->mas.masInstanceId));
+    want.SetParam("l2capPsm", static_cast<int>(record->mas.hdr.l2capPsm));
+    want.SetParam("channel", static_cast<int>(record->mas.hdr.rfcommChannelNumber));
+    want.SetParam("version", static_cast<int>(record->mas.hdr.profileVersion));
+    want.SetParam("features", static_cast<int>(record->mas.supportedFeatures));
+    want.SetParam("messageType", static_cast<int>(record->mas.supportedMessageTypes));
+    want.SetParam("serviceName", CopyDataFromStack<std::string, char>(record->mas.hdr.serviceName,
+        record->hdr.serviceNameLength, MAX_SERVICE_NAME_LEN));
     want.SetParam("moreResults", moreResults);
     return BluetoothHelper::BluetoothCommonEventHelper::PublishEventWithManagePermission(want, false);
 }
 
 bool SdpFoundEventPublishHelper::PublishMapMnsSdpFoundEvent(int32_t status, const std::string &address,
-    const std::string &uuid, bool moreResults, bluetooth_sdp_record* record)
+    const std::string &uuid, bool moreResults, BluetoothSdpRecord* record)
 {
     HILOGD("PublishMapMnsSdpFoundEvent");
     OHOS::AAFwk::Want want;
     want.SetAction(COMMON_EVENT_BLUETOOTH_MAPMNS_SDP_FOUND);
     SetCommonParams(status, address, uuid, want);
-    want.SetParam("l2capPsm", static_cast<int>(record->mns.hdr.l2cap_psm));
-    want.SetParam("channel", static_cast<int>(record->mns.hdr.rfcomm_channel_number));
-    want.SetParam("version", static_cast<int>(record->mns.hdr.profile_version));
-    want.SetParam("features", static_cast<int>(record->mns.supported_features));
-    want.SetParam("serviceName", CopyDataFromStack<std::string, char>(record->mns.hdr.service_name,
-        record->hdr.service_name_length, MAX_SERVICE_NAME_LEN));
+    want.SetParam("l2capPsm", static_cast<int>(record->mns.hdr.l2capPsm));
+    want.SetParam("channel", static_cast<int>(record->mns.hdr.rfcommChannelNumber));
+    want.SetParam("version", static_cast<int>(record->mns.hdr.profileVersion));
+    want.SetParam("features", static_cast<int>(record->mns.supportedFeatures));
+    want.SetParam("serviceName", CopyDataFromStack<std::string, char>(record->mns.hdr.serviceName,
+        record->hdr.serviceNameLength, MAX_SERVICE_NAME_LEN));
     want.SetParam("moreResults", moreResults);
     return BluetoothHelper::BluetoothCommonEventHelper::PublishEventWithManagePermission(want, false);
 }
 
 bool SdpFoundEventPublishHelper::PublishPbapPseSdpFoundEvent(int32_t status, const std::string &address,
-    const std::string &uuid, bool moreResults, bluetooth_sdp_record* record)
+    const std::string &uuid, bool moreResults, BluetoothSdpRecord* record)
 {
     HILOGD("PublishPbapPseSdpFoundEvent");
     OHOS::AAFwk::Want want;
     want.SetAction(COMMON_EVENT_BLUETOOTH_PBAPPSE_SDP_FOUND);
     SetCommonParams(status, address, uuid, want);
-    want.SetParam("l2capPsm", static_cast<int>(record->pse.hdr.l2cap_psm));
-    want.SetParam("channel", static_cast<int>(record->pse.hdr.rfcomm_channel_number));
-    want.SetParam("version", static_cast<int>(record->pse.hdr.profile_version));
-    want.SetParam("features", static_cast<int>(record->pse.supported_features));
-    want.SetParam("repositories", static_cast<int>(record->pse.supported_repositories));
-    want.SetParam("serviceName", CopyDataFromStack<std::string, char>(record->pse.hdr.service_name,
-        record->hdr.service_name_length, MAX_SERVICE_NAME_LEN));
+    want.SetParam("l2capPsm", static_cast<int>(record->pse.hdr.l2capPsm));
+    want.SetParam("channel", static_cast<int>(record->pse.hdr.rfcommChannelNumber));
+    want.SetParam("version", static_cast<int>(record->pse.hdr.profileVersion));
+    want.SetParam("features", static_cast<int>(record->pse.supportedFeatures));
+    want.SetParam("repositories", static_cast<int>(record->pse.supportedRepositories));
+    want.SetParam("serviceName", CopyDataFromStack<std::string, char>(record->pse.hdr.serviceName,
+        record->hdr.serviceNameLength, MAX_SERVICE_NAME_LEN));
     want.SetParam("moreResults", moreResults);
     return BluetoothHelper::BluetoothCommonEventHelper::PublishEventWithManagePermission(want, false);
 }
 
 bool SdpFoundEventPublishHelper::PublishObexObjectPushSdpFoundEvent(int32_t status, const std::string &address,
-    const std::string &uuid, bool moreResults, bluetooth_sdp_record* record)
+    const std::string &uuid, bool moreResults, BluetoothSdpRecord* record)
 {
     HILOGD("PublishObexObjectPushSdpFoundEvent");
     OHOS::AAFwk::Want want;
     want.SetAction(COMMON_EVENT_BLUETOOTH_OPPOPS_SDP_FOUND);
     SetCommonParams(status, address, uuid, want);
-    want.SetParam("l2capPsm", static_cast<int>(record->ops.hdr.l2cap_psm));
-    want.SetParam("channel", static_cast<int>(record->ops.hdr.rfcomm_channel_number));
-    want.SetParam("version", static_cast<int>(record->ops.hdr.profile_version));
-    want.SetParam("serviceName", CopyDataFromStack<std::string, char>(record->ops.hdr.service_name,
-        record->hdr.service_name_length, MAX_SERVICE_NAME_LEN));
+    want.SetParam("l2capPsm", static_cast<int>(record->ops.hdr.l2capPsm));
+    want.SetParam("channel", static_cast<int>(record->ops.hdr.rfcommChannelNumber));
+    want.SetParam("version", static_cast<int>(record->ops.hdr.profileVersion));
+    want.SetParam("serviceName", CopyDataFromStack<std::string, char>(record->ops.hdr.serviceName,
+        record->hdr.serviceNameLength, MAX_SERVICE_NAME_LEN));
     want.SetParam("formatsList", CopyDataFromStack<std::vector<char>, uint8_t>(
-        record->ops.supported_formats_list, record->ops.supported_formats_list_len, MAX_FORMATS_LENGTH));
+        record->ops.supportedFormatsList, record->ops.supportedFormatsListLen, MAX_FORMATS_LENGTH));
     want.SetParam("moreResults", moreResults);
     return BluetoothHelper::BluetoothCommonEventHelper::PublishEventWithManagePermission(want, false);
 }
 
 bool SdpFoundEventPublishHelper::PublishSapSdpFoundEvent(int32_t status, const std::string &address,
-    const std::string &uuid, bool moreResults, bluetooth_sdp_record* record)
+    const std::string &uuid, bool moreResults, BluetoothSdpRecord* record)
 {
     HILOGD("PublishSapSdpFoundEvent");
     OHOS::AAFwk::Want want;
     want.SetAction(COMMON_EVENT_BLUETOOTH_SAP_SDP_FOUND);
     SetCommonParams(status, address, uuid, want);
-    want.SetParam("channel", static_cast<int>(record->sap.hdr.rfcomm_channel_number));
-    want.SetParam("version", static_cast<int>(record->sap.hdr.profile_version));
-    want.SetParam("serviceName", CopyDataFromStack<std::string, char>(record->sap.hdr.service_name,
-        record->hdr.service_name_length, MAX_SERVICE_NAME_LEN));
+    want.SetParam("channel", static_cast<int>(record->sap.hdr.rfcommChannelNumber));
+    want.SetParam("version", static_cast<int>(record->sap.hdr.profileVersion));
+    want.SetParam("serviceName", CopyDataFromStack<std::string, char>(record->sap.hdr.serviceName,
+        record->hdr.serviceNameLength, MAX_SERVICE_NAME_LEN));
     want.SetParam("moreResults", moreResults);
     return BluetoothHelper::BluetoothCommonEventHelper::PublishEventWithManagePermission(want, false);
 }
 
 bool SdpFoundEventPublishHelper::PublishDipSdpFoundEvent(int32_t status, const std::string &address,
-    const std::string &uuid, bool moreResults, bluetooth_sdp_record* record)
+    const std::string &uuid, bool moreResults, BluetoothSdpRecord* record)
 {
     HILOGD("PublishDipSdpFoundEvent");
     OHOS::AAFwk::Want want;
     want.SetAction(COMMON_EVENT_BLUETOOTH_DIP_SDP_FOUND);
     SetCommonParams(status, address, uuid, want);
-    want.SetParam("specId", static_cast<int>(record->dip.spec_id));
+    want.SetParam("specId", static_cast<int>(record->dip.specId));
     want.SetParam("vendor", static_cast<int>(record->dip.vendor));
-    want.SetParam("vendorIdSource", static_cast<int>(record->dip.vendor_id_source));
+    want.SetParam("vendorIdSource", static_cast<int>(record->dip.vendorIdSource));
     want.SetParam("product", static_cast<int>(record->dip.product));
     want.SetParam("version", static_cast<int>(record->dip.version));
-    want.SetParam("primaryRecord", record->dip.primary_record);
+    want.SetParam("primaryRecord", record->dip.primaryRecord);
     want.SetParam("moreResults", moreResults);
     return BluetoothHelper::BluetoothCommonEventHelper::PublishEventWithManagePermission(want, false);
 }
 
 bool SdpFoundEventPublishHelper::PublishCommonSdpFoundEvent(int32_t status, const std::string &address,
-    const std::string &uuid, bool moreResults, bluetooth_sdp_record* record)
+    const std::string &uuid, bool moreResults, BluetoothSdpRecord* record)
 {
     HILOGD("PublishCommonSdpFoundEvent");
     OHOS::AAFwk::Want want;
     want.SetAction(COMMON_EVENT_BLUETOOTH_COMMON_SDP_FOUND);
     SetCommonParams(status, address, uuid, want);
-    want.SetParam("recordDataSize", static_cast<int>(record->hdr.user1_ptr_len));
-    want.SetParam("recordData", CopyDataFromStack<std::vector<char>, uint8_t>(record->hdr.user1_ptr,
-        record->hdr.user1_ptr_len, MAX_RAW_DATA_BUF));
+    want.SetParam("recordDataSize", static_cast<int>(record->hdr.user1PtrLen));
+    want.SetParam("recordData", CopyDataFromStack<std::vector<char>, uint8_t>(record->hdr.user1Ptr,
+        record->hdr.user1PtrLen, MAX_RAW_DATA_BUF));
     return BluetoothHelper::BluetoothCommonEventHelper::PublishEventWithManagePermission(want, false);
 }
 }  // namespace bluetooth

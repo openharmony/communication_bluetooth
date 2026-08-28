@@ -52,7 +52,7 @@ struct HwConnAttr {
 /* Stack callback parameter for socket connection observer */
 struct StackCallbackParam {
     STACK::RawAddress addr;
-    bt_status_t status;
+    BtStackStatus status;
     int result;
     int type;
     int psm;
@@ -73,29 +73,29 @@ struct HdapConfigCallback {
 
 /* A2DP offload codec configuration */
 struct A2dpOffloadConfigCallback {
-    uint16_t media_packet_header;
-    uint8_t m_pt;
+    uint16_t mediaPacketHeader;
+    uint8_t mPt;
     uint32_t ssrc;
-    uint8_t boundary_flag;
-    uint8_t broadcast_flag;
-    uint32_t codec_type;
-    uint16_t max_latency;
-    uint16_t scms_t_enable;
-    uint32_t sample_rate;
-    uint32_t encoded_audio_bitrate;
-    uint8_t bits_per_sample;
-    uint8_t ch_mode;
-    uint16_t acl_hdl;
-    uint16_t l2c_rcid;
+    uint8_t boundaryFlag;
+    uint8_t broadcastFlag;
+    uint32_t codecType;
+    uint16_t maxLatency;
+    uint16_t scmsTEnable;
+    uint32_t sampleRate;
+    uint32_t encodedAudioBitrate;
+    uint8_t bitsPerSample;
+    uint8_t chMode;
+    uint16_t aclHdl;
+    uint16_t l2cRcid;
     uint16_t mtu;
-    uint8_t codec_specific_0;
-    uint8_t codec_specific_1;
-    uint8_t codec_specific_2;
-    uint8_t codec_specific_3;
-    uint8_t codec_specific_4;
-    uint8_t codec_specific_5;
-    uint8_t codec_specific_6;
-    uint8_t codec_specific_7;
+    uint8_t codecSpecific0;
+    uint8_t codecSpecific1;
+    uint8_t codecSpecific2;
+    uint8_t codecSpecific3;
+    uint8_t codecSpecific4;
+    uint8_t codecSpecific5;
+    uint8_t codecSpecific6;
+    uint8_t codecSpecific7;
 };
 
 /* A2DP stream session info */
@@ -109,44 +109,44 @@ struct HwBtA2dpSteamSessionInfo {
 
 /* HW Bluetooth stack callbacks, dispatched from the closed-source HAL.
  * Field order must match the sBluetoothHWCallbacks initializer. */
-typedef struct {
+struct BthwifCallbacks {
     size_t size;
     void (*reserved1)(void);
-    void (*stack_errno_cb)(bt_status_t status, STACK::RawAddress *addr,
+    void (*stackErrnoCb)(BtStackStatus status, STACK::RawAddress *addr,
                            BtStackErrno state);
     void (*reserved3)(void);
-    void (*hdap_connect_cb)(STACK::RawAddress *bdAddr, bool isConnected,
+    void (*hdapConnectCb)(STACK::RawAddress *bdAddr, bool isConnected,
                             uint8_t featureBit, HdapConfigCallback config);
-    void (*profile_state_cb)(STACK::RawAddress *addr, uint8_t a2dpState,
+    void (*profileStateCb)(STACK::RawAddress *addr, uint8_t a2dpState,
                              uint8_t hfpState, std::string targetBtDevice,
                              uint8_t a2dpServiceType);
     void (*reserved6)(void);
-    void (*acl_disconn_reason_cb)(STACK::RawAddress *addr, int reason);
-    void (*sensorhub_dev_info_cb)(uint8_t *buffer, int length);
-    void (*sensorhub_reset_cb)(uint32_t state);
-    void (*hiecho_ind_call_cb)(uint8_t echoType, uint8_t *payload, uint16_t len,
+    void (*aclDisconnReasonCb)(STACK::RawAddress *addr, int reason);
+    void (*sensorhubDevInfoCb)(uint8_t *buffer, int length);
+    void (*sensorhubResetCb)(uint32_t state);
+    void (*hiechoIndCallCb)(uint8_t echoType, uint8_t *payload, uint16_t len,
                                uint8_t *args, uint16_t argsLen);
-    void (*bluetooth_conn_cb)(const StackCallbackParam &param);
+    void (*bluetoothConnCb)(const StackCallbackParam &param);
     void (*reserved12)(void);
     void (*reserved13)(void);
-    void (*device_cb)(STACK::RawAddress *addr, int deviceType);
+    void (*deviceCb)(STACK::RawAddress *addr, int deviceType);
     void (*reserved15)(void);
-    void (*a2dp_offload_state_cb)(STACK::RawAddress *addr, bool isOffload);
-    void (*a2dp_offload_codec_config_cb)(STACK::RawAddress *bdAddr,
+    void (*a2dpOffloadStateCb)(STACK::RawAddress *addr, bool isOffload);
+    void (*a2dpOffloadCodecConfigCb)(STACK::RawAddress *bdAddr,
                                          A2dpOffloadConfigCallback config);
-    void (*hiecho_device_acl_encryption_changed_cb)(
+    void (*hiechoDeviceAclEncryptionChangedCb)(
         const STACK::RawAddress &remoteAddr);
-    void (*report_a2dp_abnormal_status_cb)(
+    void (*reportA2dpAbnormalStatusCb)(
         const STACK::RawAddress &remoteAddr, int32_t errCode);
 #ifdef CONTEXTHUB_BLE_V3
-    void (*sensorhub_collaboration_cb)(const std::vector<uint8_t> &notifyValue);
+    void (*sensorhubCollaborationCb)(const std::vector<uint8_t> &notifyValue);
 #endif
-    void *end_marker[1];
-} BthwifCallbacks;
+    void *endMarker[1];
+};
 
 /* Closed-source vendor HW interface. All function pointers may be null when
  * the vendor HAL is unavailable; callers must null-check before use. */
-typedef struct {
+struct BthwifInterface {
     size_t size;
     /* Set connection attribution. */
     void (*hwConnAttrSet)(uint8_t transport, const STACK::RawAddress &addr,
@@ -162,22 +162,22 @@ typedef struct {
     bool (*checkRemoteDeviceBonded)(const STACK::RawAddress &addr);
     /* Interoperability feature matching. */
     bool (*interopMatch)(const uint16_t feature,
-                         const STACK::RawAddress &remote_bdaddr);
+                         const STACK::RawAddress &remoteBdAddr);
     /* Interoperability feature matching (Huawei wrapper). */
-    bool (*InteropMatch)(const uint16_t feature,
-                         const STACK::RawAddress &remote_bdaddr);
+    bool (*hwInteropMatch)(const uint16_t feature,
+                           const STACK::RawAddress &remoteBdAddr);
     /* Clean the HFP SCO occupied flag. */
-    void (*hwBtifHfpScoOccupiedClean)(const STACK::RawAddress &remote_bdaddr);
+    void (*hwBtifHfpScoOccupiedClean)(const STACK::RawAddress &remoteBdAddr);
     /* Remove the HFP SCO queue entry. */
-    void (*hwBtifHfpQueueRemove)(const STACK::RawAddress &remote_bdaddr);
+    void (*hwBtifHfpQueueRemove)(const STACK::RawAddress &remoteBdAddr);
     /* Remove the A2DP queue entry. */
-    void (*hwBtifA2dpQueueRemove)(const STACK::RawAddress &remote_bdaddr);
+    void (*hwBtifA2dpQueueRemove)(const STACK::RawAddress &remoteBdAddr);
     /* Get A2DP offload codec config. */
     bool (*getA2dpOffloadCodecConfig)(
-        const STACK::RawAddress &remote_bdaddr,
+        const STACK::RawAddress &remoteBdAddr,
         A2dpOffloadConfigCallback &config);
     /* Initialize the vendor HW interface. */
-    bt_status_t (*Init)(BthwifCallbacks *callbacks);
+    BtStackStatus (*init)(BthwifCallbacks *callbacks);
     /* Set advertising key. */
     void (*hwSetAdvKey)(const STACK::RawAddress &addr, const char &irk,
                         const char &hbk, const uint8_t version,
@@ -228,7 +228,7 @@ typedef struct {
     bool (*isIncomingConnection)(const STACK::RawAddress &addr);
     /* Get device info into property. */
     bool (*hwGetDeviceInfo)(const STACK::RawAddress &addr,
-                            bt_property_t &prop);
+                            BtProperty &prop);
     /* Check whether paired info needs sync. */
     bool (*needSyncPairedInfo)(std::vector<std::string> &pairedAddr);
     /* Fast LE connect. */
@@ -267,7 +267,7 @@ typedef struct {
     void (*hwSetActiveMode)(const STACK::RawAddress &addr);
     void (*hwSetAdaptiveSwitchStatus)(bool status);
     void (*hwSetAudioSourceType)(int mode);
-    void (*HwSetCollAudioEnableState)(bool enabled);
+    void (*hwSetCollAudioEnableState)(bool enabled);
     /* Audio render state and latency. */
     void (*notifyAudioRenderState)(bool isRenderActive);
     void (*sendLowLatencyStatus)(bool status);
@@ -288,7 +288,7 @@ typedef struct {
     void (*hwVendorSpecificCommand)(const SpecificCmdToHisi *cmd);
     /* Apply dynamic configuration from param update events. */
     void (*hwDynamicConfig)(void);
-} bthwif_interface_t;
+};
 
 }  // namespace bluetooth
 }  // namespace OHOS

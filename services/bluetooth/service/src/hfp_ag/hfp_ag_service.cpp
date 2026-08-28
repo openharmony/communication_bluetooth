@@ -172,7 +172,7 @@ void HfpAgService::StartUp()
         HILOGW("HfpAgService has already been started before.");
         return;
     }
-    bt_interface_t* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
+    BtInterface* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
     if (bluetoothInterface == nullptr) {
         BtChrBtExcpEvent("", BTOPT_HFP, CHR_SUB_ERRCODE_CASE3);
         HILOGE("Start up failed, bluetoothInterface is null.");
@@ -180,7 +180,7 @@ void HfpAgService::StartUp()
     }
 #ifndef BT_MCU_PROXY_ENABLE
     bluetoothHfpInterface = reinterpret_cast<::bluetooth::headset::Interface*>(
-        const_cast<void *>(bluetoothInterface->get_profile_interface(BT_PROFILE_HANDSFREE_ID)));
+        const_cast<void *>(bluetoothInterface->getProfileInterface(BT_PROFILE_HANDSFREE_ID)));
     if (bluetoothHfpInterface == nullptr) {
         BtChrBtExcpEvent("", BTOPT_HFP, CHR_SUB_ERRCODE_CASE4);
         HILOGE("Start up failed, bluetoothHfpInterface is null.");
@@ -190,7 +190,7 @@ void HfpAgService::StartUp()
     maxConnectedNum_ = GetMaxConnectionDevicesNum();
     bool isEnabled = IsInbandRingingEnabled();
 #ifndef BT_MCU_PROXY_ENABLE
-    bt_status_t status = bluetoothHfpInterface->Init((::bluetooth::headset::Callbacks *)hfpAgServiceCallback_.get(),
+    BtStackStatus status = bluetoothHfpInterface->Init((::bluetooth::headset::Callbacks *)hfpAgServiceCallback_.get(),
         maxConnectedNum_ + 1, isEnabled);
     if (status != BT_STATUS_SUCCESS) {
         BtChrBtExcpEvent("", BTOPT_HFP, CHR_SUB_ERRCODE_CASE5);
@@ -2135,7 +2135,7 @@ void HfpAgService::StopVoiceRecognitionToStack(const std::string &address)
     ::bluetooth::headset::Interface* bluetoothHfpInterface = hfpAgService->getBluetoothHfpInterface();
     CHECK_AND_RETURN_LOG(bluetoothHfpInterface != nullptr, "BluetoothHfpInterface is null.");
 
-    bt_status_t status = bluetoothHfpInterface->StopVoiceRecognition(&rawAddr);
+    BtStackStatus status = bluetoothHfpInterface->StopVoiceRecognition(&rawAddr);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("Fail StopVoiceRecognition, status: %{public}d", status);
         return;
@@ -2187,7 +2187,7 @@ void HfpAgService::SetInbandRing(bool action)
     return bluetoothHfpInterface;
 }
 
-int HfpAgService::CovertConnectStateFromStack(::bluetooth::headset::bthf_connection_state_t state)
+int HfpAgService::CovertConnectStateFromStack(::bluetooth::headset::BthfConnectionState state)
 {
     if (state == ::bluetooth::headset::BTHF_CONNECTION_STATE_DISCONNECTING) {
         return HFP_AG_STATE_DISCONNECTING;
@@ -2204,7 +2204,7 @@ int HfpAgService::CovertConnectStateFromStack(::bluetooth::headset::bthf_connect
     return HFP_AG_STATE_DISCONNECTED;
 }
 
-void HfpAgService::HfpAgServiceCallbacks::ConnectionStateCallback(::bluetooth::headset::bthf_connection_state_t state,
+void HfpAgService::HfpAgServiceCallbacks::ConnectionStateCallback(::bluetooth::headset::BthfConnectionState state,
     STACK::RawAddress* bdAddr)
 {
     HILOGI("ConnectState=%{public}d", state);
@@ -2266,7 +2266,7 @@ bool HfpAgService::IsAcceptConnection(RawAddress &rawAddr, int state)
     return true;
 }
 
-int HfpAgService::CovertAudioStateFromStack(::bluetooth::headset::bthf_audio_state_t state)
+int HfpAgService::CovertAudioStateFromStack(::bluetooth::headset::BthfAudioState state)
 {
     if (state == ::bluetooth::headset::BTHF_AUDIO_STATE_CONNECTING) {
         return HFP_AG_AUDIO_STATE_CONNECTING;
@@ -2280,7 +2280,7 @@ int HfpAgService::CovertAudioStateFromStack(::bluetooth::headset::bthf_audio_sta
     return HFP_AG_AUDIO_STATE_DISCONNECTED;
 }
 
-void HfpAgService::HfpAgServiceCallbacks::AudioStateCallback(::bluetooth::headset::bthf_audio_state_t state,
+void HfpAgService::HfpAgServiceCallbacks::AudioStateCallback(::bluetooth::headset::BthfAudioState state,
     STACK::RawAddress* bdAddr)
 {
     HILOGI("AudioState=%{public}d for %{public}s", state, GetEncryptAddr(bdAddr->ToStringForLogging()).c_str());
@@ -2295,7 +2295,7 @@ void HfpAgService::HfpAgServiceCallbacks::AudioStateCallback(::bluetooth::headse
     hfpAgService->PostEvent(event);
 }
 
-int HfpAgService::CovertVRStateFromStack(::bluetooth::headset::bthf_vr_state_t state)
+int HfpAgService::CovertVRStateFromStack(::bluetooth::headset::BthfVrState state)
 {
     if (state == ::bluetooth::headset::BTHF_VR_STATE_STOPPED) {
         return HFP_AG_HF_VR_ClOSED;
@@ -2306,7 +2306,7 @@ int HfpAgService::CovertVRStateFromStack(::bluetooth::headset::bthf_vr_state_t s
     return HFP_AG_HF_VR_ClOSED;
 }
 
-void HfpAgService::HfpAgServiceCallbacks::VoiceRecognitionCallback(::bluetooth::headset::bthf_vr_state_t state,
+void HfpAgService::HfpAgServiceCallbacks::VoiceRecognitionCallback(::bluetooth::headset::BthfVrState state,
     STACK::RawAddress* bdAddr)
 {
     RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
@@ -2347,7 +2347,7 @@ void HfpAgService::HfpAgServiceCallbacks::HangupCallCallback(STACK::RawAddress* 
     hfpAgService->PostEvent(event);
 }
 
-int HfpAgService::CovertVolumeControlTypeFromStack(::bluetooth::headset::bthf_volume_type_t type)
+int HfpAgService::CovertVolumeControlTypeFromStack(::bluetooth::headset::BthfVolumeType type)
 {
     if (type == ::bluetooth::headset::BTHF_VOLUME_TYPE_SPK) {
         return HFP_AG_VOLUME_TYPE_SPK;
@@ -2358,7 +2358,7 @@ int HfpAgService::CovertVolumeControlTypeFromStack(::bluetooth::headset::bthf_vo
     return HFP_AG_VOLUME_TYPE_SPK;
 }
 
-void HfpAgService::HfpAgServiceCallbacks::VolumeControlCallback(::bluetooth::headset::bthf_volume_type_t type,
+void HfpAgService::HfpAgServiceCallbacks::VolumeControlCallback(::bluetooth::headset::BthfVolumeType type,
     int volume, STACK::RawAddress* bdAddr)
 {
     int volumeControleType = CovertVolumeControlTypeFromStack(type);
@@ -2404,7 +2404,7 @@ void HfpAgService::HfpAgServiceCallbacks::DtmfCmdCallback(char dtmf, STACK::RawA
     hfpAgService->PostEvent(event);
 }
 
-bool HfpAgService::CovertNoiseReductionFromStack(::bluetooth::headset::bthf_nrec_t nrec)
+bool HfpAgService::CovertNoiseReductionFromStack(::bluetooth::headset::BthfNrec nrec)
 {
     if (nrec == ::bluetooth::headset::BTHF_NREC_START) {
         return true;
@@ -2412,7 +2412,7 @@ bool HfpAgService::CovertNoiseReductionFromStack(::bluetooth::headset::bthf_nrec
     return false;
 }
 
-void HfpAgService::HfpAgServiceCallbacks::NoiseReductionCallback(::bluetooth::headset::bthf_nrec_t nrec,
+void HfpAgService::HfpAgServiceCallbacks::NoiseReductionCallback(::bluetooth::headset::BthfNrec nrec,
     STACK::RawAddress* bdAddr)
 {
     HILOGI("Nrec=%{public}d for %{public}s", nrec, GET_ENCRYPT_STR_ADDR(bdAddr->ToStringForLogging()));
@@ -2428,7 +2428,7 @@ void HfpAgService::HfpAgServiceCallbacks::NoiseReductionCallback(::bluetooth::he
     hfpAgService->PostEvent(event);
 }
 
-int HfpAgService::ConvetWbsConfigFromStack(::bluetooth::headset::bthf_wbs_config_t wbsConfig)
+int HfpAgService::ConvetWbsConfigFromStack(::bluetooth::headset::BthfWbsConfig wbsConfig)
 {
     if (wbsConfig == ::bluetooth::headset::BTHF_WBS_NO) {
         return HFP_AG_WBS_NO;
@@ -2442,7 +2442,7 @@ int HfpAgService::ConvetWbsConfigFromStack(::bluetooth::headset::bthf_wbs_config
     return HFP_AG_WBS_NONE;
 }
 
-void HfpAgService::HfpAgServiceCallbacks::WbsCallback(::bluetooth::headset::bthf_wbs_config_t wbsConfig,
+void HfpAgService::HfpAgServiceCallbacks::WbsCallback(::bluetooth::headset::BthfWbsConfig wbsConfig,
     STACK::RawAddress* bdAddr)
 {
     RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
@@ -2457,7 +2457,7 @@ void HfpAgService::HfpAgServiceCallbacks::WbsCallback(::bluetooth::headset::bthf
     hfpAgService->PostEvent(event);
 }
 
-void HfpAgService::HfpAgServiceCallbacks::AtChldCallback(::bluetooth::headset::bthf_chld_type_t chld,
+void HfpAgService::HfpAgServiceCallbacks::AtChldCallback(::bluetooth::headset::BthfChldType chld,
     STACK::RawAddress* bdAddr)
 {
     RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
@@ -2594,7 +2594,7 @@ void HfpAgService::HfpAgServiceCallbacks::AtBrsfCallback(uint32_t features, STAC
 }
 #endif
 
-int HfpAgService::CovertBievValueFromStack(::bluetooth::headset::bthf_hf_ind_type_t indId)
+int HfpAgService::CovertBievValueFromStack(::bluetooth::headset::BthfHfIndType indId)
 {
     if (indId == ::bluetooth::headset::BTHF_HF_IND_ENHANCED_DRIVER_SAFETY) {
         return HFP_AG_HF_INDICATOR_ENHANCED_DRIVER_SAFETY_ID;
@@ -2605,7 +2605,7 @@ int HfpAgService::CovertBievValueFromStack(::bluetooth::headset::bthf_hf_ind_typ
     return HFP_AG_HF_INDICATOR_ENHANCED_DRIVER_SAFETY_ID;
 }
 
-void HfpAgService::HfpAgServiceCallbacks::AtBievCallback(::bluetooth::headset::bthf_hf_ind_type_t indId,
+void HfpAgService::HfpAgServiceCallbacks::AtBievCallback(::bluetooth::headset::BthfHfIndType indId,
     int indValue, STACK::RawAddress* bdAddr)
 {
     RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
@@ -2860,7 +2860,7 @@ int HfpAgService::IsVoiceRecognitionSupported(const RawAddress &device,  bool &i
 {
     STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     CHECK_AND_RETURN_LOG_RET(bluetoothHfpInterface != nullptr, false, "BluetoothHfpInterface is null.");
-    bt_status_t status = bluetoothHfpInterface->isVoiceRecognitionSupported(&rawAddr);
+    BtStackStatus status = bluetoothHfpInterface->isVoiceRecognitionSupported(&rawAddr);
     if (status != BT_STATUS_SUCCESS) {
         HILOGI("Hfp device address[%{public}s] is not supported voice recognition", GET_ENCRYPT_ADDR(device));
         BtChrCallExcpEvent(device.GetAddress(), ERRCODE_VOICE_RECOGNITION, CHR_SUB_ERRCODE_CASE2, -1);

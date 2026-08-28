@@ -794,8 +794,8 @@ void HfpAgAtPhonebook::ProcessAtResponseCodeEvent(int responseCode, int errorCod
         return;
     }
     HILOGI("Hfp device address[%{public}s]", GET_ENCRYPT_STR_ADDR(address_));
-    bt_status_t result = bluetoothHfpInterface->AtResponse(
-        static_cast<::bluetooth::headset::bthf_at_response_t>(responseCode), errorCode, &rawAddr);
+    BtStackStatus result = bluetoothHfpInterface->AtResponse(
+        static_cast<::bluetooth::headset::BthfAtResponse>(responseCode), errorCode, &rawAddr);
     if (result != BT_STATUS_SUCCESS) {
         HILOGE("Failed AtResponseCode, status: %{public}d", result);
         return;
@@ -816,7 +816,7 @@ void HfpAgAtPhonebook::ProcessAtResponseStringEvent(const std::string &response)
         return;
     }
     HILOGI("Hfp device address[%{public}s]", GET_ENCRYPT_STR_ADDR(address_));
-    bt_status_t result = bluetoothHfpInterface->FormattedAtResponse(response.c_str(), &rawAddr);
+    BtStackStatus result = bluetoothHfpInterface->FormattedAtResponse(response.c_str(), &rawAddr);
     if (result != BT_STATUS_SUCCESS) {
         HILOGE("Failed AtResponseString, status: %{public}d", result);
         return;

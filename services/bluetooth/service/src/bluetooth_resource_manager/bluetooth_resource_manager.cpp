@@ -131,7 +131,7 @@ BluetoothResourceManager::~BluetoothResourceManager()
     }
 }
 
-const bthwif_interface_t* BluetoothResourceManager::GetBtHwInterface()
+const BthwifInterface* BluetoothResourceManager::GetBtHwInterface()
 {
     if (bthwInterface_ != nullptr) {
         return bthwInterface_;
@@ -199,7 +199,7 @@ void BluetoothResourceManager::UpdateBleScanEnhanceModeTimer(int64_t timeout)
 
 int BluetoothResourceManager::StartBleScanEnhanceMode(const BleScanEnhanceModeImpl &enhanceMode)
 {
-    const bthwif_interface_t* bthwifInterface = GetBtHwInterface();
+    const BthwifInterface* bthwifInterface = GetBtHwInterface();
     CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_INTERNAL_ERROR, "pimpl is nullptr");
     if (!IsValidBleScanEnhanceMode(enhanceMode)) {
         return BT_ERR_INTERNAL_ERROR;
@@ -233,7 +233,7 @@ int BluetoothResourceManager::StartBleScanEnhanceMode(const BleScanEnhanceModeIm
 
 int BluetoothResourceManager::StopBleScanEnhanceMode()
 {
-    const bthwif_interface_t* bthwifInterface = GetBtHwInterface();
+    const BthwifInterface* bthwifInterface = GetBtHwInterface();
     CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_INTERNAL_ERROR, "pimpl is nullptr");
     CHECK_AND_RETURN_LOG_RET(bthwifInterface != nullptr, BT_ERR_INTERNAL_ERROR, "bthwifInterface is nullptr");
     HILOGI("Disable ble scan enahnce mode.");
@@ -252,7 +252,7 @@ int BluetoothResourceManager::StopBleScanEnhanceMode()
 
 int BluetoothResourceManager::SetBleScanEnhanceMode(const BleScanEnhanceModeImpl &enhanceMode)
 {
-    const bthwif_interface_t* bthwifInterface = GetBtHwInterface();
+    const BthwifInterface* bthwifInterface = GetBtHwInterface();
     CHECK_AND_RETURN_LOG_RET(pimpl != nullptr, BT_ERR_INTERNAL_ERROR, "pimpl is nullptr");
     if (!IsValidBleScanEnhanceMode(enhanceMode)) {
         return BT_ERR_INTERNAL_ERROR;
@@ -492,7 +492,7 @@ void BluetoothResourceManager::GetChannelRssiSensingData(SensingInfo &sensingInf
 
 void BluetoothResourceManager::GetTransRateData(SensingInfo &sensingInfo)
 {
-    const bthwif_interface_t* bthwifInterface = GetBtHwInterface();
+    const BthwifInterface* bthwifInterface = GetBtHwInterface();
     if (bthwifInterface == nullptr) {
         HILOGE("bthwifInterface is nullptr");
         return;

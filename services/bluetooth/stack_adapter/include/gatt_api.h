@@ -27,9 +27,9 @@
 #include "bt_types.h"
 #include "bt_gatt.h"
 
-typedef uint16_t tGATT_STATUS;
+typedef uint16_t GattStatus;
 
-/* GATT status codes of the removed stack layer (tGATT_STATUS in bluedroid
+/* GATT status codes of the removed stack layer (GattStatus in bluedroid
  * stack/include/gatt_api.h). A plain enum instead of macros: the service
  * layer references these through the STACK:: alias, and a #define would
  * expand STACK::GATT_XXX into an illegal "::0x0006" token. */
@@ -73,7 +73,7 @@ enum {
     GATT_ALREADY_OPEN = 0x0091,
     GATT_CANCEL = 0x0092,
     /* Service-layer extensions of the status table (gatt_service_base.cpp),
-     * not part of the bluedroid tGATT_STATUS set. */
+     * not part of the bluedroid GattStatus set. */
     GATT_MORE = 0x0098,
     GATT_TOO_SHORT = 0x00a0,
     GATT_CCC_CFG_ERR = 0x00fd,
@@ -84,9 +84,9 @@ enum {
 /* Invalid connection id, see gatt_client_application.h. */
 #define GATT_INVALID_CONN_ID 0xFFFF
 
-/* Authentication requirements of a remote operation, tGATT_AUTH_REQ in
+/* Authentication requirements of a remote operation, GattAuthReq in
  * bluedroid stack/include/gatt_api.h. */
-enum {
+enum GattAuthReq {
     GATT_AUTH_REQ_NONE = 0,
     GATT_AUTH_REQ_NO_MITM = 1,
     GATT_AUTH_REQ_MITM = 2,
@@ -94,12 +94,12 @@ enum {
     GATT_AUTH_REQ_SIGNED_MITM = 4,
 };
 
-/* Write operation type, tGATT_WRITE_TYPE in bluedroid. */
-typedef enum {
+/* Write operation type, GattWriteType in bluedroid. */
+enum GattWriteType {
     GATT_WRITE_NO_RSP = 1,
     GATT_WRITE = 2,
     GATT_WRITE_PREPARE = 3,
-} tGATT_WRITE_TYPE;
+};
 
 /* GATT server role of a remote device; MASTER/SLAVE/INVALID live in
  * frameworks bt_def.h. */
@@ -110,21 +110,21 @@ constexpr uint8_t GATT_ROLE_SECONDARY = 0x02;
 #define GATT_CH_CLIENT_CONFIG_NOTIFY 0x0001
 #define GATT_CH_CLIENT_CONFIG_INDICATE 0x0002
 
-typedef struct {
-    tGATT_STATUS status;
+struct GattValue {
+    GattStatus status;
     uint16_t handle;
-} tGATT_VALUE;
+};
 
-typedef enum {
+enum GattAttrType {
     GATTS_INVALID_ATTR = 0,
     GATTS_INCL_SRVC_ATTR,
     GATTS_CHAR_ATTR,
     GATTS_CHAR_DESCR_ATTR,
-} tGATT_ATTR_TYPE;
+};
 
 /* Connection termination reason reported by the disconnect callback
  * (bluedroid stack/include/gatt_api.h); HCI error code values. */
-typedef enum : uint16_t {
+enum GattDisconnReason : uint16_t {
     GATT_CONN_OK = 0,
     GATT_CONN_L2C_FAILURE = 1,        /* general L2cap failure */
     GATT_CONN_TIMEOUT = 0x08,         /* connection timeout */
@@ -134,9 +134,9 @@ typedef enum : uint16_t {
     GATT_CONN_FAILED_ESTABLISHMENT = 0x3e,     /* connection failed to establish */
     GATT_CONN_TERMINATED_POWER_OFF = 0x05,     /* remote power off */
     BTA_GATT_CONN_NONE = 0x0101,      /* no connection to cancel */
-} tGATT_DISCONN_REASON;
+};
 
-typedef enum {
+enum GattPerm {
     GATT_PERM_NONE = 0x0000,
     GATT_PERM_READ = 0x0001,
     GATT_PERM_READ_ENCRYPTED = 0x0002,
@@ -146,9 +146,9 @@ typedef enum {
     GATT_PERM_WRITE_ENC_MITM = 0x0040,
     GATT_PERM_WRITE_SIGNED = 0x0080,
     GATT_PERM_WRITE_SIGNED_MITM = 0x0100,
-} tGATT_PERM;
+};
 
-typedef enum {
+enum GattCharProp {
     GATT_CHAR_PROP_BIT_NONE = 0x00,
     GATT_CHAR_PROP_BIT_BROADCAST = 0x01,
     GATT_CHAR_PROP_BIT_READ = 0x02,
@@ -158,7 +158,7 @@ typedef enum {
     GATT_CHAR_PROP_BIT_INDICATE = 0x20,
     GATT_CHAR_PROP_BIT_AUTH_WRITE = 0x40,
     GATT_CHAR_PROP_BIT_EXT_PROP = 0x80,
-} tGATT_CHAR_PROP;
+};
 
 /* GATT over BR/EDR and LE transports are both available (in the original
  * stack these were separate interface families; stubbed as one). */

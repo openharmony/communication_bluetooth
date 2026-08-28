@@ -24,43 +24,43 @@
 
 #include "bt_types.h"
 
-typedef enum {
+enum BthfConnectionState {
     BTHF_CONNECTION_STATE_DISCONNECTED = 0,
     BTHF_CONNECTION_STATE_CONNECTING,
     BTHF_CONNECTION_STATE_CONNECTED,
     BTHF_CONNECTION_STATE_SLC_CONNECTED,
     BTHF_CONNECTION_STATE_DISCONNECTING,
-} bthf_connection_state_t;
+};
 
-typedef enum {
+enum BthfAudioState {
     BTHF_AUDIO_STATE_DISCONNECTED = 0,
     BTHF_AUDIO_STATE_CONNECTING,
     BTHF_AUDIO_STATE_CONNECTED,
     BTHF_AUDIO_STATE_DISCONNECTING,
-} bthf_audio_state_t;
+};
 
-typedef enum {
+enum BthfVrState {
     BTHF_VR_STATE_STOPPED = 0,
     BTHF_VR_STATE_STARTED,
-} bthf_vr_state_t;
+};
 
-typedef enum {
+enum BthfNrec {
     BTHF_NREC_STOP = 0,
     BTHF_NREC_START,
-} bthf_nrec_t;
+};
 
-typedef enum {
+enum BthfVolumeType {
     BTHF_VOLUME_TYPE_SPK = 0,
     BTHF_VOLUME_TYPE_MIC,
-} bthf_volume_type_t;
+};
 
-typedef enum {
+enum BthfWbsConfig {
     BTHF_WBS_NO = 0,
     BTHF_WBS_YES,
     BTHF_WBS_SUPER,
-} bthf_wbs_config_t;
+};
 
-typedef enum {
+enum BthfChldType {
     BTHF_CALL_ACTION_CHLD_0 = 0,
     BTHF_CALL_ACTION_CHLD_1,
     BTHF_CALL_ACTION_CHLD_2,
@@ -68,9 +68,9 @@ typedef enum {
     BTHF_CALL_ACTION_CHLD_4,
     BTHF_CALL_ACTION_CHLD_1X,
     BTHF_CALL_ACTION_CHLD_2X,
-} bthf_chld_type_t;
+};
 
-typedef enum {
+enum BthfCallState {
     BTHF_CALL_STATE_ACTIVE = 0,
     BTHF_CALL_STATE_HELD,
     BTHF_CALL_STATE_DIALING,
@@ -79,97 +79,97 @@ typedef enum {
     BTHF_CALL_STATE_WAITING,
     BTHF_CALL_STATE_IDLE,
     BTHF_CALL_STATE_DISCONNECTED,
-} bthf_call_state_t;
+};
 
-typedef enum {
+enum BthfAtResponse {
     BTHF_AT_RESPONSE_ERROR = 0,
     BTHF_AT_RESPONSE_OK,
-} bthf_at_response_t;
+};
 
-typedef enum {
+enum BthfCallDirection {
     BTHF_CALL_DIR_INCOMING = 0,
     BTHF_CALL_DIR_OUTGOING,
-} bthf_call_direction_t;
+};
 
-typedef enum {
+enum BthfCallMode {
     BTHF_CALL_TYPE_VOICE = 0,
     BTHF_CALL_TYPE_DATA,
     BTHF_CALL_TYPE_FAX,
-} bthf_call_mode_t;
+};
 
-typedef enum {
+enum BthfCallMptyType {
     BTHF_CALL_MPTY_TYPE_SINGLE = 0,
     BTHF_CALL_MPTY_TYPE_MULTI,
-} bthf_call_mpty_type_t;
+};
 
-typedef enum {
+enum BthfCallAddrtype {
     BTHF_CALL_ADDRTYPE_UNKNOWN = 0,
     BTHF_CALL_ADDRTYPE_INTERNATIONAL,
-} bthf_call_addrtype_t;
+};
 
-typedef enum {
+enum BthfNetworkState {
     BTHF_NETWORK_STATE_NOT_AVAILABLE = 0,
     BTHF_NETWORK_STATE_AVAILABLE,
-} bthf_network_state_t;
+};
 
-typedef enum {
+enum BthfServiceType {
     BTHF_SERVICE_TYPE_HOME = 0,
     BTHF_SERVICE_TYPE_ROAMING,
-} bthf_service_type_t;
+};
 
-typedef enum {
+enum BthfHfIndType {
     BTHF_HF_IND_ENHANCED_DRIVER_SAFETY = 0,
     BTHF_HF_IND_BATTERY_LEVEL_STATUS,
-} bthf_hf_ind_type_t;
+};
 
-typedef struct {
+struct BthfCallbacks {
     size_t size;
-    bt_status_t (*connection_state_cb)(bthf_connection_state_t state,
-                                       const RawAddress *bd_addr);
-    bt_status_t (*audio_state_cb)(bthf_audio_state_t state,
-                                  const RawAddress *bd_addr);
-    bt_status_t (*vr_cb)(bthf_vr_state_t state, const RawAddress *bd_addr);
-    bt_status_t (*answer_call_cb)(const RawAddress *bd_addr);
-    bt_status_t (*hangup_call_cb)(const RawAddress *bd_addr);
-    bt_status_t (*volume_cb)(bthf_volume_type_t type, int volume,
-                             const RawAddress *bd_addr);
-    bt_status_t (*dial_call_cb)(char *number, const RawAddress *bd_addr);
-    bt_status_t (*send_dtmf_cb)(char tone, const RawAddress *bd_addr);
-    bt_status_t (*noise_reduction_cb)(bthf_nrec_t nrec,
-                                      const RawAddress *bd_addr);
-    bt_status_t (*at_response_cb)(const RawAddress *bd_addr);
-    bt_status_t (*cw_cb)(bthf_call_state_t state, const RawAddress *bd_addr);
-    bt_status_t (*call_ind_cb)(bthf_call_state_t state,
-                               const RawAddress *bd_addr);
-    bt_status_t (*call_setup_ind_cb)(bthf_call_state_t state,
-                                     const RawAddress *bd_addr);
-    bt_status_t (*call_held_ind_cb)(bthf_call_state_t state,
-                                    const RawAddress *bd_addr);
-    bt_status_t (*net_state_cb)(bthf_network_state_t state,
-                                const RawAddress *bd_addr);
-    bt_status_t (*call_ind_net_cb)(const RawAddress *bd_addr);
-    bt_status_t (*signal_cb)(int signal, const RawAddress *bd_addr);
-    bt_status_t (*roaming_cb)(int roaming, const RawAddress *bd_addr);
-    bt_status_t (*battery_cb)(int battery, const RawAddress *bd_addr);
-    bt_status_t (*call_volume_cb)(bthf_volume_type_t type, int volume,
-                                  const RawAddress *bd_addr);
-} bthf_callbacks_t;
+    BtStackStatus (*connectionStateCb)(BthfConnectionState state,
+                                       const RawAddress *bdAddr);
+    BtStackStatus (*audioStateCb)(BthfAudioState state,
+                                  const RawAddress *bdAddr);
+    BtStackStatus (*vrCb)(BthfVrState state, const RawAddress *bdAddr);
+    BtStackStatus (*answerCallCb)(const RawAddress *bdAddr);
+    BtStackStatus (*hangupCallCb)(const RawAddress *bdAddr);
+    BtStackStatus (*volumeCb)(BthfVolumeType type, int volume,
+                             const RawAddress *bdAddr);
+    BtStackStatus (*dialCallCb)(char *number, const RawAddress *bdAddr);
+    BtStackStatus (*sendDtmfCb)(char tone, const RawAddress *bdAddr);
+    BtStackStatus (*noiseReductionCb)(BthfNrec nrec,
+                                      const RawAddress *bdAddr);
+    BtStackStatus (*atResponseCb)(const RawAddress *bdAddr);
+    BtStackStatus (*cwCb)(BthfCallState state, const RawAddress *bdAddr);
+    BtStackStatus (*callIndCb)(BthfCallState state,
+                               const RawAddress *bdAddr);
+    BtStackStatus (*callSetupIndCb)(BthfCallState state,
+                                     const RawAddress *bdAddr);
+    BtStackStatus (*callHeldIndCb)(BthfCallState state,
+                                    const RawAddress *bdAddr);
+    BtStackStatus (*netStateCb)(BthfNetworkState state,
+                                const RawAddress *bdAddr);
+    BtStackStatus (*callIndNetCb)(const RawAddress *bdAddr);
+    BtStackStatus (*signalCb)(int signal, const RawAddress *bdAddr);
+    BtStackStatus (*roamingCb)(int roaming, const RawAddress *bdAddr);
+    BtStackStatus (*batteryCb)(int battery, const RawAddress *bdAddr);
+    BtStackStatus (*callVolumeCb)(BthfVolumeType type, int volume,
+                                  const RawAddress *bdAddr);
+};
 
-typedef struct {
+struct BthfInterface {
     size_t size;
-    bt_status_t (*init)(bthf_callbacks_t *callbacks);
+    BtStackStatus (*init)(BthfCallbacks *callbacks);
     void (*cleanup)(void);
-    bt_status_t (*connect)(const RawAddress *bd_addr);
-    bt_status_t (*disconnect)(const RawAddress *bd_addr);
-    bt_status_t (*audio_connect)(const RawAddress *bd_addr);
-    bt_status_t (*audio_disconnect)(const RawAddress *bd_addr);
-    bt_status_t (*start_voice_recognition)(const RawAddress *bd_addr);
-    bt_status_t (*stop_voice_recognition)(const RawAddress *bd_addr);
-    bt_status_t (*volume_control)(const RawAddress *bd_addr,
-                                  bthf_volume_type_t type, int volume);
-    bt_status_t (*notify_battery_level)(const RawAddress *bd_addr, int level);
-    bt_status_t (*set_sco_allowed)(const RawAddress *bd_addr, bool value);
-} bthf_interface_t;
+    BtStackStatus (*connect)(const RawAddress *bdAddr);
+    BtStackStatus (*disconnect)(const RawAddress *bdAddr);
+    BtStackStatus (*audioConnect)(const RawAddress *bdAddr);
+    BtStackStatus (*audioDisconnect)(const RawAddress *bdAddr);
+    BtStackStatus (*startVoiceRecognition)(const RawAddress *bdAddr);
+    BtStackStatus (*stopVoiceRecognition)(const RawAddress *bdAddr);
+    BtStackStatus (*volumeControl)(const RawAddress *bdAddr,
+                                  BthfVolumeType type, int volume);
+    BtStackStatus (*notifyBatteryLevel)(const RawAddress *bdAddr, int level);
+    BtStackStatus (*setScoAllowed)(const RawAddress *bdAddr, bool value);
+};
 
 /*
  * The service layer refers to the HFP AG types with the qualified name
@@ -179,37 +179,37 @@ typedef struct {
 namespace bluetooth {
 namespace headset {
 
-using ::bthf_connection_state_t;
+using ::BthfConnectionState;
 using ::BTHF_CONNECTION_STATE_DISCONNECTED;
 using ::BTHF_CONNECTION_STATE_CONNECTING;
 using ::BTHF_CONNECTION_STATE_CONNECTED;
 using ::BTHF_CONNECTION_STATE_SLC_CONNECTED;
 using ::BTHF_CONNECTION_STATE_DISCONNECTING;
 
-using ::bthf_audio_state_t;
+using ::BthfAudioState;
 using ::BTHF_AUDIO_STATE_DISCONNECTED;
 using ::BTHF_AUDIO_STATE_CONNECTING;
 using ::BTHF_AUDIO_STATE_CONNECTED;
 using ::BTHF_AUDIO_STATE_DISCONNECTING;
 
-using ::bthf_vr_state_t;
+using ::BthfVrState;
 using ::BTHF_VR_STATE_STOPPED;
 using ::BTHF_VR_STATE_STARTED;
 
-using ::bthf_nrec_t;
+using ::BthfNrec;
 using ::BTHF_NREC_STOP;
 using ::BTHF_NREC_START;
 
-using ::bthf_volume_type_t;
+using ::BthfVolumeType;
 using ::BTHF_VOLUME_TYPE_SPK;
 using ::BTHF_VOLUME_TYPE_MIC;
 
-using ::bthf_wbs_config_t;
+using ::BthfWbsConfig;
 using ::BTHF_WBS_NO;
 using ::BTHF_WBS_YES;
 using ::BTHF_WBS_SUPER;
 
-using ::bthf_chld_type_t;
+using ::BthfChldType;
 using ::BTHF_CALL_ACTION_CHLD_0;
 using ::BTHF_CALL_ACTION_CHLD_1;
 using ::BTHF_CALL_ACTION_CHLD_2;
@@ -218,7 +218,7 @@ using ::BTHF_CALL_ACTION_CHLD_4;
 using ::BTHF_CALL_ACTION_CHLD_1X;
 using ::BTHF_CALL_ACTION_CHLD_2X;
 
-using ::bthf_call_state_t;
+using ::BthfCallState;
 using ::BTHF_CALL_STATE_ACTIVE;
 using ::BTHF_CALL_STATE_HELD;
 using ::BTHF_CALL_STATE_DIALING;
@@ -228,36 +228,36 @@ using ::BTHF_CALL_STATE_WAITING;
 using ::BTHF_CALL_STATE_IDLE;
 using ::BTHF_CALL_STATE_DISCONNECTED;
 
-using ::bthf_at_response_t;
+using ::BthfAtResponse;
 using ::BTHF_AT_RESPONSE_ERROR;
 using ::BTHF_AT_RESPONSE_OK;
 
-using ::bthf_call_direction_t;
+using ::BthfCallDirection;
 using ::BTHF_CALL_DIR_INCOMING;
 using ::BTHF_CALL_DIR_OUTGOING;
 
-using ::bthf_call_mode_t;
+using ::BthfCallMode;
 using ::BTHF_CALL_TYPE_VOICE;
 using ::BTHF_CALL_TYPE_DATA;
 using ::BTHF_CALL_TYPE_FAX;
 
-using ::bthf_call_mpty_type_t;
+using ::BthfCallMptyType;
 using ::BTHF_CALL_MPTY_TYPE_SINGLE;
 using ::BTHF_CALL_MPTY_TYPE_MULTI;
 
-using ::bthf_call_addrtype_t;
+using ::BthfCallAddrtype;
 using ::BTHF_CALL_ADDRTYPE_UNKNOWN;
 using ::BTHF_CALL_ADDRTYPE_INTERNATIONAL;
 
-using ::bthf_network_state_t;
+using ::BthfNetworkState;
 using ::BTHF_NETWORK_STATE_NOT_AVAILABLE;
 using ::BTHF_NETWORK_STATE_AVAILABLE;
 
-using ::bthf_service_type_t;
+using ::BthfServiceType;
 using ::BTHF_SERVICE_TYPE_HOME;
 using ::BTHF_SERVICE_TYPE_ROAMING;
 
-using ::bthf_hf_ind_type_t;
+using ::BthfHfIndType;
 using ::BTHF_HF_IND_ENHANCED_DRIVER_SAFETY;
 using ::BTHF_HF_IND_BATTERY_LEVEL_STATUS;
 

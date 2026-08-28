@@ -27,22 +27,22 @@ class Callbacks {
 public:
     virtual ~Callbacks() = default;
 
-    virtual void ConnectionStateCallback(bthf_connection_state_t state,
+    virtual void ConnectionStateCallback(BthfConnectionState state,
                                          RawAddress *bdAddr) = 0;
-    virtual void AudioStateCallback(bthf_audio_state_t state,
+    virtual void AudioStateCallback(BthfAudioState state,
                                     RawAddress *bdAddr) = 0;
-    virtual void VoiceRecognitionCallback(bthf_vr_state_t state,
+    virtual void VoiceRecognitionCallback(BthfVrState state,
                                           RawAddress *bdAddr) = 0;
     virtual void AnswerCallCallback(RawAddress *bdAddr) = 0;
     virtual void HangupCallCallback(RawAddress *bdAddr) = 0;
-    virtual void VolumeControlCallback(bthf_volume_type_t type, int volume,
+    virtual void VolumeControlCallback(BthfVolumeType type, int volume,
                                        RawAddress *bdAddr) = 0;
     virtual void DialCallCallback(char *number, RawAddress *bdAddr) = 0;
     virtual void DtmfCmdCallback(char dtmf, RawAddress *bdAddr) = 0;
-    virtual void NoiseReductionCallback(bthf_nrec_t nrec, RawAddress *bdAddr) = 0;
-    virtual void WbsCallback(bthf_wbs_config_t wbsConfig,
+    virtual void NoiseReductionCallback(BthfNrec nrec, RawAddress *bdAddr) = 0;
+    virtual void WbsCallback(BthfWbsConfig wbsConfig,
                              RawAddress *bdAddr) = 0;
-    virtual void AtChldCallback(bthf_chld_type_t chld, RawAddress *bdAddr) = 0;
+    virtual void AtChldCallback(BthfChldType chld, RawAddress *bdAddr) = 0;
     virtual void AtCnumCallback(RawAddress *bdAddr) = 0;
     virtual void AtCindCallback(RawAddress *bdAddr) = 0;
     virtual void AtCopsCallback(RawAddress *bdAddr) = 0;
@@ -50,7 +50,7 @@ public:
     virtual void UnknownAtCallback(char *atString, RawAddress *bdAddr) = 0;
     virtual void KeyPressedCallback(RawAddress *bdAddr) = 0;
     virtual void AtBindCallback(char *atString, RawAddress *bdAddr) = 0;
-    virtual void AtBievCallback(bthf_hf_ind_type_t indId, int indValue,
+    virtual void AtBievCallback(BthfHfIndType indId, int indValue,
                                 RawAddress *bdAddr) = 0;
     virtual void AtBiaCallback(bool service, bool roam, bool signal,
                                bool battery, RawAddress *bdAddr) = 0;

@@ -33,35 +33,35 @@
 #define BTSOCK_FLAG_AUTH_16_DIGIT (1 << 4)
 #define BTSOCK_FLAG_LE_COC (1 << 5)
 
-typedef enum {
+enum BtsockType {
     BTSOCK_RFCOMM = 1,
     BTSOCK_SCO = 2,
     BTSOCK_L2CAP = 3,
     BTSOCK_L2CAP_LE = 4,
-} btsock_type_t;
+};
 
-typedef enum {
+enum BtsockOpt {
     BTSOCK_OPT_AUTH = 0,
     BTSOCK_OPT_ENCRYPT,
-} btsock_opt_t;
+};
 
 /* Socket interface consumed by the service layer (socket_service.cpp); the
  * signatures follow the legacy bluedroid layout, which the removed stack
  * library implements (7-parameter listen/connect). */
-typedef struct {
+struct BtsockInterface {
     size_t size;
-    bt_status_t (*listen)(btsock_type_t type, const char *service_name,
-        const OHOS::bluetooth::Uuid *service_uuid, int channel, int *sock_fd, int flags,
+    BtStackStatus (*listen)(BtsockType type, const char *serviceName,
+        const OHOS::bluetooth::Uuid *serviceUuid, int channel, int *sockFd, int flags,
         int callingUid);
-    bt_status_t (*connect)(const RawAddress *bd_addr, btsock_type_t type,
-        const OHOS::bluetooth::Uuid *uuid, int channel, int *sock_fd, int flags,
+    BtStackStatus (*connect)(const RawAddress *bdAddr, BtsockType type,
+        const OHOS::bluetooth::Uuid *uuid, int channel, int *sockFd, int flags,
         int callingUid);
-    bt_status_t (*close)(int fd);
-    bt_status_t (*disconnect)(const RawAddress *bd_addr, btsock_type_t type, int channel,
+    BtStackStatus (*close)(int fd);
+    BtStackStatus (*disconnect)(const RawAddress *bdAddr, BtsockType type, int channel,
         int flags, int callingUid);
-} btsock_interface_t;
+};
 
-inline void btif_sock_cleanup(void)
+inline void BtifSockCleanup(void)
 {
 }
 

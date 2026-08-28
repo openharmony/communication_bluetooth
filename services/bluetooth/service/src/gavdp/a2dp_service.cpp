@@ -235,9 +235,9 @@ static void OnServiceStatusReceived(struct ServiceStatusListener *listener, stru
     if (serviceStatus->status == SERVIE_STATUS_STOP) {
         HILOGI("Bluetooth hdi service stoped");
         service->UpdateActiveDevice(ServiceUtil::AddrFromStack(STACK::RawAddress::kEmpty));
-        btav_source_interface_t *bluetoothA2dpSrcInterface = service->getBluetoothA2dpSrcInterface();
+        BtavSourceInterface *bluetoothA2dpSrcInterface = service->getBluetoothA2dpSrcInterface();
         if (bluetoothA2dpSrcInterface != nullptr) {
-            bluetoothA2dpSrcInterface->set_active_device(STACK::RawAddress::kEmpty);
+            bluetoothA2dpSrcInterface->setActiveDevice(STACK::RawAddress::kEmpty);
         }
     }
 }
@@ -283,7 +283,7 @@ void A2dpService::ProcessA2dpHdfLoad(int state, const RawAddress &rawAddr)
     if (hdfLoadedDevice_.Empty()) {
         HILOGI("all device disconnect, set empty device to stack");
         if (sBluetoothA2dpSrcInterface != nullptr) {
-            sBluetoothA2dpSrcInterface->set_active_device(STACK::RawAddress::kEmpty);
+            sBluetoothA2dpSrcInterface->setActiveDevice(STACK::RawAddress::kEmpty);
         }
     }
 }
@@ -315,7 +315,7 @@ void A2dpService::ProcessAvrcpDynamicLoad(int state, const RawAddress &rawAddr, 
     }
 }
 
-static void HandleNotFindDeviceInfoEvent(A2dpService* service, RawAddress& rawAddr, btav_connection_state_t state)
+static void HandleNotFindDeviceInfoEvent(A2dpService* service, RawAddress& rawAddr, BtavConnectionState state)
 {
     CHECK_AND_RETURN_LOG(service != nullptr, "Not find source service");
     if (state == BTAV_CONNECTION_STATE_DISCONNECTED || state == BTAV_CONNECTION_STATE_DISCONNECTING) {
@@ -330,20 +330,20 @@ static void HandleNotFindDeviceInfoEvent(A2dpService* service, RawAddress& rawAd
     service->ConnectManager().AddDevice(rawAddr, status);
 }
 
-static void bta2dp_connection_state_callback(const STACK::RawAddress& bd_addr, btav_connection_state_t state)
+static void bta2dp_connection_state_callback(const STACK::RawAddress& bdAddr, BtavConnectionState state)
 {
     HITRACE_METER(BT_TRACE_TAG);
-    HILOGI("device[%{public}s] state[%{public}d]\n", bd_addr.ToStringForLogging().c_str(), state);
+    HILOGI("device[%{public}s] state[%{public}d]\n", bdAddr.ToStringForLogging().c_str(), state);
 
     A2dpService *service = GetServiceInstance(A2DP_ROLE_SOURCE);
     CHECK_AND_RETURN_LOG(service, "Can't get the instance of service");
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(bd_addr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
     int connectPolicy = service->GetConnectStrategy(rawAddr);
-    btav_source_interface_t* bluetoothA2dpSrcInterface = service->getBluetoothA2dpSrcInterface();
+    BtavSourceInterface* bluetoothA2dpSrcInterface = service->getBluetoothA2dpSrcInterface();
     if (state == BTAV_CONNECTION_STATE_CONNECTING
         && connectPolicy == static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN)) {
         HILOGW("rejected incoming A2dp connection");
-        bluetoothA2dpSrcInterface->disconnect(bd_addr);
+        bluetoothA2dpSrcInterface->disconnect(bdAddr);
         return;
     }
     std::shared_ptr<A2dpDeviceInfo> deviceInfo = service->GetDeviceFromList(rawAddr);
@@ -391,12 +391,12 @@ static void bta2dp_connection_state_callback(const STACK::RawAddress& bd_addr, b
     service->CheckDisable();
 }
 
-static void bta2dp_audio_state_callback(const STACK::RawAddress& bd_addr, btav_audio_state_t state)
+static void bta2dp_audio_state_callback(const STACK::RawAddress& bdAddr, BtavAudioState state)
 {
     HITRACE_METER(BT_TRACE_TAG);
-    HILOGI("device[%{public}s] state[%{public}d]\n", bd_addr.ToStringForLogging().c_str(), state);
+    HILOGI("device[%{public}s] state[%{public}d]\n", bdAddr.ToStringForLogging().c_str(), state);
     A2dpService *service = GetServiceInstance(A2DP_ROLE_SOURCE);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(bd_addr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
     int error = RET_NO_ERROR;
 
     if (service == nullptr) {
@@ -421,7 +421,7 @@ static void bta2dp_audio_state_callback(const STACK::RawAddress& bd_addr, btav_a
                 BtChrTransactionManager::GetInstance().WriteTransactionStatictics(
                     TRANSACTION_TYPE_WIRELESS_CHARGING_AUDIO, TRANSACTION_RESULT_SUCCESS);
             }
-            BtChrAudioStateStart(bd_addr.ToString());
+            BtChrAudioStateStart(bdAddr.ToString());
             BtChrUeManager::GetInstance()->WriteA2dpPlayStateUe(rawAddr, true, codecType, callingName);
             service->ChangeCodecWithSceneSwitch();
         }
@@ -438,16 +438,16 @@ static void bta2dp_audio_state_callback(const STACK::RawAddress& bd_addr, btav_a
 }
 
 static void bta2dp_audio_config_callback(
-    const STACK::RawAddress& bd_addr, btav_a2dp_codec_config_t codec_config,
-    std::vector<btav_a2dp_codec_config_t> codecs_local_capabilities,
-    std::vector<btav_a2dp_codec_config_t> codecs_selectable_capabilities)
+    const STACK::RawAddress& bdAddr, BtavA2dpCodecConfig codecConfig,
+    std::vector<BtavA2dpCodecConfig> codecsLocalCapabilities,
+    std::vector<BtavA2dpCodecConfig> codecsSelectableCapabilities)
 {
     HITRACE_METER(BT_TRACE_TAG);
     HILOG_COMM_INFO("bta2dp_audio_config_callback: enter");
     // 当蓝牙开关不为开时，不允许HandleNotFindDeviceInfoEvent设置connecting
     int status = AdapterManager::GetInstance()->GetState(BTTransport::ADAPTER_BREDR);
     CHECK_AND_RETURN_LOG(status == BTStateID::STATE_TURN_ON, "don't allow to config a2dp");
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(bd_addr);
+    RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
     A2dpService *service = GetServiceInstance(A2DP_ROLE_SOURCE);
     int error = RET_NO_ERROR;
     CHECK_AND_RETURN_LOG(service != nullptr, "Can't get the instance of service");
@@ -463,26 +463,26 @@ static void bta2dp_audio_config_callback(
         deviceInfo = service->GetDeviceFromList(rawAddr);
     }
     A2dpSrcCodecStatus codecStatus;
-    if (!ConvertAudioConfigCodec(codec_config, codecStatus.codecInfo)) {
+    if (!ConvertAudioConfigCodec(codecConfig, codecStatus.codecInfo)) {
         HILOGE("wrong codec info");
     }
     A2dpSrcCodecInfo a2dpSrcCodecInfo;
-    for (auto local_codec_config : codecs_local_capabilities) {
+    for (auto local_codec_config : codecsLocalCapabilities) {
         if (!ConvertAudioConfigCodec(local_codec_config, a2dpSrcCodecInfo)) {
             HILOGE("wrong codec info");
         }
         codecStatus.codecInfoLocalCap.push_back(a2dpSrcCodecInfo);
     }
-    for (auto select_codec_config : codecs_selectable_capabilities) {
+    for (auto select_codec_config : codecsSelectableCapabilities) {
         if (!ConvertAudioConfigCodec(select_codec_config, a2dpSrcCodecInfo)) {
             HILOGE("wrong codec info");
         }
         codecStatus.codecInfoConfirmedCap.push_back(a2dpSrcCodecInfo);
     }
-    codecStatus.codecInfo.codecSpecific1 = static_cast<uint64_t>(codec_config.codec_specific_1);
-    codecStatus.codecInfo.codecSpecific2 = static_cast<uint64_t>(codec_config.codec_specific_2);
-    codecStatus.codecInfo.codecSpecific3 = static_cast<uint64_t>(codec_config.codec_specific_3);
-    codecStatus.codecInfo.codecSpecific4 = static_cast<uint64_t>(codec_config.codec_specific_4);
+    codecStatus.codecInfo.codecSpecific1 = static_cast<uint64_t>(codecConfig.codecSpecific1);
+    codecStatus.codecInfo.codecSpecific2 = static_cast<uint64_t>(codecConfig.codecSpecific2);
+    codecStatus.codecInfo.codecSpecific3 = static_cast<uint64_t>(codecConfig.codecSpecific3);
+    codecStatus.codecInfo.codecSpecific4 = static_cast<uint64_t>(codecConfig.codecSpecific4);
     CHECK_AND_RETURN_LOG(deviceInfo != nullptr, "deviceInfo is nullptr");
     deviceInfo->SetCodecStatus(codecStatus);
     BluetoothHelper::BluetoothCommonEventHelper::PublishA2dpCodecUpdateEvent(rawAddr.GetAddress(),
@@ -492,14 +492,14 @@ static void bta2dp_audio_config_callback(
     service->ProcessCodecFrameworkCallback(codecStatus.codecInfo, error, rawAddr);
 }
 
-static bool bta2dp_mandatory_codec_preferred_callback(const STACK::RawAddress& bd_addr)
+static bool bta2dp_mandatory_codec_preferred_callback(const STACK::RawAddress& bdAddr)
 {
     HILOGE("enter");
     // 目前没有setmandatorycodec接口,改为false，否则无法根据优先级选择编码器
     return false;
 }
 
-static btav_source_callbacks_t g_sBluetoothA2dpCallbacks = {
+static BtavSourceCallbacks g_sBluetoothA2dpCallbacks = {
     sizeof(g_sBluetoothA2dpCallbacks),
     bta2dp_connection_state_callback,
     bta2dp_audio_state_callback,
@@ -507,12 +507,12 @@ static btav_source_callbacks_t g_sBluetoothA2dpCallbacks = {
     bta2dp_mandatory_codec_preferred_callback,
 };
 
-btav_source_interface_t* A2dpService::getBluetoothA2dpSrcInterface() const
+BtavSourceInterface* A2dpService::getBluetoothA2dpSrcInterface() const
 {
     return sBluetoothA2dpSrcInterface;
 }
 
-btav_sink_interface_t* A2dpService::getBluetoothA2dpSnkInterface() const
+BtavSinkInterface* A2dpService::getBluetoothA2dpSnkInterface() const
 {
     return sBluetoothA2dpSnkInterface;
 }
@@ -557,17 +557,17 @@ void A2dpService::EnableService()
 {
     bool ret = true;
 
-    std::vector<btav_a2dp_codec_config_t> codec_priorities = prepareCodecPreferences();
-    std::vector<btav_a2dp_codec_config_t> codec_offloading = prepareCodecPreferences();
+    std::vector<BtavA2dpCodecConfig> codecPriorities = prepareCodecPreferences();
+    std::vector<BtavA2dpCodecConfig> codec_offloading = prepareCodecPreferences();
 
-    const bt_interface_t* bt_interface = AdapterManager::GetInstance()->getBluetoothInterface();
+    const BtInterface* bt_interface = AdapterManager::GetInstance()->getBluetoothInterface();
     if (bt_interface == nullptr) {
         HILOGE("Failed to open the Bluetooth module");
         return;
     }
     if (role_ == A2DP_ROLE_SOURCE) {
-        sBluetoothA2dpSrcInterface = reinterpret_cast<btav_source_interface_t*>(
-            const_cast<void *>(bt_interface->get_profile_interface(BT_PROFILE_ADVANCED_AUDIO_ID)));
+        sBluetoothA2dpSrcInterface = reinterpret_cast<BtavSourceInterface*>(
+            const_cast<void *>(bt_interface->getProfileInterface(BT_PROFILE_ADVANCED_AUDIO_ID)));
         if (sBluetoothA2dpSrcInterface == nullptr) {
             // Open stack DM has not exported A2DP btif glue yet; still report enable so
             // classic adapter can reach STATE_ON without null-calling init().
@@ -577,10 +577,10 @@ void A2dpService::EnableService()
         }
 #ifndef BT_MCU_PROXY_ENABLE
         sBluetoothA2dpSrcInterface->init(&g_sBluetoothA2dpCallbacks,
-            maxConnectNumSnk_, codec_priorities, codec_offloading);
+            maxConnectNumSnk_, codecPriorities, codec_offloading);
 #endif
-        const bthwif_interface_t *bthwif =
-            reinterpret_cast<const bthwif_interface_t*>(bt_interface->get_profile_interface(BT_VENDER_INTERFACE_ID));
+        const BthwifInterface *bthwif =
+            reinterpret_cast<const BthwifInterface*>(bt_interface->getProfileInterface(BT_VENDER_INTERFACE_ID));
         BluetoothHwInterface::GetInstance()->InitBtHwInterface(bthwif);
         profileId_ = PROFILE_ID_A2DP_SRC;
     }
@@ -682,7 +682,7 @@ void A2dpService::NotifyCaptureConnStateChangedInner(const RawAddress &device)
         HILOGI("%{public}s, hdap notify disConnected", __func__);
         NotifyCaptureConnStateChanged(hdapDevice, static_cast<int>(BTHdapConnectState::DISCONNECTED),
             hdapDeviceInfo->GetCodecInfo());
-        const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+        const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
         STACK::RawAddress bdAddr = ServiceUtil::AddrToStack(device);
         bluetoothHwSrcInterface->setHdapActive(bdAddr);
     }
@@ -1014,7 +1014,7 @@ void A2dpService::ForceStopOffloadPlaying(const RawAddress &device)
     A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
     CHECK_AND_RETURN_LOG(a2dpService, "a2dpService is nullptr.");
 
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
 
     STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
@@ -1234,7 +1234,7 @@ int A2dpService::SetActiveSinkDevice(const RawAddress &device)
     A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
 
     STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
-    btav_source_interface_t* bluetoothA2dpSrcInterface = getBluetoothA2dpSrcInterface();
+    BtavSourceInterface* bluetoothA2dpSrcInterface = getBluetoothA2dpSrcInterface();
     RawAddress preDevice = activeDevice_;
     std::string callingName = PermissionManager::GetCallingName();
     if (device.GetAddress() == NULL_ADDRESS || device.GetAddress() == EMPTY_ADDRESS) {
@@ -1266,7 +1266,7 @@ int A2dpService::SetActiveSinkDevice(const RawAddress &device)
             }
         }
     }
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG_RET(bluetoothHwSrcInterface != nullptr, RET_BAD_STATUS, "bluetoothHwSrcInterface is nullptr");
     bluetoothHwSrcInterface->hwSetSpatialAudioModeEnabled(
         BluetoothAudioFrameworkAdapter::IsSpatialAudioModeEnabled(device.GetAddress()));
@@ -1286,7 +1286,7 @@ int A2dpService::SetActiveSinkDevice(const RawAddress &device)
         HILOGE("ready to set_active_device from %{public}s to %{public}s", GET_ENCRYPT_ADDR(preDevice),
             GET_ENCRYPT_ADDR(device));
         UpdateActiveDevice(device);
-        bluetoothA2dpSrcInterface->set_active_device(rawAddr);
+        bluetoothA2dpSrcInterface->setActiveDevice(rawAddr);
         ConnectStrategyManager::GetInstance()->SaveLastActiveDevice(device.GetAddress());
         HILOGI("SaveLastActiveDevice");
     }
@@ -1399,17 +1399,17 @@ int A2dpService::GetCodecPreference(const RawAddress &device, A2dpSrcCodecInfo &
     return Bluetooth::BT_NO_ERROR;
 }
 
-static void WriteCodecConfigUe(const RawAddress &device, btav_a2dp_codec_config_t codec_config)
+static void WriteCodecConfigUe(const RawAddress &device, BtavA2dpCodecConfig codecConfig)
 {
     CodecInfo codecInfo;
-    codecInfo.codecType = codec_config.codec_type;
-    codecInfo.sampleRate = codec_config.sample_rate;
-    codecInfo.bitsPerSample = codec_config.bits_per_sample;
-    codecInfo.channelMode = codec_config.channel_mode;
-    codecInfo.codecSpecific1 = codec_config.codec_specific_1;
-    codecInfo.codecSpecific2 = codec_config.codec_specific_2;
-    codecInfo.codecSpecific3 = codec_config.codec_specific_1;
-    codecInfo.codecSpecific3 = codec_config.codec_specific_4;
+    codecInfo.codecType = codecConfig.codecType;
+    codecInfo.sampleRate = codecConfig.sampleRate;
+    codecInfo.bitsPerSample = codecConfig.bitsPerSample;
+    codecInfo.channelMode = codecConfig.channelMode;
+    codecInfo.codecSpecific1 = codecConfig.codecSpecific1;
+    codecInfo.codecSpecific2 = codecConfig.codecSpecific2;
+    codecInfo.codecSpecific3 = codecConfig.codecSpecific1;
+    codecInfo.codecSpecific3 = codecConfig.codecSpecific4;
 
     std::string callingName = PermissionManager::GetCallingName();
     BtChrUeManager::GetInstance()->WriteCodecConfigUe(device, codecInfo, callingName);
@@ -1438,25 +1438,25 @@ int A2dpService::SetCodecPreference(const RawAddress &device, const A2dpSrcCodec
         HILOGE("SetCodecPreference: invalid codec");
         return Bluetooth::BT_ERR_INVALID_PARAM;
     }
-    btav_a2dp_codec_config_t codec_config = {
-        .codec_type = static_cast<btav_a2dp_codec_index_t>(info.codecType),
-        .codec_priority = static_cast<btav_a2dp_codec_priority_t>(BTAV_A2DP_CODEC_PRIORITY_HIGHEST),
-        .sample_rate = static_cast<btav_a2dp_codec_sample_rate_t>(info.sampleRate),
-        .bits_per_sample = static_cast<btav_a2dp_codec_bits_per_sample_t>(info.bitsPerSample),
-        .channel_mode = static_cast<btav_a2dp_codec_channel_mode_t>(info.channelMode),
-        .codec_specific_1 = info.codecSpecific1,
-        .codec_specific_2 = info.codecSpecific2,
-        .codec_specific_3 = info.codecSpecific3,
-        .codec_specific_4 = info.codecSpecific4};
-    ConvertCodecConfig(codec_config, info);
-    std::vector<btav_a2dp_codec_config_t> codec_preferences;
-    codec_preferences.push_back(codec_config);
+    BtavA2dpCodecConfig codecConfig = {
+        .codecType = static_cast<BtavA2dpCodecIndex>(info.codecType),
+        .codecPriority = static_cast<BtavA2dpCodecPriority>(BTAV_A2DP_CODEC_PRIORITY_HIGHEST),
+        .sampleRate = static_cast<BtavA2dpCodecSampleRate>(info.sampleRate),
+        .bitsPerSample = static_cast<BtavA2dpCodecBitsPerSample>(info.bitsPerSample),
+        .channelMode = static_cast<BtavA2dpCodecChannelMode>(info.channelMode),
+        .codecSpecific1 = info.codecSpecific1,
+        .codecSpecific2 = info.codecSpecific2,
+        .codecSpecific3 = info.codecSpecific3,
+        .codecSpecific4 = info.codecSpecific4};
+    ConvertCodecConfig(codecConfig, info);
+    std::vector<BtavA2dpCodecConfig> codecPreferences;
+    codecPreferences.push_back(codecConfig);
     STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
-    bt_status_t status = sBluetoothA2dpSrcInterface->config_codec(rawAddr, codec_preferences);
+    BtStackStatus status = sBluetoothA2dpSrcInterface->configCodec(rawAddr, codecPreferences);
     CHECK_AND_RETURN_LOG_RET(status == BT_STATUS_SUCCESS, Bluetooth::BT_ERR_INVALID_PARAM,
         "Failed codec configuration");
-    WriteCodecConfigUe(device, codec_config);
-    BtChrDftStatictics::GetInstance()->WriteCodecStatictics(codec_config.codec_type);
+    WriteCodecConfigUe(device, codecConfig);
+    BtChrDftStatictics::GetInstance()->WriteCodecStatictics(codecConfig.codecType);
     return Bluetooth::BT_NO_ERROR;
 }
 
@@ -1483,28 +1483,28 @@ bool A2dpService::IsConfirmCodecInfo(A2dpSrcCodecStatus codecStatus, A2dpSrcCode
     return false;
 }
 
-void A2dpService::ConvertCodecConfig(btav_a2dp_codec_config_t &codec_config, const A2dpSrcCodecInfo &codecInfo)
+void A2dpService::ConvertCodecConfig(BtavA2dpCodecConfig &codecConfig, const A2dpSrcCodecInfo &codecInfo)
 {
     if (codecInfo.codecType == A2DP_CODEC_TYPE_AAC_USER) {
-        codec_config.codec_type = BTAV_A2DP_CODEC_INDEX_SOURCE_AAC;
+        codecConfig.codecType = BTAV_A2DP_CODEC_INDEX_SOURCE_AAC;
     } else if (codecInfo.codecType == A2DP_CODEC_TYPE_LDAC_USER) {
-        codec_config.codec_type = BTAV_A2DP_CODEC_INDEX_SOURCE_LDAC;
+        codecConfig.codecType = BTAV_A2DP_CODEC_INDEX_SOURCE_LDAC;
     } else if (codecInfo.codecType == A2DP_CODEC_TYPE_L2HCST_USER) {
-        ConvertL2hcStBitrate(codec_config, codecInfo);
+        ConvertL2hcStBitrate(codecConfig, codecInfo);
     } else if (codecInfo.codecType == A2DP_CODEC_TYPE_L2HCV2_USER) {
-        ConvertL2hcV2Bitrate(codec_config, codecInfo);
+        ConvertL2hcV2Bitrate(codecConfig, codecInfo);
     }
     if (codecInfo.channelMode == A2DP_SBC_CHANNEL_MODE_MONO_USER) {
-        codec_config.channel_mode = BTAV_A2DP_CODEC_CHANNEL_MODE_MONO;
+        codecConfig.channelMode = BTAV_A2DP_CODEC_CHANNEL_MODE_MONO;
     }
     if (codecInfo.sampleRate == A2DP_SBC_SAMPLE_RATE_44100_USER) {
-        codec_config.sample_rate = BTAV_A2DP_CODEC_SAMPLE_RATE_44100;
+        codecConfig.sampleRate = BTAV_A2DP_CODEC_SAMPLE_RATE_44100;
     }
     if (codecInfo.bitsPerSample == A2DP_SAMPLE_BITS_16_USER) {
-        codec_config.bits_per_sample = BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16;
+        codecConfig.bitsPerSample = BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16;
     }
     if (codecInfo.bitsPerSample == A2DP_SAMPLE_BITS_32_USER) {
-        codec_config.bits_per_sample = BTAV_A2DP_CODEC_BITS_PER_SAMPLE_32;
+        codecConfig.bitsPerSample = BTAV_A2DP_CODEC_BITS_PER_SAMPLE_32;
     }
 }
 
@@ -1551,7 +1551,7 @@ int A2dpService::GetRenderPosition(const RawAddress &device, uint32_t &delayValu
                                    uint32_t &timeStamp)
 {
     if (device.GetAddress() == activeDevice_.GetAddress()) {
-        const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+        const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
         CHECK_AND_RETURN_LOG_RET(bluetoothHwSrcInterface != nullptr, Bluetooth::BT_ERR_INTERNAL_ERROR,
                                  "interface nullptr");
         delayValue = bluetoothHwSrcInterface->a2dpOffloadGetLatency();
@@ -1603,7 +1603,7 @@ void A2dpService::HwSetActiveMode()
     auto addr = GetActiveSinkDevice();
     std::shared_ptr<A2dpDeviceInfo> deviceInfo = GetDeviceFromList(addr);
     if (deviceInfo && (deviceInfo->GetPlayingState() == false)) {
-        const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+        const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
         CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
         STACK::RawAddress rawAddress = ServiceUtil::AddrToStack(addr);
         HILOGD("HwSetActiveMode");
@@ -1662,7 +1662,7 @@ int A2dpService::A2dpOffloadSessionPathRequest(const RawAddress &device,
     const std::vector<A2dpSrcStreamInfo> &streamsInfo)
 {
     int ret = HW_A2DP_OFFLOAD_SOFTWARE_ENCODING;
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG_RET(bluetoothHwSrcInterface != nullptr, ret, "interface nullptr");
 
     if (BluetoothAudioFrameworkAdapter::BluetoothAdaptiveSpatialRenderingEnabledChangeListener::
@@ -1949,14 +1949,14 @@ void A2dpService::A2dpOffloadHandleDelayStop(const RawAddress &device)
     }
     if (hasSessionPlaying && a2dpStreamSessions_.size() != 0) {
         /* session stop, should request path again to judge whether reserved streams need to swith encode path */
-        const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+        const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
         CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
         STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
         bluetoothHwSrcInterface->a2dpOffloadGetSinkStreamEncodingPath(rawAddr, a2dpStreamSessions_, true);
     }
 }
 
-void PreferenceAacCodec(std::vector<btav_a2dp_codec_config_t> &codec_preferences)
+void PreferenceAacCodec(std::vector<BtavA2dpCodecConfig> &codecPreferences)
 {
     int aacValue;
     AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SRC_SERVICE, PROPERTY_CODEC_AAC_SUPPORT, aacValue);
@@ -1964,23 +1964,23 @@ void PreferenceAacCodec(std::vector<btav_a2dp_codec_config_t> &codec_preferences
         HILOGE("GetValue error[%{public}d]", aacValue);
         return;
     }
-    btav_a2dp_codec_config_t codec_configAac = {
-        .codec_type = static_cast<btav_a2dp_codec_index_t>(BTAV_A2DP_CODEC_INDEX_SOURCE_AAC),
-        .codec_priority = static_cast<btav_a2dp_codec_priority_t>(A2DP_CODEC_PRIORITY_AAC),
-        .sample_rate = static_cast<btav_a2dp_codec_sample_rate_t>(BTAV_A2DP_CODEC_SAMPLE_RATE_44100 |
+    BtavA2dpCodecConfig codec_configAac = {
+        .codecType = static_cast<BtavA2dpCodecIndex>(BTAV_A2DP_CODEC_INDEX_SOURCE_AAC),
+        .codecPriority = static_cast<BtavA2dpCodecPriority>(A2DP_CODEC_PRIORITY_AAC),
+        .sampleRate = static_cast<BtavA2dpCodecSampleRate>(BTAV_A2DP_CODEC_SAMPLE_RATE_44100 |
             BTAV_A2DP_CODEC_SAMPLE_RATE_48000),
-        .bits_per_sample = static_cast<btav_a2dp_codec_bits_per_sample_t>(BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16 |
+        .bitsPerSample = static_cast<BtavA2dpCodecBitsPerSample>(BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16 |
             BTAV_A2DP_CODEC_BITS_PER_SAMPLE_24 | BTAV_A2DP_CODEC_BITS_PER_SAMPLE_32),
-        .channel_mode = static_cast<btav_a2dp_codec_channel_mode_t>(BTAV_A2DP_CODEC_CHANNEL_MODE_MONO |
+        .channelMode = static_cast<BtavA2dpCodecChannelMode>(BTAV_A2DP_CODEC_CHANNEL_MODE_MONO |
             BTAV_A2DP_CODEC_CHANNEL_MODE_STEREO),
-        .codec_specific_1 = 0,
-        .codec_specific_2 = 0,
-        .codec_specific_3 = 0,
-        .codec_specific_4 = 0};
-    codec_preferences.push_back(codec_configAac);
+        .codecSpecific1 = 0,
+        .codecSpecific2 = 0,
+        .codecSpecific3 = 0,
+        .codecSpecific4 = 0};
+    codecPreferences.push_back(codec_configAac);
 }
 
-void PreferenceLdacCodec(std::vector<btav_a2dp_codec_config_t> &codec_preferences)
+void PreferenceLdacCodec(std::vector<BtavA2dpCodecConfig> &codecPreferences)
 {
     int ldacValue;
     AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SRC_SERVICE, PROPERTY_CODEC_LDAC_SUPPORT, ldacValue);
@@ -1988,23 +1988,23 @@ void PreferenceLdacCodec(std::vector<btav_a2dp_codec_config_t> &codec_preference
         HILOGE("GetValue error[%{public}d]", ldacValue);
         return;
     }
-    btav_a2dp_codec_config_t codec_configLdac = {
-        .codec_type = static_cast<btav_a2dp_codec_index_t>(BTAV_A2DP_CODEC_INDEX_SOURCE_LDAC),
-        .codec_priority = static_cast<btav_a2dp_codec_priority_t>(BLUETOOTH_A2DP_CODEC_PRIORITY_LDAC),
-        .sample_rate = static_cast<btav_a2dp_codec_sample_rate_t>(BTAV_A2DP_CODEC_SAMPLE_RATE_44100 |
+    BtavA2dpCodecConfig codec_configLdac = {
+        .codecType = static_cast<BtavA2dpCodecIndex>(BTAV_A2DP_CODEC_INDEX_SOURCE_LDAC),
+        .codecPriority = static_cast<BtavA2dpCodecPriority>(BLUETOOTH_A2DP_CODEC_PRIORITY_LDAC),
+        .sampleRate = static_cast<BtavA2dpCodecSampleRate>(BTAV_A2DP_CODEC_SAMPLE_RATE_44100 |
             BTAV_A2DP_CODEC_SAMPLE_RATE_48000|BTAV_A2DP_CODEC_SAMPLE_RATE_96000),
-        .bits_per_sample = static_cast<btav_a2dp_codec_bits_per_sample_t>(BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16 |
+        .bitsPerSample = static_cast<BtavA2dpCodecBitsPerSample>(BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16 |
             BTAV_A2DP_CODEC_BITS_PER_SAMPLE_24 | BTAV_A2DP_CODEC_BITS_PER_SAMPLE_32),
-        .channel_mode = static_cast<btav_a2dp_codec_channel_mode_t>(BTAV_A2DP_CODEC_CHANNEL_MODE_MONO |
+        .channelMode = static_cast<BtavA2dpCodecChannelMode>(BTAV_A2DP_CODEC_CHANNEL_MODE_MONO |
             BTAV_A2DP_CODEC_CHANNEL_MODE_STEREO),
-        .codec_specific_1 = 0,
-        .codec_specific_2 = 0,
-        .codec_specific_3 = 0,
-        .codec_specific_4 = 0};
-    codec_preferences.push_back(codec_configLdac);
+        .codecSpecific1 = 0,
+        .codecSpecific2 = 0,
+        .codecSpecific3 = 0,
+        .codecSpecific4 = 0};
+    codecPreferences.push_back(codec_configLdac);
 }
 
-void PreferenceL2hcStCodec(std::vector<btav_a2dp_codec_config_t> &codec_preferences)
+void PreferenceL2hcStCodec(std::vector<BtavA2dpCodecConfig> &codecPreferences)
 {
     int l2hcStValue;
     AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SRC_SERVICE, PROPERTY_CODEC_L2HCST_SUPPORT, l2hcStValue);
@@ -2012,67 +2012,67 @@ void PreferenceL2hcStCodec(std::vector<btav_a2dp_codec_config_t> &codec_preferen
         HILOGE("GetValue error[%{public}d]", l2hcStValue);
         return;
     }
-    btav_a2dp_codec_config_t codec_configL2hcSt = {
-        .codec_type = static_cast<btav_a2dp_codec_index_t>(BTAV_A2DP_CODEC_INDEX_SOURCE_L2HC_ST),
-        .codec_priority = static_cast<btav_a2dp_codec_priority_t>(BLUETOOTH_A2DP_CODEC_L2HCST_PRIORITY),
-        .sample_rate = static_cast<btav_a2dp_codec_sample_rate_t>(BTAV_A2DP_CODEC_SAMPLE_RATE_48000 |
+    BtavA2dpCodecConfig codec_configL2hcSt = {
+        .codecType = static_cast<BtavA2dpCodecIndex>(BTAV_A2DP_CODEC_INDEX_SOURCE_L2HC_ST),
+        .codecPriority = static_cast<BtavA2dpCodecPriority>(BLUETOOTH_A2DP_CODEC_L2HCST_PRIORITY),
+        .sampleRate = static_cast<BtavA2dpCodecSampleRate>(BTAV_A2DP_CODEC_SAMPLE_RATE_48000 |
             BTAV_A2DP_CODEC_SAMPLE_RATE_96000),
-        .bits_per_sample = static_cast<btav_a2dp_codec_bits_per_sample_t>(BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16 |
+        .bitsPerSample = static_cast<BtavA2dpCodecBitsPerSample>(BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16 |
             BTAV_A2DP_CODEC_BITS_PER_SAMPLE_24 | BTAV_A2DP_CODEC_BITS_PER_SAMPLE_32),
-        .channel_mode = static_cast<btav_a2dp_codec_channel_mode_t>(BTAV_A2DP_CODEC_CHANNEL_MODE_MONO |
+        .channelMode = static_cast<BtavA2dpCodecChannelMode>(BTAV_A2DP_CODEC_CHANNEL_MODE_MONO |
             BTAV_A2DP_CODEC_CHANNEL_MODE_STEREO),
-        .codec_specific_1 = 0,
-        .codec_specific_2 = 0,
-        .codec_specific_3 = 0,
-        .codec_specific_4 = 0};
-    codec_preferences.push_back(codec_configL2hcSt);
+        .codecSpecific1 = 0,
+        .codecSpecific2 = 0,
+        .codecSpecific3 = 0,
+        .codecSpecific4 = 0};
+    codecPreferences.push_back(codec_configL2hcSt);
 }
 
-std::vector<btav_a2dp_codec_config_t> A2dpService::prepareCodecPreferences()
+std::vector<BtavA2dpCodecConfig> A2dpService::prepareCodecPreferences()
 {
-    std::vector<btav_a2dp_codec_config_t> codec_preferences;
+    std::vector<BtavA2dpCodecConfig> codecPreferences;
     int value;
     AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SRC_SERVICE, PROPERTY_CODEC_SBC_SUPPORT, value);
     HILOGI("SRC SBC value[%{public}d]", value);
     if (value) {
-        btav_a2dp_codec_config_t codec_config = {
-            .codec_type = static_cast<btav_a2dp_codec_index_t>(BTAV_A2DP_CODEC_INDEX_SOURCE_SBC),
-            .codec_priority = static_cast<btav_a2dp_codec_priority_t>(BTAV_A2DP_CODEC_PRIORITY_DEFAULT),
-            .sample_rate = static_cast<btav_a2dp_codec_sample_rate_t>(BTAV_A2DP_CODEC_SAMPLE_RATE_44100 |
+        BtavA2dpCodecConfig codecConfig = {
+            .codecType = static_cast<BtavA2dpCodecIndex>(BTAV_A2DP_CODEC_INDEX_SOURCE_SBC),
+            .codecPriority = static_cast<BtavA2dpCodecPriority>(BTAV_A2DP_CODEC_PRIORITY_DEFAULT),
+            .sampleRate = static_cast<BtavA2dpCodecSampleRate>(BTAV_A2DP_CODEC_SAMPLE_RATE_44100 |
                 BTAV_A2DP_CODEC_SAMPLE_RATE_48000),
-            .bits_per_sample = static_cast<btav_a2dp_codec_bits_per_sample_t>(BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16 |
+            .bitsPerSample = static_cast<BtavA2dpCodecBitsPerSample>(BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16 |
                 BTAV_A2DP_CODEC_BITS_PER_SAMPLE_24 | BTAV_A2DP_CODEC_BITS_PER_SAMPLE_32),
-            .channel_mode = static_cast<btav_a2dp_codec_channel_mode_t>(BTAV_A2DP_CODEC_CHANNEL_MODE_MONO |
+            .channelMode = static_cast<BtavA2dpCodecChannelMode>(BTAV_A2DP_CODEC_CHANNEL_MODE_MONO |
                 BTAV_A2DP_CODEC_CHANNEL_MODE_STEREO),
-            .codec_specific_1 = 0,
-            .codec_specific_2 = 0,
-            .codec_specific_3 = 0,
-            .codec_specific_4 = 0};
-        codec_preferences.push_back(codec_config);
+            .codecSpecific1 = 0,
+            .codecSpecific2 = 0,
+            .codecSpecific3 = 0,
+            .codecSpecific4 = 0};
+        codecPreferences.push_back(codecConfig);
     }
     int l2hcV2Value;
     AdapterConfig::GetInstance()->GetValue(SECTION_A2DP_SRC_SERVICE, PROPERTY_CODEC_L2HCV2_SUPPORT, l2hcV2Value);
     HILOGI("SRC L2HCV2 value[%{public}d]", l2hcV2Value);
     if (l2hcV2Value) {
-        btav_a2dp_codec_config_t codec_configL2hcV2 = {
-            .codec_type = static_cast<btav_a2dp_codec_index_t>(BTAV_A2DP_CODEC_INDEX_SOURCE_L2HC_V2),
-            .codec_priority = static_cast<btav_a2dp_codec_priority_t>(BLUETOOTH_A2DP_CODEC_L2HCV2_PRIORITY),
-            .sample_rate = static_cast<btav_a2dp_codec_sample_rate_t>(BTAV_A2DP_CODEC_SAMPLE_RATE_48000 |
+        BtavA2dpCodecConfig codec_configL2hcV2 = {
+            .codecType = static_cast<BtavA2dpCodecIndex>(BTAV_A2DP_CODEC_INDEX_SOURCE_L2HC_V2),
+            .codecPriority = static_cast<BtavA2dpCodecPriority>(BLUETOOTH_A2DP_CODEC_L2HCV2_PRIORITY),
+            .sampleRate = static_cast<BtavA2dpCodecSampleRate>(BTAV_A2DP_CODEC_SAMPLE_RATE_48000 |
                 BTAV_A2DP_CODEC_SAMPLE_RATE_96000),
-            .bits_per_sample = static_cast<btav_a2dp_codec_bits_per_sample_t>(BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16 |
+            .bitsPerSample = static_cast<BtavA2dpCodecBitsPerSample>(BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16 |
                 BTAV_A2DP_CODEC_BITS_PER_SAMPLE_24 | BTAV_A2DP_CODEC_BITS_PER_SAMPLE_32),
-            .channel_mode = static_cast<btav_a2dp_codec_channel_mode_t>(BTAV_A2DP_CODEC_CHANNEL_MODE_MONO |
+            .channelMode = static_cast<BtavA2dpCodecChannelMode>(BTAV_A2DP_CODEC_CHANNEL_MODE_MONO |
                 BTAV_A2DP_CODEC_CHANNEL_MODE_STEREO),
-            .codec_specific_1 = 0,
-            .codec_specific_2 = 0,
-            .codec_specific_3 = 0,
-            .codec_specific_4 = 0};
-        codec_preferences.push_back(codec_configL2hcV2);
+            .codecSpecific1 = 0,
+            .codecSpecific2 = 0,
+            .codecSpecific3 = 0,
+            .codecSpecific4 = 0};
+        codecPreferences.push_back(codec_configL2hcV2);
     }
-    PreferenceAacCodec(codec_preferences);
-    PreferenceLdacCodec(codec_preferences);
-    PreferenceL2hcStCodec(codec_preferences);
-    return codec_preferences;
+    PreferenceAacCodec(codecPreferences);
+    PreferenceLdacCodec(codecPreferences);
+    PreferenceL2hcStCodec(codecPreferences);
+    return codecPreferences;
 }
 
 int A2dpService::EnableAutoPlay(const RawAddress &device)
@@ -2127,7 +2127,7 @@ void A2dpService::OnRenderStateChange(bool isRenderActive)
     }
     HILOGI("new render state:%{public}d", isRenderActive);
     isRenderActive_ = isRenderActive;
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
     bluetoothHwSrcInterface->notifyAudioRenderState(isRenderActive_);
     if (isRenderActive_) {
@@ -2137,7 +2137,7 @@ void A2dpService::OnRenderStateChange(bool isRenderActive)
 
 bool A2dpService::IsA2dpSceneChanged(bool isRenderStreamChanged, bool anyRenderRunning, CodecChangeAppScene lastScene)
 {
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     if (bluetoothHwSrcInterface == nullptr) {
         HILOGW("bluetoothHwSrcInterface is null");
         return lastScene != codecChangeScene_;
@@ -2246,7 +2246,7 @@ void A2dpService::OnRenderSceneChange(bool anyRenderRunning, bool gameRunning, b
 
 void A2dpService::ChangeCodecWithSceneSwitch()
 {
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
 
     // Offload场景，不切采样率
@@ -2271,7 +2271,7 @@ void A2dpService::ChangeCodecWithSceneSwitch()
             HILOGI("topAppType is game, revise to game scene %{public}d", preferedScene);
         }
         uint8_t fastFlag = false;
-        btav_a2dp_codec_sample_rate_t sampleRate;
+        BtavA2dpCodecSampleRate sampleRate;
         if (preferedScene == CodecChangeAppScene::APP_TYPE_GAME) {
             fastFlag = 1;
             sampleRate = BTAV_A2DP_CODEC_SAMPLE_RATE_48000;
@@ -2365,7 +2365,7 @@ void A2dpService::NotifyConnStateChanged(const RawAddress &device, int state, in
     NotifyConnStateChangedInner(device, state, cause);
 }
 
-void A2dpService::NotifyBondStateChanged(bt_status_t status, const RawAddress &device, bt_bond_state_t state)
+void A2dpService::NotifyBondStateChanged(BtStackStatus status, const RawAddress &device, BtBondState state)
 {
     HILOGI("device: %{public}s status: %{public}d bondState: %{public}d", GET_ENCRYPT_ADDR(device), status, state);
     if (state != BT_BOND_STATE_NONE || GetDeviceState(device) != static_cast<int>(BTConnectState::DISCONNECTED)) {
@@ -2406,7 +2406,7 @@ void A2dpService::HandleA2dpPlayingStateChange(int state)
         a2dpStatecallback_(state);
     }
     if (state == BTAV_AUDIO_STATE_STOPPED && isLastOnLowLatency_) {
-        const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+        const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
         CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
         bluetoothHwSrcInterface->sendLowLatencyStatus(false);
         isLastOnLowLatency_ = false;

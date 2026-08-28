@@ -55,7 +55,7 @@ enum GattType {
 class GattClientApplication : public BluetoothGattInterface::GattClientObserver,
     public std::enable_shared_from_this<GattClientApplication> {
 public:
-    explicit GattClientApplication(int clientIf, const btgatt_client_interface_t *interface, const GattDevice &device,
+    explicit GattClientApplication(int clientIf, const BtgattClientInterface *interface, const GattDevice &device,
         std::weak_ptr<IGattClientCallback> callback);
     ~GattClientApplication() override;
 
@@ -107,14 +107,14 @@ public:
     void CancelOpenCallback(int connId, int status, int clientIf, const STACK::RawAddress &bda) override;
     void SearchCompleteCallback(int connId, int status) override;
     void RegisterForNotificationCallback(int connId, int registered, int status, uint16_t handle) override;
-    void NotifyCallback(int connId, const btgatt_notify_params_t &data) override;
-    void ReadCharacteristicCallback(int connId, int status, btgatt_read_params_t *pData) override;
+    void NotifyCallback(int connId, const BtgattNotifyParams &data) override;
+    void ReadCharacteristicCallback(int connId, int status, BtgattReadParams *pData) override;
     void WriteCharacteristicCallback(int connId, int status, uint16_t handle,
-        const btgatt_rsp_params_t &rspContext) override;
-    void ReadDescriptorCallback(int connId, int status, const btgatt_read_params_t &data) override;
+        const BtgattRspParams &rspContext) override;
+    void ReadDescriptorCallback(int connId, int status, const BtgattReadParams &data) override;
     void WriteDescriptorCallback(int connId, int status, uint16_t handle) override;
     void ConfigureMtuCallback(int connId, int status, int mtu) override;
-    void GetGattDbCallback(int connId, const btgatt_db_element_t *db, int count) override;
+    void GetGattDbCallback(int connId, const BtgattDbElement *db, int count) override;
     void ConnUpdatedCallback(int connId, uint16_t interval, uint16_t latency, uint16_t timeout,
         uint8_t status) override;
     void ServicesChangedCallback(int connId) override;
@@ -147,7 +147,7 @@ private:
     int transport_ = GATT_TRANSPORT_INVALID;
     std::vector<Service> gattDb_ {};
 
-    const btgatt_client_interface_t *btIfGattClient_ = nullptr;
+    const BtgattClientInterface *btIfGattClient_ = nullptr;
     std::weak_ptr<IGattClientCallback> callback_;
     int authRetryState_ = AUTH_RETRY_STATE_IDLE;
     // Caches the value transferred in WriteDescriptor and WriteCharacteristic.

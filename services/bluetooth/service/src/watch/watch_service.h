@@ -536,8 +536,8 @@ private:
     bool isSecondaryPair_{false};
 
     BtHwWatchInterface* bluetoothWatchInterface = nullptr;
-    bthd_interface_t* bluetoothHidInterface = nullptr;
-    bt_interface_t* bluetoothInterface = nullptr;
+    BthdInterface* bluetoothHidInterface = nullptr;
+    BtInterface* bluetoothInterface = nullptr;
     std::unique_ptr<ClassicRemoteDeviceObserver> classicRemoteDeviceObserver_{nullptr};
     std::unique_ptr<utility::Timer> saisAddedTimer_ {nullptr};
     std::unique_ptr<utility::Timer> hidReconnectTimer_ {nullptr};

@@ -227,7 +227,7 @@ void CloudDeviceManager::SetDeviceClassProp(std::shared_ptr<BluetoothDevice> dev
     }
     device->SetDeviceClass(deviceClass);
     SetRemoteDevicePropertyInt(
-        RawAddress(device->GetAddress()), bt_property_type_t::BT_PROPERTY_CLASS_OF_DEVICE, deviceClass);
+        RawAddress(device->GetAddress()), BtPropertyType::BT_PROPERTY_CLASS_OF_DEVICE, deviceClass);
 }
 
 void CloudDeviceManager::SetDeviceNameProp(std::shared_ptr<BluetoothDevice> device, const std::string &deviceName)
@@ -236,8 +236,8 @@ void CloudDeviceManager::SetDeviceNameProp(std::shared_ptr<BluetoothDevice> devi
         return;
     }
     device->SetRemoteName(deviceName);
-    bt_property_t prop;
-    prop.type = static_cast<bt_property_type_t>(BT_PROPERTY_BDNAME);
+    BtProperty prop;
+    prop.type = static_cast<BtPropertyType>(BT_PROPERTY_BDNAME);
     std::string saveName = deviceName;
     prop.len = static_cast<int32_t>(deviceName.size());
     prop.val = const_cast<void *>(static_cast<const void *>(saveName.c_str()));
@@ -254,7 +254,7 @@ void CloudDeviceManager::SetCloudDeviceProp(std::shared_ptr<BluetoothDevice> dev
     if (isCloudDev) {
         int32_t cloudDevType = isCloudDev ? 1 : 0;
         SetRemoteDevicePropertyInt(
-            RawAddress(device->GetAddress()), bt_property_type_t::BT_PROPERTY_ClOUD_CAP, cloudDevType);
+            RawAddress(device->GetAddress()), BtPropertyType::BT_PROPERTY_CLOUD_CAP, cloudDevType);
     }
 }
 
@@ -265,7 +265,7 @@ void CloudDeviceManager::SetDeviceTypeProp(std::shared_ptr<BluetoothDevice> devi
     }
     device->SetDeviceType(devType);
     SetRemoteDevicePropertyInt(
-        RawAddress(device->GetAddress()), bt_property_type_t::BT_PROPERTY_TYPE_OF_DEVICE, BT_DEVICE_TYPE_DUMO);
+        RawAddress(device->GetAddress()), BtPropertyType::BT_PROPERTY_TYPE_OF_DEVICE, BT_DEVICE_TYPE_DUMO);
 }
 
 void CloudDeviceManager::SetDeviceUuidsProp(
@@ -280,8 +280,8 @@ void CloudDeviceManager::SetDeviceUuidsProp(
         Uuid::UUID128Bit uuid128 = uuid.ConvertTo128Bits();
         uuidsData.insert(uuidsData.end(), uuid128.begin(), uuid128.end());
     }
-    bt_property_t prop;
-    prop.type = static_cast<bt_property_type_t>(BT_PROPERTY_UUIDS);
+    BtProperty prop;
+    prop.type = static_cast<BtPropertyType>(BT_PROPERTY_UUIDS);
     int32_t len = static_cast<int32_t>(uuidsData.size());
     prop.len = len;
     prop.val = const_cast<void *>(static_cast<const void *>(uuidsData.data()));
@@ -289,10 +289,10 @@ void CloudDeviceManager::SetDeviceUuidsProp(
     RemoteDeviceProperties::GetInstance()->SetRemoteDeviceProperty(addr, prop);
 }
 
-void CloudDeviceManager::SetRemoteDevicePropertyInt(const RawAddress &device, bt_property_type_t type, int32_t value)
+void CloudDeviceManager::SetRemoteDevicePropertyInt(const RawAddress &device, BtPropertyType type, int32_t value)
 {
     void *val = &value;
-    bt_property_t prop;
+    BtProperty prop;
     prop.type = type;
     prop.len = sizeof(value);
     prop.val = val;
@@ -332,7 +332,7 @@ void CloudDeviceManager::SetDeviceProductIdProp(std::shared_ptr<BluetoothDevice>
         HILOGI("SetDeviceProductIdProp [DEVICE_INFO/icon] oldValue: %{public}d, newValue: %{public}d",
             device->GetIcon(), static_cast<int32_t>(iconIdValue));
         device->SetIcon(static_cast<int32_t>(iconIdValue));
-        SetRemoteDevicePropertyInt(addr, bt_property_type_t::BT_PROPERTY_DEVICE_INFO,
+        SetRemoteDevicePropertyInt(addr, BtPropertyType::BT_PROPERTY_DEVICE_INFO,
             static_cast<int32_t>(iconIdValue));
     }
 }

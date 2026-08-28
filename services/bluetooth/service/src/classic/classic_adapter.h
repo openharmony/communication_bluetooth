@@ -165,7 +165,7 @@ public:
     std::vector<RawAddress> GetPairedDevices() const override;
 
     int StartPairInner(const RawAddress &device, int32_t transport, const Bluetooth::BluetoothOobData &oobData,
-        const bt_interface_t *btInterface);
+        const BtInterface *btInterface);
 
     /**
      * @brief Local device start pair.
@@ -531,11 +531,11 @@ public:
     long GetBtDiscoveryEndMillis() const override;
     int GetRemoteDeviceBatteryInfo(const RawAddress &device, BatteryInfo &batteryInfo) const override;
     int SetRemoteDeviceBatteryInfo(const RawAddress &device, const BatteryInfo &batteryInfo) const override;
-    void DiscoveryStateChanged(bt_discovery_state_t state);
-    void BondStateChanged(bt_status_t status, STACK::RawAddress* bd_addr, bt_bond_state_t state);
-    void SspRequest(STACK::RawAddress* remote_bd_addr, bt_bdname_t* bd_name, uint32_t cod,
-                    bt_ssp_variant_t pairingVariant, uint32_t passKey);
-    void PinRequest(STACK::RawAddress* remote_bd_addr, bt_bdname_t* bd_name, uint32_t cod, bool min16Digit);
+    void DiscoveryStateChanged(BtDiscoveryState state);
+    void BondStateChanged(BtStackStatus status, STACK::RawAddress* bdAddr, BtBondState state);
+    void SspRequest(STACK::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
+                    BtSspVariant pairingVariant, uint32_t passKey);
+    void PinRequest(STACK::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod, bool min16Digit);
     void GenerateLocalOobDataCb(int32_t status, const Bluetooth::BluetoothOobData &data);
     void UpdateDiscovertState(int discoveryState);
     void ResumeBleStackDevice(void);
@@ -643,7 +643,7 @@ public:
      *         returns <b>false</b> if the operation fails.
      * @since 12
      */
-    bool GetRemoteDevicePropertyInfo(const RawAddress &device, bt_property_type_t type, std::string &property);
+    bool GetRemoteDevicePropertyInfo(const RawAddress &device, BtPropertyType type, std::string &property);
 
     /**
      * @brief passive pairing mode, a profile connection request needs to be sent to the peer end three seconds
@@ -772,14 +772,14 @@ public:
     void SendRemoteUuidChanged(const RawAddress &device, const std::vector<Uuid> &uuids) const;
     void SendScanModeChanged(const int scanMode) const;
     bool CheckBondStateAndReturn(std::shared_ptr<BluetoothDevice> &remoteDevice, int unbondCause);
-    void SetBondState(bt_status_t status, STACK::RawAddress bd_addr, bt_bond_state_t state);
+    void SetBondState(BtStackStatus status, STACK::RawAddress bdAddr, BtBondState state);
     int32_t UpdateCloudBluetoothDeviceInner(std::vector<Bluetooth::BluetoothTrustPairDevice> &cloudList);
 	std::string GetCarKeyDfxData() const override;
     void SetCarKeyCardData(const std::string &address, int32_t action) override;
     void InitCarKeyInfo() override;
     void AddPendingConnectDevice(const RawAddress &address, uint32_t profileId);
     void RemovePendingConnectDevice(const RawAddress &address);
-    void NotifyBondStateChanged(bt_status_t status, STACK::RawAddress bd_addr, bt_bond_state_t state);
+    void NotifyBondStateChanged(BtStackStatus status, STACK::RawAddress bdAddr, BtBondState state);
     bool StartRemoteSdpSearch(const std::string &address, const std::string &uuid) override;
     bool GetRemoteServices(const std::string &address) override;
     int32_t SetConnectionPriority(const std::string &address, int32_t priority) override;
@@ -991,12 +991,12 @@ private:
      *
      */
     void ProcessPostEnable();
-    void DiscoveryStateChangedInner(bt_discovery_state_t state);
-    void CovertUnbondCause(bt_status_t status, int &unbondCause, std::string &causeMessage);
-    void BondStateChangedInner(bt_status_t status, STACK::RawAddress bd_addr, bt_bond_state_t state);
-    void SspRequestInner(STACK::RawAddress remote_bd_addr, bt_bdname_t* bd_name, uint32_t cod,
-        bt_ssp_variant_t pairingVariant, uint32_t passKey);
-    void PinRequestInner(STACK::RawAddress remote_bd_addr, bt_bdname_t* bd_name, uint32_t cod, bool min16Digit);
+    void DiscoveryStateChangedInner(BtDiscoveryState state);
+    void CovertUnbondCause(BtStackStatus status, int &unbondCause, std::string &causeMessage);
+    void BondStateChangedInner(BtStackStatus status, STACK::RawAddress bdAddr, BtBondState state);
+    void SspRequestInner(STACK::RawAddress remoteBdAddr, BtBdname* bdName, uint32_t cod,
+        BtSspVariant pairingVariant, uint32_t passKey);
+    void PinRequestInner(STACK::RawAddress remoteBdAddr, BtBdname* bdName, uint32_t cod, bool min16Digit);
     void StartUp();
     void ShutDown();
     bool SetPairingConfirmationIfNeed(const std::string &address);
@@ -1005,24 +1005,24 @@ private:
     void DeletePendingPairedDevice(const std::string device);
     void ReleaseBtChrInfos();
     bool IsCustomTypeSupported(const RawAddress &device, int32_t customType) const;
-    bool GetHwPropertyInfo(const RawAddress &device, bt_property_type_t type, std::string &property, bool toHex = true);
+    bool GetHwPropertyInfo(const RawAddress &device, BtPropertyType type, std::string &property, bool toHex = true);
     bool IsNeededReturnCodForAudio(int32_t uid, int32_t customType) const;
     void GetPeripheralCod(const RawAddress &device, int32_t &cod) const;
     bool RemovePairInner(int32_t transport, const RawAddress &device) const;
     void CheckDeviceUuidsAndSendChr(std::shared_ptr<BluetoothDevice> remoteDevice);
     void HandleBondStateFailed(
-        bt_status_t status, std::shared_ptr<BluetoothDevice> remoteDevice, const RawAddress &device);
-    void HandleBondStateBondNone(bt_status_t status, STACK::RawAddress bd_addr,
-        std::shared_ptr<BluetoothDevice> remoteDevice, const RawAddress &device, bt_bond_state_t state);
+        BtStackStatus status, std::shared_ptr<BluetoothDevice> remoteDevice, const RawAddress &device);
+    void HandleBondStateBondNone(BtStackStatus status, STACK::RawAddress bdAddr,
+        std::shared_ptr<BluetoothDevice> remoteDevice, const RawAddress &device, BtBondState state);
 
     void HandleBondStateBonding(std::shared_ptr<BluetoothDevice> remoteDevice, const RawAddress &device);
     bool IsDisconnectAclBeforeBond(const std::string device) const;
     void AddDisconnectAclBeforeBondDevice(const std::string device);
     void DelDisconnectAclBeforeBondDevice(const std::string device);
-    bool SetBtScanModeProperty(const bt_interface_t *btInterface, int mode);
+    bool SetBtScanModeProperty(const BtInterface *btInterface, int mode);
     void IsDeviceReadyConnect(const RawAddress &address);
     bool SatisfyDisconnectAclCondition(const RawAddress &device, bool isSystemHap);
-    std::string CovertUnbondMessage(bt_status_t status);
+    std::string CovertUnbondMessage(BtStackStatus status);
     IProfile* GetProfileService(uint32_t profileId) const;
     bool IsProfileAllowed(uint32_t profileId, const RawAddress &device) const;
     bool GetProfileSupportState(uint32_t profileId, const RawAddress &device,

@@ -72,7 +72,7 @@ bluetooth::BleScanSettingsImpl ConvertScanSetting(BleScannerMessage msg)
 
 const char *EventToStr(int event, bool autoTrigger = false)
 {
-    // event_id <-> (event_str, auto_trigger_event_str)
+    // eventId <-> (event_str, auto_trigger_event_str)
     static std::map<int, std::pair<const char *, const char *>> table = {
         {BleScannerStateMachine::START_EVENT, {"START_EVENT", "INNER_START_EVENT"}},
         {BleScannerStateMachine::STOP_EVENT, {"STOP_EVENT", "INNER_STOP_EVENT"}},

@@ -25,18 +25,18 @@
 #include "bt_types.h"
 #include "../bt_hf.h"
 
-typedef struct {
+struct BthfHalInterface {
     size_t size;
-    bt_status_t (*init)(bthf_callbacks_t *callbacks);
+    BtStackStatus (*init)(BthfCallbacks *callbacks);
     void (*cleanup)(void);
-    bt_status_t (*connect)(const RawAddress *bd_addr);
-    bt_status_t (*disconnect)(const RawAddress *bd_addr);
-    bt_status_t (*audio_connect)(const RawAddress *bd_addr);
-    bt_status_t (*audio_disconnect)(const RawAddress *bd_addr);
-    bt_status_t (*start_voice_recognition)(const RawAddress *bd_addr);
-    bt_status_t (*stop_voice_recognition)(const RawAddress *bd_addr);
-    bt_status_t (*volume_control)(const RawAddress *bd_addr,
-                                  bthf_volume_type_t type, int volume);
-} bthf_hal_interface_t;
+    BtStackStatus (*connect)(const RawAddress *bdAddr);
+    BtStackStatus (*disconnect)(const RawAddress *bdAddr);
+    BtStackStatus (*audioConnect)(const RawAddress *bdAddr);
+    BtStackStatus (*audioDisconnect)(const RawAddress *bdAddr);
+    BtStackStatus (*startVoiceRecognition)(const RawAddress *bdAddr);
+    BtStackStatus (*stopVoiceRecognition)(const RawAddress *bdAddr);
+    BtStackStatus (*volumeControl)(const RawAddress *bdAddr,
+                                  BthfVolumeType type, int volume);
+};
 
 #endif  // HARDWARE_BT_HF_H

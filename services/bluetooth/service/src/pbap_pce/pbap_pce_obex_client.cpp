@@ -142,14 +142,14 @@ std::shared_ptr<ObexSocketDevice> PbapPceObexClient::RecvSocketDevice(SocketType
         HILOGE("[PbapPceObexClient] recv channel error, ret=%{public}d", ret);
         return nullptr;
     }
-    sock_connect_signal_t cs;
-    ret = recv(socketFd_, &cs, sizeof(sock_connect_signal_t), MSG_NOSIGNAL);
+    SockConnectSignal cs;
+    ret = recv(socketFd_, &cs, sizeof(SockConnectSignal), MSG_NOSIGNAL);
     if (ret <= 0) {
         HILOGE("[PbapPceObexClient] recv connect_info error, ret=%{public}d", ret);
         return nullptr;
     }
     HILOGI("[PbapPceObexClient] channel=%{public}d, mtu tx=%{public}d rx=%{public}d",
-        channel, cs.max_tx_packet_size, cs.max_rx_packet_size);
+        channel, cs.maxTxPacketSize, cs.maxRxPacketSize);
 
     std::shared_ptr<ObexSocketDevice> socketDevice = std::make_shared<ObexSocketDevice>(
         socketFd_, obexConfig_.mtu, obexConfig_.mtu, socketType, obexConfig_.addr);

@@ -648,7 +648,7 @@ private:
     std::string activeDevice_{""};
     std::map<const std::string, std::shared_ptr<AvrcpCtStateMachine>> stateMachines_{};
     std::shared_ptr<AvrcpCtCoverArtManager> coverArtManager_;
-    const btrc_ctrl_interface_t *btAvrcpInterface_{nullptr};
+    const BtrcCtrlInterface *btAvrcpInterface_{nullptr};
 
     BT_DISALLOW_COPY_AND_ASSIGN(AvrcpCtService);
 };

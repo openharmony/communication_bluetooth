@@ -221,10 +221,10 @@ int BasService::Connect(const RawAddress &device)
                 "classicAdapter is null");
             classicAdapter->AddPendingConnectDevice(device, PROFILE_ID_BAS);
             STACK::RawAddress bdaddr = ServiceUtil::AddrToStack(device);
-            bt_interface_t* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
+            BtInterface* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
             CHECK_AND_RETURN_LOG_RET(bluetoothInterface != nullptr, Bluetooth::BT_ERR_INTERNAL_ERROR,
                 "bluetoothInterface is null");
-            bluetoothInterface->get_remote_services(&bdaddr);
+            bluetoothInterface->getRemoteServices(&bdaddr);
         }
         return BAS_SUCCESS;
     }

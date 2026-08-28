@@ -592,7 +592,7 @@ void BluetoothAudioFrameworkAdapter::BluetoothAudioRendererDataTransferListener:
     CHECK_AND_RETURN_LOG(a2dpService != nullptr, "OnDataTransferStateChange: null a2dpService");
     auto device = a2dpService->GetActiveSinkDevice();
     STACK::RawAddress addr = ServiceUtil::AddrToStack(device);
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "bthwInterface_ is null");
     bool isHwDevice = bluetoothHwSrcInterface->isHwDualConnDevice(addr);
     if (!isHwDevice) {
@@ -632,7 +632,7 @@ void BluetoothAudioFrameworkAdapter::BluetoothAudioRendererDataTransferListener:
     CHECK_AND_RETURN_LOG(a2dpService != nullptr, "OnMuteStateChange: null a2dpService");
     auto device = a2dpService->GetActiveSinkDevice();
     STACK::RawAddress addr = ServiceUtil::AddrToStack(device);
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "bthwInterface_ is null");
     bool isHwDevice = bluetoothHwSrcInterface->isHwDualConnDevice(addr);
     if (!isHwDevice) {
@@ -968,7 +968,7 @@ void BluetoothAudioFrameworkAdapter::BluetoothSpatialAudioModeChangeListener::On
     HITRACE_METER(BT_TRACE_TAG);
 
     CHECK_AND_RETURN_LOG(deviceDescriptor != nullptr, "deviceDescriptor is null");
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "bthwInterface_ is null");
     A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
     CHECK_AND_RETURN_LOG(a2dpService != nullptr, "OnSpatializationEnabledChangeForAnyDevice: null a2dpService");
@@ -989,13 +989,14 @@ void BluetoothAudioFrameworkAdapter::BluetoothSpatialAudioModeChangeListener::On
     bluetoothHwSrcInterface->hwSetSpatialAudioModeEnabled(enabled);
 }
 
-void BluetoothAudioFrameworkAdapter::BluetoothSpatialAudioHeadTrackingChangeListener::OnHeadTrackingEnabledChangeForAnyDevice(
+void BluetoothAudioFrameworkAdapter::
+    BluetoothSpatialAudioHeadTrackingChangeListener::OnHeadTrackingEnabledChangeForAnyDevice(
     const std::shared_ptr<AudioStandard::AudioDeviceDescriptor> &deviceDescriptor, const bool &enabled)
 {
     HITRACE_METER(BT_TRACE_TAG);
 
     CHECK_AND_RETURN_LOG(deviceDescriptor != nullptr, "deviceDescriptor is null");
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "bthwInterface_ is null");
     A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
     CHECK_AND_RETURN_LOG(a2dpService != nullptr, "OnHeadTrackingEnabledChangeForAnyDevice: null a2dpService");
@@ -1021,7 +1022,7 @@ void BluetoothAudioFrameworkAdapter::BluetoothColAudioEnableListener::OnCollabor
 {
     HITRACE_METER(BT_TRACE_TAG);
 #ifdef BLUETOOTH_AUDIO_COLLABORATION_SUPPORT
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "bthwInterface_ is null");
     A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
     CHECK_AND_RETURN_LOG(a2dpService != nullptr, "OnCollaborationEnabledChangeForCurrentDevice: null a2dpService");
@@ -1029,7 +1030,7 @@ void BluetoothAudioFrameworkAdapter::BluetoothColAudioEnableListener::OnCollabor
     auto device = a2dpService->GetActiveSinkDevice();
     HILOGI("OnCollaborationEnabledChangeForCurrentDevice: device=%{public}s, enable=%{public}d",
         GetEncryptAddr(device.GetAddress()).c_str(), enabled);
-    bluetoothHwSrcInterface->HwSetCollAudioEnableState(enabled);
+    bluetoothHwSrcInterface->hwSetCollAudioEnableState(enabled);
 #endif
 }
 
@@ -1039,7 +1040,7 @@ void BluetoothAudioFrameworkAdapter::BluetoothAudioNnStateChangeListener::OnNnSt
 #ifdef BLUETOOTH_VOICE_COMBINE_FEATURE_ENABLE
     HILOGI("nnState=%{public}d", nnState);
 
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "bthwInterface_ is null");
     bluetoothHwSrcInterface->hwSetLocalVoiceCombineNnState(nnState);
 #endif
@@ -1049,7 +1050,7 @@ void BluetoothAudioFrameworkAdapter::BluetoothSpatialAudioAudioSourceTypeChangeL
     const AudioStandard::SpatialAudioSourceType &mode)
 {
     HITRACE_METER(BT_TRACE_TAG);
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "bthwInterface_ is null");
     A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
     CHECK_AND_RETURN_LOG(a2dpService != nullptr, "OnSpatialAudioSourceTypeChange: null a2dpService");
@@ -1065,7 +1066,7 @@ void BluetoothAudioFrameworkAdapter::BluetoothAdaptiveSpatialRenderingEnabledCha
     const std::shared_ptr<AudioStandard::AudioDeviceDescriptor> &deviceDescriptor, const bool &enabled)
 {
     HITRACE_METER(BT_TRACE_TAG);
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "bthwInterface_ is null");
     A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
     CHECK_AND_RETURN_LOG(a2dpService != nullptr,
@@ -1185,7 +1186,7 @@ void BluetoothAudioFrameworkAdapter::UpdateLocalVoiceCombineFeatureState()
 #ifdef AUDIO_FRAMEWORK
 #ifdef BLUETOOTH_VOICE_COMBINE_FEATURE_ENABLE
     HILOGI("%{public}s", __func__);
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "bthwInterface_ is null");
 
     std::string mainKey = HFP_AG_SERVER_AUDIO_EFFECT_NAME;
@@ -1252,7 +1253,7 @@ void BluetoothAudioFrameworkAdapter::BluetoothAdaptiveSpatialRenderingEnabledCha
 {
     HILOGI("adaptive switch status: %{public}d", status);
     adaptiveSwitchStatus_ = status;
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "bthwInterface_ is null");
     bluetoothHwSrcInterface->hwSetAdaptiveSwitchStatus(status);
 }

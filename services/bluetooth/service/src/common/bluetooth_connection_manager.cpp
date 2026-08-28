@@ -221,13 +221,13 @@ bool BluetoothConnectionManager::IsNativeAppOrSystemHap()
 
 void BluetoothConnectionManager::SendAntennaStatusMsg(bool isFixed)
 {
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int status = hal_util_load_bt_library(&btInterface);
     if (status) {
         HILOGE("Failed to open the Bluetooth module");
         return;
     }
-    btInterface->send_antenna_status_msg(isFixed);
+    btInterface->sendAntennaStatusMsg(isFixed);
 }
 
 void BluetoothConnectionManager::AddAclLinks(std::string address, int linkType, std::string unPairedAddr)
@@ -344,7 +344,7 @@ void BluetoothConnectionManager::OnGetConnReasonEchoRsp(const std::string &addre
         } else {
             UpdateVirtualAutoConnCap(address, typeval);
             BtChrBtExcpEvent(address, BTOPT_MULTCONNECT_AUTOCONNECT_FAIL, typeval);
-            const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+            const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
             CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
             STACK::RawAddress dstAddr;
             STACK::RawAddress::FromString(address, dstAddr);

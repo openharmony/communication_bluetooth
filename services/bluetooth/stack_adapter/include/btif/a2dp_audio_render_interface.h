@@ -47,13 +47,13 @@ public:
     static std::shared_ptr<IA2dpAudioRender> GetInstance();
 };
 
-typedef struct {
+struct BtavA2dpAudioRenderInterface {
     size_t size;
     int (*init)(int freq, int bits, int channels);
     void (*cleanup)(void);
     int (*start)(void);
     int (*stop)(void);
-    int (*write_data)(uint8_t *buffer, size_t size);
-} btav_a2dp_audio_render_interface_t;
+    int (*writeData)(uint8_t *buffer, size_t size);
+};
 
 #endif  // BTIF_A2DP_AUDIO_RENDER_INTERFACE_H

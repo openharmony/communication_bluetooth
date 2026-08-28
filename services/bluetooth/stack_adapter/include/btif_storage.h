@@ -24,10 +24,10 @@
 
 #include "bt_types.h"
 
-inline int btif_storage_get_remote_addr_type(const RawAddress *remote_bd_addr, uint8_t *addr_type)
+inline int BtifStorageGetRemoteAddrType(const RawAddress *remoteBdAddr, uint8_t *addrType)
 {
-    if (addr_type != nullptr) {
-        *addr_type = BLE_ADDR_PUBLIC;
+    if (addrType != nullptr) {
+        *addrType = BLE_ADDR_PUBLIC;
     }
     return 0;
 }

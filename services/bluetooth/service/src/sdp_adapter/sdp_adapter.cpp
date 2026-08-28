@@ -37,26 +37,26 @@ SdpAdapter &SdpAdapter::GetInstance()
     static SdpAdapter instance;
     return instance;
 }
-static void sdp_search_callback(bt_status_t status, const STACK::RawAddress &bd_addr,
-    const Uuid &uuid_in, int count, bluetooth_sdp_record *records)
+static void sdp_search_callback(BtStackStatus status, const STACK::RawAddress &bdAddr,
+    const Uuid &uuid_in, int count, BluetoothSdpRecord *records)
 {
     for (int i = 0; i < count || i == 0; i++) {
         // when status = 1 (BTA_SDP_FAILURE), records is defult(not null), count = 0.
-        bluetooth_sdp_record *record = &records[i];
-        SdpFoundEventPublishHelper::PublishSdpFoundEvent(static_cast<int32_t>(status), bd_addr.ToString(),
+        BluetoothSdpRecord *record = &records[i];
+        SdpFoundEventPublishHelper::PublishSdpFoundEvent(static_cast<int32_t>(status), bdAddr.ToString(),
             uuid_in.ToString(), (i < (count - 1)) ? true : false, record);
         if (uuid_in.ToString() == UUID_MAP_MNS.ToString()) {
             if (SdpAdapter::GetInstance().GetMapMnsSdpFoundCallback() == nullptr) {
                 return;
             }
             MapMnsSdpFoundRecord foundRecord{static_cast<int32_t>(status),
-                record->mns.hdr.rfcomm_channel_number,
-                record->mns.hdr.l2cap_psm,
-                record->mns.hdr.profile_version,
-                record->mns.supported_features,
-                bd_addr.ToString(),
+                record->mns.hdr.rfcommChannelNumber,
+                record->mns.hdr.l2capPsm,
+                record->mns.hdr.profileVersion,
+                record->mns.supportedFeatures,
+                bdAddr.ToString(),
                 UUID_MAP_MNS.ToString(),
-                record->hdr.service_name_length > 0 ? record->mas.hdr.service_name : "",
+                record->hdr.serviceNameLength > 0 ? record->mas.hdr.serviceName : "",
                 i < (count - 1) ? true : false};
             SdpAdapter::GetInstance().GetMapMnsSdpFoundCallback()(foundRecord);
         } else if (uuid_in.ToString() == UUID_OBEX_OBJECT_PUSH.ToString()) {
@@ -64,42 +64,42 @@ static void sdp_search_callback(bt_status_t status, const STACK::RawAddress &bd_
                 return;
             }
             OppSdpFoundRecord foundRecord{static_cast<int32_t>(status),
-                record->ops.hdr.rfcomm_channel_number,
-                record->ops.hdr.l2cap_psm,
-                record->ops.hdr.profile_version,
-                ServiceUtil::AddrFromStack(bd_addr).GetAddress(),
+                record->ops.hdr.rfcommChannelNumber,
+                record->ops.hdr.l2capPsm,
+                record->ops.hdr.profileVersion,
+                ServiceUtil::AddrFromStack(bdAddr).GetAddress(),
                 UUID_OBEX_OBJECT_PUSH.ToString(),
-                record->ops.hdr.service_name_length > 0 ? record->ops.hdr.service_name : "",
+                record->ops.hdr.serviceNameLength > 0 ? record->ops.hdr.serviceName : "",
                 i < (count - 1) ? true : false};
             SdpAdapter::GetInstance().GetOppSdpFoundCallback()(foundRecord);
         }
     }
 }
-btsdp_callbacks_t g_bluetoothSdpCallbacks = {sizeof(g_bluetoothSdpCallbacks), sdp_search_callback};
+BtsdpCallbacks g_bluetoothSdpCallbacks = {sizeof(g_bluetoothSdpCallbacks), sdp_search_callback};
 
 int32_t SdpAdapter::CreatePbapPseSdpRecord(const PbapPseSdpCreateParam &param)
 {
     if (!bluetoothSdpInterface_) {
         return -1;
     }
-    bluetooth_sdp_record record = {};
+    BluetoothSdpRecord record = {};
     record.pse.hdr.type = SDP_TYPE_PBAP_PSE;
     if (param.name != nullptr) {
-        record.pse.hdr.service_name = const_cast<char *>(param.name);
-        record.pse.hdr.service_name_length = strlen(param.name);
+        record.pse.hdr.serviceName = const_cast<char *>(param.name);
+        record.pse.hdr.serviceNameLength = strlen(param.name);
     } else {
-        record.pse.hdr.service_name = nullptr;
-        record.pse.hdr.service_name_length = 0;
+        record.pse.hdr.serviceName = nullptr;
+        record.pse.hdr.serviceNameLength = 0;
     }
-    record.pse.hdr.rfcomm_channel_number = param.channel;
-    record.pse.hdr.l2cap_psm = param.l2capPsm;
-    record.pse.hdr.profile_version = param.version;
+    record.pse.hdr.rfcommChannelNumber = param.channel;
+    record.pse.hdr.l2capPsm = param.l2capPsm;
+    record.pse.hdr.profileVersion = param.version;
 
-    record.pse.supported_features = param.features;
-    record.pse.supported_repositories = param.supportedRepositories;
+    record.pse.supportedFeatures = param.features;
+    record.pse.supportedRepositories = param.supportedRepositories;
 
     int32_t handle = -1;
-    int32_t ret = bluetoothSdpInterface_->create_sdp_record(&record, &handle);
+    int32_t ret = bluetoothSdpInterface_->createSdpRecord(&record, &handle);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("create_sdp_record error");
     }
@@ -112,25 +112,25 @@ int32_t SdpAdapter::CreateMapMasSdpRecord(const MapMasSdpCreateParam &param)
     if (!bluetoothSdpInterface_) {
         return -1;
     }
-    bluetooth_sdp_record record = {};
+    BluetoothSdpRecord record = {};
     record.mas.hdr.type = SDP_TYPE_MAP_MAS;
     if (param.name != nullptr) {
-        record.mas.hdr.service_name = const_cast<char *>(param.name);
-        record.mas.hdr.service_name_length = strlen(param.name);
+        record.mas.hdr.serviceName = const_cast<char *>(param.name);
+        record.mas.hdr.serviceNameLength = strlen(param.name);
     } else {
-        record.mas.hdr.service_name = nullptr;
-        record.mas.hdr.service_name_length = 0;
+        record.mas.hdr.serviceName = nullptr;
+        record.mas.hdr.serviceNameLength = 0;
     }
-    record.mas.hdr.rfcomm_channel_number = param.channel;
-    record.mas.hdr.l2cap_psm = param.l2capPsm;
-    record.mas.hdr.profile_version = param.version;
+    record.mas.hdr.rfcommChannelNumber = param.channel;
+    record.mas.hdr.l2capPsm = param.l2capPsm;
+    record.mas.hdr.profileVersion = param.version;
 
-    record.mas.mas_instance_id = param.masId;
-    record.mas.supported_features = param.features;
-    record.mas.supported_message_types = param.msgTypes;
+    record.mas.masInstanceId = param.masId;
+    record.mas.supportedFeatures = param.features;
+    record.mas.supportedMessageTypes = param.msgTypes;
 
     int32_t handle = -1;
-    int32_t ret = bluetoothSdpInterface_->create_sdp_record(&record, &handle);
+    int32_t ret = bluetoothSdpInterface_->createSdpRecord(&record, &handle);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("create_sdp_record error");
     }
@@ -143,21 +143,21 @@ int32_t SdpAdapter::CreateOppSdpRecord(const OppSdpCreateParam &param)
     if (!bluetoothSdpInterface_) {
         return -1;
     }
-    bluetooth_sdp_record record = {};
+    BluetoothSdpRecord record = {};
     record.ops.hdr.type = SDP_TYPE_OPP_SERVER;
     if (param.name != nullptr) {
-        record.ops.hdr.service_name = param.name;
-        record.ops.hdr.service_name_length = strlen(param.name);
+        record.ops.hdr.serviceName = param.name;
+        record.ops.hdr.serviceNameLength = strlen(param.name);
     } else {
-        record.ops.hdr.service_name = nullptr;
-        record.ops.hdr.service_name_length = 0;
+        record.ops.hdr.serviceName = nullptr;
+        record.ops.hdr.serviceNameLength = 0;
     }
-    record.ops.hdr.rfcomm_channel_number = param.channel;
-    record.ops.hdr.l2cap_psm = param.l2capPsm;
-    record.ops.hdr.profile_version = param.version;
+    record.ops.hdr.rfcommChannelNumber = param.channel;
+    record.ops.hdr.l2capPsm = param.l2capPsm;
+    record.ops.hdr.profileVersion = param.version;
 
     int32_t handle = -1;
-    int32_t ret = bluetoothSdpInterface_->create_sdp_record(&record, &handle);
+    int32_t ret = bluetoothSdpInterface_->createSdpRecord(&record, &handle);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("create_sdp_record error");
     }
@@ -170,7 +170,7 @@ bool SdpAdapter::RemoveSdpRecord(int32_t handle)
         return false;
     }
 
-    int32_t ret = bluetoothSdpInterface_->remove_sdp_record(handle);
+    int32_t ret = bluetoothSdpInterface_->removeSdpRecord(handle);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("remove_sdp_record error");
         return false;
@@ -185,7 +185,7 @@ bool SdpAdapter::StartRemoteSdpSearch(const std::string &address, const std::str
     }
     STACK::RawAddress rawAddress;
     STACK::RawAddress::FromString(address, rawAddress);
-    int32_t ret = bluetoothSdpInterface_->sdp_search(&rawAddress, Uuid::ConvertFromString(uuid));
+    int32_t ret = bluetoothSdpInterface_->sdpSearch(&rawAddress, Uuid::ConvertFromString(uuid));
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("sdp_search error");
         return false;
@@ -215,13 +215,13 @@ OppSdpFoundCallback SdpAdapter::GetOppSdpFoundCallback()
 
 SdpAdapter::SdpAdapter()
 {
-    bt_interface_t *bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
+    BtInterface *bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
     if (bluetoothInterface == nullptr) {
         HILOGE("bluetoothInterface in nullptr");
         return;
     }
-    bluetoothSdpInterface_ = static_cast<btsdp_interface_t *>(
-        const_cast<void *>(bluetoothInterface->get_profile_interface(BT_PROFILE_SDP_CLIENT_ID)));
+    bluetoothSdpInterface_ = static_cast<BtsdpInterface *>(
+        const_cast<void *>(bluetoothInterface->getProfileInterface(BT_PROFILE_SDP_CLIENT_ID)));
     if (bluetoothSdpInterface_ != nullptr) {
         bluetoothSdpInterface_->init(&g_bluetoothSdpCallbacks);
     } else {

@@ -22,16 +22,16 @@
 
 #include "bt_types.h"
 
-typedef enum {
+enum BtifCtrlState {
     BTIF_CTRL_STATE_ON = 0,
     BTIF_CTRL_STATE_OFF,
-} btif_ctrl_state_t;
+};
 
-inline int btif_get_address_type(const RawAddress &bd_addr, uint8_t *addr_type)
+inline int BtifGetAddressType(const RawAddress &bdAddr, uint8_t *addrType)
 {
-    (void)bd_addr;
-    if (addr_type != nullptr) {
-        *addr_type = BLE_ADDR_PUBLIC;
+    (void)bdAddr;
+    if (addrType != nullptr) {
+        *addrType = BLE_ADDR_PUBLIC;
     }
     return 0;
 }

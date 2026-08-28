@@ -98,13 +98,13 @@ public:
 
 class SongInfo {
 public:
-    std::string media_id;
+    std::string mediaId;
     std::string title;
     std::string artist;
     std::string album;
     std::string genre;
-    int track_num = -1;
-    int num_tracks = -1;
+    int trackNum = -1;
+    int numTracks = -1;
     int duration = -1;
     std::set<AttributeEntry> attributes;
 };
@@ -113,7 +113,7 @@ class MediaPlayerInfo {
 public:
     uint16_t id;
     std::string name;
-    bool browsing_supported;
+    bool browsingSupported;
 };
 
 class ListItem {

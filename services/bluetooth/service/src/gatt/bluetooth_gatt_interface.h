@@ -49,12 +49,12 @@ public:
     class GattServerObserver {
     public:
         virtual ~GattServerObserver() = default;
-        // status is tGATT_STATUS in gatt_api.h
+        // status is GattStatus in gatt_api.h
         virtual void RegisterServerCallback(int status, int serverIf, const Uuid &appUuid) {}
         // connId is a logic connection id (index + serverIf), ervey application has it's own connId
         virtual void ConnectionCallback(
             int connId, int serverIf, int connected, const STACK::RawAddress &bda, int reason) {}
-        virtual void ServiceAddedCallback(int status, int serverIf, std::vector<btgatt_db_element_t> service) {}
+        virtual void ServiceAddedCallback(int status, int serverIf, std::vector<BtgattDbElement> service) {}
         virtual void ServiceStoppedCallback(int status, int serverIf, int serviceHandle) {}
         virtual void ServiceDeletedCallback(int status, int serverIf, int serviceHandle) {}
         virtual void RequestReadCharacteristicCallback(int connId, int transId, const STACK::RawAddress &bda,
@@ -81,7 +81,7 @@ public:
     class GattClientObserver {
     public:
         virtual ~GattClientObserver() = default;
-        // status is tGATT_STATUS in gatt_api.h
+        // status is GattStatus in gatt_api.h
         virtual void RegisterClientCallback(int status, int clientIf, const Uuid &appUuid) {}
         virtual void ConnectCallback(
             int connId, int status, int clientIf, const STACK::RawAddress &bda) {}
@@ -90,18 +90,18 @@ public:
         virtual void CancelOpenCallback(int connId, int status, int clientIf, const STACK::RawAddress &bda) {}
         virtual void SearchCompleteCallback(int connId, int status) {}
         virtual void RegisterForNotificationCallback(int connId, int registered, int status, uint16_t handle) {}
-        virtual void NotifyCallback(int connId, const btgatt_notify_params_t &data) {}
-        // "data->status" is equal "status", "data->value_type" is always 0, means GATTC_READ_VALUE_TYPE_VALUE
-        virtual void ReadCharacteristicCallback(int connId, int status, btgatt_read_params_t *pData) {}
+        virtual void NotifyCallback(int connId, const BtgattNotifyParams &data) {}
+        // "data->status" is equal "status", "data->valueType" is always 0, means GATTC_READ_VALUE_TYPE_VALUE
+        virtual void ReadCharacteristicCallback(int connId, int status, BtgattReadParams *pData) {}
         virtual void WriteCharacteristicCallback(int connId, int status, uint16_t handle,
-            const btgatt_rsp_params_t &rspContext) {}
-        virtual void ReadDescriptorCallback(int connId, int status, const btgatt_read_params_t &data) {}
+            const BtgattRspParams &rspContext) {}
+        virtual void ReadDescriptorCallback(int connId, int status, const BtgattReadParams &data) {}
         virtual void WriteDescriptorCallback(int connId, int status, uint16_t handle) {}
         virtual void ExecuteWriteCallback(int connId, int status) {}
         virtual void ConfigureMtuCallback(int connId, int status, int mtu) {}
-        virtual void GetGattDbCallback(int connId, const btgatt_db_element_t* db, int count) {}
+        virtual void GetGattDbCallback(int connId, const BtgattDbElement* db, int count) {}
         virtual void ServicesRemovedCallback(int connId, uint16_t startHandle, uint16_t endHandle) {}
-        virtual void ServicesAddedCallback(int connId, const btgatt_db_element_t &added, int addedCount) {}
+        virtual void ServicesAddedCallback(int connId, const BtgattDbElement &added, int addedCount) {}
         virtual void ConnUpdatedCallback(int connId, uint16_t interval, uint16_t latency, uint16_t timeout,
             uint8_t status) {}
         virtual void ServicesChangedCallback(int connId) {}
@@ -112,7 +112,7 @@ public:
     };
 
     static BluetoothGattInterface *GetInstance(void);
-    bool Initialize(const btgatt_interface_t *gattInterface);
+    bool Initialize(const BtgattInterface *gattInterface);
 
     void AddScannerObserver(ScannerObserver &observer);
     void RemoveScannerObserver(ScannerObserver &observer);
@@ -129,7 +129,7 @@ private:
     BluetoothGattInterface();
     ~BluetoothGattInterface() = default;
 
-    const btgatt_interface_t *gattInterface_ = nullptr;
+    const BtgattInterface *gattInterface_ = nullptr;
 
     BT_DISALLOW_COPY_AND_ASSIGN(BluetoothGattInterface);
 };

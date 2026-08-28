@@ -128,12 +128,12 @@ void ParamUpdateEventManager::HandleParamUpdate()
 void ParamUpdateEventManager::DoBtParamUpdate()
 {
     auto btInterface = AdapterManager::GetInstance()->getBluetoothInterface();
-    if (btInterface == nullptr || btInterface->get_profile_interface == nullptr) {
+    if (btInterface == nullptr || btInterface->getProfileInterface == nullptr) {
         HILOGE("Failed to get btInterface");
         return;
     }
-    const bthwif_interface_t *bthwInterface =
-        reinterpret_cast<const bthwif_interface_t*>(btInterface->get_profile_interface(BT_VENDER_INTERFACE_ID));
+    const BthwifInterface *bthwInterface =
+        reinterpret_cast<const BthwifInterface*>(btInterface->getProfileInterface(BT_VENDER_INTERFACE_ID));
     if (bthwInterface == nullptr || bthwInterface->hwDynamicConfig == nullptr) {
         HILOGE("Failed to get bthwInterface");
         return;

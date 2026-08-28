@@ -311,7 +311,7 @@ bool HfpHfStateMachine::ProcessConnectEvent()
         "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
     HILOGI("[HFP_STATE_MACHINE]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t status = bluetoothHfInterface->connect(&rawAddr);
+    BtStackStatus status = bluetoothHfInterface->connect(&rawAddr);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]Failed connect, status: %{public}d", status);
         return false;
@@ -329,7 +329,7 @@ bool HfpHfStateMachine::ProcessDisconnectEvent()
         "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
     HILOGI("[HFP_STATE_MACHINE]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t status = bluetoothHfInterface->disconnect(&rawAddr);
+    BtStackStatus status = bluetoothHfInterface->disconnect(&rawAddr);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]Failed disconnect, status: %{public}d", status);
         return false;
@@ -353,7 +353,7 @@ bool HfpHfStateMachine::ProcessConnectScoEvent()
         "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
     HILOGI("[HFP_STATE_MACHINE]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t status = bluetoothHfInterface->connect_audio(&rawAddr);
+    BtStackStatus status = bluetoothHfInterface->connectAudio(&rawAddr);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]Failed connect sco, status: %{public}d", status);
         return false;
@@ -369,7 +369,7 @@ bool HfpHfStateMachine::ProcessDisconnectScoEvent()
         "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
     HILOGI("[HFP_STATE_MACHINE]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t status = bluetoothHfInterface->disconnect_audio(&rawAddr);
+    BtStackStatus status = bluetoothHfInterface->disconnectAudio(&rawAddr);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]Failed disonnect sco, status: %{public}d", status);
         return false;
@@ -388,7 +388,7 @@ void HfpHfStateMachine::ProcessSetHfVolume(int volume, int type)
     STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
-    bt_status_t status = bluetoothHfInterface->volume_control(&rawAddr, (bthf_client_volume_type_t)type, volume);
+    BtStackStatus status = bluetoothHfInterface->volumeControl(&rawAddr, (BthfClientVolumeType)type, volume);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]Failed ProcessSetHfVolume");
     } else {
@@ -413,7 +413,7 @@ void HfpHfStateMachine::ProcessFinishActiveCall(const HfpHfMessage &event)
         return;
     }
 
-    HandleCallAction((bthf_client_call_action_t)action, HFP_HF_FINISH_CALL_EVT);
+    HandleCallAction((BthfClientCallAction)action, HFP_HF_FINISH_CALL_EVT);
 }
 
 void HfpHfStateMachine::ProcessDialCall(const HfpHfMessage &event)
@@ -423,7 +423,7 @@ void HfpHfStateMachine::ProcessDialCall(const HfpHfMessage &event)
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
     std::string number = event.calls_.GetNumber();
-    bt_status_t status = bluetoothHfInterface->dial(&rawAddr, number.c_str());
+    BtStackStatus status = bluetoothHfInterface->dial(&rawAddr, number.c_str());
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]Failed DisConnect");
     } else {
@@ -441,7 +441,7 @@ void HfpHfStateMachine::ProcessOpenVoiceRecognition()
         STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
         CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
-        bt_status_t status = bluetoothHfInterface->start_voice_recognition(&rawAddr);
+        BtStackStatus status = bluetoothHfInterface->startVoiceRecognition(&rawAddr);
         if (status != BT_STATUS_SUCCESS) {
             HILOGE("[HFP_STATE_MACHINE]can't open the voice recognition!");
         } else {
@@ -457,7 +457,7 @@ void HfpHfStateMachine::ProcessCloseVoiceRecognition()
         STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
         CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
-        bt_status_t status = bluetoothHfInterface->stop_voice_recognition(&rawAddr);
+        BtStackStatus status = bluetoothHfInterface->stopVoiceRecognition(&rawAddr);
         if (status != BT_STATUS_SUCCESS) {
             HILOGE("[HFP_STATE_MACHINE]can't close the voice recognition!");
         } else {
@@ -472,8 +472,8 @@ void HfpHfStateMachine::ProcessBatteryLevelUpdate(int batteryLevel)
     STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
-    bt_status_t status =
-        bluetoothHfInterface->send_at_cmd(&rawAddr, HANDSFREECLIENT_AT_CMD_BIEV, 2, batteryLevel, NULL);
+    BtStackStatus status =
+        bluetoothHfInterface->sendAtCmd(&rawAddr, HANDSFREECLIENT_AT_CMD_BIEV, 2, batteryLevel, NULL);
     if (status !=BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]ProcessBatteryLevelUpdate Fail!");
     } else {
@@ -499,7 +499,7 @@ void HfpHfStateMachine::ProcessRejectCall()
         return;
     }
 
-    HandleCallAction((bthf_client_call_action_t)action, HFP_HF_REJECT_CALL_EVT);
+    HandleCallAction((BthfClientCallAction)action, HFP_HF_REJECT_CALL_EVT);
 }
 
 void HfpHfStateMachine::PrecessSendDtmf(int flag)
@@ -508,7 +508,7 @@ void HfpHfStateMachine::PrecessSendDtmf(int flag)
     STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
-    bt_status_t status = bluetoothHfInterface->send_dtmf(&rawAddr, flag);
+    BtStackStatus status = bluetoothHfInterface->sendDtmf(&rawAddr, flag);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]Send dtmf failed");
     } else {
@@ -523,8 +523,8 @@ void HfpHfStateMachine::PrecessSendKeyPressed()
     STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
-    bt_status_t status =
-        bluetoothHfInterface->send_at_cmd(&rawAddr, HANDSFREECLIENT_AT_CMD_VENDOR_SPECIFIC_CMD, 0, 0, ckpd);
+    BtStackStatus status =
+        bluetoothHfInterface->sendAtCmd(&rawAddr, HANDSFREECLIENT_AT_CMD_VENDOR_SPECIFIC_CMD, 0, 0, ckpd);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]Send ckpd failed");
     } else {
@@ -543,7 +543,7 @@ void HfpHfStateMachine::ProcessHoldCall()
         }
     }
 
-    HandleCallAction((bthf_client_call_action_t)action, HFP_HF_HOLD_CALL_EVT);
+    HandleCallAction((BthfClientCallAction)action, HFP_HF_HOLD_CALL_EVT);
 }
 
 void HfpHfStateMachine::ProcessAcceptCall(int flag)
@@ -593,7 +593,7 @@ void HfpHfStateMachine::ProcessAcceptCall(int flag)
         return;
     }
 
-    HandleCallAction((bthf_client_call_action_t)action, HFP_HF_ACCEPT_CALL_EVT);
+    HandleCallAction((BthfClientCallAction)action, HFP_HF_ACCEPT_CALL_EVT);
 
     if (flag == HFP_HF_ACCEPT_CALL_ACTION_HOLD) {
         SetAudioConnectionState(true);
@@ -606,7 +606,7 @@ void HfpHfStateMachine::HandleCallAction(int action, int event)
     STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
-    bt_status_t status = bluetoothHfInterface->handle_call_action(&rawAddr, (bthf_client_call_action_t)action, 0);
+    BtStackStatus status = bluetoothHfInterface->handleCallAction(&rawAddr, (BthfClientCallAction)action, 0);
     if (status == BT_STATUS_SUCCESS) {
         queuedActions.push(event);
         HILOGE("[HFP_STATE_MACHINE]Send action success[%{public}d]", action);
@@ -936,7 +936,7 @@ void HfpHfStateMachine::ProcessNetworkStateEvent(const HfpHfMessage &event)
         STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(rawAddress);
         CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
-        bt_status_t status = bluetoothHfInterface->query_current_operator_name(&rawAddr);
+        BtStackStatus status = bluetoothHfInterface->queryCurrentOperatorName(&rawAddr);
         if (status != BT_STATUS_SUCCESS) {
             HILOGE("[HFP_STATE_MACHINE]can't query the operator name!");
         } else {
@@ -1015,7 +1015,7 @@ void HfpHfStateMachine::ProcessCallIndicatorEvent(const HfpHfMessage &event)
     STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
-    bt_status_t status = bluetoothHfInterface->query_current_calls(&rawAddr);
+    BtStackStatus status = bluetoothHfInterface->queryCurrentCalls(&rawAddr);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]can't query the current calls!");
     } else {
@@ -1046,7 +1046,7 @@ void HfpHfStateMachine::ProcessSlcEstablished(const HfpHfMessage &event)
 
     if (HANDSFREECLIENT_NREC_SUPPORTED && ((static_cast<uint32_t>(peerFeatures_) &
         HFP_HF_AG_FEATURES_ECNR) == HFP_HF_AG_FEATURES_ECNR)) {
-        bt_status_t status = bluetoothHfInterface->send_at_cmd(&rawAddr, HANDSFREECLIENT_AT_CMD_NREC, 1, 0, NULL);
+        BtStackStatus status = bluetoothHfInterface->sendAtCmd(&rawAddr, HANDSFREECLIENT_AT_CMD_NREC, 1, 0, NULL);
         if (status != BT_STATUS_SUCCESS) {
             HILOGE("[HFP_STATE_MACHINE]Failed to send NREC!");
         } else {
@@ -1056,7 +1056,7 @@ void HfpHfStateMachine::ProcessSlcEstablished(const HfpHfMessage &event)
     int volume = BluetoothAudioFrameworkAdapter::GetStreamVolume(STREAM_VOICE_CALL);
     ProcessSetHfVolume(volume, HFP_HF_VOLUME_TYPE_SPK);
 
-    bt_status_t subscriberStatus = bluetoothHfInterface->retrieve_subscriber_info(&rawAddr);
+    BtStackStatus subscriberStatus = bluetoothHfInterface->retrieveSubscriberInfo(&rawAddr);
     if (subscriberStatus != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_STATE_MACHINE]Failed to retrieve subscriber info!");
     } else {

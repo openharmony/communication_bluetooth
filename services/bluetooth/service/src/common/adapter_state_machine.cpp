@@ -101,14 +101,14 @@ void AdapterTurningOnState::Entry()
     if (AdapterManager::GetInstance()->GetState(otherTransport) == BTStateID::STATE_TURN_OFF) {
         HILOGI("[ADAPTER_STATE_MACHINE]AdapterTurningOnState, enable bluetooth stack, transport = %{public}d",
             transport);
-        bt_interface_t* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
+        BtInterface* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
         if (bluetoothInterface == nullptr) {
             HILOGE("bluetoothInterface is nullptr, abort enable");
             DoInAdapterManagerThread([this] { this->Transition(TURNING_OFF_STATE); });
             return;
         }
-        const bthwif_interface_t *bthwif = reinterpret_cast<const bthwif_interface_t *>(
-            bluetoothInterface->get_profile_interface(BT_VENDER_INTERFACE_ID));
+        const BthwifInterface *bthwif = reinterpret_cast<const BthwifInterface *>(
+            bluetoothInterface->getProfileInterface(BT_VENDER_INTERFACE_ID));
         if (bthwif == nullptr) {
             HILOGW("Failed to get bthwif interface handle");
             DoInAdapterManagerThread([this] { this->Transition(TURNING_OFF_STATE); });
@@ -284,7 +284,7 @@ bool AdapterTurningOffState::HandleDisableAdapterCompleteEvent(bool isClassicAda
     if (AdapterManager::GetInstance()->GetState(otherTransport) == BTStateID::STATE_TURN_OFF) {
         HILOGI("[ADAPTER_STATE_MACHINE]AdapterTurningOffState, disable stack, isClassicAdapter is %{public}d",
             isClassicAdapter);
-        bt_interface_t* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
+        BtInterface* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
         if (bluetoothInterface == nullptr) {
             return false;
         }

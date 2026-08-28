@@ -531,8 +531,8 @@ public:
      */
     void ActiveDevice();
 
-    btav_source_interface_t* getBluetoothA2dpSrcInterface() const;
-    btav_sink_interface_t* getBluetoothA2dpSnkInterface() const;
+    BtavSourceInterface* getBluetoothA2dpSrcInterface() const;
+    BtavSinkInterface* getBluetoothA2dpSnkInterface() const;
 
     /**
      * @brief Notify media stack changed.
@@ -582,7 +582,7 @@ public:
     bool IsInCloudBondingState(const RawAddress &device) const;
     bool ProcCloudDeviceConnect(const RawAddress &device);
     void NotifyConnStateChanged(const RawAddress &device, int state, int cause);
-    void NotifyBondStateChanged(bt_status_t status, const RawAddress &device, bt_bond_state_t state);
+    void NotifyBondStateChanged(BtStackStatus status, const RawAddress &device, BtBondState state);
     bool IsA2dpSceneChanged(bool isRenderStreamChanged, bool anyRenderRunning, CodecChangeAppScene lastScene);
     void SetA2dpPlayingStateCallback(std::function<void(int)> callbackFunction);
     void HandleA2dpPlayingStateChange(int state);
@@ -761,12 +761,12 @@ private:
      * @since 21
      */
     int ConnectDeviceMax(const RawAddress &device, const std::string &callingName);
-    void ConvertCodecConfig(btav_a2dp_codec_config_t &codec_config, const A2dpSrcCodecInfo &codecInfo);
+    void ConvertCodecConfig(BtavA2dpCodecConfig &codecConfig, const A2dpSrcCodecInfo &codecInfo);
     void ClearAvrcpLoadedMap();
     bool SubscribeCommonEvent();
     int IsLocalDeviceConnectAllowed(const RawAddress &device);
 
-    std::vector<btav_a2dp_codec_config_t> prepareCodecPreferences();
+    std::vector<BtavA2dpCodecConfig> prepareCodecPreferences();
 
     class ReceiveMessage : public OHOS::EventFwk::CommonEventSubscriber {
     public:
@@ -797,8 +797,8 @@ private:
     bool isNavigationRunning_ = false;
     utility::SafeVector<std::string> virtualDevices_ = {};
 
-    btav_source_interface_t* sBluetoothA2dpSrcInterface = nullptr;
-    btav_sink_interface_t* sBluetoothA2dpSnkInterface = nullptr;
+    BtavSourceInterface* sBluetoothA2dpSrcInterface = nullptr;
+    BtavSinkInterface* sBluetoothA2dpSnkInterface = nullptr;
     const std::string NULL_ADDRESS {""};
     const std::string EMPTY_ADDRESS {"00:00:00:00:00:00"};
     utility::SafeVector<std::string> hdfLoadedDevice_ = {};
@@ -827,7 +827,7 @@ private:
  */
 A2dpService *GetServiceInstance(uint8_t role);
 
-void PreferenceL2hcStCodec(std::vector<btav_a2dp_codec_config_t> &codec_preferences);
+void PreferenceL2hcStCodec(std::vector<BtavA2dpCodecConfig> &codecPreferences);
 }  // namespace bluetooth
 }  // namespace OHOS
 #endif  // A2DP_SERVICE_H

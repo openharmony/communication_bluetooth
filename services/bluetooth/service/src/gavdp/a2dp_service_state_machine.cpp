@@ -86,7 +86,7 @@ bool A2dpDisconnected::Dispatch(const utility::Message &msg)
         return false;
     }
 
-    btav_source_interface_t* bluetoothA2dpSrcInterface = service->getBluetoothA2dpSrcInterface();
+    BtavSourceInterface* bluetoothA2dpSrcInterface = service->getBluetoothA2dpSrcInterface();
     CHECK_AND_RETURN_LOG_RET(bluetoothA2dpSrcInterface, false, "bluetoothA2dpSrcInterface is nullptr");
 
     switch (msg.what_) {
@@ -139,7 +139,7 @@ bool A2dpDisconnecting::Dispatch(const utility::Message &msg)
         return false;
     }
 
-    btav_source_interface_t* bluetoothA2dpSrcInterface = service->getBluetoothA2dpSrcInterface();
+    BtavSourceInterface* bluetoothA2dpSrcInterface = service->getBluetoothA2dpSrcInterface();
     CHECK_AND_RETURN_LOG_RET(bluetoothA2dpSrcInterface, false, "bluetoothA2dpSrcInterface is nullptr");
 
     switch (msg.what_) {
@@ -175,9 +175,9 @@ bool A2dpConnected::Dispatch(const utility::Message &msg)
         HILOGE("[A2dpConnected] service is null");
         return false;
     }
-    btav_source_interface_t* bluetoothA2dpSrcInterface = service->getBluetoothA2dpSrcInterface();
+    BtavSourceInterface* bluetoothA2dpSrcInterface = service->getBluetoothA2dpSrcInterface();
     CHECK_AND_RETURN_LOG_RET(bluetoothA2dpSrcInterface, false, "bluetoothA2dpSrcInterface is nullptr");
-    const bthwif_interface_t *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG_RET(bluetoothHwSrcInterface, false, "bluetoothHwSrcInterface interface nullptr");
 
     std::shared_ptr<A2dpDeviceInfo> deviceInfo = service->GetDeviceFromList(device);
@@ -265,7 +265,7 @@ bool A2dpConnecting::Dispatch(const utility::Message &msg)
         HILOGE("[A2dpConnected] Can't get the service of a2dp");
         return BT_STATUS_FAIL;
     }
-    btav_source_interface_t* bluetoothA2dpSrcInterface = service->getBluetoothA2dpSrcInterface();
+    BtavSourceInterface* bluetoothA2dpSrcInterface = service->getBluetoothA2dpSrcInterface();
     CHECK_AND_RETURN_LOG_RET(bluetoothA2dpSrcInterface, false, "bluetoothA2dpSrcInterface is nullptr");
 
     switch (msg.what_) {

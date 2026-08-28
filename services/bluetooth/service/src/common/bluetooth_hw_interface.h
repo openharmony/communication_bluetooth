@@ -78,9 +78,9 @@ public:
     };
 
     static BluetoothHwInterface *GetInstance(void);
-    bool InitBtHwInterface(const bthwif_interface_t *bthwif);
-    const bthwif_interface_t* GetBtHwInterface(void);
-    void SetBtHwInterface(const bthwif_interface_t* interface);
+    bool InitBtHwInterface(const BthwifInterface *bthwif);
+    const BthwifInterface* GetBtHwInterface(void);
+    void SetBtHwInterface(const BthwifInterface* interface);
     void AddSensorhubObserver(SensorhubObserver &observer);
     void RemoveSensorhubObserver(SensorhubObserver &observer);
     void CleanHfpScoOccupied(const RawAddress &device);
@@ -107,11 +107,11 @@ private:
     BluetoothHwInterface();
     ~BluetoothHwInterface() = default;
 
-    const bthwif_interface_t *bthwInterface_ = nullptr;
+    const BthwifInterface *bthwInterface_ = nullptr;
 
     BT_DISALLOW_COPY_AND_ASSIGN(BluetoothHwInterface);
 };
-    void StackErrnoCallback(bt_status_t status, STACK::RawAddress *addr, BtStackErrno state);
+    void StackErrnoCallback(BtStackStatus status, STACK::RawAddress *addr, BtStackErrno state);
     void HwHdapConnectCallback(STACK::RawAddress *bdAddr, bool isConnected, uint8_t featureBit,
         HdapConfigCallback config);
     void HwProfileStateCallback(STACK::RawAddress *addr, uint8_t a2dpState,

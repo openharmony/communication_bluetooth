@@ -25,9 +25,9 @@
 namespace OHOS {
 namespace bluetooth {
 
-static bool ConvertAudioConfigCodecPriority(btav_a2dp_codec_config_t codec_config, A2dpSrcCodecInfo &codecInfo)
+static bool ConvertAudioConfigCodecPriority(BtavA2dpCodecConfig codecConfig, A2dpSrcCodecInfo &codecInfo)
 {
-    A2dpCodecPriority a2dpCodecPriority = static_cast<A2dpCodecPriority>(codec_config.codec_priority);
+    A2dpCodecPriority a2dpCodecPriority = static_cast<A2dpCodecPriority>(codecConfig.codecPriority);
     switch (a2dpCodecPriority) {
         case A2DP_CODEC_PRIORITY_DISABLED:
             codecInfo.codecPriority = A2DP_CODEC_PRIORITY_DISABLED_USER;
@@ -55,15 +55,15 @@ static bool ConvertAudioConfigCodecPriority(btav_a2dp_codec_config_t codec_confi
             break;
         default:
             codecInfo.codecPriority = A2DP_CODEC_PRIORITY_DEFAULT_USER;
-            HILOGE("codec_priority is error param");
+            HILOGE("codecPriority is error param");
             break;
     }
     return true;
 }
 
-static bool ConvertAudioConfigCodecType(btav_a2dp_codec_config_t codec_config, A2dpSrcCodecInfo &codecInfo)
+static bool ConvertAudioConfigCodecType(BtavA2dpCodecConfig codecConfig, A2dpSrcCodecInfo &codecInfo)
 {
-    switch (codec_config.codec_type) {
+    switch (codecConfig.codecType) {
         case BTAV_A2DP_CODEC_INDEX_SOURCE_SBC:
             codecInfo.codecType = A2DP_CODEC_TYPE_SBC_USER;
             break;
@@ -80,22 +80,22 @@ static bool ConvertAudioConfigCodecType(btav_a2dp_codec_config_t codec_config, A
             codecInfo.codecType = A2DP_CODEC_TYPE_L2HCST_USER;
             break;
         default:
-            HILOGE("codec_type is error param");
+            HILOGE("codecType is error param");
             return false;
     }
     return true;
 }
 
-static bool ConvertAudioConfigCodecSampleRate(btav_a2dp_codec_config_t codec_config, A2dpSrcCodecInfo &codecInfo)
+static bool ConvertAudioConfigCodecSampleRate(BtavA2dpCodecConfig codecConfig, A2dpSrcCodecInfo &codecInfo)
 {
-    A2dpCodecSampleRate a2dpCodecSampleRate = static_cast<A2dpCodecSampleRate>(codec_config.sample_rate);
+    A2dpCodecSampleRate a2dpCodecSampleRate = static_cast<A2dpCodecSampleRate>(codecConfig.sampleRate);
     switch (a2dpCodecSampleRate) {
         case A2DP_CODEC_SAMPLE_RATE_96000:
             codecInfo.sampleRate = A2DP_L2HCV2_SAMPLE_RATE_96000_USER;
             break;
         case A2DP_CODEC_SAMPLE_RATE_48000:
             codecInfo.sampleRate = A2DP_SBC_SAMPLE_RATE_48000_USER;
-            if (codec_config.codec_type == BTAV_A2DP_CODEC_INDEX_SOURCE_L2HC_V2) {
+            if (codecConfig.codecType == BTAV_A2DP_CODEC_INDEX_SOURCE_L2HC_V2) {
                 codecInfo.sampleRate = A2DP_L2HCV2_SAMPLE_RATE_48000_USER;
             }
             break;
@@ -113,15 +113,15 @@ static bool ConvertAudioConfigCodecSampleRate(btav_a2dp_codec_config_t codec_con
                                    A2DP_L2HCV2_SAMPLE_RATE_96000_USER;
             break;
         default:
-            HILOGE("sample_rate is error param");
+            HILOGE("sampleRate is error param");
             return false;
     }
     return true;
 }
 
-static bool ConvertAudioConfigCodecBitsPer(btav_a2dp_codec_config_t codec_config, A2dpSrcCodecInfo &codecInfo)
+static bool ConvertAudioConfigCodecBitsPer(BtavA2dpCodecConfig codecConfig, A2dpSrcCodecInfo &codecInfo)
 {
-    switch (codec_config.bits_per_sample) {
+    switch (codecConfig.bitsPerSample) {
         case BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16:
             codecInfo.bitsPerSample = A2DP_SAMPLE_BITS_16_USER;
             break;
@@ -132,27 +132,27 @@ static bool ConvertAudioConfigCodecBitsPer(btav_a2dp_codec_config_t codec_config
             codecInfo.bitsPerSample = A2DP_SAMPLE_BITS_32_USER;
             break;
         default:
-            if (codec_config.bits_per_sample ==
+            if (codecConfig.bitsPerSample ==
                 (BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16 | BTAV_A2DP_CODEC_BITS_PER_SAMPLE_24)) {
                 codecInfo.bitsPerSample = A2DP_SAMPLE_BITS_16_USER | A2DP_SAMPLE_BITS_24_USER;
                 return true;
             }
-            if (codec_config.bits_per_sample ==
+            if (codecConfig.bitsPerSample ==
                 (BTAV_A2DP_CODEC_BITS_PER_SAMPLE_16 | BTAV_A2DP_CODEC_BITS_PER_SAMPLE_24 |
                 BTAV_A2DP_CODEC_BITS_PER_SAMPLE_32)) {
                 codecInfo.bitsPerSample =
                     A2DP_SAMPLE_BITS_16_USER | A2DP_SAMPLE_BITS_24_USER | A2DP_SAMPLE_BITS_32_USER;
                 return true;
             }
-            HILOGE("bits_per_sample is error param");
+            HILOGE("bitsPerSample is error param");
             return false;
     }
     return true;
 }
 
-static bool ConvertAudioConfigCodecChannelMode(btav_a2dp_codec_config_t codec_config, A2dpSrcCodecInfo &codecInfo)
+static bool ConvertAudioConfigCodecChannelMode(BtavA2dpCodecConfig codecConfig, A2dpSrcCodecInfo &codecInfo)
 {
-    A2dpCodecChannelMode a2dpCodecChannelMode = static_cast<A2dpCodecChannelMode>(codec_config.channel_mode);
+    A2dpCodecChannelMode a2dpCodecChannelMode = static_cast<A2dpCodecChannelMode>(codecConfig.channelMode);
     switch (a2dpCodecChannelMode) {
         case A2DP_CODEC_CHANNEL_MODE_STEREO:
             codecInfo.channelMode = A2DP_SBC_CHANNEL_MODE_STEREO_USER;
@@ -170,33 +170,33 @@ static bool ConvertAudioConfigCodecChannelMode(btav_a2dp_codec_config_t codec_co
     return true;
 }
 
-bool ConvertAudioConfigCodec(btav_a2dp_codec_config_t codec_config, A2dpSrcCodecInfo &codecInfo)
+bool ConvertAudioConfigCodec(BtavA2dpCodecConfig codecConfig, A2dpSrcCodecInfo &codecInfo)
 {
-    HILOGD("codec_priority:%{public}d, codec_type:%{public}d, sample_rate:%{public}d,"
+    HILOGD("codecPriority:%{public}d, codecType:%{public}d, sampleRate:%{public}d,"
         "bitPerSample:%{public}d, channelMode:%{public}d",
-        codec_config.codec_priority, codec_config.codec_type, codec_config.sample_rate,
-        codec_config.bits_per_sample, codec_config.channel_mode);
-    codecInfo.codecPriority = static_cast<uint32_t>(codec_config.codec_priority);
+        codecConfig.codecPriority, codecConfig.codecType, codecConfig.sampleRate,
+        codecConfig.bitsPerSample, codecConfig.channelMode);
+    codecInfo.codecPriority = static_cast<uint32_t>(codecConfig.codecPriority);
     bool ret = true;
-    ret = ConvertAudioConfigCodecPriority(codec_config, codecInfo);
+    ret = ConvertAudioConfigCodecPriority(codecConfig, codecInfo);
     if (!ret) {
         return false;
     }
-    ret = ConvertAudioConfigCodecType(codec_config, codecInfo);
+    ret = ConvertAudioConfigCodecType(codecConfig, codecInfo);
     if (!ret) {
         return false;
     }
-    ret = ConvertAudioConfigCodecSampleRate(codec_config, codecInfo);
+    ret = ConvertAudioConfigCodecSampleRate(codecConfig, codecInfo);
     if (!ret) {
         return false;
     }
-    ret = ConvertAudioConfigCodecBitsPer(codec_config, codecInfo);
+    ret = ConvertAudioConfigCodecBitsPer(codecConfig, codecInfo);
     if (!ret) {
         return false;
     }
-    ret = ConvertAudioConfigCodecChannelMode(codec_config, codecInfo);
-    codecInfo.codecSpecific3 = static_cast<uint64_t>(codec_config.codec_specific_3);
-    codecInfo.codecSpecific4 = static_cast<uint64_t>(codec_config.codec_specific_4);
+    ret = ConvertAudioConfigCodecChannelMode(codecConfig, codecInfo);
+    codecInfo.codecSpecific3 = static_cast<uint64_t>(codecConfig.codecSpecific3);
+    codecInfo.codecSpecific4 = static_cast<uint64_t>(codecConfig.codecSpecific4);
     if (!ret) {
         return false;
     } else {
@@ -204,26 +204,26 @@ bool ConvertAudioConfigCodec(btav_a2dp_codec_config_t codec_config, A2dpSrcCodec
     }
 }
 
-bool ConvertL2hcV2Bitrate(btav_a2dp_codec_config_t &codec_config, const A2dpSrcCodecInfo &codecInfo)
+bool ConvertL2hcV2Bitrate(BtavA2dpCodecConfig &codecConfig, const A2dpSrcCodecInfo &codecInfo)
 {
     switch (codecInfo.codecSpecific4) {
         case A2DP_L2HCV2_BIT_RATE_320K:
-            codec_config.codec_specific_4 = CodecCommon::L2HCV2_USER_RATE_LOW;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCV2_USER_RATE_LOW;
             break;
         case A2DP_L2HCV2_BIT_RATE_640K:
-            codec_config.codec_specific_4 = CodecCommon::L2HCV2_USER_RATE_MID;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCV2_USER_RATE_MID;
             break;
         case A2DP_L2HCV2_BIT_RATE_960K:
-            codec_config.codec_specific_4 = CodecCommon::L2HCV2_USER_RATE_HIGH;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCV2_USER_RATE_HIGH;
             break;
         case A2DP_L2HCV2_BIT_RATE_AUTO_RATE:
-            codec_config.codec_specific_4 = CodecCommon::L2HCV2_USER_AUTO_RATE;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCV2_USER_AUTO_RATE;
             break;
         case A2DP_L2HCV2_BIT_RATE_1500K:
-            codec_config.codec_specific_4 = CodecCommon::L2HCV2_USER_RATE_LOSSLESS;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCV2_USER_RATE_LOSSLESS;
             break;
         case A2DP_L2HCV2_BIT_RATE_2300K:
-            codec_config.codec_specific_4 = CodecCommon::L2HCV2_USER_RATE_2MBPS;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCV2_USER_RATE_2MBPS;
             break;
         default:
             HILOGE("L2HCV2 bitrate is error param");
@@ -232,35 +232,35 @@ bool ConvertL2hcV2Bitrate(btav_a2dp_codec_config_t &codec_config, const A2dpSrcC
     return true;
 }
 
-bool ConvertL2hcStBitrate(btav_a2dp_codec_config_t &codec_config, const A2dpSrcCodecInfo &codecInfo)
+bool ConvertL2hcStBitrate(BtavA2dpCodecConfig &codecConfig, const A2dpSrcCodecInfo &codecInfo)
 {
     switch (codecInfo.codecSpecific4) {
         case A2DP_L2HCST_BIT_RATE_96K:
-            codec_config.codec_specific_4 = CodecCommon::L2HCST_USER_RATE_96K;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCST_USER_RATE_96K;
             break;
         case A2DP_L2HCST_BIT_RATE_128K:
-            codec_config.codec_specific_4 = CodecCommon::L2HCST_USER_RATE_128K;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCST_USER_RATE_128K;
             break;
         case A2DP_L2HCST_BIT_RATE_192K:
-            codec_config.codec_specific_4 = CodecCommon::L2HCST_USER_RATE_192K;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCST_USER_RATE_192K;
             break;
         case A2DP_L2HCST_BIT_RATE_256K:
-            codec_config.codec_specific_4 = CodecCommon::L2HCST_USER_RATE_256K;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCST_USER_RATE_256K;
             break;
         case A2DP_L2HCST_BIT_RATE_320K:
-            codec_config.codec_specific_4 = CodecCommon::L2HCST_USER_RATE_320K;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCST_USER_RATE_320K;
             break;
         case A2DP_L2HCST_BIT_RATE_480K:
-            codec_config.codec_specific_4 = CodecCommon::L2HCST_USER_RATE_480K;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCST_USER_RATE_480K;
             break;
         case A2DP_L2HCST_BIT_RATE_640K:
-            codec_config.codec_specific_4 = CodecCommon::L2HCST_USER_RATE_640K;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCST_USER_RATE_640K;
             break;
         case A2DP_L2HCST_BIT_RATE_960K:
-            codec_config.codec_specific_4 = CodecCommon::L2HCST_USER_RATE_960K;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCST_USER_RATE_960K;
             break;
         case A2DP_L2HCST_BIT_RATE_AUTO_RATE:
-            codec_config.codec_specific_4 = CodecCommon::L2HCST_USER_AUTO_RATE;
+            codecConfig.codecSpecific4 = CodecCommon::L2HCST_USER_AUTO_RATE;
             break;
         default:
             HILOGE("L2HCST bitrate is error param");

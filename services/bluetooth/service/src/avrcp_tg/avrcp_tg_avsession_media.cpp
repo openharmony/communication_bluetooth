@@ -439,7 +439,7 @@ void AvrcpMediaInterfaceImpl::impl::GetNowPlayingList(NowPlayingCallback cb)
     if (!GetCurrSongInfo(song)) {
         HILOGE("GetCurrSongInfo failed.");
     }
-    mediaId = song.media_id;
+    mediaId = song.mediaId;
     songs.emplace_back(song);
 
     cb(mediaId, std::move(songs));
@@ -450,7 +450,7 @@ void AvrcpMediaInterfaceImpl::impl::GetMediaPlayerList(MediaListCallback cb)
     MediaPlayerInfo player;
     player.id = 0;
     player.name = "Bluetooth Player";
-    player.browsing_supported = false;
+    player.browsingSupported = false;
     players.emplace_back(player);
     HILOGI("players size: %{public}d.", players.size());
     cb(0, std::move(players));
@@ -790,7 +790,7 @@ bool AvrcpMediaInterfaceImpl::impl::GetCurrSongInfo(SongInfo &song)
         std::shared_ptr<CoverArt> coverArt = std::make_shared<CoverArt>(pixelMap);
         handle = AvrcpCoverArtStorage::GetInstance()->StoreImage(coverArt);
     }
-    song.media_id = data.GetAssetId();
+    song.mediaId = data.GetAssetId();
     song.attributes.clear();
     if (data.GetSingleLyricText() != "") {
         song.attributes.insert(

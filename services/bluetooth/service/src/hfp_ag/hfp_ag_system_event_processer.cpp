@@ -216,9 +216,9 @@ void HfpAgSystemEventProcesser::ProcessPhoneStateChange(const HfpAgPhoneState &p
         return;
     }
     HILOGI("[HFP_EVENT_PROCESSER]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t result = bluetoothHfpInterface->PhoneStateChange(numActive, numHeld,
-        (::bluetooth::headset::bthf_call_state_t)CovertCallStateToBluetdroid(callState), number.c_str(),
-        (::bluetooth::headset::bthf_call_addrtype_t)type, name.c_str(), &rawAddr);
+    BtStackStatus result = bluetoothHfpInterface->PhoneStateChange(numActive, numHeld,
+        (::bluetooth::headset::BthfCallState)CovertCallStateToBluetdroid(callState), number.c_str(),
+        (::bluetooth::headset::BthfCallAddrtype)type, name.c_str(), &rawAddr);
     if (result != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_EVENT_PROCESSER]Failed ProcessPhoneStateChange, status: %{public}d", result);
         return;
@@ -522,8 +522,8 @@ void HfpAgSystemEventProcesser::ProcessAtCindCmdEvent(int call, int callsetup, i
     int signal = systemInterface_.GetSignalStrength();
     int roam = systemInterface_.GetRoamState();
     int battery = systemInterface_.GetBatteryLevel();
-    bt_status_t result = bluetoothHfpInterface->CindResponse(status, call, callheld,
-        static_cast<::bluetooth::headset::bthf_call_state_t>(callsetup), signal, roam, battery,
+    BtStackStatus result = bluetoothHfpInterface->CindResponse(status, call, callheld,
+        static_cast<::bluetooth::headset::BthfCallState>(callsetup), signal, roam, battery,
         &rawAddr);
     if (result != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_EVENT_PROCESSER]Failed CindResponse, status: %{public}d", result);
@@ -564,7 +564,7 @@ void HfpAgSystemEventProcesser::GetNetworkOperator() const
     }
     HILOGI("[HFP_EVENT_PROCESSER]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
     networkOperator = TruncateString(networkOperator, MAX_COPS_LENGTH);
-    bt_status_t result = bluetoothHfpInterface->CopsResponse(networkOperator.c_str(), &rawAddr);
+    BtStackStatus result = bluetoothHfpInterface->CopsResponse(networkOperator.c_str(), &rawAddr);
     if (result != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_EVENT_PROCESSER]Failed CopsResponse, status: %{public}d", result);
         return;
@@ -615,12 +615,12 @@ void HfpAgSystemEventProcesser::ProcessClccResponseCmd(HfpAgCallList callList) c
     if (!number.empty()) {
         type = GetPhoneNumberType(number);
     }
-    bt_status_t result = bluetoothHfpInterface->ClccResponse(index,
-        (::bluetooth::headset::bthf_call_direction_t)dir,
-        (::bluetooth::headset::bthf_call_state_t)state,
-        (::bluetooth::headset::bthf_call_mode_t)mode,
+    BtStackStatus result = bluetoothHfpInterface->ClccResponse(index,
+        (::bluetooth::headset::BthfCallDirection)dir,
+        (::bluetooth::headset::BthfCallState)state,
+        (::bluetooth::headset::BthfCallMode)mode,
         mpty ? (::bluetooth::headset::BTHF_CALL_MPTY_TYPE_MULTI) : (::bluetooth::headset::BTHF_CALL_MPTY_TYPE_SINGLE),
-        number.c_str(), (::bluetooth::headset::bthf_call_addrtype_t)type, &rawAddr);
+        number.c_str(), (::bluetooth::headset::BthfCallAddrtype)type, &rawAddr);
     if (result != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_EVENT_PROCESSER]Failed ClccResponse, status: %{public}d", result);
         return;
@@ -863,16 +863,16 @@ bool HfpAgSystemEventProcesser::ProcessTalkBandSetRequestCommand(const std::stri
 static void SetHwDeviceInfo(RemoteDeviceProperties* remoteDeviceProp, std::string cmdType, std::string cmdValue,
     RawAddress device)
 {
-    static std::map<std::string, bt_property_type_t> devicePropertiesTable {
-        {VALUE_OF_DEVICE_INFO_NAME, bt_property_type_t::BT_PROPERTY_BDNAME},
-        {VALUE_OF_DEVICE_INFO_VENDOR_ID, bt_property_type_t::BT_PROPERTY_VENDOR_ID},
-        {VALUE_OF_DEVICE_INFO_PRODUCT_ID, bt_property_type_t::BT_PROPERTY_PRODUCT_ID},
-        {VALUE_OF_DEVICE_INFO_VERSION, bt_property_type_t::BT_PROPERTY_NAME_CHANGE_VERSION},
-        {VALUE_OF_DEVICE_INFO_NEW_MODEL_ID, bt_property_type_t::BT_PROPERTY_REMOTE_NEW_MODEL_ID},
-        {VALUE_OF_DEVICE_INFO_MODEL_ID, bt_property_type_t::BT_PROPERTY_REMOTE_MODEL_ID},
-        {VALUE_OF_DEVICE_CLASS_COD, bt_property_type_t::BT_PROPERTY_CLASS_OF_DEVICE},
-        {VALUE_OF_DEVICE_ICON, bt_property_type_t::BT_PROPERTY_DEVICE_INFO},
-        {VALUE_OF_DEVICE_TYPE_ID, bt_property_type_t::BT_PROPERTY_DEVICE_TYPE_ID}
+    static std::map<std::string, BtPropertyType> devicePropertiesTable {
+        {VALUE_OF_DEVICE_INFO_NAME, BtPropertyType::BT_PROPERTY_BDNAME},
+        {VALUE_OF_DEVICE_INFO_VENDOR_ID, BtPropertyType::BT_PROPERTY_VENDOR_ID},
+        {VALUE_OF_DEVICE_INFO_PRODUCT_ID, BtPropertyType::BT_PROPERTY_PRODUCT_ID},
+        {VALUE_OF_DEVICE_INFO_VERSION, BtPropertyType::BT_PROPERTY_NAME_CHANGE_VERSION},
+        {VALUE_OF_DEVICE_INFO_NEW_MODEL_ID, BtPropertyType::BT_PROPERTY_REMOTE_NEW_MODEL_ID},
+        {VALUE_OF_DEVICE_INFO_MODEL_ID, BtPropertyType::BT_PROPERTY_REMOTE_MODEL_ID},
+        {VALUE_OF_DEVICE_CLASS_COD, BtPropertyType::BT_PROPERTY_CLASS_OF_DEVICE},
+        {VALUE_OF_DEVICE_ICON, BtPropertyType::BT_PROPERTY_DEVICE_INFO},
+        {VALUE_OF_DEVICE_TYPE_ID, BtPropertyType::BT_PROPERTY_DEVICE_TYPE_ID}
     };
     auto iter = devicePropertiesTable.find(cmdType);
     if (iter == devicePropertiesTable.end()) {
@@ -888,7 +888,7 @@ void HfpAgSystemEventProcesser::UpdateHwDeviceInfo(const std::string &deviceName
     RawAddress device(address_);
     STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
     int32_t result = RemoteDeviceProperties::GetInstance()->GetRemoteDeviceProperty(rawAddr,
-        bt_property_type_t::BT_PROPERTY_TIMESTAMP);
+        BtPropertyType::BT_PROPERTY_TIMESTAMP);
     CHECK_AND_RETURN_LOG(result == BT_STATUS_SUCCESS, "get timestamp failed");
     int32_t timeStamp = INVALID_VALUE;
     if (!ConvertStrToDigit(deviceTimeStamp, timeStamp, HEX_STRING_TO_INT)) {
@@ -902,11 +902,11 @@ void HfpAgSystemEventProcesser::UpdateHwDeviceInfo(const std::string &deviceName
     HILOGI("timeStamp: %{public}d, localTimeStamp: %{public}d", timeStamp, localTimeStamp);
     if (timeStamp > localTimeStamp) {
         RemoteDeviceProperties::GetInstance()->SetRemoteDevicePropertyInfo(device,
-            bt_property_type_t::BT_PROPERTY_BDNAME, deviceName);
+            BtPropertyType::BT_PROPERTY_BDNAME, deviceName);
         RemoteDeviceProperties::GetInstance()->SetRemoteDevicePropertyInfo(device,
-            bt_property_type_t::BT_PROPERTY_REMOTE_FRIENDLY_NAME, deviceName);
+            BtPropertyType::BT_PROPERTY_REMOTE_FRIENDLY_NAME, deviceName);
         RemoteDeviceProperties::GetInstance()->SetRemoteDevicePropertyInfo(device,
-            bt_property_type_t::BT_PROPERTY_TIMESTAMP, deviceTimeStamp);
+            BtPropertyType::BT_PROPERTY_TIMESTAMP, deviceTimeStamp);
     } else if (timeStamp < localTimeStamp) {
         if (deviceTimestamp_.empty()) {
             deviceTimestamp_ = DexToHexString(localTimeStamp);
@@ -1213,8 +1213,8 @@ void HfpAgSystemEventProcesser::ProcessAtResponseCodeEvent(int responseCode, int
         return;
     }
     HILOGI("[HFP_EVENT_PROCESSER]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t result = bluetoothHfpInterface->AtResponse(
-        static_cast<::bluetooth::headset::bthf_at_response_t>(responseCode), errorCode, &rawAddr);
+    BtStackStatus result = bluetoothHfpInterface->AtResponse(
+        static_cast<::bluetooth::headset::BthfAtResponse>(responseCode), errorCode, &rawAddr);
     if (result != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_EVENT_PROCESSER]Failed AtResponseCode, status: %{public}d", result);
         return;
@@ -1233,7 +1233,7 @@ void HfpAgSystemEventProcesser::ProcessAtResponseStringEvent(const std::string &
         return;
     }
     HILOGI("[HFP_EVENT_PROCESSER]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t result = bluetoothHfpInterface->FormattedAtResponse(response.c_str(), &rawAddr);
+    BtStackStatus result = bluetoothHfpInterface->FormattedAtResponse(response.c_str(), &rawAddr);
     if (result != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_EVENT_PROCESSER]Failed AtResponseString, status: %{public}d", result);
         return;
@@ -1258,9 +1258,9 @@ void HfpAgSystemEventProcesser::NotifyDeviceStatusChangedEvent()
     HILOGI("Hfp device address: %{public}s, serviceState: %{public}d, signalStrength: %{public}d,"
         " roamState: %{public}d, batteryLevel: %{public}d",
         GET_ENCRYPT_STR_ADDR(address_), serviceState, signalStrength, roamState, batteryLevel);
-    bt_status_t result = bluetoothHfpInterface->DeviceStatusNotification(
-        static_cast<::bluetooth::headset::bthf_network_state_t>(serviceState),
-        static_cast<::bluetooth::headset::bthf_service_type_t>(roamState), signalStrength, batteryLevel, &rawAddr);
+    BtStackStatus result = bluetoothHfpInterface->DeviceStatusNotification(
+        static_cast<::bluetooth::headset::BthfNetworkState>(serviceState),
+        static_cast<::bluetooth::headset::BthfServiceType>(roamState), signalStrength, batteryLevel, &rawAddr);
     if (result != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_EVENT_PROCESSER]Failed notify device state, status:%{public}d", result);
         return;
@@ -1286,7 +1286,7 @@ void HfpAgSystemEventProcesser::SendBSIRValueEvent(int action)
         return;
     }
     HILOGI("[HFP_EVENT_PROCESSER]Hfp device address[%{public}s]", GetEncryptAddr(address_).c_str());
-    bt_status_t result = bluetoothHfpInterface->SendBsir(value, &rawAddr);
+    BtStackStatus result = bluetoothHfpInterface->SendBsir(value, &rawAddr);
     if (result != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_EVENT_PROCESSER]Failed send BSIR Value, status: %{public}d", result);
         return;
@@ -1314,7 +1314,7 @@ void HfpAgSystemEventProcesser::ProcessScoVolumeChangedEvent(int volumeType, int
     BtChrUeManager::GetInstance()->WriteVolChangeUe(::bluetooth::headset::BTHF_VOLUME_TYPE_SPK,
         volumeValue, callingName);
     PreferencesManager::Save(address_, volumeValue, PreferencesManagerType::HFP_VOLUME);
-    bt_status_t result = bluetoothHfpInterface->VolumeControl(
+    BtStackStatus result = bluetoothHfpInterface->VolumeControl(
         ::bluetooth::headset::BTHF_VOLUME_TYPE_SPK, volumeValue, &rawAddr);
     if (result != BT_STATUS_SUCCESS) {
         HILOGI("[HFP_EVENT_PROCESSER]Failed volume control, status: %{public}d", result);
@@ -1366,7 +1366,7 @@ void HfpAgSystemEventProcesser::SetScoVolume()
     }
     RawAddress device(address_);
     STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
-    bt_status_t result = bluetoothHfpInterface->VolumeControl(::bluetooth::headset::BTHF_VOLUME_TYPE_SPK,
+    BtStackStatus result = bluetoothHfpInterface->VolumeControl(::bluetooth::headset::BTHF_VOLUME_TYPE_SPK,
         volumeValue, &rawAddr);
     if (result != BT_STATUS_SUCCESS) {
         HILOGE("[HFP_EVENT_PROCESSER]Failed volume control, status: %{public}d", result);

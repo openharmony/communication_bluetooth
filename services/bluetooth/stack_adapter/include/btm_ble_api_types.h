@@ -24,29 +24,29 @@
 
 #include "bt_types.h"
 
-typedef struct {
+struct BleBdAddr {
     uint8_t bda[6];
-    tBLE_ADDR_TYPE addr_type;
-} tBLE_BD_ADDR;
+    BleAddrType addrType;
+};
 
-typedef struct {
-    tBLE_BD_ADDR bd_addr;
-    uint8_t adv_flag;
+struct BleDevInfo {
+    BleBdAddr bdAddr;
+    uint8_t advFlag;
     int8_t rssi;
-} tBLE_DEV_INFO;
+};
 
-typedef enum {
+enum BleConnMode {
     BLE_CONN_MODE_NONE = 0,
     BLE_CONN_MODE_ACTIVE,
     BLE_CONN_MODE_PASSIVE,
-} tBLE_CONN_MODE;
+};
 
-typedef enum {
+enum BleAdvType {
     BLE_HCI_LE_ADV_IND = 0x00,
     BLE_HCI_LE_ADV_DIRECT_IND = 0x01,
     BLE_HCI_LE_ADV_SCAN_IND = 0x02,
     BLE_HCI_LE_ADV_NONCONN_IND = 0x03,
-} tBLE_ADV_TYPE;
+};
 
 /* BTM command success status; the service layer compares the uint8_t status
  * reported by the scan-filter callbacks against it. */

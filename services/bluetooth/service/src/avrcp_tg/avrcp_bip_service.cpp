@@ -44,13 +44,13 @@ BipService::~BipService()
 }
 void BipService::SetBipClientStatus(const RawAddress &rawAddr, bool connected)
 {
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int status = hal_util_load_bt_library(&btInterface);
     if (status != 0 || btInterface == nullptr) {
         HILOGE("Failed to open the Bluetooth module, status = %{public}d.", status);
         return;
     }
-    avrcpServiceInterface_ = btInterface->get_avrcp_service();
+    avrcpServiceInterface_ = btInterface->getAvrcpService();
     if (avrcpServiceInterface_ != nullptr) {
         avrcpServiceInterface_->SetBipClientStatus(ServiceUtil::AddrToStack(rawAddr), connected);
     }

@@ -37,12 +37,12 @@ void AvrcpServiceManager::Init()
 	return;
 #endif
     g_volumeInterface.Init();
-    bt_interface_t *bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
+    BtInterface *bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
     if (bluetoothInterface == nullptr) {
         HILOGE("bluetoothInterface in nullptr");
         return;
     }
-    avrcpServiceInterface_ = bluetoothInterface->get_avrcp_service();
+    avrcpServiceInterface_ = bluetoothInterface->getAvrcpService();
     if (avrcpServiceInterface_) {
         avrcpServiceInterface_->Init(mediaLoader_.get(), &g_volumeInterface);
     }

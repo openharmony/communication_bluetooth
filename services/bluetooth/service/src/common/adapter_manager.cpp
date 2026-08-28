@@ -183,7 +183,7 @@ struct AdapterManager::impl {
 
     class AdaptersContextCallback;
     std::unique_ptr<AdaptersContextCallback> contextCallback_ = nullptr;
-    bt_interface_t* bluetoothInterface = nullptr;
+    BtInterface* bluetoothInterface = nullptr;
     void OnEnable(const std::string &name, bool ret);
     void OnDisable(const std::string &name, bool ret);
     void ProcessMessage(const BTTransport transport, const utility::Message &msg);
@@ -336,7 +336,7 @@ void AdapterManager::ProcessStackDisableCmpMsg()
         DoInAdapterManagerThread([this, msg] {this->pimpl.get()->ProcessMessage(BTTransport::ADAPTER_BLE, msg);});
     }
 }
-void AdapterManager::AdapterStateChangedInner(bt_state_t state)
+void AdapterManager::AdapterStateChangedInner(BtState state)
 {
     HILOGI("[ADAPTER_MANAGER]stack bluetooth switch state = %{public}d", state);
     if (state == BT_STATE_OFF) {
@@ -348,12 +348,12 @@ void AdapterManager::AdapterStateChangedInner(bt_state_t state)
         return;
     }
 }
-void AdapterManager::AdapterStateChangedCb(bt_state_t state)
+void AdapterManager::AdapterStateChangedCb(BtState state)
 {
     AdapterManager::GetInstance()->AdapterStateChangedInner(state);
 }
 
-void AdapterManager::DeviceFoundCb(int numProperties, bt_property_t* properties)
+void AdapterManager::DeviceFoundCb(int numProperties, BtProperty* properties)
 {
     RemoteDeviceProperties* remoteDeviceProperties = RemoteDeviceProperties::GetInstance();
     if (remoteDeviceProperties) {
@@ -361,7 +361,7 @@ void AdapterManager::DeviceFoundCb(int numProperties, bt_property_t* properties)
     }
 }
 
-void AdapterManager::DiscoveryStateChangedCb(bt_discovery_state_t state)
+void AdapterManager::DiscoveryStateChangedCb(BtDiscoveryState state)
 {
     auto classicAdapter = AdapterManager::GetInstance()->GetClassicAdapter();
     if (classicAdapter) {
@@ -369,7 +369,7 @@ void AdapterManager::DiscoveryStateChangedCb(bt_discovery_state_t state)
     }
 }
 
-void AdapterManager::BondStateChangedCb(bt_status_t status, STACK::RawAddress* bdAddr, bt_bond_state_t state)
+void AdapterManager::BondStateChangedCb(BtStackStatus status, STACK::RawAddress* bdAddr, BtBondState state)
 {
     auto classicAdapter = AdapterManager::GetInstance()->GetClassicAdapter();
     if (classicAdapter) {
@@ -379,8 +379,8 @@ void AdapterManager::BondStateChangedCb(bt_status_t status, STACK::RawAddress* b
     }
 }
 
-void AdapterManager::SspRequestCb(STACK::RawAddress* remoteBdAddr, bt_bdname_t* bdName, uint32_t cod,
-    bt_ssp_variant_t pairingVariant, uint32_t passKey)
+void AdapterManager::SspRequestCb(STACK::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
+    BtSspVariant pairingVariant, uint32_t passKey)
 {
     auto classicAdapter = AdapterManager::GetInstance()->GetClassicAdapter();
     if (classicAdapter) {
@@ -403,8 +403,8 @@ static bool CheckIsControlInterceptAllowedAndDisconnect(const std::string addres
     return true;
 }
 
-void AdapterManager::AclStateChangedCb(bt_status_t status, STACK::RawAddress* remoteBdAddr, bt_acl_state_t state,
-    bt_hci_error_code_t hciReason, tBT_TRANSPORT linkTypeCallback)
+void AdapterManager::AclStateChangedCb(BtStackStatus status, STACK::RawAddress* remoteBdAddr, BtAclState state,
+    BtHciErrorCode hciReason, BtTransport linkTypeCallback)
 {
     CHECK_AND_RETURN_LOG(remoteBdAddr, "wrong addr");
     CHECK_AND_RETURN_LOG(status == BT_STATUS_SUCCESS, "Acl Connection fail, hci error code = %{public}u", hciReason);
@@ -455,14 +455,14 @@ void AdapterManager::AclStateChangedCb(bt_status_t status, STACK::RawAddress* re
     HandleCloudBondWhenAclStateChange(device, connectState);
 }
 
-void AdapterManager::AdapterPropertiesCb(bt_status_t status, int numProperties, bt_property_t* properties)
+void AdapterManager::AdapterPropertiesCb(BtStackStatus status, int numProperties, BtProperty* properties)
 {
     AdapterProperties* adapterProperties = AdapterProperties::GetInstance();
     adapterProperties->ParseAdapterProps(status, numProperties, properties);
 }
 
-void AdapterManager::RemoteDevicePropertiesCb(bt_status_t status, STACK::RawAddress* bdAddr,
-    int numProperties, bt_property_t* properties)
+void AdapterManager::RemoteDevicePropertiesCb(BtStackStatus status, STACK::RawAddress* bdAddr,
+    int numProperties, BtProperty* properties)
 {
     RemoteDeviceProperties* remoteDeviceProperties = RemoteDeviceProperties::GetInstance();
     if (remoteDeviceProperties) {
@@ -470,11 +470,11 @@ void AdapterManager::RemoteDevicePropertiesCb(bt_status_t status, STACK::RawAddr
     }
 }
 
-void AdapterManager::ThreadEvtCb(bt_cb_thread_evt evt)
+void AdapterManager::ThreadEvtCb(BtCbThreadEvt evt)
 {
 }
 
-void AdapterManager::PinRequestCb(STACK::RawAddress* remoteBdAddr, bt_bdname_t* bdName, uint32_t cod,
+void AdapterManager::PinRequestCb(STACK::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
     bool min16Digit)
 {
     HILOG_COMM_INFO("PinRequestCb enter");
@@ -488,11 +488,11 @@ void AdapterManager::DutModeRecvCb(uint16_t opcode, uint8_t* buf, uint8_t len)
 {
 }
 
-void AdapterManager::EnergyInfoCb(bt_activity_energy_info* energyInfo, bt_uid_traffic_t* uidData)
+void AdapterManager::EnergyInfoCb(BtActivityEnergyInfo* energyInfo, BtUidTraffic* uidData)
 {
 }
 
-void AdapterManager::SensingStateChangedCb(uint8_t eventId, bt_sensing_info_t* info)
+void AdapterManager::SensingStateChangedCb(uint8_t eventId, BtSensingInfo* info)
 {
     CHECK_AND_RETURN_LOG(info != nullptr, "fail to get sensing info");
     HILOGI("eventId: %{public}d", eventId);
@@ -503,7 +503,7 @@ void AdapterManager::SensingStateChangedCb(uint8_t eventId, bt_sensing_info_t* i
     }
 }
 
-Bluetooth::BluetoothOobData AdapterManager::BuildBluetoothOobData(const bt_oob_data_t &data)
+Bluetooth::BluetoothOobData AdapterManager::BuildBluetoothOobData(const BtStackOobData &data)
 {
     BluetoothOobData outData;
     // data.address数组大小为固定值7
@@ -514,20 +514,20 @@ Bluetooth::BluetoothOobData AdapterManager::BuildBluetoothOobData(const bt_oob_d
     outData.SetConfirmationHash(confirmHash);
     std::vector<uint8_t> randomHash(data.r, data.r + sizeof(data.r) / sizeof(data.r[0]));
     outData.SetRandomizerHash(randomHash);
-    std::string deviceName(reinterpret_cast<const char*>(data.device_name));
+    std::string deviceName(reinterpret_cast<const char*>(data.deviceName));
     if (!deviceName.empty()) {
         outData.SetDeviceName(deviceName);
     }
-    outData.SetDeviceRole(data.le_device_role);
+    outData.SetDeviceRole(data.leDeviceRole);
     return outData;
 }
 
-void AdapterManager::GenerateLocalOobDataCb(tBT_TRANSPORT transport, bt_oob_data_t oobData)
+void AdapterManager::GenerateLocalOobDataCb(BtTransport transport, BtStackOobData oobData)
 {
     HILOGI("transport: %{public}d", ServiceUtil::TransportFromStack(transport));
     int32_t status = BT_STATUS_FAIL;
     BluetoothOobData data;
-    if (oobData.is_valid) {
+    if (oobData.isValid) {
         data = BuildBluetoothOobData(oobData);
         status = BT_STATUS_SUCCESS;
     } else {
@@ -581,31 +581,31 @@ int AdapterManager::ReleaseWakeLockCallout(const char* lockName)
     return BT_STATUS_SUCCESS;
 }
 
-bt_os_callouts_t BluetoothOsCallouts = {
+BtOsCallouts BluetoothOsCallouts = {
     .size = sizeof(BluetoothOsCallouts),
-    .set_wake_alarm = nullptr,
-    .acquire_wake_lock = AdapterManager::AcquireWakeLock,
-    .release_wake_lock = AdapterManager::ReleaseWakeLock,
+    .setWakeAlarm = nullptr,
+    .acquireWakeLock = AdapterManager::AcquireWakeLock,
+    .releaseWakeLock = AdapterManager::ReleaseWakeLock,
 };
 #endif
 
-bt_callbacks_t bt_callbacks {
-/** set to sizeof(bt_callbacks_t) */
-    .size = sizeof(bt_callbacks_t),
-    .adapter_state_changed_cb = AdapterManager::AdapterStateChangedCb,
-    .adapter_properties_cb = AdapterManager::AdapterPropertiesCb,
-    .remote_device_properties_cb = AdapterManager::RemoteDevicePropertiesCb,
-    .device_found_cb = AdapterManager::DeviceFoundCb,
-    .discovery_state_changed_cb = AdapterManager::DiscoveryStateChangedCb,
-    .pin_request_cb = AdapterManager::PinRequestCb,
-    .ssp_request_cb = AdapterManager::SspRequestCb,
-    .bond_state_changed_cb = AdapterManager::BondStateChangedCb,
-    .acl_state_changed_cb = AdapterManager::AclStateChangedCb,
-    .thread_evt_cb = AdapterManager::ThreadEvtCb,
-    .dut_mode_recv_cb = AdapterManager::DutModeRecvCb,
-    .energy_info_cb = AdapterManager::EnergyInfoCb,
-    .generate_local_oob_data_cb = AdapterManager::GenerateLocalOobDataCb,
-    .sensing_state_changed_cb = AdapterManager::SensingStateChangedCb,
+BtCallbacks bt_callbacks {
+/** set to sizeof(BtCallbacks) */
+    .size = sizeof(BtCallbacks),
+    .adapterStateChangedCb = AdapterManager::AdapterStateChangedCb,
+    .adapterPropertiesCb = AdapterManager::AdapterPropertiesCb,
+    .remoteDevicePropertiesCb = AdapterManager::RemoteDevicePropertiesCb,
+    .deviceFoundCb = AdapterManager::DeviceFoundCb,
+    .discoveryStateChangedCb = AdapterManager::DiscoveryStateChangedCb,
+    .pinRequestCb = AdapterManager::PinRequestCb,
+    .sspRequestCb = AdapterManager::SspRequestCb,
+    .bondStateChangedCb = AdapterManager::BondStateChangedCb,
+    .aclStateChangedCb = AdapterManager::AclStateChangedCb,
+    .threadEvtCb = AdapterManager::ThreadEvtCb,
+    .dutModeRecvCb = AdapterManager::DutModeRecvCb,
+    .energyInfoCb = AdapterManager::EnergyInfoCb,
+    .generateLocalOobDataCb = AdapterManager::GenerateLocalOobDataCb,
+    .sensingStateChangedCb = AdapterManager::SensingStateChangedCb,
 };
 
 int AdapterManager::StackInit()
@@ -615,7 +615,7 @@ int AdapterManager::StackInit()
     const bool isCommonCriteriaMode = false;
     int configCompareResult = 0;
     bool isAtv = false;
-    int status = hal_util_load_bt_library((const bt_interface_t**)&(pimpl->bluetoothInterface));
+    int status = hal_util_load_bt_library((const BtInterface**)&(pimpl->bluetoothInterface));
     if (status) {
         HILOGE("Failed to open the Bluetooth stack");
         return BT_STATUS_FAIL;
@@ -635,7 +635,7 @@ int AdapterManager::StackInit()
         return BT_STATUS_FAIL;
     }
 #ifdef COMMUNICATION_L2
-    ret= pimpl->bluetoothInterface->set_os_callouts(&BluetoothOsCallouts);
+    ret= pimpl->bluetoothInterface->setOsCallouts(&BluetoothOsCallouts);
     HILOGI("set_os_callouts");
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("weaklocal Init fail!");
@@ -1376,7 +1376,7 @@ void AdapterManager::OnAdapterStateChange(const BTTransport transport, const BTS
 
 void AdapterManager::SetHighPower() const
 {
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int status = hal_util_load_bt_library(&btInterface);
     if (status != 0) {
         HILOGE("Failed to open the Bluetooth module, status = %{public}d.", status);
@@ -1391,7 +1391,7 @@ void AdapterManager::SetHighPower() const
     auto iter = find(highPowerV2Chip.begin(), highPowerV2Chip.end(), chipType);
     if (iter != highPowerV2Chip.end()) {
         HILOGI("High Power On");
-        btInterface->enable_bluetooth_highpower(true);
+        btInterface->enableBluetoothHighpower(true);
     }
 #ifdef BLUETOOTH_HIGHPOWERV1_ENABLE
     else {
@@ -1675,18 +1675,18 @@ bool AdapterManager::IsBetaVersion() const
 
 void AdapterManager::EnableHisiPcm(bool state) const
 {
-    const bthwif_interface_t *bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
+    const BthwifInterface *bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bthwif != nullptr, "bthwif is nullptr");
     bthwif->hwEnableHisiPcm(state);
 }
 
-bt_interface_t* AdapterManager::getBluetoothInterface() const
+BtInterface* AdapterManager::getBluetoothInterface() const
 {
     return pimpl->bluetoothInterface;
 }
 
 // only used for TDD use case
-void AdapterManager::setBluetoothInterface(bt_interface_t *interface) const
+void AdapterManager::setBluetoothInterface(BtInterface *interface) const
 {
     pimpl->bluetoothInterface = interface;
 }
@@ -1966,7 +1966,7 @@ void AdapterManager::HandleCloudBondWhenAclStateChange(const RawAddress &device,
 }
 
 int AdapterManager::HandleAclStateChanged(std::shared_ptr<BluetoothDevice> remoteDevice, const RawAddress &device,
-    STACK::RawAddress *remoteBdAddr, bt_acl_state_t state)
+    STACK::RawAddress *remoteBdAddr, BtAclState state)
 {
     int connectState = CONNECTION_STATE_CONNECTED;
     if (remoteDevice == nullptr || remoteBdAddr == nullptr) {
@@ -1979,7 +1979,7 @@ int AdapterManager::HandleAclStateChanged(std::shared_ptr<BluetoothDevice> remot
             remoteDevice->GetRssi(),
             remoteDevice->GetDeviceClass());
         RemoteDeviceProperties::GetInstance()->GetRemoteDeviceProperty(
-            *remoteBdAddr, static_cast<bt_property_type_t>(BT_PROPERTY_REMOTE_VERSION_INFO));
+            *remoteBdAddr, static_cast<BtPropertyType>(BT_PROPERTY_REMOTE_VERSION_INFO));
         SaveConnectionTime(device);
         CloudDeviceManager::GetInstance()->StopBtAclTimer(device);
     } else {

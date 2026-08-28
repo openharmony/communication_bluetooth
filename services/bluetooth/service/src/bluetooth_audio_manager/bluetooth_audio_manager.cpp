@@ -564,7 +564,7 @@ int BluetoothAudioManager::SendDeviceSelection(const RawAddress &address, int us
 {
     HILOGI("address: %{public}s, useA2dp: %{public}d, useHfp: %{public}d, userSelection: %{public}d",
         GET_ENCRYPT_ADDR(address), useA2dp, useHfp, userSelection);
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int status = hal_util_load_bt_library(&btInterface);
     if (status) {
         HILOGE("Failed to open the Bluetooth module, status = %{public}d. ", status);
@@ -574,8 +574,8 @@ int BluetoothAudioManager::SendDeviceSelection(const RawAddress &address, int us
     StopOffloadWhenA2dpReleased(address, useA2dp);
     ProcessAudioRenderListenerWhenUserSelect(useA2dp);
     STACK::RawAddress device = ServiceUtil::AddrToStack(address);
-    const bthwif_interface_t *bthwif =
-        reinterpret_cast<const bthwif_interface_t*>(btInterface->get_profile_interface(BT_VENDER_INTERFACE_ID));
+    const BthwifInterface *bthwif =
+        reinterpret_cast<const BthwifInterface*>(btInterface->getProfileInterface(BT_VENDER_INTERFACE_ID));
     if (bthwif == nullptr) {
         HILOGE("Failed to get bthwif interface handle.");
         return BT_ERR_INTERNAL_ERROR;

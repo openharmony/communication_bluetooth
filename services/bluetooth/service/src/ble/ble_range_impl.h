@@ -82,7 +82,7 @@ private:
     void StoreRangingAntSwitchInfo(uint8_t macID, uint8_t antID);
     void ParseAdvPowerAntFromConfig(cJSON* configItem);
 
-    const bt_interface_t* btInterface_;
+    const BtInterface* btInterface_;
     std::shared_ptr<SatelliteManager> satelliteManager_;
 
     std::mutex rangingMutex_;

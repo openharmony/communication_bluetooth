@@ -29,45 +29,45 @@ class Interface {
 public:
     virtual ~Interface() = default;
 
-    virtual bt_status_t Init(Callbacks *callbacks, int maxHfClients,
+    virtual BtStackStatus Init(Callbacks *callbacks, int maxHfClients,
                              bool inbandRingingEnabled) = 0;
     virtual void Cleanup() = 0;
-    virtual bt_status_t Connect(RawAddress *bdAddr) = 0;
-    virtual bt_status_t Disconnect(RawAddress *bdAddr) = 0;
-    virtual bt_status_t ConnectAudio(RawAddress *bdAddr) = 0;
-    virtual bt_status_t DisconnectAudio(RawAddress *bdAddr) = 0;
-    virtual bt_status_t StartVoiceRecognition(RawAddress *bdAddr) = 0;
-    virtual bt_status_t StopVoiceRecognition(RawAddress *bdAddr) = 0;
-    virtual bt_status_t VolumeControl(bthf_volume_type_t type, int volume,
+    virtual BtStackStatus Connect(RawAddress *bdAddr) = 0;
+    virtual BtStackStatus Disconnect(RawAddress *bdAddr) = 0;
+    virtual BtStackStatus ConnectAudio(RawAddress *bdAddr) = 0;
+    virtual BtStackStatus DisconnectAudio(RawAddress *bdAddr) = 0;
+    virtual BtStackStatus StartVoiceRecognition(RawAddress *bdAddr) = 0;
+    virtual BtStackStatus StopVoiceRecognition(RawAddress *bdAddr) = 0;
+    virtual BtStackStatus VolumeControl(BthfVolumeType type, int volume,
                                       RawAddress *bdAddr) = 0;
-    virtual bt_status_t CopsResponse(const char *cops, RawAddress *bdAddr) = 0;
-    virtual bt_status_t CindResponse(int svc, int num_active, int num_held,
-                                     bthf_call_state_t call_setup, int signal,
+    virtual BtStackStatus CopsResponse(const char *cops, RawAddress *bdAddr) = 0;
+    virtual BtStackStatus CindResponse(int svc, int num_active, int num_held,
+                                     BthfCallState call_setup, int signal,
                                      int roam, int batt_chg,
                                      RawAddress *bdAddr) = 0;
-    virtual bt_status_t FormattedAtResponse(const char *rsp,
+    virtual BtStackStatus FormattedAtResponse(const char *rsp,
                                             RawAddress *bdAddr) = 0;
-    virtual bt_status_t AtResponse(bthf_at_response_t response_code,
+    virtual BtStackStatus AtResponse(BthfAtResponse response_code,
                                    int error_code, RawAddress *bdAddr) = 0;
-    virtual bt_status_t ClccResponse(int index, bthf_call_direction_t dir,
-                                     bthf_call_state_t state,
-                                     bthf_call_mode_t mode,
-                                     bthf_call_mpty_type_t mpty,
+    virtual BtStackStatus ClccResponse(int index, BthfCallDirection dir,
+                                     BthfCallState state,
+                                     BthfCallMode mode,
+                                     BthfCallMptyType mpty,
                                      const char *number,
-                                     bthf_call_addrtype_t type,
+                                     BthfCallAddrtype type,
                                      RawAddress *bdAddr) = 0;
-    virtual bt_status_t PhoneStateChange(int num_active, int num_held,
-                                         bthf_call_state_t call_state,
+    virtual BtStackStatus PhoneStateChange(int num_active, int num_held,
+                                         BthfCallState call_state,
                                          const char *number,
-                                         bthf_call_addrtype_t type,
+                                         BthfCallAddrtype type,
                                          const char *name,
                                          RawAddress *bdAddr) = 0;
     virtual void SetActiveDevice(RawAddress *bdAddr) = 0;
-    virtual bt_status_t SendBsir(int value, RawAddress *bdAddr) = 0;
-    virtual bt_status_t DeviceStatusNotification(
-        bthf_network_state_t ntk_state, bthf_service_type_t svc_type,
+    virtual BtStackStatus SendBsir(int value, RawAddress *bdAddr) = 0;
+    virtual BtStackStatus DeviceStatusNotification(
+        BthfNetworkState ntk_state, BthfServiceType svc_type,
         int signal, int batt_chg, RawAddress *bdAddr) = 0;
-    virtual bt_status_t isVoiceRecognitionSupported(RawAddress *bdAddr) = 0;
+    virtual BtStackStatus isVoiceRecognitionSupported(RawAddress *bdAddr) = 0;
 };
 
 }  // namespace headset

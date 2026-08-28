@@ -69,7 +69,7 @@ public:
 
   // Copies |from| raw Bluetooth address octets to the local object.
   // Returns the number of copied octets - should be always RawAddress::kLength
-  size_t FromOctets(const uint8_t* from);
+  size_t FromOctets(const uint8_t *from);
 
   std::array<uint8_t, kLength> ToArray() const;
 
@@ -88,22 +88,22 @@ template <>
 struct std::hash<RawAddress> {
   std::size_t operator()(const RawAddress& val) const {
     static_assert(sizeof(uint64_t) >= RawAddress::kLength);
-    uint64_t int_addr = 0;
-    memcpy(reinterpret_cast<uint8_t*>(&int_addr), val.address, RawAddress::kLength);
-    return std::hash<uint64_t>{}(int_addr);
+    uint64_t intAddr = 0;
+    memcpy(reinterpret_cast<uint8_t*>(&intAddr), val.address, RawAddress::kLength);
+    return std::hash<uint64_t>{}(intAddr);
   }
 };
 
 #define BD_ADDR_LEN 6 /* Device address length */
 
-inline void BDADDR_TO_STREAM(uint8_t*& p, const RawAddress& a) {
+inline void BdaddrToStream(uint8_t *&p, const RawAddress& a) {
   for (int ijk = 0; ijk < BD_ADDR_LEN; ijk++) {
     *(p)++ = (uint8_t)(a.address)[BD_ADDR_LEN - 1 - ijk];
   }
 }
 
-inline void STREAM_TO_BDADDR(RawAddress& a, const uint8_t*& p) {
-  uint8_t* pbda = (uint8_t*)(a.address) + BD_ADDR_LEN - 1;
+inline void StreamToBdaddr(RawAddress& a, const uint8_t *&p) {
+  uint8_t *pbda = (uint8_t *)(a.address) + BD_ADDR_LEN - 1;
   for (int ijk = 0; ijk < BD_ADDR_LEN; ijk++) {
     *pbda-- = *(p)++;
   }

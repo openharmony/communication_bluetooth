@@ -31,14 +31,14 @@ BluetoothSyncPairedDev& BluetoothSyncPairedDev::GetInstance()
 
 bool BluetoothSyncPairedDev::SyncPairedDev(std::vector<std::string> &pairedAddr)
 {
-    bt_interface_t *btIf = AdapterManager::GetInstance()->getBluetoothInterface();
+    BtInterface *btIf = AdapterManager::GetInstance()->getBluetoothInterface();
     if (btIf == nullptr) {
         HILOGE("Failed to get bluetooth interface");
         return false;
     }
 
-    const bthwif_interface_t *bthwif =
-        reinterpret_cast<const bthwif_interface_t*>(btIf->get_profile_interface(BT_VENDER_INTERFACE_ID));
+    const BthwifInterface *bthwif =
+        reinterpret_cast<const BthwifInterface*>(btIf->getProfileInterface(BT_VENDER_INTERFACE_ID));
     if (bthwif == nullptr) {
         HILOGE("Failed to get hw bluetooth interface");
         return false;

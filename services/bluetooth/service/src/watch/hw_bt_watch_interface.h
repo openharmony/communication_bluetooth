@@ -47,7 +47,7 @@ class BtHwWatchInterface {
 public:
     virtual ~BtHwWatchInterface() = default;
 
-    virtual bt_status_t init(BtWatchCallbacks *callbacks) = 0;
+    virtual BtStackStatus init(BtWatchCallbacks *callbacks) = 0;
     virtual void updateReconnectState(const STACK::RawAddress &device,
                                       bool isBtOn) = 0;
     virtual void updateDevice(const STACK::RawAddress &device,

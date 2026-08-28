@@ -49,15 +49,15 @@
 #define BT_BD_NAME_LEN 248
 #define BT_PIN_CODE_LEN 16
 
-typedef struct {
+struct BtBdname {
     uint8_t name[BT_BD_NAME_LEN + 1];
-} bt_bdname_t;
+};
 
-typedef struct {
+struct BtPinCode {
     uint8_t pin[BT_PIN_CODE_LEN + 1];
-} bt_pin_code_t;
+};
 
-typedef enum {
+enum BtStackStatus {
     BT_STATUS_SUCCESS = 0,
     BT_STATUS_FAIL,
     BT_STATUS_NOT_READY,
@@ -80,10 +80,10 @@ typedef enum {
     BT_STATUS_ALREADY_CLOSED,
     BT_STATUS_AGAIN,
     BT_STATUS_WAKELOCK_ERROR,
-} bt_status_t;
+};
 
-/* Human readable form of a bt_status_t, used by the service layer logging. */
-inline std::string bt_status_text(const bt_status_t status)
+/* Human readable form of a BtStackStatus, used by the service layer logging. */
+inline std::string BtStatusText(const BtStackStatus status)
 {
     switch (status) {
         case BT_STATUS_SUCCESS:
@@ -103,7 +103,7 @@ inline std::string bt_status_text(const bt_status_t status)
     }
 }
 
-typedef enum {
+enum BtPropertyType {
     BT_PROPERTY_BDNAME = 0x1,
     BT_PROPERTY_BDADDR,
     BT_PROPERTY_UUIDS,
@@ -123,9 +123,9 @@ typedef enum {
     BT_PROPERTY_REMOTE_IS_BEING_PAIRED,
     BT_PROPERTY_REMOTE_DEVICE_TIMESTAMP,
     /* Vendor property types of the stubbed stack; the service layer refers
-     * to them as bt_property_type_t enumerators. */
+     * to them as BtPropertyType enumerators. */
     BT_PROPERTY_AUTO_CONNECT_SWITCH,
-    BT_PROPERTY_ClOUD_CAP,
+    BT_PROPERTY_CLOUD_CAP,
     HW_BT_PROPERTY_ABS_VOLUM_KEY,
     HW_BT_PROPERTY_CUSTOM_TYPE,
     HW_BT_PROPERTY_RMT_IO_CAP_KEY,
@@ -140,38 +140,38 @@ typedef enum {
     BT_PROPERTY_TIMESTAMP,
     BT_PROPERTY_DEVICE_TYPE_ID,
     BT_PROPERTY_REMOTE_SUB_MODEL_ID,
-} bt_property_type_t;
+};
 
-typedef struct {
-    bt_property_type_t type;
+struct BtProperty {
+    BtPropertyType type;
     int len;
     void *val;
-} bt_property_t;
+};
 
-typedef enum {
+enum BtTransport {
     BT_TRANSPORT_AUTO = 0,
     BT_TRANSPORT_BR_EDR = 1,
     BT_TRANSPORT_LE = 2,
     BT_TRANSPORT_UNKNOWN = 3,
     BT_TRANSPORT_INVALID = 255,
-} tBT_TRANSPORT;
+};
 
-typedef enum {
+enum BleAddrType {
     BLE_ADDR_PUBLIC = 0x00,
     BLE_ADDR_RANDOM = 0x01,
     BLE_ADDR_PUBLIC_ID = 0x02,
     BLE_ADDR_RANDOM_ID = 0x03,
     BLE_ADDR_ANONYMOUS = 0xFF,
-} tBLE_ADDR_TYPE;
+};
 
-typedef enum {
+enum BtSspVariant {
     BT_SSP_VARIANT_PASSKEY_CONFIRMATION,
     BT_SSP_VARIANT_PASSKEY_ENTRY,
     BT_SSP_VARIANT_CONSENT,
     BT_SSP_VARIANT_PASSKEY_NOTIFICATION,
-} bt_ssp_variant_t;
+};
 
-typedef enum {
+enum BtHciErrorCode {
     BT_HCI_ERROR_SUCCESS = 0x00,
     BT_HCI_ERROR_ILLEGAL_COMMAND = 0x01,
     BT_HCI_ERROR_NO_CONNECTION = 0x02,
@@ -185,54 +185,54 @@ typedef enum {
     BT_HCI_ERROR_MAX_NUM_OF_SCO = 0x0A,
     BT_HCI_ERROR_ACL_CONNECTION_EXISTS = 0x0B,
     BT_HCI_ERROR_COMMAND_DISALLOWED = 0x0C,
-} bt_hci_error_code_t;
+};
 
-typedef struct {
+struct BtStackOobData {
     uint8_t c[16];
     uint8_t r[16];
     /* Local OOB data: 7 bytes address-with-type (little endian) followed by
      * the device name and LE role as reported by the stack. */
     uint8_t address[7];
-    uint8_t device_name[BT_BD_NAME_LEN + 1];
-    uint8_t le_device_role;
-    bool is_valid;
-} bt_oob_data_t;
+    uint8_t deviceName[BT_BD_NAME_LEN + 1];
+    uint8_t leDeviceRole;
+    bool isValid;
+};
 
-typedef enum {
+enum BtCbThreadEvt {
     BT_CB_THREAD_EVT_APP_STARTED = 0,
     BT_CB_THREAD_EVT_APP_STOPPED,
     BT_CB_THREAD_EVT_USER_CONFIRM_REQUEST,
-} bt_cb_thread_evt;
+};
 
-typedef struct {
-    uint64_t stack_state;
-    uint64_t controller_idle_time_ms;
-    uint64_t tx_time_ms;
-    uint64_t rx_time_ms;
-    uint64_t idle_time_ms;
-    uint64_t energy_used;
-} bt_activity_energy_info;
+struct BtActivityEnergyInfo {
+    uint64_t stackState;
+    uint64_t controllerIdleTimeMs;
+    uint64_t txTimeMs;
+    uint64_t rxTimeMs;
+    uint64_t idleTimeMs;
+    uint64_t energyUsed;
+};
 
-typedef struct {
+struct BtUidTraffic {
     uint16_t uid;
-    uint64_t rx_bytes;
-    uint64_t tx_bytes;
-} bt_uid_traffic_t;
+    uint64_t rxBytes;
+    uint64_t txBytes;
+};
 
 /* Remote chip version info carried by the BT_PROPERTY_REMOTE_VERSION_INFO
  * property (vendor extension of the stubbed stack). */
-typedef struct {
+struct BtRemoteVersion {
     int32_t version;
-    int32_t sub_ver;
+    int32_t subVer;
     int32_t manufacturer;
-} bt_remote_version_t;
+};
 
 /* Adapter scan modes as reported by the stack. */
-typedef enum {
+enum BtScanMode {
     BT_SCAN_MODE_NONE = 0,
     BT_SCAN_MODE_CONNECTABLE = 1,
     BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE = 2,
-} bt_scan_mode_t;
+};
 
 /* Classic device type values of the stubbed stack. */
 #define BT_DEVICE_TYPE_BREDR 1
@@ -240,54 +240,54 @@ typedef enum {
 #define BT_DEVICE_TYPE_DUMO 3
 
 
-typedef struct {
-    uint8_t le_features[8];
-    uint16_t total_trackable_advertisers;
-    uint16_t le_maximum_advertising_data_length;
-    bool le_extended_advertising_supported;
-    bool le_2m_phy_supported;
-} bt_local_le_features_t;
+struct BtLocalLeFeatures {
+    uint8_t leFeatures[8];
+    uint16_t totalTrackableAdvertisers;
+    uint16_t leMaximumAdvertisingDataLength;
+    bool leExtendedAdvertisingSupported;
+    bool le2mPhySupported;
+};
 
-typedef enum {
+enum BtState {
     BT_STATE_OFF = 0,
     BT_STATE_ON = 1,
-} bt_state_t;
+};
 
-typedef enum {
+enum BtDiscoveryState {
     BT_DISCOVERY_STOPPED = 0,
     BT_DISCOVERY_STARTED,
-} bt_discovery_state_t;
+};
 
-typedef enum {
+enum BtBondState {
     BT_BOND_STATE_NONE = 0,
     BT_BOND_STATE_BONDING,
     BT_BOND_STATE_BONDED,
-} bt_bond_state_t;
+};
 
-typedef enum {
+enum BtAclState {
     BT_ACL_STATE_CONNECTED = 0,
     BT_ACL_STATE_DISCONNECTED,
-} bt_acl_state_t;
+};
 
-typedef enum {
+enum BtPinState {
     BT_PIN_REQUEST = 0,
     BT_PIN_ENTERED,
-} bt_pin_state_t;
+};
 
 
 /*
  * Sensing info reported by the stubbed stack. Defined after RawAddress and
  * OHOS::bluetooth::Uuid since it embeds them by value.
  */
-typedef struct {
-    uint8_t sensing_state;
-    uint8_t event_type;
+struct BtSensingInfo {
+    uint8_t sensingState;
+    uint8_t eventType;
     uint32_t timestamp;
     RawAddress addr;
     OHOS::bluetooth::Uuid uuid;
     uint32_t resourceId;
     uint16_t interval;
-} bt_sensing_info_t;
+};
 
 /* Stream accessors of the removed stack layer packet.h, reading big-endian
  * fields from a byte stream and advancing the cursor. */

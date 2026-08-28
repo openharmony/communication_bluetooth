@@ -179,7 +179,7 @@ std::shared_ptr<BluetoothDevice> RemoteDeviceProperties::GetBluetoothDeviceFromM
 
 bool RemoteDeviceProperties::CancelPairing(const RawAddress &device) const
 {
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     std::string callingName = PermissionManager::GetCallingName();
     int status = hal_util_load_bt_library(&btInterface);
     if (status != 0) {
@@ -198,7 +198,7 @@ bool RemoteDeviceProperties::CancelPairing(const RawAddress &device) const
     it->second->SetPairedStatus(PAIR_CANCELING);
     STACK::RawAddress btAddr = ServiceUtil::AddrToStack(device);
     HILOGI("btAddr: %{public}s", GetEncryptAddr(btAddr.ToStringForLogging()).c_str());
-    bool ret = (btInterface->cancel_bond(&btAddr) == BT_STATUS_SUCCESS);
+    bool ret = (btInterface->cancelBond(&btAddr) == BT_STATUS_SUCCESS);
     if (ret) {
         BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_CANCEL_PAIR, device, UE_COMMON_SCENE_CASE1, callingName);
     } else {
@@ -210,7 +210,7 @@ bool RemoteDeviceProperties::CancelPairing(const RawAddress &device) const
 bool RemoteDeviceProperties::RemovePair(const RawAddress &device)
 {
     STACK::RawAddress btAddr = ServiceUtil::AddrToStack(device);
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     std::string callingName = PermissionManager::GetCallingName();
     BtChrEventWriteStr(CHR_BT_WATCH_REMOVE_PAIR, device.GetAddress(), "PKGNAME", callingName);
 
@@ -245,7 +245,7 @@ bool RemoteDeviceProperties::RemovePair(const RawAddress &device)
     it->second->SetPairedStatus(PAIR_NONE);
     DeleteLinkKey(it->second);
     adapterProperties_->RemovePairedDeviceList(it->second->GetAddress());
-    bool ret = (btInterface->remove_bond(&btAddr) == BT_STATUS_SUCCESS);
+    bool ret = (btInterface->removeBond(&btAddr) == BT_STATUS_SUCCESS);
     if (ret) {
         BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_REMOVE_PAIR, device, UE_COMMON_SCENE_CASE1, callingName);
     } else {
@@ -269,7 +269,7 @@ void RemoteDeviceProperties::DeleteLinkKey(std::shared_ptr<BluetoothDevice> remo
 
 std::vector<RawAddress> RemoteDeviceProperties::removeAllDevicesFromMap()
 {
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     std::vector<RawAddress> removeDevices;
     int status = hal_util_load_bt_library(&btInterface);
     if (status) {
@@ -286,7 +286,7 @@ std::vector<RawAddress> RemoteDeviceProperties::removeAllDevicesFromMap()
             it = remoteDevicesMap_.erase(it);
             STACK::RawAddress btAddr = ServiceUtil::AddrToStack(device);
             removeDevices.push_back(device);
-            btInterface->remove_bond(&btAddr);
+            btInterface->removeBond(&btAddr);
             removeAddrs.push_back(btAddr.ToString());
         } else {
             ++it;
@@ -311,7 +311,7 @@ int RemoteDeviceProperties::GetPairState(const RawAddress &device) const
 
 bool RemoteDeviceProperties::SetDevicePairingConfirmation(const RawAddress &device, bool accept) const
 {
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int status = hal_util_load_bt_library(&btInterface);
     if (status) {
         HILOGE("[ClassicAdapter] Failed to open the Bluetooth module");
@@ -331,13 +331,13 @@ bool RemoteDeviceProperties::SetDevicePairingConfirmation(const RawAddress &devi
     it->second->SetPairConfirmType(PAIR_CONFIRM_TYPE_INVALID);
 
     int passKey = it->second->GetPasskey();
-    bt_ssp_variant_t pairingVariant = static_cast<bt_ssp_variant_t> (it->second->GetSspVariant());
+    BtSspVariant pairingVariant = static_cast<BtSspVariant> (it->second->GetSspVariant());
     STACK::RawAddress address = ServiceUtil::AddrToStack(device);
 
     if (it->second->GetPairedStatus() == PAIR_CANCELING || accept == false) {
-        ret = (btInterface->ssp_reply(&address, pairingVariant, PAIR_REJECT, passKey) == BT_STATUS_SUCCESS);
+        ret = (btInterface->sspReply(&address, pairingVariant, PAIR_REJECT, passKey) == BT_STATUS_SUCCESS);
     } else {
-        ret = (btInterface->ssp_reply(&address, pairingVariant, PAIR_ACCEPT, passKey) == BT_STATUS_SUCCESS);
+        ret = (btInterface->sspReply(&address, pairingVariant, PAIR_ACCEPT, passKey) == BT_STATUS_SUCCESS);
     }
     return ret;
 }
@@ -408,8 +408,8 @@ bool RemoteDeviceProperties::SetAliasName(const RawAddress &device, const std::s
         HILOGE("device not found or not paired");
         return false;
     }
-    bt_property_t prop;
-    prop.type = static_cast<bt_property_type_t>(BT_PROPERTY_REMOTE_FRIENDLY_NAME);
+    BtProperty prop;
+    prop.type = static_cast<BtPropertyType>(BT_PROPERTY_REMOTE_FRIENDLY_NAME);
     int len = name.size();
     std::string saveName = name;
     if (name.size() > MAX_ALIAS_LENGTH) {
@@ -478,13 +478,13 @@ void RemoteDeviceProperties::UpdateRemoteHwDeviceType(const RawAddress &device, 
     return;
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceName(bt_property_t* property, RawAddress device)
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceName(BtProperty* property, RawAddress device)
 {
     std::string newRemoteName = adapterProperties_->ParseDeviceName(property);
     UpdateRemoteDeviceName(device, newRemoteName);
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceUuid(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceUuid(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     auto classicAdapter = AdapterManager::GetInstance()->GetClassicAdapter();
@@ -494,34 +494,34 @@ void RemoteDeviceProperties::HandlePropertyRemoteDeviceUuid(bt_property_t* prope
     }
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceCod(bt_property_t* property, RawAddress device)
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceCod(BtProperty* property, RawAddress device)
 {
     int newCod = static_cast<int>(adapterProperties_->ParseDeviceCod(property) & CLASS_OF_DEVICE_RANGE);
     UpdateRemoteDeviceCod(device, newCod);
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceType(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceType(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     unsigned int newDeviceType = adapterProperties_->ParseDeviceType(property);
     remoteDevice->SetDeviceType(newDeviceType);
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceAbsVolumKey(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceAbsVolumKey(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     int32_t absVolumeAbility = adapterProperties_->ParseAbsVolumeAbility(property);
     remoteDevice->SetDeviceAbsVolumeAbility(absVolumeAbility);
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceRssi(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceRssi(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     uint32_t rssi = adapterProperties_->ParseDeviceRssi(property);
     remoteDevice->SetRssi(rssi);
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceAlias(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceAlias(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     std::string alias = adapterProperties_->ParseAlias(property);
@@ -531,35 +531,35 @@ void RemoteDeviceProperties::HandlePropertyRemoteDeviceAlias(bt_property_t* prop
     }
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceCustomType(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceCustomType(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     int32_t customType = adapterProperties_->ParseDeviceCustomType(property);
     remoteDevice->SetCustomType(customType);
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceIoCapability(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceIoCapability(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     int32_t ioCapability = adapterProperties_->ParseRemoteDeviceIoCapability(property);
     remoteDevice->SetIoCapability(ioCapability);
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceVendorId(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceVendorId(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     int32_t vendorId = adapterProperties_->ParseDeviceVendorId(property);
     remoteDevice->SetVendorId(vendorId);
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceProductId(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceProductId(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     int32_t productId = adapterProperties_->ParseDeviceProductId(property);
     remoteDevice->SetProductId(productId);
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceManuSpecData(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceManuSpecData(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     if (property->len > 0 && property->val != nullptr) {
@@ -569,10 +569,10 @@ void RemoteDeviceProperties::HandlePropertyRemoteDeviceManuSpecData(bt_property_
     }
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceChipInfo(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceChipInfo(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
-    if (property->len < static_cast<int>(sizeof(bt_remote_version_t))) {
+    if (property->len < static_cast<int>(sizeof(BtRemoteVersion))) {
         HILOGE("Invalid length %{public}d for DeviceCustomType", property->len);
         return;
     }
@@ -580,20 +580,20 @@ void RemoteDeviceProperties::HandlePropertyRemoteDeviceChipInfo(bt_property_t* p
         HILOGE("Invalid pointer");
         return;
     }
-    int32_t version = reinterpret_cast<const bt_remote_version_t*>(property->val)->version;
-    int32_t subVer = reinterpret_cast<const bt_remote_version_t*>(property->val)->sub_ver;
-    int32_t manufacturer = reinterpret_cast<const bt_remote_version_t*>(property->val)->manufacturer;
+    int32_t version = reinterpret_cast<const BtRemoteVersion*>(property->val)->version;
+    int32_t subVer = reinterpret_cast<const BtRemoteVersion*>(property->val)->subVer;
+    int32_t manufacturer = reinterpret_cast<const BtRemoteVersion*>(property->val)->manufacturer;
     BtChrUpdateChipInfo(remoteDevice->GetAddress(), version, subVer, manufacturer);
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceAutoConnSwitch(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceAutoConnSwitch(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     int32_t autoConnSwitch = adapterProperties_->ParseDeviceAutoConnSwitch(property);
     remoteDevice->SetAutoConnSwitch(autoConnSwitch);
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceMessage(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceMessage(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     switch (property->type) {
@@ -603,7 +603,7 @@ void RemoteDeviceProperties::HandlePropertyRemoteDeviceMessage(bt_property_t* pr
         case BT_PROPERTY_AUTO_CONNECT_SWITCH:
             HandlePropertyRemoteDeviceAutoConnSwitch(property, remoteDevice);
             break;
-        case BT_PROPERTY_ClOUD_CAP:
+        case BT_PROPERTY_CLOUD_CAP:
             HandlePropertyRemoteDeviceCloudCap(property, remoteDevice);
             break;
         default:
@@ -617,10 +617,10 @@ void RemoteDeviceProperties::StackErrnoCallback(const RawAddress &device, int st
     remoteDevice->SetAutoConnSwitch(errNum);
 }
 
-void RemoteDeviceProperties::GetRemoteDevicePropsCallBack(bt_status_t status, STACK::RawAddress* bd_addr,
-    int numProperties, bt_property_t* properties)
+void RemoteDeviceProperties::GetRemoteDevicePropsCallBack(BtStackStatus status, STACK::RawAddress* bdAddr,
+    int numProperties, BtProperty* properties)
 {
-    if (bd_addr == nullptr) {
+    if (bdAddr == nullptr) {
         return;
     }
     if (status != BT_STATUS_SUCCESS) {
@@ -629,8 +629,8 @@ void RemoteDeviceProperties::GetRemoteDevicePropsCallBack(bt_status_t status, ST
     
     // The callback of abs_volume does not switch threads to prevent timing problems.
     if (properties->type == HW_BT_PROPERTY_ABS_VOLUM_KEY) {
-        bt_property_t* prop = PropertyDeepCopy(numProperties, properties);
-        GetRemoteDevicePropsCallbackInner(*bd_addr, numProperties, prop);
+        BtProperty* prop = PropertyDeepCopy(numProperties, properties);
+        GetRemoteDevicePropsCallbackInner(*bdAddr, numProperties, prop);
         if (prop) {
             free(prop);
         }
@@ -638,17 +638,17 @@ void RemoteDeviceProperties::GetRemoteDevicePropsCallBack(bt_status_t status, ST
     }
 
     DoInAdapterManagerThread(std::bind(
-        [this](STACK::RawAddress addr, int numProperties, bt_property_t* prop) {
+        [this](STACK::RawAddress addr, int numProperties, BtProperty* prop) {
             GetRemoteDevicePropsCallbackInner(addr, numProperties, prop);
             if (prop) {
                 free(prop);
             }
         },
-        *bd_addr, numProperties, PropertyDeepCopy(numProperties, properties)
+        *bdAddr, numProperties, PropertyDeepCopy(numProperties, properties)
     ));
 }
 
-void RemoteDeviceProperties::HandlePropertyByType(bt_property_t* property, const RawAddress &device,
+void RemoteDeviceProperties::HandlePropertyByType(BtProperty* property, const RawAddress &device,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     switch (property->type) {
@@ -697,27 +697,27 @@ void RemoteDeviceProperties::HandlePropertyByType(bt_property_t* property, const
     }
 }
 
-void RemoteDeviceProperties::GetRemoteDevicePropsCallbackInner(STACK::RawAddress bd_addr,
-    int numProperties, bt_property_t* properties)
+void RemoteDeviceProperties::GetRemoteDevicePropsCallbackInner(STACK::RawAddress bdAddr,
+    int numProperties, BtProperty* properties)
 {
     CHECK_AND_RETURN_LOG(properties != nullptr, "Wrong pointer !");
-    RawAddress device = ServiceUtil::AddrFromStack(bd_addr);
+    RawAddress device = ServiceUtil::AddrFromStack(bdAddr);
     std::shared_ptr<BluetoothDevice> remoteDevice = FindRemoteDevice(device);
     
     for (int i = 0; i < numProperties; i++) {
-        bt_property_t* property = properties + i;
+        BtProperty* property = properties + i;
         HandlePropertyByType(property, device, remoteDevice);
     }
 }
 
-void RemoteDeviceProperties::DeviceFoundCallBack(int numProperties, bt_property_t* properties)
+void RemoteDeviceProperties::DeviceFoundCallBack(int numProperties, BtProperty* properties)
 {
     if (properties == nullptr) {
         HILOGE("wrong properties");
         return;
     }
     DoInAdapterManagerThread(std::bind(
-        [this](int numProperties, bt_property_t* prop) {
+        [this](int numProperties, BtProperty* prop) {
             DeviceFoundInner(numProperties, prop);
             if (prop) {
                 free(prop);
@@ -728,7 +728,7 @@ void RemoteDeviceProperties::DeviceFoundCallBack(int numProperties, bt_property_
     ));
 }
 
-void RemoteDeviceProperties::DeviceFoundInner(int numProperties, bt_property_t* properties)
+void RemoteDeviceProperties::DeviceFoundInner(int numProperties, BtProperty* properties)
 {
     if (properties == nullptr) {
         HILOGE("wrong properties");
@@ -736,7 +736,7 @@ void RemoteDeviceProperties::DeviceFoundInner(int numProperties, bt_property_t* 
     }
     RawAddress address = RawAddress(INVALID_MAC_ADDRESS);
     for (int i = 0; i < numProperties; i++) {
-        bt_property_t* property = properties + i;
+        BtProperty* property = properties + i;
         if (property->type == BT_PROPERTY_BDADDR) {
             address = adapterProperties_->ParseDeviceAddr(property);
             break;
@@ -770,9 +770,9 @@ void RemoteDeviceProperties::DeviceFoundInner(int numProperties, bt_property_t* 
     }
 }
 
-bt_property_t* RemoteDeviceProperties::PropertyDeepCopy(int numProperties, bt_property_t* properties)
+BtProperty* RemoteDeviceProperties::PropertyDeepCopy(int numProperties, BtProperty* properties)
 {
-    bt_property_t* copy = nullptr;
+    BtProperty* copy = nullptr;
     if (numProperties == 0 || properties == nullptr) {
         HILOGE("wrong properties");
         return copy;
@@ -785,8 +785,8 @@ bt_property_t* RemoteDeviceProperties::PropertyDeepCopy(int numProperties, bt_pr
                 contentLen += len;
             }
         }
-        unsigned int length = static_cast<unsigned int>(sizeof(bt_property_t) * numProperties) + contentLen;
-        copy = static_cast<bt_property_t*>(malloc((sizeof(bt_property_t) * numProperties) + contentLen));
+        unsigned int length = static_cast<unsigned int>(sizeof(BtProperty) * numProperties) + contentLen;
+        copy = static_cast<BtProperty*>(malloc((sizeof(BtProperty) * numProperties) + contentLen));
         if (copy == nullptr) {
             HILOGE("malloc failed!!");
             return copy;
@@ -810,7 +810,7 @@ bt_property_t* RemoteDeviceProperties::PropertyDeepCopy(int numProperties, bt_pr
 
 bool RemoteDeviceProperties::SetDevicePin(const RawAddress &device, const std::string &pinCode) const
 {
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int status = hal_util_load_bt_library(&btInterface);
     if (status) {
         HILOGE("[ClassicAdapter] Failed to open the Bluetooth module");
@@ -829,7 +829,7 @@ bool RemoteDeviceProperties::SetDevicePin(const RawAddress &device, const std::s
     it->second->SetPairConfirmState(PAIR_CONFIRM_STATE_USER_CONFIRM_REPLY);
     it->second->SetPairConfirmType(PAIR_CONFIRM_TYPE_INVALID);
     STACK::RawAddress address = ServiceUtil::AddrToStack(device);
-    bt_pin_code_t code;
+    BtPinCode code;
     uint8_t pinLen = pinCode.length();
     if (pinLen > MAX_PIN_CODE_LENGTH) {
         HILOGE("failed, pinLen out of size");
@@ -840,9 +840,9 @@ bool RemoteDeviceProperties::SetDevicePin(const RawAddress &device, const std::s
         code.pin[i] = static_cast<uint8_t>(pinCode[i]);
     }
     if (it->second->GetPairedStatus() == PAIR_CANCELING) {
-        ret = (btInterface->pin_reply(&address, PAIR_REJECT, pinLen, &code) == BT_STATUS_SUCCESS);
+        ret = (btInterface->pinReply(&address, PAIR_REJECT, pinLen, &code) == BT_STATUS_SUCCESS);
     } else {
-        ret = (btInterface->pin_reply(&address, PAIR_ACCEPT, pinLen, &code) == BT_STATUS_SUCCESS);
+        ret = (btInterface->pinReply(&address, PAIR_ACCEPT, pinLen, &code) == BT_STATUS_SUCCESS);
     }
     return ret;
 }
@@ -909,16 +909,16 @@ int32_t RemoteDeviceProperties::GetDeviceAbsVolumeAbility(const RawAddress &devi
     }
 }
 
-int32_t RemoteDeviceProperties::GetRemoteDeviceProperty(const STACK::RawAddress &addr, bt_property_type_t type)
+int32_t RemoteDeviceProperties::GetRemoteDeviceProperty(const STACK::RawAddress &addr, BtPropertyType type)
 {
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int32_t status = hal_util_load_bt_library(&btInterface);
     if (status != 0) {
         HILOGE("Failed to open the Bluetooth module, status = %{public}d. ", status);
         return BT_STATUS_FAIL;
     }
     auto rawAddr = addr;
-    status = btInterface->get_remote_device_property(&rawAddr, type);
+    status = btInterface->getRemoteDeviceProperty(&rawAddr, type);
     if (status != BT_STATUS_SUCCESS) {
         HILOGE("Failed to get_remote_device_property, status = %{public}d. ", status);
         return BT_STATUS_FAIL;
@@ -926,16 +926,16 @@ int32_t RemoteDeviceProperties::GetRemoteDeviceProperty(const STACK::RawAddress 
     return BT_STATUS_SUCCESS;
 }
 
-void RemoteDeviceProperties::SetRemoteDeviceProperty(const STACK::RawAddress &addr, const bt_property_t &prop)
+void RemoteDeviceProperties::SetRemoteDeviceProperty(const STACK::RawAddress &addr, const BtProperty &prop)
 {
-    const bt_interface_t *btInterface = nullptr;
+    const BtInterface *btInterface = nullptr;
     int32_t status = hal_util_load_bt_library(&btInterface);
     if (status != 0) {
         HILOGE("Failed to open the Bluetooth module, status = %{public}d. ", status);
         return;
     }
     auto rawAddr = addr;
-    status = btInterface->set_remote_device_property(&rawAddr, &prop);
+    status = btInterface->setRemoteDeviceProperty(&rawAddr, &prop);
     HILOGI("status = %{public}d, type: 0x%{public}x. ", status, prop.type);
 }
 
@@ -1004,8 +1004,8 @@ int32_t RemoteDeviceProperties::SetCustomType(const RawAddress &device, int32_t 
         return BT_ERR_INVALID_PARAM;
     }
     void *type = &customType;
-    bt_property_t prop;
-    prop.type = static_cast<bt_property_type_t>(HW_BT_PROPERTY_CUSTOM_TYPE);
+    BtProperty prop;
+    prop.type = static_cast<BtPropertyType>(HW_BT_PROPERTY_CUSTOM_TYPE);
     prop.len = sizeof(customType);
     prop.val = type;
     STACK::RawAddress addr;
@@ -1106,7 +1106,7 @@ static int32_t GetPropertyIntValue(const std::string &propertyValue)
     return propertyIntValue;
 }
 
-bool RemoteDeviceProperties::SetRemoteDevicePropertyInfo(const RawAddress &device, bt_property_type_t type,
+bool RemoteDeviceProperties::SetRemoteDevicePropertyInfo(const RawAddress &device, BtPropertyType type,
     const std::string &propertyValue)
 {
     HILOGD("device: %{public}s, type: 0x%{public}x, propertyValue: %{public}s ", GET_ENCRYPT_ADDR(device), type,
@@ -1116,37 +1116,37 @@ bool RemoteDeviceProperties::SetRemoteDevicePropertyInfo(const RawAddress &devic
     int32_t propertyIntValue = INVALID_VALUE;
     std::shared_ptr<BluetoothDevice> remoteDevice = FindRemoteDevice(device);
     switch (type) {
-        case bt_property_type_t::BT_PROPERTY_BDNAME:
+        case BtPropertyType::BT_PROPERTY_BDNAME:
             remoteDevice->SetRemoteName(propertyValue);
             isIntProperty = false;
             break;
         case BT_PROPERTY_REMOTE_FRIENDLY_NAME:
             return SetAliasName(device, propertyValue);
-        case bt_property_type_t::BT_PROPERTY_VENDOR_ID:
+        case BtPropertyType::BT_PROPERTY_VENDOR_ID:
             propertyIntValue = GetPropertyIntValue(propertyValue);
             remoteDevice->SetVendorId(propertyIntValue);
             break;
-        case bt_property_type_t::BT_PROPERTY_PRODUCT_ID:
+        case BtPropertyType::BT_PROPERTY_PRODUCT_ID:
             propertyIntValue = GetPropertyIntValue(propertyValue);
             remoteDevice->SetProductId(propertyIntValue);
             break;
-        case bt_property_type_t::BT_PROPERTY_NAME_CHANGE_VERSION:
+        case BtPropertyType::BT_PROPERTY_NAME_CHANGE_VERSION:
             propertyIntValue = GetPropertyIntValue(propertyValue);
             remoteDevice->SetVersion(propertyIntValue);
             break;
-        case bt_property_type_t::BT_PROPERTY_REMOTE_NEW_MODEL_ID:
+        case BtPropertyType::BT_PROPERTY_REMOTE_NEW_MODEL_ID:
             remoteDevice->SetNewModelId(propertyValue);
             isIntProperty = false;
             break;
-        case bt_property_type_t::BT_PROPERTY_REMOTE_MODEL_ID:
+        case BtPropertyType::BT_PROPERTY_REMOTE_MODEL_ID:
             propertyIntValue = GetPropertyIntValue(propertyValue);
             remoteDevice->SetModelId(propertyIntValue);
             break;
-        case bt_property_type_t::BT_PROPERTY_CLASS_OF_DEVICE:
+        case BtPropertyType::BT_PROPERTY_CLASS_OF_DEVICE:
             propertyIntValue = GetPropertyIntValue(propertyValue);
             UpdateRemoteDeviceCod(device, propertyIntValue);
             break;
-        case bt_property_type_t::BT_PROPERTY_DEVICE_INFO:
+        case BtPropertyType::BT_PROPERTY_DEVICE_INFO:
             propertyIntValue = GetPropertyIntValue(propertyValue);
             remoteDevice->SetIcon(propertyIntValue);
             break;
@@ -1156,7 +1156,7 @@ bool RemoteDeviceProperties::SetRemoteDevicePropertyInfo(const RawAddress &devic
     return SetDeviceProperty(device, type, propertyValue, isIntProperty, propertyIntValue);
 }
 
-bool RemoteDeviceProperties::SetOtherPropertyInfo(const RawAddress &device, bt_property_type_t type,
+bool RemoteDeviceProperties::SetOtherPropertyInfo(const RawAddress &device, BtPropertyType type,
     const std::string &propertyValue)
 {
     bool isIntProperty = true;
@@ -1164,11 +1164,11 @@ bool RemoteDeviceProperties::SetOtherPropertyInfo(const RawAddress &device, bt_p
     std::shared_ptr<BluetoothDevice> remoteDevice = FindRemoteDevice(device);
     int32_t customType = DeviceType::DEVICE_TYPE_DEFAULT;
     switch (type) {
-        case bt_property_type_t::BT_PROPERTY_TIMESTAMP:
+        case BtPropertyType::BT_PROPERTY_TIMESTAMP:
             propertyIntValue = GetPropertyIntValue(propertyValue);
             remoteDevice->SetTimeStamp(propertyIntValue);
             break;
-        case bt_property_type_t::BT_PROPERTY_DEVICE_TYPE_ID:
+        case BtPropertyType::BT_PROPERTY_DEVICE_TYPE_ID:
             propertyIntValue = GetPropertyIntValue(propertyValue);
             remoteDevice->SetHwRemoteDeviceType(propertyIntValue);
             if (hwDeviceTypeToCustomType.find(propertyIntValue) != hwDeviceTypeToCustomType.end()) {
@@ -1183,7 +1183,7 @@ bool RemoteDeviceProperties::SetOtherPropertyInfo(const RawAddress &device, bt_p
     return SetDeviceProperty(device, type, propertyValue, isIntProperty, propertyIntValue);
 }
 
-bool RemoteDeviceProperties::SetDeviceProperty(const RawAddress &device, bt_property_type_t type,
+bool RemoteDeviceProperties::SetDeviceProperty(const RawAddress &device, BtPropertyType type,
     const std::string &propertyValue, bool isIntProperty, int32_t intPropertyValue)
 {
     if (isIntProperty && intPropertyValue == INVALID_VALUE) {
@@ -1191,7 +1191,7 @@ bool RemoteDeviceProperties::SetDeviceProperty(const RawAddress &device, bt_prop
         return false;
     }
     
-    bt_property_t property;
+    BtProperty property;
     property.type = type;
     if (isIntProperty) {
         property.len = sizeof(intPropertyValue);
@@ -1216,7 +1216,7 @@ bool RemoteDeviceProperties::IsNeedDelayConnect(const RawAddress &device)
     return isNeedDelayConnect;
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceConnectionTime(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceConnectionTime(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     int64_t connectionTime = adapterProperties_->ParseDeviceConnectionTime(property);
@@ -1246,8 +1246,8 @@ int32_t RemoteDeviceProperties::SetConnectionTime(const RawAddress &device, int6
         return BT_ERR_INVALID_PARAM;
     }
     void *type = &connectionTime;
-    bt_property_t prop;
-    prop.type = static_cast<bt_property_type_t>(BT_PROPERTY_CONNECTION_TIME);
+    BtProperty prop;
+    prop.type = static_cast<BtPropertyType>(BT_PROPERTY_CONNECTION_TIME);
     prop.len = sizeof(connectionTime);
     prop.val = type;
 	STACK::RawAddress addr = ServiceUtil::AddrToStack(device);
@@ -1257,7 +1257,7 @@ int32_t RemoteDeviceProperties::SetConnectionTime(const RawAddress &device, int6
     return BT_NO_ERROR;
 }
 
-void RemoteDeviceProperties::HandlePropertyRemoteDeviceCloudCap(bt_property_t* property,
+void RemoteDeviceProperties::HandlePropertyRemoteDeviceCloudCap(BtProperty* property,
     std::shared_ptr<BluetoothDevice> remoteDevice)
 {
     if (CloudDeviceManager::GetInstance() == nullptr) {

@@ -23,8 +23,8 @@ constexpr const char* AV_LATENCY_CONFIG_PATH = "/system/etc/bluetooth/bt_av_late
 // latency_base tag in json
 constexpr const char* TAG_LATENCY_BASE = "latency_base";
 
-// device_name tag in json
-constexpr const char* TAG_DEVICE_NAME = "device_name";
+// deviceName tag in json
+constexpr const char* TAG_DEVICE_NAME = "deviceName";
 
 // model_id tag in json
 constexpr const char* TAG_MODEL_ID = "model_id";
