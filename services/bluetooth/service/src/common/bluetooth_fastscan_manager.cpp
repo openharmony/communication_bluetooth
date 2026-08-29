@@ -16,7 +16,7 @@
 #undef LOG_TAG
 #define LOG_TAG "bt_fastscan_manager"
 #include "bt_def.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 #include "bluetooth_hw_interface.h"
 
 #include "app_mgr_constants.h"

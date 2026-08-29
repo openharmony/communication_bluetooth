@@ -31,7 +31,7 @@
 #include "bt_def.h"
 #include "remote_device_properties.h"
 #include "refuse_play_helper.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 #include "bt_chr_business_event.h"
 #include "bt_chr_dft_exception.h"
 #include "bt_chr_ue_manager.h"

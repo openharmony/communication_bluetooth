@@ -14,10 +14,10 @@
  */
 
 #ifndef LOG_TAG
-#define LOG_TAG "bt_hal_util"
+#define LOG_TAG "bt_stack_adapter"
 #endif
 
-#include "hal_util.h"
+#include "stack_adapter.h"
 
 #include <dlfcn.h>
 #include <mutex>
@@ -31,10 +31,10 @@ const BtInterface *g_btInterface = nullptr;
 int g_loadResult = 0;
 
 /* Stack library selection: both the closed-source and open stack expose the
- * same DM entry symbol and ship under the fixed name libbtstack.z.so. */
+ * same DM entry symbol and ship under the fixed name libbt_bluetooth.z.so. */
 const char *GetStackLibraryName()
 {
-    return "libbtstack.z.so";
+    return "libbt_bluetooth.z.so";
 }
 
 /* Both stacks must export the same entry symbol (bluedroid HAL contract). */

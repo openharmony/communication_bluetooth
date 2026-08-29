@@ -33,7 +33,7 @@
 #include "connect_strategy_manager.h"
 #include "dialog_pair.h"
 #include "common/bluetooth_hw_interface.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 #include "hw_bt_hwif.h"
 #include "permission_manager.h"
 #include "hisysevent.h"

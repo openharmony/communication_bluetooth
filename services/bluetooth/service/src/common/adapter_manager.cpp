@@ -50,7 +50,7 @@
 #include "ipc_skeleton.h"
 #include "connect_strategy_manager.h"
 #include "dialog_switch.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 #include "log.h"
 #include "parameter.h"
 #include "permission_manager.h"

@@ -55,6 +55,7 @@ btservice_common_sources = [
     "src/bluetooth_code_convert_utils.cpp",
     "src/common_util.cpp",
     "src/dynamic_library_loader.cpp",
+    "$PART_DIR/stack_adapter/src/stack_adapter.cpp",
     "src/state_machine.cpp",
     "src/xml_parse.cpp",
     "src/log_utils.cpp",

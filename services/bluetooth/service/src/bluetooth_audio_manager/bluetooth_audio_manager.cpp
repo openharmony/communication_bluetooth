@@ -31,7 +31,7 @@
 #include "avrc_defs.h"
 #include <unordered_map>
 #include "bluetooth.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 #include "bt_stack_config.h"
 #include "preferences.h"
 #include "preferences_errno.h"

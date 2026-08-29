@@ -95,7 +95,6 @@ ohos_shared_library("btpan") {
       "pan_service_impl.cpp",
       "pan_network_manager.cpp",
       "pan_statemachine.cpp",
-      "$BT_SERVICE_DIR/src/common/hal_util.cpp",
     ]
   }
 
@@ -203,7 +202,6 @@ ohos_static_library("btpan_static") {
       "pan_service_impl.cpp",
       "pan_network_manager.cpp",
       "pan_statemachine.cpp",
-      "$BT_SERVICE_DIR/src/common/hal_util.cpp",
     ]
   }
 

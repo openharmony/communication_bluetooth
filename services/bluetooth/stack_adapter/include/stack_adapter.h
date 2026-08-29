@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#ifndef BLUETOOTH_HAL_UTIL_H
-#define BLUETOOTH_HAL_UTIL_H
+#ifndef BLUETOOTH_STACK_ADAPTER_H
+#define BLUETOOTH_STACK_ADAPTER_H
 
 #include "hardware/bluetooth.h"
 
 /* Load the Bluetooth HAL library and return the BtInterface handle. */
 int hal_util_load_bt_library(const BtInterface **btInterface);
 
-#endif  // BLUETOOTH_HAL_UTIL_H
+#endif  // BLUETOOTH_STACK_ADAPTER_H

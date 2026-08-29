@@ -19,7 +19,7 @@
 #include "ble_range_impl.h"
 #include "log.h"
 #include "bt_types.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 #include "bluetooth_errorcode.h"
 #include <parameters.h>
 #include <parameter.h>

@@ -33,7 +33,7 @@
 #include "gatt_client_service.h"
 #include "bluetooth_audio_manager.h"
 #include "bluetooth_hw_interface.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 
 #include "log.h"
 #include "common_util.h"

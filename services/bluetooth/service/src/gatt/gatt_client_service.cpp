@@ -34,7 +34,7 @@
 #include "gatt_service_base.h"
 #include "interface_adapter_manager.h"
 #include "bluetooth_connection_manager.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 #include "hw_bt_chr.h"
 #include "hw_bt_hwif.h"
 #include "log.h"

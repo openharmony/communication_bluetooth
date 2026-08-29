@@ -20,7 +20,7 @@
 #include "bluetooth_errorcode.h"
 #include "common_util.h"
 #include "bt_def.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 #include "pan_network_manager.h"
 
 #include <arpa/inet.h>

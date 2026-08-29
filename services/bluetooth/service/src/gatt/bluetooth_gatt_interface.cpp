@@ -18,7 +18,7 @@
 
 #include "bluetooth_gatt_interface.h"
 #include "bt_def.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 #include "hisysevent.h"
 #include "log.h"
 #include "common_util.h"

@@ -24,7 +24,7 @@
 #include "bluetooth_common_event_helper.h"
 #include "classic_adapter.h"
 #include "connect_strategy_manager.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 #include "log.h"
 #include "common_util.h"
 #include "securec.h"

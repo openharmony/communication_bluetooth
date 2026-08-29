@@ -18,7 +18,7 @@
 #endif
 
 #include "common_util.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 #include "log.h"
 #include "service_util.h"
 #include "thread_util.h"

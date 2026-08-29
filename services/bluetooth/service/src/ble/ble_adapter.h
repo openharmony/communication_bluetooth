@@ -24,7 +24,7 @@
 #include "bluetooth.h"
 #include "bt_uuid.h"
 #include "context.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 #include "interface_adapter_ble.h"
 #include "raw_address.h"
 #include "remote_device_properties.h"

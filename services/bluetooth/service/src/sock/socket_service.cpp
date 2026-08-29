@@ -26,7 +26,7 @@
 #include "log.h"
 #include "bt_sock.h"
 #include "service_util.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 #include "bluetooth_hw_interface.h"
 #include "bt_chr_dft_exception.h"
 #include "bt_chr_ue_manager.h"

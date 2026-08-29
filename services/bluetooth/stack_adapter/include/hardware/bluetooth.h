@@ -15,7 +15,7 @@
 
 /*
  * Stub of the removed stack layer HAL interface (hardware/bluetooth.h).
- * The stack library is dlopened at runtime via hal_util; a null interface is
+ * The stack library is dlopened at runtime via stack_adapter; a null interface is
  * tolerated by the service layer, only the shape of the entry point matters.
  */
 

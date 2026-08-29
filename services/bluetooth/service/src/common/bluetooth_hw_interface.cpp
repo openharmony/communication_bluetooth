@@ -17,7 +17,7 @@
 #endif
 
 #include "remote_device_properties.h"
-#include "hal_util.h"
+#include "stack_adapter.h"
 #include "bluetooth_hw_interface.h"
 #include "log.h"
 #include "common_util.h"
