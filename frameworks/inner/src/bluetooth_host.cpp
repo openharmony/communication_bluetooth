@@ -1548,6 +1548,7 @@ int BluetoothHost::UpdateSecondaryPhonePairMode(int32_t mode)
 int BluetoothHost::SetBtChannelScan(bool isEnable, uint32_t interval)
 {
     HILOGI("isEnable: %{public}d, interval: %{public}u", isEnable, interval);
+    CHECK_AND_RETURN_LOG_RET(IS_BT_ENABLED(), BT_ERR_INVALID_STATE, "bluetooth is off.");
     CHECK_AND_RETURN_LOG_RET(interval >= CHANNEL_SCAN_INTERVAL_100MS && interval <= CHANNEL_SCAN_INTERVAL_BYPASS,
         BT_ERR_INVALID_PARAM, "invalid channel scan interval");
     sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
