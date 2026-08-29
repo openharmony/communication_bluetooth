@@ -53,11 +53,11 @@ struct BtsockInterface {
     BtStackStatus (*listen)(BtsockType type, const char *serviceName,
         const OHOS::bluetooth::Uuid *serviceUuid, int channel, int *sockFd, int flags,
         int callingUid);
-    BtStackStatus (*connect)(const RawAddress *bdAddr, BtsockType type,
+    BtStackStatus (*connect)(const OHOS::bluetooth::RawAddress *bdAddr, BtsockType type,
         const OHOS::bluetooth::Uuid *uuid, int channel, int *sockFd, int flags,
         int callingUid);
     BtStackStatus (*close)(int fd);
-    BtStackStatus (*disconnect)(const RawAddress *bdAddr, BtsockType type, int channel,
+    BtStackStatus (*disconnect)(const OHOS::bluetooth::RawAddress *bdAddr, BtsockType type, int channel,
         int flags, int callingUid);
 };
 

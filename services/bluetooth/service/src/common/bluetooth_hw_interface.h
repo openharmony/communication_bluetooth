@@ -86,7 +86,7 @@ public:
     void CleanHfpScoOccupied(const RawAddress &device);
     bool InteropMatch(const uint16_t feature, const RawAddress &device);
     void KeepBleScanInConn(const std::string &pkgName, int uid,
-        uint8_t transport, const STACK::RawAddress &addr);
+        uint8_t transport, const OHOS::bluetooth::RawAddress &addr);
     void ReportProfileStatus(const RawAddress &addr, uint8_t a2dpState, uint8_t hfpState);
 
     void AddSocketObserver(std::shared_ptr<SocketConnectionObserver> observer);
@@ -111,20 +111,20 @@ private:
 
     BT_DISALLOW_COPY_AND_ASSIGN(BluetoothHwInterface);
 };
-    void StackErrnoCallback(BtStackStatus status, STACK::RawAddress *addr, BtStackErrno state);
-    void HwHdapConnectCallback(STACK::RawAddress *bdAddr, bool isConnected, uint8_t featureBit,
+    void StackErrnoCallback(BtStackStatus status, OHOS::bluetooth::RawAddress *addr, BtStackErrno state);
+    void HwHdapConnectCallback(OHOS::bluetooth::RawAddress *bdAddr, bool isConnected, uint8_t featureBit,
         HdapConfigCallback config);
-    void HwProfileStateCallback(STACK::RawAddress *addr, uint8_t a2dpState,
+    void HwProfileStateCallback(OHOS::bluetooth::RawAddress *addr, uint8_t a2dpState,
         uint8_t hfpState, std::string targetBtDevice, uint8_t a2dpServiceType);
-    void HwAclDisconnReasonCb(STACK::RawAddress *addr, int reason);
+    void HwAclDisconnReasonCb(OHOS::bluetooth::RawAddress *addr, int reason);
     void HwGetSensorhubDevInfoCb(uint8_t *buffer, int length);
     void HwSensorhubResetCb(uint32_t state);
     void HwHiechoIndCallCb(uint8_t echoType, uint8_t *payload, uint16_t len, uint8_t *args, uint16_t argsLen);
     void HwBluetoothConnCb(const StackCallbackParam &param);
-    void HwDeviceCallback(STACK::RawAddress *addr, int deviceType);
-    void HwA2dpOffloadCodecConfigCallback(STACK::RawAddress *bdAddr, A2dpOffloadConfigCallback config);
-    void HwHiechoDeviceAclEncryptionChangedCb(const STACK::RawAddress &remoteAddr);
-    void HwReportA2dpAbnormalStatusCb(const STACK::RawAddress &remoteAddr, int32_t errCode);
+    void HwDeviceCallback(OHOS::bluetooth::RawAddress *addr, int deviceType);
+    void HwA2dpOffloadCodecConfigCallback(OHOS::bluetooth::RawAddress *bdAddr, A2dpOffloadConfigCallback config);
+    void HwHiechoDeviceAclEncryptionChangedCb(const OHOS::bluetooth::RawAddress &remoteAddr);
+    void HwReportA2dpAbnormalStatusCb(const OHOS::bluetooth::RawAddress &remoteAddr, int32_t errCode);
 
     void ProcessA2dpProfileState(RawAddress addr, uint8_t a2dpState);
     void ProcessHfpProfileState(RawAddress addr, uint8_t hfpState);
@@ -137,9 +137,9 @@ private:
     void PrintCapsuleParam(const CapsuleParam &param);
     void NotifyAudioManagerShowCapsule(const RawAddress &addr, const uint8_t a2dpState,
         const uint8_t hfpState, std::string &targetBtDevice, bool isEmptyAduio);
-    void HwHiechoSendPerServiceCapReqData(uint8_t cap, const STACK::RawAddress &remoteAddr);
+    void HwHiechoSendPerServiceCapReqData(uint8_t cap, const OHOS::bluetooth::RawAddress &remoteAddr);
     bool HwIsSupportMlinkDevice();
-    void HwHiechoSendHwAccountHashToTwsCb(const STACK::RawAddress &remoteAddr);
+    void HwHiechoSendHwAccountHashToTwsCb(const OHOS::bluetooth::RawAddress &remoteAddr);
     void HwHiechoDtsCap(uint8_t echoType, uint8_t *args);
     void HwHiechoAudioCapReq(const std::vector<uint8_t> &payload, uint16_t len, uint8_t *args);
     void HwHiechoWearState(const RawAddress &addr, const std::vector<uint8_t> &payload,

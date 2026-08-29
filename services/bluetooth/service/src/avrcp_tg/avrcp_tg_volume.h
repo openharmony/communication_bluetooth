@@ -26,6 +26,16 @@
 #include "log.h"
 #include "interface_adapter_classic.h"
 
+namespace std {
+template <>
+struct hash<OHOS::bluetooth::RawAddress> {
+    size_t operator()(const OHOS::bluetooth::RawAddress &address) const noexcept
+    {
+        return std::hash<std::string>()(address.GetAddress());
+    }
+};
+}  // namespace std
+
 namespace OHOS {
 namespace bluetooth {
 constexpr int32_t AVRCP_MAX_VOL = 127;
@@ -50,27 +60,27 @@ public:
      * @brief callback method.
      * Indicate that a device has been connected that does not support absolute volume.
      */
-    void DeviceConnected(const STACK::RawAddress &bdaddr) override;
+    void DeviceConnected(const OHOS::bluetooth::RawAddress &bdaddr) override;
 
     /**
      * @brief callback method.
      * Indicate that a device has been connected that does support absolute volume.
      * the callback called will send current valume to the remote devices
      */
-    void DeviceConnected(const STACK::RawAddress &bdaddr, VolumeChangedCb cb) override;
+    void DeviceConnected(const OHOS::bluetooth::RawAddress &bdaddr, VolumeChangedCb cb) override;
 
     /**
      * @brief callback method.
      * Register the SetVolume method to jni.
      */
-    void DeviceEmplaceSetVolume(const STACK::RawAddress &bdaddr, VolumeChangedCb cb) override;
+    void DeviceEmplaceSetVolume(const OHOS::bluetooth::RawAddress &bdaddr, VolumeChangedCb cb) override;
 
     /**
      * @brief callback method.
      * Indicate that a device has been disconnected from AVRCP. Will unregister any callbacks
      * if absolute volume is supported.
      */
-    void DeviceDisconnected(const STACK::RawAddress &bdaddr) override;
+    void DeviceDisconnected(const OHOS::bluetooth::RawAddress &bdaddr) override;
 
     /**
      * @brief callback method.
@@ -82,45 +92,45 @@ public:
      * @brief callback method.
      * Remote device change the volume
      */
-    void setVolumeOfDevice(int8_t volume, const STACK::RawAddress &bdaddr) override;
+    void setVolumeOfDevice(int8_t volume, const OHOS::bluetooth::RawAddress &bdaddr) override;
 
     /**
      * @brief Current device changed volume will send to remote by this function.
      * @param[in] addr The current device will changed.
      * @param[in] volume The current device volume to be changed.
      */
-    void SendVolumeChanged(const STACK::RawAddress &addr, int32_t volume);
+    void SendVolumeChanged(const OHOS::bluetooth::RawAddress &addr, int32_t volume);
 
     /**
      * @brief a2dp device actived, restore abs volume if support.
      * @param[in] rawAddr The device.
      */
-    void SwitchAbsVolumeDevice(const STACK::RawAddress &rawAddr, bool isNeedSetVolume = true);
+    void SwitchAbsVolumeDevice(const OHOS::bluetooth::RawAddress &rawAddr, bool isNeedSetVolume = true);
 
     /**
      * @brief Set device abs volume ability.
      * @param[in] rawAddr The device.
      * @param[in] ability The device abs volume ability.
      */
-    void SetDeviceAbsVolumeAbility(const STACK::RawAddress &rawAddr, int32_t ability);
+    void SetDeviceAbsVolumeAbility(const OHOS::bluetooth::RawAddress &rawAddr, int32_t ability);
 
     /**
      * @brief Get device abs volume ability.
      * @param[in] addr The device.
      * @return Device abs volume ability.
      */
-    int32_t GetDeviceAbsVolumeAbility(const STACK::RawAddress &rawAddr);
+    int32_t GetDeviceAbsVolumeAbility(const OHOS::bluetooth::RawAddress &rawAddr);
 
     /**
      * @brief system volume changed, audio notify volume changed.
      * @param[in] addr The device.
      * @param[in] volumeLevel The device volume.
      */
-    void SetDeviceAbsoluteVolume(const STACK::RawAddress &rawAddr, int32_t volumeLevel);
+    void SetDeviceAbsoluteVolume(const OHOS::bluetooth::RawAddress &rawAddr, int32_t volumeLevel);
 
     void NotifyAudioVolumeEvent(int32_t streamType, int32_t volume);
 
-    void SetDeviceAbsVolumeProperty(const STACK::RawAddress &rawAddr, int32_t ability);
+    void SetDeviceAbsVolumeProperty(const OHOS::bluetooth::RawAddress &rawAddr, int32_t ability);
 
 private:
     inline int32_t SystemToAvrcpVolume(int32_t volume)
@@ -145,7 +155,7 @@ private:
 
 private:
     std::mutex volumeCallbackMapLock_;
-    std::unordered_map<STACK::RawAddress, VolumeChangedCb> volumeCallbackMap_;
+    std::unordered_map<OHOS::bluetooth::RawAddress, VolumeChangedCb> volumeCallbackMap_;
     int32_t musicMaxVolumeLevel_;
 };
 }  // namespace bluetooth

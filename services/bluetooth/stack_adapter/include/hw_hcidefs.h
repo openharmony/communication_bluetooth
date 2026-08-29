@@ -18,7 +18,7 @@
 
 #include <cstdint>
 
-#include "types/raw_address.h"
+#include "raw_address.h"
 
 #ifndef STACK
 #define STACK
@@ -38,7 +38,7 @@ constexpr uint32_t COD_HID_KEYBOARD = 0x0540;
 struct ForceSleepFilterHidData {
     bool enabled;
     uint8_t transport;
-    STACK::RawAddress rawAddr;
+    OHOS::bluetooth::RawAddress rawAddr;
 };
 
 union UnionCmdToHisi {

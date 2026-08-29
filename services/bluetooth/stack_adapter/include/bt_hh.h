@@ -61,29 +61,29 @@ struct BthhHidInfo {
     uint8_t dscList[BTHH_MAX_DSC_LEN];
 };
 
-typedef void (*BthhConnectionStateCallback)(RawAddress *bdAddr, BleAddrType addrType,
+typedef void (*BthhConnectionStateCallback)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType,
                                                BtTransport transport,
                                                BthhConnectionState state);
 
-typedef void (*BthhVirtualUnplugCallback)(RawAddress *bdAddr, BleAddrType addrType,
+typedef void (*BthhVirtualUnplugCallback)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType,
                                              BtTransport transport, BthhStatus hhStatus);
 
-typedef void (*BthhHidInfoCallback)(RawAddress *bdAddr, BleAddrType addrType,
+typedef void (*BthhHidInfoCallback)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType,
                                        BtTransport transport, BthhHidInfo hidInfo);
 
-typedef void (*BthhProtocolModeCallback)(RawAddress *bdAddr, BleAddrType addrType,
+typedef void (*BthhProtocolModeCallback)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType,
                                             BtTransport transport, BthhStatus hhStatus,
                                             BthhProtocolMode mode);
 
-typedef void (*BthhIdleTimeCallback)(RawAddress *bdAddr, BleAddrType addrType,
+typedef void (*BthhIdleTimeCallback)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType,
                                         BtTransport transport, BthhStatus hhStatus,
                                         int idleRate);
 
-typedef void (*BthhGetReportCallback)(RawAddress *bdAddr, BleAddrType addrType,
+typedef void (*BthhGetReportCallback)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType,
                                          BtTransport transport, BthhStatus hhStatus,
                                          uint8_t *rptData, int rptSize);
 
-typedef void (*BthhHandshakeCallback)(RawAddress *bdAddr, BleAddrType addrType,
+typedef void (*BthhHandshakeCallback)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType,
                                         BtTransport transport, BthhStatus hhStatus);
 
 /* BT-HH callback structure. */
@@ -102,29 +102,29 @@ struct BthhCallbacks {
 struct BthhInterface {
     size_t size;
     BtStackStatus (*init)(BthhCallbacks *callbacks);
-    BtStackStatus (*connect)(RawAddress *bdAddr, BleAddrType addrType, BtTransport transport);
-    BtStackStatus (*disconnect)(RawAddress *bdAddr, BleAddrType addrType, BtTransport transport,
+    BtStackStatus (*connect)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType, BtTransport transport);
+    BtStackStatus (*disconnect)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType, BtTransport transport,
                               bool reconnectAllowed);
-    BtStackStatus (*virtualUnplug)(RawAddress *bdAddr, BleAddrType addrType,
+    BtStackStatus (*virtualUnplug)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType,
                                   BtTransport transport);
-    BtStackStatus (*setInfo)(RawAddress *bdAddr, BleAddrType addrType, BtTransport transport,
+    BtStackStatus (*setInfo)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType, BtTransport transport,
                             BthhHidInfo hidInfo);
-    BtStackStatus (*getProtocol)(RawAddress *bdAddr, BleAddrType addrType,
+    BtStackStatus (*getProtocol)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType,
                                 BtTransport transport, BthhProtocolMode protocolMode);
-    BtStackStatus (*setProtocol)(RawAddress *bdAddr, BleAddrType addrType,
+    BtStackStatus (*setProtocol)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType,
                                 BtTransport transport, BthhProtocolMode protocolMode);
-    BtStackStatus (*getIdleTime)(RawAddress *bdAddr, BleAddrType addrType,
+    BtStackStatus (*getIdleTime)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType,
                                  BtTransport transport);
-    BtStackStatus (*setIdleTime)(RawAddress *bdAddr, BleAddrType addrType,
+    BtStackStatus (*setIdleTime)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType,
                                  BtTransport transport, uint8_t idleTime);
-    BtStackStatus (*getReport)(RawAddress *bdAddr, BleAddrType addrType, BtTransport transport,
+    BtStackStatus (*getReport)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType, BtTransport transport,
                               BthhReportType reportType, uint8_t reportId, int bufferSize);
-    BtStackStatus (*getReportReply)(RawAddress *bdAddr, BleAddrType addrType,
+    BtStackStatus (*getReportReply)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType,
                                     BtTransport transport, BthhStatus status, char *report,
                                     uint16_t size);
-    BtStackStatus (*setReport)(RawAddress *bdAddr, BleAddrType addrType, BtTransport transport,
+    BtStackStatus (*setReport)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType, BtTransport transport,
                               BthhReportType reportType, char *report);
-    BtStackStatus (*sendData)(RawAddress *bdAddr, BleAddrType addrType, BtTransport transport,
+    BtStackStatus (*sendData)(OHOS::bluetooth::RawAddress *bdAddr, BleAddrType addrType, BtTransport transport,
                              char *data);
     void (*cleanup)(void);
     void (*configureEnabledProfiles)(bool enableHidp, bool enableHogp);

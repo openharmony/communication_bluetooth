@@ -21,7 +21,7 @@
 #include "bluetooth_audio_manager_interface.h"
 #include "bluetooth_device.h"
 #include <string>
-#include "types/raw_address.h"
+#include "raw_address.h"
 #include "hiecho.h"
 #include "safe_map.h"
 #include "securec.h"

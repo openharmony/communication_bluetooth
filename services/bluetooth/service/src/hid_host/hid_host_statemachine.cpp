@@ -248,8 +248,7 @@ bool HidHostConnectedState::Dispatch(const utility::Message &msg)
 
 bool HidHostStateMachine::ProcessConnectEvent()
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HidHostService *hidHostService = HidHostService::GetService();
     if (hidHostService == nullptr) {
         HILOGE("hidHostService is null");
@@ -279,8 +278,7 @@ bool HidHostStateMachine::ProcessDisConnectEvent()
     if (bluetoothHidInterface == nullptr) {
         return false;
     }
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HILOGI("[HID_MACHINE]Hid device address[%{public}s]", GetEncryptAddr(address_).c_str());
     BtStackStatus status = bluetoothHidInterface->disconnect(&rawAddr, BLE_ADDR_PUBLIC, BT_TRANSPORT_BR_EDR, false);
     if (status != BT_STATUS_SUCCESS) {
@@ -292,8 +290,7 @@ bool HidHostStateMachine::ProcessDisConnectEvent()
 
 void HidHostStateMachine::ProcessVCUnplugEvent()
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HidHostService *hidHostService = HidHostService::GetService();
     if (hidHostService == nullptr) {
         HILOGE("hidHostService is null");
@@ -313,8 +310,7 @@ void HidHostStateMachine::ProcessVCUnplugEvent()
 
 void HidHostStateMachine::ProcessSetReportEvent(const HidHostMessage &msg)
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HidHostService *hidHostService = HidHostService::GetService();
     if (hidHostService == nullptr) {
         HILOGE("hidHostService is null");
@@ -336,8 +332,7 @@ void HidHostStateMachine::ProcessSetReportEvent(const HidHostMessage &msg)
 
 void HidHostStateMachine::ProcessGetReportEvent(const HidHostMessage &msg)
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HidHostService *hidHostService = HidHostService::GetService();
     if (hidHostService == nullptr) {
         HILOGE("hidHostService is null");

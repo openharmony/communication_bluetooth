@@ -876,8 +876,7 @@ bool HfpAgAudioConnected::Dispatch(const utility::Message &msg)
 
 bool HfpAgStateMachine::ProcessConnectEvent()
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     auto hfpAgService = HfpAgService::GetService();
     if (hfpAgService == nullptr) {
         return false;
@@ -898,8 +897,7 @@ bool HfpAgStateMachine::ProcessConnectEvent()
 
 bool HfpAgStateMachine::ProcessDisConnectEvent()
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     auto hfpAgService = HfpAgService::GetService();
     if (hfpAgService == nullptr) {
         return false;
@@ -921,8 +919,7 @@ bool HfpAgStateMachine::ProcessDisConnectEvent()
 void HfpAgStateMachine::ProcessOpenRecognitionEvent(int requestSource)
 {
     std::string callingName = Bluetooth::PermissionManager::GetCallingName();
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     auto hfpAgService = HfpAgService::GetService();
     if (hfpAgService == nullptr) {
         return;
@@ -955,8 +952,7 @@ void HfpAgStateMachine::ProcessOpenRecognitionEvent(int requestSource)
 
 void HfpAgStateMachine::ProcessCloseRecognitionEvent()
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     auto hfpAgService = HfpAgService::GetService();
     if (hfpAgService == nullptr) {
         return;
@@ -991,7 +987,7 @@ bool HfpAgStateMachine::ProcessConnectAudioEvent()
     service->StopA2dpOffload();
     BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_SET_A2DP_SUSPEND, RawAddress(""), UE_COMMON_SCENE_CASE1,
         UE_COMMON_SCENE_CASE1);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr = device;
     ::bluetooth::headset::Interface* bluetoothHfpInterface = service->getBluetoothHfpInterface();
     if (bluetoothHfpInterface == nullptr) {
         HILOGE("[HFP_STATE_MACHINE]BluetoothHfpInterface is null");
@@ -1015,8 +1011,7 @@ bool HfpAgStateMachine::ProcessConnectAudioEvent()
 
 bool HfpAgStateMachine::ProcessDisconnectAudioEvent()
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     auto hfpAgService = HfpAgService::GetService();
     if (hfpAgService == nullptr) {
         return false;

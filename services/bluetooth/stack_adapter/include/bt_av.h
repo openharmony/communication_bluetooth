@@ -111,17 +111,17 @@ struct BtavA2dpCodecConfig {
 };
 
 /* A2DP source callbacks (bluedroid system/btif/include/btif_av.h). */
-typedef void (*BtavConnectionStateCallback)(const RawAddress &bdAddr, BtavConnectionState state);
-typedef void (*BtavAudioStateCallback)(const RawAddress &bdAddr, BtavAudioState state);
-typedef void (*BtavAudioSourceConfigCallback)(const RawAddress &bdAddr, BtavA2dpCodecConfig codecConfig,
+typedef void (*BtavConnectionStateCallback)(const OHOS::bluetooth::RawAddress &bdAddr, BtavConnectionState state);
+typedef void (*BtavAudioStateCallback)(const OHOS::bluetooth::RawAddress &bdAddr, BtavAudioState state);
+typedef void (*BtavAudioSourceConfigCallback)(const OHOS::bluetooth::RawAddress &bdAddr, BtavA2dpCodecConfig codecConfig,
     std::vector<BtavA2dpCodecConfig> codecsLocalCapabilities,
     std::vector<BtavA2dpCodecConfig> codecsSelectableCapabilities);
-typedef bool (*BtavMandatoryCodecPreferredCallback)(const RawAddress &bdAddr);
+typedef bool (*BtavMandatoryCodecPreferredCallback)(const OHOS::bluetooth::RawAddress &bdAddr);
 
 /* Audio configuration callback of the A2DP sink profile (bluedroid
  * system/btif/include/btif_av.h); sampleRate in Hz, channelCount 1 for
  * mono and 2 for stereo. */
-typedef void (*BtavAudioSinkConfigCallback)(const RawAddress &bdAddr, uint32_t sampleRate,
+typedef void (*BtavAudioSinkConfigCallback)(const OHOS::bluetooth::RawAddress &bdAddr, uint32_t sampleRate,
     uint8_t channelCount);
 
 struct BtavSourceCallbacks {
@@ -140,10 +140,10 @@ struct BtavSourceInterface {
         const std::vector<BtavA2dpCodecConfig> &codecPriorities,
         const std::vector<BtavA2dpCodecConfig> &offloadingPreference);
     void (*cleanup)(void);
-    BtStackStatus (*connect)(const RawAddress &bdAddr);
-    BtStackStatus (*disconnect)(const RawAddress &bdAddr);
-    BtStackStatus (*setActiveDevice)(const RawAddress &bdAddr);
-    BtStackStatus (*configCodec)(const RawAddress &bdAddr, std::vector<BtavA2dpCodecConfig> codecPreferences);
+    BtStackStatus (*connect)(const OHOS::bluetooth::RawAddress &bdAddr);
+    BtStackStatus (*disconnect)(const OHOS::bluetooth::RawAddress &bdAddr);
+    BtStackStatus (*setActiveDevice)(const OHOS::bluetooth::RawAddress &bdAddr);
+    BtStackStatus (*configCodec)(const OHOS::bluetooth::RawAddress &bdAddr, std::vector<BtavA2dpCodecConfig> codecPreferences);
 };
 
 /* A2DP sink callbacks and interface consumed by the service layer
@@ -159,12 +159,12 @@ struct BtavSinkCallbacks {
 struct BtavSinkInterface {
     size_t size;
     BtStackStatus (*init)(BtavSinkCallbacks *callbacks, int maxConnectedAudioDevices);
-    BtStackStatus (*connect)(const RawAddress &bdAddr);
-    BtStackStatus (*disconnect)(const RawAddress &bdAddr);
+    BtStackStatus (*connect)(const OHOS::bluetooth::RawAddress &bdAddr);
+    BtStackStatus (*disconnect)(const OHOS::bluetooth::RawAddress &bdAddr);
     void (*cleanup)(void);
     void (*setAudioFocusState)(int focusState);
     void (*setAudioTrackGain)(float gain);
-    BtStackStatus (*setActiveDevice)(const RawAddress &bdAddr);
+    BtStackStatus (*setActiveDevice)(const OHOS::bluetooth::RawAddress &bdAddr);
 };
 
 #endif  // BT_AV_H

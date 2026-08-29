@@ -148,6 +148,16 @@ public:
     static RawAddress ConvertToString(const uint8_t *src, const size_t size = BT_ADDRESS_BYTE_LEN);
 
     /**
+     * @brief Convert RawAddress from uint8_t byte stream.
+     *
+     * @param src uint8_t pointer.
+     * @param size Byte length, default is BT_ADDRESS_BYTE_LEN.
+     * @return Returns RawAddress instance.
+     * @since 12
+     */
+    static RawAddress StreamToBdaddr(const uint8_t *src, const size_t size = BT_ADDRESS_BYTE_LEN);
+
+    /**
      * @brief Compare two RawAddress values.
      *
      * @param rhs Compared RawAddress instance.

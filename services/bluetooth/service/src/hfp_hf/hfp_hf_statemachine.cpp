@@ -305,8 +305,7 @@ void HfpHfStateMachine::GetBluetoothHfInterface()
 
 bool HfpHfStateMachine::ProcessConnectEvent()
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     CHECK_AND_RETURN_LOG_RET(bluetoothHfInterface != nullptr, false,
         "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
@@ -323,8 +322,7 @@ bool HfpHfStateMachine::ProcessConnectEvent()
 
 bool HfpHfStateMachine::ProcessDisconnectEvent()
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     CHECK_AND_RETURN_LOG_RET(bluetoothHfInterface != nullptr, false,
         "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
@@ -347,8 +345,7 @@ bool HfpHfStateMachine::ProcessConnectScoEvent()
     }
 #endif
 
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     CHECK_AND_RETURN_LOG_RET(bluetoothHfInterface != nullptr, false,
         "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
@@ -363,8 +360,7 @@ bool HfpHfStateMachine::ProcessConnectScoEvent()
 
 bool HfpHfStateMachine::ProcessDisconnectScoEvent()
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     CHECK_AND_RETURN_LOG_RET(bluetoothHfInterface != nullptr, false,
         "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
@@ -384,8 +380,7 @@ void HfpHfStateMachine::ProcessSetHfVolume(int volume, int type)
         HILOGE("[HFP_STATE_MACHINE]Called only for Mute/Un-mute - Mic volume change is not allowed.");
         return;
     }
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
     BtStackStatus status = bluetoothHfInterface->volumeControl(&rawAddr, (BthfClientVolumeType)type, volume);
@@ -418,8 +413,7 @@ void HfpHfStateMachine::ProcessFinishActiveCall(const HfpHfMessage &event)
 
 void HfpHfStateMachine::ProcessDialCall(const HfpHfMessage &event)
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
     std::string number = event.calls_.GetNumber();
@@ -437,8 +431,7 @@ void HfpHfStateMachine::ProcessDialCall(const HfpHfMessage &event)
 void HfpHfStateMachine::ProcessOpenVoiceRecognition()
 {
     if (GetVoiceRecognitionState() == HFP_HF_VR_STATE_CLOSED) {
-        RawAddress device(address_);
-        STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+        OHOS::bluetooth::RawAddress rawAddr(address_);
         CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
         BtStackStatus status = bluetoothHfInterface->startVoiceRecognition(&rawAddr);
@@ -453,8 +446,7 @@ void HfpHfStateMachine::ProcessOpenVoiceRecognition()
 void HfpHfStateMachine::ProcessCloseVoiceRecognition()
 {
     if (GetVoiceRecognitionState() == HFP_HF_VR_STATE_OPENED) {
-        RawAddress device(address_);
-        STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+        OHOS::bluetooth::RawAddress rawAddr(address_);
         CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
         BtStackStatus status = bluetoothHfInterface->stopVoiceRecognition(&rawAddr);
@@ -468,8 +460,7 @@ void HfpHfStateMachine::ProcessCloseVoiceRecognition()
 
 void HfpHfStateMachine::ProcessBatteryLevelUpdate(int batteryLevel)
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
     BtStackStatus status =
@@ -504,8 +495,7 @@ void HfpHfStateMachine::ProcessRejectCall()
 
 void HfpHfStateMachine::PrecessSendDtmf(int flag)
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
     BtStackStatus status = bluetoothHfInterface->sendDtmf(&rawAddr, flag);
@@ -519,8 +509,7 @@ void HfpHfStateMachine::PrecessSendDtmf(int flag)
 void HfpHfStateMachine::PrecessSendKeyPressed()
 {
     const char *ckpd = "+CKPD=200\r";
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
     BtStackStatus status =
@@ -602,8 +591,7 @@ void HfpHfStateMachine::ProcessAcceptCall(int flag)
 
 void HfpHfStateMachine::HandleCallAction(int action, int event)
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
     BtStackStatus status = bluetoothHfInterface->handleCallAction(&rawAddr, (BthfClientCallAction)action, 0);
@@ -933,7 +921,7 @@ void HfpHfStateMachine::ProcessNetworkStateEvent(const HfpHfMessage &event)
     }
 
     if (networkState_ == HFP_HF_NETWORK_STATE_AVAILABLE) {
-        STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(rawAddress);
+        OHOS::bluetooth::RawAddress rawAddr = rawAddress;
         CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
         BtStackStatus status = bluetoothHfInterface->queryCurrentOperatorName(&rawAddr);
@@ -1012,7 +1000,7 @@ void HfpHfStateMachine::ProcessCallIndicatorEvent(const HfpHfMessage &event)
 
     RawAddress device(address_);
     HILOGI("[HFP_STATE_MACHINE]Send CLCC!");
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr = device;
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
     BtStackStatus status = bluetoothHfInterface->queryCurrentCalls(&rawAddr);
@@ -1026,8 +1014,7 @@ void HfpHfStateMachine::ProcessCallIndicatorEvent(const HfpHfMessage &event)
 
 void HfpHfStateMachine::ProcessSlcEstablished(const HfpHfMessage &event)
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     CHECK_AND_RETURN_LOG(bluetoothHfInterface != nullptr, "[HFP_STATE_MACHINE]BluetoothHfInterface is null");
 
     peerFeatures_ = event.arg1_;

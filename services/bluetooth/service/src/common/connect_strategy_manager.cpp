@@ -531,7 +531,7 @@ bool ConnectStrategyManager::IsProfileNeedDelayConnect(const RawAddress &device)
 
     auto* bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG_RET(bthwif != nullptr, false, "bthwif is null");
-    bool isRmoteDeviceNeedDelay = !bthwif->hwIsSupportEchoDevice(ServiceUtil::AddrToStack(device));
+    bool isRmoteDeviceNeedDelay = !bthwif->hwIsSupportEchoDevice(device);
 
     return (isRmoteDeviceNeedDelay && isProfileNeedConnect);
 }

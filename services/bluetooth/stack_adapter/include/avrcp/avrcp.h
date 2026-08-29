@@ -141,7 +141,7 @@ using MediaListCallback = std::function<void(uint16_t, std::vector<MediaPlayerIn
 using FolderItemsCallback = std::function<void(std::vector<ListItem>)>;
 using SetBrowsedPlayerCallback = std::function<void(bool, std::string, uint16_t)>;
 using AppSettingsCallback = std::function<void(uint8_t, uint8_t)>;
-using VolumeChangedCb = std::function<void(const RawAddress &, int32_t)>;
+using VolumeChangedCb = std::function<void(const OHOS::bluetooth::RawAddress &, int32_t)>;
 
 class MediaInterface {
 public:
@@ -159,7 +159,7 @@ public:
     virtual void RegisterUpdateCallback(MediaCallbacks *callback) {}
     virtual void UnregisterUpdateCallback(MediaCallbacks *callback) {}
     virtual void PlayItem(uint16_t playerId, bool nowPlaying, std::string mediaId) {}
-    virtual void SetActiveDevice(const RawAddress &address) {}
+    virtual void SetActiveDevice(const OHOS::bluetooth::RawAddress &address) {}
     virtual void AppSettingsSupport(AppSettingsCallback appCb) {}
     virtual void SetAppSettingsMode(uint8_t shuffleMode, uint8_t repeatMode) {}
     virtual void SetA2dpService(OHOS::bluetooth::IProfileA2dp *a2dpService) {}
@@ -174,12 +174,12 @@ public:
 class VolumeInterface {
 public:
     virtual ~VolumeInterface() = default;
-    virtual void DeviceConnected(const RawAddress &bdaddr) {}
-    virtual void DeviceConnected(const RawAddress &bdaddr, VolumeChangedCb cb) {}
-    virtual void DeviceEmplaceSetVolume(const RawAddress &bdaddr, VolumeChangedCb cb) {}
-    virtual void DeviceDisconnected(const RawAddress &bdaddr) {}
+    virtual void DeviceConnected(const OHOS::bluetooth::RawAddress &bdaddr) {}
+    virtual void DeviceConnected(const OHOS::bluetooth::RawAddress &bdaddr, VolumeChangedCb cb) {}
+    virtual void DeviceEmplaceSetVolume(const OHOS::bluetooth::RawAddress &bdaddr, VolumeChangedCb cb) {}
+    virtual void DeviceDisconnected(const OHOS::bluetooth::RawAddress &bdaddr) {}
     virtual void SetVolume(int8_t volume) {}
-    virtual void setVolumeOfDevice(int8_t volume, const RawAddress &bdaddr) {}
+    virtual void setVolumeOfDevice(int8_t volume, const OHOS::bluetooth::RawAddress &bdaddr) {}
 };
 
 class ServiceInterface {
@@ -187,9 +187,9 @@ public:
     virtual ~ServiceInterface() = default;
     virtual void Init(MediaInterface *mediaInterface, VolumeInterface *volumeInterface) {}
     virtual void Cleanup() {}
-    virtual void ConnectDevice(const RawAddress &bdaddr) {}
-    virtual void DisconnectDevice(const RawAddress &bdaddr) {}
-    virtual void SetBipClientStatus(const RawAddress &bdaddr, bool connected) {}
+    virtual void ConnectDevice(const OHOS::bluetooth::RawAddress &bdaddr) {}
+    virtual void DisconnectDevice(const OHOS::bluetooth::RawAddress &bdaddr) {}
+    virtual void SetBipClientStatus(const OHOS::bluetooth::RawAddress &bdaddr, bool connected) {}
     virtual void RegisterBipServer(int32_t psm) {}
     virtual void UnregisterBipServer() {}
 };

@@ -220,7 +220,7 @@ int BasService::Connect(const RawAddress &device)
             CHECK_AND_RETURN_LOG_RET(classicAdapter != nullptr, Bluetooth::BT_ERR_INTERNAL_ERROR,
                 "classicAdapter is null");
             classicAdapter->AddPendingConnectDevice(device, PROFILE_ID_BAS);
-            STACK::RawAddress bdaddr = ServiceUtil::AddrToStack(device);
+            OHOS::bluetooth::RawAddress bdaddr = device;
             BtInterface* bluetoothInterface = AdapterManager::GetInstance()->getBluetoothInterface();
             CHECK_AND_RETURN_LOG_RET(bluetoothInterface != nullptr, Bluetooth::BT_ERR_INTERNAL_ERROR,
                 "bluetoothInterface is null");

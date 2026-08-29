@@ -241,7 +241,7 @@ void CloudDeviceManager::SetDeviceNameProp(std::shared_ptr<BluetoothDevice> devi
     std::string saveName = deviceName;
     prop.len = static_cast<int32_t>(deviceName.size());
     prop.val = const_cast<void *>(static_cast<const void *>(saveName.c_str()));
-    STACK::RawAddress addr = ServiceUtil::AddrToStack(RawAddress(device->GetAddress()));
+    OHOS::bluetooth::RawAddress addr = RawAddress(device->GetAddress());
     RemoteDeviceProperties::GetInstance()->SetRemoteDeviceProperty(addr, prop);
 }
 
@@ -285,7 +285,7 @@ void CloudDeviceManager::SetDeviceUuidsProp(
     int32_t len = static_cast<int32_t>(uuidsData.size());
     prop.len = len;
     prop.val = const_cast<void *>(static_cast<const void *>(uuidsData.data()));
-    STACK::RawAddress addr = ServiceUtil::AddrToStack(RawAddress(device->GetAddress()));
+    OHOS::bluetooth::RawAddress addr = RawAddress(device->GetAddress());
     RemoteDeviceProperties::GetInstance()->SetRemoteDeviceProperty(addr, prop);
 }
 
@@ -296,7 +296,7 @@ void CloudDeviceManager::SetRemoteDevicePropertyInt(const RawAddress &device, Bt
     prop.type = type;
     prop.len = sizeof(value);
     prop.val = val;
-    STACK::RawAddress addr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress addr = device;
     RemoteDeviceProperties::GetInstance()->SetRemoteDeviceProperty(addr, prop);
 }
 
@@ -341,9 +341,9 @@ void CloudDeviceManager::SendCloudDevState(const RawAddress &device)
 {
     auto classicAdapter = AdapterManager::GetInstance()->GetClassicAdapter();
     if (classicAdapter != nullptr) {
-        STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+        OHOS::bluetooth::RawAddress rawAddr = device;
         classicAdapter->SetBondState(BT_STATUS_SUCCESS, rawAddr, BT_BOND_STATE_BONDED);
-        HILOGI("%{public}s, set to bonded", rawAddr.ToStringForLogging().c_str());
+        HILOGI("%{public}s, set to bonded", GET_ENCRYPT_STR_ADDR(rawAddr.GetAddress()));
     }
 }
  

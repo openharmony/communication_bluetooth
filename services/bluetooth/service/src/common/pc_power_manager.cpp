@@ -360,8 +360,7 @@ void IPowerState::CmdFilterHdiToHisi(const uint8_t &enabled)
         }
         const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
         CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
-        STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(realAddr);
-        ForceSleepFilterHidData filterHidData = {enabled, transport, rawAddr};
+        ForceSleepFilterHidData filterHidData = {enabled, transport, realAddr};
         UnionCmdToHisi unionCmd;
         unionCmd.hidData = filterHidData;
         SpecificCmdToHisi cmd = {unionCmd, HCI_FILTER_MOUSE_OR_KEYBOARD_OPCODE};

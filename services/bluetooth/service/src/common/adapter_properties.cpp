@@ -513,12 +513,12 @@ std::string AdapterProperties::ParseDeviceName(BtProperty* property)
 
 RawAddress AdapterProperties::ParseDeviceAddr(BtProperty* property)
 {
-    if (property->len != sizeof(STACK::RawAddress)) {
+    if (property->len != sizeof(OHOS::bluetooth::RawAddress)) {
         HILOGE("Invalid length for BT_PROPERTY_BDADDR");
         return RawAddress(INVALID_MAC_ADDRESS);
     }
     if (property->val != nullptr) {
-        RawAddress address =  ServiceUtil::AddrFromStack(*reinterpret_cast<STACK::RawAddress*>(property->val));
+        RawAddress address =  *reinterpret_cast<OHOS::bluetooth::RawAddress*>(property->val);
         return address;
     } else {
         HILOGE("Invalid pointer");
@@ -655,12 +655,12 @@ bool AdapterProperties::ParseScanMode(BtProperty* property, int &scanMode)
 std::vector<std::string> AdapterProperties::ParseBondedDevices(BtProperty* property)
 {
     HILOGD("BT_PROPERTY_ADAPTER_BONDED_DEVICES");
-    if (property->len < 0 || property->len % BD_ADDR_LEN != 0) {
+    if (property->len < 0 || property->len % OHOS::bluetooth::RawAddress::BT_ADDRESS_BYTE_LEN != 0) {
         HILOGE("wrong len !");
         return pairedAddrList_;
     }
-    int num = property->len / BD_ADDR_LEN;
-    auto addr = reinterpret_cast<const STACK::RawAddress*>(property->val);
+    int num = property->len / OHOS::bluetooth::RawAddress::BT_ADDRESS_BYTE_LEN;
+    auto addr = reinterpret_cast<const OHOS::bluetooth::RawAddress*>(property->val);
     std::vector<std::string> pairedAddrList;
 
     if (property->val == nullptr) {
@@ -668,7 +668,7 @@ std::vector<std::string> AdapterProperties::ParseBondedDevices(BtProperty* prope
         return pairedAddrList_;
     }
     for (int i = 0; i < num; ++i) {
-        RawAddress address = ServiceUtil::AddrFromStack(addr[i]);
+        RawAddress address = addr[i];
         HILOGD("BondedDevices = %{public}s", GetEncryptAddr(address.GetAddress()).c_str());
         pairedAddrList.push_back(address.GetAddress());
     }

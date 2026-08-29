@@ -74,23 +74,23 @@ GattClientApplication::~GattClientApplication()
 }
 
 void GattClientApplication::ConnectCallback(
-    int connId, int status, int clientIf, const STACK::RawAddress &bda)
+    int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda)
 {
     if (clientIf_ != clientIf) {
         return;
     }
     HILOGI("connId: %{public}d, status: %{public}d, clientIf: %{public}d, address: %{public}s",
-        connId, status, clientIf, bda.ToStringForLogging().c_str());
+        connId, status, clientIf, GET_ENCRYPT_STR_ADDR(bda.GetAddress()));
     auto resourceMgr = BluetoothResourceManager::GetInstance();
     if (resourceMgr) {
         resourceMgr->SendSensingStateChanged(GATT_CLIENT_CONNECT_DONE,
-            SensingInfo(bda.ToString(), static_cast<uint32_t>(clientIf)));
+            SensingInfo(bda.GetAddress(), static_cast<uint32_t>(clientIf)));
     }
 
-    BtChrEventWriteInt(CHR_BT_WATCH_CONNECT, bda.ToString(), "GATTCSTATUS", status);
+    BtChrEventWriteInt(CHR_BT_WATCH_CONNECT, bda.GetAddress(), "GATTCSTATUS", status);
 
     if (status != GATT_SUCCESS) {
-        BtChrEventWriteInt(CHR_BLE_DISCONNECT, bda.ToString(), "BLEPROFILEERROR", status);
+        BtChrEventWriteInt(CHR_BLE_DISCONNECT, bda.GetAddress(), "BLEPROFILEERROR", status);
         HILOGE("failed, status: %{public}d", status);
         connState_ = static_cast<int>(BTConnectState::DISCONNECTED);
         int disconnectReason = static_cast<int>(GattDisconnectReason::CONN_UNKNOWN);
@@ -98,21 +98,20 @@ void GattClientApplication::ConnectCallback(
             GATT_DIS_MSG_CONNECT_FAIL);
         return;
     }
-    BtChrEventWriteInt(CHR_BLE_DISCONNECT, bda.ToString(), "BLEPROFILEERROR", GATT_SUCCESS);
-    BtChrEventWriteTime(CHR_BLE_DISCONNECT, bda.ToString(), "BLEPROFILECONNECTEDTIME");
+    BtChrEventWriteInt(CHR_BLE_DISCONNECT, bda.GetAddress(), "BLEPROFILEERROR", GATT_SUCCESS);
+    BtChrEventWriteTime(CHR_BLE_DISCONNECT, bda.GetAddress(), "BLEPROFILECONNECTEDTIME");
     connId_ = connId;
     connState_ = static_cast<int>(BTConnectState::CONNECTED);
     BluetoothStateManager::GetInstance()->AddDeviceProfileConnectState(
-        PROFILE_NAME_GATT_CLIENT, bda.ToString(), BTConnectState::CONNECTED);
+        PROFILE_NAME_GATT_CLIENT, bda.GetAddress(), BTConnectState::CONNECTED);
     WPTR_CBACK(callback_, OnConnectionStateChanged, GattStatus::GATT_SUCCESS, connState_,
-        ServiceUtil::AddrFromStack(bda));
+        bda);
 }
 
 void GattClientApplication::KeepBleScan(const std::string &pkgName, int uid)
 {
     if (!IsConnected()) {
-        STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(addr_);
-        BluetoothHwInterface::GetInstance()->KeepBleScanInConn(pkgName, uid, BT_TRANSPORT_LE, rawAddr);
+        BluetoothHwInterface::GetInstance()->KeepBleScanInConn(pkgName, uid, BT_TRANSPORT_LE, addr_);
     }
 }
 
@@ -131,7 +130,7 @@ void GattClientApplication::Connect(bool autoConnect)
     if (btIfGattClient_) {
         // direct, not opportunistic
         int ret = btIfGattClient_->connect(
-            clientIf_, ServiceUtil::AddrToStack(addr_), !autoConnect, transport_, false, BTM_PHY_LE_1M);
+            clientIf_, addr_, !autoConnect, transport_, false, BTM_PHY_LE_1M);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             int disconnectReason = static_cast<int>(GattDisconnectReason::CONN_UNKNOWN);
@@ -145,18 +144,18 @@ void GattClientApplication::Connect(bool autoConnect)
 }
 
 void GattClientApplication::DisconnectCallback(
-    int connId, int status, int clientIf, const STACK::RawAddress &bda, int reason)
+    int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda, int reason)
 {
     if (clientIf_ != clientIf) {
         return;
     }
     HILOGI("connId: %{public}d, status: %{public}d, clientIf: %{public}d, address: %{public}s",
-        connId, status, clientIf, bda.ToStringForLogging().c_str());
+        connId, status, clientIf, GET_ENCRYPT_STR_ADDR(bda.GetAddress()));
 
     auto resourceMgr = BluetoothResourceManager::GetInstance();
     if (resourceMgr) {
         resourceMgr->SendSensingStateChanged(GATT_CLIENT_CONNECT_CLOSE,
-            SensingInfo(bda.ToString(), static_cast<uint32_t>(clientIf)));
+            SensingInfo(bda.GetAddress(), static_cast<uint32_t>(clientIf)));
     }
     int convertReason = static_cast<int>(GattDisconnectReason::CONN_UNKNOWN);
     std::string reasonMessage = "";
@@ -165,24 +164,24 @@ void GattClientApplication::DisconnectCallback(
         HILOGE("failed, status: %{public}d", status);
         connState_ = static_cast<int>(BTConnectState::CONNECTED);
         WPTR_CBACK(callback_, OnConnectionStateChanged, GattStatus::GATT_FAILURE, connState_,
-            ServiceUtil::AddrFromStack(bda), convertReason, reasonMessage);
+            bda, convertReason, reasonMessage);
         return;
     }
-    BtChrEventWriteTime(CHR_BLE_DISCONNECT, bda.ToString(),
+    BtChrEventWriteTime(CHR_BLE_DISCONNECT, bda.GetAddress(),
         "BLEPROFILEDISCONNECTTIME");
     connId_ = GATT_INVALID_CONN_ID;
     connState_ = static_cast<int>(BTConnectState::DISCONNECTED);
     WPTR_CBACK(callback_, OnConnectionStateChanged, GattStatus::GATT_SUCCESS, connState_,
-        ServiceUtil::AddrFromStack(bda), convertReason, reasonMessage);
+        bda, convertReason, reasonMessage);
 }
 
-void GattClientApplication::CancelOpenCallback(int connId, int status, int clientIf, const STACK::RawAddress &bda)
+void GattClientApplication::CancelOpenCallback(int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda)
 {
     if (clientIf_ != clientIf) {
         return;
     }
     HILOGI("connId: %{public}d, status: %{public}d, clientIf: %{public}d, address: %{public}s",
-        connId, status, clientIf, bda.ToStringForLogging().c_str());
+        connId, status, clientIf, GET_ENCRYPT_STR_ADDR(bda.GetAddress()));
     // When status is ERROR, do not handle.
     if (status != GATT_SUCCESS) {
         HILOGE("failed, status: %{public}d", status);
@@ -191,7 +190,7 @@ void GattClientApplication::CancelOpenCallback(int connId, int status, int clien
     connId_ = GATT_INVALID_CONN_ID;
     connState_ = static_cast<int>(BTConnectState::DISCONNECTED);
     WPTR_CBACK(callback_, OnConnectionStateChanged, GattStatus::GATT_SUCCESS, connState_,
-        ServiceUtil::AddrFromStack(bda));
+        bda);
 }
 
 void GattClientApplication::Disconnect(void)
@@ -213,7 +212,7 @@ void GattClientApplication::Disconnect(void)
         std::string callingName = PermissionManager::GetCallingName();
         BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_BLE_CLIENT_DISCONN, addr_.GetAddress(), clientIf_,
             callingName);
-        int ret = btIfGattClient_->disconnect(clientIf_, ServiceUtil::AddrToStack(addr_), connId_);
+        int ret = btIfGattClient_->disconnect(clientIf_, addr_, connId_);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnConnectionStateChanged, GattStatus::GATT_FAILURE, connState_, addr_, convertReason,
@@ -574,10 +573,10 @@ int GattClientApplication::RequestNotification(uint16_t characteristicHandle, bo
     if (btIfGattClient_) {
         if (enable) {
             ret = btIfGattClient_->registerForNotification(
-                clientIf_, ServiceUtil::AddrToStack(addr_), characteristicHandle);
+                clientIf_, addr_, characteristicHandle);
         } else {
             ret = btIfGattClient_->deregisterForNotification(
-                clientIf_, ServiceUtil::AddrToStack(addr_), characteristicHandle);
+                clientIf_, addr_, characteristicHandle);
         }
     }
     return ret;
@@ -589,9 +588,9 @@ void GattClientApplication::ConfigureMtuCallback(int connId, int status, int mtu
         return;
     }
     HILOGI("connId: %{public}d, status: %{public}d, mtu: %{public}d", connId, status, mtu);
-    BtChrEventWriteInt(CHR_BLE_DISCONNECT, ServiceUtil::AddrToStack(GetAddress()).ToString(),
+    BtChrEventWriteInt(CHR_BLE_DISCONNECT, GetAddress().GetAddress(),
         "BTCONMTUINITIATOR", 0);
-    BtChrEventWriteInt(CHR_BLE_DISCONNECT, ServiceUtil::AddrToStack(GetAddress()).ToString(),
+    BtChrEventWriteInt(CHR_BLE_DISCONNECT, GetAddress().GetAddress(),
         "BTCONMTURESULT", mtu);
 
     int ret = GattServiceBase::GattStatusFromStack(status);
@@ -614,7 +613,7 @@ void GattClientApplication::NotifyCallback(int connId, const BtgattNotifyParams 
         return;
     }
     HILOGD("connId: %{public}d, addr: %{public}s, handle: %{public}#x",
-        connId, data.bda.ToStringForLogging().c_str(), data.handle);
+        connId, GET_ENCRYPT_STR_ADDR(data.bda.GetAddress()), data.handle);
 
     auto value = GattServiceBase::BuildGattValue(data.value, data.len);
     std::shared_ptr<GattClientApplication> applicationPtr = shared_from_this();
@@ -658,7 +657,7 @@ void GattClientApplication::RequestConnectionPriority(int connPriority)
 
     if (btIfGattClient_) {
         int ret = btIfGattClient_->connParameterUpdate(
-            ServiceUtil::AddrToStack(addr_),
+            addr_,
             GetBleMinConnectionInterval(connPriority),
             GetBleMaxConnectionInterval(connPriority),
             GetBleConnectionLatency(connPriority),
@@ -755,7 +754,7 @@ int GattClientApplication::GetBleConnectionSupervisionTimeout(int connPriority)
 void GattClientApplication::ReadRemoteRssiValue(int appId)
 {
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->readRemoteRssi(appId, ServiceUtil::AddrToStack(addr_));
+        int ret = btIfGattClient_->readRemoteRssi(appId, addr_);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnReadRemoteRssiValue, addr_, 0, GattStatus::GATT_FAILURE);
@@ -763,16 +762,16 @@ void GattClientApplication::ReadRemoteRssiValue(int appId)
     }
 }
 
-void GattClientApplication::ReadRemoteRssiValueCallback(int clientIf, const STACK::RawAddress &bda,
+void GattClientApplication::ReadRemoteRssiValueCallback(int clientIf, const OHOS::bluetooth::RawAddress &bda,
     int rssi, int status)
 {
     if (clientIf_ != clientIf) {
         return;
     }
     HILOGI("rssi: %{public}d, status: %{public}d, clientIf: %{public}d, address: %{public}s",
-        rssi, status, clientIf, bda.ToStringForLogging().c_str());
+        rssi, status, clientIf, GET_ENCRYPT_STR_ADDR(bda.GetAddress()));
     int ret = GattServiceBase::GattStatusFromStack(status);
-    WPTR_CBACK(callback_, OnReadRemoteRssiValue, ServiceUtil::AddrFromStack(bda), rssi, ret);
+    WPTR_CBACK(callback_, OnReadRemoteRssiValue, bda, rssi, ret);
 }
 
 void GattClientApplication::PhyUpdatedCallback(int connId, uint8_t txPhy, uint8_t rxPhy, uint8_t status)
@@ -794,7 +793,7 @@ void GattClientApplication::SetPhy(int32_t txPhy, int32_t rxPhy, int32_t phyOpti
 
     if (btIfGattClient_) {
         int ret = btIfGattClient_->setPreferredPhy(
-            ServiceUtil::AddrToStack(addr_), txPhyMask, rxPhyMask, phyOptions);
+            addr_, txPhyMask, rxPhyMask, phyOptions);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnBlePhyUpdate, 0, 0, GattStatus::GATT_FAILURE);
@@ -812,7 +811,7 @@ void GattClientApplication::ReadPhyCallback(uint8_t txPhy, uint8_t rxPhy, uint8_
 void GattClientApplication::ReadPhy(void)
 {
     if (btIfGattClient_) {
-        int ret = btIfGattClient_->readPhy(ServiceUtil::AddrToStack(addr_),
+        int ret = btIfGattClient_->readPhy(addr_,
                 [this](uint8_t txPhy, uint8_t rxPhy, uint8_t status) { ReadPhyCallback(txPhy, rxPhy, status); });
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);

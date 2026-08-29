@@ -532,10 +532,10 @@ public:
     int GetRemoteDeviceBatteryInfo(const RawAddress &device, BatteryInfo &batteryInfo) const override;
     int SetRemoteDeviceBatteryInfo(const RawAddress &device, const BatteryInfo &batteryInfo) const override;
     void DiscoveryStateChanged(BtDiscoveryState state);
-    void BondStateChanged(BtStackStatus status, STACK::RawAddress* bdAddr, BtBondState state);
-    void SspRequest(STACK::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
+    void BondStateChanged(BtStackStatus status, OHOS::bluetooth::RawAddress* bdAddr, BtBondState state);
+    void SspRequest(OHOS::bluetooth::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
                     BtSspVariant pairingVariant, uint32_t passKey);
-    void PinRequest(STACK::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod, bool min16Digit);
+    void PinRequest(OHOS::bluetooth::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod, bool min16Digit);
     void GenerateLocalOobDataCb(int32_t status, const Bluetooth::BluetoothOobData &data);
     void UpdateDiscovertState(int discoveryState);
     void ResumeBleStackDevice(void);
@@ -772,14 +772,14 @@ public:
     void SendRemoteUuidChanged(const RawAddress &device, const std::vector<Uuid> &uuids) const;
     void SendScanModeChanged(const int scanMode) const;
     bool CheckBondStateAndReturn(std::shared_ptr<BluetoothDevice> &remoteDevice, int unbondCause);
-    void SetBondState(BtStackStatus status, STACK::RawAddress bdAddr, BtBondState state);
+    void SetBondState(BtStackStatus status, OHOS::bluetooth::RawAddress bdAddr, BtBondState state);
     int32_t UpdateCloudBluetoothDeviceInner(std::vector<Bluetooth::BluetoothTrustPairDevice> &cloudList);
 	std::string GetCarKeyDfxData() const override;
     void SetCarKeyCardData(const std::string &address, int32_t action) override;
     void InitCarKeyInfo() override;
     void AddPendingConnectDevice(const RawAddress &address, uint32_t profileId);
     void RemovePendingConnectDevice(const RawAddress &address);
-    void NotifyBondStateChanged(BtStackStatus status, STACK::RawAddress bdAddr, BtBondState state);
+    void NotifyBondStateChanged(BtStackStatus status, OHOS::bluetooth::RawAddress bdAddr, BtBondState state);
     bool StartRemoteSdpSearch(const std::string &address, const std::string &uuid) override;
     bool GetRemoteServices(const std::string &address) override;
     int32_t SetConnectionPriority(const std::string &address, int32_t priority) override;
@@ -993,10 +993,10 @@ private:
     void ProcessPostEnable();
     void DiscoveryStateChangedInner(BtDiscoveryState state);
     void CovertUnbondCause(BtStackStatus status, int &unbondCause, std::string &causeMessage);
-    void BondStateChangedInner(BtStackStatus status, STACK::RawAddress bdAddr, BtBondState state);
-    void SspRequestInner(STACK::RawAddress remoteBdAddr, BtBdname* bdName, uint32_t cod,
+    void BondStateChangedInner(BtStackStatus status, OHOS::bluetooth::RawAddress bdAddr, BtBondState state);
+    void SspRequestInner(OHOS::bluetooth::RawAddress remoteBdAddr, BtBdname* bdName, uint32_t cod,
         BtSspVariant pairingVariant, uint32_t passKey);
-    void PinRequestInner(STACK::RawAddress remoteBdAddr, BtBdname* bdName, uint32_t cod, bool min16Digit);
+    void PinRequestInner(OHOS::bluetooth::RawAddress remoteBdAddr, BtBdname* bdName, uint32_t cod, bool min16Digit);
     void StartUp();
     void ShutDown();
     bool SetPairingConfirmationIfNeed(const std::string &address);
@@ -1012,7 +1012,7 @@ private:
     void CheckDeviceUuidsAndSendChr(std::shared_ptr<BluetoothDevice> remoteDevice);
     void HandleBondStateFailed(
         BtStackStatus status, std::shared_ptr<BluetoothDevice> remoteDevice, const RawAddress &device);
-    void HandleBondStateBondNone(BtStackStatus status, STACK::RawAddress bdAddr,
+    void HandleBondStateBondNone(BtStackStatus status, OHOS::bluetooth::RawAddress bdAddr,
         std::shared_ptr<BluetoothDevice> remoteDevice, const RawAddress &device, BtBondState state);
 
     void HandleBondStateBonding(std::shared_ptr<BluetoothDevice> remoteDevice, const RawAddress &device);

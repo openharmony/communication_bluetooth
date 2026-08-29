@@ -37,7 +37,7 @@ enum BtpanControlState {
 };
 
 typedef void (*BtpanConnectionStateCallback)(BtpanConnectionState state,
-    BtStackStatus error, const RawAddress *bdAddr, int localRole, int remoteRole);
+    BtStackStatus error, const OHOS::bluetooth::RawAddress *bdAddr, int localRole, int remoteRole);
 typedef void (*BtpanControlStateCallback)(BtpanControlState state, int localRole,
     BtStackStatus error, const char *ifname);
 
@@ -52,8 +52,8 @@ struct BtpanInterface {
     BtStackStatus (*init)(const BtpanCallbacks *callbacks);
     BtStackStatus (*enable)(int localRole);
     int (*getLocalRole)(void);
-    BtStackStatus (*connect)(const RawAddress *bdAddr, int localRole, int remoteRole);
-    BtStackStatus (*disconnect)(const RawAddress *bdAddr);
+    BtStackStatus (*connect)(const OHOS::bluetooth::RawAddress *bdAddr, int localRole, int remoteRole);
+    BtStackStatus (*disconnect)(const OHOS::bluetooth::RawAddress *bdAddr);
     void (*cleanup)(void);
 };
 

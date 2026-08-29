@@ -264,8 +264,7 @@ void HidDeviceServiceImpl::DeregisterObserver(std::shared_ptr<IHidDeviceObserver
 
 int HidDeviceServiceImpl::Connect(const RawAddress &device)
 {
-    RawAddress hidDevice(device);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(device);
     if (bluetoothHidDeviceInterface == nullptr) {
         return BT_ERR_INTERNAL_ERROR;
     }
@@ -454,7 +453,7 @@ void HidDeviceServiceImpl::OnVirtualCableUnplugInner()
     }
 }
 
-void HidDeviceServiceImpl::OnAppStatusChanged(STACK::RawAddress* bdAddr, BthdApplicationState state)
+void HidDeviceServiceImpl::OnAppStatusChanged(OHOS::bluetooth::RawAddress* bdAddr, BthdApplicationState state)
 {
     HidDeviceServiceImpl *hidDeviceServiceImpl = HidDeviceServiceImpl::GetServiceImpl();
     if (hidDeviceServiceImpl == nullptr) {
@@ -468,7 +467,7 @@ void HidDeviceServiceImpl::OnAppStatusChanged(STACK::RawAddress* bdAddr, BthdApp
     hidDeviceServiceImpl->OnAppStatusChangedInner(connectState);
 }
 
-void HidDeviceServiceImpl::OnConnectionStateChanged(STACK::RawAddress* bdAddr, BthdConnectionState state)
+void HidDeviceServiceImpl::OnConnectionStateChanged(OHOS::bluetooth::RawAddress* bdAddr, BthdConnectionState state)
 {
     HidDeviceServiceImpl *hidDeviceServiceImpl = HidDeviceServiceImpl::GetServiceImpl();
     if (hidDeviceServiceImpl == nullptr) {
@@ -480,7 +479,7 @@ void HidDeviceServiceImpl::OnConnectionStateChanged(STACK::RawAddress* bdAddr, B
         HILOGE("bdAddr == nullptr");
         return;
     }
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     int connectState = HidDeviceServiceImpl::ConvertConnectStateFromStack(state);
     HILOGI("OnConnectionStateChanged state = %{public}d", connectState);
     hidDeviceServiceImpl->OnConnectionStateChangedInner(rawAddr, connectState);

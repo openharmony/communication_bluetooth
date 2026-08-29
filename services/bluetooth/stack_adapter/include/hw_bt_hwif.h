@@ -23,7 +23,7 @@
 
 #include "hardware/bluetooth.h"
 #include "hw_hcidefs.h"
-#include "types/raw_address.h"
+#include "raw_address.h"
 
 #ifndef STACK
 #define STACK
@@ -51,7 +51,7 @@ struct HwConnAttr {
 
 /* Stack callback parameter for socket connection observer */
 struct StackCallbackParam {
-    STACK::RawAddress addr;
+    OHOS::bluetooth::RawAddress addr;
     BtStackStatus status;
     int result;
     int type;
@@ -112,16 +112,16 @@ struct HwBtA2dpSteamSessionInfo {
 struct BthwifCallbacks {
     size_t size;
     void (*reserved1)(void);
-    void (*stackErrnoCb)(BtStackStatus status, STACK::RawAddress *addr,
+    void (*stackErrnoCb)(BtStackStatus status, OHOS::bluetooth::RawAddress *addr,
                            BtStackErrno state);
     void (*reserved3)(void);
-    void (*hdapConnectCb)(STACK::RawAddress *bdAddr, bool isConnected,
+    void (*hdapConnectCb)(OHOS::bluetooth::RawAddress *bdAddr, bool isConnected,
                             uint8_t featureBit, HdapConfigCallback config);
-    void (*profileStateCb)(STACK::RawAddress *addr, uint8_t a2dpState,
+    void (*profileStateCb)(OHOS::bluetooth::RawAddress *addr, uint8_t a2dpState,
                              uint8_t hfpState, std::string targetBtDevice,
                              uint8_t a2dpServiceType);
     void (*reserved6)(void);
-    void (*aclDisconnReasonCb)(STACK::RawAddress *addr, int reason);
+    void (*aclDisconnReasonCb)(OHOS::bluetooth::RawAddress *addr, int reason);
     void (*sensorhubDevInfoCb)(uint8_t *buffer, int length);
     void (*sensorhubResetCb)(uint32_t state);
     void (*hiechoIndCallCb)(uint8_t echoType, uint8_t *payload, uint16_t len,
@@ -129,15 +129,15 @@ struct BthwifCallbacks {
     void (*bluetoothConnCb)(const StackCallbackParam &param);
     void (*reserved12)(void);
     void (*reserved13)(void);
-    void (*deviceCb)(STACK::RawAddress *addr, int deviceType);
+    void (*deviceCb)(OHOS::bluetooth::RawAddress *addr, int deviceType);
     void (*reserved15)(void);
-    void (*a2dpOffloadStateCb)(STACK::RawAddress *addr, bool isOffload);
-    void (*a2dpOffloadCodecConfigCb)(STACK::RawAddress *bdAddr,
+    void (*a2dpOffloadStateCb)(OHOS::bluetooth::RawAddress *addr, bool isOffload);
+    void (*a2dpOffloadCodecConfigCb)(OHOS::bluetooth::RawAddress *bdAddr,
                                          A2dpOffloadConfigCallback config);
     void (*hiechoDeviceAclEncryptionChangedCb)(
-        const STACK::RawAddress &remoteAddr);
+        const OHOS::bluetooth::RawAddress &remoteAddr);
     void (*reportA2dpAbnormalStatusCb)(
-        const STACK::RawAddress &remoteAddr, int32_t errCode);
+        const OHOS::bluetooth::RawAddress &remoteAddr, int32_t errCode);
 #ifdef CONTEXTHUB_BLE_V3
     void (*sensorhubCollaborationCb)(const std::vector<uint8_t> &notifyValue);
 #endif
@@ -149,7 +149,7 @@ struct BthwifCallbacks {
 struct BthwifInterface {
     size_t size;
     /* Set connection attribution. */
-    void (*hwConnAttrSet)(uint8_t transport, const STACK::RawAddress &addr,
+    void (*hwConnAttrSet)(uint8_t transport, const OHOS::bluetooth::RawAddress &addr,
                           const HwConnAttr *attr);
     /* Send vendor private echo data. */
     void (*sendHiechoData)(uint8_t type, const uint8_t *data, int len,
@@ -157,35 +157,35 @@ struct BthwifInterface {
     /* Query local device echo product type. */
     uint8_t (*hwGetLocalDeviceEchoType)(void);
     /* Check whether the remote device supports echo. */
-    bool (*hwIsSupportEchoDevice)(const STACK::RawAddress &addr);
+    bool (*hwIsSupportEchoDevice)(const OHOS::bluetooth::RawAddress &addr);
     /* Check whether the remote device is bonded. */
-    bool (*checkRemoteDeviceBonded)(const STACK::RawAddress &addr);
+    bool (*checkRemoteDeviceBonded)(const OHOS::bluetooth::RawAddress &addr);
     /* Interoperability feature matching. */
     bool (*interopMatch)(const uint16_t feature,
-                         const STACK::RawAddress &remoteBdAddr);
+                         const OHOS::bluetooth::RawAddress &remoteBdAddr);
     /* Interoperability feature matching (Huawei wrapper). */
     bool (*hwInteropMatch)(const uint16_t feature,
-                           const STACK::RawAddress &remoteBdAddr);
+                           const OHOS::bluetooth::RawAddress &remoteBdAddr);
     /* Clean the HFP SCO occupied flag. */
-    void (*hwBtifHfpScoOccupiedClean)(const STACK::RawAddress &remoteBdAddr);
+    void (*hwBtifHfpScoOccupiedClean)(const OHOS::bluetooth::RawAddress &remoteBdAddr);
     /* Remove the HFP SCO queue entry. */
-    void (*hwBtifHfpQueueRemove)(const STACK::RawAddress &remoteBdAddr);
+    void (*hwBtifHfpQueueRemove)(const OHOS::bluetooth::RawAddress &remoteBdAddr);
     /* Remove the A2DP queue entry. */
-    void (*hwBtifA2dpQueueRemove)(const STACK::RawAddress &remoteBdAddr);
+    void (*hwBtifA2dpQueueRemove)(const OHOS::bluetooth::RawAddress &remoteBdAddr);
     /* Get A2DP offload codec config. */
     bool (*getA2dpOffloadCodecConfig)(
-        const STACK::RawAddress &remoteBdAddr,
+        const OHOS::bluetooth::RawAddress &remoteBdAddr,
         A2dpOffloadConfigCallback &config);
     /* Initialize the vendor HW interface. */
     BtStackStatus (*init)(BthwifCallbacks *callbacks);
     /* Set advertising key. */
-    void (*hwSetAdvKey)(const STACK::RawAddress &addr, const char &irk,
+    void (*hwSetAdvKey)(const OHOS::bluetooth::RawAddress &addr, const char &irk,
                         const char &hbk, const uint8_t version,
                         const char &feature);
     /* Remove advertising key. */
-    void (*hwRemoveAdvKey)(const STACK::RawAddress &addr);
+    void (*hwRemoveAdvKey)(const OHOS::bluetooth::RawAddress &addr);
     /* Get advertising IRK. */
-    void (*hwGetAdvIrk)(const STACK::RawAddress &addr,
+    void (*hwGetAdvIrk)(const OHOS::bluetooth::RawAddress &addr,
                         std::vector<uint8_t> &irk);
     /* Enable/disable Hisilicon PCM. */
     void (*hwEnableHisiPcm)(bool state);
@@ -196,13 +196,13 @@ struct BthwifInterface {
     /* Set MAC id. */
     void (*hwSetMacId)(int state);
     /* Set connection reason flag. */
-    void (*hwSetConnReasonFlag)(const STACK::RawAddress &addr, int connType,
+    void (*hwSetConnReasonFlag)(const OHOS::bluetooth::RawAddress &addr, int connType,
                                 const uint8_t *data, size_t len);
     /* Start an Hdap (L2HC) audio session. */
     void (*hdapStartSession)(uint32_t sampleRate, uint8_t bitWidth,
                              uint8_t channel);
     /* Set Hdap active device. */
-    void (*setHdapActive)(const STACK::RawAddress &addr);
+    void (*setHdapActive)(const OHOS::bluetooth::RawAddress &addr);
     /* Send params to sensorhub. */
     void (*sendParamsToSensorhub)(const char *params, int32_t type, int length);
     /* Reset sensorhub. */
@@ -221,50 +221,50 @@ struct BthwifInterface {
     /* Set BLE scan enhance mode status. */
     void (*hwSetBleScanEnhanceModeStatus)(bool enable);
     /* Send HCI disconnect. */
-    void (*hwBtsndHcicDisconnect)(const STACK::RawAddress &addr);
+    void (*hwBtsndHcicDisconnect)(const OHOS::bluetooth::RawAddress &addr);
     /* Check whether bonding or SDP in progress. */
     bool (*isBondingOrSdp)(void);
     /* Check whether incoming connection. */
-    bool (*isIncomingConnection)(const STACK::RawAddress &addr);
+    bool (*isIncomingConnection)(const OHOS::bluetooth::RawAddress &addr);
     /* Get device info into property. */
-    bool (*hwGetDeviceInfo)(const STACK::RawAddress &addr,
+    bool (*hwGetDeviceInfo)(const OHOS::bluetooth::RawAddress &addr,
                             BtProperty &prop);
     /* Check whether paired info needs sync. */
     bool (*needSyncPairedInfo)(std::vector<std::string> &pairedAddr);
     /* Fast LE connect. */
-    void (*leConnectFastest)(const STACK::RawAddress &addr);
+    void (*leConnectFastest)(const OHOS::bluetooth::RawAddress &addr);
     /* Set LE connection scan to fast mode. */
     void (*hwSetLeConnectionScanToFast)(bool enable);
     /* Register connection observer. */
-    void (*registerConnection)(const STACK::RawAddress &addr,
+    void (*registerConnection)(const OHOS::bluetooth::RawAddress &addr,
                                const OHOS::bluetooth::Uuid &uuid);
     /* Unregister connection observer. */
-    void (*unRegisterConnection)(const STACK::RawAddress &addr,
+    void (*unRegisterConnection)(const OHOS::bluetooth::RawAddress &addr,
                                  const OHOS::bluetooth::Uuid &uuid);
     /* Update CoC connection parameters. */
-    void (*updateCocConnectionParams)(const STACK::RawAddress &addr,
+    void (*updateCocConnectionParams)(const OHOS::bluetooth::RawAddress &addr,
                                       const uint16_t *params, int len);
     /* Send device selection. */
-    void (*sendDeviceSelection)(const STACK::RawAddress &device, int useA2dp,
+    void (*sendDeviceSelection)(const OHOS::bluetooth::RawAddress &device, int useA2dp,
                                 int useHfp, int userSelection);
     /* Check whether device supports echo. */
-    bool (*isDeviceSupportEcho)(const STACK::RawAddress &device);
+    bool (*isDeviceSupportEcho)(const OHOS::bluetooth::RawAddress &device);
     /* Check whether device is a dual-conn device. */
-    bool (*isHwDualConnDevice)(const STACK::RawAddress &addr);
+    bool (*isHwDualConnDevice)(const OHOS::bluetooth::RawAddress &addr);
     /* Change codec. */
     void (*changeCodec)(int preferedScene, int32_t sampleRate, bool fastFlag);
     /* A2DP offload state queries and control. */
-    bool (*a2dpOffloadIsRunning)(const STACK::RawAddress &addr);
+    bool (*a2dpOffloadIsRunning)(const OHOS::bluetooth::RawAddress &addr);
     int (*a2dpOffloadGetLatency)(void);
-    void (*a2dpOffloadSetSinkStreamStart)(const STACK::RawAddress &addr);
-    void (*a2dpOffloadSetSinkStreamStop)(const STACK::RawAddress &addr);
+    void (*a2dpOffloadSetSinkStreamStart)(const OHOS::bluetooth::RawAddress &addr);
+    void (*a2dpOffloadSetSinkStreamStop)(const OHOS::bluetooth::RawAddress &addr);
     int (*a2dpOffloadGetSinkStreamEncodingPath)(
-        const STACK::RawAddress &addr,
+        const OHOS::bluetooth::RawAddress &addr,
         std::vector<HwBtA2dpSteamSessionInfo> &sessions, bool check);
     /* Spatial audio control. */
     void (*hwSetSpatialAudioModeEnabled)(bool enabled);
     void (*hwSetSpatialAudioHeadTrackingEnabled)(bool enabled);
-    void (*hwSetActiveMode)(const STACK::RawAddress &addr);
+    void (*hwSetActiveMode)(const OHOS::bluetooth::RawAddress &addr);
     void (*hwSetAdaptiveSwitchStatus)(bool status);
     void (*hwSetAudioSourceType)(int mode);
     void (*hwSetCollAudioEnableState)(bool enabled);
@@ -272,14 +272,14 @@ struct BthwifInterface {
     void (*notifyAudioRenderState)(bool isRenderActive);
     void (*sendLowLatencyStatus)(bool status);
     int (*hwGetCurrentSceneType)(void);
-    void (*hwUpdateBtAudioLatency)(const STACK::RawAddress &addr,
+    void (*hwUpdateBtAudioLatency)(const OHOS::bluetooth::RawAddress &addr,
                                    int32_t latency);
     /* Voice combine (dual-audio) control. */
     void (*hwSetLocalVoiceCombineFeatureState)(int featureState);
     void (*hwSetLocalVoiceCombineNnState)(int32_t nnState);
     int (*hwGetLocalVoiceCombineFeatureState)(void);
-    bool (*hwGetRemoteVoiceCombineAbility)(const STACK::RawAddress &addr);
-    void (*hwSetVoiceCombineScenarioEnabled)(const STACK::RawAddress &addr,
+    bool (*hwGetRemoteVoiceCombineAbility)(const OHOS::bluetooth::RawAddress &addr);
+    void (*hwSetVoiceCombineScenarioEnabled)(const OHOS::bluetooth::RawAddress &addr,
                                              bool isCall);
     /* Set/delete advertising indication report flag. */
     void (*hwSetAdvIndReportFlag)(int filterIndex, bool flag);

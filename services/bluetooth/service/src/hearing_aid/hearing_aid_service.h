@@ -35,14 +35,14 @@ namespace bluetooth {
 
 class OHHearingAidCallbacks : public ::bluetooth::hearing_aid::HearingAidCallbacks {
     /** Callback for profile connection state change */
-    void OnConnectionState(::bluetooth::hearing_aid::ConnectionState state, const STACK::RawAddress& address);
+    void OnConnectionState(::bluetooth::hearing_aid::ConnectionState state, const OHOS::bluetooth::RawAddress& address);
 
     /** Callback for device being available. Is executed when devices are loaded
     * from storage on stack bringup, and when new device is connected to profile.
     * Main purpose of this callback is to keep its users informed of device
     * capabilities and hiSyncId.
     */
-    void OnDeviceAvailable(uint8_t capabilities, uint64_t hiSyncId, const STACK::RawAddress& address);
+    void OnDeviceAvailable(uint8_t capabilities, uint64_t hiSyncId, const OHOS::bluetooth::RawAddress& address);
 };
 
 class HearingAidService : public IProfileHearingAid, public utility::Context {

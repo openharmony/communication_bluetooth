@@ -125,50 +125,50 @@ enum BthfHfIndType {
 struct BthfCallbacks {
     size_t size;
     BtStackStatus (*connectionStateCb)(BthfConnectionState state,
-                                       const RawAddress *bdAddr);
+                                       const OHOS::bluetooth::RawAddress *bdAddr);
     BtStackStatus (*audioStateCb)(BthfAudioState state,
-                                  const RawAddress *bdAddr);
-    BtStackStatus (*vrCb)(BthfVrState state, const RawAddress *bdAddr);
-    BtStackStatus (*answerCallCb)(const RawAddress *bdAddr);
-    BtStackStatus (*hangupCallCb)(const RawAddress *bdAddr);
+                                  const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*vrCb)(BthfVrState state, const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*answerCallCb)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*hangupCallCb)(const OHOS::bluetooth::RawAddress *bdAddr);
     BtStackStatus (*volumeCb)(BthfVolumeType type, int volume,
-                             const RawAddress *bdAddr);
-    BtStackStatus (*dialCallCb)(char *number, const RawAddress *bdAddr);
-    BtStackStatus (*sendDtmfCb)(char tone, const RawAddress *bdAddr);
+                             const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*dialCallCb)(char *number, const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*sendDtmfCb)(char tone, const OHOS::bluetooth::RawAddress *bdAddr);
     BtStackStatus (*noiseReductionCb)(BthfNrec nrec,
-                                      const RawAddress *bdAddr);
-    BtStackStatus (*atResponseCb)(const RawAddress *bdAddr);
-    BtStackStatus (*cwCb)(BthfCallState state, const RawAddress *bdAddr);
+                                      const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*atResponseCb)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*cwCb)(BthfCallState state, const OHOS::bluetooth::RawAddress *bdAddr);
     BtStackStatus (*callIndCb)(BthfCallState state,
-                               const RawAddress *bdAddr);
+                               const OHOS::bluetooth::RawAddress *bdAddr);
     BtStackStatus (*callSetupIndCb)(BthfCallState state,
-                                     const RawAddress *bdAddr);
+                                     const OHOS::bluetooth::RawAddress *bdAddr);
     BtStackStatus (*callHeldIndCb)(BthfCallState state,
-                                    const RawAddress *bdAddr);
+                                    const OHOS::bluetooth::RawAddress *bdAddr);
     BtStackStatus (*netStateCb)(BthfNetworkState state,
-                                const RawAddress *bdAddr);
-    BtStackStatus (*callIndNetCb)(const RawAddress *bdAddr);
-    BtStackStatus (*signalCb)(int signal, const RawAddress *bdAddr);
-    BtStackStatus (*roamingCb)(int roaming, const RawAddress *bdAddr);
-    BtStackStatus (*batteryCb)(int battery, const RawAddress *bdAddr);
+                                const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*callIndNetCb)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*signalCb)(int signal, const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*roamingCb)(int roaming, const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*batteryCb)(int battery, const OHOS::bluetooth::RawAddress *bdAddr);
     BtStackStatus (*callVolumeCb)(BthfVolumeType type, int volume,
-                                  const RawAddress *bdAddr);
+                                  const OHOS::bluetooth::RawAddress *bdAddr);
 };
 
 struct BthfInterface {
     size_t size;
     BtStackStatus (*init)(BthfCallbacks *callbacks);
     void (*cleanup)(void);
-    BtStackStatus (*connect)(const RawAddress *bdAddr);
-    BtStackStatus (*disconnect)(const RawAddress *bdAddr);
-    BtStackStatus (*audioConnect)(const RawAddress *bdAddr);
-    BtStackStatus (*audioDisconnect)(const RawAddress *bdAddr);
-    BtStackStatus (*startVoiceRecognition)(const RawAddress *bdAddr);
-    BtStackStatus (*stopVoiceRecognition)(const RawAddress *bdAddr);
-    BtStackStatus (*volumeControl)(const RawAddress *bdAddr,
+    BtStackStatus (*connect)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*disconnect)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*audioConnect)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*audioDisconnect)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*startVoiceRecognition)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*stopVoiceRecognition)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*volumeControl)(const OHOS::bluetooth::RawAddress *bdAddr,
                                   BthfVolumeType type, int volume);
-    BtStackStatus (*notifyBatteryLevel)(const RawAddress *bdAddr, int level);
-    BtStackStatus (*setScoAllowed)(const RawAddress *bdAddr, bool value);
+    BtStackStatus (*notifyBatteryLevel)(const OHOS::bluetooth::RawAddress *bdAddr, int level);
+    BtStackStatus (*setScoAllowed)(const OHOS::bluetooth::RawAddress *bdAddr, bool value);
 };
 
 /*

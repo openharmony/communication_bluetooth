@@ -31,6 +31,7 @@
 #include "hfp_hf_service.h"
 #endif
 #include "a2dp_service.h"
+#include "bt_def.h"
 
 namespace OHOS {
 namespace bluetooth {
@@ -133,7 +134,7 @@ void SystemAbilityStatusChange::OnRemoveSystemAbility(int32_t systemAbilityId, c
                 A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
                 CHECK_AND_RETURN_LOG(a2dpService != nullptr, "get a2dp service failed!");
                 a2dpService->ForceStopOffloadPlaying(a2dpService->GetActiveSinkDevice());
-                a2dpService->UpdateActiveDevice(ServiceUtil::AddrFromStack(STACK::RawAddress::kEmpty));
+                a2dpService->UpdateActiveDevice(RawAddress(INVALID_MAC_ADDRESS));
             });
             break;
         default:

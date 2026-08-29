@@ -119,7 +119,7 @@ void HearingAidServiceImpl::SetGetStorageVolumeFunc(std::function<bool(const std
 int HearingAidServiceImpl::SetActiveDevice(const RawAddress &device, HearingAidServiceData &data)
 {
     HILOGI("SetActiveDevice: %{public}s", GET_ENCRYPT_ADDR(device));
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr = device;
     if (data.bluetoothHearingAidInterface_ == nullptr) {
         HILOGE("data.bluetoothHearingAidInterface_ is nullptr");
         return HEARING_AID_FAILURE;
@@ -188,9 +188,9 @@ void HearingAidServiceImpl::ProcessRemoveStateMachine(const std::string &address
 void HearingAidServiceImpl::ProcessVolumeSet(const HearingAidMessage &event, HearingAidServiceData &data)
 {
     std::lock_guard<BtRecursiveMutex> lck(data.mutex_);
-    STACK::RawAddress rawAddr;
+    OHOS::bluetooth::RawAddress rawAddr;
     RawAddress addr(event.msgAddr);
-    rawAddr = ServiceUtil::AddrToStack(addr);
+    rawAddr = addr;
     auto it = data.stateMachines_.find(addr.GetAddress());
     if (it != data.stateMachines_.end() && it->second != nullptr && !it->second->IsRemoving()) {
         it->second->ProcessMessage(event);

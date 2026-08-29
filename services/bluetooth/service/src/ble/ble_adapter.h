@@ -120,7 +120,7 @@ public:
     void OnStartAdvertisingEvt() const;
     void OnStopAdvertisingEvt() const;
 
-    void BondStateChanged(BtStackStatus status, STACK::RawAddress* bdAddr, BtBondState state);
+    void BondStateChanged(BtStackStatus status, OHOS::bluetooth::RawAddress* bdAddr, BtBondState state);
     void BondStateChangedInner(BtStackStatus status, RawAddress bdAddr, BtBondState state);
     void SendPairStatusChanged(const BTTransport transport, const RawAddress &device, int status) const;
     void SendAclStateChanged(const RawAddress &device, int state, unsigned int reason, int pairStatus) const;

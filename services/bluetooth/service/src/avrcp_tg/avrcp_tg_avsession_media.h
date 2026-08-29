@@ -120,7 +120,7 @@ public:
      * @brief callback method.
      * Set active device.
      */
-    void SetActiveDevice(const STACK::RawAddress &address) override;
+    void SetActiveDevice(const OHOS::bluetooth::RawAddress &address) override;
 
     /**
      * @brief callback method.

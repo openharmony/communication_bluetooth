@@ -295,7 +295,7 @@ int BleAdapter::GetPeerDeviceAddrType(const RawAddress &device) const
 {
     int ret = BLE_ADDR_TYPE_UNKNOWN;
 
-    auto remoteAddr = ServiceUtil::AddrToStack(device);
+    auto remoteAddr = device;
     uint8_t remoteAddrType;
     if (BtifStorageGetRemoteAddrType(&remoteAddr, &remoteAddrType) == BT_STATUS_SUCCESS) {
         ret = ServiceUtil::AddrTypeFromStack(remoteAddrType);

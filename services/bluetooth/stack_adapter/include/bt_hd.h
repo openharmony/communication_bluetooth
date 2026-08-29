@@ -68,9 +68,9 @@ struct BthdQosParam {
 };
 
 /* HID device callbacks (bluedroid system/include/hardware/bt_hd.h). */
-typedef void (*BthdApplicationStateCallback)(RawAddress *bdAddr,
+typedef void (*BthdApplicationStateCallback)(OHOS::bluetooth::RawAddress *bdAddr,
                                                 BthdApplicationState state);
-typedef void (*BthdConnectionStateCallback)(RawAddress *bdAddr,
+typedef void (*BthdConnectionStateCallback)(OHOS::bluetooth::RawAddress *bdAddr,
                                                BthdConnectionState state);
 typedef void (*BthdGetReportCallback)(uint8_t type, uint8_t id, uint16_t bufferSize);
 typedef void (*BthdSetReportCallback)(uint8_t type, uint8_t id, uint16_t len,
@@ -99,7 +99,7 @@ struct BthdInterface {
     BtStackStatus (*registerApp)(BthdAppParam *appParam, BthdQosParam *inQos,
                                 BthdQosParam *outQos);
     BtStackStatus (*unregisterApp)(void);
-    BtStackStatus (*connect)(RawAddress *bdAddr);
+    BtStackStatus (*connect)(OHOS::bluetooth::RawAddress *bdAddr);
     BtStackStatus (*disconnect)(void);
     BtStackStatus (*sendReport)(BthdReportType type, uint8_t id, uint16_t len,
                                uint8_t *pData);

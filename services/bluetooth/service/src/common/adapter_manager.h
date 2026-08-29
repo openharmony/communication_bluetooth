@@ -354,16 +354,16 @@ public:
     static void AdapterStateChangedCb(BtState state);
     static void DeviceFoundCb(int numProperties, BtProperty* properties);
     static void DiscoveryStateChangedCb(BtDiscoveryState state);
-    static void BondStateChangedCb(BtStackStatus status, STACK::RawAddress* bdAddr, BtBondState state);
-    static void SspRequestCb(STACK::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
+    static void BondStateChangedCb(BtStackStatus status, OHOS::bluetooth::RawAddress* bdAddr, BtBondState state);
+    static void SspRequestCb(OHOS::bluetooth::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
                              BtSspVariant pairingVariant, uint32_t passKey);
-    static void AclStateChangedCb(BtStackStatus status, STACK::RawAddress* remoteBdAddr, BtAclState state,
+    static void AclStateChangedCb(BtStackStatus status, OHOS::bluetooth::RawAddress* remoteBdAddr, BtAclState state,
                                   BtHciErrorCode hciReason, BtTransport linkTypeCallback);
     static void AdapterPropertiesCb(BtStackStatus status, int numProperties, BtProperty* properties);
-    static void RemoteDevicePropertiesCb(BtStackStatus status, STACK::RawAddress* bdAddr,
+    static void RemoteDevicePropertiesCb(BtStackStatus status, OHOS::bluetooth::RawAddress* bdAddr,
                                          int numProperties, BtProperty* properties);
     static void ThreadEvtCb(BtCbThreadEvt evt);
-    static void PinRequestCb(STACK::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
+    static void PinRequestCb(OHOS::bluetooth::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
         bool min16Digit);
     static void DutModeRecvCb(uint16_t opcode, uint8_t* buf, uint8_t len);
     static void EnergyInfoCb(BtActivityEnergyInfo* energyInfo, BtUidTraffic* uidData);
@@ -409,7 +409,7 @@ public:
     static bool StartPairIfInCloudCreateBondState(const RawAddress &device);
     static void HandleCloudBondWhenAclStateChange(const RawAddress &device, int connectionState);
     static int HandleAclStateChanged(std::shared_ptr<BluetoothDevice> remoteDevice, const RawAddress &device,
-        STACK::RawAddress *remoteBdAddr, BtAclState state);
+        OHOS::bluetooth::RawAddress *remoteBdAddr, BtAclState state);
 
     void RegisterVirtualDeviceIdManagerFunc(
         std::function<int32_t(const RawAddress &realAddr, RawAddress &randomAddr)> func) override;

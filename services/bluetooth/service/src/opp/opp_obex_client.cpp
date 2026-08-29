@@ -209,13 +209,17 @@ void OppObexClient::Connect(std::shared_ptr<OppObexClient> obexClient)
     clientSession_->Connect(header, connectHeader_);
 }
 
-static RawAddress ConvertRfcommAddr(STACK::RawAddress &addr)
+static RawAddress ConvertRfcommAddr(OHOS::bluetooth::RawAddress &addr)
 {
-    STACK::RawAddress newAddr;
+    uint8_t addrBytes[OHOS::bluetooth::RawAddress::BT_ADDRESS_BYTE_LEN];
+    addr.ConvertToUint8(addrBytes);
+    uint8_t reversedBytes[OHOS::bluetooth::RawAddress::BT_ADDRESS_BYTE_LEN];
     for (int i = 0; i < MAC_ADDR_LEN; i++) {
-        newAddr.address[i] = addr.address[MAC_ADDR_LEN - 1 - i];
+        reversedBytes[i] = addrBytes[MAC_ADDR_LEN - 1 - i];
     }
-    return ServiceUtil::AddrFromStack(newAddr);
+    OHOS::bluetooth::RawAddress newAddr =
+        OHOS::bluetooth::RawAddress::ConvertToString(reversedBytes);
+    return newAddr;
 }
 
 std::shared_ptr<ObexSocketDevice> OppObexClient::RecvSocketDevice(SocketType socketType)

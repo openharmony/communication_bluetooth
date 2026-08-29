@@ -591,10 +591,9 @@ void BluetoothAudioFrameworkAdapter::BluetoothAudioRendererDataTransferListener:
     A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
     CHECK_AND_RETURN_LOG(a2dpService != nullptr, "OnDataTransferStateChange: null a2dpService");
     auto device = a2dpService->GetActiveSinkDevice();
-    STACK::RawAddress addr = ServiceUtil::AddrToStack(device);
     const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "bthwInterface_ is null");
-    bool isHwDevice = bluetoothHwSrcInterface->isHwDualConnDevice(addr);
+    bool isHwDevice = bluetoothHwSrcInterface->isHwDualConnDevice(device);
     if (!isHwDevice) {
         HILOGI("not hw headphone device");
         return;
@@ -631,10 +630,9 @@ void BluetoothAudioFrameworkAdapter::BluetoothAudioRendererDataTransferListener:
     A2dpService *a2dpService = GetServiceInstance(A2DP_ROLE_SOURCE);
     CHECK_AND_RETURN_LOG(a2dpService != nullptr, "OnMuteStateChange: null a2dpService");
     auto device = a2dpService->GetActiveSinkDevice();
-    STACK::RawAddress addr = ServiceUtil::AddrToStack(device);
     const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "bthwInterface_ is null");
-    bool isHwDevice = bluetoothHwSrcInterface->isHwDualConnDevice(addr);
+    bool isHwDevice = bluetoothHwSrcInterface->isHwDualConnDevice(device);
     if (!isHwDevice) {
         HILOGI("not hw headphone device");
         return;

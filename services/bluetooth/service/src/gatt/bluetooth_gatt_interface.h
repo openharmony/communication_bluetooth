@@ -35,12 +35,12 @@ public:
     class ScannerObserver {
     public:
         virtual ~ScannerObserver() = default;
-        virtual void ScanResultCallback(uint16_t eventType, uint8_t addrType, const STACK::RawAddress *bda,
+        virtual void ScanResultCallback(uint16_t eventType, uint8_t addrType, const OHOS::bluetooth::RawAddress *bda,
             int8_t rssi, std::vector<uint8_t> advData) {}
         virtual void BatchScanReportCallback(int clientIf, int status, int reportFormat, int numRecords,
             std::vector<uint8_t> data) {}
         virtual void BatchScanThresholdCallback(int clientIf) {}
-        virtual void TrackAdvFoundLostCallback(const TrackAdvBaseInfo &info, const STACK::RawAddress &bda,
+        virtual void TrackAdvFoundLostCallback(const TrackAdvBaseInfo &info, const OHOS::bluetooth::RawAddress &bda,
             std::vector<uint8_t> advData) {};
         virtual void SensorhubDevInfoCallback(uint8_t *buffer, int length) {};
         virtual void SensorhubResetCallback(uint32_t state) {};
@@ -53,19 +53,19 @@ public:
         virtual void RegisterServerCallback(int status, int serverIf, const Uuid &appUuid) {}
         // connId is a logic connection id (index + serverIf), ervey application has it's own connId
         virtual void ConnectionCallback(
-            int connId, int serverIf, int connected, const STACK::RawAddress &bda, int reason) {}
+            int connId, int serverIf, int connected, const OHOS::bluetooth::RawAddress &bda, int reason) {}
         virtual void ServiceAddedCallback(int status, int serverIf, std::vector<BtgattDbElement> service) {}
         virtual void ServiceStoppedCallback(int status, int serverIf, int serviceHandle) {}
         virtual void ServiceDeletedCallback(int status, int serverIf, int serviceHandle) {}
-        virtual void RequestReadCharacteristicCallback(int connId, int transId, const STACK::RawAddress &bda,
+        virtual void RequestReadCharacteristicCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda,
             int attrHandle, int offset, bool isLong) {}
-        virtual void RequestReadDescriptorCallback(int connId, int transId, const STACK::RawAddress &bda,
+        virtual void RequestReadDescriptorCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda,
             int attrHandle, int offset, bool isLong) {}
-        virtual void RequestWriteCharacteristicCallback(int connId, int transId, const STACK::RawAddress &bda,
+        virtual void RequestWriteCharacteristicCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda,
             int attrHandle, int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value) {}
-        virtual void RequestWriteDescriptorCallback(int connId, int transId, const STACK::RawAddress &bda,
+        virtual void RequestWriteDescriptorCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda,
             int attrHandle, int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value) {}
-        virtual void RequestExecWriteCallback(int connId, int transId, const STACK::RawAddress &bda, int execWrite)
+        virtual void RequestExecWriteCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda, int execWrite)
             {}
         virtual void ResponseConfirmationCallback(int status, int handle) {}
         virtual void IndicationSentCallback(int connId, int status) {}
@@ -84,10 +84,10 @@ public:
         // status is GattStatus in gatt_api.h
         virtual void RegisterClientCallback(int status, int clientIf, const Uuid &appUuid) {}
         virtual void ConnectCallback(
-            int connId, int status, int clientIf, const STACK::RawAddress &bda) {}
+            int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda) {}
         virtual void DisconnectCallback(
-            int connId, int status, int clientIf, const STACK::RawAddress &bda, int reason) {}
-        virtual void CancelOpenCallback(int connId, int status, int clientIf, const STACK::RawAddress &bda) {}
+            int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda, int reason) {}
+        virtual void CancelOpenCallback(int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda) {}
         virtual void SearchCompleteCallback(int connId, int status) {}
         virtual void RegisterForNotificationCallback(int connId, int registered, int status, uint16_t handle) {}
         virtual void NotifyCallback(int connId, const BtgattNotifyParams &data) {}
@@ -105,7 +105,7 @@ public:
         virtual void ConnUpdatedCallback(int connId, uint16_t interval, uint16_t latency, uint16_t timeout,
             uint8_t status) {}
         virtual void ServicesChangedCallback(int connId) {}
-        virtual void ReadRemoteRssiValueCallback(int clientIf, const STACK::RawAddress &bda,
+        virtual void ReadRemoteRssiValueCallback(int clientIf, const OHOS::bluetooth::RawAddress &bda,
             int rssi, int status) {}
         virtual void PhyUpdatedCallback(int connId, uint8_t txPhy, uint8_t rxPhy, uint8_t status) {}
         virtual void ReadPhyCallback(uint8_t txPhy, uint8_t rxPhy, uint8_t status) {}

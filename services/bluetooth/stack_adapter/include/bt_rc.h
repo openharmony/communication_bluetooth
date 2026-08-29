@@ -239,44 +239,44 @@ struct BtrcFolderItems {
 
 /* AVRCP controller callbacks dispatched by the removed stack layer; the
  * signatures mirror bluedroid system/include/hardware/bt_rc.h. */
-typedef void (*BtrcPassthroughRspCallback)(const RawAddress &bdAddr, int id, int keyState);
+typedef void (*BtrcPassthroughRspCallback)(const OHOS::bluetooth::RawAddress &bdAddr, int id, int keyState);
 typedef void (*BtrcGroupnavigationRspCallback)(int id, int keyState);
 typedef void (*BtrcConnectionStateCallback)(bool rcConnect, bool btConnect,
-                                               const RawAddress &bdAddr);
-typedef void (*BtrcCtrlGetrcfeaturesCallback)(const RawAddress &bdAddr, int features);
-typedef void (*BtrcCtrlSetabsvolCmdCallback)(const RawAddress &bdAddr, uint8_t absVol,
+                                               const OHOS::bluetooth::RawAddress &bdAddr);
+typedef void (*BtrcCtrlGetrcfeaturesCallback)(const OHOS::bluetooth::RawAddress &bdAddr, int features);
+typedef void (*BtrcCtrlSetabsvolCmdCallback)(const OHOS::bluetooth::RawAddress &bdAddr, uint8_t absVol,
                                                  uint8_t label);
-typedef void (*BtrcCtrlRegisternotificationAbsVolCallback)(const RawAddress &bdAddr,
+typedef void (*BtrcCtrlRegisternotificationAbsVolCallback)(const OHOS::bluetooth::RawAddress &bdAddr,
                                                                 uint8_t label);
-typedef void (*BtrcCtrlSetplayerapplicationsettingRspCallback)(const RawAddress &bdAddr,
+typedef void (*BtrcCtrlSetplayerapplicationsettingRspCallback)(const OHOS::bluetooth::RawAddress &bdAddr,
                                                                    uint8_t accepted);
-typedef void (*BtrcCtrlPlayerapplicationsettingCallback)(const RawAddress &bdAddr,
+typedef void (*BtrcCtrlPlayerapplicationsettingCallback)(const OHOS::bluetooth::RawAddress &bdAddr,
                                                             uint8_t numAttr,
                                                             BtrcPlayerAppAttr *appAttrs,
                                                             uint8_t numExtAttr,
                                                             BtrcPlayerAppExtAttr *extAttrs);
 typedef void (*BtrcCtrlPlayerapplicationsettingChangedCallback)(
-    const RawAddress &bdAddr, const BtrcPlayerSettings &vals);
-typedef void (*BtrcCtrlTrackChangedCallback)(const RawAddress &bdAddr, uint8_t numAttr,
+    const OHOS::bluetooth::RawAddress &bdAddr, const BtrcPlayerSettings &vals);
+typedef void (*BtrcCtrlTrackChangedCallback)(const OHOS::bluetooth::RawAddress &bdAddr, uint8_t numAttr,
                                                  BtrcElementAttrVal *pAttrs);
-typedef void (*BtrcCtrlPlayPositionChangedCallback)(const RawAddress &bdAddr,
+typedef void (*BtrcCtrlPlayPositionChangedCallback)(const OHOS::bluetooth::RawAddress &bdAddr,
                                                          uint32_t songLen, uint32_t songPos);
-typedef void (*BtrcCtrlPlayStatusChangedCallback)(const RawAddress &bdAddr,
+typedef void (*BtrcCtrlPlayStatusChangedCallback)(const OHOS::bluetooth::RawAddress &bdAddr,
                                                        BtrcPlayStatus playStatus);
-typedef void (*BtrcCtrlGetFolderItemsCallback)(const RawAddress &bdAddr,
+typedef void (*BtrcCtrlGetFolderItemsCallback)(const OHOS::bluetooth::RawAddress &bdAddr,
                                                     BtrcStatus status,
                                                     const BtrcFolderItems *folderItems,
                                                     uint8_t count);
-typedef void (*BtrcCtrlChangePathCallback)(const RawAddress &bdAddr, uint32_t count);
-typedef void (*BtrcCtrlSetBrowsedPlayerCallback)(const RawAddress &bdAddr,
+typedef void (*BtrcCtrlChangePathCallback)(const OHOS::bluetooth::RawAddress &bdAddr, uint32_t count);
+typedef void (*BtrcCtrlSetBrowsedPlayerCallback)(const OHOS::bluetooth::RawAddress &bdAddr,
                                                       uint8_t numItems, uint8_t depth);
-typedef void (*BtrcCtrlSetAddressedPlayerCallback)(const RawAddress &bdAddr,
+typedef void (*BtrcCtrlSetAddressedPlayerCallback)(const OHOS::bluetooth::RawAddress &bdAddr,
                                                         uint8_t status);
-typedef void (*BtrcCtrlAddressedPlayerChangedCallback)(const RawAddress &bdAddr,
+typedef void (*BtrcCtrlAddressedPlayerChangedCallback)(const OHOS::bluetooth::RawAddress &bdAddr,
                                                             uint16_t id);
-typedef void (*BtrcCtrlNowPlayingContentsChangedCallback)(const RawAddress &bdAddr);
-typedef void (*BtrcCtrlAvailablePlayerChangedCallback)(const RawAddress &bdAddr);
-typedef void (*BtrcCtrlGetCoverArtPsmCallback)(const RawAddress &bdAddr,
+typedef void (*BtrcCtrlNowPlayingContentsChangedCallback)(const OHOS::bluetooth::RawAddress &bdAddr);
+typedef void (*BtrcCtrlAvailablePlayerChangedCallback)(const OHOS::bluetooth::RawAddress &bdAddr);
+typedef void (*BtrcCtrlGetCoverArtPsmCallback)(const OHOS::bluetooth::RawAddress &bdAddr,
                                                      const uint16_t psm);
 
 /* AVRCP controller callback structure registered via BtrcCtrlInterface::init. */
@@ -309,26 +309,26 @@ struct BtrcCtrlCallbacks {
 struct BtrcCtrlInterface {
     size_t size;
     BtStackStatus (*init)(BtrcCtrlCallbacks *callbacks);
-    BtStackStatus (*sendPassThroughCmd)(const RawAddress &bdAddr, uint8_t keyCode,
+    BtStackStatus (*sendPassThroughCmd)(const OHOS::bluetooth::RawAddress &bdAddr, uint8_t keyCode,
                                          uint8_t keyState);
-    BtStackStatus (*sendGroupNavigationCmd)(const RawAddress &bdAddr, uint8_t keyCode,
+    BtStackStatus (*sendGroupNavigationCmd)(const OHOS::bluetooth::RawAddress &bdAddr, uint8_t keyCode,
                                              uint8_t keyState);
-    BtStackStatus (*setPlayerAppSettingCmd)(const RawAddress &bdAddr, uint8_t numAttrib,
+    BtStackStatus (*setPlayerAppSettingCmd)(const OHOS::bluetooth::RawAddress &bdAddr, uint8_t numAttrib,
                                               uint8_t *attribIds, uint8_t *attribVals);
-    BtStackStatus (*playItemCmd)(const RawAddress &bdAddr, uint8_t scope, uint8_t *uid,
+    BtStackStatus (*playItemCmd)(const OHOS::bluetooth::RawAddress &bdAddr, uint8_t scope, uint8_t *uid,
                                  uint16_t uidCounter);
-    BtStackStatus (*getCurrentMetadataCmd)(const RawAddress &bdAddr);
-    BtStackStatus (*getPlaybackStateCmd)(const RawAddress &bdAddr);
-    BtStackStatus (*getNowPlayingListCmd)(const RawAddress &bdAddr, uint32_t start,
+    BtStackStatus (*getCurrentMetadataCmd)(const OHOS::bluetooth::RawAddress &bdAddr);
+    BtStackStatus (*getPlaybackStateCmd)(const OHOS::bluetooth::RawAddress &bdAddr);
+    BtStackStatus (*getNowPlayingListCmd)(const OHOS::bluetooth::RawAddress &bdAddr, uint32_t start,
                                             uint32_t end);
-    BtStackStatus (*getFolderListCmd)(const RawAddress &bdAddr, uint32_t start, uint32_t end);
-    BtStackStatus (*getPlayerListCmd)(const RawAddress &bdAddr, uint32_t start, uint32_t end);
-    BtStackStatus (*changeFolderPathCmd)(const RawAddress &bdAddr, uint8_t direction,
+    BtStackStatus (*getFolderListCmd)(const OHOS::bluetooth::RawAddress &bdAddr, uint32_t start, uint32_t end);
+    BtStackStatus (*getPlayerListCmd)(const OHOS::bluetooth::RawAddress &bdAddr, uint32_t start, uint32_t end);
+    BtStackStatus (*changeFolderPathCmd)(const OHOS::bluetooth::RawAddress &bdAddr, uint8_t direction,
                                           uint8_t *uid);
-    BtStackStatus (*setBrowsedPlayerCmd)(const RawAddress &bdAddr, uint16_t playerId);
-    BtStackStatus (*setAddressedPlayerCmd)(const RawAddress &bdAddr, uint16_t playerId);
-    BtStackStatus (*setVolumeRsp)(const RawAddress &bdAddr, uint8_t absVol, uint8_t label);
-    BtStackStatus (*registerAbsVolRsp)(const RawAddress &bdAddr,
+    BtStackStatus (*setBrowsedPlayerCmd)(const OHOS::bluetooth::RawAddress &bdAddr, uint16_t playerId);
+    BtStackStatus (*setAddressedPlayerCmd)(const OHOS::bluetooth::RawAddress &bdAddr, uint16_t playerId);
+    BtStackStatus (*setVolumeRsp)(const OHOS::bluetooth::RawAddress &bdAddr, uint8_t absVol, uint8_t label);
+    BtStackStatus (*registerAbsVolRsp)(const OHOS::bluetooth::RawAddress &bdAddr,
                                         BtrcNotificationType rspType, uint8_t absVol,
                                         uint8_t label);
     void (*cleanup)(void);

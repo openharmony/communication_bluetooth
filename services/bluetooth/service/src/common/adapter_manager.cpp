@@ -369,17 +369,17 @@ void AdapterManager::DiscoveryStateChangedCb(BtDiscoveryState state)
     }
 }
 
-void AdapterManager::BondStateChangedCb(BtStackStatus status, STACK::RawAddress* bdAddr, BtBondState state)
+void AdapterManager::BondStateChangedCb(BtStackStatus status, OHOS::bluetooth::RawAddress* bdAddr, BtBondState state)
 {
     auto classicAdapter = AdapterManager::GetInstance()->GetClassicAdapter();
     if (classicAdapter) {
         classicAdapter->BondStateChanged(status, bdAddr, state);
-        RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+        RawAddress rawAddr = *bdAddr;
         BluetoothHelper::BluetoothCommonEventHelper::PublishRemoteDevicePairStateEvent(rawAddr.GetAddress(), state);
     }
 }
 
-void AdapterManager::SspRequestCb(STACK::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
+void AdapterManager::SspRequestCb(OHOS::bluetooth::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
     BtSspVariant pairingVariant, uint32_t passKey)
 {
     auto classicAdapter = AdapterManager::GetInstance()->GetClassicAdapter();
@@ -403,13 +403,13 @@ static bool CheckIsControlInterceptAllowedAndDisconnect(const std::string addres
     return true;
 }
 
-void AdapterManager::AclStateChangedCb(BtStackStatus status, STACK::RawAddress* remoteBdAddr, BtAclState state,
+void AdapterManager::AclStateChangedCb(BtStackStatus status, OHOS::bluetooth::RawAddress* remoteBdAddr, BtAclState state,
     BtHciErrorCode hciReason, BtTransport linkTypeCallback)
 {
     CHECK_AND_RETURN_LOG(remoteBdAddr, "wrong addr");
     CHECK_AND_RETURN_LOG(status == BT_STATUS_SUCCESS, "Acl Connection fail, hci error code = %{public}u", hciReason);
 
-    RawAddress device = ServiceUtil::AddrFromStack(*remoteBdAddr);
+    RawAddress device = *remoteBdAddr;
     int linkType = ServiceUtil::LinkTypeFromStack(linkTypeCallback);
     HILOG_COMM_INFO("AclStateChangedCb address %{public}s linkType %{public}d connectState %{public}d "
         "status %{public}d", GetEncryptAddr(device.GetAddress()).c_str(), linkType, state, status);
@@ -461,7 +461,7 @@ void AdapterManager::AdapterPropertiesCb(BtStackStatus status, int numProperties
     adapterProperties->ParseAdapterProps(status, numProperties, properties);
 }
 
-void AdapterManager::RemoteDevicePropertiesCb(BtStackStatus status, STACK::RawAddress* bdAddr,
+void AdapterManager::RemoteDevicePropertiesCb(BtStackStatus status, OHOS::bluetooth::RawAddress* bdAddr,
     int numProperties, BtProperty* properties)
 {
     RemoteDeviceProperties* remoteDeviceProperties = RemoteDeviceProperties::GetInstance();
@@ -474,7 +474,7 @@ void AdapterManager::ThreadEvtCb(BtCbThreadEvt evt)
 {
 }
 
-void AdapterManager::PinRequestCb(STACK::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
+void AdapterManager::PinRequestCb(OHOS::bluetooth::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
     bool min16Digit)
 {
     HILOG_COMM_INFO("PinRequestCb enter");
@@ -496,7 +496,7 @@ void AdapterManager::SensingStateChangedCb(uint8_t eventId, BtSensingInfo* info)
 {
     CHECK_AND_RETURN_LOG(info != nullptr, "fail to get sensing info");
     HILOGI("eventId: %{public}d", eventId);
-    SensingInfo sensingInfo(info->addr.ToString(), info->uuid.ToString(), info->resourceId, info->interval);
+    SensingInfo sensingInfo(info->addr.GetAddress(), info->uuid.ToString(), info->resourceId, info->interval);
     auto resourceMgr = BluetoothResourceManager::GetInstance();
     if (resourceMgr) {
         resourceMgr->SendSensingStateChanged(eventId, sensingInfo);
@@ -1966,7 +1966,7 @@ void AdapterManager::HandleCloudBondWhenAclStateChange(const RawAddress &device,
 }
 
 int AdapterManager::HandleAclStateChanged(std::shared_ptr<BluetoothDevice> remoteDevice, const RawAddress &device,
-    STACK::RawAddress *remoteBdAddr, BtAclState state)
+    OHOS::bluetooth::RawAddress *remoteBdAddr, BtAclState state)
 {
     int connectState = CONNECTION_STATE_CONNECTED;
     if (remoteDevice == nullptr || remoteBdAddr == nullptr) {

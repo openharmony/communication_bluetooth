@@ -377,8 +377,7 @@ void PanStateMachine::ProcessConnectReqEvent(const PanMessage &msg)
         HILOGE("panInterface is nullptr.");
         return;
     }
-    bluetooth::RawAddress device(address_);
-    STACK::RawAddress rawAddr = bluetooth::ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HILOGI("Connect address[%{public}s]", bluetooth::GetEncryptAddr(address_).c_str());
     BtStackStatus status = panInterface->connect(&rawAddr, LOCAL_PANU_ROLE, REMOTE_NAP_ROLE);
     if (status != BT_STATUS_SUCCESS && status != BT_STATUS_BUSY) {
@@ -395,8 +394,7 @@ void PanStateMachine::ProcessCloseReqEvent(const PanMessage &msg)
         HILOGE("panInterface is nullptr.");
         return;
     }
-    bluetooth::RawAddress device(address_);
-    STACK::RawAddress rawAddr = bluetooth::ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HILOGI("Disconnect address[%{public}s]", bluetooth::GetEncryptAddr(address_).c_str());
     BtStackStatus status = panInterface->disconnect(&rawAddr);
     if (status != BT_STATUS_SUCCESS && status != BT_STATUS_BUSY) {

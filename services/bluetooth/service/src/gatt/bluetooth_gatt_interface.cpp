@@ -151,7 +151,7 @@ void BluetoothGattInterface::ClearGattClientInValidObserver()
 }
 
 static void ScanResultCallback(
-    uint16_t bleEvtType, uint8_t addrType, STACK::RawAddress *bda,
+    uint16_t bleEvtType, uint8_t addrType, OHOS::bluetooth::RawAddress *bda,
     uint8_t blePrimaryPhy, uint8_t bleSecondaryPhy,
     uint8_t bleAdvertisingSid, int8_t bleTxPower, int8_t rssi,
     uint16_t blePeriodicAdvInt,
@@ -234,13 +234,13 @@ static void ReportDataToRss(const std::string &address, int state, const std::st
 #endif
 }
 
-static void ConnectionCallback(int connId, int serverIf, int connected, const STACK::RawAddress &bda, int reason)
+static void ConnectionCallback(int connId, int serverIf, int connected, const OHOS::bluetooth::RawAddress &bda, int reason)
 {
     HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BT_SERVICE, "GATT_CONNECT_STATE",
-        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ADDRESS", GetEncryptAddr(bda.ToString()),
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ADDRESS", GetEncryptAddr(bda.GetAddress()),
         "STATE", connected, "ROLE", "server", "CONNECTIF", serverIf,
         "STATUS", -1);
-    ReportDataToRss(GetEncryptAddr(bda.ToString()), connected, "server", serverIf, -1);
+    ReportDataToRss(GetEncryptAddr(bda.GetAddress()), connected, "server", serverIf, -1);
     g_gattServerObservers.ForEach(
         [connId, serverIf, connected, bda, reason](std::weak_ptr<GattServerObserver> observer) {
             WPTR_CBACK_GATT_THREAD_SERVER_OBSERVER(
@@ -269,7 +269,7 @@ static void ServiceDeletedCallback(int status, int serverIf, int serviceHandle)
     });
 }
 
-static void RequestReadCharacteristicCallback(int connId, int transId, const STACK::RawAddress &bda, int attrHandle,
+static void RequestReadCharacteristicCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda, int attrHandle,
     int offset, bool isLong)
 {
     g_gattServerObservers.ForEach(
@@ -279,7 +279,7 @@ static void RequestReadCharacteristicCallback(int connId, int transId, const STA
     });
 }
 
-static void RequestReadDescriptorCallback(int connId, int transId, const STACK::RawAddress &bda, int attrHandle,
+static void RequestReadDescriptorCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda, int attrHandle,
     int offset, bool isLong)
 {
     g_gattServerObservers.ForEach(
@@ -289,7 +289,7 @@ static void RequestReadDescriptorCallback(int connId, int transId, const STACK::
     });
 }
 
-static void RequestWriteCharacteristicCallback(int connId, int transId, const STACK::RawAddress &bda,
+static void RequestWriteCharacteristicCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda,
     int attrHandle, int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value)
 {
     g_gattServerObservers.ForEach(
@@ -299,7 +299,7 @@ static void RequestWriteCharacteristicCallback(int connId, int transId, const ST
     });
 }
 
-static void RequestWriteDescriptorCallback(int connId, int transId, const STACK::RawAddress &bda, int attrHandle,
+static void RequestWriteDescriptorCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda, int attrHandle,
     int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value)
 {
     g_gattServerObservers.ForEach(
@@ -309,7 +309,7 @@ static void RequestWriteDescriptorCallback(int connId, int transId, const STACK:
     });
 }
 
-static void RequestExecWriteCallback(int connId, int transId, const STACK::RawAddress &bda, int execWrite)
+static void RequestExecWriteCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda, int execWrite)
 {
     g_gattServerObservers.ForEach([connId, transId, bda, execWrite](std::weak_ptr<GattServerObserver> observer) {
         WPTR_CBACK_GATT_THREAD_SERVER_OBSERVER(observer, RequestExecWriteCallback,
@@ -368,33 +368,33 @@ static void RegisterClientCallback(int status, int clientIf, const Uuid &appUuid
     });
 }
 
-static void ConnectCallback(int connId, int status, int clientIf, const STACK::RawAddress &bda)
+static void ConnectCallback(int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda)
 {
     HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BT_SERVICE, "GATT_CONNECT_STATE",
-        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ADDRESS", GetEncryptAddr(bda.ToString()),
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ADDRESS", GetEncryptAddr(bda.GetAddress()),
         "STATE", static_cast<int>(BTConnectState::CONNECTED), "ROLE", "client", "CONNECTIF", clientIf,
         "STATUS", status);
-    ReportDataToRss(GetEncryptAddr(bda.ToString()), static_cast<int>(BTConnectState::CONNECTED),
+    ReportDataToRss(GetEncryptAddr(bda.GetAddress()), static_cast<int>(BTConnectState::CONNECTED),
         "client", clientIf, status);
     g_gattClientObservers.ForEach([connId, status, clientIf, bda](std::weak_ptr<GattClientObserver> observer) {
         WPTR_CBACK_GATT_THREAD_CLIENT_OBSERVER(observer, ConnectCallback, connId, status, clientIf, bda);
     });
 }
 
-static void DisconnectCallback(int connId, int status, int clientIf, const STACK::RawAddress &bda, int reason)
+static void DisconnectCallback(int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda, int reason)
 {
     HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::BT_SERVICE, "GATT_CONNECT_STATE",
-        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ADDRESS", GetEncryptAddr(bda.ToString()),
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,  "ADDRESS", GetEncryptAddr(bda.GetAddress()),
         "STATE", static_cast<int>(BTConnectState::DISCONNECTED), "ROLE", "client", "CONNECTIF", clientIf,
         "STATUS", status);
-    ReportDataToRss(GetEncryptAddr(bda.ToString()), static_cast<int>(BTConnectState::DISCONNECTED),
+    ReportDataToRss(GetEncryptAddr(bda.GetAddress()), static_cast<int>(BTConnectState::DISCONNECTED),
         "client", clientIf, status);
     g_gattClientObservers.ForEach([connId, status, clientIf, bda, reason](std::weak_ptr<GattClientObserver> observer) {
         WPTR_CBACK_GATT_THREAD_CLIENT_OBSERVER(observer, DisconnectCallback, connId, status, clientIf, bda, reason);
     });
 }
 
-static void CancelOpenCallback(int connId, int status, int clientIf, const STACK::RawAddress &bda)
+static void CancelOpenCallback(int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda)
 {
     g_gattClientObservers.ForEach([connId, status, clientIf, bda](std::weak_ptr<GattClientObserver> observer) {
         WPTR_CBACK_GATT_THREAD_CLIENT_OBSERVER(observer, CancelOpenCallback, connId, status, clientIf, bda);
@@ -468,7 +468,7 @@ static void ConfigureMtuCallback(int connId, int status, int mtu)
     });
 }
 
-static void ReadRemoteRssiValueCallback(int clientIf, const STACK::RawAddress &bda, int rssi, int status)
+static void ReadRemoteRssiValueCallback(int clientIf, const OHOS::bluetooth::RawAddress &bda, int rssi, int status)
 {
     g_gattClientObservers.ForEach([clientIf, bda, rssi, status](std::weak_ptr<GattClientObserver> observer) {
         WPTR_CBACK_GATT_THREAD_CLIENT_OBSERVER(observer, ReadRemoteRssiValueCallback, clientIf, bda, rssi, status);

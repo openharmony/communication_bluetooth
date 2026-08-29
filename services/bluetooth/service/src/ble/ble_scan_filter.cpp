@@ -223,7 +223,7 @@ void BleScanFilter::ApcfCommandLog(const std::vector<ApcfCommand> &cmds) const
         switch (cmd.type) {
             case BTM_BLE_PF_ADDR_FILTER:
                 HILOGI("Address: %{public}s, AddrType: %{public}d, Irk: %{public}s",
-                    cmd.address.ToStringForLogging().c_str(), cmd.addrType, GetEncryptIrk(cmd.irk).c_str());
+                    GET_ENCRYPT_STR_ADDR(cmd.address.GetAddress()), cmd.addrType, GetEncryptIrk(cmd.irk).c_str());
                 break;
             case BTM_BLE_PF_SRVC_UUID:
                 HILOGI("ServiceUuid: %{public}s, mask: %{public}s",
@@ -258,7 +258,7 @@ ApcfCommand BleScanFilter::GetCommand(uint8_t cmdType, const BleScanFilterImpl &
 
     switch (cmdType) {
         case BTM_BLE_PF_ADDR_FILTER:
-            cmd.address = ServiceUtil::AddrToStack(RawAddress(filter.GetDeviceId()));
+            cmd.address = RawAddress(filter.GetDeviceId());
             if (filter.GetRawAddressType() == RawAddressType::RANDOM_ADDRESS) {
                 cmd.addrType = BLE_ADDR_RANDOM;
             } else if (filter.GetRawAddressType() == RawAddressType::PUBLIC_ADDRESS) {

@@ -206,8 +206,7 @@ void HfpAgSystemEventProcesser::ProcessPhoneStateChange(const HfpAgPhoneState &p
     if (callState == HFP_AG_CALL_STATE_DISCONNECTED) {
         RefusePlayHelper::GetInstance()->SetLastHangUpTime(address_);
     }
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HfpAgService *service = HfpAgService::GetService();
     CHECK_AND_RETURN_LOG(service != nullptr, "get service failed!");
     ::bluetooth::headset::Interface* bluetoothHfpInterface = service->getBluetoothHfpInterface();
@@ -508,8 +507,7 @@ void HfpAgSystemEventProcesser::GetSubscriberNumber() const
 
 void HfpAgSystemEventProcesser::ProcessAtCindCmdEvent(int call, int callsetup, int callheld)
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HfpAgService *service = HfpAgService::GetService();
     CHECK_AND_RETURN_LOG(service != nullptr, "get service failed!");
     ::bluetooth::headset::Interface* bluetoothHfpInterface = service->getBluetoothHfpInterface();
@@ -553,8 +551,7 @@ void HfpAgSystemEventProcesser::GetAgIndicator()
 void HfpAgSystemEventProcesser::GetNetworkOperator() const
 {
     std::string networkOperator = systemInterface_.GetNetworkOperator();
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HfpAgService *service = HfpAgService::GetService();
     CHECK_AND_RETURN_LOG(service != nullptr, "get service failed!");
     ::bluetooth::headset::Interface* bluetoothHfpInterface = service->getBluetoothHfpInterface();
@@ -591,8 +588,7 @@ void HfpAgSystemEventProcesser::GetNetworkOperator() const
  */
 void HfpAgSystemEventProcesser::ProcessClccResponseCmd(HfpAgCallList callList) const
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HfpAgService *service = HfpAgService::GetService();
     CHECK_AND_RETURN_LOG(service != nullptr, "get service failed!");
     ::bluetooth::headset::Interface* bluetoothHfpInterface = service->getBluetoothHfpInterface();
@@ -885,9 +881,8 @@ static void SetHwDeviceInfo(RemoteDeviceProperties* remoteDeviceProp, std::strin
 void HfpAgSystemEventProcesser::UpdateHwDeviceInfo(const std::string &deviceName, const std::string &deviceTimeStamp)
 {
     CHECK_AND_RETURN_LOG(deviceName != INVALID_NAME, "deviceName is invalid");
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
-    int32_t result = RemoteDeviceProperties::GetInstance()->GetRemoteDeviceProperty(rawAddr,
+    OHOS::bluetooth::RawAddress device(address_);
+    int32_t result = RemoteDeviceProperties::GetInstance()->GetRemoteDeviceProperty(device,
         BtPropertyType::BT_PROPERTY_TIMESTAMP);
     CHECK_AND_RETURN_LOG(result == BT_STATUS_SUCCESS, "get timestamp failed");
     int32_t timeStamp = INVALID_VALUE;
@@ -1203,8 +1198,7 @@ void HfpAgSystemEventProcesser::VoiceRecognitionStateChanged(int status)
 
 void HfpAgSystemEventProcesser::ProcessAtResponseCodeEvent(int responseCode, int errorCode) const
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HfpAgService *service = HfpAgService::GetService();
     CHECK_AND_RETURN_LOG(service != nullptr, "get service failed!");
     ::bluetooth::headset::Interface* bluetoothHfpInterface = service->getBluetoothHfpInterface();
@@ -1223,8 +1217,7 @@ void HfpAgSystemEventProcesser::ProcessAtResponseCodeEvent(int responseCode, int
 
 void HfpAgSystemEventProcesser::ProcessAtResponseStringEvent(const std::string &response) const
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HfpAgService *service = HfpAgService::GetService();
     CHECK_AND_RETURN_LOG(service != nullptr, "get service failed!");
     ::bluetooth::headset::Interface* bluetoothHfpInterface = service->getBluetoothHfpInterface();
@@ -1242,8 +1235,7 @@ void HfpAgSystemEventProcesser::ProcessAtResponseStringEvent(const std::string &
 
 void HfpAgSystemEventProcesser::NotifyDeviceStatusChangedEvent()
 {
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HfpAgService *service = HfpAgService::GetService();
     CHECK_AND_RETURN_LOG(service != nullptr, "get service failed!");
     ::bluetooth::headset::Interface* bluetoothHfpInterface = service->getBluetoothHfpInterface();
@@ -1276,8 +1268,7 @@ void HfpAgSystemEventProcesser::ProfcessDialingOutResultEvent(int result)
 void HfpAgSystemEventProcesser::SendBSIRValueEvent(int action)
 {
     bool value = (action == HFP_AG_INBAND_RING_DISABLE) ? false : true;
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HfpAgService *service = HfpAgService::GetService();
     CHECK_AND_RETURN_LOG(service != nullptr, "get service failed!");
     ::bluetooth::headset::Interface* bluetoothHfpInterface = service->getBluetoothHfpInterface();
@@ -1300,8 +1291,7 @@ void HfpAgSystemEventProcesser::ProcessScoVolumeChangedEvent(int volumeType, int
     if (speakerVolume_ == volumeValue) {
         return;
     }
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     HfpAgService *service = HfpAgService::GetService();
     CHECK_AND_RETURN_LOG(service != nullptr, "get service failed!");
     ::bluetooth::headset::Interface* bluetoothHfpInterface = service->getBluetoothHfpInterface();
@@ -1364,8 +1354,7 @@ void HfpAgSystemEventProcesser::SetScoVolume()
         HILOGE("[HFP_EVENT_PROCESSER]BluetoothHfpInterface is null");
         return;
     }
-    RawAddress device(address_);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr(address_);
     BtStackStatus result = bluetoothHfpInterface->VolumeControl(::bluetooth::headset::BTHF_VOLUME_TYPE_SPK,
         volumeValue, &rawAddr);
     if (result != BT_STATUS_SUCCESS) {

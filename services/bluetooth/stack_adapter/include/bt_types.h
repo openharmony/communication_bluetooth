@@ -33,7 +33,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
-#include "types/raw_address.h"
+#include "raw_address.h"
 #include "bt_uuid.h"
 
 /* STACK::Xxx references resolve to the global ::Xxx symbols. */
@@ -41,7 +41,7 @@
 #define STACK
 #endif
 
-/* RawAddress is provided by the ported stack layer, see types/raw_address.h. */
+/* OHOS::bluetooth::RawAddress is the unified address type of the framework. */
 
 /* INVALID_MAC_ADDRESS is provided by frameworks/inner/ipc/common/bt_def.h
  * as a constexpr, do not redefine it as a macro here. */
@@ -276,14 +276,14 @@ enum BtPinState {
 
 
 /*
- * Sensing info reported by the stubbed stack. Defined after RawAddress and
+ * Sensing info reported by the stubbed stack. Defined after OHOS::bluetooth::RawAddress and
  * OHOS::bluetooth::Uuid since it embeds them by value.
  */
 struct BtSensingInfo {
     uint8_t sensingState;
     uint8_t eventType;
     uint32_t timestamp;
-    RawAddress addr;
+    OHOS::bluetooth::RawAddress addr;
     OHOS::bluetooth::Uuid uuid;
     uint32_t resourceId;
     uint16_t interval;

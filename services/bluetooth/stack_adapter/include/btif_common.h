@@ -27,7 +27,7 @@ enum BtifCtrlState {
     BTIF_CTRL_STATE_OFF,
 };
 
-inline int BtifGetAddressType(const RawAddress &bdAddr, uint8_t *addrType)
+inline int BtifGetAddressType(const OHOS::bluetooth::RawAddress &bdAddr, uint8_t *addrType)
 {
     (void)bdAddr;
     if (addrType != nullptr) {

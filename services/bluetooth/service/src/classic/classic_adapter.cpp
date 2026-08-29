@@ -44,6 +44,7 @@
 #include "interface_adapter_manager.h"
 #include "interface_profile_manager.h"
 #include "common_util.h"
+#include "bt_def.h"
 #include "securec.h"
 #include "bt_chr_dft_exception.h"
 #include "bt_chr_ue_manager.h"
@@ -233,11 +234,11 @@ void ClassicAdapter::LoadPairedDeviceInfo()
             std::shared_ptr<BluetoothDevice> remoteDevice = remoteDeviceProperties_->FindRemoteDevice(device);
             remoteDevice->SetPairedStatus(PAIR_PAIRED);
             ConnectStrategyManager::GetInstance()->InitConnectStrategy(remoteDevice->GetAddress());
-            STACK::RawAddress btAddr = ServiceUtil::AddrToStack(device);
+            OHOS::bluetooth::RawAddress btAddr = device;
             btInterface->getRemoteDeviceProperties(&btAddr);
             BtChrUpdateDeviceInfo(device.GetAddress(), remoteDevice->GetRemoteName(), remoteDevice->GetRssi(),
                 remoteDevice->GetDeviceClass());
-            HILOGI("get_remote addr %{public}s", btAddr.ToStringForLogging().c_str());
+            HILOGI("get_remote addr %{public}s", GET_ENCRYPT_STR_ADDR(btAddr.GetAddress()));
         }
     }
 }
@@ -304,11 +305,7 @@ void ClassicAdapter::DisconnectAcl(const std::string &address)
         HILOGE("bthwInterface_ is null.");
         return;
     }
-    STACK::RawAddress rawAddr;
-    if (!STACK::RawAddress::FromString(address, rawAddr)) {
-        HILOGE("[DisconnectAcl] addr error");
-        return;
-    }
+    OHOS::bluetooth::RawAddress rawAddr(address);
     BluetoothHwInterface::GetInstance()->GetBtHwInterface()->hwBtsndHcicDisconnect(rawAddr);
 }
 
@@ -319,11 +316,7 @@ void ClassicAdapter::CreateAclConnect(const std::string &address)
         HILOGE("bluetoothInterface_ is null.");
         return;
     }
-    STACK::RawAddress rawAddr;
-    if (!STACK::RawAddress::FromString(address, rawAddr)) {
-        HILOGE("[CreateAclConnect] addr error");
-        return;
-    }
+    OHOS::bluetooth::RawAddress rawAddr(address);
     std::shared_ptr<BluetoothDevice> remoteDevice = remoteDeviceProperties_->FindRemoteDevice(RawAddress(address));
     if (remoteDevice->GetDeviceType() == DEVICE_TYPE_LE ||
         remoteDevice->GetDeviceType() == DEVICE_TYPE_UNKNOWN) {
@@ -615,11 +608,7 @@ bool ClassicAdapter::GetRemoteServices(const std::string &address)
         HILOGE("bluetoothInterface_ is null.");
         return false;
     }
-    STACK::RawAddress rawAddr;
-    if (!STACK::RawAddress::FromString(address, rawAddr)) {
-        HILOGE("[GetRemoteServices] addr error");
-        return false;
-    }
+    OHOS::bluetooth::RawAddress rawAddr(address);
     int ret = AdapterManager::GetInstance()->getBluetoothInterface()->getRemoteServices(&rawAddr);
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("get_remote_services error, error code: %{public}d", ret);
@@ -711,7 +700,7 @@ int ClassicAdapter::StartPairInner(const RawAddress &device, int32_t transport,
     const Bluetooth::BluetoothOobData &oobData, const BtInterface *btInterface)
 {
     int ret = BT_STATUS_FAIL;
-    STACK::RawAddress btAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress btAddr = device;
     if (oobData.HasOobData()) { // pairDeviceOutOfBand
         BtStackOobData btOobData;
         ConvertToBtOobData(oobData, btOobData);
@@ -1069,13 +1058,13 @@ void ClassicAdapter::DiscoveryStateChangedInner(BtDiscoveryState state)
     }
 }
 
-void ClassicAdapter::BondStateChanged(BtStackStatus status, STACK::RawAddress* bdAddr, BtBondState state)
+void ClassicAdapter::BondStateChanged(BtStackStatus status, OHOS::bluetooth::RawAddress* bdAddr, BtBondState state)
 {
     if (bdAddr == nullptr) {
         HILOGE("wrong addr");
         return;
     }
-    STACK::RawAddress addr = *bdAddr;
+    OHOS::bluetooth::RawAddress addr = *bdAddr;
     DoInClassicThread([this, status, addr, state] {
         this->BondStateChangedInner(status, addr, state);
         this->NotifyBondStateChanged(status, addr, state);
@@ -1093,13 +1082,13 @@ bool ClassicAdapter::NeedWaitForSdpComplete(std::shared_ptr<BluetoothDevice> rem
     return false;
 }
 
-static void ClearSavedDeviceInfo(STACK::RawAddress rawAddr, const RawAddress &device)
+static void ClearSavedDeviceInfo(OHOS::bluetooth::RawAddress rawAddr, const RawAddress &device)
 {
     BluetoothAudioManager::GetInstance().ClearWearDetectionSupport(device.GetAddress());
 
-    PreferencesManager::Delete(rawAddr.ToString(), PreferencesManagerType::ABS_VOLUME_SWITCH);
-    PreferencesManager::Delete(rawAddr.ToString(), PreferencesManagerType::ABS_VOLUME);
-    PreferencesManager::Delete(rawAddr.ToString(), PreferencesManagerType::NON_ABS_VOLUME);
+    PreferencesManager::Delete(rawAddr.GetAddress(), PreferencesManagerType::ABS_VOLUME_SWITCH);
+    PreferencesManager::Delete(rawAddr.GetAddress(), PreferencesManagerType::ABS_VOLUME);
+    PreferencesManager::Delete(rawAddr.GetAddress(), PreferencesManagerType::NON_ABS_VOLUME);
     PreferencesManager::Delete(device.GetAddress(), PreferencesManagerType::HFP_VOLUME);
     PreferencesManager::Delete(device.GetAddress(), PreferencesManagerType::VIRTUAL_AUTO_CONN_SWITCH);
     PreferencesManager::Delete(device.GetAddress(), PreferencesManagerType::CONNECT_ALL_PROFILE_APP_TYPE);
@@ -1165,9 +1154,9 @@ void ClassicAdapter::CovertUnbondCause(BtStackStatus status, int &unbondCause, s
     }
 }
 
-void ClassicAdapter::BondStateChangedInner(BtStackStatus status, STACK::RawAddress bdAddr, BtBondState state)
+void ClassicAdapter::BondStateChangedInner(BtStackStatus status, OHOS::bluetooth::RawAddress bdAddr, BtBondState state)
 {
-    RawAddress device = ServiceUtil::AddrFromStack(bdAddr);
+    RawAddress device = bdAddr;
     HILOGI("device: %{public}s status: %{public}d bondState: %{public}d", GET_ENCRYPT_ADDR(device), status, state);
     std::shared_ptr<BluetoothDevice> remoteDevice = remoteDeviceProperties_->GetBluetoothDeviceFromMap(device);
     if (!remoteDevice) {
@@ -1221,22 +1210,22 @@ void ClassicAdapter::BondStateChangedInner(BtStackStatus status, STACK::RawAddre
     }
 }
 
-void ClassicAdapter::SspRequest(STACK::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
+void ClassicAdapter::SspRequest(OHOS::bluetooth::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
     BtSspVariant pairingVariant, uint32_t passKey)
 {
     if (remoteBdAddr == nullptr) {
         HILOGE("wrong addr");
         return;
     }
-    STACK::RawAddress addr = *remoteBdAddr;
+    OHOS::bluetooth::RawAddress addr = *remoteBdAddr;
     DoInClassicThread([this, addr, bdName, cod, pairingVariant,
         passKey] {this->SspRequestInner(addr, bdName, cod, pairingVariant, passKey);});
 }
 
-void ClassicAdapter::SspRequestInner(STACK::RawAddress remoteBdAddr, BtBdname* bdName, uint32_t cod,
+void ClassicAdapter::SspRequestInner(OHOS::bluetooth::RawAddress remoteBdAddr, BtBdname* bdName, uint32_t cod,
     BtSspVariant pairingVariant, uint32_t passKey)
 {
-    RawAddress device = ServiceUtil::AddrFromStack(remoteBdAddr);
+    RawAddress device = remoteBdAddr;
     HILOGI("address: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int pinType = PIN_TYPE_NO_PASSKEY_CONSENT;
     if (pairingVariant == BT_SSP_VARIANT_PASSKEY_CONFIRMATION) {
@@ -1258,7 +1247,7 @@ void ClassicAdapter::SspRequestInner(STACK::RawAddress remoteBdAddr, BtBdname* b
         const BtInterface *btInterface = nullptr;
         if (hal_util_load_bt_library(&btInterface) == 0 && btInterface != nullptr &&
             btInterface->sspReply != nullptr) {
-            STACK::RawAddress address = remoteBdAddr;
+            OHOS::bluetooth::RawAddress address = remoteBdAddr;
             (void)btInterface->sspReply(&address, pairingVariant, true, passKey);
         }
         return;
@@ -1287,28 +1276,28 @@ void ClassicAdapter::SspRequestInner(STACK::RawAddress remoteBdAddr, BtBdname* b
     SendPairConfirmed(device, pinType, static_cast<int>(passKey));
 }
 
-void ClassicAdapter::PinRequest(STACK::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
+void ClassicAdapter::PinRequest(OHOS::bluetooth::RawAddress* remoteBdAddr, BtBdname* bdName, uint32_t cod,
     bool min16Digit)
 {
     if (remoteBdAddr == nullptr) {
         HILOGE("wrong addr");
         return;
     }
-    RawAddress device = ServiceUtil::AddrFromStack(*remoteBdAddr);
+    RawAddress device = *remoteBdAddr;
     std::shared_ptr<BluetoothDevice> remoteDevice = remoteDeviceProperties_->GetBluetoothDeviceFromMap(device);
     if (!remoteDevice) {
         HILOGE("device not exist");
         return;
     }
-    STACK::RawAddress addr = *remoteBdAddr;
+    OHOS::bluetooth::RawAddress addr = *remoteBdAddr;
     DoInClassicThread([this, addr, bdName, cod,
         min16Digit] {this->PinRequestInner(addr, bdName, cod, min16Digit);});
 }
 
-void ClassicAdapter::PinRequestInner(STACK::RawAddress remoteBdAddr, BtBdname* bdName, uint32_t cod,
+void ClassicAdapter::PinRequestInner(OHOS::bluetooth::RawAddress remoteBdAddr, BtBdname* bdName, uint32_t cod,
     bool min16Digit)
 {
-    RawAddress device = ServiceUtil::AddrFromStack(remoteBdAddr);
+    RawAddress device = remoteBdAddr;
     HILOGI("address: %{public}s", GetEncryptAddr(device.GetAddress()).c_str());
     int pinType = min16Digit ? PIN_TYPE_PIN_16_DIGITS : PIN_TYPE_ENTER_PIN_CODE;
     int pinCode = 0; // 0 为默认pincode
@@ -1451,9 +1440,8 @@ void ClassicAdapter::SendPairStatusChanged(const BTTransport transport, const Ra
         GET_ENCRYPT_ADDR(device), status, cause, causeMessage.c_str());
     std::shared_ptr<BluetoothDevice> remoteDevice = remoteDeviceProperties_->GetBluetoothDeviceFromMap(device);
     if (status == PAIR_PAIRED) {
-        STACK::RawAddress bdaddr = ServiceUtil::AddrToStack(device);
         remoteDeviceProperties_->GetRemoteDeviceProperty(
-            bdaddr, static_cast<BtPropertyType>(HW_BT_PROPERTY_RMT_IO_CAP_KEY));
+            device, static_cast<BtPropertyType>(HW_BT_PROPERTY_RMT_IO_CAP_KEY));
 #ifdef BLUETOOTH_FASTSCAN_ENABLE
         DoInLowPriorityThread([]() {BluetoothFastScanManagerLoader::GetInstance().Init();});
 #endif
@@ -2040,8 +2028,7 @@ bool ClassicAdapter::GetHwPropertyInfo(const RawAddress &device, BtPropertyType 
         prop.val = &value;
     }
 
-    STACK::RawAddress dev = ServiceUtil::AddrToStack(device);
-    if (!bthwif->hwGetDeviceInfo(dev, prop)) {
+    if (!bthwif->hwGetDeviceInfo(device, prop)) {
         return false;
     }
     if (type == BT_PROPERTY_REMOTE_NEW_MODEL_ID) {
@@ -2132,8 +2119,7 @@ bool ClassicAdapter::IsIncomingConnection(const RawAddress &device)
     auto* bthwif = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     CHECK_AND_RETURN_LOG_RET(bthwif != nullptr, false, "Failed to get hw bluetooth interface");
 
-    STACK::RawAddress dev = ServiceUtil::AddrToStack(device);
-    bool ret = bthwif->isIncomingConnection(dev);
+    bool ret = bthwif->isIncomingConnection(device);
     return ret;
 }
 
@@ -2258,18 +2244,13 @@ int32_t ClassicAdapter::ControlDeviceAction(const std::string &deviceId, uint32_
 {
     HILOGI("deviceId: %{public}s, controlType: %{public}u, controlTypeVal: %{public}u, \
         controlObject: %{public}u", GetEncryptAddr(deviceId).c_str(), controlType, controlTypeVal, controlObject);
-    uint8_t addrBuf[BD_ADDR_LEN];
-    uint8_t *addrStream = addrBuf;
-    RawAddress remoteAddr(deviceId);
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(remoteAddr);
-    if (rawAddr.IsEmpty()) {
+    uint8_t addrBuf[OHOS::bluetooth::RawAddress::BT_ADDRESS_BYTE_LEN];
+    OHOS::bluetooth::RawAddress rawAddr(deviceId);
+    if (rawAddr.GetAddress() == INVALID_MAC_ADDRESS) {
         HILOGI("rawAddr is empty.");
         return BT_ERR_INTERNAL_ERROR;
     }
-    if (memcpy_s(addrStream, BD_ADDR_LEN, rawAddr.address, BD_ADDR_LEN) != EOK) {
-        HILOGI("memcpy_s addrBuf failed");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    rawAddr.ConvertToUint8(addrBuf);
     BluetoothHwInterface::GetInstance()->HwHiechoDeviceCtrl(addrBuf, controlType, controlTypeVal, controlObject);
     return BT_NO_ERROR;
 }
@@ -2471,7 +2452,7 @@ void ClassicAdapter::HandleBondStateBonding(std::shared_ptr<BluetoothDevice> rem
     }
 }
 
-void ClassicAdapter::HandleBondStateBondNone(BtStackStatus status, STACK::RawAddress bdAddr,
+void ClassicAdapter::HandleBondStateBondNone(BtStackStatus status, OHOS::bluetooth::RawAddress bdAddr,
     std::shared_ptr<BluetoothDevice> remoteDevice, const RawAddress &device, BtBondState state)
 {
     if (remoteDevice == nullptr) {
@@ -2502,9 +2483,9 @@ int32_t ClassicAdapter::UpdateCloudBluetoothDeviceInner(std::vector<Bluetooth::B
     return BT_NO_ERROR;
 }
 
-void ClassicAdapter::SetBondState(BtStackStatus status, STACK::RawAddress bdAddr, BtBondState state)
+void ClassicAdapter::SetBondState(BtStackStatus status, OHOS::bluetooth::RawAddress bdAddr, BtBondState state)
 {
-    RawAddress device = ServiceUtil::AddrFromStack(bdAddr);
+    RawAddress device = bdAddr;
     HILOGI("device: %{public}s status: %{public}d SetBondState: %{public}d", GET_ENCRYPT_ADDR(device), status, state);
     std::shared_ptr<BluetoothDevice> remoteDevice = remoteDeviceProperties_->GetBluetoothDeviceFromMap(device);
     if (!remoteDevice) {
@@ -2610,13 +2591,12 @@ bool ClassicAdapter::SatisfyDisconnectAclCondition(const RawAddress &device, boo
         GetDeviceState<IProfileHfpAg>(agService_, device) == BTConnectState::CONNECTED;
 }
 
-void ClassicAdapter::NotifyBondStateChanged(BtStackStatus status, STACK::RawAddress bdAddr,
+void ClassicAdapter::NotifyBondStateChanged(BtStackStatus status, OHOS::bluetooth::RawAddress bdAddr,
     BtBondState state)
 {
     auto a2dpPtr = static_cast<A2dpService *>(a2dpSrcService_);
     if (a2dpPtr != nullptr) {
-        RawAddress device = ServiceUtil::AddrFromStack(bdAddr);
-        a2dpPtr->NotifyBondStateChanged(status, device, state);
+        a2dpPtr->NotifyBondStateChanged(status, bdAddr, state);
     }
 }
 

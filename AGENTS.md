@@ -63,7 +63,7 @@ Signed-off-by: zyjjjjjjjjjjjjjjjjj <zhangyijiu1@huawei.com>
 
 - 不要违反代码的层次结构。
 - git commit 里的 Signed-off-by 必须使用系统自带的。
-
+- HILOG 日志里不能明文打印地址，需使用 GetEncryptAddr 进行匿名化。
 
 
 

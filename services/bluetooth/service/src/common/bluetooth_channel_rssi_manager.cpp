@@ -78,7 +78,7 @@ void BluetoothChannelRssiManager::SendChannelRssiReadCommand()
     std::vector<std::string> brLinks = BluetoothConnectionManager::GetInstance()->brLinks_.GetVector();
     for (auto it = brLinks.begin(); it != brLinks.end(); it++) {
         int ret = BluetoothHwInterface::GetInstance()->GetBtHwInterface()->
-            hwSendChannelRssiReadCmd(ServiceUtil::AddrToStack(RawAddress(*it)), BT_TRANSPORT_BR_EDR);
+            hwSendChannelRssiReadCmd(RawAddress(*it), BT_TRANSPORT_BR_EDR);
         if (ret == BT_STATUS_SUCCESS) {
             HILOGI("Successfully sent rssi read cmd with brlink addr: %{public}s.", GetEncryptAddr(*it).c_str());
             return;

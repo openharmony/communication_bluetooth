@@ -55,17 +55,17 @@ struct BtCallbacks {
     size_t size;
     void (*adapterStateChangedCb)(BtState state);
     void (*adapterPropertiesCb)(BtStackStatus status, int numProperties, BtProperty *properties);
-    void (*remoteDevicePropertiesCb)(BtStackStatus status, RawAddress *bdAddr, int numProperties,
+    void (*remoteDevicePropertiesCb)(BtStackStatus status, OHOS::bluetooth::RawAddress *bdAddr, int numProperties,
         BtProperty *properties);
     void (*deviceFoundCb)(int numProperties, BtProperty *properties);
     void (*discoveryStateChangedCb)(BtDiscoveryState state);
-    void (*pinRequestCb)(RawAddress *remoteBdAddr, BtBdname *bdName, uint32_t cod,
+    void (*pinRequestCb)(OHOS::bluetooth::RawAddress *remoteBdAddr, BtBdname *bdName, uint32_t cod,
         bool min16Digit);
-    void (*sspRequestCb)(RawAddress *remoteBdAddr, BtBdname *bdName, uint32_t cod,
+    void (*sspRequestCb)(OHOS::bluetooth::RawAddress *remoteBdAddr, BtBdname *bdName, uint32_t cod,
         BtSspVariant pairingVariant, uint32_t passKey);
-    void (*bondStateChangedCb)(BtStackStatus status, RawAddress *remoteBdAddr,
+    void (*bondStateChangedCb)(BtStackStatus status, OHOS::bluetooth::RawAddress *remoteBdAddr,
         BtBondState state);
-    void (*aclStateChangedCb)(BtStackStatus status, RawAddress *remoteBdAddr,
+    void (*aclStateChangedCb)(BtStackStatus status, OHOS::bluetooth::RawAddress *remoteBdAddr,
         BtAclState state, BtHciErrorCode hciReason, BtTransport linkType);
     void (*threadEvtCb)(BtCbThreadEvt evt);
     void (*dutModeRecvCb)(uint16_t opcode, uint8_t *buf, uint8_t len);
@@ -101,30 +101,30 @@ struct BtInterface {
     int (*setOsCallouts)(void *callouts);
     const void *(*getProfileInterface)(const char *profileId);
     bluetooth::avrcp::ServiceInterface *(*getAvrcpService)(void);
-    int (*getRemoteServices)(RawAddress *bdAddr);
+    int (*getRemoteServices)(OHOS::bluetooth::RawAddress *bdAddr);
     int (*enableBluetoothHighpower)(bool enable);
     int (*enableFastScan)(bool isEnable);
     int (*setFastScan)(int level);
     int (*sendAntennaStatusMsg)(bool isFixed);
     int (*sendBleScanMsg)(bool isStarted);
     int (*configClear)(void);
-    int (*createBond)(const RawAddress *bdAddr, int transport);
-    int (*createBondOutOfBand)(const RawAddress *bdAddr, int transport,
+    int (*createBond)(const OHOS::bluetooth::RawAddress *bdAddr, int transport);
+    int (*createBondOutOfBand)(const OHOS::bluetooth::RawAddress *bdAddr, int transport,
         const BtStackOobData *p192Data, const BtStackOobData *p256Data);
-    int (*cancelBond)(const RawAddress *bdAddr);
-    int (*removeBond)(const RawAddress *bdAddr);
-    int (*pinReply)(const RawAddress *bdAddr, bool accept, uint8_t pinLen,
+    int (*cancelBond)(const OHOS::bluetooth::RawAddress *bdAddr);
+    int (*removeBond)(const OHOS::bluetooth::RawAddress *bdAddr);
+    int (*pinReply)(const OHOS::bluetooth::RawAddress *bdAddr, bool accept, uint8_t pinLen,
         BtPinCode *pinCode);
-    int (*sspReply)(const RawAddress *bdAddr, BtSspVariant variant, bool accept,
+    int (*sspReply)(const OHOS::bluetooth::RawAddress *bdAddr, BtSspVariant variant, bool accept,
         uint32_t passkey);
-    int (*getRemoteDeviceProperties)(RawAddress *bdAddr);
-    int (*getRemoteDeviceProperty)(RawAddress *bdAddr, BtPropertyType type);
-    int (*setRemoteDeviceProperty)(RawAddress *bdAddr, const BtProperty *property);
+    int (*getRemoteDeviceProperties)(OHOS::bluetooth::RawAddress *bdAddr);
+    int (*getRemoteDeviceProperty)(OHOS::bluetooth::RawAddress *bdAddr, BtPropertyType type);
+    int (*setRemoteDeviceProperty)(OHOS::bluetooth::RawAddress *bdAddr, const BtProperty *property);
     int (*setAdapterProperty)(BtProperty *property);
     int (*startDiscovery)(void);
     int (*cancelDiscovery)(void);
     int (*generateLocalOobData)(int transport);
-    void (*createAclConnection)(RawAddress *addr);
+    void (*createAclConnection)(OHOS::bluetooth::RawAddress *addr);
     /* Ranging antenna switch support consumed by BleRangeImpl; the callback
      * reports the MAC/antenna ids selected by the stack. */
     int (*registerRangingAntSwitchCallback)(void (*callback)(uint8_t macID, uint8_t antID));

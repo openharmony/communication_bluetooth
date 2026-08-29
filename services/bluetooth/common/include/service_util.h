@@ -21,7 +21,6 @@
 #include "raw_address.h"
 // Bluedroid
 #include "types/bt_transport.h"
-#include "types/raw_address.h"
 
 #include <algorithm>
 
@@ -44,24 +43,6 @@ public:
             return uuid.ToString();
         });
         return uuidStrs;
-    }
-
-    // RawAddress
-    static RawAddress AddrFromStack(const STACK::RawAddress &addr)
-    {
-        std::string tmp = addr.ToString();
-        // BlueH need upper address, but bluedroid use lower address
-        std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-        return RawAddress(tmp);
-    }
-
-    static STACK::RawAddress AddrToStack(const RawAddress &addr)
-    {
-        STACK::RawAddress dst;
-        if (!STACK::RawAddress::FromString(addr.GetAddress(), dst)) {
-            return STACK::RawAddress::kEmpty;
-        }
-        return dst;
     }
 
     // Address type

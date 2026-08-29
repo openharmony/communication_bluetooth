@@ -623,36 +623,36 @@ private:
     class HfpAgServiceCallbacks : ::bluetooth::headset::Callbacks {
     public:
         void ConnectionStateCallback(::bluetooth::headset::BthfConnectionState state,
-            STACK::RawAddress* bdAddr) override;
+            OHOS::bluetooth::RawAddress* bdAddr) override;
         void AudioStateCallback(::bluetooth::headset::BthfAudioState state,
-            STACK::RawAddress* bdAddr) override;
+            OHOS::bluetooth::RawAddress* bdAddr) override;
         void VoiceRecognitionCallback(::bluetooth::headset::BthfVrState state,
-            STACK::RawAddress* bdAddr) override;
-        void AnswerCallCallback(STACK::RawAddress* bdAddr) override;
-        void HangupCallCallback(STACK::RawAddress* bdAddr) override;
+            OHOS::bluetooth::RawAddress* bdAddr) override;
+        void AnswerCallCallback(OHOS::bluetooth::RawAddress* bdAddr) override;
+        void HangupCallCallback(OHOS::bluetooth::RawAddress* bdAddr) override;
         void VolumeControlCallback(::bluetooth::headset::BthfVolumeType type,
-            int volume, STACK::RawAddress* bdAddr) override;
-        void DialCallCallback(char* number, STACK::RawAddress* bdAddr) override;
-        void DtmfCmdCallback(char dtmf, STACK::RawAddress* bdAddr) override;
-        void NoiseReductionCallback(::bluetooth::headset::BthfNrec nrec, STACK::RawAddress* bdAddr) override;
-        void WbsCallback(::bluetooth::headset::BthfWbsConfig wbsConfig, STACK::RawAddress* bdAddr) override;
-        void AtChldCallback(::bluetooth::headset::BthfChldType chld, STACK::RawAddress* bdAddr) override;
-        void AtCnumCallback(STACK::RawAddress* bdAddr) override;
-        void AtCindCallback(STACK::RawAddress* bdAddr) override;
-        void AtCopsCallback(STACK::RawAddress* bdAddr) override;
-        void AtClccCallback(STACK::RawAddress* bdAddr) override;
-        void UnknownAtCallback(char* atString, STACK::RawAddress* bdAddr) override;
-        void KeyPressedCallback(STACK::RawAddress* bdAddr) override;
-        void AtBindCallback(char* atString, STACK::RawAddress* bdAddr) override;
+            int volume, OHOS::bluetooth::RawAddress* bdAddr) override;
+        void DialCallCallback(char* number, OHOS::bluetooth::RawAddress* bdAddr) override;
+        void DtmfCmdCallback(char dtmf, OHOS::bluetooth::RawAddress* bdAddr) override;
+        void NoiseReductionCallback(::bluetooth::headset::BthfNrec nrec, OHOS::bluetooth::RawAddress* bdAddr) override;
+        void WbsCallback(::bluetooth::headset::BthfWbsConfig wbsConfig, OHOS::bluetooth::RawAddress* bdAddr) override;
+        void AtChldCallback(::bluetooth::headset::BthfChldType chld, OHOS::bluetooth::RawAddress* bdAddr) override;
+        void AtCnumCallback(OHOS::bluetooth::RawAddress* bdAddr) override;
+        void AtCindCallback(OHOS::bluetooth::RawAddress* bdAddr) override;
+        void AtCopsCallback(OHOS::bluetooth::RawAddress* bdAddr) override;
+        void AtClccCallback(OHOS::bluetooth::RawAddress* bdAddr) override;
+        void UnknownAtCallback(char* atString, OHOS::bluetooth::RawAddress* bdAddr) override;
+        void KeyPressedCallback(OHOS::bluetooth::RawAddress* bdAddr) override;
+        void AtBindCallback(char* atString, OHOS::bluetooth::RawAddress* bdAddr) override;
         void AtBievCallback(::bluetooth::headset::BthfHfIndType indId, int indValue,
-            STACK::RawAddress* bdAddr) override;
+            OHOS::bluetooth::RawAddress* bdAddr) override;
         void AtBiaCallback(bool service, bool roam, bool signal, bool battery,
-            STACK::RawAddress* bdAddr) override;
+            OHOS::bluetooth::RawAddress* bdAddr) override;
 #ifdef BLUETOOTH_SCO_NORMALIZED_FEATURE_ENABLE
-        void AtBccCallback(STACK::RawAddress* bdAddr) override;
+        void AtBccCallback(OHOS::bluetooth::RawAddress* bdAddr) override;
 #endif
 #ifdef COMMUNICATION_L2
-        void AtBrsfCallback(uint32_t features, STACK::RawAddress* bdAddr) override;
+        void AtBrsfCallback(uint32_t features, OHOS::bluetooth::RawAddress* bdAddr) override;
 #endif
     };
 

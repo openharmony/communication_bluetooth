@@ -50,7 +50,7 @@ public:
     static RemoteDeviceProperties *GetInstance(void);
 
     BtProperty* PropertyDeepCopy(int numProperties, BtProperty* properties);
-    void GetRemoteDevicePropsCallBack(BtStackStatus status, STACK::RawAddress* bdAddr, int numProperties,
+    void GetRemoteDevicePropsCallBack(BtStackStatus status, OHOS::bluetooth::RawAddress* bdAddr, int numProperties,
         BtProperty* properties);
     void DeviceFoundCallBack(int numProperties, BtProperty* properties);
 
@@ -80,8 +80,8 @@ public:
     void RemovePairWhiteList(const RawAddress &device);
     int32_t GetDeviceAbsVolumeAbility(const RawAddress &device);
     // get device property from stack, result will return in GetRemoteDevicePropsCallbackInner
-    int32_t GetRemoteDeviceProperty(const STACK::RawAddress &addr, BtPropertyType type);
-    void SetRemoteDeviceProperty(const STACK::RawAddress &addr, const BtProperty &prop);
+    int32_t GetRemoteDeviceProperty(const OHOS::bluetooth::RawAddress &addr, BtPropertyType type);
+    void SetRemoteDeviceProperty(const OHOS::bluetooth::RawAddress &addr, const BtProperty &prop);
     bool IsAclConnected(const RawAddress &device);
     bool IsAclEncrypted(const RawAddress &device);
     std::vector<std::string> GetNotPairNoneDevices() const;
@@ -114,7 +114,7 @@ private:
     RemoteDeviceProperties();
     ~RemoteDeviceProperties();
 
-    void GetRemoteDevicePropsCallbackInner(STACK::RawAddress bdAddr, int numProperties,
+    void GetRemoteDevicePropsCallbackInner(OHOS::bluetooth::RawAddress bdAddr, int numProperties,
         BtProperty* properties);
     void DeviceFoundInner(int numProperties, BtProperty* properties);
     void WhiltListCallTimeOut(const RawAddress &device);

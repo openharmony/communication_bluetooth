@@ -62,8 +62,7 @@ BtStackStatus NativeA2dpAdapter::Connect(const RawAddress& bdAddr)
         HILOGE("interface or connect is null");
         return BT_STATUS_FAIL;
     }
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(bdAddr);
-    return iface_->connect(rawAddr);
+    return iface_->connect(bdAddr);
 }
 
 BtStackStatus NativeA2dpAdapter::Disconnect(const RawAddress& bdAddr)
@@ -72,8 +71,7 @@ BtStackStatus NativeA2dpAdapter::Disconnect(const RawAddress& bdAddr)
         HILOGE("interface or disconnect is null");
         return BT_STATUS_FAIL;
     }
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(bdAddr);
-    return iface_->disconnect(rawAddr);
+    return iface_->disconnect(bdAddr);
 }
 
 void NativeA2dpAdapter::Cleanup()
@@ -105,33 +103,29 @@ BtStackStatus NativeA2dpAdapter::SetActiveDevice(const RawAddress& bdAddr)
         HILOGE("interface or set_active_device is null");
         return BT_STATUS_FAIL;
     }
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(bdAddr);
-    return iface_->setActiveDevice(rawAddr);
+    return iface_->setActiveDevice(bdAddr);
 }
 
 // --- trampoline 实现 ---
 
-void NativeA2dpAdapter::BtavConnectionState(const STACK::RawAddress &bdAddr, BtavConnectionState state)
+void NativeA2dpAdapter::BtavConnectionState(const OHOS::bluetooth::RawAddress &bdAddr, BtavConnectionState state)
 {
     if (s_instance_ && s_instance_->callback_) {
-        RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
-        s_instance_->callback_->OnNativeConnectionStateChanged(rawAddr, state);
+        s_instance_->callback_->OnNativeConnectionStateChanged(bdAddr, state);
     }
 }
 
-void NativeA2dpAdapter::BtavAudioState(const STACK::RawAddress &bdAddr, BtavAudioState state)
+void NativeA2dpAdapter::BtavAudioState(const OHOS::bluetooth::RawAddress &bdAddr, BtavAudioState state)
 {
     if (s_instance_ && s_instance_->callback_) {
-        RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
-        s_instance_->callback_->OnNativeAudioStateChanged(rawAddr, state);
+        s_instance_->callback_->OnNativeAudioStateChanged(bdAddr, state);
     }
 }
 
-void NativeA2dpAdapter::BtavAudioConfig(const STACK::RawAddress &bdAddr, uint32_t sampleRate, uint8_t channelCount)
+void NativeA2dpAdapter::BtavAudioConfig(const OHOS::bluetooth::RawAddress &bdAddr, uint32_t sampleRate, uint8_t channelCount)
 {
     if (s_instance_ && s_instance_->callback_) {
-        RawAddress rawAddr = ServiceUtil::AddrFromStack(bdAddr);
-        s_instance_->callback_->OnNativeAudioConfigChanged(rawAddr, sampleRate, channelCount);
+        s_instance_->callback_->OnNativeAudioConfigChanged(bdAddr, sampleRate, channelCount);
     }
 }
 

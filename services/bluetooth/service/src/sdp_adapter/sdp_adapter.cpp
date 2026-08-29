@@ -37,13 +37,13 @@ SdpAdapter &SdpAdapter::GetInstance()
     static SdpAdapter instance;
     return instance;
 }
-static void sdp_search_callback(BtStackStatus status, const STACK::RawAddress &bdAddr,
+static void sdp_search_callback(BtStackStatus status, const OHOS::bluetooth::RawAddress &bdAddr,
     const Uuid &uuid_in, int count, BluetoothSdpRecord *records)
 {
     for (int i = 0; i < count || i == 0; i++) {
         // when status = 1 (BTA_SDP_FAILURE), records is defult(not null), count = 0.
         BluetoothSdpRecord *record = &records[i];
-        SdpFoundEventPublishHelper::PublishSdpFoundEvent(static_cast<int32_t>(status), bdAddr.ToString(),
+        SdpFoundEventPublishHelper::PublishSdpFoundEvent(static_cast<int32_t>(status), bdAddr.GetAddress(),
             uuid_in.ToString(), (i < (count - 1)) ? true : false, record);
         if (uuid_in.ToString() == UUID_MAP_MNS.ToString()) {
             if (SdpAdapter::GetInstance().GetMapMnsSdpFoundCallback() == nullptr) {
@@ -54,7 +54,7 @@ static void sdp_search_callback(BtStackStatus status, const STACK::RawAddress &b
                 record->mns.hdr.l2capPsm,
                 record->mns.hdr.profileVersion,
                 record->mns.supportedFeatures,
-                bdAddr.ToString(),
+                bdAddr.GetAddress(),
                 UUID_MAP_MNS.ToString(),
                 record->hdr.serviceNameLength > 0 ? record->mas.hdr.serviceName : "",
                 i < (count - 1) ? true : false};
@@ -67,7 +67,7 @@ static void sdp_search_callback(BtStackStatus status, const STACK::RawAddress &b
                 record->ops.hdr.rfcommChannelNumber,
                 record->ops.hdr.l2capPsm,
                 record->ops.hdr.profileVersion,
-                ServiceUtil::AddrFromStack(bdAddr).GetAddress(),
+                bdAddr.GetAddress(),
                 UUID_OBEX_OBJECT_PUSH.ToString(),
                 record->ops.hdr.serviceNameLength > 0 ? record->ops.hdr.serviceName : "",
                 i < (count - 1) ? true : false};
@@ -183,8 +183,7 @@ bool SdpAdapter::StartRemoteSdpSearch(const std::string &address, const std::str
     if (!bluetoothSdpInterface_) {
         return false;
     }
-    STACK::RawAddress rawAddress;
-    STACK::RawAddress::FromString(address, rawAddress);
+    OHOS::bluetooth::RawAddress rawAddress(address);
     int32_t ret = bluetoothSdpInterface_->sdpSearch(&rawAddress, Uuid::ConvertFromString(uuid));
     if (ret != BT_STATUS_SUCCESS) {
         HILOGE("sdp_search error");

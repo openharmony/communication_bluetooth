@@ -17,7 +17,7 @@
 #define BLUETOOTH_HEADSET_CALLBACKS_H
 
 #include "hardware/bt_hf.h"
-#include "types/raw_address.h"
+#include "raw_address.h"
 
 namespace bluetooth {
 namespace headset {
@@ -28,37 +28,37 @@ public:
     virtual ~Callbacks() = default;
 
     virtual void ConnectionStateCallback(BthfConnectionState state,
-                                         RawAddress *bdAddr) = 0;
+                                         OHOS::bluetooth::RawAddress *bdAddr) = 0;
     virtual void AudioStateCallback(BthfAudioState state,
-                                    RawAddress *bdAddr) = 0;
+                                    OHOS::bluetooth::RawAddress *bdAddr) = 0;
     virtual void VoiceRecognitionCallback(BthfVrState state,
-                                          RawAddress *bdAddr) = 0;
-    virtual void AnswerCallCallback(RawAddress *bdAddr) = 0;
-    virtual void HangupCallCallback(RawAddress *bdAddr) = 0;
+                                          OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual void AnswerCallCallback(OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual void HangupCallCallback(OHOS::bluetooth::RawAddress *bdAddr) = 0;
     virtual void VolumeControlCallback(BthfVolumeType type, int volume,
-                                       RawAddress *bdAddr) = 0;
-    virtual void DialCallCallback(char *number, RawAddress *bdAddr) = 0;
-    virtual void DtmfCmdCallback(char dtmf, RawAddress *bdAddr) = 0;
-    virtual void NoiseReductionCallback(BthfNrec nrec, RawAddress *bdAddr) = 0;
+                                       OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual void DialCallCallback(char *number, OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual void DtmfCmdCallback(char dtmf, OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual void NoiseReductionCallback(BthfNrec nrec, OHOS::bluetooth::RawAddress *bdAddr) = 0;
     virtual void WbsCallback(BthfWbsConfig wbsConfig,
-                             RawAddress *bdAddr) = 0;
-    virtual void AtChldCallback(BthfChldType chld, RawAddress *bdAddr) = 0;
-    virtual void AtCnumCallback(RawAddress *bdAddr) = 0;
-    virtual void AtCindCallback(RawAddress *bdAddr) = 0;
-    virtual void AtCopsCallback(RawAddress *bdAddr) = 0;
-    virtual void AtClccCallback(RawAddress *bdAddr) = 0;
-    virtual void UnknownAtCallback(char *atString, RawAddress *bdAddr) = 0;
-    virtual void KeyPressedCallback(RawAddress *bdAddr) = 0;
-    virtual void AtBindCallback(char *atString, RawAddress *bdAddr) = 0;
+                             OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual void AtChldCallback(BthfChldType chld, OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual void AtCnumCallback(OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual void AtCindCallback(OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual void AtCopsCallback(OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual void AtClccCallback(OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual void UnknownAtCallback(char *atString, OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual void KeyPressedCallback(OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual void AtBindCallback(char *atString, OHOS::bluetooth::RawAddress *bdAddr) = 0;
     virtual void AtBievCallback(BthfHfIndType indId, int indValue,
-                                RawAddress *bdAddr) = 0;
+                                OHOS::bluetooth::RawAddress *bdAddr) = 0;
     virtual void AtBiaCallback(bool service, bool roam, bool signal,
-                               bool battery, RawAddress *bdAddr) = 0;
+                               bool battery, OHOS::bluetooth::RawAddress *bdAddr) = 0;
 #ifdef BLUETOOTH_SCO_NORMALIZED_FEATURE_ENABLE
-    virtual void AtBccCallback(RawAddress *bdAddr) = 0;
+    virtual void AtBccCallback(OHOS::bluetooth::RawAddress *bdAddr) = 0;
 #endif
 #ifdef COMMUNICATION_L2
-    virtual void AtBrsfCallback(uint32_t features, RawAddress *bdAddr) = 0;
+    virtual void AtBrsfCallback(uint32_t features, OHOS::bluetooth::RawAddress *bdAddr) = 0;
 #endif
 };
 

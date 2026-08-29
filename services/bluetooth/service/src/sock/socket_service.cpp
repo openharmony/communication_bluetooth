@@ -20,6 +20,7 @@
 #include "socket_service.h"
 #include "bluetooth_connection_manager.h"
 #include "class_creator.h"
+#include "common_util.h"
 #include "datetime_ex.h"
 #include "ipc_skeleton.h"
 #include "log.h"
@@ -110,10 +111,10 @@ SocketServiceObserver::~SocketServiceObserver()
 
 void SocketServiceObserver::ConnectCallback(const StackCallbackParam &param)
 {
-    HILOGI_TIME_LIMIT(param.addr.ToStringForLogging().c_str(),
+    HILOGI_TIME_LIMIT(GET_ENCRYPT_STR_ADDR(param.addr.GetAddress()),
         "addr: %{public}s, status =%{public}d, result=%{public}d.",
-        param.addr.ToStringForLogging().c_str(), param.status, param.result);
-    const RawAddress address = ServiceUtil::AddrFromStack(param.addr);
+        GET_ENCRYPT_STR_ADDR(param.addr.GetAddress()), param.status, param.result);
+    const RawAddress address = param.addr;
     Uuid uuid = Uuid::ConvertFromMostAndLeastBit(param.msb, param.lsb);
     if (address == RawAddress(addr_) && (uuid == uuid_)) {
         HILOGI("Match addr & uuid, report socket ConnectCallback, addr: %{public}s",
@@ -287,12 +288,7 @@ int SocketService::Connect(const std::string &addr, const Uuid &uuid, int securi
         SocketConnectError(addr, uuid, SOCKET_INTERFACE_INVALID, type, psm);
         return socketFd;
     }
-    STACK::RawAddress rawAddr;
-    if (!STACK::RawAddress::FromString(addr, rawAddr)) {
-        HILOGE("[SocketService] addr error");
-        SocketConnectError(addr, uuid, ADDR_ERROR, type, psm);
-        return socketFd;
-    }
+    OHOS::bluetooth::RawAddress rawAddr(addr);
     ReportSocketConnectChr(addr, uuid, type, psm, callingName);
     BtChrAddConnSceneInfo(addr, PAIR_TYPE_USER_CONNECT, callingName, 1);
     auto resourceMgr = BluetoothResourceManager::GetInstance();
@@ -389,17 +385,13 @@ void SocketService::UpdateCocConnectionParams(const Bluetooth::BluetoothSocketCo
     params[4] = info.minConnEventLen; // 4 is param index 4 for min connect event length
     params[5] = info.maxConnEventLen;  // 5 is param index 5 for max connect event length
 
-    bthwif->updateCocConnectionParams(ServiceUtil::AddrToStack(device), params, COC_PARAMS_LEN);
+    bthwif->updateCocConnectionParams(device, params, COC_PARAMS_LEN);
 }
 
 int SocketService::RegisterConnectionObserver(const std::string &addr, const Uuid &uuid,
     std::shared_ptr<IBtClientSocketCallback> callback)
 {
-    STACK::RawAddress rawAddr;
-    if (!STACK::RawAddress::FromString(addr, rawAddr)) {
-        HILOGE("[SocketService] addr error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    OHOS::bluetooth::RawAddress rawAddr(addr);
 
     DoInSocketThread(std::bind(
         [](const std::string addr, const Uuid uuid, std::shared_ptr<IBtClientSocketCallback> callback) {
@@ -431,11 +423,7 @@ int SocketService::RegisterConnectionObserver(const std::string &addr, const Uui
 int SocketService::UnregisterConnectionObserver(const std::string &addr, const Uuid &uuid,
     std::shared_ptr<IBtClientSocketCallback> callback)
 {
-    STACK::RawAddress address;
-    if (!STACK::RawAddress::FromString(addr, address)) {
-        HILOGE("[SocketService] addr error");
-        return BT_ERR_INTERNAL_ERROR;
-    }
+    OHOS::bluetooth::RawAddress address(addr);
 
     DoInSocketThread(std::bind(
         [](const std::string addr, const Uuid uuid) {

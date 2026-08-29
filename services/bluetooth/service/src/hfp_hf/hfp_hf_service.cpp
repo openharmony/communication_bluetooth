@@ -76,12 +76,12 @@ static int CovertConnectStateFromStack(BthfClientConnectionState state)
     return HFP_HF_DISCONNECTING_EVT;
 }
 
-static void BtHfConnectionStateCb(const STACK::RawAddress* bdAddr,
+static void BtHfConnectionStateCb(const OHOS::bluetooth::RawAddress* bdAddr,
     BthfClientConnectionState state, unsigned int peerFeat, unsigned int chldFeat)
 {
     HILOGI("[HFP HF]ConnectState=%{public}d", state);
     int connectState = CovertConnectStateFromStack(state);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(connectState, peerFeat);
     event.dev_ = rawAddr.GetAddress();
     event.arg3_ = static_cast<int>(chldFeat);
@@ -102,11 +102,11 @@ static int CovertAudioStateFromStack(BthfClientAudioState state)
     return HFP_HF_AUDIO_CONNECTED_MSBC_EVT;
 }
 
-static void BtHfAudioStateCb(const STACK::RawAddress* bdAddr,
+static void BtHfAudioStateCb(const OHOS::bluetooth::RawAddress* bdAddr,
     BthfClientAudioState state)
 {
     HILOGI("[HFP HF]AudioState=%{public}d", state);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     int audioState = CovertAudioStateFromStack(state);
     HfpHfMessage event(audioState);
     event.dev_ = rawAddr.GetAddress();
@@ -115,10 +115,10 @@ static void BtHfAudioStateCb(const STACK::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfVrCmdCb(const STACK::RawAddress* bdAddr, BthfClientVrState state)
+static void BtHfVrCmdCb(const OHOS::bluetooth::RawAddress* bdAddr, BthfClientVrState state)
 {
     HILOGI("[HFP HF]VRState=%{public}d", state);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_TYPE_VOICE_RECOGNITION_CHANGED, state);
     event.dev_ = rawAddr.GetAddress();
     HfpHfService* service = HfpHfService::GetService();
@@ -126,11 +126,11 @@ static void BtHfVrCmdCb(const STACK::RawAddress* bdAddr, BthfClientVrState state
     service->PostEvent(event);
 }
 
-static void BtHfNetworkStateCb(const STACK::RawAddress* bdAddr,
+static void BtHfNetworkStateCb(const OHOS::bluetooth::RawAddress* bdAddr,
     BthfClientNetworkState state)
 {
     HILOGI("[HFP HF]networkState=%{public}d", state);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, state);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_NETWORK_STATE;
@@ -139,11 +139,11 @@ static void BtHfNetworkStateCb(const STACK::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfNetworkRoamingCb(const STACK::RawAddress* bdAddr,
+static void BtHfNetworkRoamingCb(const OHOS::bluetooth::RawAddress* bdAddr,
     BthfClientServiceType type)
 {
     HILOGI("[HFP HF]networkType=%{public}d", type);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, type);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_NETWORK_ROAM;
@@ -152,10 +152,10 @@ static void BtHfNetworkRoamingCb(const STACK::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfNetworkSignalCb(const STACK::RawAddress* bdAddr, int signal)
+static void BtHfNetworkSignalCb(const OHOS::bluetooth::RawAddress* bdAddr, int signal)
 {
     HILOGI("[HFP HF]networkSignal=%{public}d", signal);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, signal);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_NETWORK_SIGNAL;
@@ -164,10 +164,10 @@ static void BtHfNetworkSignalCb(const STACK::RawAddress* bdAddr, int signal)
     service->PostEvent(event);
 }
 
-static void BtHfBatteryLevelCb(const STACK::RawAddress* bdAddr, int level)
+static void BtHfBatteryLevelCb(const OHOS::bluetooth::RawAddress* bdAddr, int level)
 {
     HILOGI("[HFP HF]batteryLevel=%{public}d", level);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, level);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_BATTERY_LEVEL;
@@ -176,10 +176,10 @@ static void BtHfBatteryLevelCb(const STACK::RawAddress* bdAddr, int level)
     service->PostEvent(event);
 }
 
-static void BtHfCurrentOperatorCb(const STACK::RawAddress* bdAddr, const char* name)
+static void BtHfCurrentOperatorCb(const OHOS::bluetooth::RawAddress* bdAddr, const char* name)
 {
     HILOGI("[HFP HF]BtHfCurrentOperatorCb");
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_CURRENT_OPERATOR;
@@ -191,10 +191,10 @@ static void BtHfCurrentOperatorCb(const STACK::RawAddress* bdAddr, const char* n
     service->PostEvent(event);
 }
 
-static void BtHfCallCb(const STACK::RawAddress* bdAddr, BthfClientCall call)
+static void BtHfCallCb(const OHOS::bluetooth::RawAddress* bdAddr, BthfClientCall call)
 {
     HILOGI("[HFP HF]call=%{public}d", call);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, call);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_CALL_STATE;
@@ -203,11 +203,11 @@ static void BtHfCallCb(const STACK::RawAddress* bdAddr, BthfClientCall call)
     service->PostEvent(event);
 }
 
-static void BtHfCallSetupCb(const STACK::RawAddress* bdAddr,
+static void BtHfCallSetupCb(const OHOS::bluetooth::RawAddress* bdAddr,
     BthfClientCallsetup callsetup)
 {
     HILOGI("[HFP HF]callsetup=%{public}d", callsetup);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_CALL_SETUP_STATE;
@@ -217,11 +217,11 @@ static void BtHfCallSetupCb(const STACK::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfCallHeldCb(const STACK::RawAddress* bdAddr,
+static void BtHfCallHeldCb(const OHOS::bluetooth::RawAddress* bdAddr,
     BthfClientCallheld callheld)
 {
     HILOGI("[HFP HF]callheld=%{public}d", callheld);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, callheld);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_CALL_HELD_STATE;
@@ -230,11 +230,11 @@ static void BtHfCallHeldCb(const STACK::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfRespAndHoldCb(const STACK::RawAddress* bdAddr,
+static void BtHfRespAndHoldCb(const OHOS::bluetooth::RawAddress* bdAddr,
     BthfClientRespAndHold respAndHold)
 {
     HILOGI("[HFP HF]respAndHold=%{public}d", respAndHold);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, respAndHold);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_HOLD_RESULT;
@@ -243,10 +243,10 @@ static void BtHfRespAndHoldCb(const STACK::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfClipCb(const STACK::RawAddress* bdAddr, const char* number)
+static void BtHfClipCb(const OHOS::bluetooth::RawAddress* bdAddr, const char* number)
 {
     HILOGI("[HFP HF]bthf_clip_cb");
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_CALLING_LINE_IDENTIFICATION;
@@ -258,10 +258,10 @@ static void BtHfClipCb(const STACK::RawAddress* bdAddr, const char* number)
     service->PostEvent(event);
 }
 
-static void BtHfCallWaitingCb(const STACK::RawAddress* bdAddr, const char* number)
+static void BtHfCallWaitingCb(const OHOS::bluetooth::RawAddress* bdAddr, const char* number)
 {
     HILOGI("[HFP HF]bthf_call_waiting_cb");
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_CALL_WAITING;
@@ -273,12 +273,12 @@ static void BtHfCallWaitingCb(const STACK::RawAddress* bdAddr, const char* numbe
     service->PostEvent(event);
 }
 
-static void BtHfCurrentCallsCb(const STACK::RawAddress* bdAddr, int index,
+static void BtHfCurrentCallsCb(const OHOS::bluetooth::RawAddress* bdAddr, int index,
     BthfClientCallDirection dir, BthfClientCallState state,
     BthfClientCallMptyType mpty, const char* number)
 {
     HILOGI("[HFP HF]callstate=%{public}d", state);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_CURRENT_CALLS;
@@ -294,11 +294,11 @@ static void BtHfCurrentCallsCb(const STACK::RawAddress* bdAddr, int index,
     service->PostEvent(event);
 }
 
-static void BtHfVolumeChangeCb(const STACK::RawAddress* bdAddr,
+static void BtHfVolumeChangeCb(const OHOS::bluetooth::RawAddress* bdAddr,
     BthfClientVolumeType type, int volume)
 {
     HILOGI("[HFP HF]change volume=%{public}d, volume type=%{public}d", volume, type);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, type);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_SET_VOLUME;
@@ -308,11 +308,11 @@ static void BtHfVolumeChangeCb(const STACK::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfCmdCompleteCb(const STACK::RawAddress* bdAddr,
+static void BtHfCmdCompleteCb(const OHOS::bluetooth::RawAddress* bdAddr,
     BthfClientCmdComplete type, int cme)
 {
     HILOGI("[HFP HF]bthf_cmd_complete_cb=%{public}d", type);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, type);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_AT_CMD_RESULT;
@@ -321,11 +321,11 @@ static void BtHfCmdCompleteCb(const STACK::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfSubscriberInfoCb(const STACK::RawAddress* bdAddr, const char* name,
+static void BtHfSubscriberInfoCb(const OHOS::bluetooth::RawAddress* bdAddr, const char* name,
     BthfClientSubscriberServiceType type)
 {
     HILOGI("[HFP HF]BthfClientSubscriberServiceType=%{public}d", type);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, type);
     event.dev_ = rawAddr.GetAddress();
     CHECK_AND_RETURN_LOG(name != nullptr, "[HFP HF]BtHfSubscriberInfoCb name is null");
@@ -337,11 +337,11 @@ static void BtHfSubscriberInfoCb(const STACK::RawAddress* bdAddr, const char* na
     service->PostEvent(event);
 }
 
-static void BtHfInBandRingCb(const STACK::RawAddress* bdAddr,
+static void BtHfInBandRingCb(const OHOS::bluetooth::RawAddress* bdAddr,
     BthfClientInBandRingState inBand)
 {
     HILOGI("[HFP HF]BthfClientInBandRingState=%{public}d", inBand);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HfpHfMessage event(HFP_HF_INTERACTIVE_EVT, inBand);
     event.dev_ = rawAddr.GetAddress();
     event.type_ = HFP_HF_TYPE_INBAND_RING;
@@ -350,20 +350,20 @@ static void BtHfInBandRingCb(const STACK::RawAddress* bdAddr,
     service->PostEvent(event);
 }
 
-static void BtHfLastVoiceTagNumberCb(const STACK::RawAddress* bdAddr,
+static void BtHfLastVoiceTagNumberCb(const OHOS::bluetooth::RawAddress* bdAddr,
     const char* number)
 {
     HILOGI("[HFP HF]last voice tag number not supported");
 }
 
-static void BtHfRingIndicationCb(const STACK::RawAddress* bdAddr)
+static void BtHfRingIndicationCb(const OHOS::bluetooth::RawAddress* bdAddr)
 {
     /* Ringing is not handled at this indication and rather should be
        implemented (by the client of this service). Use the
        CALL_STATE_INCOMING (and similar) handle ringing. */
 }
 
-static void BtHfUnknownEventCb(const STACK::RawAddress* bdAddr,
+static void BtHfUnknownEventCb(const OHOS::bluetooth::RawAddress* bdAddr,
     const char* eventString)
 {
     HILOGI("[HFP HF]BtHfUnknownEventCb");

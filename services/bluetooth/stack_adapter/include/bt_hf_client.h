@@ -142,64 +142,64 @@ enum BthfClientInBandRingState {
 
 struct BthfClientCallbacks {
     size_t size;
-    void (*connectionStateCb)(const RawAddress *bdAddr,
+    void (*connectionStateCb)(const OHOS::bluetooth::RawAddress *bdAddr,
                                 BthfClientConnectionState state,
                                 unsigned int peerFeat, unsigned int chldFeat);
-    void (*audioStateCb)(const RawAddress *bdAddr, BthfClientAudioState state);
-    void (*vrCmdCb)(const RawAddress *bdAddr, BthfClientVrState state);
-    void (*networkStateCb)(const RawAddress *bdAddr, BthfClientNetworkState state);
-    void (*networkRoamingCb)(const RawAddress *bdAddr, BthfClientServiceType type);
-    void (*networkSignalCb)(const RawAddress *bdAddr, int signal);
-    void (*batteryLevelCb)(const RawAddress *bdAddr, int level);
-    void (*currentOperatorCb)(const RawAddress *bdAddr, const char *name);
-    void (*callCb)(const RawAddress *bdAddr, BthfClientCall call);
-    void (*callsetupCb)(const RawAddress *bdAddr, BthfClientCallsetup callsetup);
-    void (*callheldCb)(const RawAddress *bdAddr, BthfClientCallheld callheld);
-    void (*respAndHoldCb)(const RawAddress *bdAddr,
+    void (*audioStateCb)(const OHOS::bluetooth::RawAddress *bdAddr, BthfClientAudioState state);
+    void (*vrCmdCb)(const OHOS::bluetooth::RawAddress *bdAddr, BthfClientVrState state);
+    void (*networkStateCb)(const OHOS::bluetooth::RawAddress *bdAddr, BthfClientNetworkState state);
+    void (*networkRoamingCb)(const OHOS::bluetooth::RawAddress *bdAddr, BthfClientServiceType type);
+    void (*networkSignalCb)(const OHOS::bluetooth::RawAddress *bdAddr, int signal);
+    void (*batteryLevelCb)(const OHOS::bluetooth::RawAddress *bdAddr, int level);
+    void (*currentOperatorCb)(const OHOS::bluetooth::RawAddress *bdAddr, const char *name);
+    void (*callCb)(const OHOS::bluetooth::RawAddress *bdAddr, BthfClientCall call);
+    void (*callsetupCb)(const OHOS::bluetooth::RawAddress *bdAddr, BthfClientCallsetup callsetup);
+    void (*callheldCb)(const OHOS::bluetooth::RawAddress *bdAddr, BthfClientCallheld callheld);
+    void (*respAndHoldCb)(const OHOS::bluetooth::RawAddress *bdAddr,
                              BthfClientRespAndHold respAndHold);
-    void (*clipCb)(const RawAddress *bdAddr, const char *number);
-    void (*callWaitingCb)(const RawAddress *bdAddr, const char *number);
-    void (*currentCallsCb)(const RawAddress *bdAddr, int index,
+    void (*clipCb)(const OHOS::bluetooth::RawAddress *bdAddr, const char *number);
+    void (*callWaitingCb)(const OHOS::bluetooth::RawAddress *bdAddr, const char *number);
+    void (*currentCallsCb)(const OHOS::bluetooth::RawAddress *bdAddr, int index,
                              BthfClientCallDirection dir,
                              BthfClientCallState state,
                              BthfClientCallMptyType mpty, const char *number);
-    void (*volumeChangeCb)(const RawAddress *bdAddr, BthfClientVolumeType type,
+    void (*volumeChangeCb)(const OHOS::bluetooth::RawAddress *bdAddr, BthfClientVolumeType type,
                              int volume);
-    void (*cmdCompleteCb)(const RawAddress *bdAddr, BthfClientCmdComplete type,
+    void (*cmdCompleteCb)(const OHOS::bluetooth::RawAddress *bdAddr, BthfClientCmdComplete type,
                             int cme);
-    void (*subscriberInfoCb)(const RawAddress *bdAddr, const char *name,
+    void (*subscriberInfoCb)(const OHOS::bluetooth::RawAddress *bdAddr, const char *name,
                                BthfClientSubscriberServiceType type);
-    void (*inBandRingCb)(const RawAddress *bdAddr,
+    void (*inBandRingCb)(const OHOS::bluetooth::RawAddress *bdAddr,
                             BthfClientInBandRingState inBand);
-    void (*lastVoiceTagNumberCb)(const RawAddress *bdAddr, const char *number);
-    void (*ringIndicationCb)(const RawAddress *bdAddr);
-    void (*unknownEventCb)(const RawAddress *bdAddr, const char *eventString);
+    void (*lastVoiceTagNumberCb)(const OHOS::bluetooth::RawAddress *bdAddr, const char *number);
+    void (*ringIndicationCb)(const OHOS::bluetooth::RawAddress *bdAddr);
+    void (*unknownEventCb)(const OHOS::bluetooth::RawAddress *bdAddr, const char *eventString);
 };
 
 struct BthfClientInterface {
     size_t size;
     BtStackStatus (*init)(BthfClientCallbacks *callbacks);
-    BtStackStatus (*connect)(const RawAddress *bdAddr);
-    BtStackStatus (*disconnect)(const RawAddress *bdAddr);
-    BtStackStatus (*connectAudio)(const RawAddress *bdAddr);
-    BtStackStatus (*disconnectAudio)(const RawAddress *bdAddr);
-    BtStackStatus (*startVoiceRecognition)(const RawAddress *bdAddr);
-    BtStackStatus (*stopVoiceRecognition)(const RawAddress *bdAddr);
-    BtStackStatus (*volumeControl)(const RawAddress *bdAddr, BthfClientVolumeType type,
+    BtStackStatus (*connect)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*disconnect)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*connectAudio)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*disconnectAudio)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*startVoiceRecognition)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*stopVoiceRecognition)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*volumeControl)(const OHOS::bluetooth::RawAddress *bdAddr, BthfClientVolumeType type,
         int volume);
-    BtStackStatus (*dial)(const RawAddress *bdAddr, const char *number);
-    BtStackStatus (*dialMemory)(const RawAddress *bdAddr, int location);
-    BtStackStatus (*handleCallAction)(const RawAddress *bdAddr, BthfClientCallAction action,
+    BtStackStatus (*dial)(const OHOS::bluetooth::RawAddress *bdAddr, const char *number);
+    BtStackStatus (*dialMemory)(const OHOS::bluetooth::RawAddress *bdAddr, int location);
+    BtStackStatus (*handleCallAction)(const OHOS::bluetooth::RawAddress *bdAddr, BthfClientCallAction action,
         int idx);
-    BtStackStatus (*queryCurrentCalls)(const RawAddress *bdAddr);
-    BtStackStatus (*queryCurrentOperatorName)(const RawAddress *bdAddr);
-    BtStackStatus (*retrieveSubscriberInfo)(const RawAddress *bdAddr);
-    BtStackStatus (*sendDtmf)(const RawAddress *bdAddr, char code);
-    BtStackStatus (*requestLastVoiceTagNumber)(const RawAddress *bdAddr);
+    BtStackStatus (*queryCurrentCalls)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*queryCurrentOperatorName)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*retrieveSubscriberInfo)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*sendDtmf)(const OHOS::bluetooth::RawAddress *bdAddr, char code);
+    BtStackStatus (*requestLastVoiceTagNumber)(const OHOS::bluetooth::RawAddress *bdAddr);
     void (*cleanup)(void);
-    BtStackStatus (*sendAtCmd)(const RawAddress *bdAddr, int cmd, int val1, int val2,
+    BtStackStatus (*sendAtCmd)(const OHOS::bluetooth::RawAddress *bdAddr, int cmd, int val1, int val2,
         const char *arg);
-    BtStackStatus (*sendAndroidAt)(const RawAddress *bdAddr, const char *arg);
+    BtStackStatus (*sendAndroidAt)(const OHOS::bluetooth::RawAddress *bdAddr, const char *arg);
 };
 
 #endif  // BT_HF_CLIENT_H

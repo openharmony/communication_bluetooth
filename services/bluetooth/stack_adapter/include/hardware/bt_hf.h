@@ -29,13 +29,13 @@ struct BthfHalInterface {
     size_t size;
     BtStackStatus (*init)(BthfCallbacks *callbacks);
     void (*cleanup)(void);
-    BtStackStatus (*connect)(const RawAddress *bdAddr);
-    BtStackStatus (*disconnect)(const RawAddress *bdAddr);
-    BtStackStatus (*audioConnect)(const RawAddress *bdAddr);
-    BtStackStatus (*audioDisconnect)(const RawAddress *bdAddr);
-    BtStackStatus (*startVoiceRecognition)(const RawAddress *bdAddr);
-    BtStackStatus (*stopVoiceRecognition)(const RawAddress *bdAddr);
-    BtStackStatus (*volumeControl)(const RawAddress *bdAddr,
+    BtStackStatus (*connect)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*disconnect)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*audioConnect)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*audioDisconnect)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*startVoiceRecognition)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*stopVoiceRecognition)(const OHOS::bluetooth::RawAddress *bdAddr);
+    BtStackStatus (*volumeControl)(const OHOS::bluetooth::RawAddress *bdAddr,
                                   BthfVolumeType type, int volume);
 };
 

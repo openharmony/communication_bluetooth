@@ -346,8 +346,7 @@ void BluetoothConnectionManager::OnGetConnReasonEchoRsp(const std::string &addre
             BtChrBtExcpEvent(address, BTOPT_MULTCONNECT_AUTOCONNECT_FAIL, typeval);
             const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
             CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
-            STACK::RawAddress dstAddr;
-            STACK::RawAddress::FromString(address, dstAddr);
+            OHOS::bluetooth::RawAddress dstAddr(address);
             bluetoothHwSrcInterface->hwBtifHfpQueueRemove(dstAddr);
             bluetoothHwSrcInterface->hwBtifA2dpQueueRemove(dstAddr);
             bluetoothHwSrcInterface->hwBtsndHcicDisconnect(dstAddr);
@@ -379,7 +378,7 @@ void BluetoothConnectionManager::SetVirtualAutoConnectType(const RawAddress &add
     CHECK_AND_RETURN_LOG(a2dpService, "a2dpService is nullptr.");
     a2dpService->SendDeviceSelection(address, USE_A2DP, NO_CHANGE, USER_SELECT);
 
-    bthwif->hwSetConnReasonFlag(ServiceUtil::AddrToStack(address), connType, connReasonData.data(),
+    bthwif->hwSetConnReasonFlag(address, connType, connReasonData.data(),
         connReasonData.size());
 }
 

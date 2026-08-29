@@ -39,7 +39,7 @@
  * system/include/hardware/bt_sock.h). */
 struct SockConnectSignal {
     int16_t size;
-    RawAddress bdAddr;
+    OHOS::bluetooth::RawAddress bdAddr;
     int channel;
     int status;
     uint16_t maxTxPacketSize;

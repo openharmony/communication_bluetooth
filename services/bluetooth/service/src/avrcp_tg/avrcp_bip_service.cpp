@@ -52,7 +52,7 @@ void BipService::SetBipClientStatus(const RawAddress &rawAddr, bool connected)
     }
     avrcpServiceInterface_ = btInterface->getAvrcpService();
     if (avrcpServiceInterface_ != nullptr) {
-        avrcpServiceInterface_->SetBipClientStatus(ServiceUtil::AddrToStack(rawAddr), connected);
+        avrcpServiceInterface_->SetBipClientStatus(rawAddr, connected);
     }
 }
 

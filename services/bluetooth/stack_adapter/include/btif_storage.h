@@ -24,7 +24,7 @@
 
 #include "bt_types.h"
 
-inline int BtifStorageGetRemoteAddrType(const RawAddress *remoteBdAddr, uint8_t *addrType)
+inline int BtifStorageGetRemoteAddrType(const OHOS::bluetooth::RawAddress *remoteBdAddr, uint8_t *addrType)
 {
     if (addrType != nullptr) {
         *addrType = BLE_ADDR_PUBLIC;

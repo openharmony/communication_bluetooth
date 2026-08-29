@@ -113,7 +113,7 @@ struct BluetoothSdpRecord {
 };
 
 /* Callback invoked when an SDP search completes. */
-typedef void (*BtsdpSearchCallback)(BtStackStatus status, const RawAddress &bdAddr,
+typedef void (*BtsdpSearchCallback)(BtStackStatus status, const OHOS::bluetooth::RawAddress &bdAddr,
     const OHOS::bluetooth::Uuid &uuid, int numRecords, BluetoothSdpRecord *records);
 
 struct BtsdpCallbacks {
@@ -127,7 +127,7 @@ struct BtsdpInterface {
     size_t size;
     BtStackStatus (*init)(BtsdpCallbacks *callbacks);
     BtStackStatus (*deinit)();
-    BtStackStatus (*sdpSearch)(RawAddress *bdAddr, const OHOS::bluetooth::Uuid &uuid);
+    BtStackStatus (*sdpSearch)(OHOS::bluetooth::RawAddress *bdAddr, const OHOS::bluetooth::Uuid &uuid);
     BtStackStatus (*createSdpRecord)(BluetoothSdpRecord *record, int *recordHandle);
     BtStackStatus (*removeSdpRecord)(int sdpHandle);
 };

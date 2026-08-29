@@ -101,17 +101,17 @@ public:
     int GetConnectStrategy(const RawAddress &device) override;
     BthhInterface* getBluetoothHidInterface() const;
 
-    static void ConnectionStateCallback(STACK::RawAddress* bdAddr, BleAddrType addrType,
+    static void ConnectionStateCallback(OHOS::bluetooth::RawAddress* bdAddr, BleAddrType addrType,
         BtTransport transport, BthhConnectionState state);
-    static void GetProtocolModeCallback(STACK::RawAddress* bdAddr, BleAddrType addrType,
+    static void GetProtocolModeCallback(OHOS::bluetooth::RawAddress* bdAddr, BleAddrType addrType,
         BtTransport transport, BthhStatus hhStatus, BthhProtocolMode mode);
-    static void GetIdleTimeCallback(STACK::RawAddress* bdAddr, BleAddrType addrType,
+    static void GetIdleTimeCallback(OHOS::bluetooth::RawAddress* bdAddr, BleAddrType addrType,
         BtTransport transport, BthhStatus hhStatus, int idleTime);
-    static void GetReportCallback(STACK::RawAddress* bdAddr, BleAddrType addrType,
+    static void GetReportCallback(OHOS::bluetooth::RawAddress* bdAddr, BleAddrType addrType,
         BtTransport transport, BthhStatus hhStatus, uint8_t* rptData, int rptSize);
-    static void VirtualUnplugCallback(STACK::RawAddress* bdAddr, BleAddrType addrType,
+    static void VirtualUnplugCallback(OHOS::bluetooth::RawAddress* bdAddr, BleAddrType addrType,
         BtTransport transport, BthhStatus hhStatus);
-    static void HandshakeCallback(STACK::RawAddress* bdAddr, BleAddrType addrType,
+    static void HandshakeCallback(OHOS::bluetooth::RawAddress* bdAddr, BleAddrType addrType,
         BtTransport transport, BthhStatus hhStatus);
 
 private:

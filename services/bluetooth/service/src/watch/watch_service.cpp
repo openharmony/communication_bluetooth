@@ -107,17 +107,17 @@ WatchService::~WatchService()
 {
 }
 
-static void WatchDisconnectRssiCb(const STACK::RawAddress* bdAddr, int rssi)
+static void WatchDisconnectRssiCb(const OHOS::bluetooth::RawAddress* bdAddr, int rssi)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     HILOGI("watch_service: rssi=%{public}d", rssi);
     WatchService::GetInstance()->SetLinkLossRssi(rawAddr, rssi);
 }
 
-static void WatchSaisConnectionStateCb(const STACK::RawAddress* bdAddr, bool isSaisConnected)
+static void WatchSaisConnectionStateCb(const OHOS::bluetooth::RawAddress* bdAddr, bool isSaisConnected)
 {
     HILOGI("watch_service: sais connected=%{public}d", isSaisConnected);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     DoInVendorThread([rawAddr, isSaisConnected] {
         WatchService::GetInstance()->SetSaisConnectionState(rawAddr, isSaisConnected);
     });
@@ -158,10 +158,10 @@ static void WatchSaisServerAddedCb()
     WatchService::GetInstance()->SetSaisAddStatus(true);
 }
 
-static void HwWatchLeSaisEnableCb(const STACK::RawAddress* bdAddr)
+static void HwWatchLeSaisEnableCb(const OHOS::bluetooth::RawAddress* bdAddr)
 {
     HILOGI("watch_service: HwWatchLeSaisEnableCb");
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     WatchService::GetInstance()->SetPhoneConnHfp(rawAddr.GetAddress(), false);
 }
 
@@ -203,9 +203,9 @@ static BtWatchCallbacks g_sBluetoothWatchCallbacks = {
     HwWatchLinkLossNotifyCb,
 };
 
-static void HidConnectionStateCb(STACK::RawAddress* bdAddr, BthdConnectionState state)
+static void HidConnectionStateCb(OHOS::bluetooth::RawAddress* bdAddr, BthdConnectionState state)
 {
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(*bdAddr);
+    RawAddress rawAddr = *bdAddr;
     auto deviceManager = GlobalDeviceManager::getInstance().GetSaisDevice();
     HILOGI("watch_service: HID connection state=%{public}d, isIphone: %{public}d",
         state, WatchService::GetInstance()->IsIphone(rawAddr));
@@ -339,7 +339,7 @@ void WatchService::UpdateReconnectState(bool isBtOn)
     addresses = GlobalDeviceManager::getInstance().GetAllAddresses();
     for (const auto &address : addresses) {
         RawAddress device(address);
-        GetBluetoothWatchInterface()->updateReconnectState(ServiceUtil::AddrToStack(device), isBtOn);
+        GetBluetoothWatchInterface()->updateReconnectState(device, isBtOn);
     }
 }
 
@@ -503,15 +503,15 @@ void WatchService::UpdateSaisDevice(const RawAddress &device, bool isSaisDevice)
         return;
     }
     deviceManager->SetIsSaisDeviceLocked(isSaisDevice);
-    GetBluetoothWatchInterface()->updateDevice(ServiceUtil::AddrToStack(device), isSaisDevice);
+    GetBluetoothWatchInterface()->updateDevice(device, isSaisDevice);
 }
 
 void WatchService::UpdateHFStrategy(const RawAddress &device, int strategy)
 {
     if (strategy == static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN)) {
-        GetBluetoothWatchInterface()->updateReconnectState(ServiceUtil::AddrToStack(device), false);
+        GetBluetoothWatchInterface()->updateReconnectState(device, false);
     } else {
-        GetBluetoothWatchInterface()->updateReconnectState(ServiceUtil::AddrToStack(device), true);
+        GetBluetoothWatchInterface()->updateReconnectState(device, true);
     }
 }
 
@@ -559,7 +559,7 @@ void WatchService::SetSaisConnectionState(const RawAddress &device, bool isConne
     deviceManager->SetWatchHealthConnectedLocked(isConnected);
     if (isConnected) {
         deviceManager->SetIsSaisDeviceLocked(true);
-        GetBluetoothWatchInterface()->updateDevice(ServiceUtil::AddrToStack(device), true);
+        GetBluetoothWatchInterface()->updateDevice(device, true);
         PreferencesManager::Save(device.GetAddress(), true, WATCH_SAIS_DEVICE);
         deviceManager->SetJustConnectAclLocked(true);
         StartDisconnectHfpOnDemandTimer(device.GetAddress());
@@ -582,7 +582,7 @@ void WatchService::SetHidConnectionState(const RawAddress &device, int state)
         isNeedConnectHid_ = false;
     } else if (state == BTHD_CONN_STATE_DISCONNECTED) {
         if ((isNeedConnectHid_) && (bluetoothHidInterface != nullptr)) {
-            STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+            OHOS::bluetooth::RawAddress rawAddr = device;
             bluetoothHidInterface->connect(&rawAddr);
         }
         isNeedConnectHid_ = false;
@@ -757,13 +757,13 @@ void WatchService::ProcessHfpStateChangeEvt(const RawAddress &device, int state)
         deviceManager->SetIsConnectedLocked(true);
         if (bluetoothHidInterface != nullptr && hidConnectionState_ == BTHD_CONN_STATE_DISCONNECTED &&
             deviceManager->IsSaisDeviceLocked()) {
-            STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+            OHOS::bluetooth::RawAddress rawAddr = device;
             bluetoothHidInterface->connect(&rawAddr);
         }
         SendPhoneConnectStateChange(device, true);
         deviceManager->SetJustConnectAclLocked(false);
         StopConnectHfpTimer(device.GetAddress());
-        GetBluetoothWatchInterface()->sendHfpState2Hisi(ServiceUtil::AddrToStack(device), false);
+        GetBluetoothWatchInterface()->sendHfpState2Hisi(device, false);
     } else if (state == HFP_HF_STATE_DISCONNECTED) {
         deviceManager->SetOnHfCallFalseLocked();
         AllHfCallFinished(device.GetAddress(), true);
@@ -773,7 +773,7 @@ void WatchService::ProcessHfpStateChangeEvt(const RawAddress &device, int state)
         if (classicAdapter->IsAclConnected(device) && IsIphone(device)) {
             classicAdapter->DisconnectAcl(device.GetAddress());
         }
-        GetBluetoothWatchInterface()->sendHfpState2Hisi(ServiceUtil::AddrToStack(device), false);
+        GetBluetoothWatchInterface()->sendHfpState2Hisi(device, false);
     }
     deviceManager->SetHfConnectedLocked(state == HFP_HF_STATE_CONNECTED);
     PublishEventWithIntParam(EVENT_BLUETOOTH_HOST_HFP_CONNECTION_STATE, device.GetAddress(),
@@ -843,7 +843,7 @@ void WatchService::HidReconnectTimeout(const RawAddress &device)
     HILOGI("watch_service: HidReconnectTimeout isHidMapUpdateing_: %{public}d, isHidMapUpdateing_: %{public}d",
         isHidMapUpdateing_, hidConnectionState_);
     isHidMapUpdateing_ = false;
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr = device;
     if (deviceManager->IsConnectedLocked() && (bluetoothHidInterface != nullptr)
         && (hidConnectionState_ == BTHD_CONN_STATE_DISCONNECTED)) {
         bluetoothHidInterface->connect(&rawAddr);
@@ -1060,7 +1060,7 @@ bool WatchService::PublishEventWithIntParam(const std::string &eventAction, cons
 
 bool WatchService::IsPhoneOrComputer(const RawAddress &device)
 {
-    bool isPhone = GetBluetoothWatchInterface()->isPhoneMajorClass(ServiceUtil::AddrToStack(device));
+    bool isPhone = GetBluetoothWatchInterface()->isPhoneMajorClass(device);
     HILOGI("watch_service: isPhone: %{public}d", isPhone);
 
     return isPhone;
@@ -1152,7 +1152,7 @@ bool WatchService::ConnectHfp(const std::string& address)
     if (strategy == static_cast<int>(BTStrategyType::CONNECTION_FORBIDDEN)) {
         HILOGI("watch_service: device is not not allow to connect address %{public}s",
             GetEncryptAddr(device.GetAddress()).c_str());
-        GetBluetoothWatchInterface()->updateReconnectState(ServiceUtil::AddrToStack(device), false);
+        GetBluetoothWatchInterface()->updateReconnectState(device, false);
         return false;
     }
     if (deviceManager->GetHfConnectionStateLocked() != HFP_HF_STATE_DISCONNECTED) {
@@ -1164,7 +1164,7 @@ bool WatchService::ConnectHfp(const std::string& address)
         GetEncryptAddr(device.GetAddress()).c_str());
     HfpHfService* service = HfpHfService::GetService();
     CHECK_AND_RETURN_LOG_RET(service != nullptr, false, "service is null");
-    GetBluetoothWatchInterface()->sendHfpState2Hisi(ServiceUtil::AddrToStack(device), true);
+    GetBluetoothWatchInterface()->sendHfpState2Hisi(device, true);
     service->Connect(device);
     return true;
 #else
@@ -1428,12 +1428,12 @@ void WatchService::HandleVoipState(int voipState)
     RawAddress device(deviceManager->GetAddressLocked());
     if (voipState == VOIP_CALL_INCOMMING) {
         deviceManager->HandleVoipStateLocked(VOIP_CALL_INCOMMING);
-        GetBluetoothWatchInterface()->sendTbsr(ServiceUtil::AddrToStack(device), HEADPHONE_MODE);
+        GetBluetoothWatchInterface()->sendTbsr(device, HEADPHONE_MODE);
     } else if (voipState == VOIP_CALL_ACCEPT) {
         deviceManager->HandleVoipStateLocked(VOIP_CALL_ACCEPT);
     } else {
         deviceManager->HandleVoipStateLocked(-1);
-        GetBluetoothWatchInterface()->sendTbsr(ServiceUtil::AddrToStack(device), BAND_MODE);
+        GetBluetoothWatchInterface()->sendTbsr(device, BAND_MODE);
         DisconnectHfpOnDemand(deviceManager->GetAddressLocked());
     }
 }

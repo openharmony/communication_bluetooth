@@ -36,9 +36,9 @@ public:
 
 private:
     // Bluedroid C 回调 — 转发为 INativeA2dpSinkCallback 接口调用
-    static void BtavConnectionState(const STACK::RawAddress &bdAddr, BtavConnectionState state);
-    static void BtavAudioState(const STACK::RawAddress &bdAddr, BtavAudioState state);
-    static void BtavAudioConfig(const STACK::RawAddress &bdAddr, uint32_t sampleRate, uint8_t channelCount);
+    static void BtavConnectionState(const OHOS::bluetooth::RawAddress &bdAddr, BtavConnectionState state);
+    static void BtavAudioState(const OHOS::bluetooth::RawAddress &bdAddr, BtavAudioState state);
+    static void BtavAudioConfig(const OHOS::bluetooth::RawAddress &bdAddr, uint32_t sampleRate, uint8_t channelCount);
 
     BtavSinkInterface* iface_;
     static BtavSinkCallbacks s_callbacks_;

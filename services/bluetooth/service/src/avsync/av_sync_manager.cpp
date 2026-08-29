@@ -120,8 +120,7 @@ void AvSyncManager::UpdateBtAudioLatency(const RawAddress &rawAddr)
         HILOGE("Failed to get hw bluetooth interface");
         return;
     }
-    STACK::RawAddress dev = ServiceUtil::AddrToStack(rawAddr);
-    bthwif->hwUpdateBtAudioLatency(dev, latency);
+    bthwif->hwUpdateBtAudioLatency(rawAddr, latency);
     HILOGI("av_sync, %{public}s update latency %{public}d", GET_ENCRYPT_ADDR(rawAddr), latency);
 }
 

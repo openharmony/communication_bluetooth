@@ -283,13 +283,13 @@ void GattServerApplication::ClearServices(void)
 }
 
 void GattServerApplication::ConnectionCallback(int connId, int serverIf, int connected,
-    const STACK::RawAddress &bda, int reason)
+    const OHOS::bluetooth::RawAddress &bda, int reason)
 {
     if (serverIf != serverIf_) {
         return;
     }
     HILOGI("connId: %{public}d, serverIf: %{public}d, connected: %{public}d, address: %{public}s",
-        connId, serverIf, connected, bda.ToStringForLogging().c_str());
+        connId, serverIf, connected, GET_ENCRYPT_STR_ADDR(bda.GetAddress()));
 
     int convertReason = static_cast<int>(GattDisconnectReason::CONN_UNKNOWN);
     std::string reasonMessage = "";
@@ -297,17 +297,17 @@ void GattServerApplication::ConnectionCallback(int connId, int serverIf, int con
     uint8_t eventId = (connected) ? GATT_SERVER_CONNECT_DONE : GATT_SERVER_CONNECT_CLOSE;
     auto resourceMgr = BluetoothResourceManager::GetInstance();
     if (resourceMgr) {
-        resourceMgr->SendSensingStateChanged(eventId, SensingInfo(bda.ToString(), static_cast<uint32_t>(serverIf)));
+        resourceMgr->SendSensingStateChanged(eventId, SensingInfo(bda.GetAddress(), static_cast<uint32_t>(serverIf)));
     }
     // to support other transport, or detect transport
-    GattDevice device(ServiceUtil::AddrFromStack(bda), GATT_TRANSPORT_TYPE_LE, GATT_ROLE_SECONDARY);
+    GattDevice device(bda, GATT_TRANSPORT_TYPE_LE, GATT_ROLE_SECONDARY);
     int state = 0;
     if (connected) {
         state = static_cast<int>(BTConnectState::CONNECTED);
         device.SetState(state);
         connIdMap_.emplace(connId, device);
         BluetoothStateManager::GetInstance()->AddDeviceProfileConnectState(
-            PROFILE_NAME_GATT_SERVER, bda.ToString(), BTConnectState::CONNECTED);
+            PROFILE_NAME_GATT_SERVER, bda.GetAddress(), BTConnectState::CONNECTED);
     } else {
         state = static_cast<int>(BTConnectState::DISCONNECTED);
         connIdMap_.erase(connId);
@@ -352,7 +352,7 @@ void GattServerApplication::RequestReadCallback(const RequestReadCallbackContext
     }
 }
 
-void GattServerApplication::RequestReadCharacteristicCallback(int connId, int transId, const STACK::RawAddress &bda,
+void GattServerApplication::RequestReadCharacteristicCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda,
     int attrHandle, int offset, bool isLong)
 {
     if (!IsValidConnId(connId)) {
@@ -360,9 +360,9 @@ void GattServerApplication::RequestReadCharacteristicCallback(int connId, int tr
     }
     HILOGI("connId: %{public}d, transId: %{public}d, address: %{public}s, attrHandle: %{public}#x, offset: %{public}d,"
         "isLong: %{public}d",
-        connId, transId, bda.ToStringForLogging().c_str(), attrHandle, offset, isLong);
+        connId, transId, GET_ENCRYPT_STR_ADDR(bda.GetAddress()), attrHandle, offset, isLong);
 
-    RequestReadCallbackContext ctx = {connId, transId, ServiceUtil::AddrFromStack(bda), attrHandle, offset, isLong};
+    RequestReadCallbackContext ctx = {connId, transId, bda, attrHandle, offset, isLong};
     RequestReadCallback(ctx, GattElement::CHARACTERISTIC);
 }
 
@@ -383,7 +383,7 @@ void GattServerApplication::RespondCharacteristicRead(const RawAddress &addr, ui
     }
 }
 
-void GattServerApplication::RequestReadDescriptorCallback(int connId, int transId, const STACK::RawAddress &bda,
+void GattServerApplication::RequestReadDescriptorCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda,
     int attrHandle, int offset, bool isLong)
 {
     if (!IsValidConnId(connId)) {
@@ -391,9 +391,9 @@ void GattServerApplication::RequestReadDescriptorCallback(int connId, int transI
     }
     HILOGI("connId: %{public}d, transId: %{public}d, address: %{public}s, attrHandle: %{public}#x, offset: %{public}d,"
         "isLong: %{public}d",
-        connId, transId, bda.ToStringForLogging().c_str(), attrHandle, offset, isLong);
+        connId, transId, GET_ENCRYPT_STR_ADDR(bda.GetAddress()), attrHandle, offset, isLong);
 
-    RequestReadCallbackContext ctx = {connId, transId, ServiceUtil::AddrFromStack(bda), attrHandle, offset, isLong};
+    RequestReadCallbackContext ctx = {connId, transId, bda, attrHandle, offset, isLong};
     RequestReadCallback(ctx, GattElement::DESCRIPTOR);
 }
 
@@ -458,15 +458,15 @@ void GattServerApplication::RequestWriteCallback(const RequestWriteCallbackConte
 }
 
 void GattServerApplication::RequestWriteCharacteristicCallback(int connId, int transId,
-    const STACK::RawAddress &bda, int attrHandle, int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value)
+    const OHOS::bluetooth::RawAddress &bda, int attrHandle, int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value)
 {
     if (!IsValidConnId(connId)) {
         return;
     }
     HILOGI("connId: %{public}d, transId: %{public}d, address: %{public}s, attrHandle: %{public}#x, offset: %{public}d,"
         "needRsp: %{public}d, isPrep: %{public}d",
-        connId, transId, bda.ToStringForLogging().c_str(), attrHandle, offset, needRsp, isPrep);
-    RequestWriteCallbackContext ctx = {connId, transId, ServiceUtil::AddrFromStack(bda), attrHandle, offset,
+        connId, transId, GET_ENCRYPT_STR_ADDR(bda.GetAddress()), attrHandle, offset, needRsp, isPrep);
+    RequestWriteCallbackContext ctx = {connId, transId, bda, attrHandle, offset,
         needRsp, isPrep, std::move(value)};
     RequestWriteCallback(ctx, GattElement::CHARACTERISTIC);
 }
@@ -481,7 +481,7 @@ void GattServerApplication::RespondCharacteristicWrite(const RawAddress &addr, u
     SendResponse(iter->first, iter->second.transId, ToValueHandle(handle), ret);
 }
 
-void GattServerApplication::RequestWriteDescriptorCallback(int connId, int transId, const STACK::RawAddress &bda,
+void GattServerApplication::RequestWriteDescriptorCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda,
     int attrHandle, int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value)
 {
     if (!IsValidConnId(connId)) {
@@ -489,9 +489,9 @@ void GattServerApplication::RequestWriteDescriptorCallback(int connId, int trans
     }
     HILOGI("connId: %{public}d, transId: %{public}d, address: %{public}s, attrHandle: %{public}#x, offset: %{public}d,"
         "needRsp: %{public}d, isPrep: %{public}d",
-        connId, transId, bda.ToStringForLogging().c_str(), attrHandle, offset, needRsp, isPrep);
+        connId, transId, GET_ENCRYPT_STR_ADDR(bda.GetAddress()), attrHandle, offset, needRsp, isPrep);
 
-    RequestWriteCallbackContext ctx = {connId, transId, ServiceUtil::AddrFromStack(bda), attrHandle, offset,
+    RequestWriteCallbackContext ctx = {connId, transId, bda, attrHandle, offset,
         needRsp, isPrep, std::move(value)};
     RequestWriteCallback(ctx, GattElement::DESCRIPTOR);
 }
@@ -563,14 +563,14 @@ void GattServerApplication::ProcessLongValueWrite(const RequestWriteCallbackCont
     SendResponse(rspContext, ctx.value, ctx.offset);
 }
 
-void GattServerApplication::RequestExecWriteCallback(int connId, int transId, const STACK::RawAddress &bda,
+void GattServerApplication::RequestExecWriteCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda,
     int execWrite)
 {
     if (!IsValidConnId(connId)) {
         return;
     }
     HILOGI("connId: %{public}d, transId: %{public}d, address: %{public}s, execWrite: %{public}d",
-        connId, transId, bda.ToStringForLogging().c_str(), execWrite);
+        connId, transId, GET_ENCRYPT_STR_ADDR(bda.GetAddress()), execWrite);
     auto connIter = connIdMap_.find(connId);
     if (connIter == connIdMap_.end()) {
         HILOGE("Invalid connId: %{public}d", connId);
@@ -590,7 +590,7 @@ void GattServerApplication::RequestExecWriteCallback(int connId, int transId, co
         SendResponse(connId, transId, 0, GattStatus::REQUEST_NOT_SUPPORT);
         return;
     }
-    // Expect the upper-layer application to respond to the request  ServiceUtil::AddrFromStack(bda)
+    // Expect the upper-layer application to respond to the request  bda
     connIter->second.transId = transId;
     ReportWriteRequest(connIter->second.device, prep.handle, prep.value, true, prep.type);
 
@@ -721,9 +721,9 @@ void GattServerApplication::MtuChangedCallback(int connId, int mtu)
     // Update connection mtu
     connIter->second.mtu = static_cast<size_t>(mtu);
     WPTR_CBACK(callback_, OnMtuChanged, connIter->second.device, mtu);
-    BtChrEventWriteInt(CHR_BLE_DISCONNECT, ServiceUtil::AddrToStack(connIter->second.device.addr_).ToString(),
+    BtChrEventWriteInt(CHR_BLE_DISCONNECT, connIter->second.device.addr_.GetAddress(),
         "BTCONMTUINITIATOR", 1);
-    BtChrEventWriteInt(CHR_BLE_DISCONNECT, ServiceUtil::AddrToStack(connIter->second.device.addr_).ToString(),
+    BtChrEventWriteInt(CHR_BLE_DISCONNECT, connIter->second.device.addr_.GetAddress(),
         "BTCONMTURESULT", mtu);
 }
 
@@ -755,7 +755,7 @@ void GattServerApplication::Connect(const RawAddress &addr, bool isDirect)
     if (btIfGattServer_) {
         std::string callingName = PermissionManager::GetCallingName();
         BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_BLE_SERVER_CONN, addr.GetAddress(), serverIf_, callingName);
-        int ret = btIfGattServer_->connect(serverIf_, ServiceUtil::AddrToStack(addr), isDirect, GATT_TRANSPORT_LE);
+        int ret = btIfGattServer_->connect(serverIf_, addr, isDirect, GATT_TRANSPORT_LE);
         CHECK_AND_RETURN_LOG(ret == BT_STATUS_SUCCESS, "failed, ret: %{public}d", ret);
     }
 }
@@ -778,7 +778,7 @@ void GattServerApplication::CancelConnection(const RawAddress &addr)
         std::string callingName = PermissionManager::GetCallingName();
         BtChrUeManager::GetInstance()->WriteCommonUe(CHR_UE_BLE_SERVER_DISCONN, addr.GetAddress(),
             serverIf_, callingName);
-        int ret = btIfGattServer_->disconnect(serverIf_, ServiceUtil::AddrToStack(addr), iter->first);
+        int ret = btIfGattServer_->disconnect(serverIf_, addr, iter->first);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnConnectionStateChanged, iter->second.device, GattStatus::GATT_FAILURE,
@@ -817,7 +817,7 @@ void GattServerApplication::SetPhy(const RawAddress &addr, int32_t txPhy, int32_
 
     if (btIfGattServer_) {
         int ret = btIfGattServer_->setPreferredPhy(
-            ServiceUtil::AddrToStack(addr), txPhyMask, rxPhyMask, phyOptions);
+            addr, txPhyMask, rxPhyMask, phyOptions);
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);
             WPTR_CBACK(callback_, OnBlePhyUpdate, iter->second.device, 0, 0, GattStatus::GATT_FAILURE);
@@ -841,7 +841,7 @@ void GattServerApplication::ReadPhy(const RawAddress &addr)
     }
  
     if (btIfGattServer_) {
-        int ret = btIfGattServer_->readPhy(ServiceUtil::AddrToStack(addr),
+        int ret = btIfGattServer_->readPhy(addr,
             [this](uint8_t txPhy, uint8_t rxPhy, uint8_t status) { ReadPhyCallback(txPhy, rxPhy, status); });
         if (ret != BT_STATUS_SUCCESS) {
             HILOGE("failed, ret: %{public}d", ret);

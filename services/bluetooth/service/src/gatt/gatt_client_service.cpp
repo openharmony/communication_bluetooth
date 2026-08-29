@@ -671,7 +671,7 @@ std::vector<GattDevice> GattClientService::GetAllDevice()
 
             for (auto iter = pimpl->clients.begin(); iter != pimpl->clients.end(); iter++) {
                 uint8_t addrType;
-                BtifGetAddressType(ServiceUtil::AddrToStack((*iter)->GetAddress()), &addrType);
+                BtifGetAddressType((*iter)->GetAddress(), &addrType);
                 set.emplace((*iter)->GetAddress(), ServiceUtil::AddrTypeFromStack(addrType),
                     (*iter)->GetTransport(), (*iter)->GetConnState());
             }
@@ -734,7 +734,7 @@ int GattClientService::RequestFastestConn(const RawAddress &addr)
             HILOGE("bthwif is null");
             return;
         }
-        bthwif->leConnectFastest(ServiceUtil::AddrToStack(addr));
+        bthwif->leConnectFastest(addr);
     });
     return GattStatus::GATT_SUCCESS;
 }

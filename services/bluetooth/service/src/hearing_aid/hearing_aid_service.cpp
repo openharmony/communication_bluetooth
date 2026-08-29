@@ -601,11 +601,11 @@ void HearingAidService::StartStackProfile()
 }
 
 void OHHearingAidCallbacks::OnConnectionState(::bluetooth::hearing_aid::ConnectionState state,
-    const STACK::RawAddress& address)
+    const OHOS::bluetooth::RawAddress& address)
 {
     HILOGI("[HEARING_AID Service] stack state=%{public}d, addr = %{public}s",
-        state, GetEncryptAddr(address.ToString()).c_str());
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(address);
+        state, GetEncryptAddr(address.GetAddress()).c_str());
+    RawAddress rawAddr = address;
 
     if (static_cast<int>(state) < 0 || static_cast<int>(state) >= BTHEARING_AID_STATE_MAX) {
         HILOGE("[HEARING_AID Service] state invalid!");
@@ -624,16 +624,15 @@ void OHHearingAidCallbacks::OnConnectionState(::bluetooth::hearing_aid::Connecti
 }
 
 void OHHearingAidCallbacks::OnDeviceAvailable(uint8_t capabilities, uint64_t hiSyncId,
-    const STACK::RawAddress &address)
+    const OHOS::bluetooth::RawAddress &address)
 {
-    HILOGI("[HEARING_AID Service] stack device avliable %{public}s", GetEncryptAddr(address.ToString()).c_str());
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(address);
+    HILOGI("[HEARING_AID Service] stack device avliable %{public}s", GetEncryptAddr(address.GetAddress()).c_str());
     HearingAidService *service = HearingAidService::GetService();
     if (service == nullptr) {
         HILOGE("service is null!");
         return;
     }
-    service->AddHearingAidDeviceInfo(rawAddr, capabilities, hiSyncId);
+    service->AddHearingAidDeviceInfo(address, capabilities, hiSyncId);
 }
 
 

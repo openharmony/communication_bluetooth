@@ -96,8 +96,8 @@ public:
     void SetAppState(bool isForeground);
     bool GetAppState();
 
-    static void OnAppStatusChanged(STACK::RawAddress* bdAddr, BthdApplicationState state);
-    static void OnConnectionStateChanged(STACK::RawAddress* bdAddr, BthdConnectionState state);
+    static void OnAppStatusChanged(OHOS::bluetooth::RawAddress* bdAddr, BthdApplicationState state);
+    static void OnConnectionStateChanged(OHOS::bluetooth::RawAddress* bdAddr, BthdConnectionState state);
     static void OnGetReport(uint8_t type, uint8_t id, uint16_t buffer_size);
     static void OnInterruptDataReceived(uint8_t report_id, uint16_t len, uint8_t* p_data);
     static void OnSetProtocol(uint8_t protocol);

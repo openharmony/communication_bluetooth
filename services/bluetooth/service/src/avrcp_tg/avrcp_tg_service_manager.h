@@ -36,7 +36,7 @@ public:
     void SetDeviceAbsoluteVolume(const RawAddress &rawAddr, int32_t volumeLevel);
     int32_t GetDeviceAbsVolumeAbility(const RawAddress &rawAddr);
     void NotifyAudioVolumeEvent(int32_t streamType, int32_t volume);
-    void SetDeviceAbsVolumeProperty(const STACK::RawAddress &rawAddr, int32_t ability);
+    void SetDeviceAbsVolumeProperty(const OHOS::bluetooth::RawAddress &rawAddr, int32_t ability);
     void SetActiveDevice(const RawAddress &rawAddr);
     void DisableBipService();
 

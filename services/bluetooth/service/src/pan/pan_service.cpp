@@ -269,7 +269,7 @@ void PanService::NotifyStateChanged(const bluetooth::RawAddress &device, int sta
 }
 
 void PanService::ConnectionStateCallback(BtpanConnectionState state,
-    BtStackStatus error, const STACK::RawAddress* addr, int localRole, int remoteRole)
+    BtStackStatus error, const OHOS::bluetooth::RawAddress* addr, int localRole, int remoteRole)
 {
     HILOGI("error=%{public}d, state=%{public}d, addr = %{public}s",
         error, state, GetEncryptAddr(addr->ToString()).c_str());
@@ -278,7 +278,7 @@ void PanService::ConnectionStateCallback(BtpanConnectionState state,
             error, GetEncryptAddr(addr->ToString()).c_str());
         return;
     }
-    bluetooth::RawAddress rawAddr = ServiceUtil::AddrFromStack(*addr);
+    bluetooth::RawAddress rawAddr = *addr;
     auto service = PanService::GetService();
     CHECK_AND_RETURN_LOG(service != nullptr, "service is nullptr");
     service->LoadPanServiceManagerInterfaceLib();

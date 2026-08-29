@@ -96,18 +96,18 @@ public:
     }
 
     void ConnectionCallback(
-        int connId, int serverIf, int connected, const STACK::RawAddress &bda, int reason) override;
+        int connId, int serverIf, int connected, const OHOS::bluetooth::RawAddress &bda, int reason) override;
     void ServiceAddedCallback(int status, int serverIf, std::vector<BtgattDbElement> service) override;
     void ServiceDeletedCallback(int status, int serverIf, int serviceHandle) override;
-    void RequestReadCharacteristicCallback(int connId, int transId, const STACK::RawAddress &bda, int attrHandle,
+    void RequestReadCharacteristicCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda, int attrHandle,
         int offset, bool isLong) override;
-    void RequestReadDescriptorCallback(int connId, int transId, const STACK::RawAddress &bda, int attrHandle,
+    void RequestReadDescriptorCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda, int attrHandle,
         int offset, bool isLong) override;
-    void RequestWriteCharacteristicCallback(int connId, int transId, const STACK::RawAddress &bda,
+    void RequestWriteCharacteristicCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda,
         int attrHandle, int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value) override;
-    void RequestWriteDescriptorCallback(int connId, int transId, const STACK::RawAddress &bda, int attrHandle,
+    void RequestWriteDescriptorCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda, int attrHandle,
         int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value) override;
-    void RequestExecWriteCallback(int connId, int transId, const STACK::RawAddress &bda, int execWrite) override;
+    void RequestExecWriteCallback(int connId, int transId, const OHOS::bluetooth::RawAddress &bda, int execWrite) override;
     void IndicationSentCallback(int connId, int status) override;
     void MtuChangedCallback(int connId, int mtu) override;
     void ConnUpdatedCallback(int connId, uint16_t interval, uint16_t latency, uint16_t timeout,

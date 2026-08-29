@@ -78,7 +78,7 @@ bool A2dpDisconnected::Dispatch(const utility::Message &msg)
 
     int ret = BT_STATUS_SUCCESS;
     RawAddress device = *(static_cast<RawAddress *>(msg.arg2_));
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr = device;
     std::shared_ptr<BluetoothDevice> bluetoothDevice = RemoteDeviceProperties::GetInstance()->FindRemoteDevice(device);
     A2dpService *service = GetServiceInstance(msg.arg1_);
     if (service == nullptr) {
@@ -132,7 +132,7 @@ bool A2dpDisconnecting::Dispatch(const utility::Message &msg)
 
     int ret = BT_STATUS_SUCCESS;
     RawAddress device = *(static_cast<RawAddress *>(msg.arg2_));
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr = device;
     A2dpService *service = GetServiceInstance(msg.arg1_);
     if (service == nullptr) {
         HILOGE("[A2dpDisconnecting] service is null");
@@ -147,7 +147,7 @@ bool A2dpDisconnecting::Dispatch(const utility::Message &msg)
             Transition(A2DP_STATE_DISCONNECTED);
             ret = bluetoothA2dpSrcInterface->disconnect(rawAddr);
             service->ProcessConnectFrameworkCallback(static_cast<int>(BTConnectState::DISCONNECTED), device);
-            BtChrBtExcpEvent(rawAddr.ToString(), BTOPT_A2DP, CHR_SUB_ERRCODE_CASE1);
+            BtChrBtExcpEvent(rawAddr.GetAddress(), BTOPT_A2DP, CHR_SUB_ERRCODE_CASE1);
             std::shared_ptr<A2dpDeviceInfo> deviceInfo = service->GetDeviceFromList(device);
             CHECK_AND_RETURN_LOG_RET(deviceInfo != nullptr, false, "not find device");
             deviceInfo->SetConnectState(static_cast<int>(BTConnectState::DISCONNECTED));
@@ -168,7 +168,7 @@ bool A2dpConnected::Dispatch(const utility::Message &msg)
     int ret = BT_STATUS_SUCCESS;
     uint8_t role = msg.arg1_;
     RawAddress device = *(static_cast<RawAddress *>(msg.arg2_));
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr = device;
 
     A2dpService *service = GetServiceInstance(role);
     if (service == nullptr) {
@@ -259,7 +259,7 @@ bool A2dpConnecting::Dispatch(const utility::Message &msg)
     int ret = BT_STATUS_SUCCESS;
     uint8_t role = msg.arg1_;
     RawAddress device = *(static_cast<RawAddress *>(msg.arg2_));
-    STACK::RawAddress rawAddr = ServiceUtil::AddrToStack(device);
+    OHOS::bluetooth::RawAddress rawAddr = device;
     A2dpService *service = GetServiceInstance(role);
     if (service == nullptr) {
         HILOGE("[A2dpConnected] Can't get the service of a2dp");
@@ -273,7 +273,7 @@ bool A2dpConnecting::Dispatch(const utility::Message &msg)
             Transition(A2DP_STATE_DISCONNECTED);
             ret = bluetoothA2dpSrcInterface->disconnect(rawAddr);
             service->ProcessConnectFrameworkCallback(static_cast<int>(BTConnectState::DISCONNECTED), device);
-            BtChrBtExcpEvent(rawAddr.ToString(), BTOPT_A2DP, CHR_SUB_ERRCODE_CASE1);
+            BtChrBtExcpEvent(rawAddr.GetAddress(), BTOPT_A2DP, CHR_SUB_ERRCODE_CASE1);
             std::shared_ptr<A2dpDeviceInfo> deviceInfo = service->GetDeviceFromList(device);
             CHECK_AND_RETURN_LOG_RET(deviceInfo != nullptr, false, "not find device");
             deviceInfo->SetConnectState(static_cast<int>(BTConnectState::DISCONNECTED));

@@ -101,10 +101,10 @@ public:
     }
 
     void ConnectCallback(
-        int connId, int status, int clientIf, const STACK::RawAddress &bda) override;
+        int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda) override;
     void DisconnectCallback(
-        int connId, int status, int clientIf, const STACK::RawAddress &bda, int reason) override;
-    void CancelOpenCallback(int connId, int status, int clientIf, const STACK::RawAddress &bda) override;
+        int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda, int reason) override;
+    void CancelOpenCallback(int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda) override;
     void SearchCompleteCallback(int connId, int status) override;
     void RegisterForNotificationCallback(int connId, int registered, int status, uint16_t handle) override;
     void NotifyCallback(int connId, const BtgattNotifyParams &data) override;
@@ -118,7 +118,7 @@ public:
     void ConnUpdatedCallback(int connId, uint16_t interval, uint16_t latency, uint16_t timeout,
         uint8_t status) override;
     void ServicesChangedCallback(int connId) override;
-    void ReadRemoteRssiValueCallback(int clientIf, const STACK::RawAddress &bda, int rssi, int status) override;
+    void ReadRemoteRssiValueCallback(int clientIf, const OHOS::bluetooth::RawAddress &bda, int rssi, int status) override;
     void PhyUpdatedCallback(int connId, uint8_t txPhy, uint8_t rxPhy, uint8_t status) override;
     void ReadPhyCallback(uint8_t txPhy, uint8_t rxPhy, uint8_t status) override;
 

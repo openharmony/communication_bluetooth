@@ -102,7 +102,7 @@ public:
     void PostEvent(const PanMessage &event);
 
     static void ConnectionStateCallback(BtpanConnectionState state,
-        BtStackStatus error, const STACK::RawAddress* addr, int localRole, int remoteRole);
+        BtStackStatus error, const OHOS::bluetooth::RawAddress* addr, int localRole, int remoteRole);
 
     static void ControlStateCallback(BtpanControlState state,
         int localRole, BtStackStatus error, const char* ifname);

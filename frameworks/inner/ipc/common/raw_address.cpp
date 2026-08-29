@@ -48,6 +48,11 @@ void RawAddress::ConvertToUint8(uint8_t *dst, const size_t size) const
     }
 }
 
+RawAddress RawAddress::StreamToBdaddr(const uint8_t *src, const size_t size)
+{
+    return ConvertToString(src, size);
+}
+
 RawAddress RawAddress::ConvertToString(const uint8_t *src, const size_t size)
 {
     char token[BT_ADDRESS_STR_LEN + 1] = {0};

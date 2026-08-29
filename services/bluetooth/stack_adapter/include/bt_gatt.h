@@ -136,7 +136,7 @@ struct BtgattDbElement {
 };
 
 struct BtgattNotifyParams {
-    RawAddress bda;
+    OHOS::bluetooth::RawAddress bda;
     uint16_t handle;
     uint16_t len;
     uint8_t *value;
@@ -155,7 +155,7 @@ struct BtgattRspParams {
 };
 
 struct BtgattTrackAdvInfo {
-    RawAddress bdAddr;
+    OHOS::bluetooth::RawAddress bdAddr;
     int clientIf;
     int advertiserState;
     int addrType;
@@ -179,7 +179,7 @@ struct BtgattCallbacks {
 };
 
 struct BtgattScannerCallbacks {
-    void (*scanResultCb)(uint16_t bleEvtType, uint8_t addrType, RawAddress *bda, uint8_t blePrimaryPhy,
+    void (*scanResultCb)(uint16_t bleEvtType, uint8_t addrType, OHOS::bluetooth::RawAddress *bda, uint8_t blePrimaryPhy,
         uint8_t bleSecondaryPhy, uint8_t bleAdvertisingSid, int8_t bleTxPower, int8_t rssi,
         uint16_t blePeriodicAdvInt, std::vector<uint8_t> advData);
     void (*batchscanReportsCb)(int clientIf, int status, int reportFormat, int numRecords,
@@ -190,19 +190,19 @@ struct BtgattScannerCallbacks {
 
 struct BtgattServerCallbacks {
     void (*registerServerCb)(int status, int serverIf, const OHOS::bluetooth::Uuid &appUuid);
-    void (*connectionCb)(int connId, int serverIf, int connected, const RawAddress &bda, int reason);
+    void (*connectionCb)(int connId, int serverIf, int connected, const OHOS::bluetooth::RawAddress &bda, int reason);
     void (*serviceAddedCb)(int status, int serverIf, std::vector<BtgattDbElement> service);
     void (*serviceStoppedCb)(int status, int serverIf, int serviceHandle);
     void (*serviceDeletedCb)(int status, int serverIf, int serviceHandle);
-    void (*requestReadCharacteristicCb)(int connId, int transId, const RawAddress &bda, int attrHandle,
+    void (*requestReadCharacteristicCb)(int connId, int transId, const OHOS::bluetooth::RawAddress &bda, int attrHandle,
         int offset, bool isLong);
-    void (*requestReadDescriptorCb)(int connId, int transId, const RawAddress &bda, int attrHandle,
+    void (*requestReadDescriptorCb)(int connId, int transId, const OHOS::bluetooth::RawAddress &bda, int attrHandle,
         int offset, bool isLong);
-    void (*requestWriteCharacteristicCb)(int connId, int transId, const RawAddress &bda, int attrHandle,
+    void (*requestWriteCharacteristicCb)(int connId, int transId, const OHOS::bluetooth::RawAddress &bda, int attrHandle,
         int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value);
-    void (*requestWriteDescriptorCb)(int connId, int transId, const RawAddress &bda, int attrHandle,
+    void (*requestWriteDescriptorCb)(int connId, int transId, const OHOS::bluetooth::RawAddress &bda, int attrHandle,
         int offset, bool needRsp, bool isPrep, std::vector<uint8_t> value);
-    void (*requestExecWriteCb)(int connId, int transId, const RawAddress &bda, int execWrite);
+    void (*requestExecWriteCb)(int connId, int transId, const OHOS::bluetooth::RawAddress &bda, int execWrite);
     void (*responseConfirmationCb)(int status, int handle);
     void (*indicationSentCb)(int connId, int status);
     void (*congestionCb)(int connId, bool congested);
@@ -213,9 +213,9 @@ struct BtgattServerCallbacks {
 
 struct BtgattClientCallbacks {
     void (*registerClientCb)(int status, int clientIf, const OHOS::bluetooth::Uuid &appUuid);
-    void (*connectCb)(int connId, int status, int clientIf, const RawAddress &bda);
-    void (*disconnectCb)(int connId, int status, int clientIf, const RawAddress &bda, int reason);
-    void (*cancelOpenCb)(int connId, int status, int clientIf, const RawAddress &bda);
+    void (*connectCb)(int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda);
+    void (*disconnectCb)(int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda, int reason);
+    void (*cancelOpenCb)(int connId, int status, int clientIf, const OHOS::bluetooth::RawAddress &bda);
     void (*searchCompleteCb)(int connId, int status);
     void (*registerForNotificationCb)(int connId, int registered, int status, uint16_t handle);
     void (*notifyCb)(int connId, const BtgattNotifyParams &data);
@@ -224,7 +224,7 @@ struct BtgattClientCallbacks {
     void (*readDescriptorCb)(int connId, int status, const BtgattReadParams &data);
     void (*writeDescriptorCb)(int connId, int status, uint16_t handle);
     void (*executeWriteCb)(int connId, int status);
-    void (*readRemoteRssiCb)(int clientIf, const RawAddress &bda, int rssi, int status);
+    void (*readRemoteRssiCb)(int clientIf, const OHOS::bluetooth::RawAddress &bda, int rssi, int status);
     void (*configureMtuCb)(int connId, int status, int mtu);
     void (*congestionCb)(int connId, bool congested);
     void (*getGattDbCb)(int connId, const BtgattDbElement *db, int count);
@@ -248,9 +248,9 @@ struct BtgattClientInterface {
     size_t size;
     BtStackStatus (*registerClient)(const OHOS::bluetooth::Uuid &appUuid, bool eattSupport);
     BtStackStatus (*unregisterClient)(int clientIf);
-    BtStackStatus (*connect)(int clientIf, const RawAddress &bdAddr, bool isDirect, int transport,
+    BtStackStatus (*connect)(int clientIf, const OHOS::bluetooth::RawAddress &bdAddr, bool isDirect, int transport,
         bool opportunistic, int phy);
-    BtStackStatus (*disconnect)(int clientIf, const RawAddress &bdAddr, int connId);
+    BtStackStatus (*disconnect)(int clientIf, const OHOS::bluetooth::RawAddress &bdAddr, int connId);
     BtStackStatus (*searchService)(int connId, const OHOS::bluetooth::Uuid *filterUuid);
     BtStackStatus (*getGattDb)(int connId);
     BtStackStatus (*readCharacteristic)(int connId, int handle, int authReq);
@@ -261,15 +261,15 @@ struct BtgattClientInterface {
     BtStackStatus (*readDescriptor)(int connId, int handle, int authReq);
     BtStackStatus (*writeDescriptor)(int connId, int handle, int authReq,
         std::vector<uint8_t> value);
-    BtStackStatus (*registerForNotification)(int clientIf, const RawAddress &bdAddr, int handle);
-    BtStackStatus (*deregisterForNotification)(int clientIf, const RawAddress &bdAddr, int handle);
+    BtStackStatus (*registerForNotification)(int clientIf, const OHOS::bluetooth::RawAddress &bdAddr, int handle);
+    BtStackStatus (*deregisterForNotification)(int clientIf, const OHOS::bluetooth::RawAddress &bdAddr, int handle);
     BtStackStatus (*configureMtu)(int connId, int mtu);
-    BtStackStatus (*connParameterUpdate)(const RawAddress &bdAddr, int minInterval,
+    BtStackStatus (*connParameterUpdate)(const OHOS::bluetooth::RawAddress &bdAddr, int minInterval,
         int maxInterval, int latency, int timeout, int minCeLen, int maxCeLen);
-    BtStackStatus (*readRemoteRssi)(int clientIf, const RawAddress &bdAddr);
-    BtStackStatus (*setPreferredPhy)(const RawAddress &bdAddr, uint8_t txPhy, uint8_t rxPhy,
+    BtStackStatus (*readRemoteRssi)(int clientIf, const OHOS::bluetooth::RawAddress &bdAddr);
+    BtStackStatus (*setPreferredPhy)(const OHOS::bluetooth::RawAddress &bdAddr, uint8_t txPhy, uint8_t rxPhy,
         uint16_t phyOptions);
-    BtStackStatus (*readPhy)(const RawAddress &bdAddr,
+    BtStackStatus (*readPhy)(const OHOS::bluetooth::RawAddress &bdAddr,
         std::function<void(uint8_t txPhy, uint8_t rxPhy, uint8_t status)> cb);
 };
 
@@ -283,17 +283,17 @@ struct BtgattServerInterface {
     size_t size;
     BtStackStatus (*registerServer)(const OHOS::bluetooth::Uuid &uuid, bool eattSupport);
     BtStackStatus (*unregisterServer)(int serverIf);
-    BtStackStatus (*connect)(int serverIf, const RawAddress &bdAddr, bool isDirect, int transport);
-    BtStackStatus (*disconnect)(int serverIf, const RawAddress &bdAddr, int connId);
+    BtStackStatus (*connect)(int serverIf, const OHOS::bluetooth::RawAddress &bdAddr, bool isDirect, int transport);
+    BtStackStatus (*disconnect)(int serverIf, const OHOS::bluetooth::RawAddress &bdAddr, int connId);
     BtStackStatus (*addService)(int serverIf, std::vector<BtgattDbElement> service);
     BtStackStatus (*deleteService)(int serverIf, int serviceHandle);
     BtStackStatus (*sendIndication)(int serverIf, int attributeHandle, int connId, int confirm,
         std::vector<uint8_t> value);
     BtStackStatus (*sendResponse)(int connId, int transId, int status,
         const BtgattResponse &response);
-    BtStackStatus (*setPreferredPhy)(const RawAddress &bdAddr, uint8_t txPhy, uint8_t rxPhy,
+    BtStackStatus (*setPreferredPhy)(const OHOS::bluetooth::RawAddress &bdAddr, uint8_t txPhy, uint8_t rxPhy,
         uint16_t phyOptions);
-    BtStackStatus (*readPhy)(const RawAddress &bdAddr,
+    BtStackStatus (*readPhy)(const OHOS::bluetooth::RawAddress &bdAddr,
         std::function<void(uint8_t txPhy, uint8_t rxPhy, uint8_t status)> cb);
 };
 
@@ -318,7 +318,7 @@ struct BtgattFiltParamSetup {
 /* One scan filter command in APCF format, see BleScanFilter::GetCommand. */
 struct ApcfCommand {
     uint8_t type;
-    RawAddress address;
+    OHOS::bluetooth::RawAddress address;
     uint8_t addrType;
     std::array<uint8_t, 16> irk;
     OHOS::bluetooth::Uuid uuid;

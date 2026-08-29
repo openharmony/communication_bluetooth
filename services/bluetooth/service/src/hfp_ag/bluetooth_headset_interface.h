@@ -17,7 +17,7 @@
 #define BLUETOOTH_HEADSET_INTERFACE_H
 
 #include "hardware/bt_hf.h"
-#include "types/raw_address.h"
+#include "raw_address.h"
 
 namespace bluetooth {
 namespace headset {
@@ -32,42 +32,42 @@ public:
     virtual BtStackStatus Init(Callbacks *callbacks, int maxHfClients,
                              bool inbandRingingEnabled) = 0;
     virtual void Cleanup() = 0;
-    virtual BtStackStatus Connect(RawAddress *bdAddr) = 0;
-    virtual BtStackStatus Disconnect(RawAddress *bdAddr) = 0;
-    virtual BtStackStatus ConnectAudio(RawAddress *bdAddr) = 0;
-    virtual BtStackStatus DisconnectAudio(RawAddress *bdAddr) = 0;
-    virtual BtStackStatus StartVoiceRecognition(RawAddress *bdAddr) = 0;
-    virtual BtStackStatus StopVoiceRecognition(RawAddress *bdAddr) = 0;
+    virtual BtStackStatus Connect(OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual BtStackStatus Disconnect(OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual BtStackStatus ConnectAudio(OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual BtStackStatus DisconnectAudio(OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual BtStackStatus StartVoiceRecognition(OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual BtStackStatus StopVoiceRecognition(OHOS::bluetooth::RawAddress *bdAddr) = 0;
     virtual BtStackStatus VolumeControl(BthfVolumeType type, int volume,
-                                      RawAddress *bdAddr) = 0;
-    virtual BtStackStatus CopsResponse(const char *cops, RawAddress *bdAddr) = 0;
+                                      OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual BtStackStatus CopsResponse(const char *cops, OHOS::bluetooth::RawAddress *bdAddr) = 0;
     virtual BtStackStatus CindResponse(int svc, int num_active, int num_held,
                                      BthfCallState call_setup, int signal,
                                      int roam, int batt_chg,
-                                     RawAddress *bdAddr) = 0;
+                                     OHOS::bluetooth::RawAddress *bdAddr) = 0;
     virtual BtStackStatus FormattedAtResponse(const char *rsp,
-                                            RawAddress *bdAddr) = 0;
+                                            OHOS::bluetooth::RawAddress *bdAddr) = 0;
     virtual BtStackStatus AtResponse(BthfAtResponse response_code,
-                                   int error_code, RawAddress *bdAddr) = 0;
+                                   int error_code, OHOS::bluetooth::RawAddress *bdAddr) = 0;
     virtual BtStackStatus ClccResponse(int index, BthfCallDirection dir,
                                      BthfCallState state,
                                      BthfCallMode mode,
                                      BthfCallMptyType mpty,
                                      const char *number,
                                      BthfCallAddrtype type,
-                                     RawAddress *bdAddr) = 0;
+                                     OHOS::bluetooth::RawAddress *bdAddr) = 0;
     virtual BtStackStatus PhoneStateChange(int num_active, int num_held,
                                          BthfCallState call_state,
                                          const char *number,
                                          BthfCallAddrtype type,
                                          const char *name,
-                                         RawAddress *bdAddr) = 0;
-    virtual void SetActiveDevice(RawAddress *bdAddr) = 0;
-    virtual BtStackStatus SendBsir(int value, RawAddress *bdAddr) = 0;
+                                         OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual void SetActiveDevice(OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual BtStackStatus SendBsir(int value, OHOS::bluetooth::RawAddress *bdAddr) = 0;
     virtual BtStackStatus DeviceStatusNotification(
         BthfNetworkState ntk_state, BthfServiceType svc_type,
-        int signal, int batt_chg, RawAddress *bdAddr) = 0;
-    virtual BtStackStatus isVoiceRecognitionSupported(RawAddress *bdAddr) = 0;
+        int signal, int batt_chg, OHOS::bluetooth::RawAddress *bdAddr) = 0;
+    virtual BtStackStatus isVoiceRecognitionSupported(OHOS::bluetooth::RawAddress *bdAddr) = 0;
 };
 
 }  // namespace headset

@@ -59,7 +59,7 @@ public:
     void RegisterUpdateCallback(MediaCallbacks *callback);
     void UnregisterUpdateCallback(MediaCallbacks *callback);
     void PlayItem(uint16_t playerId, bool nowPlaying, std::string mediaId);
-    void SetActiveDevice(const STACK::RawAddress &address);
+    void SetActiveDevice(const OHOS::bluetooth::RawAddress &address);
     void AppSettingsSupport(AppSettingsCallback appCb);
     void SetAppSettingsMode(uint8_t shuffleMode, uint8_t repeatMode);
     void SetA2dpService(IProfileA2dp *a2dpService);
@@ -499,10 +499,10 @@ void AvrcpMediaInterfaceImpl::impl::PlayItem(uint16_t playerId, bool nowPlaying,
         }
     }
 }
-void AvrcpMediaInterfaceImpl::impl::SetActiveDevice(const STACK::RawAddress &address)
+void AvrcpMediaInterfaceImpl::impl::SetActiveDevice(const OHOS::bluetooth::RawAddress &address)
 {
     std::lock_guard<std::mutex> lock(activeAddrLock_);
-    RawAddress rawAddr = ServiceUtil::AddrFromStack(address);
+    RawAddress rawAddr = address;
     if (activeAddress_ == rawAddr.GetAddress()) {
         HILOGI("the device is already active");
         return;
@@ -1074,7 +1074,7 @@ void AvrcpMediaInterfaceImpl::PlayItem(uint16_t playerId, bool nowPlaying, std::
 {
     pimpl_->PlayItem(playerId, nowPlaying, mediaId);
 }
-void AvrcpMediaInterfaceImpl::SetActiveDevice(const STACK::RawAddress &address)
+void AvrcpMediaInterfaceImpl::SetActiveDevice(const OHOS::bluetooth::RawAddress &address)
 {
     pimpl_->SetActiveDevice(address);
 }
