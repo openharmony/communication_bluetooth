@@ -1035,11 +1035,11 @@ public:
     int SetBtChannelScan(bool isEnable, uint32_t interval);
 
     /**
-     * @brief Get BR/EDR address by BLE address.
+     * @brief Get the BR/EDR address of a dual-mode device by its BLE address after pairing.
      *
      * @param bleAddr BLE address of the device.
      * @param[out] brAddr BR/EDR address of the device.
-     * @return Returns {@link BT_NO_ERROR} if get BR/EDR address is successfully;
+     * @return Returns {@link BT_NO_ERROR} if the operation is successfully;
      *         returns an error code defined in {@link BtErrCode} otherwise.
      * @since 26
      */
