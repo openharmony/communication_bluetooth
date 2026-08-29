@@ -16,7 +16,7 @@
 #ifndef A2DP_SNK_AUDIO_RENDER_H
 #define A2DP_SNK_AUDIO_RENDER_H
 
-#include "btif/a2dp_audio_render_interface.h"
+#include "bt_a2dp_audio_render_interface.h"
 #include "audio_renderer.h"
 #include "log.h"
 #include <memory>

@@ -14,20 +14,20 @@
  */
 
 /*
- * Stub of the removed stack layer btif common glue (btif_common.h).
+ * Stub of the removed stack layer common glue (bt_common.h).
  */
 
-#ifndef BTIF_COMMON_H
-#define BTIF_COMMON_H
+#ifndef BT_COMMON_H
+#define BT_COMMON_H
 
 #include "bt_types.h"
 
-enum BtifCtrlState {
-    BTIF_CTRL_STATE_ON = 0,
-    BTIF_CTRL_STATE_OFF,
+enum BtCtrlState {
+    BT_CTRL_STATE_ON = 0,
+    BT_CTRL_STATE_OFF,
 };
 
-inline int BtifGetAddressType(const OHOS::bluetooth::RawAddress &bdAddr, uint8_t *addrType)
+inline int BtGetAddressType(const OHOS::bluetooth::RawAddress &bdAddr, uint8_t *addrType)
 {
     (void)bdAddr;
     if (addrType != nullptr) {
@@ -36,4 +36,4 @@ inline int BtifGetAddressType(const OHOS::bluetooth::RawAddress &bdAddr, uint8_t
     return 0;
 }
 
-#endif  // BTIF_COMMON_H
+#endif  // BT_COMMON_H

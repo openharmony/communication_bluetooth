@@ -14,7 +14,7 @@
  */
 
 /*
- * Stub of the removed stack layer btif gatt glue (btif_gatt.h).
+ * Stub of the removed stack layer BLE scanner and advertiser glue (bt_ble_interface.h).
  * The scanner/advertiser interfaces mirror bluedroid
  * system/include/hardware/ble_scanner.h and ble_advertiser.h with
  * std::function callbacks; SetScanParameters is the 5-arg vendor variant
@@ -22,8 +22,8 @@
  * the instances stay null in the stub world.
  */
 
-#ifndef BTIF_GATT_H
-#define BTIF_GATT_H
+#ifndef BT_BLE_INTERFACE_H
+#define BT_BLE_INTERFACE_H
 
 #include <cstdint>
 #include <functional>
@@ -32,7 +32,7 @@
 
 #include "bt_types.h"
 #include "bt_gatt.h"
-#include "btif_common.h"
+#include "bt_common.h"
 
 class BleScannerInterface {
 public:
@@ -109,4 +109,4 @@ inline BleAdvertiserInterface *GetBleAdvertiserInstance()
     return nullptr;
 }
 
-#endif  // BTIF_GATT_H
+#endif  // BT_BLE_INTERFACE_H

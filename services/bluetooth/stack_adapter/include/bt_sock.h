@@ -20,6 +20,8 @@
 #ifndef BT_SOCK_H
 #define BT_SOCK_H
 
+#include <cstddef>
+
 #include "bt_types.h"
 
 #define BT_SOCK_MAX_SERVICES 16
@@ -48,5 +50,40 @@ struct SockConnectSignal {
     uint64_t connUuidMsb;
     uint64_t socketId;
 } __attribute__((packed));
+
+
+/* Socket type and option values of the removed stack layer (bluedroid
+ * system/include/hardware/bt_sock.h). */
+enum BtsockType {
+    BTSOCK_RFCOMM = 1,
+    BTSOCK_SCO = 2,
+    BTSOCK_L2CAP = 3,
+    BTSOCK_L2CAP_LE = 4,
+};
+
+enum BtsockOpt {
+    BTSOCK_OPT_AUTH = 0,
+    BTSOCK_OPT_ENCRYPT,
+};
+
+/* Socket interface consumed by the service layer (socket_service.cpp); the
+ * signatures follow the legacy bluedroid layout, which the removed stack
+ * library implements (7-parameter listen/connect). */
+struct BtsockInterface {
+    size_t size;
+    BtStackStatus (*listen)(BtsockType type, const char *serviceName,
+        const OHOS::bluetooth::Uuid *serviceUuid, int channel, int *sockFd, int flags,
+        int callingUid);
+    BtStackStatus (*connect)(const OHOS::bluetooth::RawAddress *bdAddr, BtsockType type,
+        const OHOS::bluetooth::Uuid *uuid, int channel, int *sockFd, int flags,
+        int callingUid);
+    BtStackStatus (*close)(int fd);
+    BtStackStatus (*disconnect)(const OHOS::bluetooth::RawAddress *bdAddr, BtsockType type, int channel,
+        int flags, int callingUid);
+};
+
+inline void BtSockCleanup(void)
+{
+}
 
 #endif  // BT_SOCK_H

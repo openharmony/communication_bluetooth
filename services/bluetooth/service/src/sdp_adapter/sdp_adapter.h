@@ -18,7 +18,7 @@
 
 #include <cstdint>
 #include "bt_recursive_mutex.h"
-#include "btif_sdp.h"
+#include "bt_sdp.h"
 
 namespace OHOS {
 namespace bluetooth {

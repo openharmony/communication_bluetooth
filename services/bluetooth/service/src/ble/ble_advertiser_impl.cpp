@@ -26,7 +26,7 @@
 
 #include "ble_adapter.h"
 #include "ble_defs.h"
-#include "btif_gatt.h"
+#include "bt_ble_interface.h"
 #include "log.h"
 #include "securec.h"
 #include "thread_util.h"
@@ -39,15 +39,15 @@ BleAdvertiserImpl::BleAdvertiserImpl(IBleAdvertiserCallback &callback, IAdapterB
       callback_(&callback),
       bleAdapter_(&bleAdapter)
 {
-    btifBleAdvertiser_ = GetBleAdvertiserInstance();
+    btBleAdvertiser_ = GetBleAdvertiserInstance();
 }
 
 BleAdvertiserImpl::~BleAdvertiserImpl()
 {
     // Clear advertiser handle
     advInstances_.Iterate([this](uint8_t id, BleAdvertiserInstance &instance) {
-        if (btifBleAdvertiser_) {
-            btifBleAdvertiser_->Unregister(id);
+        if (btBleAdvertiser_) {
+            btBleAdvertiser_->Unregister(id);
         }
     });
 }
@@ -58,13 +58,13 @@ uint8_t BleAdvertiserImpl::CreateAdvertiserSetHandle(int &advStatus)
     std::lock_guard<std::mutex> lock(mutex_);
 
     uint8_t handle = BLE_INVALID_ADVERTISING_HANDLE;
-    if (btifBleAdvertiser_) {
+    if (btBleAdvertiser_) {
         auto promise = std::make_shared<std::promise<AdvInfo>>();
         std::future<AdvInfo> future = promise->get_future();
         std::weak_ptr<std::promise<AdvInfo>> promiseWptr(promise);
-        btifBleAdvertiser_->RegisterAdvertiser(
+        btBleAdvertiser_->RegisterAdvertiser(
             // callback in other thread
-            [promiseWptr, btifBleAdvertiser = btifBleAdvertiser_](uint8_t advertiserId, uint8_t status) {
+            [promiseWptr, btBleAdvertiser = btBleAdvertiser_](uint8_t advertiserId, uint8_t status) {
                 // status code see: bluedroid/system/stack/include/ble_advertiser.h - BTM_BLE_MULTI_ADV_SUCCESS
                 HILOGI("advHandle: %{public}u, status: %{public}u", advertiserId, status);
                 AdvInfo res;
@@ -75,7 +75,7 @@ uint8_t BleAdvertiserImpl::CreateAdvertiserSetHandle(int &advStatus)
                     ptr->set_value(res);
                 } else {
                     HILOGE("advHandle timeout: %{public}u", advertiserId);
-                    btifBleAdvertiser->Unregister(advertiserId);
+                    btBleAdvertiser->Unregister(advertiserId);
                 }
             });
 
@@ -106,8 +106,8 @@ void BleAdvertiserImpl::UnregisterAdvertisingHandle(int advHandle)
         HILOGI("remove advInstance: %{public}d", advHandle);
         advInstances_.Erase(advHandle);
     }
-    if (btifBleAdvertiser_) {
-        btifBleAdvertiser_->Unregister(advHandle);
+    if (btBleAdvertiser_) {
+        btBleAdvertiser_->Unregister(advHandle);
     }
 }
 
@@ -340,8 +340,8 @@ void BleAdvertiserImpl::StartAdvertising(const BleAdvertiserSettingsImpl &settin
     }
     ParseSettings(settings, !scanResponseData.empty(), &params);
 
-    if (btifBleAdvertiser_) {
-        btifBleAdvertiser_->StartAdvertising(
+    if (btBleAdvertiser_) {
+        btBleAdvertiser_->StartAdvertising(
             advHandle,
             [this, advHandle](uint8_t status) { OnAdvStartedEventFromStack(advHandle, status); },
             std::move(params), std::move(advertiseData), std::move(scanResponseData),
@@ -367,8 +367,8 @@ void BleAdvertiserImpl::EnableAdvertising(uint8_t advHandle, uint16_t duration)
         return;
     }
 
-    if (btifBleAdvertiser_) {
-        btifBleAdvertiser_->Enable(advHandle, true,
+    if (btBleAdvertiser_) {
+        btBleAdvertiser_->Enable(advHandle, true,
             [this, advHandle](uint8_t status) { OnAdvEnabledEventFromStack(advHandle, status); },
             duration, 0,
             [this, advHandle](uint8_t status) { OnAdvDisabledEventFromStack(advHandle, status); });
@@ -392,8 +392,8 @@ void BleAdvertiserImpl::DisableAdvertising(uint8_t advHandle)
         return;
     }
 
-    if (btifBleAdvertiser_) {
-        btifBleAdvertiser_->Enable(advHandle, false,
+    if (btBleAdvertiser_) {
+        btBleAdvertiser_->Enable(advHandle, false,
             [this, advHandle](uint8_t status) { OnAdvDisabledEventFromStack(advHandle, status); },
             0, 0,
             [](uint8_t status) {});
@@ -413,8 +413,8 @@ void BleAdvertiserImpl::StopAdvertising(uint8_t advHandle)
     // Change the advertiser status in advance. If an error occurs, the advertiser status will be changed later.
     ChangeAdvStatus(advHandle, ADVERTISE_NOT_STARTED);
 
-    if (btifBleAdvertiser_) {
-        btifBleAdvertiser_->Unregister(advHandle);
+    if (btBleAdvertiser_) {
+        btBleAdvertiser_->Unregister(advHandle);
     }
     OnAdvStoppedEvent(advHandle, BT_STATUS_SUCCESS);
 }
@@ -464,8 +464,8 @@ void BleAdvertiserImpl::OnSetAdvertisingDataEvent(uint8_t advHandle, SetAdvDataS
         return;
     }
 
-    if (state == SetAdvDataState::SCAN_RSP && btifBleAdvertiser_) {
-        btifBleAdvertiser_->SetData(advHandle, true, std::move(rspData),
+    if (state == SetAdvDataState::SCAN_RSP && btBleAdvertiser_) {
+        btBleAdvertiser_->SetData(advHandle, true, std::move(rspData),
             [this, advHandle](uint8_t status) {
                 OnSetAdvertisingDataEvent(advHandle, SetAdvDataState::COMPLETE, {}, status);
             });
@@ -505,8 +505,8 @@ void BleAdvertiserImpl::SetAdvertisingData(const BleAdvertiserDataImpl &advData,
 
     auto [advertiseData, scanResponseData] = ConvertAndLogData(advData, scanResponse);
 
-    if (btifBleAdvertiser_) {
-        btifBleAdvertiser_->SetData(advHandle, false, std::move(advertiseData),
+    if (btBleAdvertiser_) {
+        btBleAdvertiser_->SetData(advHandle, false, std::move(advertiseData),
             [this, advHandle, scanResponseData = std::move(scanResponseData)](uint8_t status) {
                 OnSetAdvertisingDataEvent(advHandle, SetAdvDataState::SCAN_RSP, scanResponseData, status);
             });
@@ -540,9 +540,9 @@ void BleAdvertiserImpl::SetAdvOrRspData(const BleAdvertiserDataImpl &data,
         BleAdvertiserDataLog(rspPayload, true);
         sendData = std::vector<uint8_t>(rspPayload.begin(), rspPayload.end());
     }
-    if (btifBleAdvertiser_) {
+    if (btBleAdvertiser_) {
         HILOGI("advHandle: %{public}d, type: %{public}d.", advHandle, type);
-        btifBleAdvertiser_->SetData(advHandle, !isAdv, std::move(sendData),
+        btBleAdvertiser_->SetData(advHandle, !isAdv, std::move(sendData),
             [this, advHandle, type](uint8_t status) { OnSetAdvDataEventByType(advHandle, type, status); });
     }
 }
@@ -584,8 +584,8 @@ void BleAdvertiserImpl::ChangeAdvertisingParams(uint8_t advHandle, const BleAdve
 
     AdvertiseParameters params;
     ParseSettings(settings, false, &params);
-    if (btifBleAdvertiser_ != nullptr) {
-        btifBleAdvertiser_->SetParameters(advHandle, std::move(params),
+    if (btBleAdvertiser_ != nullptr) {
+        btBleAdvertiser_->SetParameters(advHandle, std::move(params),
             [this, advHandle](uint8_t status, int8_t txPower) {
                 OnAdvChangeParamsEventFromStack(advHandle, status, txPower);
             });

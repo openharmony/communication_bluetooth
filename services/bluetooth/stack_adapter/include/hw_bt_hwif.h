@@ -167,11 +167,11 @@ struct BthwifInterface {
     bool (*hwInteropMatch)(const uint16_t feature,
                            const OHOS::bluetooth::RawAddress &remoteBdAddr);
     /* Clean the HFP SCO occupied flag. */
-    void (*hwBtifHfpScoOccupiedClean)(const OHOS::bluetooth::RawAddress &remoteBdAddr);
+    void (*hwBtHfpScoOccupiedClean)(const OHOS::bluetooth::RawAddress &remoteBdAddr);
     /* Remove the HFP SCO queue entry. */
-    void (*hwBtifHfpQueueRemove)(const OHOS::bluetooth::RawAddress &remoteBdAddr);
+    void (*hwBtHfpQueueRemove)(const OHOS::bluetooth::RawAddress &remoteBdAddr);
     /* Remove the A2DP queue entry. */
-    void (*hwBtifA2dpQueueRemove)(const OHOS::bluetooth::RawAddress &remoteBdAddr);
+    void (*hwBtA2dpQueueRemove)(const OHOS::bluetooth::RawAddress &remoteBdAddr);
     /* Get A2DP offload codec config. */
     bool (*getA2dpOffloadCodecConfig)(
         const OHOS::bluetooth::RawAddress &remoteBdAddr,

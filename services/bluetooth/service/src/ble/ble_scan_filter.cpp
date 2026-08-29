@@ -47,7 +47,7 @@ constexpr const char *WALLET_SET_HIGH_RSSI_CHIP_TYPE = "mp17c";
 constexpr int BLE_ADDR_ALL_TYPE = 0x02;
 
 BleScanFilter::BleScanFilter(int scannerId, BleScannerInterface *scanner)
-    : scannerId_(scannerId), btifBleScanner_(scanner) {}
+    : scannerId_(scannerId), btBleScanner_(scanner) {}
 
 BleScanFilter::~BleScanFilter()
 {
@@ -56,7 +56,7 @@ BleScanFilter::~BleScanFilter()
 bool BleScanFilter::SendScanFilterParam(uint8_t action, int filterIndex,
     std::unique_ptr<BtgattFiltParamSetup> filtParam) const
 {
-    if (!btifBleScanner_) {
+    if (!btBleScanner_) {
         return false;
     }
 
@@ -64,7 +64,7 @@ bool BleScanFilter::SendScanFilterParam(uint8_t action, int filterIndex,
     auto promise = std::make_shared<std::promise<uint8_t>>();
     auto future = promise->get_future();
 
-    btifBleScanner_->ScanFilterParamSetup(scannerId_, action, filterIndex, std::move(filtParam),
+    btBleScanner_->ScanFilterParamSetup(scannerId_, action, filterIndex, std::move(filtParam),
         [promise](uint8_t availableSpace, uint8_t actionType, uint8_t btmStatus) {
             HITRACE_METER_NAME(BT_TRACE_TAG, "ScanFilterParamCb");
             if (btmStatus != BTM_SUCCESS) {
@@ -95,14 +95,14 @@ bool BleScanFilter::SendScanFilterParam(uint8_t action, int filterIndex,
 
 bool BleScanFilter::SendScanFilter(int filterIndex, std::vector<ApcfCommand> cmds) const
 {
-    if (!btifBleScanner_) {
+    if (!btBleScanner_) {
         return false;
     }
 
     auto promise = std::make_shared<std::promise<bool>>();
     auto future = promise->get_future();
 
-    btifBleScanner_->ScanFilterAdd(filterIndex, std::move(cmds),
+    btBleScanner_->ScanFilterAdd(filterIndex, std::move(cmds),
         [promise](uint8_t filterType, uint8_t availableSpace, uint8_t action, uint8_t btmStatus) {
             HILOGD("ScanFilterAdd: filterType: %{public}u, availableSpace: %{public}u, action: %{public}u,"
                 "btmStatus: %{public}u", filterType, availableSpace, action, btmStatus);

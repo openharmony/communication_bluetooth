@@ -213,8 +213,8 @@ void BluetoothHwInterface::CleanHfpScoOccupied(const RawAddress &device)
 {
     OHOS::bluetooth::RawAddress rawAddr = device;
     CHECK_AND_RETURN_LOG(bthwInterface_ != nullptr, "bthwInterface_ is null");
-    CHECK_AND_RETURN_LOG(bthwInterface_->hwBtifHfpScoOccupiedClean != nullptr, "hwBtifHfpScoOccupiedClean is null");
-    bthwInterface_->hwBtifHfpScoOccupiedClean(rawAddr);
+    CHECK_AND_RETURN_LOG(bthwInterface_->hwBtHfpScoOccupiedClean != nullptr, "hwBtHfpScoOccupiedClean is null");
+    bthwInterface_->hwBtHfpScoOccupiedClean(rawAddr);
 }
 
 __attribute__((no_sanitize("cfi")))

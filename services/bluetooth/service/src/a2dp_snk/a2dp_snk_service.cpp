@@ -19,7 +19,7 @@
 #include "a2dp_snk_service.h"
 #include "class_creator.h"
 #include "log.h"
-#include "btif/a2dp_audio_render_interface.h"
+#include "bt_a2dp_audio_render_interface.h"
 #include "a2dp_snk_audio_render.h"
 #include "car_policy_adapter.h"
 #include "cdc_stream_state_machine.h"

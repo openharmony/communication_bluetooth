@@ -24,7 +24,7 @@
 #include "base_def.h"
 #include "context.h"
 #include "bt_uuid.h"
-#include "btif_gatt.h"
+#include "bt_ble_interface.h"
 #include "gatt_data.h"
 #include "interface_profile_gatt_client.h"
 #include "raw_address.h"

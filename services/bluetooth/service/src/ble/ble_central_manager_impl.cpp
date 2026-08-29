@@ -26,7 +26,7 @@
 #include "common/bluetooth_hw_interface.h"
 #include "common/bluetooth_channel_rssi_manager.h"
 #include "bt_def.h"
-#include "btif_gatt.h"
+#include "bt_ble_interface.h"
 #include "log.h"
 #include "raw_address.h"
 #include "service_util.h"
@@ -104,7 +104,7 @@ BleCentralManagerImpl::BleCentralManagerImpl(IBleCentralManagerCallback &callbac
     : callback_(&callback), status_(SCAN_NOT_STARTED),
       pimpl(std::make_unique<BleCentralManagerImpl::impl>(*this))
 {
-    btifBleScanner_ = GetBleScannerInstance();
+    btBleScanner_ = GetBleScannerInstance();
     bthwInterface_ = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
     currentUsedTrackAdvs_ = 0;
 }
@@ -130,8 +130,8 @@ void BleCentralManagerImpl::Start(void)
         pimpl->isAddObserver_ = true;
     }
 
-    if (btifBleScanner_) {
-        btifBleScanner_->Scan(true);
+    if (btBleScanner_) {
+        btBleScanner_->Scan(true);
     }
 
     status_ = SCAN_FAILED_ALREADY_STARTED;
@@ -163,8 +163,8 @@ void BleCentralManagerImpl::SetScanParameters(uint16_t intervalMSecs, uint16_t w
 {
     int interval = intervalMSecs / BLE_SCAN_UNIT_TIME;
     int window = windowMSecs / BLE_SCAN_UNIT_TIME;
-    if (btifBleScanner_) {
-        btifBleScanner_->SetScanParameters(interval, window, legacy, phy,
+    if (btBleScanner_) {
+        btBleScanner_->SetScanParameters(interval, window, legacy, phy,
             [this](uint8_t status) { SetScanParametersCallback(status); });
     }
 }
@@ -198,7 +198,7 @@ void BleCentralManagerImpl::BatchscanConfigStorage(int clientIf, int batchScanFu
     int batchScanNotifyThreshold)
 {
     InitializeBatchScanOperation();
-    btifBleScanner_->BatchscanConfigStorage(clientIf, batchScanFullMax, batchScanTruncMax, batchScanNotifyThreshold,
+    btBleScanner_->BatchscanConfigStorage(clientIf, batchScanFullMax, batchScanTruncMax, batchScanNotifyThreshold,
         [](uint8_t btmStatus) { PromiseCallback(g_promise, btmStatus); });
     WaitForBatchScanOperationEnd();
 }
@@ -207,7 +207,7 @@ void BleCentralManagerImpl::BatchscanEnable(int scanMode, int scanInterval, int 
     int discardRule)
 {
     InitializeBatchScanOperation();
-    btifBleScanner_->BatchscanEnable(scanMode, scanInterval, scanWindow, addrType, discardRule,
+    btBleScanner_->BatchscanEnable(scanMode, scanInterval, scanWindow, addrType, discardRule,
         [](uint8_t btmStatus) { PromiseCallback(g_promise, btmStatus); });
     WaitForBatchScanOperationEnd();
 }
@@ -215,14 +215,14 @@ void BleCentralManagerImpl::BatchscanEnable(int scanMode, int scanInterval, int 
 void BleCentralManagerImpl::BatchscanDisable()
 {
     InitializeBatchScanOperation();
-    btifBleScanner_->BatchscanDisable(
+    btBleScanner_->BatchscanDisable(
         [](uint8_t btmStatus) { PromiseCallback(g_promise, btmStatus); });
     WaitForBatchScanOperationEnd();
 }
 
 void BleCentralManagerImpl::BatchscanReadReports(int clientIf, int scanMode)
 {
-    btifBleScanner_->BatchscanReadReports(clientIf, scanMode);
+    btBleScanner_->BatchscanReadReports(clientIf, scanMode);
 }
 
 void BleCentralManagerImpl::StartScan(const BleScanSettingsImpl &setting)
@@ -259,8 +259,8 @@ void BleCentralManagerImpl::StopScan(void)
         return;
     }
 
-    if (btifBleScanner_ != nullptr) {
-        btifBleScanner_->Scan(false);
+    if (btBleScanner_ != nullptr) {
+        btBleScanner_->Scan(false);
     }
 
     status_ = SCAN_NOT_STARTED;
@@ -533,7 +533,7 @@ int32_t BleCentralManagerImpl::ConfigScanFilter(int32_t scannerId, const BleScan
     std::lock_guard<std::mutex> lock(filterMuteLock_);
     auto iter = GetScanFilterIter(scannerId);
     if (iter == filters_.end()) {
-        iter = filters_.emplace(filters_.end(), scannerId, btifBleScanner_);
+        iter = filters_.emplace(filters_.end(), scannerId, btBleScanner_);
     } else {
         HILOGE("Already config filter scannerId :%{public}d", scannerId);
         return Bluetooth::BT_ERR_BLE_SCAN_ALREADY_STARTED;
@@ -549,8 +549,8 @@ int32_t BleCentralManagerImpl::ConfigScanFilter(int32_t scannerId, const BleScan
     }
 
     // Enable scan filter if not
-    if (!scanFilterEnabled_.load() && btifBleScanner_) {
-        btifBleScanner_->ScanFilterEnable(true,
+    if (!scanFilterEnabled_.load() && btBleScanner_) {
+        btBleScanner_->ScanFilterEnable(true,
             [this](uint8_t action, uint8_t btmStatus) {
                 HILOGI("ScanFilterEnable: action: %{public}u, btmStatus: %{public}u", action, btmStatus);
                 scanFilterEnabled_ = true;

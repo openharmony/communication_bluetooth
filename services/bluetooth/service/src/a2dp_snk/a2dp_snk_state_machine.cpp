@@ -250,7 +250,7 @@ bool A2dpSnkDisconnectedState::Dispatch(const utility::Message &msg)
     auto *svc = stateMachine_.GetService();
     switch (event.what_) {
         case A2DP_SNK_CONN_CONNECT_EVT:
-            // 本地发起连接：native connect 是异步投递到 btif 线程，成功后转 Connecting 等待栈回调。
+            // 本地发起连接：native connect 是异步投递到蓝牙栈线程，成功后转 Connecting 等待栈回调。
             // 入队失败（极端场景）停留 Disconnected，避免 20s 超时白等。
             if (svc && svc->NativeConnect(RawAddress(event.addr_))) {
                 Transition(A2dpSnkStateMachine::CONNECTING);

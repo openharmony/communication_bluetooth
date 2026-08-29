@@ -14,12 +14,12 @@
  */
 
 /*
- * Stub of the removed stack layer btif config glue (btif_config.h).
+ * Stub of the removed stack layer config glue (bt_stack_config.h).
  */
 
-#ifndef BTIF_CONFIG_H
-#define BTIF_CONFIG_H
+#ifndef BT_STACK_CONFIG_H
+#define BT_STACK_CONFIG_H
 
 #include "bt_types.h"
 
-#endif  // BTIF_CONFIG_H
+#endif  // BT_STACK_CONFIG_H

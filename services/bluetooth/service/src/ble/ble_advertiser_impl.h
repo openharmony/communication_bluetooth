@@ -24,7 +24,7 @@
 
 #include "base_def.h"
 #include "ble_defs.h"
-#include "btif_gatt.h"
+#include "bt_ble_interface.h"
 #include "interface_adapter_ble.h"
 #include "bluetooth_resource_manager.h"
 
@@ -238,8 +238,8 @@ private:
 
     void RemoveAdvHandle(uint8_t advHandle)
     {
-        if (btifBleAdvertiser_) {
-            btifBleAdvertiser_->Unregister(advHandle);
+        if (btBleAdvertiser_) {
+            btBleAdvertiser_->Unregister(advHandle);
         }
         advInstances_.Erase(advHandle);
     }
@@ -252,7 +252,7 @@ private:
     // Advertising callback
     IBleAdvertiserCallback *callback_ = nullptr;
     IAdapterBle *bleAdapter_ = nullptr;
-    BleAdvertiserInterface* btifBleAdvertiser_ = nullptr;
+    BleAdvertiserInterface* btBleAdvertiser_ = nullptr;
 
     BT_DISALLOW_COPY_AND_ASSIGN(BleAdvertiserImpl);
 };

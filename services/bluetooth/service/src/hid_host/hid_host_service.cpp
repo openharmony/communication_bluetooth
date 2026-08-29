@@ -29,7 +29,7 @@
 #include "hitrace_meter.h"
 #include "control_intercept_plugin.h"
 #include "ipc_skeleton.h"
-#include "btif_common.h"  // do_in_jni_thread
+#include "bt_common.h"  // do_in_jni_thread
 #include "bluetooth_common_event_helper.h"
 
 namespace OHOS {

@@ -23,7 +23,7 @@
 #include "base_def.h"
 #include "ble_defs.h"
 #include "ble_scan_filter.h"
-#include "btif_gatt.h"
+#include "bt_ble_interface.h"
 #include "interface_adapter_ble.h"
 #include "hw_bt_hwif.h"
 #include "bluetooth_resource_manager.h"
@@ -185,7 +185,7 @@ private:
     int AppendScanFilterInner(int32_t scannerId, const BleScanSettingsImpl &settings,
         const std::vector<BleScanFilterImpl> &filters);
     IBleCentralManagerCallback *callback_ = nullptr;
-    BleScannerInterface *btifBleScanner_ = nullptr;
+    BleScannerInterface *btBleScanner_ = nullptr;
     const BthwifInterface *bthwInterface_ = nullptr;
     // scan status
     std::atomic_int status_ {SCAN_NOT_STARTED};

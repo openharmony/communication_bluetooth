@@ -20,7 +20,7 @@
 #include <string>
 
 #include "base_def.h"
-#include "btif_gatt.h"
+#include "bt_ble_interface.h"
 #include "class_creator.h"
 #include "context.h"
 #include "gatt_data.h"

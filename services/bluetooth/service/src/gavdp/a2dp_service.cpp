@@ -570,7 +570,7 @@ void A2dpService::EnableService()
         sBluetoothA2dpSrcInterface = reinterpret_cast<BtavSourceInterface*>(
             const_cast<void *>(bt_interface->getProfileInterface(BT_PROFILE_ADVANCED_AUDIO_ID)));
         if (sBluetoothA2dpSrcInterface == nullptr) {
-            // Open stack DM has not exported A2DP btif glue yet; still report enable so
+            // Open stack DM has not exported A2DP glue yet; still report enable so
             // classic adapter can reach STATE_ON without null-calling init().
             HILOGW("A2DP source profile unavailable, skip stack init");
             GetContext()->OnEnable(name_, true);

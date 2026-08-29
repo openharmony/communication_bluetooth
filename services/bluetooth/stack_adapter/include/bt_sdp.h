@@ -14,11 +14,11 @@
  */
 
 /*
- * Stub of the removed stack layer btif sdp glue (btif_sdp.h).
+ * Stub of the removed stack layer SDP glue (bt_sdp.h).
  */
 
-#ifndef BTIF_SDP_H
-#define BTIF_SDP_H
+#ifndef BT_SDP_H
+#define BT_SDP_H
 
 #include "bt_types.h"
 
@@ -132,4 +132,4 @@ struct BtsdpInterface {
     BtStackStatus (*removeSdpRecord)(int sdpHandle);
 };
 
-#endif  // BTIF_SDP_H
+#endif  // BT_SDP_H

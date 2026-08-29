@@ -347,8 +347,8 @@ void BluetoothConnectionManager::OnGetConnReasonEchoRsp(const std::string &addre
             const BthwifInterface *bluetoothHwSrcInterface = BluetoothHwInterface::GetInstance()->GetBtHwInterface();
             CHECK_AND_RETURN_LOG(bluetoothHwSrcInterface != nullptr, "interface nullptr");
             OHOS::bluetooth::RawAddress dstAddr(address);
-            bluetoothHwSrcInterface->hwBtifHfpQueueRemove(dstAddr);
-            bluetoothHwSrcInterface->hwBtifA2dpQueueRemove(dstAddr);
+            bluetoothHwSrcInterface->hwBtHfpQueueRemove(dstAddr);
+            bluetoothHwSrcInterface->hwBtA2dpQueueRemove(dstAddr);
             bluetoothHwSrcInterface->hwBtsndHcicDisconnect(dstAddr);
         }
     } else {

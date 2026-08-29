@@ -32,7 +32,7 @@
 #include "interface_adapter_ble.h"
 #include "interface_adapter_manager.h"
 #include "ipc_skeleton.h"
-#include "btif_common.h"
+#include "bt_common.h"
 #include "bluetooth_common_event_helper.h"
 #include "bluetooth_connection_manager.h"
 #include "profile_config.h"

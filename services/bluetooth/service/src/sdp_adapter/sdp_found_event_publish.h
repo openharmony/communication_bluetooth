@@ -16,7 +16,7 @@
 #ifndef SDP_FOUND_EVENT_PUBLISH_H
 #define SDP_FOUND_EVENT_PUBLISH_H
 #include <cstdint>
-#include "btif_sdp.h"
+#include "bt_sdp.h"
 
 namespace OHOS {
 namespace bluetooth {

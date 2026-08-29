@@ -15,11 +15,11 @@
 
 /*
  * Stub of the removed stack layer A2DP audio render interface
- * (btif/a2dp_audio_render_interface.h).
+ * (bt_a2dp_audio_render_interface.h).
  */
 
-#ifndef BTIF_A2DP_AUDIO_RENDER_INTERFACE_H
-#define BTIF_A2DP_AUDIO_RENDER_INTERFACE_H
+#ifndef BT_A2DP_AUDIO_RENDER_INTERFACE_H
+#define BT_A2DP_AUDIO_RENDER_INTERFACE_H
 
 #include <cstddef>
 #include <cstdint>
@@ -56,4 +56,4 @@ struct BtavA2dpAudioRenderInterface {
     int (*writeData)(uint8_t *buffer, size_t size);
 };
 
-#endif  // BTIF_A2DP_AUDIO_RENDER_INTERFACE_H
+#endif  // BT_A2DP_AUDIO_RENDER_INTERFACE_H

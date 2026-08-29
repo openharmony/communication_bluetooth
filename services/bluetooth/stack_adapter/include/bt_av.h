@@ -110,7 +110,7 @@ struct BtavA2dpCodecConfig {
     uint64_t codecSpecific4;
 };
 
-/* A2DP source callbacks (bluedroid system/btif/include/btif_av.h). */
+/* A2DP source callbacks. */
 typedef void (*BtavConnectionStateCallback)(const OHOS::bluetooth::RawAddress &bdAddr, BtavConnectionState state);
 typedef void (*BtavAudioStateCallback)(const OHOS::bluetooth::RawAddress &bdAddr, BtavAudioState state);
 typedef void (*BtavAudioSourceConfigCallback)(const OHOS::bluetooth::RawAddress &bdAddr, BtavA2dpCodecConfig codecConfig,
@@ -118,9 +118,8 @@ typedef void (*BtavAudioSourceConfigCallback)(const OHOS::bluetooth::RawAddress 
     std::vector<BtavA2dpCodecConfig> codecsSelectableCapabilities);
 typedef bool (*BtavMandatoryCodecPreferredCallback)(const OHOS::bluetooth::RawAddress &bdAddr);
 
-/* Audio configuration callback of the A2DP sink profile (bluedroid
- * system/btif/include/btif_av.h); sampleRate in Hz, channelCount 1 for
- * mono and 2 for stereo. */
+/* Audio configuration callback of the A2DP sink profile; sampleRate in Hz,
+ * channelCount 1 for mono and 2 for stereo. */
 typedef void (*BtavAudioSinkConfigCallback)(const OHOS::bluetooth::RawAddress &bdAddr, uint32_t sampleRate,
     uint8_t channelCount);
 
@@ -132,8 +131,7 @@ struct BtavSourceCallbacks {
     BtavMandatoryCodecPreferredCallback mandatoryCodecPreferredCb;
 };
 
-/* A2DP source interface consumed by the service layer (a2dp_service.cpp);
- * bluedroid reference is system/btif/include/btif_av.h. */
+/* A2DP source interface consumed by the service layer (a2dp_service.cpp). */
 struct BtavSourceInterface {
     size_t size;
     BtStackStatus (*init)(BtavSourceCallbacks *callbacks, int maxConnectedAudioDevices,
@@ -147,8 +145,8 @@ struct BtavSourceInterface {
 };
 
 /* A2DP sink callbacks and interface consumed by the service layer
- * (native_a2dp_adapter.cpp); the interface members mirror the bluedroid
- * btif_av_sink_* entry points (system/btif/include/btif_av.h). */
+ * (native_a2dp_adapter.cpp); the interface members mirror the removed stack
+ * layer av sink entry points. */
 struct BtavSinkCallbacks {
     size_t size;
     BtavConnectionStateCallback connectionStateCb;

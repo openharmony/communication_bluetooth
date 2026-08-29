@@ -24,7 +24,7 @@
 #include "datetime_ex.h"
 #include "ipc_skeleton.h"
 #include "log.h"
-#include "btif_sock.h"
+#include "bt_sock.h"
 #include "service_util.h"
 #include "hal_util.h"
 #include "bluetooth_hw_interface.h"
@@ -349,7 +349,7 @@ int SocketService::Listen(const std::string &name, const Uuid &uuid, int securit
 
 void SocketService::ShutDownInternal()
 {
-    BtifSockCleanup();
+    BtSockCleanup();
     GetContext()->OnDisable(PROFILE_NAME_SPP, true);
     // Clear all resources
     if (serviceObservers.empty()) {

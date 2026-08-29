@@ -26,7 +26,7 @@
 #include "base_def.h"
 #include "ble_defs.h"
 #include "ble_service_data.h"
-#include "btif_gatt.h"
+#include "bt_ble_interface.h"
 #include "bluetooth_hw_interface.h"
 
 namespace OHOS {
@@ -126,7 +126,7 @@ private:
     uint16_t GetOnFoundCount(uint8_t sensitivityMode) const;
 
     int scannerId_ = 0;
-    BleScannerInterface *btifBleScanner_ = nullptr;
+    BleScannerInterface *btBleScanner_ = nullptr;
     std::mutex filterIndexsMutex_ {};
     std::set<int> filterIndexSet_ {};
     SafeMap<int, BleScanFilterImpl> filterImpl_;

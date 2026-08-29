@@ -14,17 +14,17 @@
  */
 
 /*
- * Stub of the removed stack layer btif storage glue (btif_storage.h).
+ * Stub of the removed stack layer storage glue (bt_storage.h).
  */
 
-#ifndef BTIF_STORAGE_H
-#define BTIF_STORAGE_H
+#ifndef BT_STORAGE_H
+#define BT_STORAGE_H
 
 #include <cstdint>
 
 #include "bt_types.h"
 
-inline int BtifStorageGetRemoteAddrType(const OHOS::bluetooth::RawAddress *remoteBdAddr, uint8_t *addrType)
+inline int BtStorageGetRemoteAddrType(const OHOS::bluetooth::RawAddress *remoteBdAddr, uint8_t *addrType)
 {
     if (addrType != nullptr) {
         *addrType = BLE_ADDR_PUBLIC;
@@ -32,4 +32,4 @@ inline int BtifStorageGetRemoteAddrType(const OHOS::bluetooth::RawAddress *remot
     return 0;
 }
 
-#endif  // BTIF_STORAGE_H
+#endif  // BT_STORAGE_H

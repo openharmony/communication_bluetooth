@@ -46,8 +46,8 @@ constexpr const char *SETTINGS_DATASHARE_KEY_COLLABORATION_SWITCH =
     "settings.collaboration.multi_device_collaboration_service_switch";
 
 constexpr const char *SETTINGS_DATASHARE_URI_DEFAULT_DEVICE_NAME =
-    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=settings.general.deviceName";
-constexpr const char *SETTINGS_DATASHARE_KEY_DEFAULT_DEVICE_NAME = "settings.general.deviceName";
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=settings.general.device_name";
+constexpr const char *SETTINGS_DATASHARE_KEY_DEFAULT_DEVICE_NAME = "settings.general.device_name";
 
 class BluetoothObserver : public AAFwk::DataAbilityObserverStub {
 public:

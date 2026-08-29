@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "btif_config.h"
+#include "bt_stack_config.h"
 #include "bt_chr_ue_manager.h"
 #include "common_util.h"
 #include "gatt_api.h"

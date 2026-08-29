@@ -23,7 +23,7 @@
 
 #include "adapter_config.h"
 #include "ble/ble_defs.h"
-#include "btif_gatt.h"
+#include "bt_ble_interface.h"
 #include "bt_chr_ue_manager.h"
 #include "gatt_api.h"
 #include "gatt_data.h"

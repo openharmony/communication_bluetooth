@@ -32,7 +32,7 @@
 #include <unordered_map>
 #include "bluetooth.h"
 #include "hal_util.h"
-#include "btif_config.h"
+#include "bt_stack_config.h"
 #include "preferences.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"

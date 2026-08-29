@@ -31,8 +31,8 @@
 #include "ble_central_manager_impl.h"
 #include "ble_defs.h"
 #include "bt_types.h"
-#include "btif_config.h"
-#include "btif_storage.h"
+#include "bt_stack_config.h"
+#include "bt_storage.h"
 #include "class_creator.h"
 #include "bluetooth_connection_manager.h"
 #include "compat.h"
@@ -297,7 +297,7 @@ int BleAdapter::GetPeerDeviceAddrType(const RawAddress &device) const
 
     auto remoteAddr = device;
     uint8_t remoteAddrType;
-    if (BtifStorageGetRemoteAddrType(&remoteAddr, &remoteAddrType) == BT_STATUS_SUCCESS) {
+    if (BtStorageGetRemoteAddrType(&remoteAddr, &remoteAddrType) == BT_STATUS_SUCCESS) {
         ret = ServiceUtil::AddrTypeFromStack(remoteAddrType);
     }
 

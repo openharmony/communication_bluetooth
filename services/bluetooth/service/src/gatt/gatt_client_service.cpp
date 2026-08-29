@@ -27,8 +27,8 @@
 #include <set>
 
 #include "bt_chr_ue_manager.h"
-#include "btif_config.h"
-#include "btif_gatt.h"
+#include "bt_stack_config.h"
+#include "bt_ble_interface.h"
 #include "class_creator.h"
 #include "gatt_client_application.h"
 #include "gatt_service_base.h"
@@ -671,7 +671,7 @@ std::vector<GattDevice> GattClientService::GetAllDevice()
 
             for (auto iter = pimpl->clients.begin(); iter != pimpl->clients.end(); iter++) {
                 uint8_t addrType;
-                BtifGetAddressType((*iter)->GetAddress(), &addrType);
+                BtGetAddressType((*iter)->GetAddress(), &addrType);
                 set.emplace((*iter)->GetAddress(), ServiceUtil::AddrTypeFromStack(addrType),
                     (*iter)->GetTransport(), (*iter)->GetConnState());
             }
