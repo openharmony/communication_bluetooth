@@ -347,8 +347,7 @@ napi_value NapiSppServer::SppCloseServerSocket(napi_env env, napi_callback_info 
         if (client->client_) {
             client->client_->Close();
             NapiSppClient::clientMap.erase(id);
-            NAPI_BT_RETURN_IF(napi_release_threadsafe_function(client->sppReadThreadSafeFunc_, napi_tsfn_abort),
-                "inner error", nullptr);
+            napi_release_threadsafe_function(client->sppReadThreadSafeFunc_, napi_tsfn_abort);
         }
     } else {
         HILOGE("no such key in clientMap.");
