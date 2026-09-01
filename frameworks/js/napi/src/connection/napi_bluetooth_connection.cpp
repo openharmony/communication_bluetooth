@@ -428,7 +428,7 @@ napi_value GetCarKeyDfxData(napi_env env, napi_callback_info info)
     HILOGD("enter");
     //since 26.0.0
     std::vector<int32_t> validErrCodes = {
-        BT_ERR_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
+        BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_INVALID_PARAM, BT_ERR_API_NOT_SUPPORT,
         BT_ERR_INVALID_STATE, BT_ERR_INTERNAL_ERROR
     };
     NAPI_BT_CONTEXT(env, "connection.GetCarKeyDfxData", validErrCodes);
@@ -1272,6 +1272,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
     napi_value deviceChargeStateObject = DeviceChargeStateInit(env);
     napi_value hashAlgorithmTypeObject = HashAlgorithmTypeInit(env);
     napi_value aclStateObject = AclStateInit(env);
+    napi_value carKeyActionTypeObject = CarKeyActionTypeInit(env);
     napi_property_descriptor exportProperties[] = {
         DECLARE_NAPI_PROPERTY("ScanMode", scanModeObj),
         DECLARE_NAPI_PROPERTY("BondState", bondStateObj),
@@ -1285,6 +1286,7 @@ napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("DeviceChargeState", deviceChargeStateObject),
         DECLARE_NAPI_PROPERTY("HashAlgorithmType", hashAlgorithmTypeObject),
         DECLARE_NAPI_PROPERTY("AclState", aclStateObject),
+        DECLARE_NAPI_PROPERTY("CarKeyActionType", carKeyActionTypeObject),
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
     napi_define_properties(env, exports, sizeof(exportProperties) / sizeof(*exportProperties), exportProperties);
@@ -1459,6 +1461,18 @@ napi_value AclStateInit(napi_env env)
     SetNamedPropertyByInteger(env, aclState, static_cast<int32_t>(AclConnectionState::STATE_DISCONNECTED),
         "STATE_DISCONNECTED");
     return aclState;
+}
+
+napi_value CarKeyActionTypeInit(napi_env env)
+{
+    HILOGD("enter");
+    napi_value carKeyActionType = nullptr;
+    napi_create_object(env, &carKeyActionType);
+    SetNamedPropertyByInteger(env, carKeyActionType,
+        static_cast<int32_t>(CarKeyActionType::CAR_KEY_ACTION_ADD), "CAR_KEY_ACTION_ADD");
+    SetNamedPropertyByInteger(env, carKeyActionType,
+        static_cast<int32_t>(CarKeyActionType::CAR_KEY_ACTION_DELETE), "CAR_KEY_ACTION_DELETE");
+    return carKeyActionType;
 }
 
 void RegisterObserverToHost()
