@@ -1010,6 +1010,17 @@ public:
      * @since 26
      */
     int32_t VerifyMultiPermissions(bool systemHapNeeded, const std::set<std::string> &permissions);
+
+    /**
+     * @brief Get the BR/EDR address of a dual-mode device by its BLE address after pairing.
+     *
+     * @param bleAddr BLE address of the device.
+     * @param[out] brAddr BR/EDR address of the device.
+     * @return Returns {@link BT_NO_ERROR} if the operation is successfully;
+     *         returns an error code defined in {@link BtErrCode} otherwise.
+     * @since 26
+     */
+    int GetBrAddressByBleAddress(const std::string &bleAddr, std::string &brAddr);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.
