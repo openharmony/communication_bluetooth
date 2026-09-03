@@ -18,6 +18,9 @@
 
 #include "bluetooth_log.h"
 #include "napi_bluetooth_a2dp_src.h"
+#ifdef BLUETOOTH_A2DP_SINK_FEATURE_ENABLE
+#include "napi_bluetooth_a2dp_snk.h"
+#endif
 #include "hitrace_meter.h"
 
 namespace OHOS {
@@ -35,6 +38,9 @@ static napi_value Init(napi_env env, napi_value exports)
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 
     NapiA2dpSource::DefineA2dpSourceJSClass(env, exports);
+#ifdef BLUETOOTH_A2DP_SINK_FEATURE_ENABLE
+    NapiA2dpSink::DefineA2dpSinkJSClass(env, exports);
+#endif
 
     HILOGD("-----a2dp Init end------");
     return exports;

@@ -73,7 +73,7 @@ static napi_value Init(napi_env env, napi_value exports)
     NapiConstant::DefineJSConstant(env, exports);
 
     BluetoothHostInit(env, exports);
-    NapiA2dpSink::DefineA2dpSinkJSClass(env);
+    NapiA2dpSink::DefineA2dpSinkJSClass(env, exports);
     NapiA2dpSource::DefineA2dpSourceJSClass(env, exports);
     NapiAvrcpController::DefineAvrcpControllerJSClass(env);
     NapiAvrcpTarget::DefineAvrcpTargetJSClass(env);
