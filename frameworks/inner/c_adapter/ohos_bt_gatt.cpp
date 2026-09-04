@@ -443,6 +443,10 @@ int BleStopAdv(int advId)
     std::function stopAdvFunc = [advId]() {
         HILOGD("stop adv in adv_Queue thread, advId = %{public}d", advId);
         lock_guard<ffrt::mutex> lock(g_advMutex);
+        if (g_BleAdvertiser == nullptr || g_bleAdvCallbacks[advId] == nullptr) {
+            HILOGE("stopAdvFunc fail, advertiser or callback is null, advId: %{public}d", advId);
+            return;
+        }
         int ret = g_BleAdvertiser->StopAdvertising(g_bleAdvCallbacks[advId]);
         if (ret != BT_NO_ERROR) {
             HILOGE("fail, advId: %{public}d, ret: %{public}d", advId, ret);
