@@ -185,6 +185,22 @@ public:
     ~NapiNativeBleConnectionStateChangeParam() override = default;
 };
 
+/**
+ * Phonebook sync state change parameters: only carries deviceId and a
+ * PhoneBookSyncStateType value (already mapped from service-side state).
+ */
+class NapiNativeSyncStateChangeParam : public NapiNativeObject {
+public:
+    NapiNativeSyncStateChangeParam(std::string deviceAddr, int syncState)
+        : deviceAddr_(std::move(deviceAddr)), syncState_(syncState) {}
+    ~NapiNativeSyncStateChangeParam() override = default;
+
+    napi_value ToNapiValue(napi_env env) const override;
+private:
+    std::string deviceAddr_ = "";
+    int syncState_ = -1;
+};
+
 class NapiNativeGattsCharacterReadRequest : public NapiNativeObject {
 public:
     NapiNativeGattsCharacterReadRequest(int transId, std::string deviceAddr, GattCharacteristic &character)

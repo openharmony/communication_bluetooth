@@ -120,6 +120,14 @@ if (bluetooth_bas_feature) {
   ]
 }
 
+if (bluetooth_pbap_pce_feature) {
+  FwkSrc += [ "src/bluetooth_pbap_pce.cpp" ]
+  FwkIpcSrc += [
+    "$BT_IPCSRC_DIR/bluetooth_pbap_pce_observer_stub.cpp",
+    "$BT_IPCSRC_DIR/bluetooth_pbap_pce_proxy.cpp",
+  ]
+}
+
 config("btframework_config") {
   cflags_cc = [
     "-fPIC",
@@ -147,6 +155,9 @@ config("btframework_config") {
 
   if (bluetooth_bas_feature) {
     defines += [ "BLUETOOTH_BAS_FEATURE_ENABLE" ]
+  }
+  if (bluetooth_pbap_pce_feature) {
+    defines += [ "BLUETOOTH_PBAP_PCE_FEATURE_ENABLE" ]
   }
 }
 
