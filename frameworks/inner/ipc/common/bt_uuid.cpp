@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,9 @@
 
 #include <sys/time.h>
 #include <algorithm>
+#include <charconv>
 #include <cstdlib>
+#include <system_error>
 #include "array"
 #include "securec.h"
 #include <cstdlib>
@@ -27,6 +29,22 @@
 
 namespace OHOS {
 namespace bluetooth {
+namespace {
+bool ParseUuidHexByte(const std::string &hex, uint8_t &outValue)
+{
+    if (hex.size() != static_cast<std::size_t>(Uuid::SIZE_STRING_TO_INT)) {
+        return false;
+    }
+    uint8_t value = 0;
+    auto result = std::from_chars(hex.data(), hex.data() + hex.size(), value, Uuid::UUID128_BYTES_TYPE);
+    if ((result.ec != std::errc()) || (result.ptr != hex.data() + hex.size())) {
+        return false;
+    }
+    outValue = value;
+    return true;
+}
+}
+
 Uuid Uuid::Random()
 {
     Uuid random;
@@ -91,7 +109,15 @@ Uuid Uuid::ConvertFromString(const std::string &name)
     }
 
     for (std::size_t i = 0; (i + 1) < tmp.length(); i += SIZE_STRING_TO_INT) {
-        ret.uuid_[i / SIZE_STRING_TO_INT] = std::stoi(tmp.substr(i, SIZE_STRING_TO_INT), nullptr, UUID128_BYTES_TYPE);
+        std::size_t index = i / SIZE_STRING_TO_INT;
+        if (index >= static_cast<std::size_t>(UUID128_BYTES_TYPE)) {
+            break;
+        }
+        uint8_t byte = 0;
+        if (!ParseUuidHexByte(tmp.substr(i, SIZE_STRING_TO_INT), byte)) {
+            return Uuid();
+        }
+        ret.uuid_[index] = byte;
     }
 
     return ret;
