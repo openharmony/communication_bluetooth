@@ -143,7 +143,7 @@ napi_value NapiBas::OnBatteryChange(napi_env env, napi_callback_info info)
 #ifdef BLUETOOTH_BAS_FEATURE_ENABLE
     auto status = g_basObserver->eventSubscribe_.RegisterWithName(env, info,
         STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE);
-    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     std::map<std::string, int32_t> batteryInfos;
     int32_t ret = BluetoothBasHost::GetProfile()->GetConnectedDeviceBatteryInfos(batteryInfos);
     if (ret != BT_NO_ERROR) {
@@ -174,7 +174,7 @@ napi_value NapiBas::OffBatteryChange(napi_env env, napi_callback_info info)
 #ifdef BLUETOOTH_BAS_FEATURE_ENABLE
     auto status = g_basObserver->eventSubscribe_.DeregisterWithName(env, info,
         STR_BT_BAS_CALLBACK_BATTERY_LEVEL_CHANGE);
-    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, status == napi_ok, BT_ERR_INTERNAL_ERROR);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, status == napi_ok, BT_ERR_INVALID_PARAM);
 #else
     NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, false, BT_ERR_API_NOT_SUPPORT);
 #endif
