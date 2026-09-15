@@ -25,7 +25,7 @@ namespace Bluetooth {
 class NapiA2dpSink {
 public:
 
-    static void DefineA2dpSinkJSClass(napi_env env);
+    static void DefineA2dpSinkJSClass(napi_env env, napi_value exports);
     static napi_value A2dpSinkConstructor(napi_env env, napi_callback_info info);
 
     static napi_value On(napi_env env, napi_callback_info info);
@@ -37,8 +37,12 @@ public:
     static napi_value Connect(napi_env env, napi_callback_info info);
     static napi_value Disconnect(napi_env env, napi_callback_info info);
 
+    static napi_value DefineCreateProfile(napi_env env, napi_value exports);
+    static napi_value CreateA2dpSnkProfile(napi_env env, napi_callback_info info);
+
     static std::shared_ptr<NapiA2dpSinkObserver> observer_;
     static bool isRegistered_;
+    static napi_ref g_napiProfile;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

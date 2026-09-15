@@ -29,15 +29,17 @@ using namespace std;
 
 std::shared_ptr<NapiA2dpSinkObserver> NapiA2dpSink::observer_ = std::make_shared<NapiA2dpSinkObserver>();
 bool NapiA2dpSink::isRegistered_ = false;
+napi_ref NapiA2dpSink::g_napiProfile = nullptr;
 
-void NapiA2dpSink::DefineA2dpSinkJSClass(napi_env env)
+void NapiA2dpSink::DefineA2dpSinkJSClass(napi_env env, napi_value exports)
 {
     napi_value constructor;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
-        DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
+        DECLARE_NAPI_FUNCTION("getConnectedDevices", GetConnectionDevices),
         DECLARE_NAPI_FUNCTION("getDeviceState", GetDeviceState),
+        DECLARE_NAPI_FUNCTION("getConnectionState", GetDeviceState),
         DECLARE_NAPI_FUNCTION("getPlayingState", getPlayingState),
         DECLARE_NAPI_FUNCTION("connect", Connect),
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
@@ -45,9 +47,32 @@ void NapiA2dpSink::DefineA2dpSinkJSClass(napi_env env)
 
     napi_define_class(env, "A2dpSink", NAPI_AUTO_LENGTH, A2dpSinkConstructor, nullptr,
         sizeof(properties) / sizeof(properties[0]), properties, &constructor);
+#ifdef BLUETOOTH_API_SINCE_10
+    DefineCreateProfile(env, exports);
+    napi_create_reference(env, constructor, 1, &g_napiProfile);
+#else
     napi_value napiProfile;
     napi_new_instance(env, constructor, 0, nullptr, &napiProfile);
     NapiProfile::SetProfile(env, ProfileId::PROFILE_A2DP_SINK, napiProfile);
+#endif
+}
+
+napi_value NapiA2dpSink::DefineCreateProfile(napi_env env, napi_value exports)
+{
+    napi_property_descriptor properties[] = {
+        DECLARE_NAPI_FUNCTION("createA2dpSnkProfile", CreateA2dpSnkProfile),
+    };
+    napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties);
+    return exports;
+}
+
+napi_value NapiA2dpSink::CreateA2dpSnkProfile(napi_env env, napi_callback_info info)
+{
+    napi_value profile;
+    napi_value constructor = nullptr;
+    napi_get_reference_value(env, g_napiProfile, &constructor);
+    napi_new_instance(env, constructor, 0, nullptr, &profile);
+    return profile;
 }
 
 napi_value NapiA2dpSink::A2dpSinkConstructor(napi_env env, napi_callback_info info)

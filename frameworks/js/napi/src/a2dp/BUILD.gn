@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 BT_PART_DIR = "../../../../.."
 BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
@@ -65,6 +66,15 @@ ohos_shared_library("a2dp") {
     "$BT_NAPI_DIR/src/a2dp/napi_bluetooth_a2dp_src_observer.cpp",
     "$BT_NAPI_DIR/src/a2dp/native_module_a2dp.cpp",
   ]
+  if (bluetooth_a2dp_sink_feature_switch) {
+    sources += [
+      "$BT_NAPI_DIR/src/napi_bluetooth_a2dp_snk.cpp",
+      "$BT_NAPI_DIR/src/napi_bluetooth_a2dp_snk_observer.cpp",
+    ]
+    defines += [
+      "BLUETOOTH_A2DP_SINK_FEATURE_ENABLE"
+    ]
+  }
 
   deps = [
     "$BT_PART_DIR/frameworks/inner:btframework",

@@ -71,6 +71,7 @@ taihe_shared_library("bluetoothA2dp_taihe_native") {
     "src/ani_constructor.cpp",
     "src/ohos.bluetooth.a2dp.impl.cpp",
     "src/taihe_bluetooth_a2dp_src_observer.cpp",
+    "src/taihe_bluetooth_a2dp_snk_observer.cpp",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_bluetooth_error.cpp",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_bluetooth_utils.cpp",
     "$SUBSYSTEM_DIR/bluetooth/frameworks/ets/taihe/common/taihe_event_module.cpp"

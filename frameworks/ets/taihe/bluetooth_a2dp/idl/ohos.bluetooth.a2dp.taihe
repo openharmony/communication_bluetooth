@@ -113,3 +113,27 @@ struct CodecInfo {
 }
 
 function CreateA2dpSrcProfile(): A2dpSourceProfile;
+
+interface A2dpSinkProfile : BaseProfile {
+    @!sts_inject_into_class("""on(type: string, callback: object): void{
+        if (type === "connectionStateChange") {
+            this.onConnectionStateChange(callback as (info: baseProfile.StateChangeParam) => void);
+        }
+    }
+    """)
+
+    @!sts_inject_into_class("""off(type: string, callback?: object): void{
+        if (type === "connectionStateChange") {
+            this.offConnectionStateChange(callback as ((info: baseProfile.StateChangeParam) => void) | undefined);
+        }
+    }
+    """)
+
+    Connect(deviceId: String): void;
+
+    Disconnect(deviceId: String): void;
+
+    GetPlayingState(deviceId: String): PlayingState;
+}
+
+function CreateA2dpSnkProfile(): A2dpSinkProfile;

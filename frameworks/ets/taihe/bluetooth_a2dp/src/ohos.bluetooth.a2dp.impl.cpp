@@ -22,10 +22,12 @@
 #include "taihe/runtime.hpp"
 #include "stdexcept"
 #include "bluetooth_a2dp_src.h"
+#include "bluetooth_a2dp_snk.h"
 #include "bluetooth_avrcp_tg.h"
 #include "bluetooth_errorcode.h"
 #include "bluetooth_log.h"
 #include "taihe_bluetooth_a2dp_src_observer.h"
+#include "taihe_bluetooth_a2dp_snk_observer.h"
 #include "taihe_bluetooth_utils.h"
 
 namespace OHOS {
@@ -332,10 +334,151 @@ private:
     // as the parameters in the constructor of the actual implementation class.
     return taihe::make_holder<A2dpSourceProfileImpl, ohos::bluetooth::a2dp::A2dpSourceProfile>();
 }
+
+class A2dpSinkProfileImpl {
+public:
+    A2dpSinkProfileImpl()
+    {
+        observer_ = std::make_shared<TaiheA2dpSinkObserver>();
+    }
+
+    void OnConnectionStateChange(::taihe::callback_view<void(
+        ::ohos::bluetooth::baseProfile::StateChangeParam const& data)> callback)
+    {
+        if (observer_) {
+            observer_->eventSubscribe_.RegisterEvent(callback);
+        }
+        if (!isRegistered_) {
+            A2dpSink *profile = A2dpSink::GetProfile();
+            profile->RegisterObserver(observer_);
+            isRegistered_ = true;
+        }
+    }
+
+    void OffConnectionStateChange(::taihe::optional_view<::taihe::callback<void(
+        ::ohos::bluetooth::baseProfile::StateChangeParam const& data)>> callback)
+    {
+        if (observer_) {
+            observer_->eventSubscribe_.DeregisterEvent(callback);
+        }
+    }
+
+    void Connect(taihe::string_view deviceId)
+    {
+        HILOGD("start");
+        std::string remoteAddr = static_cast<std::string>(deviceId);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
+
+        A2dpSink *profile = A2dpSink::GetProfile();
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        bool ret = profile->Connect(remoteDevice);
+        HILOGI("ret: %{public}d", ret);
+    }
+
+    void Disconnect(taihe::string_view deviceId)
+    {
+        HILOGD("start");
+        std::string remoteAddr = static_cast<std::string>(deviceId);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
+
+        A2dpSink *profile = A2dpSink::GetProfile();
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        bool ret = profile->Disconnect(remoteDevice);
+        HILOGI("ret: %{public}d", ret);
+    }
+
+    ohos::bluetooth::a2dp::PlayingState GetPlayingState(taihe::string_view deviceId)
+    {
+        HILOGD("start");
+        std::string remoteAddr = static_cast<std::string>(deviceId);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM, ohos::bluetooth::a2dp::PlayingState::from_value(0));
+        
+        int state = 0;
+        A2dpSink *profile = A2dpSink::GetProfile();
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        int32_t errorCode = profile->GetPlayingState(remoteDevice, state);
+        HILOGI("errorCode: %{public}d, state: %{public}d", errorCode, state);
+        TAIHE_BT_ASSERT_RETURN(errorCode == BT_NO_ERROR, errorCode,
+            ohos::bluetooth::a2dp::PlayingState::from_value(state));
+        return ohos::bluetooth::a2dp::PlayingState::from_value(state);
+    }
+
+    ohos::bluetooth::constant::ProfileConnectionState GetConnectionState(taihe::string_view deviceId)
+    {
+        HILOGD("enter");
+        std::string remoteAddr = std::string(deviceId);
+        A2dpSink *profile = A2dpSink::GetProfile();
+        BluetoothRemoteDevice device(remoteAddr, BT_TRANSPORT_BREDR);
+        int btConnectState = profile->GetDeviceState(device);
+        int status = TaiheUtils::GetProfileConnectionState(btConnectState);
+        HILOGD("status: %{public}d", status);
+        return ohos::bluetooth::constant::ProfileConnectionState::from_value(status);
+    }
+
+    taihe::array<taihe::string> GetConnectedDevices()
+    {
+        HILOGI("enter");
+        A2dpSink *profile = A2dpSink::GetProfile();
+        std::vector<int> states;
+        states.push_back(1);
+        std::vector<BluetoothRemoteDevice> devices = profile->GetDevicesByStates(states);
+
+        std::vector<std::string> deviceVector;
+        for (auto &device : devices) {
+            deviceVector.push_back(device.GetDeviceAddr());
+        }
+
+        return deviceVector.empty() ? taihe::array<taihe::string>{}
+            : taihe::array<taihe::string>(taihe::copy_data_t{}, deviceVector.data(), deviceVector.size());
+    }
+
+    ohos::bluetooth::baseProfile::ConnectionStrategy GetConnectionStrategySync(taihe::string_view deviceId)
+    {
+        HILOGD("start");
+        std::string remoteAddr = std::string(deviceId);
+        bool checkRet = CheckDeviceIdParam(remoteAddr);
+        TAIHE_BT_ASSERT_RETURN(checkRet, BT_ERR_INVALID_PARAM,
+            ohos::bluetooth::baseProfile::ConnectionStrategy::from_value(0));
+
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        A2dpSink *profile = A2dpSink::GetProfile();
+        int strategy = profile->GetConnectStrategy(remoteDevice);
+        HILOGD("strategy: %{public}d", strategy);
+        return ohos::bluetooth::baseProfile::ConnectionStrategy::from_value(strategy);
+    }
+
+    void SetConnectionStrategySync(taihe::string_view deviceId,
+        ohos::bluetooth::baseProfile::ConnectionStrategy strategy)
+    {
+        HILOGD("start");
+        std::string remoteAddr = std::string(deviceId);
+        int32_t connStrategy = strategy.get_value();
+        bool checkRet = CheckSetConnectStrategyParam(remoteAddr, connStrategy);
+        TAIHE_BT_ASSERT_RETURN_VOID(checkRet, BT_ERR_INVALID_PARAM);
+
+        BluetoothRemoteDevice remoteDevice(remoteAddr, BT_TRANSPORT_BREDR);
+        A2dpSink *profile = A2dpSink::GetProfile();
+        bool ret = profile->SetConnectStrategy(remoteDevice, connStrategy);
+        HILOGI("ret: %{public}d", ret);
+    }
+
+private:
+    std::shared_ptr<TaiheA2dpSinkObserver> observer_ = nullptr;
+    bool isRegistered_ = false;
+};
+
+::ohos::bluetooth::a2dp::A2dpSinkProfile CreateA2dpSnkProfile()
+{
+    return taihe::make_holder<A2dpSinkProfileImpl, ohos::bluetooth::a2dp::A2dpSinkProfile>();
+}
 }  // namespace Bluetooth
 }  // namespace OHOS
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
 TH_EXPORT_CPP_API_CreateA2dpSrcProfile(OHOS::Bluetooth::CreateA2dpSrcProfile);
+TH_EXPORT_CPP_API_CreateA2dpSnkProfile(OHOS::Bluetooth::CreateA2dpSnkProfile);
 // NOLINTEND
