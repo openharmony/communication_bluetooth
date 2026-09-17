@@ -424,6 +424,11 @@ int GattClientService::Connect(int appId, bool autoConnect)
             return GattStatus::GATT_FAILURE;
         }
     }
+    if (IAdapterManager::GetInstance()->IsBleOnlyMode() && !isAllowed &&
+        !IAdapterManager::GetInstance()->IsBleAccessible(callingname)) {
+        HILOGW("BLE_ONLY mode, refuse gatt connect from non-owner app");
+        return GattStatus::GATT_FAILURE;
+    }
 
     std::string pkgName = Bluetooth::PermissionManager::GetCallingName();
     int uid = OHOS::IPCSkeleton::GetCallingUid();

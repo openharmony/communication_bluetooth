@@ -37,6 +37,7 @@
 #include "bluetooth_common_event_helper.h"
 #include "bluetooth_connection_manager.h"
 #include "bluetooth_device_battery_manager.h"
+#include "bluetooth_switch_state_machine.h"
 #include "common/bluetooth_hw_interface.h"
 #ifdef BLUETOOTH_HIGHPOWERV1_ENABLE
 #include "bluetooth_highpower_manager.h"
@@ -715,6 +716,7 @@ void AdapterManager::Initialize() const
 #ifndef BLUETOOTH_FACTORY_MODE
     // 自动开蓝牙 - 重启场景
     const int bluetoothStateHalf = 2;
+    BluetoothSwitchStateMachine::GetInstance().InitFromProperty();
     int lastBtState = GetIntParameter(g_bluetoothSwitchStatePropertyName, 0);
     if (lastBtState == bluetoothStateHalf) {
         pimpl->isRestrictBluetooth = true;
@@ -1341,8 +1343,10 @@ void AdapterManager::OnAdapterStateChange(const BTTransport transport, const BTS
     }
 
     bool isBrOnInRestrictedMode = IsBluetoothRestricted() && (transport == ADAPTER_BREDR) && state == STATE_TURN_ON;
-    bool isNeedReportBrOff = ret && isBrOnInRestrictedMode;
-    bool isNeedReportStateChange = ret && !isBrOnInRestrictedMode;
+    bool isBrOnInBleOnlyMode = IsBleOnlyMode() && (transport == ADAPTER_BREDR) && state == STATE_TURN_ON;
+    // Both restricted(half) and BLE-only modes hide the real BR-on state from apps.
+    bool isNeedReportBrOff = ret && (isBrOnInRestrictedMode || isBrOnInBleOnlyMode);
+    bool isNeedReportStateChange = ret && !isBrOnInRestrictedMode && !isBrOnInBleOnlyMode;
     if (isNeedReportStateChange) {
         if (GetSysState() != SYS_STATE_RESETTING) {
             BluetoothHelper::BluetoothCommonEventHelper::PublishBluetoothStateChangeEvent(state, transport);
@@ -1356,7 +1360,11 @@ void AdapterManager::OnAdapterStateChange(const BTTransport transport, const BTS
     if (isNeedReportBrOff) {
         BluetoothHelper::BluetoothCommonEventHelper::PublishBluetoothStateChangeEvent(STATE_TURN_OFF, ADAPTER_BLE);
         NotifyAdapterStateChange(pimpl->adapterObservers_, ADAPTER_BREDR, STATE_TURN_OFF);
-        NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_HALF);
+        if (isBrOnInBleOnlyMode) {
+            NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_BLE_ONLY);
+        } else {
+            NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_HALF);
+        }
         BtChrUeManager::GetInstance()->WriteBtSwitchChangeUe(
             ADAPTER_BREDR, UE_COMMON_SCENE_CASE2, UE_COMMON_SCENE_CASE0, "", 0);
     }
@@ -1369,7 +1377,7 @@ void AdapterManager::OnAdapterStateChange(const BTTransport transport, const BTS
     msg.arg1_ = (static_cast<unsigned int>(classicState) << CLASSIC_ENABLE_STATE_BIT) + bleState;
     DoInAdapterManagerThread([this, msg] {this->pimpl->sysStateMachine_.ProcessMessage(msg);});
     UnLoadBluetoothSystemAbility(transport, state);
-    if (transport == ADAPTER_BREDR && state == STATE_TURN_ON) {
+    if (transport == ADAPTER_BREDR && state == STATE_TURN_ON && !IsBleOnlyMode()) {
         ExecuteTaskWhenBluetoothOn();
     }
 }
@@ -1429,6 +1437,7 @@ void AdapterManager::UnLoadBluetoothSystemAbility(const BTTransport transport, c
 #else
     HILOGI("Bluetooth cannot be disabled!");
 #endif
+    BluetoothSwitchStateMachine::GetInstance().SyncState(BluetoothSwitchState::STATE_OFF);
     // Unblock framework BluetoothSwitchModule: without STATE_OFF, isBtSwitchProcessing_
     // stays true and a later UI enable is only cached then dropped on timeout.
     NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_OFF);
@@ -1720,10 +1729,14 @@ bool AdapterManager::IsFactoryReset() const
 void AdapterManager::SetBluetoothRestrictedFlag(bool isBluetoothRestricted) const
 {
     pimpl->isRestrictBluetooth = isBluetoothRestricted;
-    if (isBluetoothRestricted) {
-        SetParameter(g_bluetoothSwitchStatePropertyName, BLUETOOTH_SWITCH_STATE_HALF);
-    } else {
-        SetParameter(g_bluetoothSwitchStatePropertyName, g_bluetoothSwitchStateOn);
+    auto &stateMachine = BluetoothSwitchStateMachine::GetInstance();
+    BluetoothSwitchState target = isBluetoothRestricted ? BluetoothSwitchState::STATE_HALF
+                                                        : BluetoothSwitchState::STATE_ON;
+    if (stateMachine.TransitionTo(target) != BT_NO_ERROR) {
+        // keep legacy behavior: persist even when the transition table rejects it
+        stateMachine.SyncState(target);
+        SetParameter(g_bluetoothSwitchStatePropertyName,
+            BluetoothSwitchStateMachine::SwitchStateToPropertyValue(target));
     }
     return;
 }
@@ -1732,6 +1745,11 @@ void AdapterManager::SetBluetoothRestrictedFlagOnly(bool isBluetoothRestricted) 
 {
     HILOGI("SetBluetoothRestrictedFlagOnly isBluetoothRestricted=%{public}d", isBluetoothRestricted);
     pimpl->isRestrictBluetooth = isBluetoothRestricted;
+    if (!isBluetoothRestricted) {
+        // disable path clears any special switch mode in memory;
+        // the persisted property is written to "0" when both stacks are off
+        BluetoothSwitchStateMachine::GetInstance().SyncState(BluetoothSwitchState::STATE_OFF);
+    }
 }
 
 BTStateID AdapterManager::GetRestrictedState(BTTransport transport) const
@@ -1908,6 +1926,68 @@ int32_t AdapterManager::EnableBluetoothToRestrictMode(std::string callingName,
         SetBluetoothRestrictedFlag(true);
     }
     return ret;
+}
+
+int32_t AdapterManager::EnableBluetoothToBleOnlyMode(std::string callingName, bool isUserTriggered)
+{
+    if (system::GetBoolParameter("persist.edm.force_enable_bluetooth", false)) {
+        HILOGI("Forcibly enable Bluetooth.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    pimpl->WaitAdapterManagerInitializeComplete();
+    // Both BLE and BR stacks follow the normal full-enable path
+    // (BLE enable auto brings up BREDR); the BLE-only state only changes
+    // what is reported to and allowed for apps.
+    int32_t ret = Enable(ADAPTER_BLE, false, callingName, isUserTriggered);
+    if (ret == BT_NO_ERROR) {
+        ret = BluetoothSwitchStateMachine::GetInstance().EnterBleOnlyMode(callingName);
+        if (ret != BT_NO_ERROR) {
+            HILOGE("EnterBleOnlyMode failed, ret=%{public}d", ret);
+        } else if (GetState(BTTransport::ADAPTER_BREDR) == BTStateID::STATE_TURN_ON) {
+            // stacks are already up: no adapter state change will fire,
+            // notify the switch state directly
+            NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_BLE_ONLY);
+        }
+    }
+    return ret;
+}
+
+int32_t AdapterManager::EnableBluetoothFromBleOnlyMode(std::string callingName) const
+{
+    callingName = pimpl->AttemptReplaceThirdpartyAppName(callingName);
+    HILOGI("Enable Bluetooth from ble only mode, calling by (%{public}s)", callingName.c_str());
+    int32_t ret = BluetoothSwitchStateMachine::GetInstance().TransitionTo(BluetoothSwitchState::STATE_ON);
+    if (ret != BT_NO_ERROR) {
+        return ret;
+    }
+    if (GetState(BTTransport::ADAPTER_BREDR) != BTStateID::STATE_TURN_ON) {
+        HILOGW("BR stack is not on yet, just clear ble only state");
+        return BT_NO_ERROR;
+    }
+    // Broadcast br on
+    BluetoothHelper::BluetoothCommonEventHelper::PublishBluetoothStateChangeEvent(STATE_TURN_ON, ADAPTER_BREDR);
+    NotifyAdapterStateChange(pimpl->adapterObservers_, ADAPTER_BREDR, STATE_TURN_ON);
+    NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_ON);
+    pimpl->classicAdapter_->instance->SetBtScanMode(BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE, BT_SCAN_DURATION_MS);
+    PostAutoConnectTask(AUTO_CONNECT_DELAY_MS);
+    BluetoothConnectionManager::GetInstance()->CheckNeedReportConnectedDevice();
+    return BT_NO_ERROR;
+}
+
+bool AdapterManager::IsBleOnlyMode() const
+{
+    return BluetoothSwitchStateMachine::GetInstance().IsBleOnlyMode();
+}
+
+bool AdapterManager::IsBleAccessible(const std::string &callingName) const
+{
+    return PermissionManager::IsSystemHap() ||
+        BluetoothSwitchStateMachine::GetInstance().IsOwnerAccessible(callingName);
+}
+
+bool AdapterManager::IsBrAllowed() const
+{
+    return BluetoothSwitchStateMachine::GetInstance().IsBrAllowed();
 }
 
 void AdapterManager::SaveConnectionTime(const RawAddress &device)

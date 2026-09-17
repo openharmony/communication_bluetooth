@@ -385,6 +385,12 @@ public:
         bool isUserTriggered = false) const override;
     int32_t EnableBluetoothToRestrictMode(std::string callingName = "",
         bool isUserTriggered = false) override;
+    int32_t EnableBluetoothToBleOnlyMode(std::string callingName = "",
+        bool isUserTriggered = false) override;
+    int32_t EnableBluetoothFromBleOnlyMode(std::string callingName = "") const override;
+    bool IsBleOnlyMode() const override;
+    bool IsBleAccessible(const std::string &callingName) const override;
+    bool IsBrAllowed() const override;
     bool IsBetaVersion() const;
     void EnableHisiPcm(bool state) const;
     bool IsCollaborationModeOn(void) const;

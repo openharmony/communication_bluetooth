@@ -475,6 +475,18 @@ public:
     int EnableBluetoothToRestrictMode(std::string name = "");
 
     /**
+     * @brief Enable bluetooth to BLE-only mode.
+     *
+     * Both BLE and BR stacks are enabled underneath, but only BLE functions are
+     * allowed and only the app which enables bluetooth (the owner) can use BLE.
+     *
+     * @param name Indicate the calling application to enable bluetooth. The default value is current application.
+     * @return Returns BT_NO_ERROR if the operation is accepted;
+     *         returns others if the operation is rejected.
+     */
+    int EnableBluetoothToBleOnlyMode(std::string name = "");
+
+    /**
      * @brief Get br/edr enable/disable state.
      *
      * @return Returns <b>true</b> if br is enabled;

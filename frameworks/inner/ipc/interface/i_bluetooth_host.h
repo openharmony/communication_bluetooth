@@ -149,6 +149,7 @@ public:
     virtual int32_t SetFastScanLevel(int level) = 0;
     virtual void UpdateVirtualDevice(int32_t action, const std::string &address) = 0;
     virtual int32_t EnableBluetoothToRestrictMode(const std::string &callingName) = 0;
+    virtual int32_t EnableBluetoothToBleOnlyMode(const std::string &callingName) = 0;
     virtual int32_t ControlDeviceAction(const std::string &deviceId, uint32_t controlType,
         uint32_t controlTypeVal, uint32_t controlObject) = 0;
     virtual int32_t GetLastConnectionTime(const std::string &address, int64_t &connectionTime) = 0;

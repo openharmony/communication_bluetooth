@@ -1439,6 +1439,14 @@ int32_t BluetoothHostServer::GetBtState(int32_t &state)
     if (IAdapterManager::GetInstance()->IsBluetoothRestricted()) {
         brState = IAdapterManager::GetInstance()->GetRestrictedState(bluetooth::BTTransport::ADAPTER_BREDR);
         bleState = IAdapterManager::GetInstance()->GetRestrictedState(bluetooth::BTTransport::ADAPTER_BLE);
+    } else if (IAdapterManager::GetInstance()->IsBleOnlyMode()) {
+        // BLE_ONLY mode: BR is never usable; BLE is visible only to the owner app.
+        brState = BTStateID::STATE_TURN_OFF;
+        bleState = IAdapterManager::GetInstance()->GetState(bluetooth::BTTransport::ADAPTER_BLE);
+        if (bleState == BTStateID::STATE_TURN_ON &&
+            !IAdapterManager::GetInstance()->IsBleAccessible(PermissionManager::GetCallingName())) {
+            bleState = BTStateID::STATE_TURN_OFF;
+        }
     } else {
         brState = IAdapterManager::GetInstance()->GetState(bluetooth::BTTransport::ADAPTER_BREDR);
         bleState = IAdapterManager::GetInstance()->GetState(bluetooth::BTTransport::ADAPTER_BLE);
@@ -1569,6 +1577,10 @@ int32_t BluetoothHostServer::EnableBle(bool noAutoConnect, bool isAsync, const s
     // If is in restricted mode, just change to br on.
     if (IAdapterManager::GetInstance()->IsBluetoothRestricted()) {
         return IAdapterManager::GetInstance()->EnablebluetoothFromRestricted(realCallingName, isAsync, true);
+    }
+    // If is in BLE-only mode, upgrade to full-on; both stacks are already up.
+    if (IAdapterManager::GetInstance()->IsBleOnlyMode()) {
+        return IAdapterManager::GetInstance()->EnableBluetoothFromBleOnlyMode(realCallingName);
     }
 
     return IAdapterManager::GetInstance()->Enable(BTTransport::ADAPTER_BLE, isAsync, realCallingName, true);
@@ -2605,6 +2617,34 @@ int32_t BluetoothHostServer::EnableBluetoothToRestrictMode(const std::string &ca
     auto adapterManager = IAdapterManager::GetInstance();
     if (adapterManager) {
         return adapterManager->EnableBluetoothToRestrictMode(realCallingName, true);
+    }
+    return BT_ERR_INTERNAL_ERROR;
+}
+
+int32_t BluetoothHostServer::EnableBluetoothToBleOnlyMode(const std::string &callingName)
+{
+    // bluetooth switch action may has been transferred to fusion connectivity
+    std::string realCallingName = (callingName == "" ? PermissionManager::GetCallingName() : callingName);
+#ifdef FUSION_CONNECTIVITY_SUPPORTED
+    do {
+        if (!IsBluetoothSwitchAllowed()) {
+            std::lock_guard<std::mutex> lock(pimpl->fusionConnectivityObserverMutex_);
+            if (!pimpl->fusionConnectivityObserver_) {
+                HILOGW("fusionConnectivityObserver_ is nullptr, Attempt enable bluetooth directly");
+                break;
+            }
+            pimpl->fusionConnectivityObserver_->OnBluetoothSwitchAction(
+                TRANS_ACTION_ENABLE_BLUETOOTH_TO_BLE_ONLY_MODE, realCallingName);
+            HILOGI("%{public}s enable bluetooth to ble only mode is transferred", realCallingName.c_str());
+            return BT_ERR_SWITCH_OP_TRANSFERRED;
+        }
+    } while (0);
+#endif
+
+    HILOGI("enable bluetooth to ble only mode, calling by (%{public}s)", realCallingName.c_str());
+    auto adapterManager = IAdapterManager::GetInstance();
+    if (adapterManager) {
+        return adapterManager->EnableBluetoothToBleOnlyMode(realCallingName, true);
     }
     return BT_ERR_INTERNAL_ERROR;
 }

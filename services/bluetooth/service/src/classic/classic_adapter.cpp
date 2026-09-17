@@ -374,7 +374,8 @@ bool ClassicAdapter::SetFastScanLevel(int level)
 bool ClassicAdapter::SetBtScanMode(int mode, int duration)
 {
     StopBtScanModeTimer();
-    if (AdapterManager::GetInstance()->IsBluetoothRestricted()) {
+    if (AdapterManager::GetInstance()->IsBluetoothRestricted() ||
+        !AdapterManager::GetInstance()->IsBrAllowed()) {
         HILOGE("[ClassicAdapter]RestrictBluetooth state, refuse StartBtDiscovery");
         return false;
     }
@@ -461,7 +462,8 @@ int32_t ClassicAdapter::StartBtDiscovery()
     const BtInterface *btInterface = nullptr;
     std::string callingName = PermissionManager::GetCallingName();
 
-    if (AdapterManager::GetInstance()->IsBluetoothRestricted()) {
+    if (AdapterManager::GetInstance()->IsBluetoothRestricted() ||
+        !AdapterManager::GetInstance()->IsBrAllowed()) {
         HILOGE("[ClassicAdapter]RestrictBluetooth state, refuse StartBtDiscovery");
         return BT_ERR_RESTRICT_STATE;
     }
@@ -741,7 +743,8 @@ bool ClassicAdapter::StartPair(int32_t transport, const RawAddress &device, cons
         return false;
     }
     CHECK_AND_RETURN_LOG_RET(
-        !AdapterManager::GetInstance()->IsBluetoothRestricted(), false, "RestrictBluetooth state, refuse pair device");
+        !AdapterManager::GetInstance()->IsBluetoothRestricted() &&
+        AdapterManager::GetInstance()->IsBrAllowed(), false, "RestrictBluetooth state, refuse pair device");
     const BtInterface *btInterface = nullptr;
     if (hal_util_load_bt_library(&btInterface)) {
         HILOGE("[ClassicAdapter] Failed to open the Bluetooth module");

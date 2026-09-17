@@ -397,6 +397,11 @@ int BluetoothBleAdvertiserServer::StartAdvertising(const BluetoothBleAdvertiserS
     std::string callingName = PermissionManager::GetCallingName();
     std::string logKey = "(StartAdvertising)callingName:" + callingName;
     HILOGI_ACCUMULATE(logKey, "interval:%d, advHandle:%u", settings.GetInterval(), advHandle);
+    if (IAdapterManager::GetInstance()->IsBleOnlyMode() &&
+        !IAdapterManager::GetInstance()->IsBleAccessible(callingName)) {
+        HILOGW("BLE_ONLY mode, refuse ble advertising from non-owner app(%{public}s)", callingName.c_str());
+        return BT_ERR_INVALID_STATE;
+    }
     auto bleService = IAdapterManager::GetInstance()->GetBleAdapterInterface();
     if (bleService != nullptr) {
         BleAdvertiserSettingsImpl implSettings = pimpl->CovertImplSettingDataInner(callingName, settings);

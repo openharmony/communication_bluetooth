@@ -75,6 +75,7 @@ ServiceCommonSrc = [
   "src/common/switch_dependency.cpp",
   "src/common/satellite_manager.cpp",
   "src/common/bluetooth_state_manager.cpp",
+  "src/common/bluetooth_switch_state_machine.cpp",
   "src/common/cloud_device_manager.cpp",
   "src/common/system_ability_processer.cpp",
   "src/common/bluetooth_hw_interface_hook.cpp",

@@ -1962,12 +1962,14 @@ enum BluetoothSwitchState {
     STATE_ON,
     STATE_OFF,
     STATE_HALF,
+    STATE_BLE_ONLY,  // BLE only: both stacks are on, BLE is available only to the owner app
 };
 
 enum BluetoothTransferredSwitchAction {
     TRANS_ACTION_ENABLE_BLUETOOTH = 0,
     TRANS_ACTION_DISABLE_BLUETOOTH,
     TRANS_ACTION_ENABLE_BLUETOOTH_TO_RESTRICT_MODE,
+    TRANS_ACTION_ENABLE_BLUETOOTH_TO_BLE_ONLY_MODE,
 };
 
 enum ControlType {
