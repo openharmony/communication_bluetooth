@@ -86,6 +86,14 @@ stateDiagram-v2
 `AdapterManager::EnableBluetoothToHalfAppRegisteredMode` 在发起开栈动作前预检查当前状态必须为
 OFF 或 HALF_APP_REGISTERED（重入刷新 owner），否则直接返回 `BT_ERR_INVALID_STATE`，避免"栈已开始拉起但状态置入被拒"的不一致。
 
+完成事件（V2 通知）的对齐说明：
+
+- 常规路径：BR 栈开启完成回调 `OnAdapterStateChange` 拦截后发 `STATE_HALF_APP_REGISTERED`；
+- 同态重入（HALF_APP_REGISTERED → 自身）：栈已在运行、无状态回调，由
+  `EnableBluetoothToHalfAppRegisteredMode` 直接补发 V2，防止 framework 开关动作等超时；
+- 降级 HALF_APP_REGISTERED → HALF：同理，由 `EnableBluetoothToRestrictMode` 直接补发 V2
+  `STATE_HALF`。
+
 ## 3. 关键时序图
 
 ### 3.1 进入 HALF_APP_REGISTERED（从全关）

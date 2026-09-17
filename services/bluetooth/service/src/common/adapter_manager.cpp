@@ -1921,9 +1921,16 @@ int32_t AdapterManager::EnableBluetoothToRestrictMode(std::string callingName,
         return BT_ERR_INTERNAL_ERROR;
     }
     pimpl->WaitAdapterManagerInitializeComplete();
+    bool isDegradedFromRegistered = BluetoothSwitchStateMachine::GetInstance()
+        .GetSwitchState() == BluetoothSwitchState::STATE_HALF_APP_REGISTERED;
     int32_t ret = Enable(ADAPTER_BLE, false, callingName, isUserTriggered);
     if (ret == BT_NO_ERROR) {
         SetBluetoothRestrictedFlag(true);
+        if (isDegradedFromRegistered) {
+            // stacks are already up: no adapter state change will fire,
+            // notify the switch state directly to unblock the framework switch module
+            NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_HALF);
+        }
     }
     return ret;
 }
@@ -1951,6 +1958,11 @@ int32_t AdapterManager::EnableBluetoothToHalfAppRegisteredMode(std::string calli
         ret = BluetoothSwitchStateMachine::GetInstance().EnterHalfAppRegisteredMode(callingName);
         if (ret != BT_NO_ERROR) {
             HILOGE("EnterHalfAppRegisteredMode failed, ret=%{public}d", ret);
+        } else if (current == BluetoothSwitchState::STATE_HALF_APP_REGISTERED) {
+            // idempotent re-entry: stacks are already up, deliver the completion
+            // event directly so the framework switch module does not wait for timeout
+            NotifyAdapterStateChangeV2(pimpl->adapterObservers_,
+                BluetoothSwitchState::STATE_HALF_APP_REGISTERED);
         }
     }
     return ret;
