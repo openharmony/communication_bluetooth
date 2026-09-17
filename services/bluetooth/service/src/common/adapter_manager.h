@@ -385,10 +385,10 @@ public:
         bool isUserTriggered = false) const override;
     int32_t EnableBluetoothToRestrictMode(std::string callingName = "",
         bool isUserTriggered = false) override;
-    int32_t EnableBluetoothToBleOnlyMode(std::string callingName = "",
+    int32_t EnableBluetoothToHalfAppRegisteredMode(std::string callingName = "",
         bool isUserTriggered = false) override;
-    int32_t EnableBluetoothFromBleOnlyMode(std::string callingName = "") const override;
-    bool IsBleOnlyMode() const override;
+    int32_t EnableBluetoothFromHalfAppRegisteredMode(std::string callingName = "") const override;
+    bool IsHalfAppRegisteredMode() const override;
     bool IsBleAccessible(const std::string &callingName) const override;
     bool IsBrAllowed() const override;
     bool IsBetaVersion() const;

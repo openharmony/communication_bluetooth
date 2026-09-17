@@ -117,7 +117,7 @@ private:
     int32_t SetFastScanLevelInner(MessageParcel &data, MessageParcel &reply);
     int32_t UpdateVirtualDeviceInner(MessageParcel &data, MessageParcel &reply);
     int32_t EnableBluetoothToRestrictModeInner(MessageParcel &data, MessageParcel &reply);
-    int32_t EnableBluetoothToBleOnlyModeInner(MessageParcel &data, MessageParcel &reply);
+    int32_t EnableBluetoothToHalfAppRegisteredModeInner(MessageParcel &data, MessageParcel &reply);
     int32_t ControlDeviceActionInner(MessageParcel &data, MessageParcel &reply);
     int32_t GetLastConnectionTimeInner(MessageParcel &data, MessageParcel &reply);
     int32_t UpdateCloudBluetoothDeviceInner(MessageParcel &data, MessageParcel &reply);

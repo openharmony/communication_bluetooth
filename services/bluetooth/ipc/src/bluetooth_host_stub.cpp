@@ -162,7 +162,7 @@ const std::map<uint32_t, BluetoothHostStub::BluetoothHostStubFuncPerm> Bluetooth
         CHECK_PERM(true, {}, {ACCESS_BLUETOOTH}))},
     {STUB_FUNC(BT_ENABLE_BLUETOOTH_TO_RESTRICT_MODE, EnableBluetoothToRestrictModeInner,
         CHECK_PERM(false, {}, {ACCESS_BLUETOOTH}))},
-    {STUB_FUNC(BT_ENABLE_BLUETOOTH_TO_BLE_ONLY_MODE, EnableBluetoothToBleOnlyModeInner,
+    {STUB_FUNC(BT_ENABLE_BLUETOOTH_TO_HALF_APP_REGISTERED_MODE, EnableBluetoothToHalfAppRegisteredModeInner,
         CHECK_PERM(false, {}, {ACCESS_BLUETOOTH}))},
     {STUB_FUNC(CTRL_DEVICE_ACTION, ControlDeviceActionInner,
         CHECK_PERM(true, {}, MULTI_PERM(ACCESS_BLUETOOTH, MANAGE_BLUETOOTH)))},
@@ -1575,10 +1575,10 @@ int32_t BluetoothHostStub::EnableBluetoothToRestrictModeInner(MessageParcel &dat
     return BT_NO_ERROR;
 }
 
-int32_t BluetoothHostStub::EnableBluetoothToBleOnlyModeInner(MessageParcel &data, MessageParcel &reply)
+int32_t BluetoothHostStub::EnableBluetoothToHalfAppRegisteredModeInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string callingName = data.ReadString();
-    int32_t result = EnableBluetoothToBleOnlyMode(callingName);
+    int32_t result = EnableBluetoothToHalfAppRegisteredMode(callingName);
     result = reply.WriteInt32(result);
     if (result != BT_NO_ERROR) {
         return BT_ERR_IPC_TRANS_FAILED;

@@ -37,7 +37,7 @@ public:
         // reset to a clean OFF state before each case
         BluetoothSwitchStateMachine::GetInstance().SyncState(BluetoothSwitchState::STATE_OFF);
         SetParameter("persist.bluetooth.switch_enable", "0");
-        SetParameter("persist.bluetooth.ble_only_owner", "");
+        SetParameter("persist.bluetooth.half_app_registered_owner", "");
     }
     void TearDown() {}
 };
@@ -55,7 +55,7 @@ HWTEST_F(BluetoothSwitchStateMachineTest, PropertyValueMapping, TestSize.Level1)
     EXPECT_STREQ(BluetoothSwitchStateMachine::SwitchStateToPropertyValue(
         BluetoothSwitchState::STATE_HALF), "2");
     EXPECT_STREQ(BluetoothSwitchStateMachine::SwitchStateToPropertyValue(
-        BluetoothSwitchState::STATE_BLE_ONLY), "3");
+        BluetoothSwitchState::STATE_HALF_APP_REGISTERED), "3");
 
     EXPECT_EQ(BluetoothSwitchStateMachine::PropertyValueToSwitchState("0"),
         BluetoothSwitchState::STATE_OFF);
@@ -64,7 +64,7 @@ HWTEST_F(BluetoothSwitchStateMachineTest, PropertyValueMapping, TestSize.Level1)
     EXPECT_EQ(BluetoothSwitchStateMachine::PropertyValueToSwitchState("2"),
         BluetoothSwitchState::STATE_HALF);
     EXPECT_EQ(BluetoothSwitchStateMachine::PropertyValueToSwitchState("3"),
-        BluetoothSwitchState::STATE_BLE_ONLY);
+        BluetoothSwitchState::STATE_HALF_APP_REGISTERED);
     EXPECT_EQ(BluetoothSwitchStateMachine::PropertyValueToSwitchState("invalid"),
         BluetoothSwitchState::STATE_OFF);
 }
@@ -76,22 +76,38 @@ HWTEST_F(BluetoothSwitchStateMachineTest, PropertyValueMapping, TestSize.Level1)
 HWTEST_F(BluetoothSwitchStateMachineTest, ValidTransitions, TestSize.Level1)
 {
     auto &sm = BluetoothSwitchStateMachine::GetInstance();
-    EXPECT_EQ(sm.TransitionTo(BluetoothSwitchState::STATE_ON), BT_NO_ERROR);
-    EXPECT_TRUE(sm.GetSwitchState() == BluetoothSwitchState::STATE_ON);
+    using S = BluetoothSwitchState;
 
-    EXPECT_EQ(sm.TransitionTo(BluetoothSwitchState::STATE_BLE_ONLY), BT_NO_ERROR);
-    EXPECT_TRUE(sm.IsBleOnlyMode());
-    EXPECT_FALSE(sm.IsBrAllowed());
+    // OFF -> ON -> OFF
+    EXPECT_EQ(sm.TransitionTo(S::STATE_ON), BT_NO_ERROR);
+    EXPECT_TRUE(sm.GetSwitchState() == S::STATE_ON);
+    EXPECT_EQ(sm.TransitionTo(S::STATE_OFF), BT_NO_ERROR);
 
-    EXPECT_EQ(sm.TransitionTo(BluetoothSwitchState::STATE_ON), BT_NO_ERROR);
-    EXPECT_TRUE(sm.IsBrAllowed());
-
-    EXPECT_EQ(sm.TransitionTo(BluetoothSwitchState::STATE_HALF), BT_NO_ERROR);
+    // OFF -> HALF -> ON -> OFF
+    EXPECT_EQ(sm.TransitionTo(S::STATE_HALF), BT_NO_ERROR);
     EXPECT_TRUE(sm.IsBluetoothRestricted());
+    EXPECT_EQ(sm.TransitionTo(S::STATE_ON), BT_NO_ERROR);
+    EXPECT_EQ(sm.TransitionTo(S::STATE_OFF), BT_NO_ERROR);
 
-    EXPECT_EQ(sm.TransitionTo(BluetoothSwitchState::STATE_BLE_ONLY), BT_NO_ERROR);
-    EXPECT_EQ(sm.TransitionTo(BluetoothSwitchState::STATE_OFF), BT_NO_ERROR);
-    EXPECT_TRUE(sm.GetSwitchState() == BluetoothSwitchState::STATE_OFF);
+    // OFF -> HALF -> OFF
+    EXPECT_EQ(sm.TransitionTo(S::STATE_HALF), BT_NO_ERROR);
+    EXPECT_EQ(sm.TransitionTo(S::STATE_OFF), BT_NO_ERROR);
+
+    // OFF -> HALF_APP_REGISTERED -> ON / HALF / OFF
+    EXPECT_EQ(sm.TransitionTo(S::STATE_HALF_APP_REGISTERED), BT_NO_ERROR);
+    EXPECT_TRUE(sm.IsHalfAppRegisteredMode());
+    EXPECT_FALSE(sm.IsBrAllowed());
+    EXPECT_EQ(sm.TransitionTo(S::STATE_ON), BT_NO_ERROR);
+    EXPECT_TRUE(sm.IsBrAllowed());
+    EXPECT_EQ(sm.TransitionTo(S::STATE_OFF), BT_NO_ERROR);
+
+    EXPECT_EQ(sm.TransitionTo(S::STATE_HALF_APP_REGISTERED), BT_NO_ERROR);
+    EXPECT_EQ(sm.TransitionTo(S::STATE_HALF), BT_NO_ERROR);
+    EXPECT_TRUE(sm.IsBluetoothRestricted());
+    EXPECT_EQ(sm.TransitionTo(S::STATE_OFF), BT_NO_ERROR);
+
+    EXPECT_EQ(sm.TransitionTo(S::STATE_HALF_APP_REGISTERED), BT_NO_ERROR);
+    EXPECT_EQ(sm.TransitionTo(S::STATE_OFF), BT_NO_ERROR);
 }
 
 /**
@@ -101,21 +117,35 @@ HWTEST_F(BluetoothSwitchStateMachineTest, ValidTransitions, TestSize.Level1)
 HWTEST_F(BluetoothSwitchStateMachineTest, InvalidTransitionRejected, TestSize.Level1)
 {
     auto &sm = BluetoothSwitchStateMachine::GetInstance();
+    using S = BluetoothSwitchState;
+
+    // ON -> HALF and ON -> HALF_APP_REGISTERED are forbidden
+    sm.SyncState(S::STATE_ON);
+    EXPECT_EQ(sm.TransitionTo(S::STATE_HALF), BT_ERR_INVALID_STATE);
+    EXPECT_EQ(sm.TransitionTo(S::STATE_HALF_APP_REGISTERED), BT_ERR_INVALID_STATE);
+    EXPECT_TRUE(sm.GetSwitchState() == S::STATE_ON);
+
+    // HALF -> HALF_APP_REGISTERED is forbidden
+    sm.SyncState(S::STATE_HALF);
+    EXPECT_EQ(sm.TransitionTo(S::STATE_HALF_APP_REGISTERED), BT_ERR_INVALID_STATE);
+    EXPECT_TRUE(sm.GetSwitchState() == S::STATE_HALF);
+
     // same-state transition is accepted as no-op
-    EXPECT_EQ(sm.TransitionTo(BluetoothSwitchState::STATE_OFF), BT_NO_ERROR);
-    // OFF -> OFF no change; all table transitions from OFF are valid, verify state intact
-    EXPECT_TRUE(sm.GetSwitchState() == BluetoothSwitchState::STATE_OFF);
+    EXPECT_EQ(sm.TransitionTo(S::STATE_HALF), BT_NO_ERROR);
+    EXPECT_TRUE(sm.GetSwitchState() == S::STATE_HALF);
+
+    sm.SyncState(S::STATE_OFF);
 }
 
 /**
- * @tc.name: EnterBleOnlyModeOwnerCheck
- * @tc.desc: entering BLE-only records the owner app and gates BLE access
+ * @tc.name: EnterHalfAppRegisteredModeOwnerCheck
+ * @tc.desc: entering half-app-registered records the owner app and gates BLE access
  */
-HWTEST_F(BluetoothSwitchStateMachineTest, EnterBleOnlyModeOwnerCheck, TestSize.Level1)
+HWTEST_F(BluetoothSwitchStateMachineTest, EnterHalfAppRegisteredModeOwnerCheck, TestSize.Level1)
 {
     auto &sm = BluetoothSwitchStateMachine::GetInstance();
-    EXPECT_EQ(sm.EnterBleOnlyMode("com.example.owner"), BT_NO_ERROR);
-    EXPECT_TRUE(sm.IsBleOnlyMode());
+    EXPECT_EQ(sm.EnterHalfAppRegisteredMode("com.example.owner"), BT_NO_ERROR);
+    EXPECT_TRUE(sm.IsHalfAppRegisteredMode());
     EXPECT_EQ(sm.GetOwnerName(), "com.example.owner");
 
     // owner allowed, other apps and empty name refused
@@ -123,7 +153,11 @@ HWTEST_F(BluetoothSwitchStateMachineTest, EnterBleOnlyModeOwnerCheck, TestSize.L
     EXPECT_FALSE(sm.IsOwnerAccessible("com.example.other"));
     EXPECT_FALSE(sm.IsOwnerAccessible(""));
 
-    // leaving BLE-only reopens access for everyone
+    // idempotent re-enter refreshes the owner
+    EXPECT_EQ(sm.EnterHalfAppRegisteredMode("com.example.owner2"), BT_NO_ERROR);
+    EXPECT_EQ(sm.GetOwnerName(), "com.example.owner2");
+
+    // leaving half-app-registered reopens access for everyone
     EXPECT_EQ(sm.TransitionTo(BluetoothSwitchState::STATE_ON), BT_NO_ERROR);
     EXPECT_TRUE(sm.IsOwnerAccessible("com.example.other"));
     EXPECT_EQ(sm.GetOwnerName(), "");
@@ -136,13 +170,13 @@ HWTEST_F(BluetoothSwitchStateMachineTest, EnterBleOnlyModeOwnerCheck, TestSize.L
 HWTEST_F(BluetoothSwitchStateMachineTest, RestoreFromProperty, TestSize.Level1)
 {
     auto &sm = BluetoothSwitchStateMachine::GetInstance();
-    EXPECT_EQ(sm.EnterBleOnlyMode("com.example.owner"), BT_NO_ERROR);
+    EXPECT_EQ(sm.EnterHalfAppRegisteredMode("com.example.owner"), BT_NO_ERROR);
 
     // simulate reboot: reset memory then restore from property
     sm.SyncState(BluetoothSwitchState::STATE_OFF);
-    EXPECT_FALSE(sm.IsBleOnlyMode());
+    EXPECT_FALSE(sm.IsHalfAppRegisteredMode());
     sm.InitFromProperty();
-    EXPECT_TRUE(sm.IsBleOnlyMode());
+    EXPECT_TRUE(sm.IsHalfAppRegisteredMode());
     EXPECT_EQ(sm.GetOwnerName(), "com.example.owner");
     EXPECT_FALSE(sm.IsBrAllowed());
 }
@@ -154,12 +188,12 @@ HWTEST_F(BluetoothSwitchStateMachineTest, RestoreFromProperty, TestSize.Level1)
 HWTEST_F(BluetoothSwitchStateMachineTest, SyncStateDoesNotPersist, TestSize.Level1)
 {
     auto &sm = BluetoothSwitchStateMachine::GetInstance();
-    EXPECT_EQ(sm.EnterBleOnlyMode("com.example.owner"), BT_NO_ERROR);
+    EXPECT_EQ(sm.EnterHalfAppRegisteredMode("com.example.owner"), BT_NO_ERROR);
     sm.SyncState(BluetoothSwitchState::STATE_ON);
     EXPECT_TRUE(sm.GetSwitchState() == BluetoothSwitchState::STATE_ON);
-    // property still holds "3", restore brings BLE-only back
+    // property still holds "3", restore brings half-app-registered back
     sm.InitFromProperty();
-    EXPECT_TRUE(sm.IsBleOnlyMode());
+    EXPECT_TRUE(sm.IsHalfAppRegisteredMode());
 }
 }  // namespace bluetooth
 }  // namespace OHOS

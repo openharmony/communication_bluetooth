@@ -171,8 +171,8 @@ public:
         if (state == bluetooth::BluetoothSwitchState::STATE_HALF) {
             host_.switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::BLUETOOTH_HALF);
         }
-        if (state == bluetooth::BluetoothSwitchState::STATE_BLE_ONLY) {
-            host_.switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::BLUETOOTH_BLE_ONLY);
+        if (state == bluetooth::BluetoothSwitchState::STATE_HALF_APP_REGISTERED) {
+            host_.switchModule_->ProcessBluetoothSwitchEvent(BluetoothSwitchEvent::BLUETOOTH_HALF_APP_REGISTERED);
         }
         host_.observers_.ForEach([state](std::shared_ptr<BluetoothHostObserver> observer) {
             observer->OnBluetoothStateChanged(state);
@@ -194,9 +194,9 @@ public:
             host_.switchModule_->ProcessBluetoothSwitchEvent(
                 BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_RESTRICE_MODE, callingName);
         }
-        if (action == bluetooth::TRANS_ACTION_ENABLE_BLUETOOTH_TO_BLE_ONLY_MODE) {
+        if (action == bluetooth::TRANS_ACTION_ENABLE_BLUETOOTH_TO_HALF_APP_REGISTERED) {
             host_.switchModule_->ProcessBluetoothSwitchEvent(
-                BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_BLE_ONLY_MODE, callingName);
+                BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_HALF_APP_REGISTERED, callingName);
         }
     }
 
@@ -595,7 +595,7 @@ public:
         return proxy->EnableBluetoothToRestrictMode(callingName);
     }
 
-    int EnableBluetoothToBleOnlyMode(std::string callingName) override
+    int EnableBluetoothToHalfAppRegisteredMode(std::string callingName) override
     {
         CHECK_AND_RETURN_LOG_RET(BluetoothHost::GetDefaultHost().IsBluetoothSupported(),
             BT_ERR_API_NOT_SUPPORT, "bluetooth is not supported!");
@@ -606,7 +606,7 @@ public:
 
         sptr<IBluetoothHost> proxy = GetRemoteProxy<IBluetoothHost>(BLUETOOTH_HOST);
         CHECK_AND_RETURN_LOG_RET(proxy != nullptr, BT_ERR_INTERNAL_ERROR, "proxy is nullptr");
-        return proxy->EnableBluetoothToBleOnlyMode(callingName);
+        return proxy->EnableBluetoothToHalfAppRegisteredMode(callingName);
     }
 };
 
@@ -967,13 +967,13 @@ int BluetoothHost::EnableBluetoothToRestrictMode(std::string name)
         BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_RESTRICE_MODE, name);
 }
 
-int BluetoothHost::EnableBluetoothToBleOnlyMode(std::string name)
+int BluetoothHost::EnableBluetoothToHalfAppRegisteredMode(std::string name)
 {
     HILOGI("enter");
     std::lock_guard<std::mutex> lock(pimpl->switchModuleMutex_);
     CHECK_AND_RETURN_LOG_RET(pimpl->switchModule_, BT_ERR_INTERNAL_ERROR, "switchModule is nullptr");
     return pimpl->switchModule_->ProcessBluetoothSwitchEvent(
-        BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_BLE_ONLY_MODE, name);
+        BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_HALF_APP_REGISTERED, name);
 }
 
 bool BluetoothHost::IsBrEnabled() const

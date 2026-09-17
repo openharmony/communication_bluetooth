@@ -1343,10 +1343,10 @@ void AdapterManager::OnAdapterStateChange(const BTTransport transport, const BTS
     }
 
     bool isBrOnInRestrictedMode = IsBluetoothRestricted() && (transport == ADAPTER_BREDR) && state == STATE_TURN_ON;
-    bool isBrOnInBleOnlyMode = IsBleOnlyMode() && (transport == ADAPTER_BREDR) && state == STATE_TURN_ON;
-    // Both restricted(half) and BLE-only modes hide the real BR-on state from apps.
-    bool isNeedReportBrOff = ret && (isBrOnInRestrictedMode || isBrOnInBleOnlyMode);
-    bool isNeedReportStateChange = ret && !isBrOnInRestrictedMode && !isBrOnInBleOnlyMode;
+    bool isBrOnInHalfAppRegisteredMode = IsHalfAppRegisteredMode() && (transport == ADAPTER_BREDR) && state == STATE_TURN_ON;
+    // Both restricted(half) and half-app-registered modes hide the real BR-on state from apps.
+    bool isNeedReportBrOff = ret && (isBrOnInRestrictedMode || isBrOnInHalfAppRegisteredMode);
+    bool isNeedReportStateChange = ret && !isBrOnInRestrictedMode && !isBrOnInHalfAppRegisteredMode;
     if (isNeedReportStateChange) {
         if (GetSysState() != SYS_STATE_RESETTING) {
             BluetoothHelper::BluetoothCommonEventHelper::PublishBluetoothStateChangeEvent(state, transport);
@@ -1360,8 +1360,8 @@ void AdapterManager::OnAdapterStateChange(const BTTransport transport, const BTS
     if (isNeedReportBrOff) {
         BluetoothHelper::BluetoothCommonEventHelper::PublishBluetoothStateChangeEvent(STATE_TURN_OFF, ADAPTER_BLE);
         NotifyAdapterStateChange(pimpl->adapterObservers_, ADAPTER_BREDR, STATE_TURN_OFF);
-        if (isBrOnInBleOnlyMode) {
-            NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_BLE_ONLY);
+        if (isBrOnInHalfAppRegisteredMode) {
+            NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_HALF_APP_REGISTERED);
         } else {
             NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_HALF);
         }
@@ -1377,7 +1377,7 @@ void AdapterManager::OnAdapterStateChange(const BTTransport transport, const BTS
     msg.arg1_ = (static_cast<unsigned int>(classicState) << CLASSIC_ENABLE_STATE_BIT) + bleState;
     DoInAdapterManagerThread([this, msg] {this->pimpl->sysStateMachine_.ProcessMessage(msg);});
     UnLoadBluetoothSystemAbility(transport, state);
-    if (transport == ADAPTER_BREDR && state == STATE_TURN_ON && !IsBleOnlyMode()) {
+    if (transport == ADAPTER_BREDR && state == STATE_TURN_ON && !IsHalfAppRegisteredMode()) {
         ExecuteTaskWhenBluetoothOn();
     }
 }
@@ -1928,40 +1928,44 @@ int32_t AdapterManager::EnableBluetoothToRestrictMode(std::string callingName,
     return ret;
 }
 
-int32_t AdapterManager::EnableBluetoothToBleOnlyMode(std::string callingName, bool isUserTriggered)
+int32_t AdapterManager::EnableBluetoothToHalfAppRegisteredMode(std::string callingName, bool isUserTriggered)
 {
     if (system::GetBoolParameter("persist.edm.force_enable_bluetooth", false)) {
         HILOGI("Forcibly enable Bluetooth.");
         return BT_ERR_INTERNAL_ERROR;
     }
     pimpl->WaitAdapterManagerInitializeComplete();
+    // Per the transition table this mode can only be entered from OFF
+    // (re-entry while already in the mode is an idempotent owner refresh).
+    auto current = BluetoothSwitchStateMachine::GetInstance().GetSwitchState();
+    if (current != BluetoothSwitchState::STATE_OFF &&
+        current != BluetoothSwitchState::STATE_HALF_APP_REGISTERED) {
+        HILOGE("switch state %{public}d cannot enter HALF_APP_REGISTERED mode", current);
+        return BT_ERR_INVALID_STATE;
+    }
     // Both BLE and BR stacks follow the normal full-enable path
-    // (BLE enable auto brings up BREDR); the BLE-only state only changes
-    // what is reported to and allowed for apps.
+    // (BLE enable auto brings up BREDR); the HALF_APP_REGISTERED state only
+    // changes what is reported to and allowed for apps.
     int32_t ret = Enable(ADAPTER_BLE, false, callingName, isUserTriggered);
     if (ret == BT_NO_ERROR) {
-        ret = BluetoothSwitchStateMachine::GetInstance().EnterBleOnlyMode(callingName);
+        ret = BluetoothSwitchStateMachine::GetInstance().EnterHalfAppRegisteredMode(callingName);
         if (ret != BT_NO_ERROR) {
-            HILOGE("EnterBleOnlyMode failed, ret=%{public}d", ret);
-        } else if (GetState(BTTransport::ADAPTER_BREDR) == BTStateID::STATE_TURN_ON) {
-            // stacks are already up: no adapter state change will fire,
-            // notify the switch state directly
-            NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_BLE_ONLY);
+            HILOGE("EnterHalfAppRegisteredMode failed, ret=%{public}d", ret);
         }
     }
     return ret;
 }
 
-int32_t AdapterManager::EnableBluetoothFromBleOnlyMode(std::string callingName) const
+int32_t AdapterManager::EnableBluetoothFromHalfAppRegisteredMode(std::string callingName) const
 {
     callingName = pimpl->AttemptReplaceThirdpartyAppName(callingName);
-    HILOGI("Enable Bluetooth from ble only mode, calling by (%{public}s)", callingName.c_str());
+    HILOGI("Enable Bluetooth from half-app-registered mode, calling by (%{public}s)", callingName.c_str());
     int32_t ret = BluetoothSwitchStateMachine::GetInstance().TransitionTo(BluetoothSwitchState::STATE_ON);
     if (ret != BT_NO_ERROR) {
         return ret;
     }
     if (GetState(BTTransport::ADAPTER_BREDR) != BTStateID::STATE_TURN_ON) {
-        HILOGW("BR stack is not on yet, just clear ble only state");
+        HILOGW("BR stack is not on yet, just clear half-app-registered state");
         return BT_NO_ERROR;
     }
     // Broadcast br on
@@ -1974,9 +1978,9 @@ int32_t AdapterManager::EnableBluetoothFromBleOnlyMode(std::string callingName) 
     return BT_NO_ERROR;
 }
 
-bool AdapterManager::IsBleOnlyMode() const
+bool AdapterManager::IsHalfAppRegisteredMode() const
 {
-    return BluetoothSwitchStateMachine::GetInstance().IsBleOnlyMode();
+    return BluetoothSwitchStateMachine::GetInstance().IsHalfAppRegisteredMode();
 }
 
 bool AdapterManager::IsBleAccessible(const std::string &callingName) const

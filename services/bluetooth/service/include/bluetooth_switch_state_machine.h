@@ -31,7 +31,7 @@ namespace bluetooth {
  *   STATE_ON       "1"  both BLE and BR stacks on, all functions available
  *   STATE_OFF      "0"  both stacks off
  *   STATE_HALF     "2"  restricted half-open: BLE on, BR stack hidden
- *   STATE_BLE_ONLY "3"  both stacks on underneath, but only BLE is allowed
+ *   STATE_HALF_APP_REGISTERED "3"  both stacks on underneath, but only BLE is allowed
  *                       and only the owner app (the app which enabled
  *                       bluetooth) can use BLE; BR functions are refused.
  */
@@ -46,7 +46,7 @@ public:
 
     BluetoothSwitchState GetSwitchState() const;
     bool IsBluetoothRestricted() const;
-    bool IsBleOnlyMode() const;
+    bool IsHalfAppRegisteredMode() const;
 
     /**
      * @brief Transition to the target state with legality check and persistence.
@@ -60,13 +60,13 @@ public:
     void SyncState(BluetoothSwitchState state);
 
     /**
-     * @brief Enter STATE_BLE_ONLY, recording the app which enabled bluetooth as owner.
+     * @brief Enter STATE_HALF_APP_REGISTERED, recording the app which enabled bluetooth as owner.
      */
-    int32_t EnterBleOnlyMode(const std::string &ownerName);
+    int32_t EnterHalfAppRegisteredMode(const std::string &ownerName);
 
     /**
      * @brief Whether the caller matches the owner app recorded on entering
-     * STATE_BLE_ONLY. Callers should combine this with their own
+     * STATE_HALF_APP_REGISTERED. Callers should combine this with their own
      * system-hap/native check for the full accessibility decision.
      * Other states always allow.
      */
@@ -74,7 +74,7 @@ public:
 
     /**
      * @brief Whether BR functions (discovery/pairing/connection) are allowed.
-     * Only forbidden in STATE_BLE_ONLY.
+     * Only forbidden in STATE_HALF_APP_REGISTERED.
      */
     bool IsBrAllowed() const;
 

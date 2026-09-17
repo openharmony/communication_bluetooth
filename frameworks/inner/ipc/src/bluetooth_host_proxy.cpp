@@ -1895,7 +1895,7 @@ int32_t BluetoothHostProxy::EnableBluetoothToRestrictMode(const std::string &cal
     return reply.ReadInt32();
 }
 
-int32_t BluetoothHostProxy::EnableBluetoothToBleOnlyMode(const std::string &callingName)
+int32_t BluetoothHostProxy::EnableBluetoothToHalfAppRegisteredMode(const std::string &callingName)
 {
     MessageParcel data;
     CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), BT_ERR_IPC_TRANS_FAILED,
@@ -1906,7 +1906,7 @@ int32_t BluetoothHostProxy::EnableBluetoothToBleOnlyMode(const std::string &call
         return BT_ERR_IPC_TRANS_FAILED;
     }
     int32_t error = InnerTransact(
-        BluetoothHostInterfaceCode::BT_ENABLE_BLUETOOTH_TO_BLE_ONLY_MODE, option, data, reply);
+        BluetoothHostInterfaceCode::BT_ENABLE_BLUETOOTH_TO_HALF_APP_REGISTERED_MODE, option, data, reply);
     CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
     return reply.ReadInt32();
 }

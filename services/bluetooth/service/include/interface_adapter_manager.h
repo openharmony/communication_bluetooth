@@ -260,29 +260,29 @@ public:
     virtual int32_t EnableBluetoothToRestrictMode(std::string callingName, bool isUserTriggered) = 0;
 
     /**
-     * @brief Enable bluetooth to BLE-only mode: both stacks are enabled underneath,
+     * @brief Enable bluetooth to half-app-registered mode: both stacks are enabled underneath,
      * but only BLE functions are allowed and only the owner app can use BLE.
      *
      * @param callingName Indicate the calling application, recorded as the owner.
      * @return int32_t
      */
-    virtual int32_t EnableBluetoothToBleOnlyMode(std::string callingName, bool isUserTriggered) = 0;
+    virtual int32_t EnableBluetoothToHalfAppRegisteredMode(std::string callingName, bool isUserTriggered) = 0;
 
     /**
-     * @brief Enable bluetooth from BLE-only mode to full-on state.
+     * @brief Enable bluetooth from half-app-registered mode to full-on state.
      *
      * @param callingName Indicate calling application
      * @return int32_t
      */
-    virtual int32_t EnableBluetoothFromBleOnlyMode(std::string callingName) const = 0;
+    virtual int32_t EnableBluetoothFromHalfAppRegisteredMode(std::string callingName) const = 0;
 
     /**
-     * @brief Whether the bluetooth switch is in BLE-only mode.
+     * @brief Whether the bluetooth switch is in half-app-registered mode.
      */
-    virtual bool IsBleOnlyMode() const = 0;
+    virtual bool IsHalfAppRegisteredMode() const = 0;
 
     /**
-     * @brief Whether the caller can use BLE functions in BLE-only mode.
+     * @brief Whether the caller can use BLE functions in half-app-registered mode.
      */
     virtual bool IsBleAccessible(const std::string &callingName) const = 0;
 

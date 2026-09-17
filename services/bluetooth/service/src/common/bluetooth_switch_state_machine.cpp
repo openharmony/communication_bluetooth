@@ -28,11 +28,11 @@ namespace bluetooth {
 namespace {
 const int32_t PROPERTY_VALUE_MAX_LEN = 128;
 const char *BLUETOOTH_SWITCH_STATE_PROPERTY = "persist.bluetooth.switch_enable";
-const char *BLUETOOTH_BLE_ONLY_OWNER_PROPERTY = "persist.bluetooth.ble_only_owner";
+const char *BLUETOOTH_HALF_APP_REGISTERED_OWNER_PROPERTY = "persist.bluetooth.half_app_registered_owner";
 const char *SWITCH_STATE_VALUE_OFF = "0";
 const char *SWITCH_STATE_VALUE_ON = "1";
 const char *SWITCH_STATE_VALUE_HALF = "2";
-const char *SWITCH_STATE_VALUE_BLE_ONLY = "3";
+const char *SWITCH_STATE_VALUE_HALF_APP_REGISTERED = "3";
 }  // namespace
 
 BluetoothSwitchStateMachine &BluetoothSwitchStateMachine::GetInstance()
@@ -48,8 +48,8 @@ const char *BluetoothSwitchStateMachine::SwitchStateToPropertyValue(BluetoothSwi
             return SWITCH_STATE_VALUE_ON;
         case BluetoothSwitchState::STATE_HALF:
             return SWITCH_STATE_VALUE_HALF;
-        case BluetoothSwitchState::STATE_BLE_ONLY:
-            return SWITCH_STATE_VALUE_BLE_ONLY;
+        case BluetoothSwitchState::STATE_HALF_APP_REGISTERED:
+            return SWITCH_STATE_VALUE_HALF_APP_REGISTERED;
         case BluetoothSwitchState::STATE_OFF:
         default:
             return SWITCH_STATE_VALUE_OFF;
@@ -64,8 +64,8 @@ int BluetoothSwitchStateMachine::PropertyValueToSwitchState(const std::string &v
     if (value == SWITCH_STATE_VALUE_HALF) {
         return BluetoothSwitchState::STATE_HALF;
     }
-    if (value == SWITCH_STATE_VALUE_BLE_ONLY) {
-        return BluetoothSwitchState::STATE_BLE_ONLY;
+    if (value == SWITCH_STATE_VALUE_HALF_APP_REGISTERED) {
+        return BluetoothSwitchState::STATE_HALF_APP_REGISTERED;
     }
     return BluetoothSwitchState::STATE_OFF;
 }
@@ -76,9 +76,9 @@ void BluetoothSwitchStateMachine::InitFromProperty()
     char value[PROPERTY_VALUE_MAX_LEN] = {0};
     GetParameter(BLUETOOTH_SWITCH_STATE_PROPERTY, "0", value, PROPERTY_VALUE_MAX_LEN - 1);
     switchState_ = static_cast<BluetoothSwitchState>(std::atoi(value));
-    if (switchState_ == BluetoothSwitchState::STATE_BLE_ONLY) {
+    if (switchState_ == BluetoothSwitchState::STATE_HALF_APP_REGISTERED) {
         char owner[PROPERTY_VALUE_MAX_LEN] = {0};
-        GetParameter(BLUETOOTH_BLE_ONLY_OWNER_PROPERTY, "", owner, PROPERTY_VALUE_MAX_LEN - 1);
+        GetParameter(BLUETOOTH_HALF_APP_REGISTERED_OWNER_PROPERTY, "", owner, PROPERTY_VALUE_MAX_LEN - 1);
         ownerName_ = owner;
     } else {
         ownerName_ = "";
@@ -97,29 +97,27 @@ bool BluetoothSwitchStateMachine::IsBluetoothRestricted() const
     return GetSwitchState() == BluetoothSwitchState::STATE_HALF;
 }
 
-bool BluetoothSwitchStateMachine::IsBleOnlyMode() const
+bool BluetoothSwitchStateMachine::IsHalfAppRegisteredMode() const
 {
-    return GetSwitchState() == BluetoothSwitchState::STATE_BLE_ONLY;
+    return GetSwitchState() == BluetoothSwitchState::STATE_HALF_APP_REGISTERED;
 }
 
 bool BluetoothSwitchStateMachine::IsTransitionValid(BluetoothSwitchState from, BluetoothSwitchState to) const
 {
-    // Any state can go to OFF (disable) or ON (full enable, includes half/full -> on);
-    // ON can fall back to HALF or BLE_ONLY without restarting the stacks;
-    // HALF and BLE_ONLY can switch between each other directly.
+    // Linear model: enable flows OFF -> ON/HALF/HALF_APP_REGISTERED; the two restricted
+    // states can only upgrade to ON or shut down to OFF, and HALF_APP_REGISTERED (both
+    // stacks already up) may additionally degrade to HALF. Degradation from ON and
+    // HALF -> HALF_APP_REGISTERED are forbidden.
     static const std::pair<BluetoothSwitchState, BluetoothSwitchState> validTransitions[] = {
         {BluetoothSwitchState::STATE_OFF, BluetoothSwitchState::STATE_ON},
         {BluetoothSwitchState::STATE_OFF, BluetoothSwitchState::STATE_HALF},
-        {BluetoothSwitchState::STATE_OFF, BluetoothSwitchState::STATE_BLE_ONLY},
+        {BluetoothSwitchState::STATE_OFF, BluetoothSwitchState::STATE_HALF_APP_REGISTERED},
         {BluetoothSwitchState::STATE_ON, BluetoothSwitchState::STATE_OFF},
-        {BluetoothSwitchState::STATE_ON, BluetoothSwitchState::STATE_HALF},
-        {BluetoothSwitchState::STATE_ON, BluetoothSwitchState::STATE_BLE_ONLY},
-        {BluetoothSwitchState::STATE_HALF, BluetoothSwitchState::STATE_OFF},
         {BluetoothSwitchState::STATE_HALF, BluetoothSwitchState::STATE_ON},
-        {BluetoothSwitchState::STATE_HALF, BluetoothSwitchState::STATE_BLE_ONLY},
-        {BluetoothSwitchState::STATE_BLE_ONLY, BluetoothSwitchState::STATE_OFF},
-        {BluetoothSwitchState::STATE_BLE_ONLY, BluetoothSwitchState::STATE_ON},
-        {BluetoothSwitchState::STATE_BLE_ONLY, BluetoothSwitchState::STATE_HALF},
+        {BluetoothSwitchState::STATE_HALF, BluetoothSwitchState::STATE_OFF},
+        {BluetoothSwitchState::STATE_HALF_APP_REGISTERED, BluetoothSwitchState::STATE_ON},
+        {BluetoothSwitchState::STATE_HALF_APP_REGISTERED, BluetoothSwitchState::STATE_OFF},
+        {BluetoothSwitchState::STATE_HALF_APP_REGISTERED, BluetoothSwitchState::STATE_HALF},
     };
     for (const auto &transition : validTransitions) {
         if (transition.first == from && transition.second == to) {
@@ -132,8 +130,8 @@ bool BluetoothSwitchStateMachine::IsTransitionValid(BluetoothSwitchState from, B
 void BluetoothSwitchStateMachine::PersistState(BluetoothSwitchState state) const
 {
     SetParameter(BLUETOOTH_SWITCH_STATE_PROPERTY, SwitchStateToPropertyValue(state));
-    if (state != BluetoothSwitchState::STATE_BLE_ONLY) {
-        SetParameter(BLUETOOTH_BLE_ONLY_OWNER_PROPERTY, "");
+    if (state != BluetoothSwitchState::STATE_HALF_APP_REGISTERED) {
+        SetParameter(BLUETOOTH_HALF_APP_REGISTERED_OWNER_PROPERTY, "");
     }
 }
 
@@ -149,26 +147,32 @@ int32_t BluetoothSwitchStateMachine::TransitionTo(BluetoothSwitchState target)
     }
     HILOGI("switch state transition %{public}d -> %{public}d", switchState_, target);
     switchState_ = target;
-    if (target != BluetoothSwitchState::STATE_BLE_ONLY) {
+    if (target != BluetoothSwitchState::STATE_HALF_APP_REGISTERED) {
         ownerName_ = "";
     }
     PersistState(target);
     return BT_NO_ERROR;
 }
 
-int32_t BluetoothSwitchStateMachine::EnterBleOnlyMode(const std::string &ownerName)
+int32_t BluetoothSwitchStateMachine::EnterHalfAppRegisteredMode(const std::string &ownerName)
 {
     std::lock_guard<std::mutex> lock(stateMutex_);
-    if (!IsTransitionValid(switchState_, BluetoothSwitchState::STATE_BLE_ONLY)) {
-        HILOGE("invalid switch state transition %{public}d -> BLE_ONLY, owner(%{public}s)",
+    if (switchState_ == BluetoothSwitchState::STATE_HALF_APP_REGISTERED) {
+        // idempotent: re-entering only refreshes the owner
+        ownerName_ = ownerName;
+        SetParameter(BLUETOOTH_HALF_APP_REGISTERED_OWNER_PROPERTY, ownerName.c_str());
+        return BT_NO_ERROR;
+    }
+    if (!IsTransitionValid(switchState_, BluetoothSwitchState::STATE_HALF_APP_REGISTERED)) {
+        HILOGE("invalid switch state transition %{public}d -> HALF_APP_REGISTERED, owner(%{public}s)",
             switchState_, ownerName.c_str());
         return BT_ERR_INVALID_STATE;
     }
-    HILOGI("switch state transition %{public}d -> BLE_ONLY, owner(%{public}s)", switchState_, ownerName.c_str());
-    switchState_ = BluetoothSwitchState::STATE_BLE_ONLY;
+    HILOGI("switch state transition %{public}d -> HALF_APP_REGISTERED, owner(%{public}s)", switchState_, ownerName.c_str());
+    switchState_ = BluetoothSwitchState::STATE_HALF_APP_REGISTERED;
     ownerName_ = ownerName;
-    SetParameter(BLUETOOTH_SWITCH_STATE_PROPERTY, SWITCH_STATE_VALUE_BLE_ONLY);
-    SetParameter(BLUETOOTH_BLE_ONLY_OWNER_PROPERTY, ownerName.c_str());
+    SetParameter(BLUETOOTH_SWITCH_STATE_PROPERTY, SWITCH_STATE_VALUE_HALF_APP_REGISTERED);
+    SetParameter(BLUETOOTH_HALF_APP_REGISTERED_OWNER_PROPERTY, ownerName.c_str());
     return BT_NO_ERROR;
 }
 
@@ -180,7 +184,7 @@ void BluetoothSwitchStateMachine::SyncState(BluetoothSwitchState state)
     }
     HILOGI("sync switch state %{public}d -> %{public}d", switchState_, state);
     switchState_ = state;
-    if (state != BluetoothSwitchState::STATE_BLE_ONLY) {
+    if (state != BluetoothSwitchState::STATE_HALF_APP_REGISTERED) {
         ownerName_ = "";
     }
 }
@@ -188,7 +192,7 @@ void BluetoothSwitchStateMachine::SyncState(BluetoothSwitchState state)
 bool BluetoothSwitchStateMachine::IsOwnerAccessible(const std::string &callingName) const
 {
     std::lock_guard<std::mutex> lock(stateMutex_);
-    if (switchState_ != BluetoothSwitchState::STATE_BLE_ONLY) {
+    if (switchState_ != BluetoothSwitchState::STATE_HALF_APP_REGISTERED) {
         return true;
     }
     return !callingName.empty() && callingName == ownerName_;
@@ -196,7 +200,7 @@ bool BluetoothSwitchStateMachine::IsOwnerAccessible(const std::string &callingNa
 
 bool BluetoothSwitchStateMachine::IsBrAllowed() const
 {
-    return !IsBleOnlyMode();
+    return !IsHalfAppRegisteredMode();
 }
 
 std::string BluetoothSwitchStateMachine::GetOwnerName() const
