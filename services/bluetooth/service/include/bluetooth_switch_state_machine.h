@@ -19,15 +19,17 @@
 #include <mutex>
 #include <set>
 #include <string>
-#include <vector>
 #include "base_def.h"
 #include "bt_def.h"
+#include "btcommon/state_machine.h"
 
 namespace OHOS {
 namespace bluetooth {
 
 /**
- * @brief Four-state bluetooth switch state machine.
+ * @brief Four-state bluetooth switch state machine, built on the common
+ * utility::StateMachine mechanism (states dispatch switch messages and
+ * drive Entry/Exit, all transitions flow through messages).
  *
  * States (persisted in "persist.bluetooth.switch_enable"):
  *   STATE_ON             "1"  both stacks on, all functions available
@@ -38,12 +40,27 @@ namespace bluetooth {
  *                             for everyone. Owner pids live in memory only
  *                             (cleared on reboot / on leaving this state).
  *
- * Transitions (10 legal edges):
- *   OFF -> ON / HALF / BLE_OWNER_ONLY;  ON -> HALF / OFF;
+ * Legal transitions:
+ *   OFF -> ON / HALF / BLE_OWNER_ONLY;  ON -> HALF (watch legacy) / OFF;
  *   HALF -> ON / OFF;  BLE_OWNER_ONLY -> ON / OFF / HALF.
  */
 class BluetoothSwitchStateMachine {
 public:
+    // switch state machine message kinds
+    enum SwitchStateMessage {
+        MSG_SWITCH_ENABLE_ON = 1,     // -> STATE_ON
+        MSG_SWITCH_ENABLE_HALF,       // -> STATE_HALF
+        MSG_SWITCH_ENTER_OWNER_ONLY,  // -> STATE_BLE_OWNER_ONLY (arg1_ = owner pid)
+        MSG_SWITCH_DISABLE,           // -> STATE_OFF, memory only (unload flow persists "0")
+        MSG_SWITCH_INIT,              // restore, arg1_ = BluetoothSwitchState
+    };
+
+    // state names registered in the utility state machine
+    static const std::string SWITCH_STATE_OFF_NAME;
+    static const std::string SWITCH_STATE_ON_NAME;
+    static const std::string SWITCH_STATE_HALF_NAME;
+    static const std::string SWITCH_STATE_OWNER_ONLY_NAME;
+
     static BluetoothSwitchStateMachine &GetInstance();
 
     /**
@@ -59,8 +76,9 @@ public:
     bool IsBleOwnerOnlyMode() const;
 
     /**
-     * @brief Transition to the target state with legality check and persistence.
-     * Leaving BLE_OWNER_ONLY atomically clears the owner pid set.
+     * @brief Request a transition by message; legality is checked by the
+     * current state's dispatch, leaving BLE_OWNER_ONLY clears the owner set.
+     * STATE_BLE_OWNER_ONLY is not a valid target here - use TryEnterBleOwnerOnlyMode.
      */
     int32_t TransitionTo(BluetoothSwitchState target);
 
@@ -73,9 +91,8 @@ public:
     int32_t TryEnterBleOwnerOnlyMode(int32_t pid);
 
     /**
-     * @brief Update the in-memory state without persistence or legality check.
-     * Used by the disable path (the persisted property is written to "0" by the
-     * stack unload flow). Clears owners when leaving BLE_OWNER_ONLY.
+     * @brief Move to STATE_OFF in memory only (disable path; the persisted
+     * property is written to "0" by the stack unload flow). Clears owners.
      */
     void SyncState(BluetoothSwitchState state);
 
@@ -104,18 +121,30 @@ public:
     static int PropertyValueToSwitchState(const std::string &value);
 
     static constexpr int32_t MAX_OWNERS = 8;
+    static constexpr int32_t INVALID_OWNER_PID = -1;
 
 private:
-    BluetoothSwitchStateMachine() = default;
-    ~BluetoothSwitchStateMachine() = default;
-    BT_DISALLOW_COPY_AND_ASSIGN(BluetoothSwitchStateMachine);
+    BluetoothSwitchStateMachine();
 
-    bool IsTransitionValid(BluetoothSwitchState from, BluetoothSwitchState to) const;
-    void PersistState(BluetoothSwitchState state) const;
+    // entry hook invoked by each state's Entry(); clears the owner set when
+    // leaving BLE_OWNER_ONLY and persists the property when requested
+    void OnStateEntered(BluetoothSwitchState state, bool persist);
+
+    // message helpers, called with stateMutex_ held
+    int32_t DispatchMessage(const utility::Message &msg);
+    std::string StateName(BluetoothSwitchState state) const;
+    BluetoothSwitchState CurrentStateLocked() const;
 
     mutable std::mutex stateMutex_ {};
-    BluetoothSwitchState switchState_ = BluetoothSwitchState::STATE_OFF;
+    utility::StateMachine machine_;
+    bool persistOnEntry_ {true};
+    int32_t pendingOwnerPid_ {INVALID_OWNER_PID};
     std::set<int32_t> ownerPids_ {};
+
+    friend class SwitchOffState;
+    friend class SwitchOnState;
+    friend class SwitchHalfState;
+    friend class SwitchOwnerOnlyState;
 };
 
 }  // namespace bluetooth

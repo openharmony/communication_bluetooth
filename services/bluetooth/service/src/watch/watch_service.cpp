@@ -355,8 +355,12 @@ bool WatchService::IsEnableBluetoothAfterExitStrMode()
         bool bluetoothState = (GetIntParameter(g_bluetoothHalfOpenProperty, 0) ==
             BLUETOOTH_SWITCH_STATE_OFF) ? false : true;
         DoInAdapterManagerThread([bluetoothState]() {
-            AdapterManager::GetInstance()->Enable(ADAPTER_BLE);
-            AdapterManager::GetInstance()->SetBluetoothRestrictedFlag(bluetoothState);
+            if (bluetoothState) {
+                // half-open state is identified by the switch state machine
+                AdapterManager::GetInstance()->EnableBluetoothFromOffToRestrictMode("bluetooth_watch");
+            } else {
+                AdapterManager::GetInstance()->Enable(ADAPTER_BLE);
+            }
         });
         SetParameter(g_bluetoothHalfOpenProperty, g_stateOff);
         return true;

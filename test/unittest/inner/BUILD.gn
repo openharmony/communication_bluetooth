@@ -76,6 +76,7 @@ ohos_unittest("bluetooth_switch_state_machine_test") {
         "$FRAMWORK_DIR/services/bluetooth/service/include",
         "$FRAMWORK_DIR/services/bluetooth/service/src/base",
         "$FRAMWORK_DIR/services/bluetooth/common",
+        "$FRAMWORK_DIR/services/bluetooth/common/include",
         "$FRAMWORK_DIR/frameworks/inner/ipc/common",
         "$FRAMWORK_DIR/interfaces/inner_api/include",
     ]

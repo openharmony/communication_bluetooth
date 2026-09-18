@@ -214,14 +214,6 @@ public:
     virtual int32_t SatelliteControl(int type, int state) const = 0;
 
     /**
-     * @brief Set bluetooth restricted state.
-     *
-     * @param isBluetoothRestricted <b>True or false if bluetooth is restricte
-     * @since 12
-     */
-    virtual void SetBluetoothRestrictedFlag(bool isBluetoothRestricted) const = 0;
-
-    /**
      * @brief Get bluetooth restricted state.
      *
      * @param transport Enable classic or ble.

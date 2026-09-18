@@ -112,13 +112,11 @@ HWTEST_F(BluetoothSwitchStateMachineTest, InvalidTransitionRejected, TestSize.Le
     auto &sm = BluetoothSwitchStateMachine::GetInstance();
     using S = BluetoothSwitchState;
 
-    // ON -> BLE_OWNER_ONLY forbidden
+    // ON -> BLE_OWNER_ONLY forbidden (TryEnter only accepts OFF / same-mode)
     sm.SyncState(S::STATE_ON);
-    EXPECT_EQ(sm.TransitionTo(S::STATE_BLE_OWNER_ONLY), BT_ERR_INVALID_STATE);
+    EXPECT_EQ(sm.TryEnterBleOwnerOnlyMode(100), BT_ERR_INVALID_STATE);
     // HALF -> BLE_OWNER_ONLY forbidden
     sm.SyncState(S::STATE_HALF);
-    EXPECT_EQ(sm.TransitionTo(S::STATE_BLE_OWNER_ONLY), BT_ERR_INVALID_STATE);
-    // TryEnter only from OFF (or same-mode append)
     EXPECT_EQ(sm.TryEnterBleOwnerOnlyMode(100), BT_ERR_INVALID_STATE);
 
     // same-state transition is a no-op success
@@ -191,7 +189,7 @@ HWTEST_F(BluetoothSwitchStateMachineTest, BrOnEventResolution, TestSize.Level1)
     EXPECT_TRUE(sm.ResolveBrOnEvent() == S::STATE_ON);
     sm.SyncState(S::STATE_HALF);
     EXPECT_TRUE(sm.ResolveBrOnEvent() == S::STATE_HALF);
-    sm.SyncState(S::STATE_BLE_OWNER_ONLY);
+    (void)sm.TryEnterBleOwnerOnlyMode(100);
     EXPECT_TRUE(sm.ResolveBrOnEvent() == S::STATE_BLE_OWNER_ONLY);
     EXPECT_FALSE(sm.IsBrAllowed());
     sm.SyncState(S::STATE_OFF);

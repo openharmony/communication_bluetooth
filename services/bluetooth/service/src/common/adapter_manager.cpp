@@ -174,7 +174,6 @@ struct AdapterManager::impl {
     SysStateMachine sysStateMachine_ = {};
     std::string sysState_ = SYS_STATE_STOPPED;
     std::atomic_bool isFactoryReseting {false};
-    std::atomic_bool isRestrictBluetooth {false};
     BaseObserverList<IAdapterStateObserver> adapterObservers_ = {};
     BaseObserverList<ISystemStateObserver> systemObservers_ = {};
 
@@ -664,7 +663,10 @@ int AdapterManager::EnableBluetoothFromOffToRestrictMode(const std::string &call
     int32_t ret = Enable(ADAPTER_BLE, false, callingName);
     
     if (ret == BT_NO_ERROR) {
-        SetBluetoothRestrictedFlag(true);
+        ret = BluetoothSwitchStateMachine::GetInstance().TransitionTo(BluetoothSwitchState::STATE_HALF);
+        if (ret != BT_NO_ERROR) {
+            HILOGE("transition to HALF rejected, ret=%{public}d", ret);
+        }
     }
 
     return ret;
@@ -719,7 +721,7 @@ void AdapterManager::Initialize() const
     BluetoothSwitchStateMachine::GetInstance().InitFromProperty();
     int lastBtState = GetIntParameter(g_bluetoothSwitchStatePropertyName, 0);
     if (lastBtState == bluetoothStateHalf) {
-        pimpl->isRestrictBluetooth = true;
+        HILOGI("restore half-open restricted mode");
     }
     if (lastBtState > 0) {
         HILOGI("enable bluetooth lastBtState: %{public}d, 1(on) 2(half)", lastBtState);
@@ -1023,8 +1025,9 @@ int32_t AdapterManager::DisableInner(BTTransport transport, bool isAsync, std::s
         pimpl->ThirdpartyAppBeginOperateBluetoothSwitch(callingName);
         return dialogResult_->HandleBluetoothSwitchDialogResult(isAsync);
     }
-    // set RestrictBluetooth false, means when disable bluetooth, no Restricted Bluetooth
-    SetBluetoothRestrictedFlagOnly(false);
+    // disable clears any special switch mode (and owners) in memory;
+    // the persisted property is written to "0" when both stacks are off
+    BluetoothSwitchStateMachine::GetInstance().SyncState(BluetoothSwitchState::STATE_OFF);
     if (transport == ADAPTER_BREDR) {
         BluetoothTurningOffHook();
         auto connectionManager = BluetoothConnectionManager::GetInstance();
@@ -1729,28 +1732,6 @@ bool AdapterManager::IsFactoryReset() const
     return system::GetBoolParameter(bluetoothFactoryResetParam, false);  // false is the default value
 }
 
-void AdapterManager::SetBluetoothRestrictedFlag(bool isBluetoothRestricted) const
-{
-    pimpl->isRestrictBluetooth = isBluetoothRestricted;
-    BluetoothSwitchState target = isBluetoothRestricted ? BluetoothSwitchState::STATE_HALF
-                                                        : BluetoothSwitchState::STATE_ON;
-    if (BluetoothSwitchStateMachine::GetInstance().TransitionTo(target) != BT_NO_ERROR) {
-        HILOGE("SetBluetoothRestrictedFlag: transition to %{public}d rejected", target);
-    }
-    return;
-}
-
-void AdapterManager::SetBluetoothRestrictedFlagOnly(bool isBluetoothRestricted) const
-{
-    HILOGI("SetBluetoothRestrictedFlagOnly isBluetoothRestricted=%{public}d", isBluetoothRestricted);
-    pimpl->isRestrictBluetooth = isBluetoothRestricted;
-    if (!isBluetoothRestricted) {
-        // disable path clears any special switch mode (and owners) in memory;
-        // the persisted property is written to "0" when both stacks are off
-        BluetoothSwitchStateMachine::GetInstance().SyncState(BluetoothSwitchState::STATE_OFF);
-    }
-}
-
 BTStateID AdapterManager::GetRestrictedState(BTTransport transport) const
 {
     BTStateID state = BTStateID::STATE_TURN_OFF;
@@ -1787,13 +1768,13 @@ int32_t AdapterManager::EnablebluetoothFromRestricted(
     }
     if (GetState(BTTransport::ADAPTER_BREDR) != BTStateID::STATE_TURN_ON) {
         HILOGW("bluetooth stack is not enable complete, just clear restricted flag");
-        SetBluetoothRestrictedFlag(false);
+        (void)BluetoothSwitchStateMachine::GetInstance().TransitionTo(BluetoothSwitchState::STATE_ON);
         return BT_NO_ERROR;
     }
 
     callingName = pimpl->AttemptReplaceThirdpartyAppName(callingName);
     HILOGI("Enable Bluetooth from ble on, set RestrictBluetooth -> false");
-    SetBluetoothRestrictedFlag(false);
+    (void)BluetoothSwitchStateMachine::GetInstance().TransitionTo(BluetoothSwitchState::STATE_ON);
     BtChrUeManager::GetInstance()->WriteBtSwitchChangeUe(
         ADAPTER_BREDR, UE_COMMON_SCENE_CASE0, UE_COMMON_SCENE_CASE0, callingName, 0);
     // Broadcast br on
@@ -1836,7 +1817,7 @@ int AdapterManager::SetVirtualAutoConnectType(const std::string &address, int co
 
 bool AdapterManager::IsBluetoothRestricted() const
 {
-    return pimpl->isRestrictBluetooth.load();
+    return BluetoothSwitchStateMachine::GetInstance().IsBluetoothRestricted();
 }
 
 bool AdapterManager::IsAdpaterNullptrWhenEnable(BTTransport transport) const
@@ -1923,7 +1904,11 @@ int32_t AdapterManager::EnableBluetoothToRestrictMode(std::string callingName,
     bool isDegradedFromOwnerOnly = IsBleOwnerOnlyMode();
     int32_t ret = Enable(ADAPTER_BLE, false, callingName, isUserTriggered);
     if (ret == BT_NO_ERROR) {
-        SetBluetoothRestrictedFlag(true);
+        ret = BluetoothSwitchStateMachine::GetInstance().TransitionTo(BluetoothSwitchState::STATE_HALF);
+        if (ret != BT_NO_ERROR) {
+            HILOGE("transition to HALF rejected, ret=%{public}d", ret);
+            return ret;
+        }
         if (isDegradedFromOwnerOnly) {
             // stacks are already up: no adapter state change will fire, deliver
             // the completion event directly so the framework switch module

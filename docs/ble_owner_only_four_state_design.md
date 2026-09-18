@@ -21,6 +21,10 @@
 
 独立文件：`services/bluetooth/service/include/bluetooth_switch_state_machine.h` + `src/common/bluetooth_switch_state_machine.cpp`，单例 `BluetoothSwitchStateMachine`。
 
+**接入通用 statemachine 机制**：状态机基于 `utility::StateMachine`（`services/bluetooth/common/include/btcommon/state_machine.h`）实现——四个状态（SwitchOff/SwitchOn/SwitchHalf/SwitchOwnerOnly）为 `State` 子类，各自实现 `Entry()/Exit()/Dispatch(msg)`；所有迁移通过消息触发（`MSG_SWITCH_ENABLE_ON / ENABLE_HALF / ENTER_OWNER_ONLY / DISABLE / INIT`），由当前状态的 Dispatch 校验合法性并 `Transition()`，非法消息返回 false → `BT_ERR_INVALID_STATE`；`Entry()` 钩子统一完成属性持久化与 owner 集合维护（disable 路径置 `persistOnEntry_=false` 不落盘）。
+
+**开关状态单一事实源**：移除 `AdapterManager::impl::isRestrictBluetooth` 标志及 `SetBluetoothRestrictedFlag / SetBluetoothRestrictedFlagOnly` 接口，`IsBluetoothRestricted()` 等全部查询改由状态机识别；watch 恢复路径改走 `EnableBluetoothFromOffToRestrictMode`。
+
 ### 2.1 状态机图（10 条合法边，watch 适配）
 
 ```mermaid
@@ -54,7 +58,7 @@ stateDiagram-v2
 - 同态幂等：BLE_OWNER_ONLY 重入 = 追加 owner；
 - 非法迁移返回 `BT_ERR_INVALID_STATE` 并打 HILOG；
 - `SyncState()` 仅内存同步（disable 路径专用，属性 "0" 由卸载流程写）；
-- **watch 适配**：`SetBluetoothRestrictedFlag(true/false)` 改走状态机正式迁移（ON→HALF 合法化），删除 fallback 特殊路径。
+- **watch 适配**：ON→HALF 为合法迁移边；watch STR 恢复改调 `EnableBluetoothFromOffToRestrictMode`，不再存在 restrict 布尔标志。
 
 ### 2.2 owner 集合设计（PID 标识，多 owner）
 
@@ -107,9 +111,9 @@ sequenceDiagram
 | 接口 | 说明 |
 | --- | --- |
 | `TryEnterBleOwnerOnlyMode(pid)` | 原子：OFF→新态建集合并加入 / 已在态中追加 / 其他来源拒绝 |
-| `TransitionTo(target)` | 合法迁移+持久化；离开 owner 态时原子清空 owner 集合 |
+| `TransitionTo(target)` | 发对应迁移消息，合法性由当前状态 Dispatch 校验；离开 owner 态清空 owner 集合（BLE_OWNER_ONLY 不是合法 target，须用 TryEnter） |
 | `SyncState(state)` | 仅内存（disable 路径），同样清 owner |
-| `ResolveBrOnEvent()` | 锁内快照 BR-on 应发事件（STATE_ON / STATE_HALF / STATE_BLE_OWNER_ONLY） |
+| `ResolveBrOnEvent()` | 锁内快照 BR-on 应发事件（即当前开关状态） |
 | `InitFromProperty()` | 重启恢复状态（"3" 恢复双栈；owner 集合为空 → fail-safe） |
 | `IsBleOwnerOnlyMode()` / `IsBluetoothRestricted()` | 状态查询 |
 | `IsOwnerAccessible(pid)` / `GetOwnerPids()` | owner 集合判断/读取（供 server 缓存对账） |
@@ -210,13 +214,15 @@ sequenceDiagram
     autonumber
     participant W as watch_service
     participant AM as AdapterManager
-    participant BSM as BluetoothSwitchStateMachine
+    participant BSM as BluetoothSwitchStateMachine(utility::StateMachine)
 
-    W->>AM: SetBluetoothRestrictedFlag(true)
-    AM->>BSM: TransitionTo(STATE_HALF)（ON→HALF 合法边）
-    Note over BSM : 若此前在owner态→先清owner再迁移
-    BSM-->>AM : BT_NO_ERROR，属性="2"
-    Note over AM : 不再使用fallback特殊路径
+    Note over W : STR 恢复时此前为半开
+    W->>AM: EnableBluetoothFromOffToRestrictMode("bluetooth_watch")
+    AM->>Stk: Enable(ADAPTER_BLE)
+    AM->>BSM: MSG_SWITCH_ENABLE_HALF
+    Note over BSM : 当前状态 Dispatch 校验→Transition("SwitchHalf")→Entry 写属性="2"
+    BSM-->>AM : BT_NO_ERROR
+    Note over AM,BSM : isRestrictBluetooth 标志已移除，状态唯一识别来自状态机
 ```
 
 ## 4. 状态可见性矩阵
@@ -235,7 +241,8 @@ owner 集合仅存在于 STATE_BLE_OWNER_ONLY；进入 HALF/ON/OFF 即全部清�
 | --- | --- | --- |
 | 公共定义 | `bt_def.h` | `STATE_BLE_OWNER_ONLY`、`TRANS_ACTION_ENABLE_BLUETOOTH_TO_BLE_OWNER_ONLY` |
 | 状态机（新文件） | `bluetooth_switch_state_machine.{h,cpp}` | 单例、10 边迁移表、多 owner PID 集合、原子入态/迁移、锁内事件快照、fail-safe 恢复 |
-| service | `adapter_manager.{h,cpp}`、`interface_adapter_manager.h` | 进入（pid 参数）/升级/降级接口（post AM 线程）、`SetBluetoothRestrictedFlag` 改正式迁移、BR-on 拦截用 `ResolveBrOnEvent`、V2 补发、`IsBleAccessible(pid)` |
+| service | `adapter_manager.{h,cpp}`、`interface_adapter_manager.h` | 进入（pid 参数）/升级/降级接口、**移除 isRestrictBluetooth/SetBluetoothRestrictedFlag(Only)**、开关状态全部由状态机识别、BR-on 拦截用 `ResolveBrOnEvent`、V2 补发、`IsBleAccessible(pid)` |
+| watch | `watch_service.cpp` | STR 恢复改走 `EnableBluetoothFromOffToRestrictMode`，去除标志位调用 |
 | server | `bluetooth_host_server.{h,cpp}` | `ownerPidCache_` 缓存（追加/清空/V2 对账）、`GetBtState` 按 pid+缓存可见、`EnableBt/DisableBt` 不鉴权 owner |
 | 功能拦截 | `classic_adapter.cpp`、BLE 扫描/广播/GATT 入口 | BR 全禁；BLE 按 pid+缓存鉴权 |
 | IPC | 接口码、`i_bluetooth_host.h`、proxy/stub | `BT_ENABLE_BLUETOOTH_TO_BLE_OWNER_ONLY_MODE`（传 pid） |

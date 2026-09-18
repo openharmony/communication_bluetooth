@@ -380,8 +380,6 @@ public:
     bool IsBluetoothSysStateStarted() const;
     int32_t SatelliteControl(int type, int state) const override;
     bool IsBluetoothRestricted() const override;
-    void SetBluetoothRestrictedFlag(bool isBluetoothRestricted) const override;
-    void SetBluetoothRestrictedFlagOnly(bool isBluetoothRestricted) const;
     BTStateID GetRestrictedState(BTTransport transport)  const override;
     int32_t EnablebluetoothFromRestricted(std::string callingName = "", bool isAsync = false,
         bool isUserTriggered = false) const override;
