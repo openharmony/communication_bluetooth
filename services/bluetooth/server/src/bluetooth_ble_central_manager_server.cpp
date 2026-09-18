@@ -1039,6 +1039,12 @@ int BluetoothBleCentralManagerServer::StartScan(int32_t scannerId, const Bluetoo
 
     CHECK_AND_RETURN_LOG_RET(CheckBleScanPermission(), BT_ERR_PERMISSION_FAILED, "CheckBleScanPermission failed");
     CHECK_AND_RETURN_LOG_RET(scannerId != BLE_SCAN_INVALID_ID, BT_ERR_INTERNAL_ERROR, "Invalid scannerId");
+    if (IAdapterManager::GetInstance()->IsBleOwnerOnlyMode() &&
+        !IAdapterManager::GetInstance()->IsBleAccessible(IPSkeleton::GetCallingPid())) {
+        HILOGW("BLE owner only mode, refuse ble scan from non-owner pid(%{public}d)",
+            IPCSkeleton::GetCallingPid());
+        return BT_ERR_INVALID_STATE;
+    }
     BleScanSettingsImpl settingsImpl;
     SetScanSettingsInfo(settingsImpl, settings);
     if (settings.GetScanMode() == SCAN_MODE_LOW_LATENCY) {

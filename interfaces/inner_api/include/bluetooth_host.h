@@ -475,6 +475,19 @@ public:
     int EnableBluetoothToRestrictMode(std::string name = "");
 
     /**
+     * @brief Enable bluetooth to BLE-owner-only mode.
+     *
+     * Both BLE and BR stacks are enabled underneath, but BLE is visible/usable
+     * only by registered owner pids (the caller becomes an owner; multiple
+     * owners supported) and BR functions are refused for everyone.
+     *
+     * @param name Indicate the calling application to enable bluetooth. The default value is current application.
+     * @return Returns BT_NO_ERROR if the operation is accepted;
+     *         returns others if the operation is rejected.
+     */
+    int EnableBluetoothToBleOwnerOnlyMode(std::string name = "");
+
+    /**
      * @brief Get br/edr enable/disable state.
      *
      * @return Returns <b>true</b> if br is enabled;

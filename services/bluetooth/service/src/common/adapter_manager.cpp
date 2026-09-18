@@ -37,6 +37,7 @@
 #include "bluetooth_common_event_helper.h"
 #include "bluetooth_connection_manager.h"
 #include "bluetooth_device_battery_manager.h"
+#include "bluetooth_switch_state_machine.h"
 #include "common/bluetooth_hw_interface.h"
 #ifdef BLUETOOTH_HIGHPOWERV1_ENABLE
 #include "bluetooth_highpower_manager.h"
@@ -715,6 +716,7 @@ void AdapterManager::Initialize() const
 #ifndef BLUETOOTH_FACTORY_MODE
     // 自动开蓝牙 - 重启场景
     const int bluetoothStateHalf = 2;
+    BluetoothSwitchStateMachine::GetInstance().InitFromProperty();
     int lastBtState = GetIntParameter(g_bluetoothSwitchStatePropertyName, 0);
     if (lastBtState == bluetoothStateHalf) {
         pimpl->isRestrictBluetooth = true;
@@ -1340,23 +1342,27 @@ void AdapterManager::OnAdapterStateChange(const BTTransport transport, const BTS
         Disable(ADAPTER_BLE);
     }
 
-    bool isBrOnInRestrictedMode = IsBluetoothRestricted() && (transport == ADAPTER_BREDR) && state == STATE_TURN_ON;
-    bool isNeedReportBrOff = ret && isBrOnInRestrictedMode;
-    bool isNeedReportStateChange = ret && !isBrOnInRestrictedMode;
+    // snapshot the switch state once under the lock so the decision and the
+    // emitted event cannot be torn apart by a concurrent mode switch
+    BluetoothSwitchState brOnEvent = BluetoothSwitchStateMachine::GetInstance().ResolveBrOnEvent();
+    bool isBrOnHiddenMode = (transport == ADAPTER_BREDR) && (state == STATE_TURN_ON) &&
+        (brOnEvent == BluetoothSwitchState::STATE_HALF || brOnEvent == BluetoothSwitchState::STATE_BLE_OWNER_ONLY);
+    bool isNeedReportBrOff = ret && isBrOnHiddenMode;
+    bool isNeedReportStateChange = ret && !isBrOnHiddenMode;
     if (isNeedReportStateChange) {
         if (GetSysState() != SYS_STATE_RESETTING) {
             BluetoothHelper::BluetoothCommonEventHelper::PublishBluetoothStateChangeEvent(state, transport);
             NotifyAdapterStateChange(pimpl->adapterObservers_, transport, state);
             if (transport == ADAPTER_BREDR && state == STATE_TURN_ON) {
                 OnBluetoothOnHook();
-                NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_ON);
+                NotifyAdapterStateChangeV2(pimpl->adapterObservers_, brOnEvent);
             }
         }
     }
     if (isNeedReportBrOff) {
         BluetoothHelper::BluetoothCommonEventHelper::PublishBluetoothStateChangeEvent(STATE_TURN_OFF, ADAPTER_BLE);
         NotifyAdapterStateChange(pimpl->adapterObservers_, ADAPTER_BREDR, STATE_TURN_OFF);
-        NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_HALF);
+        NotifyAdapterStateChangeV2(pimpl->adapterObservers_, brOnEvent);
         BtChrUeManager::GetInstance()->WriteBtSwitchChangeUe(
             ADAPTER_BREDR, UE_COMMON_SCENE_CASE2, UE_COMMON_SCENE_CASE0, "", 0);
     }
@@ -1369,7 +1375,7 @@ void AdapterManager::OnAdapterStateChange(const BTTransport transport, const BTS
     msg.arg1_ = (static_cast<unsigned int>(classicState) << CLASSIC_ENABLE_STATE_BIT) + bleState;
     DoInAdapterManagerThread([this, msg] {this->pimpl->sysStateMachine_.ProcessMessage(msg);});
     UnLoadBluetoothSystemAbility(transport, state);
-    if (transport == ADAPTER_BREDR && state == STATE_TURN_ON) {
+    if (transport == ADAPTER_BREDR && state == STATE_TURN_ON && !IsBleOwnerOnlyMode()) {
         ExecuteTaskWhenBluetoothOn();
     }
 }
@@ -1429,6 +1435,7 @@ void AdapterManager::UnLoadBluetoothSystemAbility(const BTTransport transport, c
 #else
     HILOGI("Bluetooth cannot be disabled!");
 #endif
+    BluetoothSwitchStateMachine::GetInstance().SyncState(BluetoothSwitchState::STATE_OFF);
     // Unblock framework BluetoothSwitchModule: without STATE_OFF, isBtSwitchProcessing_
     // stays true and a later UI enable is only cached then dropped on timeout.
     NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_OFF);
@@ -1464,6 +1471,11 @@ void AdapterManager::UpdateBluetoothSwitchStatus(const BTTransport transport, co
     HILOGI("bluetooth switch state is on, Update bluetooth switch status");
     if (!IsBluetoothSwitchEnableFromSystemParameter()) {
         SetParameter(g_bluetoothSwitchStatePropertyName, g_bluetoothSwitchStateOn);
+    }
+    // claim OFF -> ON for the concurrent OFF-fan-out race; HALF/BLE_OWNER_ONLY
+    // states are left untouched (BR-on is hidden there)
+    if (BluetoothSwitchStateMachine::GetInstance().GetSwitchState() == BluetoothSwitchState::STATE_OFF) {
+        BluetoothSwitchStateMachine::GetInstance().TransitionTo(BluetoothSwitchState::STATE_ON);
     }
 }
 
@@ -1720,10 +1732,10 @@ bool AdapterManager::IsFactoryReset() const
 void AdapterManager::SetBluetoothRestrictedFlag(bool isBluetoothRestricted) const
 {
     pimpl->isRestrictBluetooth = isBluetoothRestricted;
-    if (isBluetoothRestricted) {
-        SetParameter(g_bluetoothSwitchStatePropertyName, BLUETOOTH_SWITCH_STATE_HALF);
-    } else {
-        SetParameter(g_bluetoothSwitchStatePropertyName, g_bluetoothSwitchStateOn);
+    BluetoothSwitchState target = isBluetoothRestricted ? BluetoothSwitchState::STATE_HALF
+                                                        : BluetoothSwitchState::STATE_ON;
+    if (BluetoothSwitchStateMachine::GetInstance().TransitionTo(target) != BT_NO_ERROR) {
+        HILOGE("SetBluetoothRestrictedFlag: transition to %{public}d rejected", target);
     }
     return;
 }
@@ -1732,6 +1744,11 @@ void AdapterManager::SetBluetoothRestrictedFlagOnly(bool isBluetoothRestricted) 
 {
     HILOGI("SetBluetoothRestrictedFlagOnly isBluetoothRestricted=%{public}d", isBluetoothRestricted);
     pimpl->isRestrictBluetooth = isBluetoothRestricted;
+    if (!isBluetoothRestricted) {
+        // disable path clears any special switch mode (and owners) in memory;
+        // the persisted property is written to "0" when both stacks are off
+        BluetoothSwitchStateMachine::GetInstance().SyncState(BluetoothSwitchState::STATE_OFF);
+    }
 }
 
 BTStateID AdapterManager::GetRestrictedState(BTTransport transport) const
@@ -1903,11 +1920,96 @@ int32_t AdapterManager::EnableBluetoothToRestrictMode(std::string callingName,
         return BT_ERR_INTERNAL_ERROR;
     }
     pimpl->WaitAdapterManagerInitializeComplete();
+    bool isDegradedFromOwnerOnly = IsBleOwnerOnlyMode();
     int32_t ret = Enable(ADAPTER_BLE, false, callingName, isUserTriggered);
     if (ret == BT_NO_ERROR) {
         SetBluetoothRestrictedFlag(true);
+        if (isDegradedFromOwnerOnly) {
+            // stacks are already up: no adapter state change will fire, deliver
+            // the completion event directly so the framework switch module
+            // does not wait for timeout
+            NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_HALF);
+        }
     }
     return ret;
+}
+
+int32_t AdapterManager::EnableBluetoothToBleOwnerOnlyMode(
+    int32_t pid, std::string callingName, bool isUserTriggered)
+{
+    if (system::GetBoolParameter("persist.edm.force_enable_bluetooth", false)) {
+        HILOGI("Forcibly enable Bluetooth.");
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    pimpl->WaitAdapterManagerInitializeComplete();
+    // Atomic claim first (OFF -> BLE_OWNER_ONLY, or append when already in the
+    // mode) so concurrent OFF fan-out requests (ON/HALF/owner-only) race on a
+    // single critical section instead of interleaving check and commit.
+    bool alreadyOwnerOnly = IsBleOwnerOnlyMode();
+    int32_t ret = BluetoothSwitchStateMachine::GetInstance().TryEnterBleOwnerOnlyMode(pid);
+    if (ret != BT_NO_ERROR) {
+        HILOGE("TryEnterBleOwnerOnlyMode rejected pid %{public}d, ret=%{public}d", pid, ret);
+        return ret;
+    }
+    if (alreadyOwnerOnly) {
+        // same-mode re-entry: stacks are already up, deliver the completion
+        // event directly
+        NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_BLE_OWNER_ONLY);
+        return BT_NO_ERROR;
+    }
+    // Both BLE and BR stacks follow the normal full-enable path (BLE enable
+    // auto brings up BREDR); the owner-only state only changes what is
+    // reported to and allowed for apps.
+    ret = Enable(ADAPTER_BLE, false, callingName, isUserTriggered);
+    if (ret != BT_NO_ERROR) {
+        // roll back the claim, enable was not accepted
+        BluetoothSwitchStateMachine::GetInstance().SyncState(BluetoothSwitchState::STATE_OFF);
+    }
+    return ret;
+}
+
+int32_t AdapterManager::EnableBluetoothFromBleOwnerOnlyMode(std::string callingName) const
+{
+    callingName = pimpl->AttemptReplaceThirdpartyAppName(callingName);
+    HILOGI("Enable Bluetooth from ble owner only mode, calling by (%{public}s)", callingName.c_str());
+    // upgrade clears the owner set atomically
+    int32_t ret = BluetoothSwitchStateMachine::GetInstance().TransitionTo(BluetoothSwitchState::STATE_ON);
+    if (ret != BT_NO_ERROR) {
+        return ret;
+    }
+    if (GetState(BTTransport::ADAPTER_BREDR) != BTStateID::STATE_TURN_ON) {
+        HILOGW("BR stack is not on yet, just clear owner only state");
+        return BT_NO_ERROR;
+    }
+    // Broadcast br on
+    BluetoothHelper::BluetoothCommonEventHelper::PublishBluetoothStateChangeEvent(STATE_TURN_ON, ADAPTER_BREDR);
+    NotifyAdapterStateChange(pimpl->adapterObservers_, ADAPTER_BREDR, STATE_TURN_ON);
+    NotifyAdapterStateChangeV2(pimpl->adapterObservers_, BluetoothSwitchState::STATE_ON);
+    pimpl->classicAdapter_->instance->SetBtScanMode(BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE, BT_SCAN_DURATION_MS);
+    PostAutoConnectTask(AUTO_CONNECT_DELAY_MS);
+    BluetoothConnectionManager::GetInstance()->CheckNeedReportConnectedDevice();
+    return BT_NO_ERROR;
+}
+
+bool AdapterManager::IsBleOwnerOnlyMode() const
+{
+    return BluetoothSwitchStateMachine::GetInstance().IsBleOwnerOnlyMode();
+}
+
+bool AdapterManager::IsBleAccessible(int32_t pid) const
+{
+    // strict: owner set only, system apps are NOT exempted
+    return BluetoothSwitchStateMachine::GetInstance().IsOwnerAccessible(pid);
+}
+
+bool AdapterManager::IsBrAllowed() const
+{
+    return BluetoothSwitchStateMachine::GetInstance().IsBrAllowed();
+}
+
+std::set<int32_t> AdapterManager::GetOwnerPids() const
+{
+    return BluetoothSwitchStateMachine::GetInstance().GetOwnerPids();
 }
 
 void AdapterManager::SaveConnectionTime(const RawAddress &device)

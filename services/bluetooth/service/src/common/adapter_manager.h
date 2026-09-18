@@ -22,6 +22,8 @@
 #include "adapter_properties.h"
 #include "bluetooth.h"
 #include "bluetooth_errorcode.h"
+#include <set>
+
 #include "bt_def.h"
 #include "interface_adapter.h"
 #include "interface_adapter_manager.h"
@@ -385,6 +387,13 @@ public:
         bool isUserTriggered = false) const override;
     int32_t EnableBluetoothToRestrictMode(std::string callingName = "",
         bool isUserTriggered = false) override;
+    int32_t EnableBluetoothToBleOwnerOnlyMode(int32_t pid, std::string callingName = "",
+        bool isUserTriggered = false) override;
+    int32_t EnableBluetoothFromBleOwnerOnlyMode(std::string callingName = "") const override;
+    bool IsBleOwnerOnlyMode() const override;
+    bool IsBleAccessible(int32_t pid) const override;
+    bool IsBrAllowed() const override;
+    std::set<int32_t> GetOwnerPids() const override;
     bool IsBetaVersion() const;
     void EnableHisiPcm(bool state) const;
     bool IsCollaborationModeOn(void) const;

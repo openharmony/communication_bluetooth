@@ -64,6 +64,34 @@ ohos_unittest("bluetooth_uuid_module_test") {
     ]
 }
 
+ohos_unittest("bluetooth_switch_state_machine_test") {
+    module_out_path = module_output_path
+
+    sources = [
+        "$FRAMWORK_DIR/services/bluetooth/service/src/common/bluetooth_switch_state_machine.cpp",
+        "bluetooth_switch_state_machine_test.cpp",
+    ]
+
+    include_dirs = [
+        "$FRAMWORK_DIR/services/bluetooth/service/include",
+        "$FRAMWORK_DIR/services/bluetooth/service/src/base",
+        "$FRAMWORK_DIR/services/bluetooth/common",
+        "$FRAMWORK_DIR/frameworks/inner/ipc/common",
+        "$FRAMWORK_DIR/interfaces/inner_api/include",
+    ]
+
+    configs = [
+        ":module_private_config",
+    ]
+
+    external_deps = [
+        "hilog:libhilog",
+        "init:libbegetutil",
+        "googletest:gmock_main",
+        "googletest:gtest_main",
+    ]
+}
+
 ################################################################################
 group("unittest") {
     testonly = true
@@ -73,6 +101,7 @@ group("unittest") {
     if (is_phone_product) {
         deps += [
             ":bluetooth_uuid_module_test",
+            ":bluetooth_switch_state_machine_test",
         ]
     }
 }

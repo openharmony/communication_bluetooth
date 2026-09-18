@@ -30,9 +30,11 @@ static const char *ToString(BluetoothSwitchEvent event)
         case BluetoothSwitchEvent::ENABLE_BLUETOOTH: return "ENABLE_BLUETOOTH";
         case BluetoothSwitchEvent::DISABLE_BLUETOOTH: return "DISABLE_BLUETOOTH";
         case BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_RESTRICE_MODE: return "ENABLE_BLUETOOTH_TO_RESTRICE_MODE";
+        case BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_BLE_OWNER_ONLY: return "ENABLE_BLUETOOTH_TO_BLE_OWNER_ONLY";
         case BluetoothSwitchEvent::BLUETOOTH_ON: return "BLUETOOTH_ON";
         case BluetoothSwitchEvent::BLUETOOTH_OFF: return "BLUETOOTH_OFF";
         case BluetoothSwitchEvent::BLUETOOTH_HALF: return "BLUETOOTH_HALF";
+        case BluetoothSwitchEvent::BLUETOOTH_BLE_OWNER_ONLY: return "BLUETOOTH_BLE_OWNER_ONLY";
         default: break;
     }
     return "Unknown";
@@ -42,7 +44,8 @@ void BluetoothSwitchModule::LogBluetoothSwitchEvent(BluetoothSwitchEvent event)
 {
     bool needLog = (event == BluetoothSwitchEvent::BLUETOOTH_ON ||
         event == BluetoothSwitchEvent::BLUETOOTH_OFF ||
-        event == BluetoothSwitchEvent::BLUETOOTH_HALF) ? isBtSwitchProcessing_.load() : true;
+        event == BluetoothSwitchEvent::BLUETOOTH_HALF ||
+        event == BluetoothSwitchEvent::BLUETOOTH_BLE_OWNER_ONLY) ? isBtSwitchProcessing_.load() : true;
     if (needLog) {
         HILOGI("Process Event: %{public}s", ToString(event));
     }
@@ -62,12 +65,16 @@ int BluetoothSwitchModule::ProcessBluetoothSwitchEvent(
             return ProcessDisableBluetoothEvent(callingName, isAsync);
         case BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_RESTRICE_MODE:
             return ProcessEnableBluetoothToRestrictModeEvent(callingName);
+        case BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_BLE_OWNER_ONLY:
+            return ProcessEnableBluetoothToBleOwnerOnlyEvent(callingName);
         case BluetoothSwitchEvent::BLUETOOTH_ON:
             return ProcessBluetoothOnEvent();
         case BluetoothSwitchEvent::BLUETOOTH_OFF:
             return ProcessBluetoothOffEvent();
         case BluetoothSwitchEvent::BLUETOOTH_HALF:
             return ProcessBluetoothHalfEvent();
+        case BluetoothSwitchEvent::BLUETOOTH_BLE_OWNER_ONLY:
+            return ProcessBluetoothBleOwnerOnlyEvent();
         default: break;
     }
     HILOGI("Invalid event: %{public}s", ToString(event));
@@ -170,6 +177,18 @@ int BluetoothSwitchModule::ProcessEnableBluetoothToRestrictModeEvent(const std::
         cachedEvent);
 }
 
+int BluetoothSwitchModule::ProcessEnableBluetoothToBleOwnerOnlyEvent(const std::string &callingName)
+{
+    BluetoothSwitchCacheEvent cachedEvent = {
+        .event = BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_BLE_OWNER_ONLY,
+        .callingName = callingName,
+    };
+
+    return ProcessBluetoothSwitchAction(
+        [this, callingName]() { return switchAction_->EnableBluetoothToBleOwnerOnlyMode(callingName); },
+        cachedEvent);
+}
+
 int BluetoothSwitchModule::ProcessBluetoothOnEvent(void)
 {
     return ProcessBluetoothSwitchActionEnd(
@@ -177,11 +196,19 @@ int BluetoothSwitchModule::ProcessBluetoothOnEvent(void)
         {BluetoothSwitchEvent::DISABLE_BLUETOOTH});
 }
 
+int BluetoothSwitchModule::ProcessBluetoothBleOwnerOnlyEvent(void)
+{
+    return ProcessBluetoothSwitchActionEnd(
+        BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_BLE_OWNER_ONLY,
+        {BluetoothSwitchEvent::ENABLE_BLUETOOTH, BluetoothSwitchEvent::DISABLE_BLUETOOTH});
+}
+
 int BluetoothSwitchModule::ProcessBluetoothOffEvent(void)
 {
     return ProcessBluetoothSwitchActionEnd(
         BluetoothSwitchEvent::DISABLE_BLUETOOTH,
-        {BluetoothSwitchEvent::ENABLE_BLUETOOTH, BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_RESTRICE_MODE});
+        {BluetoothSwitchEvent::ENABLE_BLUETOOTH, BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_RESTRICE_MODE,
+            BluetoothSwitchEvent::ENABLE_BLUETOOTH_TO_BLE_OWNER_ONLY});
 }
 
 int BluetoothSwitchModule::ProcessBluetoothHalfEvent(void)

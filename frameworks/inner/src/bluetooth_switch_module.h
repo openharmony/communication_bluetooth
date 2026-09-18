@@ -34,6 +34,7 @@ public:
     virtual int EnableBluetooth(bool, std::string, bool) = 0;
     virtual int DisableBluetooth(std::string, bool) = 0;
     virtual int EnableBluetoothToRestrictMode(std::string) = 0;
+    virtual int EnableBluetoothToBleOwnerOnlyMode(std::string) = 0;
 };
 
 enum class BluetoothSwitchEvent : int {
@@ -41,9 +42,11 @@ enum class BluetoothSwitchEvent : int {
     ENABLE_BLUETOOTH = 0,
     DISABLE_BLUETOOTH,
     ENABLE_BLUETOOTH_TO_RESTRICE_MODE,
+    ENABLE_BLUETOOTH_TO_BLE_OWNER_ONLY,
     BLUETOOTH_ON,
     BLUETOOTH_OFF,
     BLUETOOTH_HALF,
+    BLUETOOTH_BLE_OWNER_ONLY,
 };
 
 struct BluetoothSwitchCacheEvent {
@@ -64,9 +67,11 @@ private:
     int ProcessEnableBluetoothEvent(const std::string &callingName, bool isAsync);
     int ProcessDisableBluetoothEvent(const std::string &callingName, bool isAsync);
     int ProcessEnableBluetoothToRestrictModeEvent(const std::string &callingName);
+    int ProcessEnableBluetoothToBleOwnerOnlyEvent(const std::string &callingName);
     int ProcessBluetoothOnEvent(void);
     int ProcessBluetoothOffEvent(void);
     int ProcessBluetoothHalfEvent(void);
+    int ProcessBluetoothBleOwnerOnlyEvent(void);
     int ProcessBluetoothSwitchAction(std::function<int(void)> action, BluetoothSwitchCacheEvent cachedEvent);
     int ProcessBluetoothSwitchCachedEvent(BluetoothSwitchEvent event, const std::string &callingName);
     int ProcessBluetoothSwitchActionEnd(

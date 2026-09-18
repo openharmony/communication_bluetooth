@@ -37,6 +37,7 @@
 #include "interface_adapter_ble.h"
 #include "interface_adapter_classic.h"
 #include <memory>
+#include <set>
 
 namespace OHOS {
 namespace bluetooth {
@@ -258,6 +259,47 @@ public:
      * @since 12
      */
     virtual int32_t EnableBluetoothToRestrictMode(std::string callingName, bool isUserTriggered) = 0;
+
+    /**
+     * @brief Enable bluetooth to BLE-owner-only mode: both stacks are enabled
+     * underneath, but BLE is visible/usable only by registered owner pids and
+     * BR functions are refused for everyone.
+     *
+     * @param pid Calling pid, registered as an owner (multiple owners supported).
+     * @param callingName Indicate the calling application.
+     * @return int32_t
+     */
+    virtual int32_t EnableBluetoothToBleOwnerOnlyMode(
+        int32_t pid, std::string callingName, bool isUserTriggered) = 0;
+
+    /**
+     * @brief Upgrade from BLE-owner-only mode to full-on state (stacks stay up).
+     *
+     * @param callingName Indicate calling application
+     * @return int32_t
+     */
+    virtual int32_t EnableBluetoothFromBleOwnerOnlyMode(std::string callingName) const = 0;
+
+    /**
+     * @brief Whether the bluetooth switch is in BLE-owner-only mode.
+     */
+    virtual bool IsBleOwnerOnlyMode() const = 0;
+
+    /**
+     * @brief Whether the caller pid can use BLE functions (owner set only,
+     * system apps are NOT exempted).
+     */
+    virtual bool IsBleAccessible(int32_t pid) const = 0;
+
+    /**
+     * @brief Whether BR functions (discovery/pairing/connection) are allowed.
+     */
+    virtual bool IsBrAllowed() const = 0;
+
+    /**
+     * @brief Get the registered owner pid set of BLE-owner-only mode.
+     */
+    virtual std::set<int32_t> GetOwnerPids() const = 0;
 
     /**
      * @brief Disable bluetooth service.

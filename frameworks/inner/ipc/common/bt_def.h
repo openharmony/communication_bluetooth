@@ -1962,12 +1962,14 @@ enum BluetoothSwitchState {
     STATE_ON,
     STATE_OFF,
     STATE_HALF,
+    STATE_BLE_OWNER_ONLY,  // both stacks on; BLE visible/usable only by registered owner pids
 };
 
 enum BluetoothTransferredSwitchAction {
     TRANS_ACTION_ENABLE_BLUETOOTH = 0,
     TRANS_ACTION_DISABLE_BLUETOOTH,
     TRANS_ACTION_ENABLE_BLUETOOTH_TO_RESTRICT_MODE,
+    TRANS_ACTION_ENABLE_BLUETOOTH_TO_BLE_OWNER_ONLY,
 };
 
 enum ControlType {

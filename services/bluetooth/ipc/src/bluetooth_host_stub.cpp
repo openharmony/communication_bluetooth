@@ -162,6 +162,8 @@ const std::map<uint32_t, BluetoothHostStub::BluetoothHostStubFuncPerm> Bluetooth
         CHECK_PERM(true, {}, {ACCESS_BLUETOOTH}))},
     {STUB_FUNC(BT_ENABLE_BLUETOOTH_TO_RESTRICT_MODE, EnableBluetoothToRestrictModeInner,
         CHECK_PERM(false, {}, {ACCESS_BLUETOOTH}))},
+    {STUB_FUNC(BT_ENABLE_BLUETOOTH_TO_BLE_OWNER_ONLY_MODE, EnableBluetoothToBleOwnerOnlyModeInner,
+        CHECK_PERM(false, {}, {ACCESS_BLUETOOTH}))},
     {STUB_FUNC(CTRL_DEVICE_ACTION, ControlDeviceActionInner,
         CHECK_PERM(true, {}, MULTI_PERM(ACCESS_BLUETOOTH, MANAGE_BLUETOOTH)))},
     {STUB_FUNC(GET_CONNECTION_TIME, GetLastConnectionTimeInner, nullptr)},
@@ -1566,6 +1568,17 @@ int32_t BluetoothHostStub::EnableBluetoothToRestrictModeInner(MessageParcel &dat
 {
     std::string callingName = data.ReadString();
     int32_t result = EnableBluetoothToRestrictMode(callingName);
+    result = reply.WriteInt32(result);
+    if (result != BT_NO_ERROR) {
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    return BT_NO_ERROR;
+}
+
+int32_t BluetoothHostStub::EnableBluetoothToBleOwnerOnlyModeInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::string callingName = data.ReadString();
+    int32_t result = EnableBluetoothToBleOwnerOnlyMode(callingName);
     result = reply.WriteInt32(result);
     if (result != BT_NO_ERROR) {
         return BT_ERR_IPC_TRANS_FAILED;

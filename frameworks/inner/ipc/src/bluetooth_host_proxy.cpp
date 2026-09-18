@@ -1895,6 +1895,22 @@ int32_t BluetoothHostProxy::EnableBluetoothToRestrictMode(const std::string &cal
     return reply.ReadInt32();
 }
 
+int32_t BluetoothHostProxy::EnableBluetoothToBleOwnerOnlyMode(const std::string &callingName)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()), BT_ERR_IPC_TRANS_FAILED,
+        "WriteInterfaceToken error");
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    if (!data.WriteString(callingName)) {
+        return BT_ERR_IPC_TRANS_FAILED;
+    }
+    int32_t error = InnerTransact(
+        BluetoothHostInterfaceCode::BT_ENABLE_BLUETOOTH_TO_BLE_OWNER_ONLY_MODE, option, data, reply);
+    CHECK_AND_RETURN_LOG_RET((error == BT_NO_ERROR), BT_ERR_INTERNAL_ERROR, "error: %{public}d", error);
+    return reply.ReadInt32();
+}
+
 int32_t BluetoothHostProxy::ControlDeviceAction(const std::string &deviceId, uint32_t controlType,
     uint32_t controlTypeVal, uint32_t controlObject)
 {

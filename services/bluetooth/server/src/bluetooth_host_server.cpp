@@ -22,6 +22,8 @@
 #include "hisysevent.h"
 #include "system_ability_definition.h"
 
+#include <set>
+
 #include "adapter_device_config.h"
 #include "bt_chr_dft_exception.h"
 #include "bt_chr_ue_manager.h"
@@ -176,6 +178,11 @@ struct BluetoothHostServer::impl {
     sptr<FusionConnectivityObserverDeathRecipient> fusionConnectivityObserverDeathRecipient_ = nullptr;
     sptr<IBluetoothHostObserver> fusionConnectivityObserver_ = nullptr;
 #endif  // FUSION_CONNECTIVITY_SUPPORTED
+
+    /// BLE-owner-only mode: server-side cache of the owner pid set,
+    /// kept in sync with BluetoothSwitchStateMachine (state machine wins)
+    std::mutex ownerPidCacheMutex_ {};
+    std::set<int32_t> ownerPidCache_ {};
 
 private:
     void createServers();
@@ -1439,6 +1446,16 @@ int32_t BluetoothHostServer::GetBtState(int32_t &state)
     if (IAdapterManager::GetInstance()->IsBluetoothRestricted()) {
         brState = IAdapterManager::GetInstance()->GetRestrictedState(bluetooth::BTTransport::ADAPTER_BREDR);
         bleState = IAdapterManager::GetInstance()->GetRestrictedState(bluetooth::BTTransport::ADAPTER_BLE);
+    } else if (IAdapterManager::GetInstance()->IsBleOwnerOnlyMode()) {
+        // strict owner-only visibility: BR is never usable; BLE is visible
+        // only to owner pids (system apps are NOT exempted). Reconcile the
+        // server-side cache with the state machine on this path.
+        RefreshOwnerPidCache();
+        brState = BTStateID::STATE_TURN_OFF;
+        bleState = IAdapterManager::GetInstance()->GetState(bluetooth::BTTransport::ADAPTER_BLE);
+        if (bleState == BTStateID::STATE_TURN_ON && !IsOwnerPidCached(IPCSkeleton::GetCallingPid())) {
+            bleState = BTStateID::STATE_TURN_OFF;
+        }
     } else {
         brState = IAdapterManager::GetInstance()->GetState(bluetooth::BTTransport::ADAPTER_BREDR);
         bleState = IAdapterManager::GetInstance()->GetState(bluetooth::BTTransport::ADAPTER_BLE);
@@ -1569,6 +1586,15 @@ int32_t BluetoothHostServer::EnableBle(bool noAutoConnect, bool isAsync, const s
     // If is in restricted mode, just change to br on.
     if (IAdapterManager::GetInstance()->IsBluetoothRestricted()) {
         return IAdapterManager::GetInstance()->EnablebluetoothFromRestricted(realCallingName, isAsync, true);
+    }
+    // If is in BLE-owner-only mode, upgrade to full-on; both stacks are already
+    // up and switch interfaces are not owner-restricted.
+    if (IAdapterManager::GetInstance()->IsBleOwnerOnlyMode()) {
+        int32_t ret = IAdapterManager::GetInstance()->EnableBluetoothFromBleOwnerOnlyMode(realCallingName);
+        if (ret == BT_NO_ERROR) {
+            RefreshOwnerPidCache();
+        }
+        return ret;
     }
 
     return IAdapterManager::GetInstance()->Enable(BTTransport::ADAPTER_BLE, isAsync, realCallingName, true);
@@ -2579,6 +2605,53 @@ void BluetoothHostServer::DeregisterBtResourceManagerObserver(const sptr<IBlueto
     }
     pimpl->resourceMgrObservers_.Deregister(observer);
     pimpl->resourceMgrAppContainer_->RemoveRemoteObject(observer->AsObject());
+}
+
+void BluetoothHostServer::RefreshOwnerPidCache()
+{
+    auto ownerPids = IAdapterManager::GetInstance()->GetOwnerPids();
+    std::lock_guard<std::mutex> lock(pimpl->ownerPidCacheMutex_);
+    pimpl->ownerPidCache_ = std::move(ownerPids);
+}
+
+bool BluetoothHostServer::IsOwnerPidCached(int32_t pid)
+{
+    std::lock_guard<std::mutex> lock(pimpl->ownerPidCacheMutex_);
+    return pimpl->ownerPidCache_.find(pid) != pimpl->ownerPidCache_.end();
+}
+
+int32_t BluetoothHostServer::EnableBluetoothToBleOwnerOnlyMode(const std::string &callingName)
+{
+    // bluetooth switch action may has been transferred to fusion connectivity
+    std::string realCallingName = (callingName == "" ? PermissionManager::GetCallingName() : callingName);
+    int32_t callingPid = IPCSkeleton::GetCallingPid();
+#ifdef FUSION_CONNECTIVITY_SUPPORTED
+    do {
+        if (!IsBluetoothSwitchAllowed()) {
+            std::lock_guard<std::mutex> lock(pimpl->fusionConnectivityObserverMutex_);
+            if (!pimpl->fusionConnectivityObserver_) {
+                HILOGW("fusionConnectivityObserver_ is nullptr, Attempt enable bluetooth directly");
+                break;
+            }
+            pimpl->fusionConnectivityObserver_->OnBluetoothSwitchAction(
+                TRANS_ACTION_ENABLE_BLUETOOTH_TO_BLE_OWNER_ONLY, realCallingName);
+            HILOGI("%{public}s enable bluetooth to ble owner only mode is transferred", realCallingName.c_str());
+            return BT_ERR_SWITCH_OP_TRANSFERRED;
+        }
+    } while (0);
+#endif
+
+    HILOGI("enable bluetooth to ble owner only mode, calling by (%{public}s), pid(%{public}d)",
+        realCallingName.c_str(), callingPid);
+    auto adapterManager = IAdapterManager::GetInstance();
+    if (adapterManager == nullptr) {
+        return BT_ERR_INTERNAL_ERROR;
+    }
+    int32_t ret = adapterManager->EnableBluetoothToBleOwnerOnlyMode(callingPid, realCallingName, true);
+    if (ret == BT_NO_ERROR) {
+        RefreshOwnerPidCache();
+    }
+    return ret;
 }
 
 int32_t BluetoothHostServer::EnableBluetoothToRestrictMode(const std::string &callingName)
