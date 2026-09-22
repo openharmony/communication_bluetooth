@@ -43,6 +43,15 @@ constexpr int OOB_C_SIZE = 16; // size of confirmationHash of OobData
 constexpr int OOB_R_SIZE = 16; // size of randomizerHash of OobData
 constexpr int OOB_NAME_MAX_SIZE = 256; // size limit of deviceName of OobData
 constexpr int ADDRESS_BYTE_LEN = 6;
+// Service-side PBAP business states reported by PbapPceServiceImpl.
+constexpr int PBAP_BUSINESS_STATE_DOWNLOADING = 4;
+constexpr int PBAP_BUSINESS_STATE_DOWNLOADED = 5;
+constexpr int PBAP_BUSINESS_STATE_DOWNLOAD_ERROR = 6;
+// JS API PhoneBookSyncStateType values.
+constexpr int PHONEBOOK_STATE_IDLE = 0;
+constexpr int PHONEBOOK_STATE_DOWNLOADING = 1;
+constexpr int PHONEBOOK_STATE_DOWNLOADED = 2;
+constexpr int PHONEBOOK_STATE_DOWNLOAD_ERROR = 3;
 
 napi_value GetCallbackErrorValue(napi_env env, int errCode, const std::string &errMsg)
 {
@@ -394,6 +403,23 @@ int GetProfileConnectionState(int state)
             break;
     }
     return profileConnectionState;
+}
+
+int GetProfilePhoneBookSyncState(int state)
+{
+    // Map service-side PBAP business state to JS API PhoneBookSyncStateType
+    // Connection only states are not sync sub-states; the connection state is
+    // exposed via getConnectionState() inherited from BaseProfile.
+    switch (state) {
+        case PBAP_BUSINESS_STATE_DOWNLOADING:
+            return PHONEBOOK_STATE_DOWNLOADING;
+        case PBAP_BUSINESS_STATE_DOWNLOADED:
+            return PHONEBOOK_STATE_DOWNLOADED;
+        case PBAP_BUSINESS_STATE_DOWNLOAD_ERROR:
+            return PHONEBOOK_STATE_DOWNLOAD_ERROR;
+        default:
+            return PHONEBOOK_STATE_IDLE;
+    }
 }
 
 uint32_t GetProfileId(int profile)

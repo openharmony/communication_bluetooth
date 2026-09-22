@@ -19,4 +19,5 @@ declare_args() {
   bluetooth_hap_opp_switch_feature = true
   bluetooth_hfp_hf_feature_switch = false
   bluetooth_a2dp_sink_feature_switch = false
+  bluetooth_pbap_pce_feature = false
 }

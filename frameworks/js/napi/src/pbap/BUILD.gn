@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/communication/bluetooth/bluetooth.gni")
 
 BT_PART_DIR = "../../../../.."
 BT_NAPI_DIR = "$BT_PART_DIR/frameworks/js/napi"
@@ -64,6 +65,14 @@ ohos_shared_library("pbap") {
     "napi_bluetooth_pbap_pse_observer.cpp",
     "native_module_pbap.cpp",
   ]
+
+  if (bluetooth_pbap_pce_feature) {
+    defines += [ "BLUETOOTH_PBAP_PCE_FEATURE_ENABLE" ]
+    sources += [
+      "napi_bluetooth_pbap_pce.cpp",
+      "napi_bluetooth_pbap_pce_observer.cpp",
+    ]
+  }
 
   deps = [
     "$BT_PART_DIR/frameworks/inner:btframework",

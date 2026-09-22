@@ -40,7 +40,11 @@ void NapiHandsFreeUnit::DefineHandsFreeUnitJSClass(napi_env env, napi_value expo
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
+#ifdef BLUETOOTH_API_SINCE_10
+        DECLARE_NAPI_FUNCTION("getConnectedDevices", GetConnectionDevices),
+#else
         DECLARE_NAPI_FUNCTION("getConnectionDevices", GetConnectionDevices),
+#endif
 #ifdef BLUETOOTH_API_SINCE_10
         DECLARE_NAPI_FUNCTION("getConnectionState", GetDeviceState),
 #else

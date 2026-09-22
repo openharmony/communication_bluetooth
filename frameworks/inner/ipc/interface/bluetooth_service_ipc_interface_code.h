@@ -466,8 +466,7 @@ enum class BluetoothPanInterfaceCode {
 
 enum BluetoothPbapPceObserverInterfaceCode {
     PBAP_PCE_ON_SERVICE_CONNECTION_STATE_CHANGED = 0,
-    PBAP_PCE_ON_SERVICE_PASSWORD_REQUIRED,
-    PBAP_PCE_ON_ACTION_COMPLETED,
+    PBAP_PCE_ON_SYNC_STATE_CHANGE,
     // The last code, if you want to add a new code, please add it before this
     PBAP_PCE_OBSERVER_BUTT
 };
@@ -488,6 +487,7 @@ enum BluetoothPbapPceInterfaceCode {
     PBAP_PCE_GET_DEVICES_BY_STATE,
     PBAP_PCE_REGISTER_OBSERVER,
     PBAP_PCE_DEREGISTER_OBSERVER,
+    PBAP_PCE_GET_PHONEBOOK_STATE,
     // The last code, if you want to add a new code, please add it before this
     PBAP_PCE_BUTT
 };

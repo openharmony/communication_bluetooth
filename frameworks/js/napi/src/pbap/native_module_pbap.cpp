@@ -17,8 +17,11 @@
 #endif
 
 #include "bluetooth_log.h"
-#include "napi_bluetooth_pbap_pse.h"
 #include "hitrace_meter.h"
+#ifdef BLUETOOTH_PBAP_PCE_FEATURE_ENABLE
+#include "napi_bluetooth_pbap_pce.h"
+#endif
+#include "napi_bluetooth_pbap_pse.h"
 
 namespace OHOS {
 namespace Bluetooth {
@@ -35,6 +38,9 @@ static napi_value Init(napi_env env, napi_value exports)
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 
     NapiPbapServer::DefinePbapServerJSClass(env, exports);
+#ifdef BLUETOOTH_PBAP_PCE_FEATURE_ENABLE
+    NapiPbapClient::DefinePbapClientJSClass(env, exports);
+#endif
 
     HILOGI("-----Pbap Init end------");
     return exports;

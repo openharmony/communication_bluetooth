@@ -152,6 +152,7 @@ napi_value NapiGetUndefinedRet(napi_env env);
 napi_value NapiGetInt32Ret(napi_env env, int32_t res);
 
 int GetProfileConnectionState(int state);
+int GetProfilePhoneBookSyncState(int state);
 int GetScoConnectionState(int state);
 uint32_t GetProfileId(int profile);
 

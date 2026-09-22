@@ -283,6 +283,22 @@ napi_value NapiNativeStateChangeParam::ToNapiValue(napi_env env) const
     return result;
 }
 
+napi_value NapiNativeSyncStateChangeParam::ToNapiValue(napi_env env) const
+{
+    napi_value result = nullptr;
+    napi_create_object(env, &result);
+
+    napi_value deviceId = nullptr;
+    napi_create_string_utf8(env, deviceAddr_.c_str(), NAPI_AUTO_LENGTH, &deviceId);
+    napi_set_named_property(env, result, "deviceId", deviceId);
+
+    napi_value state = nullptr;
+    napi_create_int32(env, GetProfilePhoneBookSyncState(syncState_), &state);
+    napi_set_named_property(env, result, "state", state);
+
+    return result;
+}
+
 napi_value NapiNativeOppTransferInformation::ToNapiValue(napi_env env) const
 {
     napi_value result = nullptr;
