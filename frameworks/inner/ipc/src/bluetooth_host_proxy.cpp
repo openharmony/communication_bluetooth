@@ -2359,7 +2359,7 @@ int32_t BluetoothHostProxy::GetBleMacByBrMac(const std::string &brMac, std::stri
     }
     int32_t exception = reply.ReadInt32();
     if (exception == BT_NO_ERROR) {
-        bleAddr = reply.ReadString();
+        bleMac = reply.ReadString();
     }
     return exception;
 }
