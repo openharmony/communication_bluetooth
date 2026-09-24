@@ -173,6 +173,7 @@ public:
     virtual int32_t UpdateSecondaryPhonePairMode(int32_t mode) = 0;
     virtual int32_t SetBtChannelScan(bool isEnable, uint32_t interval) = 0;
     virtual int32_t GetBrAddressByBleAddress(const std::string &bleAddr, std::string &brAddr) = 0;
+    virtual int32_t GetBleMacByBrMac(const std::string &brMac, std::string &bleMac) = 0;
 };
 }  // namespace Bluetooth
 }  // namespace OHOS

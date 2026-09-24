@@ -1044,6 +1044,17 @@ public:
      * @since 26
      */
     int GetBrAddressByBleAddress(const std::string &bleAddr, std::string &brAddr);
+
+    /**
+     * @brief Obtains the real BLE address of a paired remote device based on its real BR address.
+     *
+     * @param brMac BR/EDR address of the device.
+     * @param[out] bleMac BLE address of the device.
+     * @return Returns {@link BT_NO_ERROR} if the operation is successfully;
+     *         returns an error code defined in {@link BtErrCode} otherwise.
+     * @since 26
+     */
+    int GetBleMacByBrMac(const std::string &brMac, std::string &bleMac);
 private:
     /**
      * @brief A constructor used to create a <b>BluetoothHost</b> instance.

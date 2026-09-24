@@ -2342,5 +2342,26 @@ int32_t BluetoothHostProxy::GetBrAddressByBleAddress(const std::string &bleAddr,
     }
     return exception;
 }
+
+int32_t BluetoothHostProxy::GetBleMacByBrMac(const std::string &brMac, std::string &bleMac)
+{
+    MessageParcel data;
+    CHECK_AND_RETURN_LOG_RET(data.WriteInterfaceToken(BluetoothHostProxy::GetDescriptor()),
+        BT_ERR_IPC_TRANS_FAILED, "WriteInterfaceToken error");
+    CHECK_AND_RETURN_LOG_RET(data.WriteString(brMac), BT_ERR_IPC_TRANS_FAILED, "Write brMac error");
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    int32_t error = InnerTransact(BluetoothHostInterfaceCode::GET_BLE_MAC_BY_BR_MAC, option, data, reply);
+    if (error != BT_NO_ERROR) {
+        HILOGE("fail, error: %{public}d", error);
+        return error;
+    }
+    int32_t exception = reply.ReadInt32();
+    if (exception == BT_NO_ERROR) {
+        bleAddr = reply.ReadString();
+    }
+    return exception;
+}
 }  // namespace Bluetooth
 }  // namespace OHOS

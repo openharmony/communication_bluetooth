@@ -87,6 +87,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setCarKeyDfxData", SetCarKeyCardData),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceTransport", GetRemoteDeviceTransport),
         DECLARE_NAPI_FUNCTION("getVirtualAddressByHash", GetVirtualAddressByHash),
+        DECLARE_NAPI_FUNCTION("GetBleMacByBrMac", GetBleMacByBrMac),
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
@@ -324,6 +325,32 @@ napi_value GetVirtualAddressByHash(napi_env env, napi_callback_info info)
     NAPI_BT_ASSERT_ERR_NUM_RETURN(env, err == BT_NO_ERROR, err);
     napi_value result = nullptr;
     napi_create_string_utf8(env, virtualAddress.c_str(), virtualAddress.size(), &result);
+    return result;
+}
+
+napi_status CheckGetBleMacByBrMacParam(napi_env env, napi_callback_info info, std::string &brMac)
+{
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = {nullptr};
+    NAPI_BT_CALL_RETURN(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+    NAPI_BT_RETURN_IF(argc != ARGS_SIZE_ONE, "Requires 1 argument.", napi_invalid_arg);
+    NAPI_BT_RETURN_IF(!ParseString(env, brMac, argv[PARAM0]), "ParseString failed", napi_invalid_arg);
+    return napi_ok;
+}
+
+napi_value GetBleMacByBrMac(napi_env env, napi_callback_info info)
+{
+    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
+        "connection.GetBleMacByBrMac");
+    std::string brMac;
+    std::string bleMac;
+    auto status = CheckGetBleMacByBrMacParam(env, info, brMac);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    BluetoothHost *host = &BluetoothHost::GetDefaultHost();
+    int32_t err = host->GetBleMacByBrMac(brMac, bleMac);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, err == BT_NO_ERROR, err);
+    napi_value result = nullptr;
+    napi_create_string_utf8(env, bleMac.c_str(), bleMac.size(), &result);
     return result;
 }
 
