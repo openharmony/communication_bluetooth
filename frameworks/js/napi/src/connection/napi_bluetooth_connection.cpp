@@ -341,8 +341,8 @@ napi_status CheckGetBleMacByBrMacParam(napi_env env, napi_callback_info info, st
 napi_value GetBleMacByBrMac(napi_env env, napi_callback_info info)
 {
     std::vector<int32_t> validErrCodes = {
-        BT_ERR_PERMISSION_FAILED,BT_ERR_SYSTEM_PERMISSION_FAILED,BT_ERR_INVALID_PARAM,
-        BT_ERR_API_NOT_SUPPORT,BT_ERR_INVALID_STATE, BT_ERR_UNPAIRED_DEVICE,
+        BT_ERR_PERMISSION_FAILED, BT_ERR_SYSTEM_PERMISSION_FAILED, BT_ERR_INVALID_PARAM,
+        BT_ERR_API_NOT_SUPPORT, BT_ERR_INVALID_STATE, BT_ERR_UNPAIRED_DEVICE,
         BT_ERR_INTERNAL_ERROR, BT_ERR_NO_BLE_ASSOCIATION
     };
     NAPI_BT_CONTEXT(env, "connection.GetBleMacByBrMac", validErrCodes);
