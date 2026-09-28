@@ -340,15 +340,19 @@ napi_status CheckGetBleMacByBrMacParam(napi_env env, napi_callback_info info, st
 
 napi_value GetBleMacByBrMac(napi_env env, napi_callback_info info)
 {
-    std::shared_ptr<NapiHaEventUtils> haUtils = std::make_shared<NapiHaEventUtils>(env,
-        "connection.GetBleMacByBrMac");
+    std::vector<int32_t> validErrCodes = {
+        BT_ERR_PERMISSION_FAILED,BT_ERR_SYSTEM_PERMISSION_FAILED,BT_ERR_INVALID_PARAM,
+        BT_ERR_API_NOT_SUPPORT,BT_ERR_INVALID_STATE, BT_ERR_UNPAIRED_DEVICE,
+        BT_ERR_INTERNAL_ERROR, BT_ERR_NO_BLE_ASSOCIATION
+    };
+    NAPI_BT_CONTEXT(env, "connection.GetBleMacByBrMac", validErrCodes);
     std::string brMac;
     std::string bleMac;
     auto status = CheckGetBleMacByBrMacParam(env, info, brMac);
-    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, status == napi_ok, BT_ERR_INVALID_PARAM);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, status == napi_ok, BT_ERR_INVALID_PARAM);
     BluetoothHost *host = &BluetoothHost::GetDefaultHost();
     int32_t err = host->GetBleMacByBrMac(brMac, bleMac);
-    NAPI_BT_ASSERT_ERR_NUM_RETURN(env, err == BT_NO_ERROR, err);
+    NAPI_BT_ASSERT_ERR_NUM_RETURN_VERIFY(env, err == BT_NO_ERROR, err);
     napi_value result = nullptr;
     napi_create_string_utf8(env, bleMac.c_str(), bleMac.size(), &result);
     return result;
