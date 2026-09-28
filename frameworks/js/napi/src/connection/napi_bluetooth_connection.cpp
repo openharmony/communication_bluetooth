@@ -87,7 +87,7 @@ napi_value DefineConnectionFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setCarKeyDfxData", SetCarKeyCardData),
         DECLARE_NAPI_FUNCTION("getRemoteDeviceTransport", GetRemoteDeviceTransport),
         DECLARE_NAPI_FUNCTION("getVirtualAddressByHash", GetVirtualAddressByHash),
-        DECLARE_NAPI_FUNCTION("GetBleMacByBrMac", GetBleMacByBrMac),
+        DECLARE_NAPI_FUNCTION("getBleMacByBrMac", GetBleMacByBrMac),
     };
     HITRACE_METER_NAME(HITRACE_TAG_OHOS, "connection:napi_define_properties");
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
