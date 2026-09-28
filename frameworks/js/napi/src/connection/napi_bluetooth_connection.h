@@ -115,6 +115,7 @@ napi_value SetRemoteDeviceType(napi_env env, napi_callback_info info);
 napi_value GetRemoteDeviceType(napi_env env, napi_callback_info info);
 napi_value GetRemoteDeviceBatteryInfo(napi_env env, napi_callback_info info);
 napi_value GetVirtualAddressByHash(napi_env env, napi_callback_info info);
+napi_value GetBleMacByBrMac(napi_env env, napi_callback_info info);
 
 napi_value ConnectionPropertyValueInit(napi_env env, napi_value exports);
 napi_value ScanModeInit(napi_env env);

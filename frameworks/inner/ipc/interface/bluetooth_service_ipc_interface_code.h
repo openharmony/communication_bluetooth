@@ -352,6 +352,7 @@ enum BluetoothHostInterfaceCode {
     BT_UPDATE_PHONE_TYPE,
     SET_BT_CHANNEL_SCAN,
     GET_BR_ADDRESS_BY_BLE_ADDRESS,
+    GET_BLE_MAC_BY_BR_MAC,
     // The last code, if you want to add a new code, please add it before this
     BT_HOST_BUTT
 };
